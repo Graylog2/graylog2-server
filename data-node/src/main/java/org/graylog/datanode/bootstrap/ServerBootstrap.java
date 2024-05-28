@@ -28,13 +28,13 @@ import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.DatanodeConfigurationBindings;
 import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
+import org.graylog.datanode.bindings.OpensearchProcessBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
-import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.Tools;
@@ -97,8 +97,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Override
-    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
-        super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
+    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, Configuration configuration) {
+        super.beforeStart(tlsProtocolsConfiguration, configuration);
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
@@ -109,8 +109,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         applySecuritySettings(tlsProtocolsConfiguration);
 
         // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults(pathConfiguration);
-
+        setNettyNativeDefaults(configuration);
     }
 
     @Override
@@ -175,10 +174,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 });
     }
 
-    private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
+    private void setNettyNativeDefaults(Configuration configuration) {
         // Give netty a better spot than /tmp to unpack its tcnative libraries
         if (System.getProperty("io.netty.native.workdir") == null) {
-            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
+            System.setProperty("io.netty.native.workdir", configuration.getNativeLibDir().toAbsolutePath().toString());
         }
         // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
         if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
@@ -270,6 +269,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new GenericBindings(isMigrationCommand()));
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
+        result.add(new OpensearchProcessBindings());
         result.add(new DatanodeConfigurationBindings());
 
         return result;

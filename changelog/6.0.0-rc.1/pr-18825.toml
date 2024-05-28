@@ -1,0 +1,5 @@
+type = "c"
+message = "Remote reindex migration in datanode now uses async opensearch tasks."
+
+pulls = ["18825"]
+issues=["Graylog2/graylog-plugin-enterprise#6844"]

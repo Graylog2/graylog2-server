@@ -1,0 +1,5 @@
+type = "f"
+message = "improve Remote Reindex Migration Indices display UX."
+
+pulls = ["18754"]
+issues=["Graylog2/graylog-plugin-enterprise#6844"]

@@ -82,7 +82,8 @@ export type BlockFieldDict = {
   optional: boolean,
   rule_builder_variable: boolean,
   allow_negatives: boolean,
-  description: string | null
+  description: string | null,
+  default_value?: unknown,
 }
 
 export type BlockDict = {

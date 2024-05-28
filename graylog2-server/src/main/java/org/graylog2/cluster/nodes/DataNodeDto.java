@@ -85,7 +85,8 @@ public abstract class DataNodeDto extends NodeDto {
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_DataNodeDto.Builder();
+            return new AutoValue_DataNodeDto.Builder()
+                    .setLeader(false); // TODO: completely remove the leader property from this DTO
         }
 
         @JsonProperty("cluster_address")

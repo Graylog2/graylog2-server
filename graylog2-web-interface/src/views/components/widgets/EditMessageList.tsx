@@ -44,7 +44,6 @@ const FullHeightRow = styled(Row)`
 
 const FullHeightCol = styled(Col)`
   height: 100%;
-  overflow: auto;
 `;
 
 const PreviewOptionCheckbox = styled(Checkbox)`

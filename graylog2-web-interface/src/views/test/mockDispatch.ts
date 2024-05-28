@@ -28,7 +28,9 @@ const defaultState = { view: { view: createSearch(), activeQuery: 'query-id-1' }
 const mockSearchExecutors: SearchExecutors = {
   resultMapper: (r) => r,
   parse: async () => SearchMetadata.empty(),
-  execute: async () => ({}) as SearchExecutionResult,
+  executeJobResult: async () => ({}) as SearchExecutionResult,
+  startJob: async () => ({ nodeId: 'dummyNodeIdForTesting', asyncSearchId: 'dummySearchIdForTesting' }),
+  cancelJob: async () => null,
 };
 
 type ActionFn = (d: AppDispatch, getState: () => RootState, extraArgs?: ExtraArguments) => UnknownAction;

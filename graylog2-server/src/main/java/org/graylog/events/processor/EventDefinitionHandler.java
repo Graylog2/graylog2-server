@@ -105,6 +105,7 @@ public class EventDefinitionHandler {
         var copy = eventDefinition.toBuilder()
                 .id(null)
                 .title("COPY-" + eventDefinition.title())
+                .remediationSteps(eventDefinition.remediationSteps())
                 .scope(DefaultEntityScope.NAME)
                 .state(EventDefinition.State.DISABLED)
                 .build();

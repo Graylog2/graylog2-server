@@ -20,7 +20,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -36,9 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -55,14 +54,16 @@ public class Beats2Codec extends AbstractCodec {
     private static final String CK_NO_BEATS_PREFIX = "no_beats_prefix";
 
     private final ObjectMapper objectMapper;
+    private final MessageFactory messageFactory;
     private final boolean noBeatsPrefix;
 
     @Inject
-    public Beats2Codec(@Assisted Configuration configuration, ObjectMapper objectMapper) {
+    public Beats2Codec(@Assisted Configuration configuration, ObjectMapper objectMapper, MessageFactory messageFactory) {
         super(configuration);
 
         this.noBeatsPrefix = configuration.getBoolean(CK_NO_BEATS_PREFIX, false);
         this.objectMapper = requireNonNull(objectMapper);
+        this.messageFactory = messageFactory;
     }
 
     @Nullable
@@ -104,7 +105,7 @@ public class Beats2Codec extends AbstractCodec {
 
         final String hostname = agentName.asText(BEATS_UNKNOWN);
 
-        final Message gelfMessage = new Message(message, hostname, timestamp);
+        final Message gelfMessage = messageFactory.createMessage(message, hostname, timestamp);
         gelfMessage.addField("beats_type", beatsType);
 
         // This field should be stored without a prefix

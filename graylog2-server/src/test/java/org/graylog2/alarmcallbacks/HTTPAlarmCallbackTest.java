@@ -26,8 +26,9 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.types.DummyAlertCondition;
-import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackException;
 import org.graylog2.plugin.configuration.Configuration;
@@ -70,6 +71,7 @@ public class HTTPAlarmCallbackTest {
     private UrlWhitelistService whitelistService;
 
     private MockWebServer server;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
@@ -124,8 +126,8 @@ public class HTTPAlarmCallbackTest {
                 "Alert Condition Title"
         );
         final List<MessageSummary> messageSummaries = ImmutableList.of(
-                new MessageSummary("graylog_1", new Message("Test message 1", "source1", new DateTime(2016, 9, 6, 17, 0, DateTimeZone.UTC))),
-                new MessageSummary("graylog_2", new Message("Test message 2", "source2", new DateTime(2016, 9, 6, 17, 0, DateTimeZone.UTC)))
+                new MessageSummary("graylog_1", messageFactory.createMessage("Test message 1", "source1", new DateTime(2016, 9, 6, 17, 0, DateTimeZone.UTC))),
+                new MessageSummary("graylog_2", messageFactory.createMessage("Test message 2", "source2", new DateTime(2016, 9, 6, 17, 0, DateTimeZone.UTC)))
         );
         final AlertCondition.CheckResult checkResult = new AbstractAlertCondition.CheckResult(
                 true,

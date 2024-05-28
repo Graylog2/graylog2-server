@@ -23,6 +23,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
@@ -35,7 +36,6 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
@@ -69,37 +69,6 @@ public class RemoteReindexingMigrationIT {
         this.openSearchInstance.close();
     }
 
-    @ContainerMatrixTest
-    void testRemoteReindexingSync() throws ExecutionException, RetryException {
-        final String indexName = createRandomIndex();
-        final String indexName2 = createRandomIndex();
-        final String messageContent = ingestRandomMessage(indexName);
-        final String messageContent2 = ingestRandomMessage(indexName2);
-
-        // flush the newly created document
-        openSearchInstance.client().refreshNode();
-
-        final String request = """
-                {
-                    "hostname": "%s",
-                    "indices": ["%s", "%s"],
-                    "synchronous": true
-                }
-                """.formatted(openSearchInstance.internalUri(), indexName, indexName2);
-
-
-        LOG.info("Requesting remote reindex: " + request);
-
-        final ValidatableResponse migrationResponse = apis.post("/remote-reindex-migration/remoteReindex", request, 200);
-
-        // one document migrated
-        migrationResponse.assertThat().body("indices", Matchers.hasSize(2));
-        migrationResponse.assertThat().body("indices[0].status", Matchers.equalTo("FINISHED"));
-        migrationResponse.assertThat().body("indices[1].status", Matchers.equalTo("FINISHED"));
-
-        Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
-        Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
-    }
 
     @ContainerMatrixTest
     void testRemoteAsyncReindexing() throws ExecutionException, RetryException {
@@ -115,15 +84,16 @@ public class RemoteReindexingMigrationIT {
 
         final String request = """
                 {
+                    "allowlist": "%s",
                     "hostname": "%s",
                     "indices": ["%s", "%s"],
                     "synchronous": false
                 }
-                """.formatted(openSearchInstance.internalUri(), indexName, indexName2);
+                """.formatted(allowlistValue(openSearchInstance.internalUri()), openSearchInstance.internalUri(), indexName, indexName2);
 
 
         final ValidatableResponse migrationResponse = apis.post("/remote-reindex-migration/remoteReindex", request, 200);
-        final String migrationID = migrationResponse.extract().body().jsonPath().get("id");
+        final String migrationID = migrationResponse.extract().body().asString();
 
         ValidatableResponse response = waitForMigrationFinished(migrationID);
 
@@ -132,6 +102,12 @@ public class RemoteReindexingMigrationIT {
 
         Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
         Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
+
+    }
+
+    @NotNull
+    private String allowlistValue(String indexerUri) {
+        return indexerUri.replace("http://", "");
 
     }
 

@@ -1,0 +1,5 @@
+type="f"
+message="Fixed user permission-based filtering on Event Definitions."
+
+issues=["19007"]
+pulls=["19262"]

@@ -16,13 +16,16 @@
  */
 package org.graylog2.indexer.datanode;
 
+import jakarta.ws.rs.core.MultivaluedMap;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 public interface ProxyRequestAdapter {
-    record ProxyRequest(String method, String path, InputStream body) {}
+    record ProxyRequest(String method, String path, InputStream body, String hostname,
+                        MultivaluedMap<String, String> queryParameters) {}
 
-    record ProxyResponse(int status, InputStream response) {}
+    record ProxyResponse(int status, InputStream response, String contentType) {}
 
     ProxyResponse request(ProxyRequest request) throws IOException;
 }

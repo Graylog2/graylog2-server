@@ -20,7 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { createSearch } from 'fixtures/searches';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
@@ -49,9 +49,7 @@ HighlightingRules.defaultProps = {
 };
 
 describe('HighlightingRules', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('renders search term legend even when rules are empty', async () => {
     render(<HighlightingRules />);

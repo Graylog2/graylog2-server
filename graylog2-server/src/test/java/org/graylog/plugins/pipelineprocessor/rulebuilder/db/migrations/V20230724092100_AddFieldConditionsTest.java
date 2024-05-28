@@ -58,15 +58,15 @@ import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.Period;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -78,14 +78,14 @@ import java.util.concurrent.Executors;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
-public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
+class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
 
     V20230724092100_AddFieldConditions migration;
+    private final MessageFactory messageFactory = new TestMessageFactory();
     @Mock
     private RuleFragmentService ruleFragmentService;
 
-    @BeforeClass
+    @BeforeAll
     @SuppressForbidden("Allow using default thread factory")
     public static void initialize() {
         final Map<String, Function<?>> functions = commonFunctions();
@@ -130,14 +130,14 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
         functionRegistry = new FunctionRegistry(functions);
     }
 
-    @Before
+    @BeforeEach
     public void initializeMigration() {
         migration = new V20230724092100_AddFieldConditions(ruleFragmentService);
     }
 
     @Test
-    public void testFieldBoolean() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldBoolean() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         message.addField("bool", true);
         final RuleFragment fragment = migration.createCheckFieldType("bool");
         Rule testRule = createFragmentSource(fragment, Map.of("field", "bool"));
@@ -159,8 +159,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldCollection() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldCollection() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldTypeNoConversion("collection");
 
         message.addField("list", List.of("a", "b", "c"));
@@ -173,8 +173,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldDouble() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldDouble() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldType("double");
 
         message.addField("double", 2.25);
@@ -193,8 +193,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldDate() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldDate() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckDateField();
 
         message.addField("date", Tools.nowUTC());
@@ -211,8 +211,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldList() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldList() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldTypeNoConversion("list");
 
         message.addField("list", List.of("a", "b", "c"));
@@ -225,8 +225,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldIp() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldIp() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldType("ip");
 
         message.addField("ip", new IpAddress(InetAddress.getLoopbackAddress()));
@@ -245,8 +245,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldLong() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldLong() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldType("long");
 
         message.addField("long", 1234L);
@@ -265,8 +265,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldMap() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldMap() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldType("map");
 
         message.addField("map", Map.of("a", "b"));
@@ -279,8 +279,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldNotNull() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldNotNull() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldTypeNoConversion("not_null");
 
         message.addField("notnull", "anything");
@@ -292,8 +292,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldNull() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldNull() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldTypeNoConversion("null");
 
         Rule testRule = createFragmentSource(fragment, Map.of("field", "null"));
@@ -305,8 +305,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldNumber() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldNumber() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldTypeNoConversion("number");
 
         message.addField("number", 1234);
@@ -319,8 +319,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldString() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldString() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldType("string");
 
         message.addField("string", "iamastring");
@@ -333,8 +333,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldPeriod() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldPeriod() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldTypeNoConversion("period");
 
         message.addField("period", Period.parse("P1M"));
@@ -347,8 +347,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldUrl() throws MalformedURLException {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldUrl() throws MalformedURLException {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCheckFieldType("url");
 
         message.addField("url", new URL("http://dummy.net"));
@@ -367,8 +367,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldCidr() throws MalformedURLException {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldCidr() throws MalformedURLException {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createCIDRMatchField();
 
         message.addField("ip", "192.168.1.42");
@@ -382,8 +382,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldContains() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldContains() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createStringContainsField();
 
         message.addField("string", "snickerdoodledoo");
@@ -398,8 +398,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldStartsWith() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldStartsWith() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createStringStartsWithField();
 
         message.addField("string", "snickerdoodledoo");
@@ -414,8 +414,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldEndsWith() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldEndsWith() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createStringEndsWithField();
 
         message.addField("string", "snickerdoodledoo");
@@ -430,8 +430,8 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     }
 
     @Test
-    public void testFieldGrokMatches() {
-        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+    void testFieldGrokMatches() {
+        Message message = messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC());
         final RuleFragment fragment = migration.createGrokMatchesField();
 
         message.addField("string", "string");

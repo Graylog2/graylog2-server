@@ -27,9 +27,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.security.certutil.CertConstants;
-import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -52,7 +50,6 @@ import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORIT
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class TruststoreCreatorTest {
 
@@ -69,8 +66,8 @@ public class TruststoreCreatorTest {
 
         assertTrue(truststore.location().toFile().exists());
 
-        KeystoreFileStorage keystoreFileStorage = new KeystoreFileStorage(mock(KeystoreContentMover.class));
-        final Optional<KeyStore> keyStoreOptional = keystoreFileStorage.readKeyStore(new KeystoreFileLocation(truststore.location()), truststore.password());
+        KeystoreFileStorage keystoreFileStorage = new KeystoreFileStorage();
+        final Optional<KeyStore> keyStoreOptional = keystoreFileStorage.readKeyStore(truststore.location(), truststore.password());
 
         assertTrue(keyStoreOptional.isPresent());
 

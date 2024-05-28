@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Search query input in event definition form removing its value while typing."
+
+issues = ["18700"]
+pulls = ["18742"]

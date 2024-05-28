@@ -21,11 +21,12 @@ import styled, { css } from 'styled-components';
 
 type Props = PropsWithChildren<{
   closeOnItemClick?: boolean,
+  keepMounted?: boolean,
+  offset?: MenuProps['offset'],
   onChange?: (isOpen: boolean) => void,
   onClose?: () => void,
   opened?: boolean,
   portalProps?: { target: HTMLElement },
-  keepMounted?: boolean,
   position?: MenuProps['position'],
   shadow?: MenuProps['shadow'],
   width?: number,
@@ -36,15 +37,16 @@ type Props = PropsWithChildren<{
 const Menu = ({
   children,
   closeOnItemClick,
+  keepMounted,
+  offset,
+  onChange,
   onClose,
+  opened,
+  portalProps,
+  position,
   shadow,
   width,
   withinPortal,
-  position,
-  opened,
-  onChange,
-  portalProps,
-  keepMounted,
   zIndex,
 }: Props) => (
   <MantineMenu closeOnItemClick={closeOnItemClick}
@@ -57,6 +59,7 @@ const Menu = ({
                position={position}
                withinPortal={withinPortal}
                keepMounted={keepMounted}
+               offset={offset}
                zIndex={zIndex}>
     {children}
   </MantineMenu>
@@ -85,8 +88,10 @@ const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
 Menu.Target = MantineMenu.Target;
 
 Menu.Dropdown = styled(MantineMenu.Dropdown)(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lighter.default};
+  && {
+    background-color: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.variant.lighter.default};
+  }
 `);
 
 Menu.Item = StyledMenuItem;
@@ -95,15 +100,16 @@ Menu.Label = StyledMenuLabel;
 
 Menu.defaultProps = {
   closeOnItemClick: true,
-  position: undefined,
+  keepMounted: undefined,
+  offset: undefined,
+  onChange: undefined,
+  onClose: undefined,
+  opened: undefined,
   portalProps: undefined,
+  position: undefined,
   shadow: undefined,
   width: undefined,
   withinPortal: false,
-  opened: undefined,
-  onChange: undefined,
-  onClose: undefined,
-  keepMounted: undefined,
   zIndex: undefined,
 };
 

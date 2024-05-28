@@ -56,6 +56,7 @@ const StyledDefList = styled.dl.attrs({
     dt {
       float: left;
     }
+
     dd {
       padding-left: ${theme.spacings.md};
       margin-left: 200px;

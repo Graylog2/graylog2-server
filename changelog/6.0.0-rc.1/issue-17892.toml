@@ -1,0 +1,11 @@
+type = "fixed"
+message = """
+Corrected parameter description for handle_dup_keys in the pipline rule key_value function.
+If not specified, the function defaults to using the first encountered value for duplicate keys.
+Fixed default values when using the rule builder.
+"""
+
+issues = ["17892"]
+pulls = ["17969"]
+
+

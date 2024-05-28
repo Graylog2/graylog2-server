@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
+import jakarta.inject.Inject;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -73,7 +74,6 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentT
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleTypes;
-import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidFieldAccess;
 import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidFunctionArgument;
 import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidOperation;
 import org.graylog.plugins.pipelineprocessor.parser.errors.MissingRequiredParam;
@@ -88,8 +88,6 @@ import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-
-import jakarta.inject.Inject;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -436,9 +434,6 @@ public class PipelineRuleParser {
             isIdIsFieldAccess.pop(); // reset for error checks
             final Expression object = exprs.get(ctx.fieldSet);
             final Expression field = exprs.get(ctx.field);
-            if (field instanceof ArrayLiteralExpression) {
-                parseContext.addError(new InvalidFieldAccess(ctx, field));
-            }
             final FieldAccessExpression expr = new FieldAccessExpression(ctx.getStart(), object, field);
             log.trace("FIELDACCESS: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);

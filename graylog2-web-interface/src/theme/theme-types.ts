@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ColorScheme, ThemeBaseColors } from '@graylog/sawmill';
-import type { DeepPartial } from 'utility-types';
+import type { ColorScheme, CustomColors } from '@graylog/sawmill';
 
-export type ThemesColors = Record<ColorScheme, DeepPartial<ThemeBaseColors>>
+export type CustomThemesColors = Record<ColorScheme, CustomColors>

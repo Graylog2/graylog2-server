@@ -1,0 +1,5 @@
+type = "fixed"
+message = "debounce Query Change in Alerts & Events"
+
+issues = ["16388"]
+pulls = ["17987"]

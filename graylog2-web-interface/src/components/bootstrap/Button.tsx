@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
-import type { MantineTheme } from '@graylog/sawmill/mantine';
 import { Button as MantineButton } from '@mantine/core';
-import styled, { css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { useTheme, css } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
 
@@ -38,11 +38,10 @@ export type StyleProps = ColorVariant | 'link';
 
 const mapStyle = (style: StyleProps) => (style === 'default' ? 'gray' : style);
 
-const styleProps = (style: StyleProps) => {
+const stylesProps = (style: StyleProps) => {
   switch (style) {
-    case 'default': return { color: 'gray' };
     case 'link': return { variant: 'subtle' };
-    default: return { color: style };
+    default: return {};
   }
 };
 
@@ -75,12 +74,12 @@ const stylesForSize = (size: BsSize) => {
   }
 };
 
-const disabledStyles = (other: MantineTheme['other'], style: StyleProps) => {
+const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) => {
   if (style === 'link') {
     return '';
   }
 
-  const colors = other.colors.disabled[style];
+  const colors = themeColors.disabled[style];
 
   return css`
     &:disabled,
@@ -88,44 +87,79 @@ const disabledStyles = (other: MantineTheme['other'], style: StyleProps) => {
       pointer-events: all;
       color: ${colors.color};
       background-color: ${colors.background};
-      opacity: 0.65;
+      opacity: 0.45;
+
+      &:hover {
+        color: ${colors.color};
+      }
     }
   `;
 };
 
+const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) => {
+  switch (bsStyle) {
+    case 'danger':
+    case 'info':
+    case 'success':
+    case 'primary':
+    case 'warning':
+      return css`
+        color: ${themeColors.global.textDefault};
+
+        &:hover {
+        color: ${themeColors.global.textDefault};
+        }
+
+        &:focus {
+        color: ${themeColors.global.textDefault};
+        }
+    `;
+    default: return '';
+  }
+};
+
 const StyledButton = styled(MantineButton)<{
   $bsStyle: StyleProps,
-  $bsSize: BsSize
+  $bsSize: BsSize,
+  $active: boolean
 }>(({
   theme,
   $bsStyle,
   $bsSize,
-}) => css`
-  color: ${theme.mantine.other.colors.contrast[$bsStyle]};
-  font-weight: 400;
-  overflow: visible;
+  $active,
+}) => {
+  const textColor = $bsStyle === 'link' ? theme.colors.global.link : theme.colors.button[$bsStyle].color;
 
-  ${disabledStyles(theme.mantine.other, $bsStyle)}
-  ${stylesForSize($bsSize)}
-
-  &:hover {
-    color: ${theme.mantine.other.colors.contrast[$bsStyle]};
-    text-decoration: none;
-  }
-
-  &:focus {
-    color: ${theme.mantine.other.colors.contrast[$bsStyle]};
-    text-decoration: none;
-  }
-
-  .mantine-Button-label {
-    gap: 0.25em;
+  return css`
+    color: ${textColor};
+    font-weight: 400;
     overflow: visible;
-  }
-  .mantine-Button-loader {
-    visibility: hidden;
-  }
-`);
+
+    ${disabledStyles(theme.colors, $bsStyle)}
+    ${stylesForSize($bsSize)}
+
+    &:hover {
+      color: ${textColor};
+      text-decoration: none;
+    }
+
+    &:focus {
+      color: ${textColor};
+      text-decoration: none;
+    }
+
+    ${$active && activeStyles(theme.colors, $bsStyle)}
+
+    .mantine-Button-label {
+      gap: 0.25em;
+      overflow: visible;
+    }
+
+    .mantine-Button-loader {
+      visibility: hidden;
+    }
+  `;
+});
 
 type Props = React.PropsWithChildren<{
   active?: boolean,
@@ -151,17 +185,21 @@ type Props = React.PropsWithChildren<{
 const Button = React.forwardRef<HTMLButtonElement, Props>(
   ({
     'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
-    title, form, target, type, rel, role, name, tabIndex, children,
+    title, form, target, type, rel, role, name, tabIndex, children, active,
   }, ref) => {
+    const theme = useTheme();
     const style = mapStyle(bsStyle);
-
+    const color = style === 'link' ? 'transparent' : theme.colors.button[style].background;
     const sharedProps = {
       id,
       'aria-label': ariaLabel,
       className,
-      ...styleProps(style),
+      ...stylesProps(style),
+      $active: active,
       $bsStyle: style,
       $bsSize: bsSize,
+      variant: active ? 'outline' : 'filled',
+      color,
       'data-testid': dataTestId,
       disabled,
       role,

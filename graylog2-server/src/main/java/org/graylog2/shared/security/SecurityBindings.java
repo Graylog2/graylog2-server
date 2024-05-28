@@ -19,8 +19,6 @@ package org.graylog2.shared.security;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
-import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
-import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.models.system.sessions.responses.DefaultSessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
@@ -42,7 +40,6 @@ public class SecurityBindings extends PluginModule {
         addPermissions(RestPermissions.class);
         addInitializer(UserSessionTerminationService.class);
 
-        bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         install(new FactoryModuleBuilder()
                 .implement(TrustManager.class, DefaultX509TrustManager.class)
                 .build(TrustManagerProvider.class));

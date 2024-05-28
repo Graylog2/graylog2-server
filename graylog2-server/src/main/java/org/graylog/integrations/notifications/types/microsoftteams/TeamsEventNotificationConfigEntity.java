@@ -91,7 +91,6 @@ public abstract class TeamsEventNotificationConfigEntity implements EventNotific
                 .color(color().asString(parameters))
                 .webhookUrl(webhookUrl().asString(parameters))
                 .customMessage(customMessage().asString(parameters))
-                .customMessage(customMessage().asString(parameters))
                 .iconUrl(iconUrl().asString(parameters))
                 .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
                 .build();

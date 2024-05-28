@@ -114,6 +114,11 @@ public abstract class RelativeRange extends TimeRange {
         }
     }
 
+    @Override
+    public TimeRange withReferenceDate(DateTime now) {
+        return this.toBuilder().nowUTC(now).build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         abstract RelativeRange autoBuild();
@@ -144,7 +149,7 @@ public abstract class RelativeRange extends TimeRange {
                 }
             }
 
-            if (to().isPresent() && !from().isPresent()) {
+            if (to().isPresent() && from().isEmpty()) {
                 throw new InvalidRangeParametersException("If `to` is specified, `from` must be specified to!");
             }
 

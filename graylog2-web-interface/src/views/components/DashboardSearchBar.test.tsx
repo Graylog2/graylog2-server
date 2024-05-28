@@ -20,15 +20,15 @@ import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
-import MockStore from 'helpers/mocking/StoreMock';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { execute, setGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 
@@ -43,11 +43,9 @@ jest.mock('views/hooks/useMinimumRefreshInterval', () => () => ({
   isInitialLoading: false,
 }));
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('hooks/useSearchConfiguration', () => () => ({
+  config: mockSearchesClusterConfig,
+  refresh: () => {},
 }));
 
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({
@@ -72,9 +70,7 @@ describe('DashboardSearchBar', () => {
     jest.clearAllMocks();
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('should render the DashboardSearchBar', async () => {
     render(<DashboardSearchBar />);

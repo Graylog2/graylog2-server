@@ -17,7 +17,6 @@
 package org.graylog2.migrations;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
@@ -34,29 +33,18 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 public class MaintenanceStrategiesHelper {
     private static final Logger LOG = LoggerFactory.getLogger(MaintenanceStrategiesHelper.class);
-    private final Map<String, Provider<RotationStrategy>> rotationStrategies;
-    private final Map<String, Provider<RetentionStrategy>> retentionStrategies;
-    private final ClusterConfigService clusterConfigService;
     private final ElasticsearchConfiguration elasticsearchConfiguration;
 
 
     @Inject
-    public MaintenanceStrategiesHelper(Map<String, Provider<RotationStrategy>> rotationStrategies, Map<String, Provider<RetentionStrategy>> retentionStrategies, ClusterConfigService clusterConfigService, ElasticsearchConfiguration elasticsearchConfiguration) {
-        this.rotationStrategies = rotationStrategies;
-        this.retentionStrategies = retentionStrategies;
-        this.clusterConfigService = clusterConfigService;
+    public MaintenanceStrategiesHelper(ElasticsearchConfiguration elasticsearchConfiguration) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 

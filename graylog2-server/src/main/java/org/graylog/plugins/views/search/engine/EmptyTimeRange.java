@@ -42,6 +42,11 @@ public class EmptyTimeRange extends TimeRange {
         return null;
     }
 
+    @Override
+    public TimeRange withReferenceDate(DateTime now) {
+        return this;
+    }
+
     public static TimeRange emptyTimeRange() {
         return INSTANCE;
     }

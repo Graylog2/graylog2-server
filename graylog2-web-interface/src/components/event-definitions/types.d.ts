@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type React from 'react';
+
 import type { SearchBarControl } from 'views/types';
 
 interface EventDefinitionType {
@@ -35,5 +37,6 @@ declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
     'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>
+    'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC, key: string }>
   }
 }

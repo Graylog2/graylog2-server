@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.simulator;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSortedSet;
+import jakarta.inject.Inject;
 import org.apache.commons.lang.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -26,12 +27,11 @@ import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.shared.messageq.noop.NoopMessageQueueAcknowledger;
 import org.graylog2.shared.metrics.MetricRegistryFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
-import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,11 +43,14 @@ public class RuleSimulator {
 
     private final ConfigurationStateUpdater configurationStateUpdater;
     private final ObjectMapper objectMapper;
+    private final MessageFactory messageFactory;
 
     @Inject
-    public RuleSimulator(ConfigurationStateUpdater configurationStateUpdater, ObjectMapper objectMapper) {
+    public RuleSimulator(ConfigurationStateUpdater configurationStateUpdater, ObjectMapper objectMapper,
+                         MessageFactory messageFactory) {
         this.configurationStateUpdater = configurationStateUpdater;
         this.objectMapper = objectMapper;
+        this.messageFactory = messageFactory;
     }
 
     public Message simulate(Rule rule, Message message) {
@@ -83,9 +86,9 @@ public class RuleSimulator {
             if (map.containsKey(messageField) && !(map.get(messageField) instanceof String)) {
                 map.put(messageField, String.valueOf(map.get(messageField)));
             }
-            message = new Message(map);
+            message = messageFactory.createMessage(map);
         } catch (JacksonException e) {
-            message = new Message(messageString, "127.0.0.1", DateTime.now(DateTimeZone.UTC));
+            message = messageFactory.createMessage(messageString, "127.0.0.1", DateTime.now(DateTimeZone.UTC));
             if (StringUtils.startsWith(StringUtils.trim(messageString), "{")) {
                 message.addField("gl2_simulator_json_error",
                         "Cannot parse simulation message as JSON. Using as raw message field instead: " + e.getMessage());

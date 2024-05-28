@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTime;
 
 @AutoValue
 @JsonAutoDetect
@@ -37,6 +38,10 @@ public abstract class DerivedTimeRange {
         }
 
         return query.globalOverride().flatMap(GlobalOverride::timerange).orElse(value());
+    }
+
+    public DerivedTimeRange withReferenceDate(DateTime now) {
+        return DerivedTimeRange.of(value().withReferenceDate(now));
     }
 
     @JsonCreator

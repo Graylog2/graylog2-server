@@ -35,10 +35,11 @@ const StyledForm = styled.form`
 
 type Props = {
   creatingToken: boolean,
+  disableForm: boolean,
   onCreate: (tokenName: string) => void,
 };
 
-const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
+const CreateTokenForm = ({ creatingToken, disableForm, onCreate }: Props) => {
   const [tokenName, setTokenName] = useState('');
 
   const createToken = (event: React.SyntheticEvent) => {
@@ -52,12 +53,13 @@ const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
       <FormGroup controlId="create-token-input">
         <ControlLabel>Token Name</ControlLabel>
         <FormControl type="text"
+                     disabled={disableForm}
                      placeholder="What is this token for?"
                      value={tokenName}
                      onChange={(event) => setTokenName((event.target as HTMLInputElement).value)} />
       </FormGroup>
       <Button id="create-token"
-              disabled={tokenName === '' || creatingToken}
+              disabled={disableForm || tokenName === '' || creatingToken}
               type="submit"
               bsStyle="primary">
         {(creatingToken ? <Spinner text="Creating..." /> : 'Create Token')}
@@ -68,11 +70,13 @@ const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
 
 CreateTokenForm.propTypes = {
   creatingToken: PropTypes.bool,
+  disableForm: PropTypes.bool,
   onCreate: PropTypes.func.isRequired,
 };
 
 CreateTokenForm.defaultProps = {
   creatingToken: false,
+  disableForm: false,
 };
 
 export default CreateTokenForm;

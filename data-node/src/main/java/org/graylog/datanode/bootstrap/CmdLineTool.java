@@ -50,6 +50,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.commands.MigrateCmd;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.CliCommand;
@@ -185,7 +186,7 @@ public abstract class CmdLineTool implements CliCommand {
      * Things that have to run before the {@link #startCommand()} method is being called.
      * Please note that this happens *before* the configuration file has been parsed.
      */
-    protected void beforeStart(TLSProtocolsConfiguration configuration, PathConfiguration pathConfiguration) {
+    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, Configuration configuration) {
     }
 
     /**
@@ -262,7 +263,7 @@ public abstract class CmdLineTool implements CliCommand {
         installCommandConfig();
 
         beforeStart();
-        beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
+        beforeStart(parseAndGetTLSConfiguration(), parseAndGetConfiguration(configFile));
 
         processConfiguration(jadConfig);
 
@@ -304,6 +305,12 @@ public abstract class CmdLineTool implements CliCommand {
         reporter.start();
 
         startCommand();
+    }
+
+    private Configuration parseAndGetConfiguration(String configFile) {
+        final Configuration configuration = new Configuration();
+        processConfiguration(new JadConfig(getConfigRepositories(configFile), configuration));
+        return configuration;
     }
 
     // Parse only the TLSConfiguration bean

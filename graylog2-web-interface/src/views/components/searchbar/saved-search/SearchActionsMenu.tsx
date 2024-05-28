@@ -210,7 +210,8 @@ const SearchActionsMenu = () => {
 
   return (
     <Container aria-label="Search Meta Buttons">
-      <SavedSearchForm show={showForm}
+      <SavedSearchForm key={currentTitle}
+                       show={showForm}
                        saveSearch={saveSearch}
                        saveAsSearch={saveAsSearch}
                        isCreateNew={isNew || !isAllowedToEdit}

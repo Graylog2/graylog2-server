@@ -30,7 +30,6 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 
 jest.mock('stores/useAppDispatch');
-jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
 
 jest.mock('views/logic/slices/undoRedoActions', () => ({
   ...jest.requireActual('views/logic/slices/undoRedoActions'),

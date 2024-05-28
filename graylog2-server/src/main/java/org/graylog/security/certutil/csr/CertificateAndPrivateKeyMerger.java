@@ -21,9 +21,8 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.cert.CertificateChain;
+import org.graylog.security.certutil.keystore.storage.KeystoreUtils;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -32,16 +31,8 @@ import java.security.PrivateKey;
 
 /**
  * Merges signed certificate, received after CSR was processed, with private key, that was awaiting in a safe file.
- * Saves the result of the merge into Mongo collection.
  */
 public class CertificateAndPrivateKeyMerger {
-
-    private final KeyPairChecker keyPairChecker;
-
-    @Inject
-    public CertificateAndPrivateKeyMerger(final KeyPairChecker keyPairChecker) {
-        this.keyPairChecker = keyPairChecker;
-    }
 
     public KeyStore merge(final CertificateChain certificateChain,
                           final PrivateKeyEncryptedStorage privateKeyEncryptedStorage,
@@ -54,7 +45,7 @@ public class CertificateAndPrivateKeyMerger {
         nodeKeystore.load(null, null);
 
         final PrivateKey privateKey = privateKeyEncryptedStorage.readEncryptedKey(privateKeyStoragePassword);
-        if (!keyPairChecker.matchingKeys(privateKey, certificateChain.signedCertificate().getPublicKey())) {
+        if (!KeystoreUtils.matchingKeys(privateKey, certificateChain.signedCertificate().getPublicKey())) {
             throw new GeneralSecurityException("Private key from CSR and public key from certificate do not form a valid pair");
         }
         nodeKeystore.setKeyEntry(alias, privateKey, certFilePassword, certificateChain.toCertificateChainArray());

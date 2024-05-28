@@ -18,9 +18,6 @@ package org.graylog.security.certutil.keystore.storage;
 
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
-
-import jakarta.inject.Inject;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,36 +27,29 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.Optional;
 
-public final class KeystoreFileStorage implements KeystoreStorage<KeystoreFileLocation> {
+public final class KeystoreFileStorage implements KeystoreStorage<Path> {
 
-    private final KeystoreContentMover keystoreContentMover;
-
-    @Inject
-    public KeystoreFileStorage(final KeystoreContentMover keystoreContentMover) {
-        this.keystoreContentMover = keystoreContentMover;
-    }
 
     @Override
-    public void writeKeyStore(final KeystoreFileLocation location,
+    public void writeKeyStore(Path location,
                               final KeyStore keyStore,
                               final char[] currentPassword,
                               final char[] newPassword) throws KeyStoreStorageException {
-        final Path keystorePath = location.keystorePath();
-        try (FileOutputStream store = new FileOutputStream(keystorePath.toFile())) {
+        try (FileOutputStream store = new FileOutputStream(location.toFile())) {
             if (newPassword == null) {
                 keyStore.store(store, currentPassword);
             } else {
-                KeyStore newKeyStore = keystoreContentMover.moveContents(keyStore, currentPassword, newPassword);
+                KeyStore newKeyStore = KeystoreUtils.newStoreCopyContent(keyStore, currentPassword, newPassword);
                 newKeyStore.store(store, newPassword);
             }
         } catch (Exception ex) {
-            throw new KeyStoreStorageException("Failed to save keystore to " + keystorePath, ex);
+            throw new KeyStoreStorageException("Failed to save keystore to " + location, ex);
         }
     }
 
     @Override
-    public Optional<KeyStore> readKeyStore(final KeystoreFileLocation location, char[] password) throws KeyStoreStorageException {
-        try (var in = Files.newInputStream(location.keystorePath())) {
+    public Optional<KeyStore> readKeyStore(final Path location, char[] password) throws KeyStoreStorageException {
+        try (var in = Files.newInputStream(location)) {
             KeyStore caKeystore = KeyStore.getInstance(CertConstants.PKCS12);
             caKeystore.load(in, password);
             return Optional.of(caKeystore);

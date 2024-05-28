@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixing text color for unqualified fields in field select."
+
+issues = ["18975"]
+pulls = ["18976"]

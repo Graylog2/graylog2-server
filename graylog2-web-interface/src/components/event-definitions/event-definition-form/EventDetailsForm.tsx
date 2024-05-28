@@ -23,6 +23,7 @@ import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
 
 import { Select } from 'components/common';
+import { MarkdownEditor, MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import * as FormsUtils from 'util/FormsUtils';
@@ -68,7 +69,9 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Pr
     onChange('priority', toNumber(nextPriority));
   };
 
-  const readOnly = !canEdit || eventDefinition.config.type === 'system-notifications-v1';
+  const readOnly = !canEdit
+    || eventDefinition.config.type === 'system-notifications-v1'
+    || eventDefinition.config.type === 'sigma-v1';
 
   return (
     <Row>
@@ -95,6 +98,22 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Pr
                  onChange={handleChange}
                  readOnly={readOnly}
                  rows={2} />
+
+          <div style={{ width: '100%' }}>
+            <ControlLabel>Remediation Steps  <small className="text-muted">(Optional)</small></ControlLabel>
+            {readOnly ? (
+              <MarkdownPreview show
+                               withFullView
+                               height={150}
+                               value={eventDefinition.remediation_steps || 'No remediation steps given'} />
+            ) : (
+              <MarkdownEditor id="event-definition-remediation-steps"
+                              readOnly={readOnly}
+                              height={150}
+                              value={eventDefinition.remediation_steps}
+                              onChange={(newValue: string) => handleChange({ target: { name: 'remediation_steps', value: newValue } })} />
+            )}
+          </div>
 
           <FormGroup controlId="event-definition-priority">
             <ControlLabel>Priority</ControlLabel>

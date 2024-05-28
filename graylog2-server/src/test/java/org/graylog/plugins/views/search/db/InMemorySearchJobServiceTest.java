@@ -16,68 +16,71 @@
  */
 package org.graylog.plugins.views.search.db;
 
-import com.codahale.metrics.json.MetricsModule;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.common.collect.ImmutableMap;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog2.database.ObjectIdSerializer;
-import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
-import org.graylog2.shared.jackson.SizeSerializer;
-import org.graylog2.shared.rest.RangeJsonSerializer;
-import org.joda.time.Period;
-import org.junit.Test;
+import jakarta.ws.rs.ForbiddenException;
+import org.assertj.core.api.Assertions;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.TestSearchUser;
+import org.graylog2.plugin.system.SimpleNodeId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Optional;
+
+import static org.graylog.plugins.views.search.SearchJob.NO_CANCELLATION;
 
 public class InMemorySearchJobServiceTest {
 
-    private ObjectMapper objectMapper;
+    private SearchJobService toTest;
 
-    @Test
+
+    @BeforeEach
     public void setup() throws Exception {
-        final ObjectMapper mapper = new ObjectMapper();
-        final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(this.getClass().getClassLoader());
-
-        this.objectMapper = mapper
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-                .setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy())
-                .setTypeFactory(typeFactory)
-                .registerModule(new GuavaModule())
-                .registerModule(new JodaModule())
-                .registerModule(new Jdk8Module())
-                .registerModule(new JavaTimeModule())
-                .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
-                .registerModule(new SimpleModule("Graylog")
-                        .addKeyDeserializer(Period.class, new JodaTimePeriodKeyDeserializer())
-                        .addSerializer(new RangeJsonSerializer())
-                        .addSerializer(new SizeSerializer())
-                        .addSerializer(new ObjectIdSerializer()));
-
-        // kludge because we don't have an injector in tests
-        ImmutableMap<String, Class> subtypes = ImmutableMap.<String, Class>builder()
-                .put(StreamFilter.NAME, StreamFilter.class)
-                .put(ElasticsearchQueryString.NAME, ElasticsearchQueryString.class)
-                .put(MessageList.NAME, MessageList.class)
-                .build();
-
-        subtypes.forEach((name, klass) -> objectMapper.registerSubtypes(new NamedType(klass, name)));
+        toTest = new InMemorySearchJobService(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"));
     }
 
     @Test
-    public void create() {
+    public void testUsersCanLoadTheirOwnJobs() {
+        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette", NO_CANCELLATION);
+        final Optional<SearchJob> retrievedJob = toTest.load(jannettesJob.getId(), searchUser("Jannette"));
+        Assertions.assertThat(retrievedJob)
+                .isPresent()
+                .hasValue(jannettesJob);
     }
 
+    @Test
+    public void testThrowsExceptionWhenTryingToLoadJobOfDifferentUser() {
+        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette", NO_CANCELLATION);
+        Assertions.assertThatThrownBy(() -> toTest.load(jannettesJob.getId(), searchUser("Michelle")))
+                .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    public void testAdminCanLoadJobOfDifferentUser() {
+        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette", NO_CANCELLATION);
+        final Optional<SearchJob> retrievedJob = toTest.load(jannettesJob.getId(), adminUser("Clara"));
+        Assertions.assertThat(retrievedJob)
+                .isPresent()
+                .hasValue(jannettesJob);
+    }
+
+    @Test
+    public void testReturnsEmptyOptionalWhenTryingToLoadNonExistingJob() {
+        final Optional<SearchJob> retrievedJob = toTest.load("Guadalajara!", null);
+        Assertions.assertThat(retrievedJob)
+                .isEmpty();
+    }
+
+    private SearchUser searchUser(final String username) {
+        return TestSearchUser.builder()
+                .withUser(u -> u.withUsername(username))
+                .build();
+    }
+
+    private SearchUser adminUser(final String username) {
+        return TestSearchUser.builder()
+                .withUser(u -> u.withUsername(username).isLocalAdmin(true))
+                .build();
+    }
 }

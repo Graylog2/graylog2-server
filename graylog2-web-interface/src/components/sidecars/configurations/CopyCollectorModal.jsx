@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 
-import CloneMenuItem from '../common/CloneMenuItem';
+import CloneMenuModal from '../common/CloneMenuModal';
 
 class CopyCollectorModal extends React.Component {
   static propTypes = {
@@ -88,14 +88,14 @@ class CopyCollectorModal extends React.Component {
     const { errorMessage, name, showModal } = this.state;
 
     return (
-      <CloneMenuItem onSelect={this.openModal}
-                     onClose={this._closeModal}
-                     onSave={this._save}
-                     id={this._getId('collector-name')}
-                     onChange={this._changeName}
-                     error={errorMessage}
-                     name={name}
-                     showModal={showModal} />
+      <CloneMenuModal onSelect={this.openModal}
+                      onClose={this._closeModal}
+                      onSave={this._save}
+                      id={this._getId('collector-name')}
+                      onChange={this._changeName}
+                      error={errorMessage}
+                      name={name}
+                      showModal={showModal} />
     );
   }
 }

@@ -63,6 +63,12 @@ const StyledInputGroup = styled(InputGroup)`
   display: flex;
 `;
 
+const InputGroupAddon = styled(InputGroup.Addon)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 /**
  * Returns a duration and unit compatible with `TimeUnitInput` from a duration accepted by `moment.duration()`
  * and a list of time units.
@@ -254,9 +260,9 @@ const TimeUnitInput = createReactClass({
     ));
 
     const checkbox = (
-      <InputGroup.Addon>
+      <InputGroupAddon>
         <input type="checkbox" checked={this._isChecked()} onChange={this._onToggleEnable} title="Toggle time" />
-      </InputGroup.Addon>
+      </InputGroupAddon>
     );
 
     return (

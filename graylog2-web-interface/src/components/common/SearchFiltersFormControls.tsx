@@ -25,7 +25,7 @@ import type { SearchFilter } from 'components/event-definitions/event-definition
 
 type Props = {
   filters: SearchFilter[],
-  onChange: (filters: SearchFilter[]) => void,
+  onChange: (filters: OrderedMap<string, SearchFilter>) => void,
   hideFiltersPreview?: (val: boolean) => void,
 };
 

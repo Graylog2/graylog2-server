@@ -33,9 +33,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.views.storage.migration.state.actions.TrafficSnapshot;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -47,10 +49,12 @@ import org.graylog2.shared.security.RestPermissions;
 public class MigrationStateResource {
 
     private final MigrationStateMachine stateMachine;
+    private final KafkaJournalConfiguration journalConfiguration;
 
     @Inject
-    public MigrationStateResource(MigrationStateMachine stateMachine, @Context HttpHeaders httpHeaders) {
+    public MigrationStateResource(MigrationStateMachine stateMachine, @Context HttpHeaders httpHeaders, KafkaJournalConfiguration journalConfiguration) {
         this.stateMachine = stateMachine;
+        this.journalConfiguration = journalConfiguration;
         this.stateMachine.getContext().addExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY, ProxiedResource.authenticationToken(httpHeaders));
     }
 
@@ -94,5 +98,19 @@ public class MigrationStateResource {
     public CurrentStateInformation resetState() {
         stateMachine.reset();
         return new CurrentStateInformation(stateMachine.getState(), stateMachine.nextSteps());
+    }
+
+    @GET
+    @Path("/journalestimate")
+    @NoAuditEvent("No audit event needed")
+    @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
+    @ApiOperation(value = "Get journal size estimate (bytes/minute)")
+    public JournalEstimate getJournalEstimate() {
+        long bytesPerMinute = stateMachine.getContext()
+                .getExtendedState(TrafficSnapshot.ESTIMATED_TRAFFIC_PER_MINUTE, Long.class)
+                .orElse(0L);
+        long journalSize = journalConfiguration.getMessageJournalMaxSize().toBytes();
+        long maxDowntimeMinutes = (bytesPerMinute != 0) ? Math.floorDiv(journalSize, bytesPerMinute) : journalSize;
+        return new JournalEstimate(bytesPerMinute, journalSize, maxDowntimeMinutes);
     }
 }

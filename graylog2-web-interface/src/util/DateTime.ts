@@ -33,6 +33,7 @@ export const DATE_TIME_FORMATS = {
   internalIndexer: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]', // ISO 8601, used for ES search queries, when a timestamp has to be reformatted
   date: 'YYYY-MM-DD',
   hourAndMinute: 'HH:mm',
+  dateHourAndMinute: 'YYYY-MM-DD HH:mm',
 };
 
 const DEFAULT_OUTPUT_TZ = 'UTC';
@@ -102,6 +103,16 @@ export const relativeDifference = (dateTime: DateTime) => {
   const dateObject = toDateObject(dateTime);
 
   return validateDateTime(dateObject, dateTime).fromNow();
+};
+
+/**
+ * Returns the time difference, relative to the provided date time, in days.
+ */
+export const relativeDifferenceDays = (dateTime: DateTime) => {
+  const eventDateObject = toDateObject(dateTime);
+  const todayDateObject = toDateObject(new Date());
+
+  return todayDateObject.diff(eventDateObject, 'days');
 };
 
 /**

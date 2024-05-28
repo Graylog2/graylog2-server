@@ -22,15 +22,18 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
+import org.graylog.plugins.views.search.searchtypes.pivot.MayHaveUnit;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(Average.NAME)
 @JsonDeserialize(builder = Average.Builder.class)
-public abstract class Average implements SeriesSpec, HasField {
+public abstract class Average implements SeriesSpec, HasField, MayHaveUnit {
     public static final String NAME = "avg";
 
     @Override
@@ -39,8 +42,15 @@ public abstract class Average implements SeriesSpec, HasField {
     @Override
     public abstract String id();
 
+    @Override
+    public abstract Optional<UnitId> unit();
+
+    @Override
     @JsonProperty
     public abstract String field();
+
+    @JsonProperty("whole_number")
+    public abstract Boolean wholeNumber();
 
     @Override
     public String literal() {
@@ -55,14 +65,14 @@ public abstract class Average implements SeriesSpec, HasField {
     }
 
     public static Builder builder() {
-        return new AutoValue_Average.Builder().type(NAME);
+        return new AutoValue_Average.Builder().type(NAME).wholeNumber(false);
     }
 
     @AutoValue.Builder
     public abstract static class Builder extends SeriesSpecBuilder<Average, Builder> {
         @JsonCreator
         public static Builder create() {
-            return Average.builder();
+            return Average.builder().wholeNumber(false);
         }
 
         @Override
@@ -72,14 +82,26 @@ public abstract class Average implements SeriesSpec, HasField {
         @JsonProperty
         public abstract Builder field(String field);
 
+        @JsonProperty
+        public abstract Builder unit(@Nullable UnitId unit);
+
+        @JsonProperty("whole_number")
+        public abstract Builder wholeNumber(Boolean wholeNumber);
+
         abstract Optional<String> id();
         abstract String field();
+        abstract Boolean wholeNumber();
         abstract Average autoBuild();
 
         @Override
         public Average build() {
             if (id().isEmpty()) {
                 id(NAME + "(" + field() + ")");
+            }
+            if (wholeNumber() != null) {
+                wholeNumber(wholeNumber());
+            } else {
+                wholeNumber(false);
             }
             return autoBuild();
         }

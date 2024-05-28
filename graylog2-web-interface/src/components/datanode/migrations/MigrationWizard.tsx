@@ -15,9 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
-import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
 import { Spinner, Wizard } from 'components/common';
 import CAStep from 'components/datanode/migrations/CAStep';
 import ManualMigrationStep from 'components/datanode/migrations/ManualMigrationStep';
@@ -29,14 +27,6 @@ import MigrationWelcomeStep from 'components/datanode/migrations/MigrationWelcom
 import CertificateRenewalStep from 'components/datanode/migrations/CertificateRenewalStep';
 import MigrationFinishedStep from 'components/datanode/migrations/MigrationFinishedStep';
 
-const StyledWizard = styled(Wizard)`
-  .migration-wizard{
-    .nav > li > a {
-      background-color: red !important;
-    }
-  }
-`;
-
 const MigrationWizard = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
   const { onTriggerNextState } = useTriggerMigrationState();
@@ -45,9 +35,7 @@ const MigrationWizard = () => {
     return <Spinner text="Loading ..." />;
   }
 
-  const onTriggerStep = (step: MigrationActions, args: StepArgs = {}) => {
-    onTriggerNextState({ step, args });
-  };
+  const onTriggerStep = async (step: MigrationActions, args: StepArgs = {}) => onTriggerNextState({ step, args });
 
   const { state: activeStep } = currentStep;
 
@@ -56,11 +44,6 @@ const MigrationWizard = () => {
       key: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.key,
       title: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.description,
       component: <MigrationWelcomeStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
-    },
-    {
-      key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key,
-      title: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.description,
-      component: <CompatibilityCheckStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.CA_CREATION_PAGE.key,
@@ -85,13 +68,13 @@ const MigrationWizard = () => {
   ];
 
   return (
-    <StyledWizard steps={steps}
-                  activeStep={activeStep}
-                  onStepChange={() => {}}
-                  horizontal
-                  justified
-                  containerClassName="migration-wizard"
-                  hidePreviousNextButtons />
+    <Wizard steps={steps}
+            activeStep={activeStep}
+            onStepChange={() => {}}
+            horizontal
+            justified
+            containerClassName="migration-wizard"
+            hidePreviousNextButtons />
   );
 };
 

@@ -36,8 +36,6 @@ jest.mock('views/logic/slices/undoRedoActions', () => ({
   redo: jest.fn(() => () => Promise.resolve()),
 }));
 
-jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
-
 describe('<RedoNavItem />', () => {
   const RedoNavItemComponent = () => (
     <TestStoreProvider undoRedoState={undoRedoTestStore}>

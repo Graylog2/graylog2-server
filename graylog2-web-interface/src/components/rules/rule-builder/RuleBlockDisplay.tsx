@@ -55,7 +55,7 @@ const StyledRow = styled(Row)<{ $hovered: boolean }>(({ theme, $hovered }) => cs
   align-items: center;
   margin: 0;
   height: ${theme.spacings.xl};
-  background-color: ${$hovered ? theme.colors.table.backgroundHover : 'transparent'};
+  background-color: ${$hovered ? theme.colors.table.row.backgroundHover : 'transparent'};
   border-left: solid 1px ${theme.colors.gray[80]};
 `);
 
@@ -193,7 +193,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
               <MenuItem onClick={onInsertAbove}>Insert above</MenuItem>
               <MenuItem onClick={onInsertBelow}>Insert below</MenuItem>
               <MenuItem divider />
-              <MenuItem onClick={onDelete}>Delete</MenuItem>
+              <MenuItem onClick={onDelete} variant="danger">Delete</MenuItem>
             </OverlayDropdownButton>
           </ActionsContainer>
         )}

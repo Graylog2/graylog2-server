@@ -62,6 +62,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.storage.opensearch2.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cluster.ClusterStateApi;
+import org.graylog.storage.opensearch2.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch2.stats.StatsApi;
 import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -76,12 +77,14 @@ import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.Message;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -102,6 +105,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterOS2.class);
     private final OpenSearchClient client;
     private final StatsApi statsApi;
+    private final ClusterStatsApi clusterStatsApi;
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
@@ -109,11 +113,13 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
                              StatsApi statsApi,
+                             ClusterStatsApi clusterStatsApi,
                              CatApi catApi,
                              ClusterStateApi clusterStateApi,
                              IndexTemplateAdapter indexTemplateAdapter) {
         this.client = client;
         this.statsApi = statsApi;
+        this.clusterStatsApi = clusterStatsApi;
         this.catApi = catApi;
         this.clusterStateApi = clusterStateApi;
         this.indexTemplateAdapter = indexTemplateAdapter;
@@ -153,13 +159,28 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public void create(String index, IndexSettings indexSettings) {
+        executeCreateIndexRequest(index, createIndexRequest(index, indexSettings, null));
+    }
+
+    @Override
+    public void create(String index, IndexSettings indexSettings, @Nullable Map<String, Object> mapping) {
+        executeCreateIndexRequest(index, createIndexRequest(index, indexSettings, mapping));
+    }
+
+    private CreateIndexRequest createIndexRequest(String index,
+                                                   IndexSettings indexSettings,
+                                                   @Nullable Map<String, Object> mapping) {
         final Map<String, Object> settings = new HashMap<>();
         settings.put("number_of_shards", indexSettings.shards());
         settings.put("number_of_replicas", indexSettings.replicas());
+        CreateIndexRequest request = new CreateIndexRequest(index).settings(settings);
+        if (mapping != null) {
+            request = request.mapping(mapping);
+        }
+        return request;
+    }
 
-        final CreateIndexRequest request = new CreateIndexRequest(index)
-                .settings(settings);
-
+    private void executeCreateIndexRequest(String index, CreateIndexRequest request) {
         client.execute((c, requestOptions) -> c.indices().create(request, requestOptions),
                 "Unable to create index " + index);
     }
@@ -177,6 +198,18 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
+    public Map<String, Object> getIndexMapping(@Nonnull String index) {
+        final GetMappingsRequest request = new GetMappingsRequest()
+                .indices(index)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+
+        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+                "Couldn't read mapping of index " + index);
+
+        return result.mappings().get(index).sourceAsMap();
+    }
+
+    @Override
     public void updateIndexMetaData(@Nonnull String index, @Nonnull Map<String, Object> metadata, boolean mergeExisting) {
         Map<String, Object> metaUpdate = new HashMap<>();
         if (mergeExisting) {
@@ -189,14 +222,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public Map<String, Object> getIndexMetaData(@Nonnull String index) {
-        final GetMappingsRequest request = new GetMappingsRequest()
-                .indices(index)
-                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
-
-        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
-                "Couldn't read mapping of index " + index);
-
-        final Object metaData = result.mappings().get(index).sourceAsMap().get("_meta");
+        final Object metaData = getIndexMapping(index).get("_meta");
         //noinspection rawtypes
         if (metaData instanceof Map map) {
             //noinspection unchecked
@@ -382,6 +408,11 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Override
     public JsonNode getIndexStats(Collection<String> indices) {
         return statsApi.indexStatsWithDocsAndStore(indices);
+    }
+
+    @Override
+    public IndexSetStats getIndexSetStats() {
+        return clusterStatsApi.clusterStats();
     }
 
     @Override

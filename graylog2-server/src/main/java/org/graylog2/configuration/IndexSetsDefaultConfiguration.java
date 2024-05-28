@@ -58,6 +58,8 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
     public static final String RETENTION_STRATEGY = "retention_strategy"; // alias for retention_strategy_config
 
+    public static final String FIELD_USE_LEGACY_ROTATION = "use_legacy_rotation";
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -126,6 +128,9 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     @JsonProperty(FIELD_DATA_TIERING)
     public abstract DataTieringConfig dataTiering();
 
+    @JsonProperty(value = FIELD_USE_LEGACY_ROTATION)
+    public abstract Boolean useLegacyRotation();
+
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
@@ -134,6 +139,7 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         @JsonCreator
         public static Builder create() {
             return new AutoValue_IndexSetsDefaultConfiguration.Builder()
+                    .useLegacyRotation(true)
                     .dataTiering(new PlaceholderDataTieringConfig());
         }
 
@@ -184,6 +190,9 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
 
         @JsonProperty(FIELD_DATA_TIERING)
         public abstract Builder dataTiering(DataTieringConfig dataTiering);
+
+        @JsonProperty(FIELD_USE_LEGACY_ROTATION)
+        public abstract Builder useLegacyRotation(boolean useLegacyRotation);
 
         public abstract IndexSetsDefaultConfiguration build();
     }

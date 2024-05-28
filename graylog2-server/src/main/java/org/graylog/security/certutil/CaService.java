@@ -32,7 +32,7 @@ public interface CaService {
 
     CA get() throws KeyStoreStorageException;
 
-    void create(String organization, final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException, KeyStoreException;
+    CA create(String organization, final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException, KeyStoreException;
 
     void upload(String pass, List<FormDataBodyPart> parts) throws CACreationException;
     void startOver();

@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.engine.validation;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
@@ -23,12 +25,10 @@ import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 import java.util.Optional;
 import java.util.Set;
@@ -72,7 +72,7 @@ public class TimeRangeValidator implements SearchValidator {
     }
 
     @Override
-    public Set<SearchError> validate(final Search search) {
+    public Set<SearchError> validate(final Search search, final SearchUser searchUser) {
         final SearchConfig searchConfig = searchConfigProvider.get();
         return search.queries()
                 .stream()
@@ -81,7 +81,7 @@ public class TimeRangeValidator implements SearchValidator {
     }
 
     @Override
-    public Set<SearchError> validate(final Query query) {
+    public Set<SearchError> validate(final Query query, final SearchUser searchUser) {
         final SearchConfig searchConfig = searchConfigProvider.get();
         return validateQueryTimeRange(query, searchConfig).collect(Collectors.toSet());
     }

@@ -23,6 +23,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import jakarta.inject.Inject;
 import org.graylog.plugins.netflow.flows.FlowException;
 import org.graylog.plugins.netflow.flows.NetFlowFormatter;
 import org.graylog.plugins.netflow.v5.NetFlowV5Packet;
@@ -54,9 +55,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,11 +80,14 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
     private static final Logger LOG = LoggerFactory.getLogger(NetFlowCodec.class);
     private final NetFlowV9FieldTypeRegistry typeRegistry;
     private final NetflowV9CodecAggregator netflowV9CodecAggregator;
+    private final NetFlowFormatter netFlowFormatter;
 
     @Inject
-    protected NetFlowCodec(@Assisted Configuration configuration, NetflowV9CodecAggregator netflowV9CodecAggregator) throws IOException {
+    protected NetFlowCodec(@Assisted Configuration configuration, NetflowV9CodecAggregator netflowV9CodecAggregator,
+                           NetFlowFormatter netFlowFormatter) throws IOException {
         super(configuration);
         this.netflowV9CodecAggregator = netflowV9CodecAggregator;
+        this.netFlowFormatter = netFlowFormatter;
 
         final String netFlow9DefinitionsPath = configuration.getString(CK_NETFLOW9_DEFINITION_PATH);
         if (netFlow9DefinitionsPath == null || netFlow9DefinitionsPath.trim().isEmpty()) {
@@ -130,7 +131,7 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
                     final NetFlowV5Packet netFlowV5Packet = NetFlowV5Parser.parsePacket(buffer);
 
                     return netFlowV5Packet.records().stream()
-                            .map(record -> NetFlowFormatter.toMessage(netFlowV5Packet.header(), record, sender))
+                            .map(record -> netFlowFormatter.toMessage(netFlowV5Packet.header(), record, sender))
                             .collect(Collectors.toList());
                 case ORDERED_V9_MARKER:
                     // our "custom" netflow v9 that has all the templates in the same packet
@@ -160,7 +161,7 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
 
         return netFlowV9Packets.stream().map(netFlowV9Packet -> netFlowV9Packet.records().stream()
                         .filter(record -> record instanceof NetFlowV9Record)
-                        .map(record -> NetFlowFormatter.toMessage(netFlowV9Packet.header(), record, sender))
+                        .map(record -> netFlowFormatter.toMessage(netFlowV9Packet.header(), record, sender))
                         .collect(Collectors.toList())
                 ).flatMap(Collection::stream)
                 .collect(Collectors.toList());

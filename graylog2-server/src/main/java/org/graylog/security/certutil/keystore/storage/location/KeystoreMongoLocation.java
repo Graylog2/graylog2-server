@@ -16,5 +16,38 @@
  */
 package org.graylog.security.certutil.keystore.storage.location;
 
-public record KeystoreMongoLocation(String nodeId, KeystoreMongoCollection collection) implements KeystoreLocation {
+import org.graylog2.plugin.system.NodeId;
+
+public class KeystoreMongoLocation implements KeystoreLocation {
+    private final String nodeId;
+    private final KeystoreMongoCollection collection;
+
+    public static final String CA_KEYSTORE_ID = "GRAYLOG CA";
+
+    private KeystoreMongoLocation(String nodeId, KeystoreMongoCollection collection) {
+        this.nodeId = nodeId;
+        this.collection = collection;
+    }
+
+
+    public static KeystoreMongoLocation certificateAuthority() {
+        return new KeystoreMongoLocation(CA_KEYSTORE_ID, KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
+    }
+
+    public static KeystoreMongoLocation datanode(NodeId nodeId) {
+        return datanode(nodeId.getNodeId());
+    }
+
+    public static KeystoreMongoLocation datanode(String nodeId) {
+        return new KeystoreMongoLocation(nodeId, KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
+    }
+
+
+    public String nodeId() {
+        return nodeId;
+    }
+
+    public KeystoreMongoCollection collection() {
+        return collection;
+    }
 }

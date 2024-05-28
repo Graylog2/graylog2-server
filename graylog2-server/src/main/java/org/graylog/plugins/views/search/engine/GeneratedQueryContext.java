@@ -17,10 +17,15 @@
 package org.graylog.plugins.views.search.engine;
 
 import org.graylog.plugins.views.search.errors.SearchError;
+import org.joda.time.DateTimeZone;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface GeneratedQueryContext {
+    DateTimeZone timezone();
+
+    Optional<String> getSearchTypeQueryString(String id);
 
     void addError(SearchError error);
 

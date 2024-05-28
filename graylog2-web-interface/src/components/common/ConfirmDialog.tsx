@@ -48,8 +48,7 @@ const ConfirmDialog = ({
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
   return (
-    <Modal show={show}
-           onHide={onHide}>
+    <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -64,7 +63,7 @@ const ConfirmDialog = ({
                      submitButtonType="button"
                      disabledSubmit={btnConfirmDisabled}
                      submitButtonText={btnConfirmText}
-                     displayCancel={hideCancelButton as any} />
+                     displayCancel={!hideCancelButton as any} />
       </Modal.Footer>
     </Modal>
   );

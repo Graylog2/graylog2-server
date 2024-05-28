@@ -19,6 +19,13 @@ package org.graylog.plugins.views.search.searchfilters.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(
@@ -28,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = InlineQueryStringSearchFilter.class, name = UsedSearchFilter.INLINE_QUERY_STRING_SEARCH_FILTER),
         @JsonSubTypes.Type(value = ReferencedQueryStringSearchFilter.class, name = UsedSearchFilter.REFERENCED_SEARCH_FILTER),
 })
-public interface UsedSearchFilter {
+public interface UsedSearchFilter extends NativeEntityConverter<UsedSearchFilter>, ContentPackable<UsedSearchFilter> {
 
     String TYPE = "type";
 
@@ -45,4 +52,18 @@ public interface UsedSearchFilter {
     boolean negation();
 
     boolean disabled();
+
+    // This method should only be overridden for referenced filters as those will be exported as separate entities in content packs.
+    // Inline filters will not be updated during import/export.
+    @Override
+    default UsedSearchFilter toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        return this;
+    }
+
+    // This method should only be overridden for referenced filters as those will be exported as separate entities in content packs.
+    // Inline filters will not be updated during import/export.
+    @Override
+    default UsedSearchFilter toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        return this;
+    }
 }

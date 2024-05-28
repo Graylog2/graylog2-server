@@ -137,13 +137,30 @@ type DataTiering = {
   }>,
 }
 
+type FieldValueProvider = {
+  type: string,
+  displayName: string,
+  formComponent: React.ComponentType,
+  summaryComponent: React.ComponentType,
+  defaultConfig: {
+    template?: string,
+    table_name?: string,
+    key_field?: string,
+  },
+  requiredFields: {
+    template?: string,
+    table_name?: string,
+    key_field?: string,
+  },
+}
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
     dataTiering?: Array<DataTiering>
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
-    globalNotifications?: Array<GlobalNotification>
+    globalNotifications?: Array<GlobalNotification>;
+    fieldValueProviders?:Array<FieldValueProvider>;
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,

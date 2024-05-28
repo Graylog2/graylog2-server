@@ -21,6 +21,6 @@ export const ENTITY_TABLE_ID = 'dashboards';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'summary', 'favorite'],
+  displayedColumns: (isEvidenceModal: boolean) => (isEvidenceModal ? ['title', 'description', 'summary'] : ['title', 'description', 'summary', 'favorite']),
   columnsOrder: ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'],
 };

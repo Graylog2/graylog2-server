@@ -25,7 +25,7 @@ import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Spinner } from 'components/common';
-import { Alert, BootstrapModalForm, Input, Badge } from 'components/bootstrap';
+import { Alert, BootstrapModalForm, Input } from 'components/bootstrap';
 import type {
   RemovalResponse,
 } from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
@@ -40,8 +40,6 @@ const StyledLabel = styled.h5`
   font-weight: bold;
   margin-bottom: 5px;
 `;
-
-const BetaBadge = () => <Badge bsStyle="danger">Beta Feature</Badge>;
 
 type Props = {
   show: boolean,
@@ -169,7 +167,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   }, [sendTelemetry, telemetryPathName]);
 
   return (
-    <BootstrapModalForm title={<span>Remove Field Type Overrides <BetaBadge /></span>}
+    <BootstrapModalForm title={<span>Remove Field Type Overrides</span>}
                         submitButtonText="Remove field type overrides"
                         onSubmitForm={onSubmit}
                         onCancel={onCancel}

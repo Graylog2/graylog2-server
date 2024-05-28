@@ -25,22 +25,34 @@ const StyledButtonToolbar = styled(ButtonToolbar)`
   flex-wrap: wrap;
 `;
 
+const getSortedNextSteps = (nextSteps: MigrationActions[]) => nextSteps.reduce((sortedNextSteps, step) => {
+  if (!MIGRATION_ACTIONS[step]?.label) {
+    return [step, ...sortedNextSteps];
+  }
+
+  sortedNextSteps.push(step);
+
+  return sortedNextSteps;
+}, []);
+
 type Props = {
     nextSteps?: Array<MigrationActions>,
     disabled?: boolean,
     onTriggerStep: OnTriggerStepFunction,
     args?: StepArgs,
     hidden?: boolean,
+    children?: React.ReactNode,
 }
 
-const MigrationStepTriggerButtonToolbar = ({ nextSteps, disabled, onTriggerStep, args, hidden }: Props) => {
+const MigrationStepTriggerButtonToolbar = ({ nextSteps, disabled, onTriggerStep, args, hidden, children }: Props) => {
   if (hidden) {
     return null;
   }
 
   return (
     <StyledButtonToolbar>
-      {nextSteps.map((step) => <Button key={step} bsStyle="success" bsSize="small" disabled={disabled} onClick={() => onTriggerStep(step, args)}>{MIGRATION_ACTIONS[step]?.label || 'Next'}</Button>)}
+      {getSortedNextSteps(nextSteps).map((step, index) => <Button key={step} bsStyle={index ? 'default' : 'success'} bsSize="small" disabled={disabled} onClick={() => onTriggerStep(step, args)}>{MIGRATION_ACTIONS[step]?.label || 'Next'}</Button>)}
+      {children}
     </StyledButtonToolbar>
   );
 };
@@ -50,6 +62,7 @@ MigrationStepTriggerButtonToolbar.defaultProps = {
   disabled: false,
   args: {},
   hidden: false,
+  children: undefined,
 };
 
 export default MigrationStepTriggerButtonToolbar;

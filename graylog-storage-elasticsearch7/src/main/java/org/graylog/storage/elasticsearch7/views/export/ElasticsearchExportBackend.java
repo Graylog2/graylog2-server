@@ -16,6 +16,8 @@
  */
 package org.graylog.storage.elasticsearch7.views.export;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportBackend;
@@ -31,25 +33,17 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.TermsQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog2.plugin.Message;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
@@ -58,7 +52,6 @@ import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.Qu
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.termsQuery;
-import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
 @SuppressWarnings("rawtypes")
 public class ElasticsearchExportBackend implements ExportBackend {
@@ -131,8 +124,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
         SearchSourceBuilder ssb = new SearchSourceBuilder()
                 .query(query)
-                .size(command.chunkSize())
-                .sort(Message.FIELD_TIMESTAMP, SortOrder.ASC);
+                .size(command.chunkSize());
 
         return requestStrategy.configure(ssb);
     }

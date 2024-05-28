@@ -17,6 +17,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
+import FormWarningsProvider from 'contexts/FormWarningsProvider';
+
 import FilterAggregationForm from './FilterAggregationForm';
 import withStreams from './withStreams';
 
@@ -31,7 +33,11 @@ type Props = {
   }
 };
 
-const FilterAggregationFormContainer = (props: Props) => <FilterAggregationForm {...props} />;
+const FilterAggregationFormContainer = (props: Props) => (
+  <FormWarningsProvider>
+    <FilterAggregationForm {...props} />
+  </FormWarningsProvider>
+);
 
 FilterAggregationFormContainer.propTypes = {
   action: PropTypes.oneOf(['create', 'edit']).isRequired,

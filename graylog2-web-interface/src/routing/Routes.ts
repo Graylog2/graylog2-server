@@ -72,6 +72,7 @@ const Routes = {
     HOST_ACTIVITY: `${SECURITY_PATH}/host-activity`,
     NETWORK_ACTIVITY: `${SECURITY_PATH}/network-activity`,
     ANOMALIES: `${SECURITY_PATH}/anomalies`,
+    ACTIVITY: `${SECURITY_PATH}/activity`,
   },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',

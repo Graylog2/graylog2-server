@@ -18,13 +18,16 @@ package org.graylog2.contentpacks.model.entities;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.searchfilters.model.DBSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,16 +49,21 @@ class QueryEntityTest {
 
     @Test
     public void testLoadsSearchFiltersCollectionFromContentPack() {
+        final String originalId = "42";
+        final String expectedId = "43";
 
         final ImmutableList<UsedSearchFilter> originalSearchFilters = ImmutableList.of(
                 InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").disabled(true).build(),
-                ReferencedQueryStringSearchFilter.create("42").withQueryString("method:GET")
+                ReferencedQueryStringSearchFilter.create(originalId).withQueryString("method:GET")
         );
 
         final ImmutableList<UsedSearchFilter> expectedSearchFilters = ImmutableList.of(
                 InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").disabled(true).build(),
-                InlineQueryStringSearchFilter.builder().queryString("method:GET").build()
+                ReferencedQueryStringSearchFilter.create(expectedId).withQueryString("method:GET")
         );
+
+        final Map<EntityDescriptor, Object> nativeEntities = Map.of(EntityDescriptor.create(originalId, ModelTypes.SEARCH_FILTER_V1), new TestDBSearchFilter(expectedId));
+
         QueryEntity queryWithFilters = QueryEntity.Builder
                 .createWithDefaults()
                 .id("nvmd")
@@ -63,8 +71,20 @@ class QueryEntityTest {
                 .query(ElasticsearchQueryString.empty())
                 .filters(originalSearchFilters)
                 .build();
-        assertThat(queryWithFilters.toNativeEntity(Collections.emptyMap(), Collections.emptyMap()).filters())
+        assertThat(queryWithFilters.toNativeEntity(Collections.emptyMap(), nativeEntities).filters())
                 .isNotNull()
                 .isEqualTo(expectedSearchFilters);
+    }
+
+    private class TestDBSearchFilter implements DBSearchFilter {
+        String id;
+
+        TestDBSearchFilter(String id) {
+            this.id = id;
+        }
+        @Override
+        public String id() {
+            return id;
+        }
     }
 }

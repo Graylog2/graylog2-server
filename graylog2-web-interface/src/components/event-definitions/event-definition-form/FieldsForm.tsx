@@ -29,9 +29,6 @@ import HoverForHelp from 'components/common/HoverForHelp';
 import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
 
-// Import built-in Field Value Providers
-import './field-value-providers';
-
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 

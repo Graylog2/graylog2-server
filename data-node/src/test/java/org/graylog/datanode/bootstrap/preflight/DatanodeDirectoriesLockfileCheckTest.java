@@ -28,21 +28,22 @@ import java.nio.file.Path;
 
 class DatanodeDirectoriesLockfileCheckTest {
 
+    public static final String VALID_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
+    public static final String OTHER_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000001";
+
     @Test
     void testLockCreation(@TempDir Path dataDir,
                           @TempDir Path logsDir,
                           @TempDir Path configDir) throws IOException {
 
-        final Path dataDirLock = dataDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
         final Path logsDirLock = logsDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
         final Path configDirLock = configDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
 
-        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck("5ca1ab1e-0000-4000-a000-000000000000", new DatanodeDirectories(dataDir, logsDir, null, configDir, null));
+        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck(VALID_NODE_ID, new DatanodeDirectories(dataDir, logsDir, null, configDir));
         check.runCheck();
 
-        Assertions.assertThat(Files.readString(dataDirLock)).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
-        Assertions.assertThat(Files.readString(logsDirLock)).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
-        Assertions.assertThat(Files.readString(configDirLock)).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
+        Assertions.assertThat(Files.readString(logsDirLock)).isEqualTo(VALID_NODE_ID);
+        Assertions.assertThat(Files.readString(configDirLock)).isEqualTo(VALID_NODE_ID);
     }
 
 
@@ -51,20 +52,17 @@ class DatanodeDirectoriesLockfileCheckTest {
                           @TempDir Path logsDir,
                           @TempDir Path configDir) throws IOException {
 
-        final Path dataDirLock = dataDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
         final Path logsDirLock = logsDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
         final Path configDirLock = configDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
 
-        Files.writeString(dataDirLock, "5ca1ab1e-0000-4000-a000-000000000000");
-        Files.writeString(logsDirLock, "5ca1ab1e-0000-4000-a000-000000000000");
-        Files.writeString(configDirLock, "5ca1ab1e-0000-4000-a000-000000000000");
+        Files.writeString(logsDirLock, VALID_NODE_ID);
+        Files.writeString(configDirLock, VALID_NODE_ID);
 
-        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck("5ca1ab1e-0000-4000-a000-000000000000", new DatanodeDirectories(dataDir, logsDir, null, configDir, null));
+        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck(VALID_NODE_ID, new DatanodeDirectories(dataDir, logsDir, null, configDir));
         check.runCheck();
 
-        Assertions.assertThat(Files.readString(dataDirLock)).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
-        Assertions.assertThat(Files.readString(logsDirLock)).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
-        Assertions.assertThat(Files.readString(configDirLock)).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
+        Assertions.assertThat(Files.readString(logsDirLock)).isEqualTo(VALID_NODE_ID);
+        Assertions.assertThat(Files.readString(configDirLock)).isEqualTo(VALID_NODE_ID);
     }
 
     @Test
@@ -72,18 +70,17 @@ class DatanodeDirectoriesLockfileCheckTest {
                                @TempDir Path logsDir,
                                @TempDir Path configDir) throws IOException {
 
-        final Path dataDirLock = dataDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
         final Path logsDirLock = logsDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
         final Path configDirLock = configDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
 
-        Files.writeString(dataDirLock, "5ca1ab1e-0000-4000-a000-000000000001");
-        Files.writeString(logsDirLock, "5ca1ab1e-0000-4000-a000-000000000001");
-        Files.writeString(configDirLock, "5ca1ab1e-0000-4000-a000-000000000001");
+        Files.writeString(logsDirLock, OTHER_NODE_ID);
+        Files.writeString(configDirLock, OTHER_NODE_ID);
 
-        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck("5ca1ab1e-0000-4000-a000-000000000000", new DatanodeDirectories(dataDir, logsDir, null, configDir, null));
+        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck(VALID_NODE_ID, new DatanodeDirectories(dataDir, logsDir, null, configDir));
 
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(DatanodeLockFileException.class)
                 .hasMessageContaining("locked for datanode 5ca1ab1e-0000-4000-a000-000000000001, access with datanode 5ca1ab1e-0000-4000-a000-000000000000 rejected");
     }
+
 }

@@ -23,50 +23,43 @@ import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.security.GeneralSecurityException;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Enumeration;
 import java.util.List;
 
+import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
-@ExtendWith(MockitoExtension.class)
 public class CertificateAndPrivateKeyMergerTest {
-
-    @Mock
-    KeyPairChecker keyPairChecker;
-    @Mock
-    PrivateKeyEncryptedStorage privateKeyEncryptedStorage;
 
     CertificateAndPrivateKeyMerger toTest;
 
     @BeforeEach
     void setUp() {
-        toTest = new CertificateAndPrivateKeyMerger(keyPairChecker);
+        toTest = new CertificateAndPrivateKeyMerger();
     }
 
     @Test
     void testThrowsExceptionIfPrivateKeyAndCertificateDoNotMatch() throws Exception {
-        final PrivateKey privateKey = mock(PrivateKey.class);
-        final PublicKey publicKey = mock(PublicKey.class);
-        final X509Certificate signedCertificate = mock(X509Certificate.class);
-        doReturn(publicKey).when(signedCertificate).getPublicKey();
-        doReturn(false).when(keyPairChecker).matchingKeys(privateKey, publicKey);
-        doReturn(privateKey).when(privateKeyEncryptedStorage).readEncryptedKey("privPass".toCharArray());
-        assertThrows(GeneralSecurityException.class, () -> toTest.merge(new CertificateChain(signedCertificate, List.of()),
-                privateKeyEncryptedStorage,
+
+        KeyPairGenerator keyGen1 = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+        keyGen1.initialize(2048);
+        final java.security.KeyPair keyPair1 = keyGen1.genKeyPair();
+        final PrivateKeyEncryptedStorage keyStorage = mockPrivateKeyStorage(keyPair1.getPrivate());
+
+        final CertRequest req = CertRequest.selfSigned("localhost")
+                .validity(Duration.ofHours(24));
+        final KeyPair keyPair = CertificateGenerator.generate(req);
+
+        assertThrows(GeneralSecurityException.class, () -> toTest.merge(new CertificateChain(keyPair.certificate(), List.of()),
+                keyStorage,
                 "privPass".toCharArray(),
                 "certPass".toCharArray(),
                 "data-node")
@@ -76,19 +69,17 @@ public class CertificateAndPrivateKeyMergerTest {
     @Test
     void testMergingOnRealPairImplementation() throws Exception {
         final CertRequest req = CertRequest.selfSigned("localhost")
-                .validity(Duration.ZERO);
+                .validity(Duration.ofHours(24));
         final KeyPair keyPair = CertificateGenerator.generate(req);
 
         final char[] privPass = "privPass".toCharArray();
         final char[] certPass = "certPass".toCharArray();
         final String alias = "data-node";
 
-
-        doReturn(keyPair.privateKey()).when(privateKeyEncryptedStorage).readEncryptedKey(privPass);
-        doReturn(true).when(keyPairChecker).matchingKeys(keyPair.privateKey(), keyPair.publicKey());
+        final PrivateKeyEncryptedStorage storage = mockPrivateKeyStorage(keyPair.privateKey());
 
         final KeyStore merged = toTest.merge(new CertificateChain(keyPair.certificate(), List.of()),
-                privateKeyEncryptedStorage,
+                storage,
                 privPass,
                 certPass,
                 alias);
@@ -99,5 +90,19 @@ public class CertificateAndPrivateKeyMergerTest {
         final Enumeration<String> aliases = merged.aliases();
         assertEquals(alias, aliases.nextElement());
         assertFalse(aliases.hasMoreElements());
+    }
+
+    private static PrivateKeyEncryptedStorage mockPrivateKeyStorage(PrivateKey privateKey) {
+        return new PrivateKeyEncryptedStorage() {
+            @Override
+            public void writeEncryptedKey(char[] password, PrivateKey privateKey) {
+                // do nothing
+            }
+
+            @Override
+            public PrivateKey readEncryptedKey(char[] password) {
+                return privateKey;
+            }
+        };
     }
 }

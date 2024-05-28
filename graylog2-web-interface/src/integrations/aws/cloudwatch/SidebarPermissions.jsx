@@ -38,7 +38,7 @@ function Policies({ title, note, policy }) {
           <Note>{note}</Note>
         </HeaderContent>
 
-        <IconContainer $opened={opened}><Icon name="arrow-right" size="2x" /></IconContainer>
+        <IconContainer $opened={opened}><Icon name="arrow_right_alt" size="2x" /></IconContainer>
       </Header>
 
       <Policy opened={opened}>

@@ -31,4 +31,7 @@ export const validationErrorExplanation = {
 export const validationError: QueryValidationState = {
   status: 'ERROR',
   explanations: [validationErrorExplanation],
+  context: {
+    searched_index_ranges: [],
+  },
 };

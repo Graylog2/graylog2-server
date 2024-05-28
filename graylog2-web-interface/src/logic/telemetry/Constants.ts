@@ -53,6 +53,7 @@ export const TELEMETRY_EVENT_TYPE = {
     WIDGET_EDIT_TOGGLED: 'Search Widget Edit Toggled',
     WIDGET_EDIT_CANCEL_CLICKED: 'Search Widget Edit Cancel Clicked',
     WIDGET_CONFIG_UPDATED: 'Search Widget Config Updated',
+    EXPORT: 'Search Widget Exported',
   },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',
@@ -284,6 +285,9 @@ export const TELEMETRY_EVENT_TYPE = {
     INVESTIGATION_NOTE_SAVED: 'Security Investigation Note Saved',
     INVESTIGATION_NOTE_EDIT: 'Security Investigation Note Updated',
     INVESTIGATION_NOTE_DELETED: 'Security Investigation Note Deleted',
+    INVESTIGATION_DETAILS_SECTION_OPENED: 'Security Investigation Details Section Opened',
+    INVESTIGATION_TIMELINE_FILTER_UPDATED: 'Security Investigation Timeline Filter Updated',
+    INVESTIGATION_TIMELINE_CAROUSEL_NAVIGATED: 'Security Investigation Timeline Carousel Navigated',
     SIGMA_IMPORT_RULES_OPENED: 'Security Sigma Rules Import Opened',
     SIGMA_IMPORT_RULES_IMPORTED: 'Security Sigma Rules Imported',
     SIGMA_RULE_UPDATED: 'Security Sigma Rules Update',

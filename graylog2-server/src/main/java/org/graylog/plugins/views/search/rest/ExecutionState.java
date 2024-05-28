@@ -24,7 +24,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.plugins.views.search.Parameter;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @AutoValue
@@ -43,8 +45,26 @@ public abstract class ExecutionState {
     @JsonProperty
     public abstract ImmutableMap<String, Object> additionalParameters();
 
+    @JsonProperty("cancel_after_seconds")
+    @Nullable
+    public abstract Integer cancelAfterSeconds();
+
     public static ExecutionState empty() {
         return builder().build();
+    }
+
+    public ExecutionState withDefaultQueryCancellationIfNotSpecified(final SearchesClusterConfig searchesClusterConfig) {
+        if (cancelAfterSeconds() == null) {
+            if (searchesClusterConfig != null) {
+                final Integer defaultCancelAfterSeconds = searchesClusterConfig.cancelAfterSeconds();
+                if (defaultCancelAfterSeconds != null)
+                    return toBuilder()
+                            .setCancelAfterSeconds(defaultCancelAfterSeconds)
+                            .build();
+            }
+        }
+        //if individual cancelAfterInterval for execution was set, or there is nothing in the config to be used, return unchanged object
+        return this;
     }
 
     public static Builder builder() {
@@ -63,6 +83,9 @@ public abstract class ExecutionState {
 
         @JsonProperty("global_override")
         public abstract Builder setGlobalOverride(ExecutionStateGlobalOverride globalOverride);
+
+        @JsonProperty("cancel_after_seconds")
+        public abstract Builder setCancelAfterSeconds(@Nullable Integer cancelAfterSeconds);
 
         public abstract ExecutionStateGlobalOverride.Builder globalOverrideBuilder();
 

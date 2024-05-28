@@ -20,6 +20,7 @@ const webpack = require('webpack');
 const AssetsPlugin = require('assets-webpack-plugin');
 const merge = require('webpack-merge');
 const { EsbuildPlugin } = require('esbuild-loader');
+const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
@@ -131,6 +132,15 @@ if (TARGET.startsWith('build')) {
       }),
       new webpack.LoaderOptionsPlugin({
         minimize: true,
+      }),
+      // Create SBOM files for graylog-server frontend dependencies.
+      new CycloneDxWebpackPlugin({
+        specVersion: '1.5',
+        rootComponentAutodetect: false,
+        rootComponentType: 'application',
+        rootComponentName: 'graylog-server',
+        outputLocation: '../cyclonedx-vendor',
+        includeWellknown: false,
       }),
     ],
     output: {

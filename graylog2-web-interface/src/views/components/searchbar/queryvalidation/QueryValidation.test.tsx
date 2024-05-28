@@ -105,10 +105,16 @@ describe('QueryValidation', () => {
     const multipleValidationErrors: QueryValidationState = {
       status: 'ERROR',
       explanations: [validationErrorExplanation, { ...validationErrorExplanation, id: 'validation-explanation-id-2' }],
+      context: {
+        searched_index_ranges: [],
+      },
     };
     const singleValidationError: QueryValidationState = {
       status: 'ERROR',
       explanations: [validationErrorExplanation],
+      context: {
+        searched_index_ranges: [],
+      },
     };
 
     const { rerender } = render(<SUT error={multipleValidationErrors} />);
@@ -145,6 +151,9 @@ describe('QueryValidation', () => {
         errorMessage: 'Query contains unknown field: TargetFilename',
         relatedProperty: 'TargetFilename',
       }],
+      context: {
+        searched_index_ranges: [],
+      },
     };
     render(<SUT error={validationErrorForUnknownField} />);
 

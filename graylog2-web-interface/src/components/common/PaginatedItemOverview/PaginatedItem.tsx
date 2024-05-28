@@ -30,10 +30,10 @@ type Props = {
 const Container = styled.span(({ theme }) => css`
   display: flex;
   padding: 10px;
-  background-color: ${theme.colors.table.background};
+  background-color: ${theme.colors.table.row.background};
 
   &:nth-of-type(even) {
-    background-color: ${theme.colors.table.backgroundAlt};
+    background-color: ${theme.colors.table.row.backgroundAlt};
   }
 `);
 

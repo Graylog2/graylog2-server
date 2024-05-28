@@ -16,10 +16,11 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.apache.http.HttpException;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpException;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpResponse;
+import org.graylog.shaded.opensearch2.org.apache.http.ProtocolVersion;
+import org.graylog.shaded.opensearch2.org.apache.http.message.BasicHttpResponse;
+import org.graylog.shaded.opensearch2.org.apache.http.message.BasicStatusLine;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class OpenSearchFilterDeprecationWarningsInterceptorTest {
     public void testInterceptorNoHeader() throws IOException, HttpException {
         OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
-        final var response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
+        HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         interceptor.process(response, null);
 
         assertThat(response.getAllHeaders())
@@ -43,7 +44,7 @@ public class OpenSearchFilterDeprecationWarningsInterceptorTest {
     public void testInterceptorSingleHeader() throws IOException, HttpException {
         OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
-        final var response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
+        HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");
         interceptor.process(response, null);
 
@@ -60,7 +61,7 @@ public class OpenSearchFilterDeprecationWarningsInterceptorTest {
     public void testInterceptorMultipleHeaderIgnoredWarning() throws IOException, HttpException {
         OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
-        final var response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
+        HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");
         response.addHeader("Warning", "This warning should not trigger the interceptor.");
         interceptor.process(response, null);
@@ -74,7 +75,7 @@ public class OpenSearchFilterDeprecationWarningsInterceptorTest {
     public void testInterceptorMultipleHeaderFilteredWarning() throws IOException, HttpException {
         OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
-        final var response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
+        HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");
         response.addHeader("Warning", "This warning should not trigger the interceptor.");
         response.addHeader("Warning", "This text contains the trigger: setting was deprecated in OpenSearch - and should be filtered out");
@@ -94,7 +95,7 @@ public class OpenSearchFilterDeprecationWarningsInterceptorTest {
     public void testInterceptorMultipleHeaderFilteredWarning2() throws IOException, HttpException {
         OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
-        final var response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
+        HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");
         response.addHeader("Warning", "This warning should not trigger the interceptor.");
         response.addHeader("Warning", "This text contains the trigger: but in a future major version, direct access to system indices and their aliases will not be allowed - and should be filtered out");
@@ -114,7 +115,7 @@ public class OpenSearchFilterDeprecationWarningsInterceptorTest {
     public void testInterceptorMultipleHeaderFilteredWarningAndMultipleTriggers() throws IOException, HttpException {
         OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
-        final var response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
+        HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         response.addHeader("Test", "This header should not trigger the interceptor.");
         response.addHeader("Warning", "This warning should not trigger the interceptor.");
         response.addHeader("Warning", "This text contains the trigger: but in a future major version, direct access to system indices and their aliases will not be allowed - and should be filtered out");

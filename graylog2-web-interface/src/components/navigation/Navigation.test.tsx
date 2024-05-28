@@ -33,7 +33,6 @@ jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('hooks/useCurrentUser');
 jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
 jest.mock('routing/withLocation', () => (x) => x);
-jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
 jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
 
 describe('Navigation', () => {

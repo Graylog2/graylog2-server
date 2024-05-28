@@ -215,6 +215,7 @@ public class SearchSyncIT {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(5))
+                .retryIfExceptionOfType(AssertionError.class)
                 .build();
 
         return retryer.call(() -> given()

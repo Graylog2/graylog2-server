@@ -25,9 +25,13 @@ import org.junit.Test;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class IndexSetConfigTest {
     @Test
@@ -277,5 +281,74 @@ public class IndexSetConfigTest {
 
         assertThat(config.isRegular()).isEmpty();
         assertThat(config.isRegularIndex()).isFalse();
+    }
+
+    @Test
+    public void testEventIndexWithChangedFieldMappingsIsIllegal() {
+        assertFalse(testIndexSetConfig(EVENT_TEMPLATE_TYPE,
+                new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
+                null).canHaveCustomFieldMappings());
+    }
+
+    @Test
+    public void testEventIndexWithProfileSetIsIllegal() {
+        assertFalse(testIndexSetConfig(EVENT_TEMPLATE_TYPE,
+                null,
+                "profile").canHaveProfile());
+    }
+
+    @Test
+    public void testFailureIndexWithProfileSetIsIllegal() {
+        assertFalse(testIndexSetConfig("failures",
+                null,
+                "profile").canHaveProfile());
+    }
+
+    @Test
+    public void testFailureIndexWithChangedFieldMappingsIsIllegal() {
+        assertFalse(testIndexSetConfig("failures",
+                new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
+                null).canHaveCustomFieldMappings());
+    }
+
+    @Test
+    public void testMessageIndexWithChangedFieldMappingsAndProfileIsLegal() {
+        final IndexSetConfig indexSetConfig = testIndexSetConfig(DEFAULT_INDEX_TEMPLATE_TYPE,
+                new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
+                "profile");
+        assertTrue(indexSetConfig.canHaveProfile());
+        assertTrue(indexSetConfig.canHaveCustomFieldMappings());
+    }
+
+
+    private IndexSetConfig testIndexSetConfig(final String templateType,
+                                              final CustomFieldMappings customFieldMappings,
+                                              final String fieldTypeProfile) {
+        return IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Index",
+                "Test Index",
+                true,
+                templateType == DEFAULT_INDEX_TEMPLATE_TYPE,
+                "graylog",
+                null,
+                "graylog_*",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "graylog42-template",
+                templateType,
+                1,
+                false,
+                null,
+                customFieldMappings,
+                fieldTypeProfile,
+                null);
+
     }
 }

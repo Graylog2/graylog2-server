@@ -16,8 +16,13 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
@@ -28,22 +33,28 @@ import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.indexer.datanode.ProxyRequestAdapter;
+import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
-import org.graylog2.indexer.migration.RemoteReindexMigration;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
+import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 import org.graylog2.system.processing.control.ClusterProcessingControl;
 import org.graylog2.system.processing.control.ClusterProcessingControlFactory;
 import org.graylog2.system.processing.control.RemoteProcessingControlResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public class MigrationActionsImpl implements MigrationActions {
@@ -59,13 +70,24 @@ public class MigrationActionsImpl implements MigrationActions {
     private final DataNodeProvisioningService dataNodeProvisioningService;
 
     private final RemoteReindexingMigrationAdapter migrationService;
+    private final MetricRegistry metricRegistry;
+
+    private final DatanodeRestApiProxy datanodeProxy;
+    private final ElasticsearchVersionProvider searchVersionProvider;
+    private final List<URI> elasticsearchHosts;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public MigrationActionsImpl(final ClusterConfigService clusterConfigService, NodeService<DataNodeDto> nodeService,
                                 final CaService caService, DataNodeProvisioningService dataNodeProvisioningService,
                                 RemoteReindexingMigrationAdapter migrationService,
                                 final ClusterProcessingControlFactory clusterProcessingControlFactory,
-                                final PreflightConfigService preflightConfigService) {
+                                final PreflightConfigService preflightConfigService,
+                                final MetricRegistry metricRegistry,
+                                final DatanodeRestApiProxy datanodeProxy,
+                                ElasticsearchVersionProvider searchVersionProvider,
+                                @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
+                                final ObjectMapper objectMapper) {
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
         this.caService = caService;
@@ -73,13 +95,29 @@ public class MigrationActionsImpl implements MigrationActions {
         this.clusterProcessingControlFactory = clusterProcessingControlFactory;
         this.migrationService = migrationService;
         this.preflightConfigService = preflightConfigService;
+        this.metricRegistry = metricRegistry;
+        this.datanodeProxy = datanodeProxy;
+        this.searchVersionProvider = searchVersionProvider;
+        this.elasticsearchHosts = elasticsearchHosts;
+        this.objectMapper = objectMapper;
     }
 
 
     @Override
-    public boolean runDirectoryCompatibilityCheck() {
-        // TODO: add real test
-        return true;
+    public void runDirectoryCompatibilityCheck() {
+        List<CompatibilityResult> results = nodeService.allActive().values().stream().map(node -> {
+            final ProxyRequestAdapter.ProxyRequest request = new ProxyRequestAdapter.ProxyRequest(
+                    "GET", "indices-directory/compatibility", null, node.getHostname(), new MultivaluedHashMap<>());
+            try {
+                ProxyRequestAdapter.ProxyResponse response = datanodeProxy.request(request);
+                return objectMapper.readValue(response.response(), CompatibilityResult.class);
+            } catch (IOException e) {
+                return new CompatibilityResult(node.getHostname(), "unknown", new CompatibilityResult.IndexerDirectoryInformation(List.of(), "unknown"), List.of(e.getMessage()));
+            }
+        }).collect(Collectors.toList());
+        getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_COMPATIBILITY_CHECK_PASSED,
+                results.stream().allMatch(r -> r.compatibilityErrors().isEmpty()));
+        getStateMachineContext().setResponse(results);
     }
 
     @Override
@@ -90,13 +128,13 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void rollingUpgradeSelected() {
-
+        Counter traffic = (Counter) metricRegistry.getMetrics().get(GlobalMetricNames.INPUT_TRAFFIC);
+        getStateMachineContext().addExtendedState(TrafficSnapshot.TRAFFIC_SNAPSHOT, new TrafficSnapshot(traffic.getCount()));
     }
 
     @Override
     public boolean directoryCompatibilityCheckOk() {
-        // TODO: add real test
-        return true;
+        return getStateMachineContext().getExtendedState(MigrationStateMachineContext.KEY_COMPATIBILITY_CHECK_PASSED, Boolean.class).orElse(false);
     }
 
     @Override
@@ -134,35 +172,41 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public boolean removalPolicyDoesNotExist() {
+    public boolean renewalPolicyDoesNotExist() {
         return this.clusterConfigService.get(RenewalPolicy.class) == null;
     }
 
     @Override
-    public boolean caAndRemovalPolicyExist() {
-        return !caDoesNotExist() && !removalPolicyDoesNotExist();
+    public boolean caAndRenewalPolicyExist() {
+        return !caDoesNotExist() && !renewalPolicyDoesNotExist();
     }
 
     @Override
     public void provisionDataNodes() {
         // if we start provisioning DataNodes via the migration, Preflight is definitely done/no option anymore
         var preflight = preflightConfigService.getPreflightConfigResult();
-        if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
-            preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+        if (preflight == null || !preflight.equals(PreflightConfigResult.PREPARED)) {
+            preflightConfigService.setConfigResult(PreflightConfigResult.PREPARED);
         }
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
+        activeDataNodes.values().stream()
+                .filter(node -> node.getDataNodeStatus() != DataNodeStatus.AVAILABLE)
+                .filter(node -> dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId()).map(config -> config.state() != DataNodeProvisioningConfig.State.STARTUP_PREPARED).orElse(true))
+                .forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
     }
 
     @Override
     public void provisionAndStartDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
+        activeDataNodes.values().stream()
+                .filter(node -> node.getDataNodeStatus() != DataNodeStatus.AVAILABLE)
+                .forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
     }
 
     @Override
     public boolean provisioningFinished() {
-        return nodeService.allActive().values().stream().allMatch(node -> dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId())
+        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE ||
+                dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId())
                 .map(dn -> dn.state() == DataNodeProvisioningConfig.State.STARTUP_PREPARED)
                 .orElse(false));
     }
@@ -176,7 +220,7 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public boolean dataNodeStartupFinished() {
         boolean dataNodesAvailable = nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
-        if (dataNodesAvailable) { // set preflight config once more to FINISHED to be sure that a Graylog restart will connect to the data nodes
+        if (dataNodesAvailable) { // set preflight config to FINISHED to be sure that a Graylog restart will connect to the data nodes
             var preflight = preflightConfigService.getPreflightConfigResult();
             if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
                 preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
@@ -187,12 +231,13 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void startRemoteReindex() {
+        final String allowlist = getStateMachineContext().getActionArgumentOpt("allowlist", String.class).orElseThrow(() -> new NullPointerException("allowlist has to be provided"));
         final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
         final List<String> indices = getStateMachineContext().getActionArgumentOpt("indices", List.class).orElse(Collections.emptyList()); // todo: generics!
-        final RemoteReindexMigration migration = migrationService.start(hostname, user, password, indices, false);
-        final String migrationID = migration.id();
+        final int threadsCount = getStateMachineContext().getActionArgumentOpt("threads", Integer.class).orElse(4);
+        final String migrationID = migrationService.start(new RemoteReindexRequest(allowlist, hostname, user, password, indices, threadsCount));
         getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, migrationID);
     }
 
@@ -201,6 +246,37 @@ public class MigrationActionsImpl implements MigrationActions {
         getStateMachineContext().getExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, String.class)
                 .map(migrationService::status)
                 .ifPresent(status -> getStateMachineContext().setResponse(status));
+    }
+
+    @Override
+    public void calculateTrafficEstimate() {
+        Counter currentTraffic = (Counter) metricRegistry.getMetrics().get(GlobalMetricNames.INPUT_TRAFFIC);
+        MigrationStateMachineContext context = getStateMachineContext();
+        if (context.getExtendedState(TrafficSnapshot.ESTIMATED_TRAFFIC_PER_MINUTE) == null) {
+            context.getExtendedState(TrafficSnapshot.TRAFFIC_SNAPSHOT, TrafficSnapshot.class)
+                    .ifPresent(traffic -> context.addExtendedState(TrafficSnapshot.ESTIMATED_TRAFFIC_PER_MINUTE, traffic.calculateEstimatedTrafficPerMinute(currentTraffic.getCount())));
+        }
+    }
+
+    @Override
+    public void verifyRemoteIndexerConnection() {
+        final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
+        final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
+        final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
+        getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password));
+    }
+
+    @Override
+    public boolean isCompatibleInPlaceMigrationVersion() {
+        return !searchVersionProvider.get().isElasticsearch();
+    }
+
+    @Override
+    public void getElasticsearchHosts() {
+        getStateMachineContext().setResponse(Map.of(
+                "elasticsearch_hosts", elasticsearchHosts.stream().map(URI::toString).collect(Collectors.joining(",")),
+                "allowlist_hosts", elasticsearchHosts.stream().map(host -> host.getHost() + ":" + host.getPort()).collect(Collectors.joining(","))
+        ));
     }
 
     @Override

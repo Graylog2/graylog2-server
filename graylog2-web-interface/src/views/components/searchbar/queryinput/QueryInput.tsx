@@ -19,7 +19,7 @@ import { useCallback, useMemo, useContext, useRef, useImperativeHandle } from 'r
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -51,6 +51,14 @@ const GlobalEditorStyles = createGlobalStyle<{ $width?: number; $offsetLeft: num
     left: ${(props) => (props.$offsetLeft ?? 143) + 7}px !important;
   }
 `;
+
+const Container = styled.div<{ $hasValue: boolean }>(({ $hasValue }) => css`
+  width: 100%;
+
+  .ace_hidden-cursors {
+    display: ${$hasValue ? 'block' : 'none'};
+  }
+`);
 
 const displayValidationErrors = () => {
   QueryValidationActions.displayValidationErrors();
@@ -322,9 +330,11 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   useShowHotkeysInOverview();
   useImperativeHandle(outerRef, () => innerRef.current, []);
 
+  const offsetLeft = useMemo(() => inputElement?.getBoundingClientRect()?.left, [inputElement]);
+
   return (
-    <>
-      <GlobalEditorStyles $width={inputWidth} $offsetLeft={inputElement?.offsetLeft} />
+    <Container $hasValue={!!value}>
+      <GlobalEditorStyles $width={inputWidth} $offsetLeft={offsetLeft} />
       <BasicQueryInput height={height}
                        className={className}
                        disabled={false}
@@ -342,7 +352,7 @@ const QueryInput = React.forwardRef<Editor, Props>(({
                        value={value}
                        wrapEnabled={wrapEnabled} />
 
-    </>
+    </Container>
   );
 });
 

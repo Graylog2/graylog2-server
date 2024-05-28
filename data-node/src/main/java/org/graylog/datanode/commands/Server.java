@@ -94,14 +94,13 @@ public class Server extends ServerBootstrap {
                 new RestBindings(),
                 new DataNodeProvisioningBindings(),
                 new PeriodicalBindings(),
-                new ObjectMapperModule(chainingClassLoader),
-                new PasswordAlgorithmBindings()
+                new ObjectMapperModule(chainingClassLoader)
         );
         return modules.build();
     }
 
     @Override
-    protected List<Object> getCommandConfigurationBeans() {
+    public List<Object> getCommandConfigurationBeans() {
         return Arrays.asList(configuration,
                 mongoDbConfiguration,
                 tlsConfiguration,
@@ -140,7 +139,6 @@ public class Server extends ServerBootstrap {
         // always set leader to "false" on startup and let the NodePingPeriodical take care of it later
         nodeService.registerServer(DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
-                .setLeader(false)
                 .setTransportAddress(configuration.getHttpPublishUri().toString())
                 .setHostname(Tools.getLocalCanonicalHostname())
                 .setDataNodeStatus(DataNodeStatus.STARTING)

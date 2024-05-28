@@ -27,9 +27,11 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 
+export const SEARCH_BUTTON_WIDTH = '64';
+
 const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => css`
   position: relative;
-  min-width: 63px;
+  min-width: ${SEARCH_BUTTON_WIDTH}px;
 
   &&&.disabled {
     color: ${theme.utils.contrastingColor(theme.colors.variant.success)};

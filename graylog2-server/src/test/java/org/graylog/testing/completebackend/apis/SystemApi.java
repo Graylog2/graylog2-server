@@ -44,4 +44,9 @@ public class SystemApi implements GraylogRestApi {
                 """;
         api.put("/system/urlwhitelist", String.format(Locale.ROOT, approvedUrlsReq, uri), 204);
     }
+
+    public GraylogApiResponse datanodes() {
+        return new GraylogApiResponse(api.get("/system/cluster/datanodes", 200));
+    }
+
 }

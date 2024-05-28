@@ -40,6 +40,7 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
         this.migrationActions = migrationActions;
         this.persistenceService = persistenceService;
         this.context = persistenceService.getStateMachineContext().orElse(new MigrationStateMachineContext());
+        migrationActions.setStateMachineContext(context);
     }
 
     @Override

@@ -35,6 +35,8 @@ import org.graylog.plugins.netflow.v9.NetFlowV9Packet;
 import org.graylog.plugins.netflow.v9.NetFlowV9Record;
 import org.graylog.plugins.netflow.v9.NetFlowV9Template;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
@@ -61,6 +63,8 @@ public class NetflowV9CodecAggregatorTest {
     private NetFlowCodec codec;
     private NetflowV9CodecAggregator codecAggregator;
     private InetSocketAddress source;
+    private final MessageFactory messageFactory = new TestMessageFactory();
+    private final NetFlowFormatter netFlowFormatter = new NetFlowFormatter(messageFactory);
 
     public NetflowV9CodecAggregatorTest() throws IOException {
         source = new InetSocketAddress(InetAddress.getLocalHost(), 12345);
@@ -71,7 +75,7 @@ public class NetflowV9CodecAggregatorTest {
         // the codec aggregator creates "netflowv9"ish packets, that always contain all necessary templates before the data flows
         // this is not an RFC netflow packet, but greatly simplifies decoding
         codecAggregator = new NetflowV9CodecAggregator();
-        codec = new NetFlowCodec(Configuration.EMPTY_CONFIGURATION, codecAggregator);
+        codec = new NetFlowCodec(Configuration.EMPTY_CONFIGURATION, codecAggregator, netFlowFormatter);
     }
 
 
@@ -430,7 +434,7 @@ public class NetflowV9CodecAggregatorTest {
         final Collection<NetFlowV9Packet> packets = parseNetflowPcapStream("netflow-data/cisco-asa-netflowv9.pcap");
         final Collection<Message> messages = new ArrayList<>();
         packets.forEach(packet -> {
-            messages.addAll(packet.records().stream().map(record -> NetFlowFormatter.toMessage(packet.header(), record, null)).collect(Collectors.toList()));
+            messages.addAll(packet.records().stream().map(record -> netFlowFormatter.toMessage(packet.header(), record, null)).collect(Collectors.toList()));
         });
         assertThat(messages).hasSize(139);
         assertThat(messages).filteredOn(message ->

@@ -17,6 +17,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import ClientCertificateConfig from 'components/datanode/client-certificate/ClientCertificateConfig';
+
 import CertificateRenewalPolicyConfig from './CertificateRenewalPolicyConfig';
 
 const Container = styled.div`
@@ -28,6 +30,7 @@ const Container = styled.div`
 const DataNodeConfiguration = () => (
   <Container>
     <CertificateRenewalPolicyConfig />
+    <ClientCertificateConfig />
   </Container>
 );
 

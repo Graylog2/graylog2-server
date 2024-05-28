@@ -19,7 +19,7 @@ import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
 import asMock from 'helpers/mocking/AsMock';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import ProfileForm from 'components/indices/IndexSetFieldTypeProfiles/ProfileForm';
@@ -42,9 +42,7 @@ const selectItem = async (select: HTMLElement, option: string | RegExp) => {
 };
 
 describe('IndexSetFieldTypesList', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useFieldTypesForMappings).mockReturnValue({

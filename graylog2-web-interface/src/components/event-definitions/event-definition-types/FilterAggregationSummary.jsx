@@ -113,7 +113,7 @@ class FilterAggregationSummary extends React.Component {
       <dd>
         {filters.map((filter) => (
           <div key={filter.id}>
-            {filter.title} -&gt; <code>{filter.queryString}</code>
+            {filter.title ? `${filter.title} -> ` : null}<code>{filter.queryString}</code>
           </div>
         ))}
       </dd>
