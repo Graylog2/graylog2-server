@@ -20,24 +20,18 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
-import javax.annotation.Nullable;
-
 @AutoValue
 @JsonDeserialize(builder = JobDefinitionDto.Builder.class)
-public abstract class JobDefinitionDto {
+public abstract class JobDefinitionDto implements MongoEntity {
     private static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     private static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_CONFIG = "config";
-
-    @Id
-    @ObjectId
-    @Nullable
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
 
     @JsonProperty(FIELD_TITLE)
     public abstract String title();
@@ -64,6 +58,7 @@ public abstract class JobDefinitionDto {
         @Id
         @ObjectId
         @JsonProperty(FIELD_ID)
+        @Nullable
         public abstract Builder id(String id);
 
         @JsonProperty(FIELD_TITLE)

@@ -39,9 +39,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mongojack.Id;
 
-import javax.annotation.Nullable;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -56,12 +54,12 @@ class MongoCollectionsTest {
     private MongoCollections collections;
     private EncryptedValueService encryptedValueService;
 
-    record Person(@JsonProperty("id") @Id @org.mongojack.ObjectId String id,
+    record Person(String id,
                   @JsonProperty("external_id") @org.mongojack.ObjectId String externalId,
                   @JsonProperty("object_id") ObjectId objectId,
                   @JsonProperty("first_name") String firstName,
                   @JsonProperty("created_at") ZonedDateTime createdAt,
-                  @JsonProperty("last_modified_at") DateTime lastModifiedAt) {
+                  @JsonProperty("last_modified_at") DateTime lastModifiedAt) implements MongoEntity {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -71,11 +69,10 @@ class MongoCollectionsTest {
     record IgnoreTest(@JsonProperty("ignore_me_not") String ignoreMeNot,
                       @MongoIgnore @JsonProperty("ignore_me") String ignoreMe) {}
 
-    record IdGenerationTest(@Nullable @JsonProperty("id") @Id @org.mongojack.ObjectId String id) {}
+    record IdGenerationTest(String id) implements MongoEntity {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record TimestampTest(@Nullable @JsonProperty("id") @Id @org.mongojack.ObjectId String id,
-                         @JsonProperty("timestamp") DateTime timestamp) {}
+    record TimestampTest(String id, @JsonProperty("timestamp") DateTime timestamp) implements MongoEntity {}
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
@@ -85,7 +82,7 @@ class MongoCollectionsTest {
 
     @Test
     void testBasicTypes() {
-        final MongoCollection<Person> collection = collections.get("people", Person.class);
+        final MongoCollection<Person> collection = collections.collection("people", Person.class);
         final Person person = new Person(
                 "000000000000000000000001",
                 "000000000000000000000002",
@@ -115,7 +112,7 @@ class MongoCollectionsTest {
 
     @Test
     void testEncryptedValue() {
-        final MongoCollection<Secret> collection = collections.get("secrets", Secret.class);
+        final MongoCollection<Secret> collection = collections.nonEntityCollection("secrets", Secret.class);
         final EncryptedValue encryptedValue = encryptedValueService.encrypt("gary");
         collection.insertOne(new Secret(encryptedValue));
         assertThat(collection.find().first()).isNotNull().satisfies(secret -> {
@@ -129,22 +126,22 @@ class MongoCollectionsTest {
     void testMongoIgnore() {
         // @MongoIgnore should prevent a property from being written to Mongo. But if it's returned from Mongo,
         // e.g. because it was calculated by an aggregation, it should be populated in the returned object.
-        final MongoCollection<IgnoreTest> collection = collections.get("ignoreTest", IgnoreTest.class);
+        final MongoCollection<IgnoreTest> collection = collections.nonEntityCollection("ignoreTest", IgnoreTest.class);
         collection.insertOne(new IgnoreTest("I should be present", "I should be gone"));
         assertThat(collection.find().first()).isEqualTo(new IgnoreTest("I should be present", null));
 
-        final MongoCollection<Document> rawCollection = collections.get("alsoIgnoreTest", Document.class);
+        final MongoCollection<Document> rawCollection = collections.nonEntityCollection("alsoIgnoreTest", Document.class);
         rawCollection.insertOne(new Document(Map.of(
                 "ignore_me_not", "I should be present",
                 "ignore_me", "I sneaked in")));
 
-        final MongoCollection<IgnoreTest> collection2 = collections.get("alsoIgnoreTest", IgnoreTest.class);
+        final MongoCollection<IgnoreTest> collection2 = collections.nonEntityCollection("alsoIgnoreTest", IgnoreTest.class);
         assertThat(collection2.find().first()).isEqualTo(new IgnoreTest("I should be present", "I sneaked in"));
     }
 
     @Test
     void testIdGeneration() {
-        final MongoCollection<IdGenerationTest> collection = collections.get("id-generation-test", IdGenerationTest.class);
+        final MongoCollection<IdGenerationTest> collection = collections.collection("id-generation-test", IdGenerationTest.class);
         final var testObject = new IdGenerationTest(null);
         final InsertOneResult result = collection.insertOne(testObject);
         final BsonValue insertedId = result.getInsertedId();
@@ -155,7 +152,7 @@ class MongoCollectionsTest {
 
     @Test
     void testTimestampToJodaDateTimeConversion() {
-        final MongoCollection<TimestampTest> collection = collections.get("timestamp-test", TimestampTest.class);
+        final MongoCollection<TimestampTest> collection = collections.collection("timestamp-test", TimestampTest.class);
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);
 

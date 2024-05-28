@@ -42,7 +42,7 @@ public class DBCustomJobDefinitionService {
 
     @Inject
     public DBCustomJobDefinitionService(MongoCollections collections) {
-        this.db = collections.get(DBJobDefinitionService.COLLECTION_NAME, JobDefinitionDto.class);
+        this.db = collections.collection(DBJobDefinitionService.COLLECTION_NAME, JobDefinitionDto.class);
     }
 
     public JobDefinitionDto findOrCreate(JobDefinitionDto dto) {
