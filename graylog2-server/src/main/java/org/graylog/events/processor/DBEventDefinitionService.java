@@ -57,13 +57,6 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
-            .put(SearchFilterableConfig.FIELD_FILTERS, SearchQueryField.create(String.format(Locale.US, "%s.%s.%s",
-                    EventDefinitionDto.FIELD_CONFIG,
-                    SearchFilterableConfig.FIELD_FILTERS,
-                    UsedSearchFilter.ID_FIELD)))
-            .put(EventProcessorConfig.TYPE_FIELD, SearchQueryField.create(String.format(Locale.US, "%s.%s",
-                    EventDefinitionDto.FIELD_CONFIG,
-                    EventProcessorConfig.TYPE_FIELD)))
             .build();
 
     private final DBEventProcessorStateService stateService;
@@ -178,42 +171,37 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
      * Returns the list of event definitions that is using the given search filter ID and filter by query.
      *
      * @param searchFilterId the search filter ID
+     * @param query the search query
      * @return the event definitions with the given notification ID
      */
-    public long countByQuery(String query) {
+    public List<EventDefinitionDto> searchBySearchFilterId(String searchFilterId, String query) {
+        return ImmutableList.copyOf((db.find(searchFilterSearchQuery(searchFilterId, query)).iterator()));
+    }
+
+    public PaginatedList<EventDefinitionDto> searchPaginatedBySearchFilterId(final String searchFilterId,
+                                                                             final int page,
+                                                                             final int perPage,
+                                                                             final String query,
+                                                                             final String sortByField,
+                                                                             final String sortOrder) {
+        final DBSort.SortBuilder sortBuilder = getSortBuilder(sortOrder, sortByField);
+        return findPaginatedWithQueryFilterAndSort(searchFilterSearchQuery(searchFilterId, query), null,
+                sortBuilder, page, perPage);
+    }
+
+    private DBQuery.Query searchFilterSearchQuery(String searchFilterId, String query) {
         final SearchQuery searchQuery;
         try {
             searchQuery = searchQueryParser.parse(query);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        return db.count(searchQuery.toDBQuery());
-    }
 
-//    public PaginatedList<EventDefinitionDto> searchPaginatedBySearchFilterId(final String searchFilterId,
-//                                                                             final int page,
-//                                                                             final int perPage,
-//                                                                             final String query,
-//                                                                             final String sortByField,
-//                                                                             final String sortOrder) {
-//        final DBSort.SortBuilder sortBuilder = getSortBuilder(sortOrder, sortByField);
-//        return findPaginatedWithQueryFilterAndSort(searchFilterSearchQuery(searchFilterId, query), null,
-//                sortBuilder, page, perPage);
-//    }
-//
-//    private DBQuery.Query searchFilterSearchQuery(String searchFilterId, String query) {
-//        final SearchQuery searchQuery;
-//        try {
-//            searchQuery = searchQueryParser.parse(query);
-//        } catch (IllegalArgumentException e) {
-//            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-//        }
-//
-//        final String field = String.format(Locale.US, "%s.%s.%s",
-//                EventDefinitionDto.FIELD_CONFIG,
-//                SearchFilterableConfig.FIELD_FILTERS,
-//                UsedSearchFilter.ID_FIELD);
-//
-//        return DBQuery.and(DBQuery.in(field, searchFilterId), searchQuery.toDBQuery());
-//    }
+        final String field = String.format(Locale.US, "%s.%s.%s",
+                EventDefinitionDto.FIELD_CONFIG,
+                SearchFilterableConfig.FIELD_FILTERS,
+                UsedSearchFilter.ID_FIELD);
+
+        return DBQuery.and(DBQuery.in(field, searchFilterId), searchQuery.toDBQuery());
+    }
 }
