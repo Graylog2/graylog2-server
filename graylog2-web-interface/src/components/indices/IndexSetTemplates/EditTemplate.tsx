@@ -39,11 +39,11 @@ const EditTemplate = ({
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { editTemplate } = useTemplateMutation();
+  const { updateTemplate } = useTemplateMutation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
   const onSubmit = useCallback((newTemplate: IndexSetTemplate) => {
-    editTemplate({ template: newTemplate, id: template.id }).then(() => {
+    updateTemplate({ template: newTemplate, id: template.id }).then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT, {
         app_pathname: telemetryPathName,
         app_action_value: 'edit-index-set-template-edited',
@@ -51,7 +51,7 @@ const EditTemplate = ({
 
       navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
     });
-  }, [editTemplate, navigate, template.id, sendTelemetry, telemetryPathName]);
+  }, [updateTemplate, navigate, template.id, sendTelemetry, telemetryPathName]);
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_OPENED, { app_pathname: telemetryPathName, app_action_value: 'edit-index-set-template-opened' });

@@ -25,7 +25,7 @@ import useTemplate from 'components/indices/IndexSetTemplates/hooks/useTemplate'
 
 const IndexSetTemplateEditPage = () => {
   const { templateId } = useParams();
-  const { data, isFetching } = useTemplate(templateId);
+  const { data, isFetching, isSuccess, isError } = useTemplate(templateId);
 
   return (
     <DocumentTitle title="Edit Index Set Template">
@@ -35,7 +35,9 @@ const IndexSetTemplateEditPage = () => {
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          {!isFetching ? <EditTemplate template={data} /> : <Spinner />}
+          {isFetching && <Spinner />}
+          {isSuccess && <EditTemplate template={data} />}
+          {isError && <p>There was an error when loading the template.</p>}
         </Col>
       </Row>
     </DocumentTitle>

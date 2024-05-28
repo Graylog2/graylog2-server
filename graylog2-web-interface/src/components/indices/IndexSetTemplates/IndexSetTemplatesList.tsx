@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
+import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
 
 import {
@@ -44,6 +45,10 @@ export const DEFAULT_LAYOUT = {
   displayedColumns: ['title', 'built_in', 'description'],
   columnsOrder: ['title', 'built_in', 'description'],
 };
+
+const SearchWrapper = styled.div(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xs};
+`);
 
 const IndexSetTemplatesList = () => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
@@ -108,7 +113,7 @@ const IndexSetTemplatesList = () => {
     <PaginatedList totalItems={pagination?.total}
                    pageSize={layoutConfig.pageSize}
                    showPageSizeSelect={false}>
-      <div style={{ marginBottom: 5 }}>
+      <SearchWrapper>
         <SearchForm onSearch={onSearch}
                     onReset={onSearchReset}
                     query={query}
@@ -117,13 +122,12 @@ const IndexSetTemplatesList = () => {
                          urlQueryFilters={urlQueryFilters}
                          setUrlQueryFilters={onChangeFilters} />
         </SearchForm>
-      </div>
-      {pagination?.total === 0 && (
+      </SearchWrapper>
+      {pagination?.total === 0 ? (
         <NoEntitiesExist>
           No index set templates have been found.
         </NoEntitiesExist>
-      )}
-      {!!list?.length && (
+      ) : (
         <EntityDataTable<IndexSetTemplate> data={list}
                                            visibleColumns={layoutConfig.displayedAttributes}
                                            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
