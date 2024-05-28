@@ -22,7 +22,6 @@ import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -67,19 +66,14 @@ public class ViewServiceUsesViewRequirementsTest {
     @Mock
     private ViewRequirements.Factory viewRequirementsFactory;
 
-    @Mock
-    private ViewRequirements viewRequirements;
-
     private ViewService viewService;
 
     @Before
     public void setUp() throws Exception {
         final var mapper = new ObjectMapperProvider();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(mapper.get());
-        final MongoCollections mongoCollections = new MongoCollections(new CommonMongoJackObjectMapperProvider(mapper),
-                mongodb.mongoConnection());
+        final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         this.viewService = new ViewService(
-                objectMapperProvider,
                 clusterConfigService,
                 viewRequirementsFactory,
                 mock(EntityOwnershipService.class),

@@ -71,7 +71,6 @@ public class ViewServiceTest {
                 new ClusterEventBus()
         );
         this.dbService = new ViewService(
-                objectMapperProvider,
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
                 mock(EntityOwnershipService.class),

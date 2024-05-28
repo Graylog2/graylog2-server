@@ -26,7 +26,6 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.indices.MongoDbIndexTools;
@@ -61,8 +60,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
     private final MongoUtils<ViewDTO> mongoUtils;
 
     @Inject
-    protected ViewService(MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                          ClusterConfigService clusterConfigService,
+    protected ViewService(ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
                           EntityOwnershipService entityOwnerShipService,
                           ViewSummaryService viewSummaryService,
@@ -73,7 +71,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
         this.viewSummaryService = viewSummaryService;
         this.collection = mongoCollections.collection(COLLECTION_NAME, ViewDTO.class);
         this.pagination = mongoCollections.paginationHelper(this.collection);
-        this.mongoUtils = new MongoUtils<>(collection, mongoJackObjectMapperProvider.get());
+        this.mongoUtils = mongoCollections.utils(collection);
 
         new MongoDbIndexTools<>(collection).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
     }
