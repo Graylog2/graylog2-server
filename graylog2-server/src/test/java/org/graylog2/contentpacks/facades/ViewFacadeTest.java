@@ -103,7 +103,7 @@ public class ViewFacadeTest {
     public static class TestSearchDBService extends SearchDbService {
         protected TestSearchDBService(MongoConnection mongoConnection,
                                       MongoJackObjectMapperProvider mapper) {
-            super(new MongoCollections(mapper, mongoConnection), dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters(), mapper);
+            super(new MongoCollections(mapper, mongoConnection), dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
         }
     }
 

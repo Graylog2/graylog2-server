@@ -101,8 +101,8 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
         final RandomObjectIdProvider randomObjectIdProvider = new StaticRandomObjectIdProvider(new Date(1575020937839L));
         final RandomUUIDProvider randomUUIDProvider = new RandomUUIDProvider(new Date(1575020937839L), 1575020937839L);
 
-        this.viewService = spy(new ViewService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider));
-        this.searchService = spy(new SearchService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider));
+        this.viewService = spy(new ViewService(new MongoCollections(mapperProvider, mongodb.mongoConnection())));
+        this.searchService = spy(new SearchService(new MongoCollections(mapperProvider, mongodb.mongoConnection())));
 
         migration = new V20191125144500_MigrateDashboardsToViews(
                 dashboardsService,

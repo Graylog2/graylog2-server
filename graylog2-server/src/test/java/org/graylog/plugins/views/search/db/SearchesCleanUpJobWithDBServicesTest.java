@@ -16,14 +16,12 @@
  */
 package org.graylog.plugins.views.search.db;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
@@ -70,21 +68,20 @@ public class SearchesCleanUpJobWithDBServicesTest {
     }
 
     @Before
-    public void setup(MongoJackObjectMapperProvider mapperProvider, ObjectMapper mapper) {
+    public void setup(MongoJackObjectMapperProvider mapperProvider) {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
 
         final ViewSummaryService viewService = new TestViewService(
                 mongodb.mongoConnection(),
                 mapperProvider,
-                new MongoCollections(new CommonMongoJackObjectMapperProvider(() -> mapper), mongodb.mongoConnection())
+                new MongoCollections(mapperProvider, mongodb.mongoConnection())
         );
         this.searchDbService = spy(
                 new SearchDbService(
                         new MongoCollections(mapperProvider, mongodb.mongoConnection()),
                         dto -> new SearchRequirements(Collections.emptySet(), dto),
-                        new IgnoreSearchFilters(),
-                        mapperProvider
+                        new IgnoreSearchFilters()
                 )
         );
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4),

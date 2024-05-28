@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchSummary;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.joda.time.Instant;
@@ -55,14 +54,13 @@ public class SearchDbService {
     @Inject
     protected SearchDbService(MongoCollections mongoCollections,
                               SearchRequirements.Factory searchRequirementsFactory,
-                              SearchFiltersReFetcher searchFiltersRefetcher,
-                              MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
+                              SearchFiltersReFetcher searchFiltersRefetcher) {
         this.searchRequirementsFactory = searchRequirementsFactory;
         db = mongoCollections.collection("searches", Search.class);
         db.createIndex(Indexes.ascending(Search.FIELD_CREATED_AT));
         summarydb = mongoCollections.collection("searches", SearchSummary.class);
         this.searchFiltersRefetcher = searchFiltersRefetcher;
-        this.mongoUtils = new MongoUtils<>(db, mongoJackObjectMapperProvider.get());
+        this.mongoUtils = mongoCollections.utils(db);
     }
 
     public Optional<Search> get(String id) {

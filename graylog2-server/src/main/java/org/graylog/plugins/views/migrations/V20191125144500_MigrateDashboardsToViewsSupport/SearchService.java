@@ -19,7 +19,6 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 
@@ -28,9 +27,9 @@ class SearchService {
     private final MongoUtils<Search> mongoUtils;
 
     @Inject
-    SearchService(MongoCollections mongoCollections, MongoJackObjectMapperProvider mapper) {
+    SearchService(MongoCollections mongoCollections) {
         db = mongoCollections.collection("searches", Search.class);
-        this.mongoUtils = new MongoUtils<>(db, mapper.get());
+        this.mongoUtils = mongoCollections.utils(db);
     }
 
     public ObjectId save(Search search) {

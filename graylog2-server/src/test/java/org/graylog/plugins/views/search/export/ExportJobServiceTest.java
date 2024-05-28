@@ -37,8 +37,7 @@ class ExportJobServiceTest {
                 "000000000000000000000003",
                 ResultFormat.empty());
 
-        final ExportJobService service = new ExportJobService(new MongoCollections(mongoJackObjectMapperProvider, mongoDBTestService.mongoConnection()),
-                mongoJackObjectMapperProvider);
+        final ExportJobService service = new ExportJobService(new MongoCollections(mongoJackObjectMapperProvider, mongoDBTestService.mongoConnection()));
 
         assertThat(service.get(service.save(job))).isNotEmpty().containsInstanceOf(SearchTypeExportJob.class);
     }

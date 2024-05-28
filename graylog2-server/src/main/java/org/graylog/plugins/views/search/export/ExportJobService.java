@@ -21,7 +21,6 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 
@@ -33,12 +32,12 @@ public class ExportJobService {
     private final MongoUtils<ExportJob> mongoUtils;
 
     @Inject
-    public ExportJobService(MongoCollections mongoCollections, MongoJackObjectMapperProvider mapper) {
+    public ExportJobService(MongoCollections mongoCollections) {
         db = mongoCollections.collection("export_jobs", ExportJob.class);
 
         db.createIndex(Indexes.ascending(ExportJob.FIELD_CREATED_AT), new IndexOptions().expireAfter(1L, TimeUnit.HOURS));
 
-        this.mongoUtils = new MongoUtils<>(db, mapper.get());
+        this.mongoUtils = mongoCollections.utils(db);
     }
 
     public Optional<ExportJob> get(String id) {

@@ -19,7 +19,6 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 
@@ -29,9 +28,9 @@ class ViewService {
     private final MongoUtils<View> mongoUtils;
 
     @Inject
-    ViewService(MongoCollections mongoCollections, MongoJackObjectMapperProvider mapper) {
+    ViewService(MongoCollections mongoCollections) {
         this.db = mongoCollections.collection("views", View.class);
-        this.mongoUtils = new MongoUtils<>(db, mapper.get());
+        this.mongoUtils = mongoCollections.utils(this.db);
     }
 
     public ObjectId save(View view) {
