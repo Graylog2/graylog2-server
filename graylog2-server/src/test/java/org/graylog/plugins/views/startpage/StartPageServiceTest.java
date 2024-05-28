@@ -46,7 +46,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -112,21 +111,22 @@ public class StartPageServiceTest {
 
     @Test
     public void testCreateLastOpenedForUser() {
-        startPageService.addLastOpenedFor(ViewDTO.builder().id("id1").title("test").state(new HashMap<>()).searchId("1").build(), searchUser);
+        final var viewBuilder = ViewDTO.builder().title("test").state(Map.of()).searchId("1");
+        startPageService.addLastOpenedFor(viewBuilder.id("id1").build(), searchUser);
         var result = startPageService.findLastOpenedFor(searchUser, 1, 10);
         var list = (List<LastOpened>)result.jsonValue().get("lastOpened");
         assertThat(list.size()).isEqualTo(1);
         assertThat(list.get(0).grn().entity()).isEqualTo("id1");
 
-        startPageService.addLastOpenedFor(ViewDTO.builder().id("id2").title("test").state(new HashMap<>()).searchId("1").build(), searchUser);
+        startPageService.addLastOpenedFor(viewBuilder.id("id2").build(), searchUser);
         result = startPageService.findLastOpenedFor(searchUser, 1, 10);
         list = (List<LastOpened>)result.jsonValue().get("lastOpened");
         assertThat(list.size()).isEqualTo(2);
         assertThat(list.get(0).grn().entity()).isEqualTo("id2");
         assertThat(list.get(1).grn().entity()).isEqualTo("id1");
 
-        startPageService.addLastOpenedFor(ViewDTO.builder().id("id3").title("test").state(new HashMap<>()).searchId("1").build(), searchUser);
-        startPageService.addLastOpenedFor(ViewDTO.builder().id("id1").title("test").state(new HashMap<>()).searchId("1").build(), searchUser);
+        startPageService.addLastOpenedFor(viewBuilder.id("id3").build(), searchUser);
+        startPageService.addLastOpenedFor(viewBuilder.id("id1").build(), searchUser);
         result = startPageService.findLastOpenedFor(searchUser, 1, 10);
         list = (List<LastOpened>)result.jsonValue().get("lastOpened");
         assertThat(list.size()).isEqualTo(3);

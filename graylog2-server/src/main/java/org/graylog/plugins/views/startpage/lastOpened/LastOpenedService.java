@@ -81,7 +81,11 @@ public class LastOpenedService {
     }
 
     public void save(LastOpenedForUserDTO loi) {
-        create(loi);
+        if (loi.id() == null) {
+            create(loi);
+        } else {
+            db.replaceOne(MongoUtils.idEq(loi.id()), loi);
+        }
     }
 
     @VisibleForTesting
