@@ -14,5 +14,4 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as ContactUs } from './ContactUs';
 export { default as DocumentationLink } from './DocumentationLink';
