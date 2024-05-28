@@ -21,6 +21,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
+import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
@@ -35,8 +36,6 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 
 import java.util.Collection;
 import java.util.List;
@@ -84,17 +83,13 @@ public class ViewService implements ViewUtils<ViewDTO> {
                                                    Predicate<ViewDTO> filter,
                                                    SortOrder order,
                                                    String sortField,
-                                                   DBQuery.Query grandTotalQuery,
+                                                   Bson grandTotalQuery,
                                                    int page,
                                                    int perPage) {
-        final PaginatedList<ViewDTO> viewsList = pagination.perPage(perPage)
-                .sort(Sorts.orderBy(order.toBsonSort(sortField), order.toBsonSort(ViewDTO.SECONDARY_SORT)))
-                .grandTotalFilter(grandTotalQuery)
-                .includeGrandTotal(true)
-                .filter(query.toBson())
-                .page(page, filter);
-        return viewsList.withList(viewsList.delegate()
-                .stream()
+        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSortWithGrandTotal(searchUser, query, filter,
+                Sorts.orderBy(order.toBsonSort(sortField), order.toBsonSort(ViewDTO.SECONDARY_SORT)),
+                grandTotalQuery, page, perPage);
+        return viewsList.withList(viewsList.delegate().stream()
                 .map(this::requirementsForView)
                 .toList());
     }
@@ -107,8 +102,8 @@ public class ViewService implements ViewUtils<ViewDTO> {
     protected PaginatedList<ViewDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
                                                                                        SearchQuery dbQuery,
                                                                                        Predicate<ViewDTO> filter,
-                                                                                       DBSort.SortBuilder sort,
-                                                                                       DBQuery.Query grandTotalQuery,
+                                                                                       Bson sort,
+                                                                                       Bson grandTotalQuery,
                                                                                        int page,
                                                                                        int perPage) {
         var grandTotal = collection.countDocuments(grandTotalQuery);
@@ -134,14 +129,14 @@ public class ViewService implements ViewUtils<ViewDTO> {
                                                   String sortField,
                                                   int page,
                                                   int perPage) {
-        return searchPaginated(searchUser, query, filter, order, sortField, DBQuery.empty(), page, perPage);
+        return searchPaginated(searchUser, query, filter, order, sortField, new BsonDocument(), page, perPage);
     }
 
-    private PaginatedList<ViewDTO> searchPaginatedWithGrandTotal(DBQuery.Query query,
+    private PaginatedList<ViewDTO> searchPaginatedWithGrandTotal(Bson query,
                                                                  Predicate<ViewDTO> filter,
                                                                  SortOrder order,
                                                                  String sortField,
-                                                                 DBQuery.Query grandTotalQuery,
+                                                                 Bson grandTotalQuery,
                                                                  int page,
                                                                  int perPage) {
         return pagination.perPage(perPage)
@@ -161,14 +156,14 @@ public class ViewService implements ViewUtils<ViewDTO> {
                                                         int perPage) {
         checkNotNull(sortField);
         return searchPaginatedWithGrandTotal(
-                DBQuery.and(
-                        DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
-                        query.toDBQuery()
+                Filters.and(
+                        Filters.or(Filters.eq(ViewDTO.FIELD_TYPE, type), Filters.not(Filters.exists(ViewDTO.FIELD_TYPE))),
+                        query.toBson()
                 ),
                 filter,
                 order,
                 sortField,
-                DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
+                Filters.or(Filters.eq(ViewDTO.FIELD_TYPE, type), Filters.not(Filters.exists(ViewDTO.FIELD_TYPE))),
                 page,
                 perPage
         );

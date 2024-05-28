@@ -34,10 +34,8 @@ import java.util.concurrent.TimeUnit;
 
 public class MongoDbIndexTools<T> {
 
-    static final String INDEX_NAME_KEY = "name";
     static final String COLLATION_KEY = "collation";
-    static final String UNIQUE_KEY = "unique";
-    static final String LOCALE_KEY = "locale";
+    static final String INDEX_DOCUMENT_KEY = "key";
 
     private final MongoCollection<T> db;
 
@@ -50,7 +48,7 @@ public class MongoDbIndexTools<T> {
         final IndexOptions indexOptions = new IndexOptions().expireAfter(ttl.getSeconds(), TimeUnit.SECONDS);
         final Bson updatedAtKey = Indexes.ascending(fieldUpdatedAt);
         for (Document document : collection.listIndexes()) {
-            final Set<String> keySet = document.get("key", Document.class).keySet();
+            final Set<String> keySet = document.get(INDEX_DOCUMENT_KEY, Document.class).keySet();
             if (keySet.contains(fieldUpdatedAt)) {
                 // Since MongoDB 5.0 this is an Integer. Used to be a Long ¯\_(ツ)_/¯
                 final long expireAfterSeconds = document.get("expireAfterSeconds", Number.class).longValue();
@@ -118,7 +116,7 @@ public class MongoDbIndexTools<T> {
         }
         return MongoUtils.stream(existingIndices)
                 .filter(info ->
-                        info.get("key", Document.class).containsKey(sortField)
+                        info.get(INDEX_DOCUMENT_KEY, Document.class).containsKey(sortField)
                 )
                 .findFirst();
     }
