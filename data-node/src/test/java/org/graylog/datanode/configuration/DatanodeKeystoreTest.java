@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode.configuration;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -24,25 +26,50 @@ import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.CsrSigner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.LinkedList;
 import java.util.List;
 
 class DatanodeKeystoreTest {
 
+    private EventBus eventBus;
+    private final List<DatanodeKeystoreChangedEvent> receivedEvents = new LinkedList<>();
+
+    @BeforeEach
+    void setUp() {
+        eventBus = new EventBus();
+        eventBus.register(this);
+    }
+
+    @AfterEach
+    void tearDown() {
+        eventBus.unregister(this);
+    }
+
+    @Subscribe
+    public void subscribe(DatanodeKeystoreChangedEvent event) {
+        // remember received events so we can verify them later
+        receivedEvents.add(event);
+    }
+
     @Test
     void testCreateRead(@TempDir Path tempDir) throws Exception {
-        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), "foobar");
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), "foobar", this.eventBus);
         Assertions.assertThat(datanodeKeystore.exists()).isFalse();
 
         final KeyPair keyPair = generateKeyPair();
 
         datanodeKeystore.create(keyPair);
         Assertions.assertThat(datanodeKeystore.exists()).isTrue();
+        Assertions.assertThat(this.receivedEvents).hasSize(1);
+
         Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isFalse();
         final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest("my-hostname", List.of("second-hostname"));
         Assertions.assertThat(csr.getSubject().toString()).isEqualTo("CN=my-hostname");
@@ -64,5 +91,4 @@ class DatanodeKeystoreTest {
                 .validity(Duration.ofDays(31));
         return CertificateGenerator.generate(certRequest);
     }
-
 }

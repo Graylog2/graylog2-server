@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.preflight;
+package org.graylog.datanode.configuration;
 
-public enum DatanodeProvisioningEvent {
-    CREATE_PRIVATE_KEY,
-    CERTIFICATE_RECEIVED,
-
-    STARTUP_REQUESTED,
-
-    CONNECTING_FAILED,
-    CONNECTING_SUCCEEDED
+/**
+ * This event will be triggered every time a datanode private key or certificate changes. Other parts of the system,
+ * that use the keystore (opensearch process, jersey) should react to this event and refresh their security setups
+ */
+public class DatanodeKeystoreChangedEvent {
 }

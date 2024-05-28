@@ -27,15 +27,13 @@ import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DataNodeServiceImpl implements DataNodeService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DataNodeServiceImpl.class);
+public class DataNodeCommandServiceImpl implements DataNodeCommandService {
 
     private final ClusterEventBus clusterEventBus;
     private final NodeService<DataNodeDto> nodeService;
 
     @Inject
-    public DataNodeServiceImpl(ClusterEventBus clusterEventBus, NodeService<DataNodeDto> nodeService, EventBus eventBus) {
+    public DataNodeCommandServiceImpl(ClusterEventBus clusterEventBus, NodeService<DataNodeDto> nodeService, EventBus eventBus) {
         this.clusterEventBus = clusterEventBus;
         this.nodeService = nodeService;
         eventBus.register(this);
@@ -76,6 +74,15 @@ public class DataNodeServiceImpl implements DataNodeService {
             throw new IllegalArgumentException("Only running data nodes can be stopped.");
         }
         DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.STOP);
+        clusterEventBus.post(e);
+        return node;
+    }
+
+
+    @Override
+    public DataNodeDto triggerCertificateRequest(String nodeId) throws NodeNotFoundException {
+        final DataNodeDto node = nodeService.byNodeId(nodeId);
+        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REQUEST_CERTIFICATE);
         clusterEventBus.post(e);
         return node;
     }

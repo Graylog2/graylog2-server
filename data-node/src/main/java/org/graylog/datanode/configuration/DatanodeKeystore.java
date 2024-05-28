@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.configuration;
 
+import com.google.common.eventbus.EventBus;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -52,15 +53,17 @@ public class DatanodeKeystore {
 
     public static final Path DATANODE_KEYSTORE_FILE = Path.of("keystore.jks");
     public static String DATANODE_KEY_ALIAS = "datanode";
+    private final EventBus eventBus;
 
     @Inject
-    public DatanodeKeystore(DatanodeConfiguration configuration, final @Named("password_secret") String passwordSecret) {
-        this(configuration.datanodeDirectories(), passwordSecret);
+    public DatanodeKeystore(DatanodeConfiguration configuration, final @Named("password_secret") String passwordSecret, EventBus eventBus) {
+        this(configuration.datanodeDirectories(), passwordSecret, eventBus);
     }
 
-    DatanodeKeystore(DatanodeDirectories datanodeDirectories, String passwordSecret) {
+    DatanodeKeystore(DatanodeDirectories datanodeDirectories, String passwordSecret, EventBus eventBus) {
         this.datanodeDirectories = datanodeDirectories;
         this.passwordSecret = passwordSecret;
+        this.eventBus = eventBus;
     }
 
     public boolean exists() {
@@ -86,29 +89,16 @@ public class DatanodeKeystore {
         return datanodeDirectories.getConfigurationTargetDir().resolve(DATANODE_KEYSTORE_FILE);
     }
 
-    public KeyStore create(KeyPair keyPair) {
+    public KeyStore create(KeyPair keyPair) throws DatanodeKeystoreException {
         try {
-            final Path keystorePath = datanodeDirectories.createConfigurationFile(DATANODE_KEYSTORE_FILE);
-            final KeyStore keystore = keyPair.toKeystore(DATANODE_KEY_ALIAS, passwordSecret.toCharArray());
-            try (FileOutputStream fos = new FileOutputStream(keystorePath.toFile())) {
-                keystore.store(fos, passwordSecret.toCharArray());
-            }
-            return keystore;
+            return persistKeystore(keyPair.toKeystore(DATANODE_KEY_ALIAS, passwordSecret.toCharArray()));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new DatanodeKeystoreException(e);
         }
     }
 
     public KeyStore create(KeyStore keystore) throws DatanodeKeystoreException {
-        try {
-            final Path keystorePath = datanodeDirectories.createConfigurationFile(DATANODE_KEYSTORE_FILE);
-            try (FileOutputStream fos = new FileOutputStream(keystorePath.toFile())) {
-                keystore.store(fos, passwordSecret.toCharArray());
-            }
-            return keystore;
-        } catch (Exception e) {
-            throw new DatanodeKeystoreException(e);
-        }
+        return persistKeystore(keystore);
     }
 
     public void replaceCertificatesInKeystore(CertificateChain certificateChain) throws DatanodeKeystoreException {
@@ -124,12 +114,14 @@ public class DatanodeKeystore {
         }
     }
 
-    private void persistKeystore(KeyStore keystore) throws DatanodeKeystoreException {
+    private KeyStore persistKeystore(KeyStore keystore) throws DatanodeKeystoreException {
         try (FileOutputStream fos = new FileOutputStream(keystorePath().toFile())) {
             keystore.store(fos, passwordSecret.toCharArray());
+            eventBus.post(new DatanodeKeystoreChangedEvent());
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
             throw new DatanodeKeystoreException(e);
         }
+        return keystore;
     }
 
     public KeyStore loadKeystore() throws DatanodeKeystoreException {

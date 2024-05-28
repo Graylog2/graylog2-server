@@ -44,7 +44,7 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.configuration.RunsWithDataNode;
-import org.graylog2.datanode.DataNodeService;
+import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
@@ -65,7 +65,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 public class DataNodeManagementResource extends RestResource {
 
-    private final DataNodeService dataNodeService;
+    private final DataNodeCommandService dataNodeService;
     private final NodeService<DataNodeDto> nodeService;
     private final CertRenewalService certRenewalService;
     private final Boolean runsWithDataNode;
@@ -74,7 +74,7 @@ public class DataNodeManagementResource extends RestResource {
     private final BulkExecutor<DataNodeDto, UserContext> bulkStartExecutor;
 
     @Inject
-    protected DataNodeManagementResource(DataNodeService dataNodeService,
+    protected DataNodeManagementResource(DataNodeCommandService dataNodeService,
                                          NodeService<DataNodeDto> nodeService,
                                          CertRenewalService certRenewalService,
                                          @RunsWithDataNode Boolean runsWithDataNode,

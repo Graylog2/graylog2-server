@@ -33,6 +33,7 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
+import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
@@ -85,22 +86,13 @@ public class DataNodeConfigurationEventHandler {
 
 
     @Subscribe
-    public void doRun(DataNodeProvisioningStateChangeEvent event) {
+    public void doRun(DataNodeLifecycleEvent event) {
+
         if (nodeId.getNodeId().equals(event.nodeId())) {
-            LOG.info("Received DataNodeProvisioningStateChangeEvent with state " + event.state());
-
-            final DataNodeProvisioningConfig cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeId.getNodeId()).orElseThrow(() -> new IllegalStateException("No preflight configuration found for node " + nodeId.getNodeId()));
-
-            Optional.ofNullable(event.state()).ifPresent(state -> {
-                switch (state) {
-                    case CONFIGURED -> writeCsr(cfg);
-                    case SIGNED -> LOG.warn("Ignoring state, will be handled by events");
-                    case STARTUP_TRIGGER ->
-                            dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
-                }
-            });
-        } else {
-            LOG.debug("Ignoring DataNodeProvisioningStateChangeEvent, it's not intended for this datanode");
+            LOG.info("Received DataNodeLifecycleEvent with trigger " + event.trigger());
+            switch (event.trigger()) {
+                case REQUEST_CERTIFICATE -> writeCsr();
+            }
         }
     }
 
@@ -117,18 +109,23 @@ public class DataNodeConfigurationEventHandler {
             // Following state change will trigger an DataNodeProvisioningStateChangeEvent which will notify
             // OpensearchProcessService and it will rebuild opensearch configuration and start the opensearch
             // process with the just received certificate
+
+            // TODO: what about directly triggering stateMachine.fire(OpensearchEvent.PROCESS_PREPARED) and skip the
+            // middleman OpensearchProcessService ? Or trigger generic datanode configuration change event and
+            // let the opensearch process handle it?
             dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STORED);
         } catch (Exception ex) {
             LOG.error("Config entry in signed state, but wrong certificate data present in Mongo", ex);
         }
     }
 
-    private void writeCsr(DataNodeProvisioningConfig cfg) {
+    private void writeCsr() {
         try {
             final var hostname = nodeService.byNodeId(nodeId).getHostname();
 
             final var altNames = ImmutableList.<String>builder()
-                    .addAll(Optional.ofNullable(cfg.altNames()).orElse(Collections.emptyList()))
+                    // TODO: we don't support any external alt names configuration now
+                    //.addAll(Optional.ofNullable(cfg.altNames()).orElse(Collections.emptyList()))
                     .addAll(determineAltNames())
                     .build();
 
@@ -138,7 +135,6 @@ public class DataNodeConfigurationEventHandler {
             LOG.info("created CSR for this node");
         } catch (CSRGenerationException | IOException | NodeNotFoundException | DatanodeKeystoreException ex) {
             LOG.error("error generating a CSR: " + ex.getMessage(), ex);
-            dataNodeProvisioningService.save(cfg.asError(ex.getMessage()));
         }
     }
 

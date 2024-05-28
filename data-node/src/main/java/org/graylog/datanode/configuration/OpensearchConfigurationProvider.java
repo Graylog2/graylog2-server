@@ -17,6 +17,8 @@
 package org.graylog.datanode.configuration;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
@@ -27,11 +29,14 @@ import org.graylog.datanode.configuration.variants.LocalKeystoreSecureConfigurat
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
+import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -44,6 +49,9 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfigurationProvider.class);
+
     private final Configuration localConfiguration;
     private final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration;
     private final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration;
@@ -57,6 +65,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
      * This configuration won't survive datanode restart. But it can be repeatedly provided to the managed opensearch
      */
     private final Map<String, Object> transientConfiguration = new ConcurrentHashMap<>();
+    private final EventBus eventBus;
 
     @Inject
     public OpensearchConfigurationProvider(final Configuration localConfiguration,
@@ -66,7 +75,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                                            final InSecureConfiguration inSecureConfiguration,
                                            final NodeService<DataNodeDto> nodeService,
                                            final @Named("password_secret") String passwordSecret,
-                                           final S3RepositoryConfiguration s3RepositoryConfiguration) {
+                                           final S3RepositoryConfiguration s3RepositoryConfiguration,
+                                           final EventBus eventBus) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
@@ -75,6 +85,24 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;
         this.s3RepositoryConfiguration = s3RepositoryConfiguration;
+        this.eventBus = eventBus;
+        eventBus.register(this); // we want to be notified every time datanode keystore changes
+    }
+
+    @Subscribe
+    public void onKeystoreChange(DatanodeKeystoreChangedEvent event) {
+        LOG.info("OpensearchConfigurationProvider received DatanodeKeystoreChangedEvent, refreshing configuration");
+        triggerConfigurationChangeEvent();
+    }
+
+    public void setTransientConfiguration(String key, Object value) {
+        this.transientConfiguration.put(key, value);
+        triggerConfigurationChangeEvent();
+    }
+
+    private void triggerConfigurationChangeEvent() {
+        final OpensearchConfiguration configuration = get();
+        eventBus.post(new OpensearchConfigurationChangeEvent(configuration));
     }
 
     @Override
@@ -163,9 +191,5 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         config.putAll(transientConfiguration);
 
         return config.build();
-    }
-
-    public void setTransientConfiguration(String key, Object value) {
-        this.transientConfiguration.put(key, value);
     }
 }

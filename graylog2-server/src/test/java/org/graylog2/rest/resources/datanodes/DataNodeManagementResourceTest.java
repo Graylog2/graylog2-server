@@ -24,7 +24,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.datanode.DataNodeService;
+import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class DataNodeManagementResourceTest {
     private DataNodeManagementResource classUnderTest;
 
     @Mock
-    private DataNodeService dataNodeService;
+    private DataNodeCommandService dataNodeService;
     @Mock
     private NodeService<DataNodeDto> nodeService;
     @Mock

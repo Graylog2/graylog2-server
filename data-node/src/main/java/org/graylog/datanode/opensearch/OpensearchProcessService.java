@@ -16,20 +16,25 @@
  */
 package org.graylog.datanode.opensearch;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
+import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
+import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
@@ -38,8 +43,17 @@ import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
@@ -57,6 +71,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final Configuration configuration;
 
     private final OpensearchStateMachine stateMachine;
+
+    private boolean firstStartBanner = true;
 
 
     @Inject
@@ -86,18 +102,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @Subscribe
     @SuppressWarnings("unused")
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
-        switch (event.action()) {
-            case ADD -> {
-                stateMachine.fire(OpensearchEvent.PROCESS_STOPPED);
-                this.configurationProvider.setTransientConfiguration("reindex.remote.allowlist", event.allowlist());
-                configure(); // , "action.auto_create_index", "false"));
-                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
-            }
-            case REMOVE -> {
-                stateMachine.fire(OpensearchEvent.PROCESS_STOPPED);
-                configure();
-                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
-            }
+        if (Objects.requireNonNull(event.action()) == RemoteReindexAllowlistEvent.ACTION.ADD) {
+            this.configurationProvider.setTransientConfiguration("reindex.remote.allowlist", event.allowlist());
         }
     }
 
@@ -110,10 +116,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
             }
             case STORED -> {
-                LOG.info("Provisioning ready, configuring and starting OpenSearch");
-                configure();
-                dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_PREPARED);
-                stateMachine.fire(OpensearchEvent.PROCESS_PREPARED);
+                LOG.info("Ignoring this event, configuration change should propagate automatically and start the process");
             }
         }
     }
@@ -132,7 +135,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     }
 
     private void checkWritePreflightFinishedOnInsecureStartup() {
-        if(configuration.isInsecureStartup()) {
+        if (configuration.isInsecureStartup()) {
             var preflight = preflightConfigService.getPreflightConfigResult();
             if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
                 preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
@@ -145,9 +148,18 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
      */
     @Override
     protected void startUp() {
-        final OpensearchConfiguration config = configurationProvider.get();
-        configure();
+        // initial attempt
+        onConfiguration(configurationProvider.get());
+    }
+
+    @Subscribe
+    public void onOpensearchConfigurationChange(OpensearchConfigurationChangeEvent event) {
+        onConfiguration(event.config());
+    }
+
+    private void onConfiguration(OpensearchConfiguration config) {
         if (config.securityConfigured()) {
+            this.process.configure(config);
             LOG.info("OpenSearch starting up");
             checkWritePreflightFinishedOnInsecureStartup();
             try {
@@ -156,15 +168,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             } catch (Exception e) {
                 LOG.error("Could not start up data node", e);
             }
-
-        }
-    }
-
-    private void configure() {
-        final OpensearchConfiguration config = configurationProvider.get();
-        if (config.securityConfigured()) {
-            this.process.configure(config);
-        } else {
+        } else if (firstStartBanner) {
             String noConfigMessage = """
                     \n
                     ========================================================================================================
@@ -174,8 +178,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                     ========================================================================================================
                     """;
             LOG.info(noConfigMessage);
+            firstStartBanner = false;
         }
-        eventBus.post(new OpensearchConfigurationChangeEvent(config)); //refresh jersey
     }
 
 

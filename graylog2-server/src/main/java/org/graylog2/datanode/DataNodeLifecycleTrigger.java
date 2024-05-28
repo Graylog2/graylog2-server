@@ -17,5 +17,11 @@
 package org.graylog2.datanode;
 
 public enum DataNodeLifecycleTrigger {
-    REMOVE, RESET, STOP, START, REMOVED, STOPPED, STARTED, CLEAR
+    REMOVE, RESET, STOP, START, REMOVED, STOPPED, STARTED, CLEAR,
+    /**
+     * Tell the data node that it should request a new certificate, by creating a certificate signing request.
+     * This CSR will then be propagated as an event to the certificate authority, that will issue a signed cert
+     * and send it as an event back to the data node.
+     */
+    REQUEST_CERTIFICATE
 }
