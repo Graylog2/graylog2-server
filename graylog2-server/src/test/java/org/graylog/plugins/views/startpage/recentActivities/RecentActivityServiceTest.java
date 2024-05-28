@@ -31,6 +31,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,8 +91,8 @@ public class RecentActivityServiceTest {
 
         this.testUserService = testUserService;
         this.grnRegistry = grnRegistry;
-        this.recentActivityService = new RecentActivityService(mongodb.mongoConnection(),
-                mongoJackObjectMapperProvider,
+        this.recentActivityService = new RecentActivityService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()),
+                mongodb.mongoConnection(),
                null,
                 grnRegistry,
                 permissionAndRoleResolver,

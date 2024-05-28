@@ -38,6 +38,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.lookup.Catalog;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -100,8 +101,9 @@ public class StartPageServiceTest {
         };
 
         var eventbus = new EventBus();
-        var lastOpenedService = new LastOpenedService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus);
-        var recentActivityService = new RecentActivityService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, grnRegistry, permissionAndRoleResolver);
+        final var connection = mongodb.mongoConnection();
+        var lastOpenedService = new LastOpenedService(connection, mongoJackObjectMapperProvider, eventbus);
+        var recentActivityService = new RecentActivityService(new MongoCollections(mongoJackObjectMapperProvider, connection), connection, eventbus, grnRegistry, permissionAndRoleResolver);
         catalog = mock(Catalog.class);
         doReturn(Optional.of(new Catalog.Entry("", ""))).when(catalog).getEntry(any());
         startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageItemTitleRetriever(catalog, Map.of()));
