@@ -34,6 +34,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.users.events.UserDeletedEvent;
 import org.joda.time.DateTime;
@@ -93,9 +94,7 @@ public class LastOpenedServiceTest {
 
         this.testUserService = testUserService;
         this.grnRegistry = grnRegistry;
-        this.lastOpenedService = new LastOpenedService(mongodb.mongoConnection(),
-                mongoJackObjectMapperProvider,
-                new EventBus());
+        this.lastOpenedService = new LastOpenedService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()), new EventBus());
     }
 
     @Test
@@ -107,9 +106,9 @@ public class LastOpenedServiceTest {
         lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)))));
         lastOpenedService.save(new LastOpenedForUserDTO("user3", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)))));
 
-        assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(3);
+        assertThat(lastOpenedService.count()).isEqualTo(3);
         lastOpenedService.removeFavoriteEntityOnUserDeletion(UserDeletedEvent.create("user2", "user2"));
-        assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(2);
+        assertThat(lastOpenedService.count()).isEqualTo(2);
         assertThat(lastOpenedService.findForUser("user1")).isNotEmpty();
         assertThat(lastOpenedService.findForUser("user3")).isNotEmpty();
     }
@@ -126,23 +125,32 @@ public class LastOpenedServiceTest {
         lastOpenedService.save(new LastOpenedForUserDTO("user3", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_3 ,DateTime.now(DateTimeZone.UTC)))));
         lastOpenedService.save(new LastOpenedForUserDTO("user4", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_4 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_3 ,DateTime.now(DateTimeZone.UTC)))));
 
-        assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(4);
+        assertThat(lastOpenedService.count()).isEqualTo(4);
         lastOpenedService.removeLastOpenedOnEntityDeletion(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(GRNTypes.SEARCH, "2"), "user4"));
-        assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(4);
+        assertThat(lastOpenedService.count()).isEqualTo(4);
 
-        var last1 = lastOpenedService.findForUser("user1").get();
-        assertThat(last1.items().size()).isEqualTo(0);
+        assertThat(lastOpenedService.findForUser("user1"))
+                .isPresent()
+                .map(LastOpenedForUserDTO::items)
+                .hasValueSatisfying(items -> assertThat(items).hasSize(0));
 
-        var last2 = lastOpenedService.findForUser("user2").get();
-        assertThat(last2.items().size()).isEqualTo(1);
-        assertThat(last2.items().get(0).grn().entity()).isEqualTo("1");
+        assertThat(lastOpenedService.findForUser("user2"))
+                .isPresent()
+                .map(LastOpenedForUserDTO::items)
+                .hasValueSatisfying(items -> assertThat(items).hasSize(1))
+                .map(items -> items.get(0).grn().entity())
+                .hasValue("1");
 
-        var last3 = lastOpenedService.findForUser("user3").get();
-        assertThat(last3.items().size()).isEqualTo(2);
-        assertThat(last3.items().get(0).grn().entity()).isEqualTo("1");
-        assertThat(last3.items().get(1).grn().entity()).isEqualTo("3");
+        assertThat(lastOpenedService.findForUser("user3"))
+                .isPresent()
+                .map(LastOpenedForUserDTO::items)
+                .hasValueSatisfying(items -> assertThat(items).hasSize(2))
+                .hasValueSatisfying(items -> assertThat(items.get(0).grn().entity()).isEqualTo("1"))
+                .hasValueSatisfying(items -> assertThat(items.get(1).grn().entity()).isEqualTo("3"));
 
-        var last4 = lastOpenedService.findForUser("user4").get();
-        assertThat(last4.items().size()).isEqualTo(3);
+        assertThat(lastOpenedService.findForUser("user4"))
+                .isPresent()
+                .map(LastOpenedForUserDTO::items)
+                .hasValueSatisfying(items -> assertThat(items).hasSize(3));
     }
 }

@@ -102,8 +102,9 @@ public class StartPageServiceTest {
 
         var eventbus = new EventBus();
         final var connection = mongodb.mongoConnection();
-        var lastOpenedService = new LastOpenedService(connection, mongoJackObjectMapperProvider, eventbus);
-        var recentActivityService = new RecentActivityService(new MongoCollections(mongoJackObjectMapperProvider, connection), connection, eventbus, grnRegistry, permissionAndRoleResolver);
+        final var collections = new MongoCollections(mongoJackObjectMapperProvider, connection);
+        var lastOpenedService = new LastOpenedService(collections, eventbus);
+        var recentActivityService = new RecentActivityService(collections, connection, eventbus, grnRegistry, permissionAndRoleResolver);
         catalog = mock(Catalog.class);
         doReturn(Optional.of(new Catalog.Entry("", ""))).when(catalog).getEntry(any());
         startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageItemTitleRetriever(catalog, Map.of()));
