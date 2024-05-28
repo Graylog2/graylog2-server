@@ -38,6 +38,12 @@ const FlexWrapper = styled.div(({ theme }) => css`
       margin-bottom: 0;
     }
 
+    dl > dt {
+      float: left;
+      clear: left;
+      margin-right: ${theme.spacings.xs};
+    }
+
     dl > dd {
       margin-bottom: ${theme.spacings.sm};
     }
