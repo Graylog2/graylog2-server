@@ -126,7 +126,11 @@ const useOnWindowUnload = () => {
   }, [dispatch]);
 };
 
-const Search = () => {
+type Props = {
+  forceSideBarPinned?: boolean,
+};
+
+const Search = ({ forceSideBarPinned }: Props) => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
   const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar } = useSearchPageLayout();
@@ -171,9 +175,9 @@ const Search = () => {
                               <GridContainer id="main-row" $interactive={interactive}>
                                 <IfInteractive>
                                   {showSidebar && (
-                                  <ConnectedSidebar>
-                                    <FieldsOverview />
-                                  </ConnectedSidebar>
+                                    <ConnectedSidebar forceSideBarPinned={forceSideBarPinned}>
+                                      <FieldsOverview />
+                                    </ConnectedSidebar>
                                   )}
                                 </IfInteractive>
                                 <SearchArea as={SearchAreaContainer}>
@@ -212,6 +216,10 @@ const Search = () => {
       </ExternalValueActionsProvider>
     </>
   );
+};
+
+Search.defaultProps = {
+  forceSideBarPinned: false,
 };
 
 export default Search;

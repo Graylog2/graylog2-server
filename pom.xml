@@ -100,10 +100,10 @@
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.25.6</aws-java-sdk-2.version>
-        <aws-kinesis-client.version>2.5.8</aws-kinesis-client.version>
+        <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.1.0</aws-msk-iam-auth.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
-        <byte-buddy.version>1.14.14</byte-buddy.version>
+        <byte-buddy.version>1.14.16</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.172</classgraph.version>
@@ -123,7 +123,7 @@
         <grok.version>0.1.9-graylog-2</grok.version>
         <grpc.version>1.64.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>33.1.0-jre</guava.version>
+        <guava.version>33.2.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.1</HdrHistogram.version>
         <hamcrest.version>2.2</hamcrest.version>
@@ -140,7 +140,7 @@
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
-        <jersey.version>3.1.6</jersey.version>
+        <jersey.version>3.1.7</jersey.version>
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.12.7</joda-time.version>
         <jool.version>0.9.15</jool.version>
@@ -153,7 +153,7 @@
         <mongodb-driver.version>5.1.0</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.109.Final</netty.version>
+        <netty.version>4.1.110.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.65.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -168,7 +168,7 @@
         <shiro.version>2.0.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <snappy-java.version>1.1.10.5</snappy-java.version>
-        <oshi.version>6.6.0</oshi.version>
+        <oshi.version>6.6.1</oshi.version>
         <siv-mode.version>1.5.2</siv-mode.version>
         <slf4j.version>2.0.13</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
@@ -177,7 +177,7 @@
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.0</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
-        <validation-api.version>3.0.2</validation-api.version>
+        <validation-api.version>3.1.0</validation-api.version>
         <zstd.version>1.5.6-3</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
@@ -187,7 +187,7 @@
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
-        <assertj-core.version>3.25.3</assertj-core.version>
+        <assertj-core.version>3.26.0</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.1</awaitility.version>
         <equalsverifier.version>3.16.1</equalsverifier.version>
@@ -413,7 +413,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.26.1</version>
+                <version>1.26.2</version>
             </dependency>
 
             <dependency>
