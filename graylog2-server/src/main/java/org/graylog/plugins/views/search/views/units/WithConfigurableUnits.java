@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.views;
+package org.graylog.plugins.views.search.views.units;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-
-@JsonAutoDetect
-public interface WidgetConfigDTO {
-
+/**
+ * Marker interface for those implementations of {@link org.graylog.plugins.views.search.views.WidgetConfigDTO},
+ * where customizing/configuring per field unit setting is supported.
+ */
+public interface WithConfigurableUnits {
+    String UNIT_SETTINGS_PROPERTY = "units";
 }

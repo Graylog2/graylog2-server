@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
+import org.graylog.plugins.views.search.views.units.WithConfigurableUnits;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 
 import javax.annotation.Nullable;
@@ -36,7 +37,7 @@ import java.util.OptionalInt;
 @AutoValue
 @JsonTypeName(AggregationConfigDTO.NAME)
 @JsonDeserialize(builder = AggregationConfigDTO.Builder.class)
-public abstract class AggregationConfigDTO implements WidgetConfigDTO {
+public abstract class AggregationConfigDTO implements WidgetConfigDTO, WithConfigurableUnits {
     public static final String NAME = "aggregation";
     private static final String FIELD_ROW_PIVOTS = "row_pivots";
     private static final String FIELD_COLUMN_PIVOTS = "column_pivots";
@@ -53,7 +54,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     @JsonProperty(FIELD_ROW_PIVOTS)
     public abstract List<PivotDTO> rowPivots();
 
-    @JsonProperty(WidgetConfigDTO.UNIT_SETTINGS_PROPERTY)
+    @JsonProperty(UNIT_SETTINGS_PROPERTY)
     public abstract Map<String, UnitId> unitSettings();
 
     @JsonProperty(FIELD_COLUMN_PIVOTS)
@@ -115,7 +116,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         @JsonProperty(FIELD_ROW_PIVOTS)
         public abstract Builder rowPivots(List<PivotDTO> rowPivots);
 
-        @JsonProperty(WidgetConfigDTO.UNIT_SETTINGS_PROPERTY)
+        @JsonProperty(UNIT_SETTINGS_PROPERTY)
         public abstract Builder unitSettings(Map<String, UnitId> unitSettings);
 
         abstract List<PivotDTO> rowPivots();

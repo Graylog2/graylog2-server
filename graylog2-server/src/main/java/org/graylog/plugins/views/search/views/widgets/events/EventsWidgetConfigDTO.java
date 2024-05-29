@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
+import org.graylog.plugins.views.search.views.units.WithConfigurableUnits;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ import java.util.Set;
 @AutoValue
 @JsonTypeName(EventsWidgetConfigDTO.NAME)
 @JsonDeserialize(builder = EventsWidgetConfigDTO.Builder.class)
-public abstract class EventsWidgetConfigDTO implements WidgetConfigDTO {
+public abstract class EventsWidgetConfigDTO implements WidgetConfigDTO, WithConfigurableUnits {
     public static final String NAME = "events";
 
     public enum Direction {
@@ -62,7 +63,7 @@ public abstract class EventsWidgetConfigDTO implements WidgetConfigDTO {
     @JsonProperty(FIELD_FIELDS)
     public abstract Set<String> fields();
 
-    @JsonProperty(WidgetConfigDTO.UNIT_SETTINGS_PROPERTY)
+    @JsonProperty(UNIT_SETTINGS_PROPERTY)
     public abstract Map<String, UnitId> unitSettings();
 
     @JsonProperty(FIELD_FILTERS)
@@ -79,7 +80,7 @@ public abstract class EventsWidgetConfigDTO implements WidgetConfigDTO {
         @JsonProperty(FIELD_FIELDS)
         public abstract Builder fields(Set<String> fields);
 
-        @JsonProperty(WidgetConfigDTO.UNIT_SETTINGS_PROPERTY)
+        @JsonProperty(UNIT_SETTINGS_PROPERTY)
         public abstract Builder unitSettings(Map<String, UnitId> unitSettings);
 
         @JsonProperty(FIELD_FILTERS)

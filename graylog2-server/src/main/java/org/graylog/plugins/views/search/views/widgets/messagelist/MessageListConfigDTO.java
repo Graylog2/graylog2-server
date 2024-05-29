@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
+import org.graylog.plugins.views.search.views.units.WithConfigurableUnits;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
@@ -37,7 +38,7 @@ import java.util.Map;
 @AutoValue
 @JsonTypeName(MessageListConfigDTO.NAME)
 @JsonDeserialize(builder = MessageListConfigDTO.Builder.class)
-public abstract class MessageListConfigDTO implements WidgetConfigDTO {
+public abstract class MessageListConfigDTO implements WidgetConfigDTO, WithConfigurableUnits {
     public static final String NAME = "messages";
     private static final String FIELD_FIELDS = "fields";
     private static final String FIELD_SHOW_MESSAGE_ROW = "show_message_row";
@@ -48,7 +49,7 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
     @JsonProperty(FIELD_FIELDS)
     public abstract ImmutableSet<String> fields();
 
-    @JsonProperty(WidgetConfigDTO.UNIT_SETTINGS_PROPERTY)
+    @JsonProperty(UNIT_SETTINGS_PROPERTY)
     public abstract Map<String, UnitId> unitSettings();
 
     @JsonProperty(FIELD_SHOW_MESSAGE_ROW)
@@ -69,7 +70,7 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
         @JsonProperty(FIELD_FIELDS)
         public abstract Builder fields(ImmutableSet<String> fields);
 
-        @JsonProperty(WidgetConfigDTO.UNIT_SETTINGS_PROPERTY)
+        @JsonProperty(UNIT_SETTINGS_PROPERTY)
         public abstract Builder unitSettings(Map<String, UnitId> unitSettings);
 
         @JsonProperty(FIELD_SHOW_MESSAGE_ROW)
