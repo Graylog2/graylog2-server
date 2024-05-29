@@ -297,6 +297,7 @@ const CollectorsAdministration = ({
             {(configAssignments.length > 0)
               && (
               <IconButton name="edit_square"
+                          title="Edit configuration"
                           onClick={() => {
                             setSelected([collectorId]);
                             setShowConfigurationModal(true);

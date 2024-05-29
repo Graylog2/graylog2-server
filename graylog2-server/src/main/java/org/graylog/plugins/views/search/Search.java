@@ -34,6 +34,7 @@ import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -57,9 +58,9 @@ import static java.util.stream.Collectors.toSet;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = Search.Builder.class)
-public abstract class Search implements ContentPackable<SearchEntity>, ParameterProvider {
+public abstract class Search implements ContentPackable<SearchEntity>, ParameterProvider, MongoEntity {
     public static final String FIELD_REQUIRES = "requires";
-    static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
 
     // generated during build to help quickly find a parameter by name.
