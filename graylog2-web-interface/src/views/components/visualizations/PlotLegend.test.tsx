@@ -87,7 +87,7 @@ describe('PlotLegend', () => {
     const colorHints = await screen.findAllByLabelText('Color Hint');
     fireEvent.click(colorHints[0]);
 
-    screen.getByText('Configuration for name1');
+    await screen.findByRole('heading', { name: /Configuration for name1/i });
     const color = screen.getByTitle('#b71c1c');
     fireEvent.click(color);
 
