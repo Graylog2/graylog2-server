@@ -54,6 +54,10 @@ public abstract class ExportMessagesCommand {
         }
     }
 
+    public boolean exportAllFields() {
+        return fieldsInOrder().isEmpty();
+    }
+
     public abstract AbsoluteRange timeRange();
 
     public abstract ElasticsearchQueryString queryString();
