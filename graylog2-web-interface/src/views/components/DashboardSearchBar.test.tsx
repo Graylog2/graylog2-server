@@ -99,7 +99,7 @@ describe('DashboardSearchBar', () => {
     await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
   });
 
-  it('should call trigger search execution and set global override on submit when there are changes', async () => {
+  it('should trigger search execution and set global override on submit when there are changes', async () => {
     render(<DashboardSearchBar />);
 
     const timeRangeFilter = await screen.findByText(/no override/i);
