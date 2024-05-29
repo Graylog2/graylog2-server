@@ -36,7 +36,8 @@ public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingEx
         final var errorPath = errorPath(e);
         final var location = e.getLocation();
         final String message = errorWithJsonPath(e, errorPath);
-        final var apiError = RequestError.create(message, location.getLineNr(), location.getColumnNr(), errorPath);
+        final var referencePath = e.getPathReference();
+        final var apiError = RequestError.create(message, location.getLineNr(), location.getColumnNr(), errorPath, referencePath);
         return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
     }
 
