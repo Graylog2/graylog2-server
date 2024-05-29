@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { styled, css } from 'styled-components';
+import { useFormikContext } from 'formik';
 
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import FieldUnitPopover from 'views/components/aggregationwizard/units/FieldUnitPopover';
 import UnitContainer from 'views/components/aggregationwizard/units/UnitContainer';
 import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 
 type Props = {
   field: string,
@@ -34,6 +36,13 @@ const Label = styled.span(({ theme }) => css`
 
 const FieldUnitComponent = ({ field, predefinedValue }: Props) => {
   const { getUnitInfo } = useFieldUnitTypes();
+  const { setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+
+  useEffect(() => {
+    if (predefinedValue) {
+      setFieldValue(`units.${field}`, { abbrev: predefinedValue.abbrev, unitType: predefinedValue.unitType });
+    }
+  }, [predefinedValue]);
 
   if (predefinedValue?.isDefined) return <UnitContainer><Label title={getUnitInfo(predefinedValue.unitType, predefinedValue.abbrev).name}>{predefinedValue.abbrev}</Label></UnitContainer>;
 

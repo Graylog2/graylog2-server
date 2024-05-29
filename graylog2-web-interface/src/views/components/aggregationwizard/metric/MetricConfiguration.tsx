@@ -97,19 +97,6 @@ const Metric = ({ index }: Props) => {
     }
   }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
 
-  const onFieldChange = useCallback((newValue: string) => {
-    setFieldValue(`metrics.${index}.field`, newValue);
-    /*
-    if (preDefinedFieldTypes?.[newValue]) {
-      setFieldValue(`metrics.${index}.unitType`, preDefinedFieldTypes[newValue].unitType);
-      setFieldValue(`metrics.${index}.abbrev`, preDefinedFieldTypes[newValue].abbrev);
-    } else {
-      setFieldValue(`metrics.${index}.unitType`, undefined);
-      setFieldValue(`metrics.${index}.abbrev`, undefined);
-    }
-    */
-  }, [index, preDefinedFieldTypes, setFieldValue]);
-
   const showUnitType = isFunctionAllowsUnit(currentFunction);
 
   return (
@@ -135,7 +122,7 @@ const Metric = ({ index }: Props) => {
       {hasFieldOption && (
         <FieldContainer>
           <Field name={`metrics.${index}.field`}>
-            {({ field: { name, value }, meta: { error } }) => (
+            {({ field: { name, value, onChange }, meta: { error } }) => (
               <Input id="metric-field"
                      label="Field"
                      error={error}
@@ -144,7 +131,9 @@ const Metric = ({ index }: Props) => {
                 <FieldSelect id="metric-field-select"
                              selectRef={metricFieldSelectRef}
                              menuPortalTarget={document.body}
-                             onChange={onFieldChange}
+                             onChange={(fieldName) => {
+                               onChange({ target: { name, value: fieldName } });
+                             }}
                              clearable={!isFieldRequired}
                              isFieldQualified={isFieldQualified}
                              name={name}
