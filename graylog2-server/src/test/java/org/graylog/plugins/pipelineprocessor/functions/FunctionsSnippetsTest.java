@@ -1699,6 +1699,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message.getField("add_array_to_array_empty_value")).isEqualTo(List.of("one", "two"));
             assertThat(message.getField("combined_json_array")).isEqualTo(List.of("Administrator", "Administrator", "Administrator", "Administrator", "user01"));
             assertThat(message.getField("mixed_types_json_array")).isEqualTo(List.of("text"));
+            assertThat(message.getField("add_value_to_null_array")).isEqualTo(List.of("test"));
+            assertThat(message.getField("add_null_to_array")).isEqualTo(List.of("test"));
         }
     }
 
