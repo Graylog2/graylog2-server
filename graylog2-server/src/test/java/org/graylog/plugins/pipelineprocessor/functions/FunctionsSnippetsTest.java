@@ -875,15 +875,32 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Message message = evaluateRule(rule);
 
         assertThat(message).isNotNull();
+        System.out.println(message.getFields());
         assertThat(message.getFieldCount()).isEqualTo(7);
         assertThat(message.getTimestamp()).isNotNull();
-        // named captures only
-        assertThat(message.hasField("num")).isTrue();
-        assertThat(message.hasField("BASE10NUM")).isFalse();
 
-        // Test for issue 5563 and 5794
-        // ensure named groups with underscore work
-        assertThat(message.hasField("test_field")).isTrue();
+        assertThat(message.getField("vendor_attack")).isEqualTo("DDOS");
+        assertThat(message.getField("destination_ip")).isEqualTo("10.0.1.34");
+
+        // Our Grok library had a bug where it didn't remove the ":type" suffix from a field name when the pattern
+        // didn't match. Instead, it tried to add a "packets:long" field to the message which triggered a warning
+        // log message about the field name being invalid.
+        // See:
+        //   - https://github.com/Graylog2/graylog2-server/issues/18883
+        //   - https://github.com/graylog-labs/java-grok/pull/4
+        //
+        // We are using the "__grok_map" field to capture the raw Grok matches, so we can check if the library
+        // behaves correctly. Without this, we wouldn't be able to check the behavior because Message#addField
+        // skips "null" values and invalid field names.
+        assertThat(message.hasField("__grok_map")).isTrue();
+        //noinspection unchecked
+        final Map<String, Object> grokMap = (Map<String, Object>) message.getField("__grok_map");
+        assertThat(grokMap)
+                .withFailMessage("The \"packets\" field should be present in the Grok map")
+                .containsKey("packets");
+        assertThat(grokMap.get("packets"))
+                .withFailMessage("The \"packets\" field should be null")
+                .isNull();
     }
 
     @Test
