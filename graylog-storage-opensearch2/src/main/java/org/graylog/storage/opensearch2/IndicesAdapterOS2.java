@@ -84,6 +84,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -158,13 +159,28 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public void create(String index, IndexSettings indexSettings) {
+        executeCreateIndexRequest(index, createIndexRequest(index, indexSettings, null));
+    }
+
+    @Override
+    public void create(String index, IndexSettings indexSettings, @Nullable Map<String, Object> mapping) {
+        executeCreateIndexRequest(index, createIndexRequest(index, indexSettings, mapping));
+    }
+
+    private CreateIndexRequest createIndexRequest(String index,
+                                                   IndexSettings indexSettings,
+                                                   @Nullable Map<String, Object> mapping) {
         final Map<String, Object> settings = new HashMap<>();
         settings.put("number_of_shards", indexSettings.shards());
         settings.put("number_of_replicas", indexSettings.replicas());
+        CreateIndexRequest request = new CreateIndexRequest(index).settings(settings);
+        if (mapping != null) {
+            request = request.mapping(mapping);
+        }
+        return request;
+    }
 
-        final CreateIndexRequest request = new CreateIndexRequest(index)
-                .settings(settings);
-
+    private void executeCreateIndexRequest(String index, CreateIndexRequest request) {
         client.execute((c, requestOptions) -> c.indices().create(request, requestOptions),
                 "Unable to create index " + index);
     }
@@ -182,6 +198,18 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
+    public Map<String, Object> getIndexMapping(@Nonnull String index) {
+        final GetMappingsRequest request = new GetMappingsRequest()
+                .indices(index)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+
+        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+                "Couldn't read mapping of index " + index);
+
+        return result.mappings().get(index).sourceAsMap();
+    }
+
+    @Override
     public void updateIndexMetaData(@Nonnull String index, @Nonnull Map<String, Object> metadata, boolean mergeExisting) {
         Map<String, Object> metaUpdate = new HashMap<>();
         if (mergeExisting) {
@@ -194,14 +222,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public Map<String, Object> getIndexMetaData(@Nonnull String index) {
-        final GetMappingsRequest request = new GetMappingsRequest()
-                .indices(index)
-                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
-
-        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
-                "Couldn't read mapping of index " + index);
-
-        final Object metaData = result.mappings().get(index).sourceAsMap().get("_meta");
+        final Object metaData = getIndexMapping(index).get("_meta");
         //noinspection rawtypes
         if (metaData instanceof Map map) {
             //noinspection unchecked
