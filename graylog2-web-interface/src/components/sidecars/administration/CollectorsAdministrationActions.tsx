@@ -50,14 +50,25 @@ const CollectorsAdministrationActions = ({
   const onCancelConfigurationModal = useCallback(() => setShowConfigurationModal(false), []);
 
   const selectedLogCollectorsNames = uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector.name));
-  const configButtonTooltip = `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously`;
+  const disableConfigButton = !selectedSidecarCollectorPairs.length || selectedLogCollectorsNames.length !== 1;
+
+  const getConfigButtonTooltip = () => {
+    switch (true) {
+      case !selectedSidecarCollectorPairs.length:
+        return 'Incompatible collectors, please check your sidecar configuration.';
+      case selectedLogCollectorsNames.length !== 1:
+        return `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously.`;
+      default:
+        return 'Assign Configurations';
+    }
+  };
 
   return (
     <ButtonToolbar>
-      <ConfigurationButton title={(selectedLogCollectorsNames.length > 1) ? configButtonTooltip : undefined}
+      <ConfigurationButton title={getConfigButtonTooltip()}
                            bsStyle="primary"
                            bsSize="small"
-                           disabled={selectedLogCollectorsNames.length !== 1}
+                           disabled={disableConfigButton}
                            onClick={() => setShowConfigurationModal(true)}>
         <Icon name="edit_square" /> Assign Configurations
       </ConfigurationButton>
