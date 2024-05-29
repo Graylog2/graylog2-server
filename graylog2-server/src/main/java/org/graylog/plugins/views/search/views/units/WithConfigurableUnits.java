@@ -16,10 +16,16 @@
  */
 package org.graylog.plugins.views.search.views.units;
 
+import org.graylog.plugins.formatting.units.model.UnitId;
+
+import java.util.Map;
+
 /**
- * Marker interface for those implementations of {@link org.graylog.plugins.views.search.views.WidgetConfigDTO},
+ * Interface for those implementations of {@link org.graylog.plugins.views.search.views.WidgetConfigDTO},
  * where customizing/configuring per field unit setting is supported.
  */
 public interface WithConfigurableUnits {
     String UNIT_SETTINGS_PROPERTY = "units";
+
+    Map<String, UnitId> unitSettings();
 }

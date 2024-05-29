@@ -49,6 +49,7 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO, WithConfi
     @JsonProperty(FIELD_FIELDS)
     public abstract ImmutableSet<String> fields();
 
+    @Override
     @JsonProperty(UNIT_SETTINGS_PROPERTY)
     public abstract Map<String, UnitId> unitSettings();
 

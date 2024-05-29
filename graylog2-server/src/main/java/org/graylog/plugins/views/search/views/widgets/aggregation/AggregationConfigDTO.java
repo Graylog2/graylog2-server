@@ -54,6 +54,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO, WithConfi
     @JsonProperty(FIELD_ROW_PIVOTS)
     public abstract List<PivotDTO> rowPivots();
 
+    @Override
     @JsonProperty(UNIT_SETTINGS_PROPERTY)
     public abstract Map<String, UnitId> unitSettings();
 

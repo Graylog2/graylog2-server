@@ -63,6 +63,7 @@ public abstract class EventsWidgetConfigDTO implements WidgetConfigDTO, WithConf
     @JsonProperty(FIELD_FIELDS)
     public abstract Set<String> fields();
 
+    @Override
     @JsonProperty(UNIT_SETTINGS_PROPERTY)
     public abstract Map<String, UnitId> unitSettings();
 
