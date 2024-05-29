@@ -14,18 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-
-import { Col, Row } from 'components/bootstrap';
-
-import SupportSources from './SupportSources';
-
-const ContactUs = () => (
-  <Row className="content">
-    <Col md={12}>
-      <SupportSources />
-    </Col>
-  </Row>
-);
-
-export default ContactUs;
+export { default as DocumentationLink } from './DocumentationLink';
+export { default as SupportSources } from './SupportSources';
