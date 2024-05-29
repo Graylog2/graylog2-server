@@ -121,7 +121,7 @@ public class StartPageService {
             lastOpenedService.save(loi);
         } else {
             var items = new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of(item));
-            lastOpenedService.create(items, searchUser);
+            lastOpenedService.create(items);
         }
     }
 }
