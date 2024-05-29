@@ -23,7 +23,6 @@ import com.google.common.base.Suppliers;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import okhttp3.OkHttpClient;
-import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioningHandler;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
@@ -47,8 +46,8 @@ public class PreflightConnectionChecker {
 
     private static final Logger LOG = LoggerFactory.getLogger(PreflightConnectionChecker.class);
     private final ObjectMapper objectMapper;
-    private final Supplier<OkHttpClient> okHttpClient;
     private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
+    private final CustomCAX509TrustManager trustManager;
 
     @Inject
     public PreflightConnectionChecker(ObjectMapper objectMapper, final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
@@ -56,12 +55,19 @@ public class PreflightConnectionChecker {
 
         this.objectMapper = objectMapper;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
-        this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager, indexerJwtAuthTokenProvider));
+        this.trustManager = trustManager;
     }
 
     public Optional<SearchVersion> checkConnection(DataNodeDto node) {
-        final VersionProbe versionProbe = new VersionProbe(objectMapper, okHttpClient.get(), 1, Duration.seconds(1), true, true, indexerJwtAuthTokenProvider);
-        return versionProbe.probe(Collections.singletonList(URI.create(node.getTransportAddress())));
+        final OkHttpClient okHttpClient = buildConnectivityCheckOkHttpClient(trustManager, indexerJwtAuthTokenProvider);
+        final VersionProbe versionProbe = new VersionProbe(objectMapper, okHttpClient, 1, Duration.seconds(1), true, true, indexerJwtAuthTokenProvider);
+        try {
+            return versionProbe.probe(Collections.singletonList(URI.create(node.getTransportAddress())));
+            // TODO: version probe doesn't throw exceptions, it just logs them. But we need access to them!
+        } catch (Exception e) {
+            LOG.error("Failed to reach datanode", e);
+            return Optional.empty();
+        }
     }
 
     private static OkHttpClient buildConnectivityCheckOkHttpClient(final X509TrustManager trustManager, IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {

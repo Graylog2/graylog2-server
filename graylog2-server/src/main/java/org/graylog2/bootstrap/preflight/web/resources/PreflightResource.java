@@ -203,9 +203,20 @@ public class PreflightResource {
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
     public void startOver() {
+        stopDatanodes();
         caService.startOver();
         clusterConfigService.remove(RenewalPolicy.class);
-        //dataNodeProvisioningService.deleteAll();
+    }
+
+    private void stopDatanodes() {
+        nodesInformationService.allActive()
+                .values().forEach(node -> {
+                    try {
+                        datanodesCommandService.stopNode(node.getNodeId());
+                    } catch (NodeNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     @DELETE
@@ -213,8 +224,11 @@ public class PreflightResource {
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
     public void startOver(@PathParam("nodeID") String nodeID) {
-        //TODO:  reset a specific datanode
-        //dataNodeProvisioningService.delete(nodeID);
+        try {
+            datanodesCommandService.stopNode(nodeID);
+        } catch (NodeNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @POST

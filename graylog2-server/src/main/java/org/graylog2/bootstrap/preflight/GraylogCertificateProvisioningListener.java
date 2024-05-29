@@ -21,7 +21,6 @@ import com.google.common.eventbus.Subscribe;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 import org.graylog.security.certutil.CaConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
@@ -47,8 +46,8 @@ import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 /**
  * This is the graylog-server handler that reacts to certificate signing requests and returns signed certificates.
  */
-public class GraylogCertificateProvisioningHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningHandler.class);
+public class GraylogCertificateProvisioningListener {
+    private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningListener.class);
     private final CaConfiguration configuration;
     private final CaService caService;
     private final CsrSigner csrSigner;
@@ -57,13 +56,13 @@ public class GraylogCertificateProvisioningHandler {
     private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public GraylogCertificateProvisioningHandler(final CaService caService,
-                                                 final Configuration configuration,
-                                                 final CsrSigner csrSigner,
-                                                 final ClusterConfigService clusterConfigService,
-                                                 final @Named("password_secret") String passwordSecret,
-                                                 final EventBus eventBus,
-                                                 final ClusterEventBus clusterEventBus
+    public GraylogCertificateProvisioningListener(final CaService caService,
+                                                  final Configuration configuration,
+                                                  final CsrSigner csrSigner,
+                                                  final ClusterConfigService clusterConfigService,
+                                                  final @Named("password_secret") String passwordSecret,
+                                                  final EventBus eventBus,
+                                                  final ClusterEventBus clusterEventBus
     ) {
         this.caService = caService;
         this.passwordSecret = passwordSecret;

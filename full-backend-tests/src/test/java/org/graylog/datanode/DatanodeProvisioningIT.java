@@ -46,6 +46,8 @@ import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,15 +84,24 @@ public class DatanodeProvisioningIT {
 
     @TempDir
     private Path tempDir;
+    private BasicAuthCredentials basicAuth;
 
     public DatanodeProvisioningIT(GraylogApis apis) {
         this.apis = apis;
     }
 
+    @BeforeEach
+    void setUp() {
+        basicAuth = extractBasicAuthFromLogs(apis.backend().getLogs());
+    }
+
+    @AfterEach
+    void tearDown() {
+        resetProvisioning(basicAuth);
+    }
+
     @ContainerMatrixTest
     void provisionDatanodeGenerateCA() throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
-        final BasicAuthCredentials basicAuth = extractBasicAuthFromLogs(apis.backend().getLogs());
-
         final String caSubjectName = createSelfSignedCA(basicAuth);
 
         configureAutomaticCertRenewalPolicy(basicAuth);
@@ -151,6 +162,15 @@ public class DatanodeProvisioningIT {
         }
     }
 
+    private ValidatableResponse resetProvisioning(BasicAuthCredentials basicAuth) {
+        return given()
+                .spec(apis.requestSpecification())
+                .auth().basic(basicAuth.username, basicAuth.password)
+                .delete("/startOver")
+                .then()
+                .statusCode(HttpStatus.SC_NO_CONTENT);
+    }
+
     private ValidatableResponse triggerDatanodeProvisioning(BasicAuthCredentials basicAuth) {
         return given()
                 .spec(apis.requestSpecification())
@@ -187,7 +207,6 @@ public class DatanodeProvisioningIT {
     void provisionDatanodeUploadCA() throws ExecutionException, RetryException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 
         final Path caKeystore = createCA();
-        final BasicAuthCredentials basicAuth = extractBasicAuthFromLogs(apis.backend().getLogs());
 
         uploadCA(basicAuth, caKeystore);
         configureAutomaticCertRenewalPolicy(basicAuth);

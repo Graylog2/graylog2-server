@@ -18,7 +18,6 @@ package org.graylog2.cluster.preflight;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioningHandler;
 
 public class DataNodeProvisioningBindings extends AbstractModule {
 

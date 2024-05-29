@@ -82,7 +82,7 @@ public class PreflightWebModule extends Graylog2Module {
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(PreflightBoot.class).asEagerSingleton();
         bind(NotificationService.class).to(NullNotificationService.class);
-        bind(GraylogCertificateProvisioningHandler.class).asEagerSingleton();
+        bind(GraylogCertificateProvisioningListener.class).asEagerSingleton();
 
         addPreflightRestResource(PreflightResource.class);
         addPreflightRestResource(CertificateRenewalPolicyResource.class);

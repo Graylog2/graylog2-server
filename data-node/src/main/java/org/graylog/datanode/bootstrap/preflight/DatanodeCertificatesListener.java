@@ -30,10 +30,8 @@ import org.graylog2.bootstrap.preflight.CertificateSigningRequestEvent;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-import org.graylog2.cluster.preflight.DataNodeProvisioningService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
+import org.graylog2.datanode.DataNodeLifecycleTrigger;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
@@ -42,15 +40,21 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Collections;
+import java.security.cert.CertificateException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * This listener handles two types of events:
+ * <ul>
+ *     <li>{@link DataNodeLifecycleTrigger#REQUEST_CERTIFICATE} that will generate and send a certificate signing request</li>
+ *     <li>{@link CertificateSignedEvent} that holds the already signed certificate chain which should be </li>
+ * </ul>
+ */
 @Singleton
-public class DataNodeConfigurationEventHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(DataNodeConfigurationEventHandler.class);
+public class DatanodeCertificatesListener {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeCertificatesListener.class);
 
     private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
@@ -59,11 +63,11 @@ public class DataNodeConfigurationEventHandler {
     private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public DataNodeConfigurationEventHandler(final NodeService<DataNodeDto> nodeService,
-                                             final NodeId nodeId,
-                                             final DatanodeKeystore datanodeKeystore,
-                                             final ClusterEventBus clusterEventBus,
-                                             final EventBus eventBus
+    public DatanodeCertificatesListener(final NodeService<DataNodeDto> nodeService,
+                                        final NodeId nodeId,
+                                        final DatanodeKeystore datanodeKeystore,
+                                        final ClusterEventBus clusterEventBus,
+                                        final EventBus eventBus
     ) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -74,30 +78,28 @@ public class DataNodeConfigurationEventHandler {
 
 
     @Subscribe
-    public void doRun(DataNodeLifecycleEvent event) {
+    public void certificateRequestedListener(DataNodeLifecycleEvent event) {
         if (nodeId.getNodeId().equals(event.nodeId())) {
             LOG.info("Received DataNodeLifecycleEvent with trigger " + event.trigger());
-            switch (event.trigger()) {
-                case REQUEST_CERTIFICATE -> writeCsr();
+            if (Objects.requireNonNull(event.trigger()) == DataNodeLifecycleTrigger.REQUEST_CERTIFICATE) {
+                triggerCertificateSigningRequest();
             }
         }
     }
 
     @Subscribe
     public void certificateSignedListener(CertificateSignedEvent event) {
-        if (!nodeId.getNodeId().equals(event.nodeId())) {
-            // not for this datanode, ignoring
-            return;
-        }
-        LOG.info("Received CertificateSignedEvent for node " + event.nodeId());
-        try {
-            datanodeKeystore.replaceCertificatesInKeystore(event.readCertChain());
-        } catch (Exception ex) {
-            LOG.error("Config entry in signed state, but wrong certificate data present in Mongo", ex);
+        if (nodeId.getNodeId().equals(event.nodeId())) {
+            LOG.info("Received signed certificates for datanode " + event.nodeId());
+            try {
+                datanodeKeystore.replaceCertificatesInKeystore(event.readCertChain());
+            } catch (DatanodeKeystoreException | CertificateException | IOException ex) {
+                LOG.error("Failed to replace certificate chain in datanode keystore", ex);
+            }
         }
     }
 
-    private void writeCsr() {
+    private void triggerCertificateSigningRequest() {
         try {
             final var hostname = nodeService.byNodeId(nodeId).getHostname();
 
@@ -108,17 +110,11 @@ public class DataNodeConfigurationEventHandler {
                     .build();
 
             final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest(hostname, altNames);
-
-            postCsrEvent(csr);
-            LOG.info("created CSR for this node");
+            clusterEventBus.post(CertificateSigningRequestEvent.fromCsr(nodeId.getNodeId(), csr));
+            LOG.info("Posted CertificateSigningRequestEvent for node " + nodeId.getNodeId());
         } catch (CSRGenerationException | IOException | NodeNotFoundException | DatanodeKeystoreException ex) {
             LOG.error("error generating a CSR: " + ex.getMessage(), ex);
         }
-    }
-
-    private void postCsrEvent(PKCS10CertificationRequest csr) throws IOException {
-        clusterEventBus.post(CertificateSigningRequestEvent.fromCsr(nodeId.getNodeId(), csr));
-        LOG.info("Posted CertificateSigningRequestEvent for node " + nodeId.getNodeId());
     }
 
     private Iterable<String> determineAltNames() {
