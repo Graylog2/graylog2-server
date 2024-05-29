@@ -201,7 +201,6 @@ const DataTable = ({
 
   const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup, units } = config;
 
-  console.log({ config, units });
   const rows = retrieveChartData(data) ?? [];
 
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);

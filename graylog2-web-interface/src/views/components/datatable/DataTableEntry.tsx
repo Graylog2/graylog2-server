@@ -62,7 +62,6 @@ const flattenValuePath = (valuePath: ValuePath) => valuePath.flatMap((path) => O
 
 const Column = ({ field, value, type, valuePath, source, unit }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
-  // console.log('!!!! !!!! GGGG !!!!! !!!!!', { unit });
 
   return (
     <TableDataCell $isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
@@ -95,7 +94,6 @@ const columnNameToField = (column, series = []) => {
 };
 
 const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, valuePath, item, types, units }: Props) => {
-  console.log('DataTableEntry', { units });
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
 

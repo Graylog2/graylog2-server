@@ -80,22 +80,14 @@ export const updateWidgetAggregationElements = (formValues: WidgetConfigFormValu
       throw new Error(`Aggregation element with key ${key} is missing toConfig.`);
     }
 
-    console.log({ formValues, oldConfig, toConfig, key });
-
     return toConfig;
   }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), oldConfig.toBuilder());
-
-  console.log({ newConfig });
 
   return newConfig.build();
 };
 
 const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void, oldConfig: AggregationWidgetConfig) => {
   const newConfig = updateWidgetAggregationElements(formValues, oldConfig);
-
-  console.log('!!!!!!!!!', {
-    newConfig,
-  });
 
   return onConfigChange(newConfig);
 };

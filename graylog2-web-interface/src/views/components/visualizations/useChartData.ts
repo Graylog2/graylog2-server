@@ -26,7 +26,6 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 const useChartData = (rows: Rows, config: Optional<ChartDataConfig, 'formatTime'>) => {
   const { formatTime } = useUserDateTime();
   const mapKeys = useMapKeys();
-  // console.log('useChartData', { rows, config });
 
   return useMemo(() => chartData(rows, {
     formatTime,
