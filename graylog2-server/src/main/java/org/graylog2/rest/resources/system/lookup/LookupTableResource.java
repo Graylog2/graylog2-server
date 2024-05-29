@@ -254,7 +254,7 @@ public class LookupTableResource extends RestResource {
                                             allowableValues = "title,description,name,id")
                                   @DefaultValue(LookupTableDto.FIELD_TITLE) @QueryParam("sort") String sort,
                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                      @DefaultValue("desc") @QueryParam("order") SortOrder order,
+                                  @DefaultValue("desc") @QueryParam("order") SortOrder order,
                                   @ApiParam(name = "query") @QueryParam("query") String query,
                                   @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
@@ -448,7 +448,7 @@ public class LookupTableResource extends RestResource {
                                               allowableValues = "title,description,name,id")
                                     @DefaultValue(DataAdapterDto.FIELD_TITLE) @QueryParam("sort") String sort,
                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                        @DefaultValue("desc") @QueryParam("order") SortOrder order,
+                                    @DefaultValue("desc") @QueryParam("order") SortOrder order,
                                     @ApiParam(name = "query") @QueryParam("query") String query) {
 
         if (!ADAPTER_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
@@ -657,7 +657,7 @@ public class LookupTableResource extends RestResource {
                                        allowableValues = "title,description,name,id")
                              @DefaultValue(CacheDto.FIELD_TITLE) @QueryParam("sort") String sort,
                              @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                 @DefaultValue("desc") @QueryParam("order") SortOrder order,
+                             @DefaultValue("desc") @QueryParam("order") SortOrder order,
                              @ApiParam(name = "query") @QueryParam("query") String query) {
         if (!CACHE_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
             sort = CacheDto.FIELD_TITLE;
