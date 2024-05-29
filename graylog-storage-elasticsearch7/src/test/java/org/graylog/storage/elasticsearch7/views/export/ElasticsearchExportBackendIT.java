@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch7.views.export;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.annotation.Nonnull;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportException;
@@ -32,7 +33,6 @@ import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import jakarta.annotation.Nonnull;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
@@ -194,11 +194,11 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void resultsHaveAllMessageFields() {
+    public void resultsHaveAllMessageFieldsIfFieldsHaveNotBeenExplicitlyChosen() {
         importFixture("messages.json");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
-                .fieldsInOrder("timestamp", "message")
+                .fieldsInOrder(ExportMessagesCommand.ALL_FIELDS)
                 .build();
 
         LinkedHashSet<SimpleMessageChunk> allChunks = helper.collectChunksFor(command);

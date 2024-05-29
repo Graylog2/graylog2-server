@@ -30,6 +30,8 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 5px;
 `;
 
 type Props = React.PropsWithChildren<{

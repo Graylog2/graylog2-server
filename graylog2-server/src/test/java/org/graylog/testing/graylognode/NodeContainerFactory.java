@@ -145,10 +145,9 @@ public class NodeContainerFactory {
 
                 .withEnv("GRAYLOG_ENABLE_DEBUG_RESOURCES", "true") // see RestResourcesModule#addDebugResources
                 .withEnv(config.configParams)
-                .withExposedPorts(config.portsToExpose())
-                .withStartupTimeout(Duration.of(600, SECONDS));
+                .withExposedPorts(config.portsToExpose());
 
-        container.waitingFor(getWaitStrategy(container.getEnvMap()));
+        container.waitingFor(getWaitStrategy(container.getEnvMap())).withStartupTimeout(Duration.of(600, SECONDS));
 
         if (!includeFrontend) {
             container.withEnv("DEVELOPMENT", "true");

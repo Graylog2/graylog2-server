@@ -75,7 +75,6 @@ const InPlaceMigration = ({ currentStep, onTriggerStep }: MigrationStepComponent
         return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key:
         return <CompatibilityCheckStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
-      case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key:
       case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key:
         return <CertificatesProvisioning currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key:

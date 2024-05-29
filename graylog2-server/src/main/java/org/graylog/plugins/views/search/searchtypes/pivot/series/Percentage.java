@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import org.graylog.plugins.formatting.units.model.UnitId;
+import org.graylog.plugins.views.search.searchtypes.pivot.MayHaveUnit;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import javax.annotation.Nullable;
@@ -31,7 +33,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Percentage.NAME)
 @JsonDeserialize(builder = Percentage.Builder.class)
-public abstract class Percentage implements SeriesSpec, HasOptionalField {
+public abstract class Percentage implements SeriesSpec, HasOptionalField, MayHaveUnit {
     public static final String NAME = "percentage";
 
     public enum Strategy {
@@ -44,6 +46,10 @@ public abstract class Percentage implements SeriesSpec, HasOptionalField {
 
     @Override
     public abstract String id();
+
+    @Override
+    public abstract Optional<UnitId> unit();
+
 
     @JsonProperty
     public abstract Optional<Strategy> strategy();
@@ -64,7 +70,9 @@ public abstract class Percentage implements SeriesSpec, HasOptionalField {
     }
 
     public static Builder builder() {
-        return new AutoValue_Percentage.Builder().type(Percentage.NAME);
+        return new AutoValue_Percentage.Builder()
+                .unit(new UnitId("percent", "%"))
+                .type(Percentage.NAME);
     }
 
     @AutoValue.Builder
@@ -83,6 +91,9 @@ public abstract class Percentage implements SeriesSpec, HasOptionalField {
         abstract Optional<String> id();
 
         public abstract Builder field(@Nullable String field);
+
+        @JsonProperty
+        public abstract Builder unit(@Nullable UnitId unit);
 
         @JsonProperty("field")
         public Builder nonEmptyField(@Nullable String field) {
