@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
+import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
 import asMock from 'helpers/mocking/AsMock';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
@@ -243,11 +244,13 @@ const indexSetTemplateDefaults = {
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
 jest.mock('components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults', () => jest.fn());
+jest.mock('components/indices/IndexSetTemplates/hooks/useSelectedTemplate', () => jest.fn());
 
 describe('IndexSetConfigurationForm', () => {
   beforeEach(() => {
     asMock(useProfileOptions).mockReturnValue(({ isLoading: false, options: [], refetch: () => {} }));
     asMock(useIndexSetTemplateDefaults).mockReturnValue(({ loadingIndexSetTemplateDefaults: false, indexSetTemplateDefaults }));
+    asMock(useSelectedIndexSetTemplate).mockReturnValue(({ selectedIndexSetTemplate: undefined, setSelectedIndexSetTemplate: jest.fn() }));
   });
 
   const onSave = jest.fn();
