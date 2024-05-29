@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -32,7 +33,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 @JsonAutoDetect
-abstract class Dashboard {
+abstract class Dashboard implements MongoEntity {
     private static final String FIELD_ID = "_id";
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_DESCRIPTION = "description";
@@ -43,7 +44,7 @@ abstract class Dashboard {
     private static final String EMBEDDED_POSITIONS = "positions";
 
     @JsonProperty(FIELD_ID)
-    abstract String id();
+    public abstract String id();
 
     @JsonProperty(FIELD_TITLE)
     abstract String title();

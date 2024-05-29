@@ -41,7 +41,6 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSort
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardWidgetConverter;
@@ -87,16 +86,8 @@ public class DashboardV1FacadeTest {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    private DashboardV1Facade facade;
-    private ViewFacadeTest.TestViewService viewService;
     private ViewFacadeTest.TestSearchDBService searchDbService;
-    private ViewFacadeTest.TestViewSummaryService viewSummaryService;
-    private final String viewId = "5def958063303ae5f68eccae"; /* stored in database */
-    private final String newViewId = "5def958063303ae5f68edead";
-    private final String newStreamId = "5def958063303ae5f68ebeaf";
-    private final String streamId = "5cdab2293d27467fbe9e8a72"; /* stored in database */
     private ViewDTO viewDTO;
-    private UserService userService;
 
 
     @Before
@@ -118,17 +109,16 @@ public class DashboardV1FacadeTest {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
         searchDbService = new ViewFacadeTest.TestSearchDBService(mongoConnection, mapper);
-        final MongoCollections mongoCollections = new MongoCollections(
-                new CommonMongoJackObjectMapperProvider(() -> objectMapper), mongoConnection);
-        viewService = new ViewFacadeTest.TestViewService(mongoConnection, mapper, null, mongoCollections);
-        viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoConnection, mapper, mongoCollections);
-        userService = mock(UserService.class);
+        final MongoCollections mongoCollections = new MongoCollections(mapper, mongoConnection);
+        ViewFacadeTest.TestViewService viewService = new ViewFacadeTest.TestViewService(null, mongoCollections);
+        ViewFacadeTest.TestViewSummaryService viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoConnection, mapper, mongoCollections);
+        UserService userService = mock(UserService.class);
         final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
                 mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
         when(userService.load("testuser")).thenReturn(fakeUser);
         final DashboardWidgetConverter dashboardWidgetConverter = new DashboardWidgetConverter();
         final EntityConverter entityConverter = new EntityConverter(dashboardWidgetConverter);
-        facade = new DashboardV1Facade(objectMapper, searchDbService, entityConverter, viewService, viewSummaryService, userService);
+        DashboardV1Facade facade = new DashboardV1Facade(objectMapper, searchDbService, entityConverter, viewService, viewSummaryService, userService);
         final URL resourceUrl = Resources.getResource(DashboardV1Facade.class, "content-pack-dashboard-v1.json");
         final ContentPack contentPack = objectMapper.readValue(resourceUrl, ContentPack.class);
         assertThat(contentPack).isInstanceOf(ContentPackV1.class);

@@ -16,36 +16,49 @@
  */
 package org.graylog2.database.indices;
 
-import com.mongodb.BasicDBObject;
-import org.bson.types.ObjectId;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Collation;
+import com.mongodb.client.model.CollationStrength;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.graylog.testing.ObjectMapperExtension;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mongojack.JacksonDBCollection;
 
 import java.util.List;
 
-import static org.graylog2.database.indices.MongoDbIndexTools.COLLATION_KEY;
-import static org.graylog2.database.indices.MongoDbIndexTools.LOCALE_KEY;
-import static org.graylog2.database.indices.MongoDbIndexTools.UNIQUE_KEY;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@ExtendWith(ObjectMapperExtension.class)
 class MongoDbIndexToolsTest {
+    private static final String COLLECTION_NAME = "test";
 
-    private MongoDbIndexTools toTest;
-    @Mock
-    private JacksonDBCollection<?, ObjectId> db;
+    private MongoDbIndexTools<Document> toTest;
+    private MongoCollection<Document> db;
+    private MongoCollection<Document> rawdb;
 
     @BeforeEach
-    void setUp() {
-        toTest = new MongoDbIndexTools(db);
+    void setUp(MongoDBTestService mongodb, ObjectMapper objectMapper) {
+        mongodb.mongoCollection(COLLECTION_NAME).drop();
+        final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection());
+        this.rawdb = mongoCollections.get(COLLECTION_NAME, Document.class);
+        this.db = spy(this.rawdb);
+        toTest = new MongoDbIndexTools<>(db);
     }
 
     @Test
@@ -58,88 +71,56 @@ class MongoDbIndexToolsTest {
         toTest.prepareIndices("id", List.of("id"), List.of());
 
         verify(db, never()).createIndex(any());
-        verify(db, never()).createIndex(any(), any());
+        verify(db, never()).createIndex(any(Bson.class), any(IndexOptions.class));
     }
 
     @Test
     void doesNotCreateSimpleIndexIfProperOneExists() {
-        doReturn(List.of(BasicDBObject.parse("""
-                {v: 2, key: { number: 1 }, name: 'number_1'}
-                """)))
-                .when(db).getIndexInfo();
+        rawdb.createIndex(Indexes.ascending("number"));
 
         toTest.prepareIndices("id", List.of("number"), List.of());
         verify(db, never()).createIndex(any());
-        verify(db, never()).createIndex(any(), any());
+        verify(db, never()).createIndex(any(Bson.class), any(IndexOptions.class));
     }
 
     @Test
     void doesNotCreateCollationIndexIfProperOneExists() {
-        doReturn(List.of(BasicDBObject.parse("""
-                               {
-                                 v: 2,
-                                 key: { summary: 1 },
-                                 name: 'summary_1',
-                                 collation: {
-                                   locale: 'en',
-                                   strength: 3
-
-                                 }
-                               }
-                """)))
-                .when(db).getIndexInfo();
+        rawdb.createIndex(Indexes.ascending("summary"), new IndexOptions().collation(Collation.builder().locale("en").build()));
 
         toTest.prepareIndices("id", List.of("summary"), List.of("summary"));
         verify(db, never()).createIndex(any());
-        verify(db, never()).createIndex(any(), any());
+        verify(db, never()).createIndex(any(Bson.class), any(IndexOptions.class));
     }
 
     @Test
     void createsSimpleIndexIfDoesNotExists() {
-        doReturn(List.of()).when(db).getIndexInfo();
-
         toTest.prepareIndices("id", List.of("number"), List.of());
-        verify(db).createIndex(new BasicDBObject("number", 1), new BasicDBObject(UNIQUE_KEY, false));
+        verify(db).createIndex(eq(Indexes.ascending("number")), argThat(indexOptions -> !indexOptions.isUnique()));
     }
 
     @Test
     void createsCollationIndexIfDoesNotExists() {
-        doReturn(List.of()).when(db).getIndexInfo();
-
         toTest.prepareIndices("id", List.of("summary"), List.of("summary"));
-        verify(db).createIndex(new BasicDBObject("summary", 1), new BasicDBObject(COLLATION_KEY, new BasicDBObject(LOCALE_KEY, "en")));
+        verify(db).createIndex(eq(Indexes.ascending("summary")), argThat(indexOptions -> indexOptions.getCollation().getLocale().equals("en")));
     }
 
     @Test
     void replacesWrongCollationIndexWithProperOne() {
         //number should not have collation index, but a simple one!
-        doReturn(List.of(BasicDBObject.parse("""
-                               {
-                                 v: 2,
-                                 key: { number: 1 },
-                                 name: 'number_1',
-                                 collation: {
-                                   locale: 'en',
-                                   strength: 3
-
-                                 }
-                               }
-                """)))
-                .when(db).getIndexInfo();
+        rawdb.createIndex(Indexes.ascending("number"), new IndexOptions().collation(Collation.builder().locale("en").collationStrength(CollationStrength.TERTIARY).build()));
 
         toTest.prepareIndices("id", List.of("number"), List.of());
-        verify(db).dropIndex(new BasicDBObject("number", 1));
-        verify(db).createIndex(new BasicDBObject("number", 1), new BasicDBObject(UNIQUE_KEY, false));
+        verify(db).dropIndex(Indexes.ascending("number"));
+        verify(db).createIndex(eq(Indexes.ascending("number")), argThat(indexOptions -> !indexOptions.isUnique()));
     }
 
     @Test
     void replacesWrongSimpleIndexWithProperOne() {
         //summary should not have collation index, but a simple one!
-        doReturn(List.of(BasicDBObject.parse("{v: 2, key: { summary: 1 }, name: 'summary_1'}))")))
-                .when(db).getIndexInfo();
+        rawdb.createIndex(Indexes.ascending("summary"));
 
         toTest.prepareIndices("id", List.of("summary"), List.of("summary"));
-        verify(db).dropIndex(new BasicDBObject("summary", 1));
-        verify(db).createIndex(new BasicDBObject("summary", 1), new BasicDBObject(COLLATION_KEY, new BasicDBObject(LOCALE_KEY, "en")));
+        verify(db).dropIndex(Indexes.ascending("summary"));
+        verify(db).createIndex(eq(Indexes.ascending("summary")), argThat(indexOptions -> indexOptions.getCollation().getLocale().equals("en")));
     }
 }

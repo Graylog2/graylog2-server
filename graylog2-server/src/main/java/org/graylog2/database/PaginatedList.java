@@ -65,6 +65,10 @@ public class PaginatedList<E> extends ForwardingList<E> {
         this.grandTotal = grandTotal;
     }
 
+    public PaginatedList<E> withList(List<E> entities) {
+        return new PaginatedList<>(entities, total, page, perPage, grandTotal);
+    }
+
     @Override
     public List<E> delegate() {
         return delegate;
