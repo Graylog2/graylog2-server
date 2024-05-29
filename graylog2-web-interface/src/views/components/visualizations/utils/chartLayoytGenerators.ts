@@ -17,9 +17,11 @@
 
 import transform from 'lodash/transform';
 
-import type { MetricUnitType } from 'views/types';
+import type { FieldUnitType } from 'views/types';
 import type Series from 'views/logic/aggregationbuilder/Series';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 const Y_POSITION_AXIS_STEP = 0.08;
 type DefaulAxisKey = 'withoutUnit';
@@ -56,7 +58,7 @@ const defaultSettings = {
   rangemode: 'tozero',
 };
 
-export const getFormatSettings = (unitTypeKey: MetricUnitType | DefaulAxisKey) => {
+export const getFormatSettings = (unitTypeKey: FieldUnitType | DefaulAxisKey) => {
   switch (unitTypeKey) {
     case 'percent':
       return ({
@@ -91,7 +93,7 @@ export const getFormatSettings = (unitTypeKey: MetricUnitType | DefaulAxisKey) =
   }
 };
 
-export const getUnitLayout = (unitTypeKey: MetricUnitType | DefaulAxisKey, axisCount: number) => ({
+export const getUnitLayout = (unitTypeKey: FieldUnitType | DefaulAxisKey, axisCount: number) => ({
   ...getFormatSettings(unitTypeKey),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
@@ -100,15 +102,16 @@ export const getUnitLayout = (unitTypeKey: MetricUnitType | DefaulAxisKey, axisC
 type SeriesName = string;
 type AxisName = string;
 
-export const generateYAxis = (series: Array<Series>): { mapperAxisNumber: Record<string, number>, layouts: Record<string, unknown>, yAxisMapper: Record<SeriesName, AxisName>} => {
+export const generateYAxis = ({ series, units }: AggregationWidgetConfig): { mapperAxisNumber: Record<string, number>, layouts: Record<string, unknown>, yAxisMapper: Record<SeriesName, AxisName>} => {
   let axisCount = 1;
-  const unitLayout: {} | Record<MetricUnitType, { layout: Record<string, unknown>, axisKeyName: string}> = {};
+  const unitLayout: {} | Record<FieldUnitType, { layout: Record<string, unknown>, axisKeyName: string}> = {};
   const mapper = {};
   const mapperAxisNumber = {};
 
   series.forEach((s: Series) => {
     const seriesName = s.config.name || s.function;
-    const { unitType } = s.unit;
+    const { field } = parseSeries(s.function) ?? {};
+    const unitType = units?.getFieldUnit(field)?.unitType;
     const unitTypeKey = unitType || DEFAULT_AXIS_KEY;
 
     if (!unitLayout[unitTypeKey]) {

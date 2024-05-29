@@ -24,8 +24,8 @@ import { HoverForHelp } from 'components/common';
 import { Input, Label } from 'components/bootstrap';
 import type { UnitJson } from 'hooks/useFieldUnitTypes';
 import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
-import type { MetricUnitsFormValues } from 'views/types';
-import UnitContainer from 'views/components/aggregationwizard/metric/UnitContainer';
+import type { FieldUnitsFormValues } from 'views/types';
+import UnitContainer from 'views/components/aggregationwizard/units/UnitContainer';
 
 const Container = styled.div`
   display: flex;
@@ -36,25 +36,25 @@ const Container = styled.div`
   }
 `;
 
-const UnitMetricPopover = ({ index }: { index: number }) => {
+const FieldUnitPopover = ({ field }: { field: string }) => {
   const [show, setShow] = useState(false);
-  const { setFieldValue, values } = useFormikContext<MetricUnitsFormValues>();
+  const { setFieldValue, values } = useFormikContext<{units: FieldUnitsFormValues }>();
   const { units } = useFieldUnitTypes();
-  const currentUnitType = useMemo<string>(() => values?.metrics?.[index]?.unitType, [values, index]);
+  const currentUnitType = useMemo<string>(() => values?.units?.[field]?.unitType, [values, field]);
   const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: key })), [units]);
   const unitOptions = useMemo(() => currentUnitType && units[currentUnitType]
     .map(({ abbrev, name }: UnitJson) => ({ value: abbrev, label: name })), [units, currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {
-    setFieldValue(`metrics.${index}.unitType`, val || undefined);
-    setFieldValue(`metrics.${index}.unitAbbrev`, undefined);
-  }, [index, setFieldValue]);
+    setFieldValue(`units.${field}.unitType`, val || undefined);
+    setFieldValue(`units.${field}.abbrev`, undefined);
+  }, [field, setFieldValue]);
 
   const badgeLabel = useMemo(() => {
-    const curUnit = values?.metrics?.[index]?.unitAbbrev;
+    const curUnit = values?.units?.[field]?.abbrev;
 
     return curUnit || '-';
-  }, [index, values?.metrics]);
+  }, [field, values?.units]);
 
   return (
     <Popover position="right" opened={show} withArrow>
@@ -69,7 +69,7 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
       </Popover.Target>
       <Popover.Dropdown title="Metrics Unit Settings">
         <Container>
-          <Field name={`metrics.${index}.unitType`}>
+          <Field name={`units.${field}.unitType`}>
             {({ field: { name, value }, meta: { error } }) => (
               <Input id="metric-unit-type-field"
                      label="Type"
@@ -87,7 +87,7 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
             )}
           </Field>
           {currentUnitType && (
-          <Field name={`metrics.${index}.unitAbbrev`}>
+          <Field name={`units.${field}.abbrev`}>
             {({ field: { name, value, onChange }, meta: { error } }) => (
               <Input id="metric-unit-field"
                      label={<span>Unit <HoverForHelp displayLeftMargin>Field value unit which is used in Data Base</HoverForHelp></span>}
@@ -111,4 +111,4 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
   );
 };
 
-export default UnitMetricPopover;
+export default FieldUnitPopover;

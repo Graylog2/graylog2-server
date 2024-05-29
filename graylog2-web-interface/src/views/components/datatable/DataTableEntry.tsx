@@ -29,7 +29,8 @@ import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import type SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 
 import TableDataCell from './TableDataCell';
 
@@ -48,11 +49,12 @@ type Props = {
   series: Array<Series>,
   types: FieldTypeMappingsList,
   valuePath: ValuePath,
+  units: UnitsConfig,
 };
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-type ColumnProps = { field: string, value: any, type: FieldType, valuePath: ValuePath, source: string | undefined | null, unit: SeriesUnit };
+type ColumnProps = { field: string, value: any, type: FieldType, valuePath: ValuePath, source: string | undefined | null, unit: FieldUnit };
 
 const flattenValuePath = (valuePath: ValuePath) => valuePath.flatMap((path) => Object.entries(path))
   .map(([key, value]) => `${key}:${value}`)
@@ -60,6 +62,7 @@ const flattenValuePath = (valuePath: ValuePath) => valuePath.flatMap((path) => O
 
 const Column = ({ field, value, type, valuePath, source, unit }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
+  // console.log('!!!! !!!! GGGG !!!!! !!!!!', { unit });
 
   return (
     <TableDataCell $isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
@@ -91,7 +94,8 @@ const columnNameToField = (column, series = []) => {
   return currentSeries ? currentSeries.function : column;
 };
 
-const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
+const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, valuePath, item, types, units }: Props) => {
+  console.log('DataTableEntry', { units });
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
 
@@ -124,7 +128,8 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
     <tr className={`fields-row ${classes}`}>
       {columns.map(({ field, value, path, source }, idx) => {
         const key = `${activeQuery}-${field}=${value}-${idx}`;
-        const curSeries = series?.find((s) => s.function === source);
+        const fieldName = parseSeries(field)?.field ?? field;
+        const unit = units.getFieldUnit(fieldName);
 
         return (
           <Column key={key}
@@ -133,7 +138,7 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
                   type={fieldTypeFor(columnNameToField(field, series), types)}
                   valuePath={path.slice()}
                   source={source}
-                  unit={curSeries?.unit} />
+                  unit={unit} />
         );
       })}
     </tr>

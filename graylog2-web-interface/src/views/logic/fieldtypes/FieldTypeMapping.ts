@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SeriesUnitJson } from 'views/logic/aggregationbuilder/SeriesUnit';
-import SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
+import type { FieldUnitJson } from 'views/logic/aggregationbuilder/FieldUnit';
+import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 import FieldType from './FieldType';
 import type { FieldTypeJSON } from './FieldType';
@@ -23,17 +23,17 @@ import type { FieldTypeJSON } from './FieldType';
 export type FieldTypeMappingJSON = {
   name: string,
   type: FieldTypeJSON,
-  unit?: SeriesUnitJson,
+  unit?: FieldUnitJson,
 };
 
 class FieldTypeMapping {
   value: {
     name: string,
     type: FieldType,
-    unit?: SeriesUnit,
+    unit?: FieldUnit,
   };
 
-  constructor(name: string, type: FieldType, unit: SeriesUnit) {
+  constructor(name: string, type: FieldType, unit: FieldUnit) {
     this.value = { name, type, unit };
   }
 
@@ -52,10 +52,10 @@ class FieldTypeMapping {
   static fromJSON(value: FieldTypeMappingJSON) {
     const { name, type, unit } = value;
 
-    return new FieldTypeMapping(name, FieldType.fromJSON(type), SeriesUnit.fromJSON(unit));
+    return new FieldTypeMapping(name, FieldType.fromJSON(type), FieldUnit.fromJSON(unit));
   }
 
-  static create(name: string, type: FieldType, unit: SeriesUnit) {
+  static create(name: string, type: FieldType, unit: FieldUnit) {
     return new FieldTypeMapping(name, type, unit);
   }
 }

@@ -17,14 +17,14 @@
 import React from 'react';
 import { styled, css } from 'styled-components';
 
-import type SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
-import UnitMetricPopover from 'views/components/aggregationwizard/metric/UnitMetricPopover';
-import UnitContainer from 'views/components/aggregationwizard/metric/UnitContainer';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import FieldUnitPopover from 'views/components/aggregationwizard/units/FieldUnitPopover';
+import UnitContainer from 'views/components/aggregationwizard/units/UnitContainer';
 import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
 
 type Props = {
-  index: number,
-  predefinedValue: SeriesUnit
+  field: string,
+  predefinedValue: FieldUnit
 }
 
 const Label = styled.span(({ theme }) => css`
@@ -32,12 +32,12 @@ const Label = styled.span(({ theme }) => css`
   font-weight: bold;
 `);
 
-const MetricUnit = ({ index, predefinedValue }: Props) => {
+const FieldUnitComponent = ({ field, predefinedValue }: Props) => {
   const { getUnitInfo } = useFieldUnitTypes();
 
   if (predefinedValue?.isDefined) return <UnitContainer><Label title={getUnitInfo(predefinedValue.unitType, predefinedValue.abbrev).name}>{predefinedValue.abbrev}</Label></UnitContainer>;
 
-  return <UnitMetricPopover index={index} />;
+  return <FieldUnitPopover field={field} />;
 };
 
-export default MetricUnit;
+export default FieldUnitComponent;

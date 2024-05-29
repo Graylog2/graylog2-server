@@ -24,8 +24,8 @@ import mapValues from 'lodash/mapValues';
 import get from 'lodash/get';
 import keyBy from 'lodash/keyBy';
 
-import type { MetricUnitType } from 'views/types';
-import type { SeriesUnitState } from 'views/logic/aggregationbuilder/SeriesUnit';
+import type { FieldUnitType } from 'views/types';
+import type { FieldUnitState } from 'views/logic/aggregationbuilder/FieldUnit';
 
 import supportedUnits from '../../../graylog-shared-resources/units/supported_units.json';
 
@@ -36,7 +36,7 @@ export type UnitJson = {
   type: 'base' | 'derived',
   abbrev: string,
   name: string,
-  unit_type: MetricUnitType,
+  unit_type: FieldUnitType,
   conversion?: {
     value: number,
     action: UnitConversionAction
@@ -46,20 +46,20 @@ export type Unit = {
   type: 'base' | 'derived',
   abbrev: string,
   name: string,
-  unitType: MetricUnitType,
+  unitType: FieldUnitType,
   conversion?: {
     value: number,
     action: UnitConversionAction
   } | undefined
 }
-type FieldUnitTypesJson = Record<MetricUnitType, Array<UnitJson>>
-type FieldUnitTypes = Record<MetricUnitType, Array<Unit>>
-export type ConversionParams = SeriesUnitState;
+type FieldUnitTypesJson = Record<FieldUnitType, Array<UnitJson>>
+type FieldUnitTypes = Record<FieldUnitType, Array<Unit>>
+export type ConversionParams = FieldUnitState;
 export type ConvertedResult = { value: number | null, unit: Unit };
 
 const unitFromJson = (unitJson: UnitJson): Unit => set<Unit>(omit(unitJson, 'unit_type'), 'unitType', unitJson.unit_type);
 
-const _getBaseUnit = (units: FieldUnitTypes, unitType: MetricUnitType): Unit => units[unitType].find(({ type }) => type === 'base');
+const _getBaseUnit = (units: FieldUnitTypes, unitType: FieldUnitType): Unit => units[unitType].find(({ type }) => type === 'base');
 
 const _convertValueToBaseUnit = (units: FieldUnitTypes, value: number, params: ConversionParams): ConvertedResult => {
   const unit = units[params.unitType].find(({ abbrev }) => params.abbrev === abbrev);
@@ -135,12 +135,12 @@ export type ConvertValueToUnit = (value: number, fromParams: ConversionParams, t
 
 const useFieldUnitTypes = () => {
   const units = useMemo<FieldUnitTypes>(() => mapValues(sourceUnits, (unitsJson: Array<UnitJson>):Array<Unit> => unitsJson.map((unitJson) => unitFromJson(unitJson))), []);
-  const getBaseUnit = useCallback((fieldType: MetricUnitType) => _getBaseUnit(units, fieldType), [units]);
+  const getBaseUnit = useCallback((fieldType: FieldUnitType) => _getBaseUnit(units, fieldType), [units]);
   const convertValueToBaseUnit = useCallback((value: number, params: ConversionParams) => _convertValueToBaseUnit(units, value, params), [units]);
   const convertValueToUnit: ConvertValueToUnit = useCallback((value, fromParams, toParams) => _convertValueToUnit(units, value, fromParams, toParams), [units]);
   const getPrettifiedValue = useCallback((value: number, params: ConversionParams) => _getPrettifiedValue(units, value, params), [units]);
   const unitsByAbbrev = useMemo(() => mapValues(units, (list) => keyBy(list, 'abbrev')), [units]);
-  const getUnitInfo = useCallback((unitType: MetricUnitType, abbrev: string) => get(unitsByAbbrev, [unitType, abbrev]), [unitsByAbbrev]);
+  const getUnitInfo = useCallback((unitType: FieldUnitType, abbrev: string) => get(unitsByAbbrev, [unitType, abbrev]), [unitsByAbbrev]);
 
   return { units, unitsByAbbrev, getUnitInfo, getBaseUnit, convertValueToBaseUnit, convertValueToUnit, getPrettifiedValue };
 };

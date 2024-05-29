@@ -15,7 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type Series from 'views/logic/aggregationbuilder/Series';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
+import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 
-const getSeriesUnit = (series: Array<Series>, seriesName: string) => series.find((s) => s.config.name === seriesName || s.function === seriesName)?.unit;
+const getSeriesUnit = (series: Array<Series>, seriesName: string, units: UnitsConfig) => {
+  const func = series.find((s) => s.config.name === seriesName || s.function === seriesName).function;
+  const { field } = parseSeries(func);
+
+  return units.getFieldUnit(field);
+};
 
 export default getSeriesUnit;

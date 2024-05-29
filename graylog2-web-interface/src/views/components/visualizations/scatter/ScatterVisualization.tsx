@@ -38,7 +38,7 @@ const ScatterVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
-  const { layouts, yAxisMapper } = useMemo(() => generateYAxis(config.series), [config.series]);
+  const { layouts, yAxisMapper } = useMemo(() => generateYAxis(config), [config]);
   const _layout = useMemo(() => ({
     ...layouts,
     hovermode: 'x',

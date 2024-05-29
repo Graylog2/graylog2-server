@@ -27,7 +27,7 @@ import NodeField from 'views/components/fieldtypes/NodeField';
 import StreamsField from 'views/components/fieldtypes/StreamsField';
 import PercentageField from 'views/components/fieldtypes/PercentageField';
 import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
-import type SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 import EmptyValue from './EmptyValue';
 import CustomPropTypes from './CustomPropTypes';
@@ -53,12 +53,12 @@ type TypeSpecificValueProps = {
   type: FieldType,
   truncate?: boolean,
   render?: React.ComponentType<ValueRendererProps>,
-  unit?: SeriesUnit,
+  unit?: FieldUnit,
 };
 
 type FormattedValueProps = Omit<TypeSpecificValueProps, 'type'>;
 
-const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: SeriesUnit}) => {
+const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit}) => {
   const { getPrettifiedValue } = useFieldUnitTypes();
   const prettified = getPrettifiedValue(value, { abbrev: unit.abbrev, unitType: unit.unitType });
 

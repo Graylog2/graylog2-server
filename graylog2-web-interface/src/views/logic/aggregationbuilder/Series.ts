@@ -17,22 +17,17 @@
 import get from 'lodash/get';
 import * as Immutable from 'immutable';
 
-import type { SeriesUnitJson } from 'views/logic/aggregationbuilder/SeriesUnit';
-import SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
-
 import SeriesConfig from './SeriesConfig';
 import type { SeriesConfigJson } from './SeriesConfig';
 
 export type SeriesJson = {
   config: SeriesConfigJson,
   function: string,
-  unit?: SeriesUnitJson,
 };
 
 type InternalState = {
   config: SeriesConfig,
   function: string,
-  unit?: SeriesUnit,
 };
 
 export type Definition = {
@@ -86,8 +81,8 @@ export const parseSeries = (s: string) => {
 export default class Series {
   private readonly _value: InternalState;
 
-  constructor(func: string, config: SeriesConfig = SeriesConfig.empty(), unit: SeriesUnit = SeriesUnit.empty()) {
-    this._value = { function: func, config, unit };
+  constructor(func: string, config: SeriesConfig = SeriesConfig.empty()) {
+    this._value = { function: func, config };
   }
 
   get function() {
@@ -96,10 +91,6 @@ export default class Series {
 
   get config() {
     return this._value.config;
-  }
-
-  get unit() {
-    return this._value.unit;
   }
 
   get effectiveName(): string {
@@ -116,12 +107,11 @@ export default class Series {
     return {
       config: this._value.config,
       function: this._value.function,
-      unit: this._value.unit.toJSON(),
     };
   }
 
   static fromJSON(value: SeriesJson) {
-    return new Series(value.function, SeriesConfig.fromJSON(value.config), SeriesUnit.fromJSON(value.unit));
+    return new Series(value.function, SeriesConfig.fromJSON(value.config));
   }
 
   static forFunction(func: string) {
@@ -162,18 +152,14 @@ class Builder {
     return new Builder(this.value.set('config', newConfig));
   }
 
-  unit(newUnit: SeriesUnit) {
-    return new Builder(this.value.set('unit', newUnit));
-  }
-
   parameter(newParameter: any) {
     return new Builder(this.value.set('parameter', newParameter));
   }
 
   build() {
-    const { config, unit } = this.value.toObject();
+    const { config } = this.value.toObject();
     const func = this.value.get('function');
 
-    return new Series(func, config, unit);
+    return new Series(func, config);
   }
 }

@@ -17,12 +17,12 @@
 
 import { useContext, useMemo } from 'react';
 
-import type { MetricUnitType } from 'views/types';
+import type { FieldUnitType } from 'views/types';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
-type FieldUnits = Record<string, { unit_type: MetricUnitType, unit: string }>
+type FieldUnits = Record<string, { unit_type: FieldUnitType, unit: string }>
 
 const useQueryFieldTypes = () => {
   const fieldTypes = useContext(FieldTypesContext);

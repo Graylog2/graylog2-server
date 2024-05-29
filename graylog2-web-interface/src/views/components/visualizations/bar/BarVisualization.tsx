@@ -88,7 +88,7 @@ const BarVisualization = makeVisualization(({
 }: VisualizationComponentProps) => {
   const { convertValueToUnit } = useFieldUnitTypes();
   const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
-  const { layouts, yAxisMapper, mapperAxisNumber } = useMemo(() => generateYAxis(config.series), [config.series]);
+  const { layouts, yAxisMapper, mapperAxisNumber } = useMemo(() => generateYAxis(config), [config]);
   const barmode = useMemo(() => (visualizationConfig && visualizationConfig.barmode ? visualizationConfig.barmode : undefined), [visualizationConfig]);
   const _layout = useMemo(() => ({
     ...layouts,
@@ -112,7 +112,7 @@ const BarVisualization = makeVisualization(({
     const totalAxis = Object.keys(layouts).length;
 
     const offsetSettings = getBarChartTraceOffsetSettings(barmode, { yaxis, totalAxis, axisNumber, traceIndex: idx, totalTraces: total });
-    const curUnit = getSeriesUnit(config.series, name || originalName);
+    const curUnit = getSeriesUnit(config.series, name || originalName, config.units);
 
     const getData = () => ({
       type,

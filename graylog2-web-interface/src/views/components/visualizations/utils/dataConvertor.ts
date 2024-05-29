@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { ConvertValueToUnit, ConversionParams } from 'hooks/useFieldUnitTypes';
-import type SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
-import type { MetricUnitType } from 'views/types';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import type { FieldUnitType } from 'views/types';
 
-const chartLayoutBaseUnitTypes: Record<MetricUnitType, string> = {
+const chartLayoutBaseUnitTypes: Record<FieldUnitType, string> = {
   size: 'b',
   percent: '%',
   time: 'ms',
 };
 
-const dataConvertor = (values: Array<number>, convertValueToUnit: ConvertValueToUnit, unit: SeriesUnit) => {
+const dataConvertor = (values: Array<number>, convertValueToUnit: ConvertValueToUnit, unit: FieldUnit) => {
   if (!unit?.isDefined) return values;
   const from: ConversionParams = { abbrev: unit.abbrev, unitType: unit.unitType };
   const to: ConversionParams = { abbrev: chartLayoutBaseUnitTypes[unit.unitType], unitType: unit.unitType };

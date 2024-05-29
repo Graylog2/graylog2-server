@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import type SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
@@ -32,7 +32,7 @@ type Props = {
   value: any,
   render?: ValueRenderer,
   type: FieldType,
-  unit?: SeriesUnit,
+  unit?: FieldUnit,
 };
 
 const ValueActionTitle = styled.span`

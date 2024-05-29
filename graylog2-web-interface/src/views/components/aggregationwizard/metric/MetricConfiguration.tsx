@@ -32,7 +32,7 @@ import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
 import useFieldTypesUnits from 'views/hooks/useFieldTypesUnits';
-import MetricUnit from 'views/components/aggregationwizard/metric/MetricUnit';
+import FieldUnitComponent from 'views/components/aggregationwizard/units/FieldUnitComponent';
 
 import FieldSelect from '../FieldSelect';
 
@@ -99,14 +99,15 @@ const Metric = ({ index }: Props) => {
 
   const onFieldChange = useCallback((newValue: string) => {
     setFieldValue(`metrics.${index}.field`, newValue);
-
+    /*
     if (preDefinedFieldTypes?.[newValue]) {
       setFieldValue(`metrics.${index}.unitType`, preDefinedFieldTypes[newValue].unitType);
-      setFieldValue(`metrics.${index}.unitAbbrev`, preDefinedFieldTypes[newValue].abbrev);
+      setFieldValue(`metrics.${index}.abbrev`, preDefinedFieldTypes[newValue].abbrev);
     } else {
       setFieldValue(`metrics.${index}.unitType`, undefined);
-      setFieldValue(`metrics.${index}.unitAbbrev`, undefined);
+      setFieldValue(`metrics.${index}.abbrev`, undefined);
     }
+    */
   }, [index, preDefinedFieldTypes, setFieldValue]);
 
   const showUnitType = isFunctionAllowsUnit(currentFunction);
@@ -152,7 +153,7 @@ const Metric = ({ index }: Props) => {
               </Input>
             )}
           </Field>
-          {showUnitType && <MetricUnit index={index} predefinedValue={preDefinedFieldTypes?.[metrics[index]?.field]} />}
+          {showUnitType && <FieldUnitComponent field={metrics?.[index].field} predefinedValue={preDefinedFieldTypes?.[metrics[index]?.field]} />}
         </FieldContainer>
       )}
       {isPercentile && (
