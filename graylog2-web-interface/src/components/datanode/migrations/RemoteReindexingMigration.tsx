@@ -72,7 +72,6 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStep
     switch (step) {
       case MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key:
         return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
-      case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key:
       case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key:
         return <CertificatesProvisioning currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key:
