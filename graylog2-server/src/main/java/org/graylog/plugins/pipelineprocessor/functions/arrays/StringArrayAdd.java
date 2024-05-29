@@ -65,7 +65,7 @@ public class StringArrayAdd extends AbstractFunction<List<String>> {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         }
-        return Collections.singletonList(value.toString());
+        return value == null ? Collections.emptyList() : Collections.singletonList(value.toString());
     }
 
     private static String convertValue(Object o) {
