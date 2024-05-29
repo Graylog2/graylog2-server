@@ -79,7 +79,11 @@ public class FavoritesService {
     }
 
     public void save(FavoritesForUserDTO favorite) {
-        this.db.replaceOne(MongoUtils.idEq(favorite.id()), favorite);
+        if (favorite.id() == null) {
+            create(favorite);
+        } else {
+            this.db.replaceOne(MongoUtils.idEq(favorite.id()), favorite);
+        }
     }
 
     public void addFavoriteItemFor(final String in, final SearchUser searchUser) {
@@ -93,7 +97,7 @@ public class FavoritesService {
             }
         } else {
             var items = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(grn));
-            this.create(items, searchUser);
+            this.create(items);
         }
     }
 
@@ -121,7 +125,7 @@ public class FavoritesService {
         return MongoUtils.stream(db.find());
     }
 
-    public Optional<FavoritesForUserDTO> create(final FavoritesForUserDTO favorite, final SearchUser searchUser) {
+    public Optional<FavoritesForUserDTO> create(final FavoritesForUserDTO favorite) {
         try {
             final var result = db.insertOne(favorite);
             return mongoUtils.getById(MongoUtils.insertedId(result));
