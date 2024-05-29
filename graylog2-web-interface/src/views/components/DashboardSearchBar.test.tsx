@@ -106,7 +106,9 @@ describe('DashboardSearchBar', () => {
 
     userEvent.click(timeRangeFilter);
     userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
-    userEvent.click(await screen.findByRole('button', { name: 'Update time range' }));
+    const timeRangePickerSubmitButton = await screen.findByRole('button', { name: 'Update time range' });
+    await waitFor(() => expect(timeRangePickerSubmitButton).toBeEnabled());
+    userEvent.click(timeRangePickerSubmitButton);
 
     const searchButton = await screen.findByRole('button', {
       name: /perform search \(changes were made after last search execution\)/i,
