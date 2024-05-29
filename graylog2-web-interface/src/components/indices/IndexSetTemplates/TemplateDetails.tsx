@@ -39,6 +39,7 @@ const FlexWrapper = styled.div(({ theme }) => css`
     }
 
     dl > dt {
+      width: 240px;
       float: left;
       clear: left;
       margin-right: ${theme.spacings.xs};
