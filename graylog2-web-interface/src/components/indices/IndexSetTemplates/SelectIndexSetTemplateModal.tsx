@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -23,7 +24,7 @@ import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Row, Col, Modal, SegmentedControl } from 'components/bootstrap';
-import { ModalSubmit, Spinner, Select, Section } from 'components/common';
+import { ModalSubmit, Spinner, Select } from 'components/common';
 import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
 import useTemplates from 'components/indices/IndexSetTemplates/hooks/useTemplates';
 import TemplateDetails from 'components/indices/IndexSetTemplates/TemplateDetails';
@@ -175,28 +176,20 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
               )}
               {selectedTemplateCategory === 'custom' && (
                 isLoadingCustom ? (<Spinner />) : (
-                  <Row>
-                    <Col md={5}>
-                      <FlexWrapper>
+                  <FlexWrapper>
+                    <Row>
+                      <Col md={12}>
                         <Select clearable={false}
                                 onChange={handleCustomSelect}
                                 options={customList.map((template) => ({ label: template.title, value: template.id }))}
                                 placeholder="Select a template"
                                 value={selectedCustomTemplate?.id} />
-                        {selectedCustomTemplate?.description && (
-                        <Section title="Description">
-                          <p>{selectedCustomTemplate?.description}</p>
-                        </Section>
-                        )}
-                      </FlexWrapper>
-
-                    </Col>
-                    <Col md={7}>
-                      {selectedCustomTemplate && (
-                        <TemplateDetails template={selectedCustomTemplate} />
-                      )}
-                    </Col>
-                  </Row>
+                      </Col>
+                    </Row>
+                    {selectedCustomTemplate && (
+                    <TemplateDetails template={selectedCustomTemplate} />
+                    )}
+                  </FlexWrapper>
                 )
               )}
             </Col>
@@ -213,6 +206,11 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
       </Modal.Footer>
     </Modal>
   );
+};
+
+SelectIndexSetTemplateModal.propTypes = {
+  hideModal: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired,
 };
 
 export default SelectIndexSetTemplateModal;
