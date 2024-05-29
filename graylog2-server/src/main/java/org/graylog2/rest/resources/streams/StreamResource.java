@@ -175,7 +175,7 @@ public class StreamResource extends RestResource {
                           RecentActivityService recentActivityService,
                           AuditEventSender auditEventSender,
                           MessageFactory messageFactory,
-                          Set<StreamDeletionGuard> streamDeletionGuards
+                          Set<StreamDeletionGuard> streamDeletionGuards,
                           PipelineStreamConnectionsService pipelineStreamConnectionsService,
                           PipelineService pipelineService) {
         this.streamService = streamService;
