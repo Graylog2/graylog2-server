@@ -187,7 +187,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
                       </Col>
                     </Row>
                     {selectedCustomTemplate && (
-                    <TemplateDetails template={selectedCustomTemplate} />
+                    <TemplateDetails template={selectedCustomTemplate} showDescription />
                     )}
                   </FlexWrapper>
                 )

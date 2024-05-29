@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -27,6 +28,7 @@ import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/t
 
 type Props = {
   template: IndexSetTemplate,
+  showDescription?: boolean
 }
 
 const FlexWrapper = styled(Col)(({ theme }) => css`
@@ -81,6 +83,7 @@ const formatRefreshInterval = (intervalInMs : number) => {
 
 const TemplateDetails = ({
   template,
+  showDescription,
 }: Props) => {
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
@@ -100,7 +103,7 @@ const TemplateDetails = ({
           </Row>
         )}
 
-        {template.description && (
+        {template.description && showDescription && (
         <Row>
           <Col md={12}>
             <Section title="Description">
@@ -167,6 +170,11 @@ const TemplateDetails = ({
 
 TemplateDetails.propTypes = {
   template: indexSetTemplatePropType.isRequired,
+  showDescription: PropTypes.bool,
+};
+
+TemplateDetails.defaultProps = {
+  showDescription: false,
 };
 
 export default TemplateDetails;
