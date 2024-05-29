@@ -14,5 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as ContactUs } from './ContactUs';
-export { default as DocumentationLink } from './DocumentationLink';
+package org.graylog.plugins.views.search.views.units;
+
+import org.graylog.plugins.formatting.units.model.UnitId;
+
+import java.util.Map;
+
+/**
+ * Interface for those implementations of {@link org.graylog.plugins.views.search.views.WidgetConfigDTO},
+ * where customizing/configuring per field unit setting is supported.
+ */
+public interface WithConfigurableUnits {
+    String UNIT_SETTINGS_PROPERTY = "units";
+
+    Map<String, UnitId> unitSettings();
+}
