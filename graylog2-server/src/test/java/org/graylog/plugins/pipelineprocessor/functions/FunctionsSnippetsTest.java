@@ -384,7 +384,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                 GrokPattern.create("BASE10NUM", "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))"),
                 GrokPattern.create("NUMBER", "(?:%{BASE10NUM:UNWANTED})"),
                 GrokPattern.create("UNDERSCORE", "(?<test_field>test)"),
-                GrokPattern.create("NUM", "%{BASE10NUM}")
+                GrokPattern.create("NUM", "%{BASE10NUM}"),
+                GrokPattern.create("DATA", ".*?"),
+                GrokPattern.create("IPV4", "(?<![0-9])(?:(?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]))(?![0-9])"),
+                GrokPattern.create("IPV6", "((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(%.+)?"),
+                GrokPattern.create("IP", "(?:%{IPV6}|%{IPV4})"),
+                GrokPattern.create("NONNEGINT", "\\b(?:[0-9]+)\\b")
         );
         when(grokPatternService.loadAll()).thenReturn(patterns);
         when(grokPatternService.loadByName("GREEDY")).thenReturn(Optional.of(greedyPattern));
@@ -867,6 +872,39 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         // Test for issue 5563 and 5794
         // ensure named groups with underscore work
         assertThat(message.hasField("test_field")).isTrue();
+    }
+
+    @Test
+    public void grokIssue18883() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getFieldCount()).isEqualTo(7);
+        assertThat(message.getTimestamp()).isNotNull();
+
+        assertThat(message.getField("vendor_attack")).isEqualTo("DDOS");
+        assertThat(message.getField("destination_ip")).isEqualTo("10.0.1.34");
+
+        // Our Grok library had a bug where it didn't remove the ":type" suffix from a field name when the pattern
+        // didn't match. Instead, it tried to add a "packets:long" field to the message which triggered a warning
+        // log message about the field name being invalid.
+        // See:
+        //   - https://github.com/Graylog2/graylog2-server/issues/18883
+        //   - https://github.com/graylog-labs/java-grok/pull/4
+        //
+        // We are using the "__grok_map" field to capture the raw Grok matches, so we can check if the library
+        // behaves correctly. Without this, we wouldn't be able to check the behavior because Message#addField
+        // skips "null" values and invalid field names.
+        assertThat(message.hasField("__grok_map")).isTrue();
+        //noinspection unchecked
+        final Map<String, Object> grokMap = (Map<String, Object>) message.getField("__grok_map");
+        assertThat(grokMap)
+                .withFailMessage("The \"packets\" field should be present in the Grok map")
+                .containsKey("packets");
+        assertThat(grokMap.get("packets"))
+                .withFailMessage("The \"packets\" field should be null")
+                .isNull();
     }
 
     @Test
