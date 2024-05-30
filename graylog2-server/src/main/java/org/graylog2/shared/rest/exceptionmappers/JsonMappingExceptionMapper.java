@@ -18,6 +18,7 @@ package org.graylog2.shared.rest.exceptionmappers;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
@@ -36,9 +37,22 @@ public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingEx
         final var errorPath = errorPath(e);
         final var location = e.getLocation();
         final String message = errorWithJsonPath(e, errorPath);
-        final var referencePath = e.getPathReference();
+        final var referencePath = referencePath(e);
         final var apiError = RequestError.create(message, location.getLineNr(), location.getColumnNr(), errorPath, referencePath);
         return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
+    }
+
+    private String referencePath(JsonMappingException e) {
+        final var sb = new StringBuilder().append(e.getPathReference());
+
+        if (e instanceof ValueInstantiationException vie) {
+            if (!sb.isEmpty()) {
+                sb.append("->");
+            }
+            sb.append(vie.getType().getRawClass().getCanonicalName());
+        }
+
+        return sb.toString();
     }
 
     private String errorPath(final JsonMappingException e) {

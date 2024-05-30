@@ -28,7 +28,7 @@ import java.util.Optional;
 @JsonAutoDetect
 @AutoValue
 @JsonTypeName("RequestError") // Explicitly indicates the class type to avoid AutoValue_ at the beginning
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public abstract class RequestError implements GenericError {
     @JsonProperty
     public abstract int line();

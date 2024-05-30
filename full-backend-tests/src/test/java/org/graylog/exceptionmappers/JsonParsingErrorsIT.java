@@ -16,6 +16,7 @@
  */
 package org.graylog.exceptionmappers;
 
+import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -29,6 +30,7 @@ import static org.hamcrest.Matchers.equalTo;
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.OS2_LATEST)
 public class JsonParsingErrorsIT {
     private static final String SYNC_SEARCH = "/views/search/sync";
+    private static final String STREAMS = "/streams";
 
     private final GraylogApis api;
 
@@ -38,11 +40,7 @@ public class JsonParsingErrorsIT {
 
     @ContainerMatrixTest
     void returnsSpecificErrorWhenTypeMismatches() {
-        given()
-                .spec(api.requestSpecification())
-                .log().ifValidationFails()
-                .when()
-                .body("""
+        assertErrorResponse(SYNC_SEARCH, """
                         {
                          	"queries": [
                          		{
@@ -59,12 +57,6 @@ public class JsonParsingErrorsIT {
                          	]
                          }
                                                 """)
-                .post(SYNC_SEARCH)
-                .then()
-                .log().ifValidationFails()
-                .assertThat()
-                .statusCode(400)
-                .body("type", equalTo("RequestError"))
                 .body("path", equalTo("queries.[0].timerange.from"))
                 .body("line", equalTo(11))
                 .body("column", equalTo(14))
@@ -78,11 +70,7 @@ public class JsonParsingErrorsIT {
 
     @ContainerMatrixTest
     void returnsSpecificErrorForJsonParsingError() {
-        given()
-                .spec(api.requestSpecification())
-                .log().ifValidationFails()
-                .when()
-                .body("""
+        assertErrorResponse(SYNC_SEARCH, """
                         {
                          	"queries": [
                          		{
@@ -99,12 +87,6 @@ public class JsonParsingErrorsIT {
                          	]
                          }
                                                 """)
-                .post(SYNC_SEARCH)
-                .then()
-                .log().ifValidationFails()
-                .assertThat()
-                .statusCode(400)
-                .body("type", equalTo("RequestError"))
                 .body("path", equalTo("queries.[0].timerange"))
                 .body("line", equalTo(12))
                 .body("column", equalTo(5))
@@ -114,5 +96,35 @@ public class JsonParsingErrorsIT {
                                 "->java.util.LinkedHashSet[0]" +
                                 "->org.graylog.plugins.views.search.rest.AutoValue_QueryDTO$Builder[\"timerange\"]"));
 
+    }
+
+    @ContainerMatrixTest
+    void extractsReferencePathFromMissingProperty() {
+        assertErrorResponse(STREAMS, "{}")
+                .body("reference_path", equalTo("org.graylog2.rest.resources.streams.requests.CreateStreamRequest"));
+        assertErrorResponse(STREAMS, """
+                {
+                    "title": "Foo",
+                    "rules": [{}]
+                }
+                """)
+                .body("reference_path", equalTo(
+                        "org.graylog2.rest.resources.streams.requests.CreateStreamRequest[\"rules\"]" +
+                                "->java.util.ArrayList[0]" +
+                                "->org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest"));
+    }
+
+    private ValidatableResponse assertErrorResponse(String url, String body) {
+        return given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .body(body)
+                .post(url)
+                .then()
+                .log().ifValidationFails()
+                .assertThat()
+                .statusCode(400)
+                .body("type", equalTo("RequestError"));
     }
 }
