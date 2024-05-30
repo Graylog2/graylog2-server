@@ -875,7 +875,6 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Message message = evaluateRule(rule);
 
         assertThat(message).isNotNull();
-        System.out.println(message.getFields());
         assertThat(message.getFieldCount()).isEqualTo(7);
         assertThat(message.getTimestamp()).isNotNull();
 
