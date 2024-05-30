@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useState } from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import {
@@ -14,12 +15,11 @@ import {
 } from 'components/bootstrap';
 import { Icon, IfPermitted } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
+import SectionGrid from 'components/common/Section/SectionGrid';
 
 import StreamDataRoutingIntake from './StreamDataRoutingIntake';
 import StreamDataRoutingProcessing from './StreamDataRoutingProcessing';
 import StreamDataRoutingDestinations from './StreamDataRoutingDestinations';
-import SectionGrid from 'components/common/Section/SectionGrid';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 type Props = {
   stream: Stream,
@@ -91,6 +91,7 @@ const FullHeightCol = styled(Col)`
 const StyledSectionGrid = styled(SectionGrid)`
   align-items: center;
 `;
+
 const StreamDetails = ({ stream }: Props) => {
   const navigate = useNavigate();
   const [currentSegment, setCurrentSegment] = useState<DetailsSegments>(INTAKE_SEGMENT);
@@ -98,46 +99,45 @@ const StreamDetails = ({ stream }: Props) => {
 
   return (
     <>
-    <DataWarehouseJobComponent />
-    <Container>
-      <Header>
-        <LeftCol>
-          <Button onClick={() => navigate(Routes.STREAMS)}>
-            <Icon name="arrow_left_alt" size="sm" /> Back
-          </Button>
+      <DataWarehouseJobComponent />
+      <Container>
+        <Header>
+          <LeftCol>
+            <Button onClick={() => navigate(Routes.STREAMS)}>
+              <Icon name="arrow_left_alt" size="sm" /> Back
+            </Button>
 
-          <h1>{stream.title}</h1>
+            <h1>{stream.title}</h1>
 
-          <IfPermitted permissions="stream:edit">
-            <DropdownButton title={<Icon name="more_horiz" />} id="stream-actions" noCaret bsSize="xs">
-              <MenuItem onClick={() => {}}>Edit</MenuItem>
-            </DropdownButton>
-          </IfPermitted>
-        </LeftCol>
-        <RightCol>
-        </RightCol>
-      </Header>
+            <IfPermitted permissions="stream:edit">
+              <DropdownButton title={<Icon name="more_horiz" />} id="stream-actions" noCaret bsSize="xs">
+                <MenuItem onClick={() => {}}>Edit</MenuItem>
+              </DropdownButton>
+            </IfPermitted>
+          </LeftCol>
+          <RightCol />
+        </Header>
 
-      <Row className="content no-bm">
-        <Col xs={12}>
-          <StyledSectionGrid $columns='1fr 8fr'>
-            <h3>Data Routing</h3>
-            <MainDetailsRow>
-              <SegmentedControl<DetailsSegments> data={SEGMENTS_DETAILS}
-                                                value={currentSegment}
-                                                onChange={setCurrentSegment} />
-            </MainDetailsRow>
-          </StyledSectionGrid>
-        </Col>
-      </Row>
-      <SegmentContainer className="content">
-        <FullHeightCol xs={12}>
-          {currentSegment === INTAKE_SEGMENT && <StreamDataRoutingIntake stream={stream} />}
-          {currentSegment === PROCESSING_SEGMENT && <StreamDataRoutingProcessing />}
-          {currentSegment === DESTINATIONS_SEGMENT && <StreamDataRoutingDestinations stream={stream}/>}
-        </FullHeightCol>
-      </SegmentContainer>
-    </Container>
+        <Row className="content no-bm">
+          <Col xs={12}>
+            <StyledSectionGrid $columns="1fr 8fr">
+              <h3>Data Routing</h3>
+              <MainDetailsRow>
+                <SegmentedControl<DetailsSegments> data={SEGMENTS_DETAILS}
+                                                   value={currentSegment}
+                                                   onChange={setCurrentSegment} />
+              </MainDetailsRow>
+            </StyledSectionGrid>
+          </Col>
+        </Row>
+        <SegmentContainer className="content">
+          <FullHeightCol xs={12}>
+            {currentSegment === INTAKE_SEGMENT && <StreamDataRoutingIntake stream={stream} />}
+            {currentSegment === PROCESSING_SEGMENT && <StreamDataRoutingProcessing />}
+            {currentSegment === DESTINATIONS_SEGMENT && <StreamDataRoutingDestinations />}
+          </FullHeightCol>
+        </SegmentContainer>
+      </Container>
     </>
   );
 };

@@ -37,16 +37,16 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
 
   return (
     <Section title="Stream rules"
-                      actions={(
-                        <IfPermitted permissions="streams:create">
-                          <CreateStreamRuleButton bsStyle="success"
-                                                  streamId={stream.id} />
-                        </IfPermitted>
-                      )}>
-      <Table condensed>
+             actions={(
+               <IfPermitted permissions="streams:create">
+                 <CreateStreamRuleButton bsStyle="success"
+                                         streamId={stream.id} />
+               </IfPermitted>
+             )}>
+      <Table condensed striped hover>
         <thead>
           <tr>
-            <th>Rule</th>
+            <th colSpan={2}>Rule</th>
           </tr>
         </thead>
         <tbody>

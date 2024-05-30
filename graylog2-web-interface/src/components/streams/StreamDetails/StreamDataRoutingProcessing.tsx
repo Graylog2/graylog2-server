@@ -30,10 +30,10 @@ const StreamDataRoutingProcessing = () => {
 
   return (
     <>
-      <Section title='Illuminate Processing'>
+      <Section title="Illuminate Processing">
         <p>Illuminate Processing step</p>
       </Section>
-      <Section title='Pipelines'>
+      <Section title="Pipelines">
         <Table condensed>
           <thead>
             <tr>

@@ -27,7 +27,7 @@ import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import UserNotification from 'util/UserNotification';
 import { StreamRulesInputsActions, StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
-import type { StreamRule as StreamRuleTypeDefinition, Stream } from 'stores/streams/StreamsStore';
+import type { StreamRule as StreamRuleTypeDefinition, Stream, StreamRule } from 'stores/streams/StreamsStore';
 
 import useCurrentUser from '../../hooks/useCurrentUser';
 
@@ -56,12 +56,12 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
     StreamRulesInputsActions.list();
   }, []);
 
-  const _onEdit = (event) => {
+  const _onEdit = (event: React.SyntheticEvent ) => {
     event.preventDefault();
     setShowStreamRuleForm(true);
   };
 
-  const _onDelete = (event) => {
+  const _onDelete = (event: React.SyntheticEvent) => {
     event.preventDefault();
 
     /* TODO: Replace with custom confirmation dialog */
@@ -77,7 +77,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
     }
   };
 
-  const _onSubmit = (streamRuleId, data) => StreamRulesStore.update(stream.id, streamRuleId, data, () => {
+  const _onSubmit = (streamRuleId: string, data: StreamRule) => StreamRulesStore.update(stream.id, streamRuleId, data, () => {
     if (onSubmit) {
       onSubmit(streamRuleId, data);
     }
