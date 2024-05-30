@@ -49,6 +49,7 @@ describe('ShowDashboardInBigDisplayMode', () => {
     refreshConfig: null,
     startAutoRefresh: () => {},
     stopAutoRefresh: () => {},
+    intervalStartCount: 0,
   };
 
   useViewsPlugin();
@@ -64,6 +65,7 @@ describe('ShowDashboardInBigDisplayMode', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
+      intervalStartCount: 0,
     });
   });
 

@@ -125,6 +125,7 @@ describe('EventsList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
+      intervalStartCount: 0,
     });
   });
 
@@ -188,6 +189,7 @@ describe('EventsList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh,
+      intervalStartCount: 0,
     });
 
     const dispatch = jest.fn().mockResolvedValue(finishedLoading({

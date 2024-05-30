@@ -46,7 +46,7 @@ describe('RefreshControls', () => {
   const SUT = ({ onSubmit, children }: { onSubmit?: () => void, children?: React.ReactNode }) => (
     <Formik initialValues={{}} onSubmit={onSubmit}>
       <Form>
-        <RefreshControls />
+        <RefreshControls disable={false} />
         {children}
       </Form>
     </Formik>
@@ -74,6 +74,7 @@ describe('RefreshControls', () => {
     refreshConfig: null,
     stopAutoRefresh: () => {},
     startAutoRefresh: () => {},
+    intervalStartCount: 0,
   };
 
   beforeEach(() => {

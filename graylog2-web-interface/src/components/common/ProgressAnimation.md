@@ -6,12 +6,8 @@ import { Button } from 'components/bootstrap';
 import ProgressAnimation from './ProgressAnimation';
 import styled from 'styled-components';
 
-const Label = styled.span`
-  z-index: 1;
-`
-
 const Example = () => {
-  const [animationStart, setAnimationStartCount] = useState(1);
+  const [animationStartCount, setAnimationStartCount] = useState(1);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -21,11 +17,12 @@ const Example = () => {
     return () => {
       clearInterval(interval);
     } 
-  }, []);
+  }, [animationStartCount]);
+  
   return (
-    <Button onClick={() => setAnimationStartCount((cur) => cur + 1)}>
-      {!!animationStart && <ProgressAnimation $animationDuration={10000} key={`animation-${animationStart}`} />}
-      <Label>Click to restart animation</Label>
+    <Button>
+      A button
+      {!!animationStartCount && <ProgressAnimation $animationDuration={10000} key={`animation-${animationStartCount}`} $increase={false} />}
     </Button>
   )
 }

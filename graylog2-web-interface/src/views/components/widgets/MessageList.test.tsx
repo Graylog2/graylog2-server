@@ -104,6 +104,7 @@ describe('MessageList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
+      intervalStartCount: 0,
     });
   });
 
@@ -216,6 +217,7 @@ describe('MessageList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh,
+      intervalStartCount: 0,
     });
 
     const dispatch = jest.fn().mockResolvedValue(finishedLoading({
