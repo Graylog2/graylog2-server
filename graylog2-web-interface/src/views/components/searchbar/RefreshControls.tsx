@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import moment from 'moment';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
@@ -42,14 +42,48 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const ButtonLabel = () => {
+const StyledDropdownButton = styled(DropdownButton)`
+  position: relative;
+`;
+
+const animateProgress = keyframes`
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+`;
+
+const Label = styled.span`
+  z-index: 1;
+  position: relative;
+`;
+
+const Progress = styled.div<{ $duration: number }>(({ theme, $duration }) => css`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: linear ${animateProgress} ${$duration}ms;
+  background-color: ${theme.colors.gray['80']};
+  z-index: 0;
+`);
+
+const ButtonLabel = ({ animationCount }: { animationCount: number }) => {
   const { refreshConfig } = useAutoRefresh();
 
   if (!refreshConfig?.enabled) {
     return <>Not updating</>;
   }
 
-  return <>Every <ReadableDuration duration={refreshConfig.interval} /></>;
+  return (
+    <>
+      {!!animationCount && <Progress $duration={refreshConfig.interval} key={`${refreshConfig.interval}-${animationCount}`} />}
+      <Label>Every <ReadableDuration duration={refreshConfig.interval} /></Label>
+    </>
+  );
 };
 
 const useDisableOnFormChange = () => {
@@ -83,7 +117,27 @@ const useDefaultInterval = () => {
   return defaultAutoRefreshInterval;
 };
 
-const RefreshControls = () => {
+const useAnimateProgressOnRefresh = (setAnimationCount: React.Dispatch<React.SetStateAction<number>>) => {
+  const { registerCallback, unregisterCallback } = useAutoRefresh();
+
+  useEffect(() => {
+    const callback = () => {
+      setAnimationCount((cur) => (cur + 1));
+    };
+
+    registerCallback(callback, 'progress-animation');
+
+    return () => {
+      unregisterCallback('progress-animation');
+    };
+  }, [registerCallback, unregisterCallback]);
+};
+
+type Props = {
+  disable: boolean
+}
+
+const RefreshControls = ({ disable }: Props) => {
   const { dirty, submitForm } = useFormikContext();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -92,6 +146,7 @@ const RefreshControls = () => {
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions);
   const { refreshConfig, startAutoRefresh, stopAutoRefresh } = useAutoRefresh();
   const defaultInterval = useDefaultInterval();
+  const [animationCount, setAnimationCount] = useState(0);
 
   useDisableOnFormChange();
 
@@ -106,9 +161,13 @@ const RefreshControls = () => {
     startAutoRefresh(durationToMS(interval));
 
     if (dirty) {
-      submitForm();
+      submitForm().then(() => {
+        setAnimationCount((cur) => (cur + 1));
+      });
+    } else {
+      setAnimationCount((cur) => (cur + 1));
     }
-  }, [dirty, location.pathname, sendTelemetry, startAutoRefresh, submitForm]);
+  }, [dirty, location.pathname, sendTelemetry, submitForm]);
 
   const toggleEnable = useCallback(() => {
     if (!defaultInterval && !refreshConfig?.interval) {
@@ -126,21 +185,28 @@ const RefreshControls = () => {
       stopAutoRefresh();
     } else {
       if (dirty) {
-        submitForm();
+        submitForm().then(() => {
+          setAnimationCount((cur) => (cur + 1));
+        });
+      } else {
+        setAnimationCount((cur) => (cur + 1));
       }
 
       startAutoRefresh(refreshConfig?.interval ?? durationToMS(defaultInterval));
     }
   }, [defaultInterval, dirty, refreshConfig?.enabled, refreshConfig?.interval, sendTelemetry, startAutoRefresh, stopAutoRefresh, submitForm]);
 
+  useAnimateProgressOnRefresh(setAnimationCount);
+
   return (
     <FlexibleButtonGroup aria-label="Refresh Search Controls">
-      <Button onClick={toggleEnable} title={refreshConfig.enabled ? 'Pause Refresh' : 'Start Refresh'} disabled={isLoadingMinimumInterval || !defaultInterval}>
-        <Icon name="refresh" spin={refreshConfig.enabled} />
+      <Button onClick={toggleEnable} title={refreshConfig?.enabled ? 'Pause Refresh' : 'Start Refresh'} disabled={disable || isLoadingMinimumInterval || !defaultInterval}>
+        <Icon name={refreshConfig?.enabled ? 'pause' : 'update'} />
       </Button>
 
-      <DropdownButton title={<ButtonLabel />}
-                      id="refresh-options-dropdown">
+      <StyledDropdownButton title={<ButtonLabel animationCount={animationCount} />}
+                            disabled={disable}
+                            id="refresh-options-dropdown">
         {isLoadingMinimumInterval && <Spinner />}
         {!isLoadingMinimumInterval && intervalOptions.map(([interval, label]) => {
           const isBelowMinimum = durationToMS(interval) < durationToMS(minimumRefreshInterval);
@@ -158,7 +224,7 @@ const RefreshControls = () => {
             </MenuItem>
           );
         })}
-      </DropdownButton>
+      </StyledDropdownButton>
     </FlexibleButtonGroup>
   );
 };
