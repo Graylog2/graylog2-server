@@ -22,12 +22,13 @@ import { LinkContainer } from 'components/common/router';
 import type UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
-import { Button, DropdownButton, MenuItem, ButtonToolbar } from 'components/bootstrap';
+import { Button, MenuItem, ButtonToolbar } from 'components/bootstrap';
 import { OverlayTrigger, IfPermitted } from 'components/common';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { MoreActions } from 'components/common/EntityDataTable';
 
 type Props = {
   user: UserOverview,
@@ -124,7 +125,7 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
           </Button>
         </LinkContainer>
       </IfPermitted>
-      <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${id}`}>
+      <MoreActions>
         <EditTokensAction user={user} wrapperComponent={MenuItem} />
         <IfPermitted permissions={[`users:edit:${username}`]}>
           {showEnableDisable && (
@@ -136,11 +137,12 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
           )}
           <MenuItem id={`delete-user-${id}`}
                     title={`Delete user ${fullName}`}
+                    variant="danger"
                     onClick={_deleteUser}>
             Delete
           </MenuItem>
         </IfPermitted>
-      </DropdownButton>
+      </MoreActions>
     </>
   );
 };

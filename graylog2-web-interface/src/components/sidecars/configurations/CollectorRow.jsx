@@ -21,9 +21,10 @@ import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
 
 import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, DropdownButton, MenuItem, Button } from 'components/bootstrap';
+import { ButtonToolbar, MenuItem, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
+import { MoreActions } from 'components/common/EntityDataTable';
 
 import CopyCollectorModal from './CopyCollectorModal';
 
@@ -61,13 +62,13 @@ const CollectorRow = createReactClass({
             <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(collector.id)}>
               <Button bsSize="xsmall">Edit</Button>
             </LinkContainer>
-            <DropdownButton id={`more-actions-${collector.id}`} title="More actions" bsSize="xsmall" pullRight>
+            <MoreActions>
               <CopyCollectorModal collector={collector}
                                   validateCollector={validateCollector}
                                   copyCollector={onClone} />
               <MenuItem divider />
               <MenuItem onSelect={this.handleDelete} variant="danger">Delete</MenuItem>
-            </DropdownButton>
+            </MoreActions>
           </ButtonToolbar>
         </td>
       </tr>

@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog.plugins.views.search.views.units;
 
-import { Col, Row } from 'components/bootstrap';
+import org.graylog.plugins.formatting.units.model.UnitId;
 
-import SupportSources from './SupportSources';
+import java.util.Map;
 
-const ContactUs = () => (
-  <Row className="content">
-    <Col md={12}>
-      <SupportSources />
-    </Col>
-  </Row>
-);
+/**
+ * Interface for those implementations of {@link org.graylog.plugins.views.search.views.WidgetConfigDTO},
+ * where customizing/configuring per field unit setting is supported.
+ */
+public interface WithConfigurableUnits {
+    String UNIT_SETTINGS_PROPERTY = "units";
 
-export default ContactUs;
+    Map<String, UnitId> unitSettings();
+}
