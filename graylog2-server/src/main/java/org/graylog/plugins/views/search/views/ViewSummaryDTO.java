@@ -22,17 +22,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.bson.Document;
+import jakarta.validation.constraints.NotBlank;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotBlank;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -44,7 +42,7 @@ import java.util.stream.Collectors;
 @JsonDeserialize(builder = ViewSummaryDTO.Builder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @WithBeanGetter
-public abstract class ViewSummaryDTO implements ViewLike {
+public abstract class ViewSummaryDTO implements ViewLike, MongoEntity {
     @ObjectId
     @Id
     @Nullable
