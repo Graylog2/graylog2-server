@@ -76,7 +76,7 @@ describe('PaginatedList', () => {
       name: /configure page size/i,
     }));
 
-    fireEvent.click(screen.getByRole('menuitem', { name: /100/ }));
+    fireEvent.click(await screen.findByRole('menuitem', { name: /100/ }));
 
     expect(onChangeStub).toHaveBeenCalledWith(1, 100);
 
