@@ -102,6 +102,7 @@ public class JsonParsingErrorsIT {
     void extractsReferencePathFromMissingProperty() {
         assertErrorResponse(STREAMS, "{}")
                 .body("reference_path", equalTo("org.graylog2.rest.resources.streams.requests.CreateStreamRequest"));
+
         assertErrorResponse(STREAMS, """
                 {
                     "title": "Foo",
@@ -112,6 +113,27 @@ public class JsonParsingErrorsIT {
                         "org.graylog2.rest.resources.streams.requests.CreateStreamRequest[\"rules\"]" +
                                 "->java.util.ArrayList[0]" +
                                 "->org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest"));
+    }
+
+    @ContainerMatrixTest
+    void handlesGenericJSONErrorsOnRootLevel() {
+        assertErrorResponse(STREAMS, """
+                {
+                    "title": "Foo",
+                }
+                """)
+                .body("message", equalTo("Unexpected character ('}' (code 125)): was expecting double-quote to start field name"))
+                .body("line", equalTo(3))
+                .body("column", equalTo(1));
+
+        assertErrorResponse(STREAMS, """
+                {
+                    "title":: "Foo"
+                }
+                """)
+                .body("message", equalTo("Unexpected character (':' (code 58)): expected a valid value (JSON String, Number, Array, Object or token 'null', 'true' or 'false')"))
+                .body("line", equalTo(2))
+                .body("column", equalTo(13));
     }
 
     private ValidatableResponse assertErrorResponse(String url, String body) {
