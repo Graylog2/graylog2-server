@@ -34,9 +34,9 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
+import { LinkContainer } from 'components/common/router';
 
 import StreamModal from '../StreamModal';
-import { LinkContainer } from 'components/common/router';
 
 const DefaultStreamHelp = () => (
   <HoverForHelp displayLeftMargin>Action not available for the default
@@ -157,7 +157,7 @@ const StreamActions = ({
   return (
     <ButtonToolbar>
       <LinkContainer to={Routes.stream_view(stream.id)}>
-        <Button bsStyle="default" bsSize='xsmall'>View details</Button>
+        <Button bsStyle="primary" bsSize="xsmall">View details</Button>
       </LinkContainer>
       <ShareButton entityId={stream.id}
                    entityType="stream"
