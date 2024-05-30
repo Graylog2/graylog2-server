@@ -76,6 +76,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_ORDER_UPDATE = PREFIX + "extractor_order:update";
     public static final String FIELD_TYPE_MAPPING_CREATE = PREFIX + "field_type_mapping:create";
     public static final String FIELD_TYPE_MAPPING_DELETE = PREFIX + "field_type_mapping:delete";
+    public static final String FIELD_TYPE_POLLING_TRIGGERED = PREFIX + "field_type_polling:trigger";
 
     public static final String INDEX_FIELD_TYPE_PROFILE_CREATE = PREFIX + "index_field_type_profile:create";
     public static final String INDEX_FIELD_TYPE_PROFILE_UPDATE = PREFIX + "index_field_type_profile:update";
@@ -221,6 +222,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(EXTRACTOR_UPDATE)
             .add(FIELD_TYPE_MAPPING_CREATE)
             .add(FIELD_TYPE_MAPPING_DELETE)
+            .add(FIELD_TYPE_POLLING_TRIGGERED)
             .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
             .add(GRANTS_UPDATE)
             .add(GROK_PATTERN_CREATE)

@@ -33,6 +33,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
@@ -42,6 +43,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Set;
 
+import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_POLLING_TRIGGERED;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Api(value = "FieldTypes", tags = {CLOUD_VISIBLE})
@@ -79,6 +81,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @Path("/poll")
     @RequiresPermissions("*")
+    @AuditEvent(type = FIELD_TYPE_POLLING_TRIGGERED)
     public Response triggerFieldTypePolling() {
         fieldTypePoller.triggerFullRefresh();
 
