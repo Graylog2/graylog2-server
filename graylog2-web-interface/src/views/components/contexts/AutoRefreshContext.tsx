@@ -29,8 +29,7 @@ type AutoRefreshContextType = {
   refreshConfig: RefreshConfig | null,
   startAutoRefresh: (interval: number) => void
   stopAutoRefresh: () => void,
-  registerCallback: (callback: RefreshCallback, id: string) => void,
-  unregisterCallback: (id: string) => void,
+  intervalStartCount: number,
 };
 
 const AutoRefreshContext = React.createContext<AutoRefreshContextType | null>(null);
