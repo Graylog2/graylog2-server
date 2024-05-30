@@ -22,7 +22,7 @@ import AppConfig from 'util/AppConfig';
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import ErrorPage from 'components/errors/ErrorPage';
-import SupportSources from 'components/support/SupportSources';
+import { SupportSources } from 'components/support';
 import ClipboardButton from 'components/common/ClipboardButton';
 
 const ToggleDetails = styled.div`
