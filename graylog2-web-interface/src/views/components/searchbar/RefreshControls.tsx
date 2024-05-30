@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';
 import moment from 'moment';
-import styled, { keyframes, css } from 'styled-components';
+import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
@@ -34,6 +34,7 @@ import ReadableDuration from 'components/common/ReadableDuration';
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
   justify-content: flex-end;
+  position: relative;
 
   > .btn-group {
     .btn:first-child {
@@ -42,17 +43,8 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const StyledDropdownButton = styled(DropdownButton)`
-  position: relative;
-`;
-
-const Label = styled.span`
-  z-index: 1;
-  position: relative;
-`;
-
 const ButtonLabel = () => {
-  const { refreshConfig, intervalStartCount } = useAutoRefresh();
+  const { refreshConfig } = useAutoRefresh();
 
   if (!refreshConfig?.enabled) {
     return <>Not updating</>;
@@ -60,8 +52,7 @@ const ButtonLabel = () => {
 
   return (
     <>
-      {!!intervalStartCount && <ProgressAnimation $animationDuration={refreshConfig.interval} key={`${refreshConfig.interval}-${intervalStartCount}`} />}
-      <Label>Every <ReadableDuration duration={refreshConfig.interval} /></Label>
+      Every <ReadableDuration duration={refreshConfig.interval} />
     </>
   );
 };
@@ -108,7 +99,7 @@ const RefreshControls = ({ disable }: Props) => {
   const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions } } = useSearchConfiguration();
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions);
-  const { refreshConfig, startAutoRefresh, stopAutoRefresh } = useAutoRefresh();
+  const { refreshConfig, startAutoRefresh, stopAutoRefresh, intervalStartCount } = useAutoRefresh();
   const defaultInterval = useDefaultInterval();
 
   useDisableOnFormChange();
@@ -153,13 +144,19 @@ const RefreshControls = ({ disable }: Props) => {
 
   return (
     <FlexibleButtonGroup aria-label="Refresh Search Controls">
+      {refreshConfig?.enabled && !!intervalStartCount && (
+        <ProgressAnimation key={`${refreshConfig.interval}-${intervalStartCount}`}
+                           $animationDuration={refreshConfig.interval}
+                           $increase={false} />
+      )}
+
       <Button onClick={toggleEnable} title={refreshConfig?.enabled ? 'Pause Refresh' : 'Start Refresh'} disabled={disable || isLoadingMinimumInterval || !defaultInterval}>
         <Icon name={refreshConfig?.enabled ? 'pause' : 'update'} />
       </Button>
 
-      <StyledDropdownButton title={<ButtonLabel />}
-                            disabled={disable}
-                            id="refresh-options-dropdown">
+      <DropdownButton title={<ButtonLabel />}
+                      disabled={disable}
+                      id="refresh-options-dropdown">
         {isLoadingMinimumInterval && <Spinner />}
         {!isLoadingMinimumInterval && intervalOptions.map(([interval, label]) => {
           const isBelowMinimum = durationToMS(interval) < durationToMS(minimumRefreshInterval);
@@ -177,7 +174,7 @@ const RefreshControls = ({ disable }: Props) => {
             </MenuItem>
           );
         })}
-      </StyledDropdownButton>
+      </DropdownButton>
     </FlexibleButtonGroup>
   );
 };

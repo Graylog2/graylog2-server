@@ -17,7 +17,7 @@
 
 import styled, { css, keyframes } from 'styled-components';
 
-const animateProgress = keyframes`
+const animateIncrease = keyframes`
   0% {
     width: 0;
   }
@@ -25,15 +25,25 @@ const animateProgress = keyframes`
     width: 100%;
   }
 `;
-const ProgressAnimation = styled.div<{ $animationDuration: number }>(({ theme, $animationDuration }) => css`
+
+const animateDecrease = keyframes`
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0;
+  }
+`;
+
+const ProgressAnimation = styled.div<{ $animationDuration: number, $increase: boolean }>(({ theme, $animationDuration, $increase }) => css`
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
   bottom: 0;
-  animation: linear ${animateProgress} ${$animationDuration}ms;
-  background-color: ${theme.colors.gray['80']};
-  z-index: 0;
+  height: 2px;
+  animation: linear ${$increase ? animateIncrease : animateDecrease} ${$animationDuration}ms;
+  background-color: ${theme.colors.global.textDefault};
+  z-index: 2;
+  ${$increase ? 'left: 0;' : 'right: 0;'} 
 `);
 
 export default ProgressAnimation;
