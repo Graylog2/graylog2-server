@@ -28,7 +28,7 @@ import assertUnreachable from 'logic/assertUnreachable';
 import useAppDispatch from 'stores/useAppDispatch';
 
 import GenericPlot from './GenericPlot';
-import type { ChartColor, ChartConfig } from './GenericPlot';
+import type { ChartColor, ChartConfig, PlotLayout } from './GenericPlot';
 import OnZoom from './OnZoom';
 
 import CustomPropTypes from '../CustomPropTypes';
@@ -43,7 +43,7 @@ export type Props = {
   },
   height?: number;
   setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor,
-  plotLayout?: any,
+  plotLayout?: Partial<PlotLayout>,
   onZoom?: (from: string, to: string, userTimezone: string) => boolean,
 };
 
@@ -57,13 +57,6 @@ const yLegendPosition = (containerHeight: number) => {
   }
 
   return -0.14;
-};
-
-type Layout = {
-  yaxis: { fixedrange?: boolean },
-  legend?: { y?: number },
-  showlegend?: boolean,
-  hovermode: 'x',
 };
 
 const mapAxisType = (axisType: AxisType): 'linear' | 'log' => {
@@ -87,8 +80,8 @@ const XYPlot = ({
   onZoom,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
-  const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) };
-  const defaultLayout: Layout = {
+  const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) } as const;
+  const defaultLayout: Partial<PlotLayout> = {
     yaxis,
     hovermode: 'x',
   };
@@ -97,7 +90,7 @@ const XYPlot = ({
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
 
-  const layout = { ...defaultLayout, ...plotLayout };
+  const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
   const dispatch = useAppDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline

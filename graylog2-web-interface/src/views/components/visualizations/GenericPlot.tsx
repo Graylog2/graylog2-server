@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useMemo, useCallback } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
 import type * as Plotly from 'plotly.js';
-import { useEffect } from 'react';
+import type { Layout } from 'plotly.js';
 
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -26,12 +27,21 @@ import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/E
 import { ROOT_FONT_SIZE } from 'theme/constants';
 
 import ChartColorContext from './ChartColorContext';
-import styles from './GenericPlot.lazy.css';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
+export type PlotLayout = Layout
+
 const StyledPlot = styled(Plot)(({ theme }) => css`
+  div.plotly-notifier {
+    visibility: hidden;
+  }
+
+  .customPopover .popover-content {
+    padding: 0;
+  }
+  
   .hoverlayer .hovertext {
     rect {
       fill: ${theme.colors.global.contentBackground} !important;
@@ -85,7 +95,7 @@ export type ChartColor = {
 
 type Props = {
   chartData: Array<any>,
-  layout?: {},
+  layout?: Partial<PlotLayout>,
   onZoom?: (from: string, to: string) => boolean,
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor,
   onClickMarker?: (event: OnClickMarkerEvent) => void
@@ -107,64 +117,105 @@ const style = { height: '100%', width: '100%' };
 
 const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
 
-const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverMarker, onUnhoverMarker, onZoom }: Props) => {
+const usePlotLayout = (layout: {}) => {
   const theme = useTheme();
-  const fontSettings = {
-    color: theme.colors.global.textDefault,
-    size: ROOT_FONT_SIZE * Number(theme.fonts.size.small.replace(/rem|em/i, '')),
-    family: theme.fonts.family.body,
-  };
-  const defaultLayout = {
-    shapes: [],
-    autosize: true,
-    showlegend: false,
-    margin: {
-      t: 10,
-      l: 40,
-      r: 10,
-      b: 0,
-      pad: 0,
-    },
-    legend: {
-      orientation: 'h' as const,
-      font: fontSettings,
-    },
-    hoverlabel: {
-      namelength: -1,
-    },
-    paper_bgcolor: 'transparent',
-    plot_bgcolor: 'transparent',
-    title: {
-      font: fontSettings,
-    },
-    yaxis: {
-      automargin: true,
-      gridcolor: theme.colors.variant.lightest.default,
-      tickfont: fontSettings,
-      title: {
-        font: fontSettings,
-      },
-    },
-    xaxis: {
-      automargin: true,
-      tickfont: fontSettings,
-      title: {
-        font: fontSettings,
-      },
-    },
-  };
+  const interactive = useContext(InteractiveContext);
+  const { colors } = useContext(ChartColorContext);
 
-  const plotLayout = merge({}, defaultLayout, layout);
-
-  useEffect(() => {
-    styles.use();
-
-    return () => {
-      styles.unuse();
+  return useMemo(() => {
+    const fontSettings = {
+      color: theme.colors.global.textDefault,
+      size: ROOT_FONT_SIZE * Number(theme.fonts.size.small.replace(/rem|em/i, '')),
+      family: theme.fonts.family.body,
     };
-  });
 
-  const _onRelayout = (axis: Axis) => {
+    const defaultLayout = {
+      shapes: [],
+      autosize: true,
+      showlegend: false,
+      margin: {
+        t: 10,
+        l: 40,
+        r: 10,
+        b: 0,
+        pad: 0,
+      },
+      legend: {
+        orientation: 'h' as const,
+        font: fontSettings,
+      },
+      hoverlabel: {
+        namelength: -1,
+      },
+      paper_bgcolor: 'transparent',
+      plot_bgcolor: 'transparent',
+      title: {
+        font: fontSettings,
+      },
+      yaxis: {
+        automargin: true,
+        gridcolor: theme.colors.variant.lightest.default,
+        tickfont: fontSettings,
+        title: {
+          font: fontSettings,
+        },
+      },
+      xaxis: {
+        automargin: true,
+        tickfont: fontSettings,
+        title: {
+          font: fontSettings,
+        },
+      },
+    };
+
+    const plotLayout = merge({}, defaultLayout, layout);
+
+    plotLayout.shapes = plotLayout.shapes.map((shape) => ({
+      ...shape,
+      line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
+    }));
+
+    return interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout);
+  }, [colors, interactive, layout, theme.colors.global.textDefault, theme.colors.variant.lightest.default, theme.fonts.family.body, theme.fonts.size.small]);
+};
+
+const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfig, color: ColorMapper) => ChartColor) => {
+  const theme = useTheme();
+  const { colors } = useContext(ChartColorContext);
+
+  return useMemo(() => chartData.map((chart) => {
+    if (setChartColor && colors) {
+      const conf = setChartColor(chart, colors);
+
+      if (chart.type === 'pie') {
+        conf.outsidetextfont = { color: theme.colors.global.textDefault };
+      }
+
+      if (chart?.name === eventsDisplayName) {
+        const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
+
+        conf.marker = { color: eventColor, size: 5 };
+      }
+
+      if (conf.line || conf.marker) {
+        return merge(chart, conf);
+      }
+
+      return chart;
+    }
+
+    return chart;
+  }), [chartData, colors, setChartColor, theme.colors.global.textDefault]);
+};
+
+const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverMarker, onUnhoverMarker, onZoom }: Props) => {
+  const interactive = useContext(InteractiveContext);
+  const plotLayout = usePlotLayout(layout);
+  const plotChartData = usePlotChatData(chartData, setChartColor);
+  const onRenderComplete = useContext(RenderCompletionCallback);
+
+  const _onRelayout = useCallback((axis: Axis) => {
     if (!axis.autosize && axis['xaxis.range[0]'] && axis['xaxis.range[1]']) {
       const from = axis['xaxis.range[0]'];
       const to = axis['xaxis.range[1]'];
@@ -173,9 +224,9 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
     }
 
     return true;
-  };
+  }, [onZoom]);
 
-  const _onHoverMarker = (event: unknown) => {
+  const _onHoverMarker = useCallback((event: unknown) => {
     const { points } = event as { points: Array<{ bbox: { x0: number, y0: number }, y: string, x: string }> };
 
     onHoverMarker?.({
@@ -184,69 +235,26 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
       x: points[0].x,
       y: points[0].y,
     });
-  };
+  }, [onHoverMarker]);
 
-  const _onMarkerClick = ({ points }: Readonly<Plotly.PlotMouseEvent>) => {
+  const _onMarkerClick = useCallback(({ points }: Readonly<Plotly.PlotMouseEvent>) => {
     onClickMarker?.({
       x: points[0].x as string,
       y: points[0].y as string,
     });
-  };
+  }, [onClickMarker]);
 
   return (
-    <ChartColorContext.Consumer>
-      {({ colors }) => {
-        plotLayout.shapes = plotLayout.shapes.map((shape) => ({
-          ...shape,
-          line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
-        }));
-
-        const newChartData = chartData.map((chart) => {
-          if (setChartColor && colors) {
-            const conf = setChartColor(chart, colors);
-
-            if (chart.type === 'pie') {
-              conf.outsidetextfont = { color: theme.colors.global.textDefault };
-            }
-
-            if (chart?.name === eventsDisplayName) {
-              const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
-
-              conf.marker = { color: eventColor, size: 5 };
-            }
-
-            if (conf.line || conf.marker) {
-              return merge(chart, conf);
-            }
-
-            return chart;
-          }
-
-          return chart;
-        });
-
-        return (
-          <InteractiveContext.Consumer>
-            {(interactive) => (
-              <RenderCompletionCallback.Consumer>
-                {(onRenderComplete) => (
-                  <StyledPlot data={newChartData}
-                              useResizeHandler
-                              layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
-                              style={style}
-                              onAfterPlot={onRenderComplete}
-                              onClick={interactive ? _onMarkerClick : () => false}
-                              onHover={_onHoverMarker}
-                              onUnhover={onUnhoverMarker}
-                              onRelayout={interactive ? _onRelayout : () => false}
-                              config={config} />
-                )}
-              </RenderCompletionCallback.Consumer>
-            )}
-          </InteractiveContext.Consumer>
-        );
-      }}
-    </ChartColorContext.Consumer>
+    <StyledPlot data={plotChartData}
+                useResizeHandler
+                layout={plotLayout}
+                style={style}
+                onAfterPlot={onRenderComplete}
+                onClick={interactive ? _onMarkerClick : () => false}
+                onHover={_onHoverMarker}
+                onUnhover={onUnhoverMarker}
+                onRelayout={interactive ? _onRelayout : () => false}
+                config={config} />
   );
 };
 
