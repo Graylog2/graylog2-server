@@ -46,6 +46,8 @@ const renderForm = () => render(
 
 describe('TimeRangePresetForm', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
+
     asMock(useSearchConfiguration).mockReturnValue({
       config: mockSearchesClusterConfig,
       refresh: jest.fn(),
@@ -98,15 +100,17 @@ describe('TimeRangePresetForm', () => {
     ]));
   });
 
-  it('edit time range action trigger onUpdate', async () => {
+  it('edit time range action triggers onUpdate', async () => {
     renderForm();
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const timerangeFilter = await within(timerangeItem).findByText('5 minutes ago');
     fireEvent.click(timerangeFilter);
     const fromInput = await screen.findByTitle('Set the from value');
     fireEvent.change(fromInput, { target: { value: 15 } });
-    const submit = await screen.findByTitle('Update time range');
-    fireEvent.click(submit);
+    const submitButton = await screen.findByRole('button', { name: /update time range/i });
+
+    await waitFor(() => expect(submitButton).toBeEnabled());
+    fireEvent.click(submitButton);
 
     await waitFor(() => expect(mockOnUpdate).toHaveBeenCalledWith(Immutable.List([
       { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 900, type: 'relative' } },

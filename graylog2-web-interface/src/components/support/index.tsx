@@ -14,15 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.searchtypes.pivot;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.plugins.formatting.units.model.UnitId;
-
-import java.util.Optional;
-
-public interface MayHaveUnit {
-
-    @JsonProperty
-    Optional<UnitId> unit();
-}
+export { default as DocumentationLink } from './DocumentationLink';
+export { default as SupportSources } from './SupportSources';

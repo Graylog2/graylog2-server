@@ -22,7 +22,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
+import org.graylog.plugins.views.search.views.units.WithConfigurableUnits;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
@@ -31,11 +33,12 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @AutoValue
 @JsonTypeName(MessageListConfigDTO.NAME)
 @JsonDeserialize(builder = MessageListConfigDTO.Builder.class)
-public abstract class MessageListConfigDTO implements WidgetConfigDTO {
+public abstract class MessageListConfigDTO implements WidgetConfigDTO, WithConfigurableUnits {
     public static final String NAME = "messages";
     private static final String FIELD_FIELDS = "fields";
     private static final String FIELD_SHOW_MESSAGE_ROW = "show_message_row";
@@ -45,6 +48,10 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
 
     @JsonProperty(FIELD_FIELDS)
     public abstract ImmutableSet<String> fields();
+
+    @Override
+    @JsonProperty(UNIT_SETTINGS_PROPERTY)
+    public abstract Map<String, UnitId> unitSettings();
 
     @JsonProperty(FIELD_SHOW_MESSAGE_ROW)
     public abstract boolean showMessageRow();
@@ -63,6 +70,9 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
     public abstract static class Builder {
         @JsonProperty(FIELD_FIELDS)
         public abstract Builder fields(ImmutableSet<String> fields);
+
+        @JsonProperty(UNIT_SETTINGS_PROPERTY)
+        public abstract Builder unitSettings(Map<String, UnitId> unitSettings);
 
         @JsonProperty(FIELD_SHOW_MESSAGE_ROW)
         public abstract Builder showMessageRow(boolean showMessageRow);
@@ -85,6 +95,7 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_MessageListConfigDTO.Builder()
+                    .unitSettings(Map.of())
                     .decorators(Collections.emptyList())
                     .sort(Collections.emptyList());
         }
