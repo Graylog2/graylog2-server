@@ -136,6 +136,20 @@ public class JsonParsingErrorsIT {
                 .body("column", equalTo(13));
     }
 
+    @ContainerMatrixTest
+    void handleInvalidPropertiesOnRootLevel() {
+        assertErrorResponse(SYNC_SEARCH, """
+                {
+                    "foo": 23
+                }
+                """)
+                .body("message", equalTo("Unable to map property foo.\nKnown properties include: parameters, id, queries"))
+                .body("line", equalTo(2))
+                .body("column", equalTo(14))
+                .body("path", equalTo("foo"))
+                .body("reference_path", equalTo("org.graylog.plugins.views.search.rest.AutoValue_SearchDTO$Builder[\"foo\"]"));
+    }
+
     private ValidatableResponse assertErrorResponse(String url, String body) {
         return given()
                 .spec(api.requestSpecification())

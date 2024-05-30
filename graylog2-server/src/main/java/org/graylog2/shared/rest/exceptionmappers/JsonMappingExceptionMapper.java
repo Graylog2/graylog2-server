@@ -18,13 +18,17 @@ package org.graylog2.shared.rest.exceptionmappers;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
+import com.google.common.base.Joiner;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import org.graylog2.plugin.rest.RequestError;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -73,6 +77,14 @@ public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingEx
         final var messagePrefix = "Error at " + quotedPath + " " + location;
 
 
+        if (e instanceof PropertyBindingException propertyBindingException) {
+            final Collection<Object> knownPropertyIds = firstNonNull(propertyBindingException.getKnownPropertyIds(), Collections.emptyList());
+            final StringBuilder message = new StringBuilder("Unable to map property ")
+                    .append(propertyBindingException.getPropertyName())
+                    .append(".\nKnown properties include: ");
+            Joiner.on(", ").appendTo(message, knownPropertyIds);
+            return message.toString();
+        }
         if (e instanceof MismatchedInputException mismatchedInputException) {
             final var targetType = mismatchedInputException.getTargetType();
             if (targetType != null) {
