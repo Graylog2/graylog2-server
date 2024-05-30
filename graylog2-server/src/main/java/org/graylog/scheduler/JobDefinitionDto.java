@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import jakarta.annotation.Nullable;
 import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -58,7 +57,6 @@ public abstract class JobDefinitionDto implements MongoEntity {
         @Id
         @ObjectId
         @JsonProperty(FIELD_ID)
-        @Nullable
         public abstract Builder id(String id);
 
         @JsonProperty(FIELD_TITLE)

@@ -39,7 +39,9 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mongojack.Id;
 
+import javax.annotation.Nullable;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -54,7 +56,7 @@ class MongoCollectionsTest {
     private MongoCollections collections;
     private EncryptedValueService encryptedValueService;
 
-    record Person(String id,
+    record Person(@JsonProperty("id") @Id @org.mongojack.ObjectId String id,
                   @JsonProperty("external_id") @org.mongojack.ObjectId String externalId,
                   @JsonProperty("object_id") ObjectId objectId,
                   @JsonProperty("first_name") String firstName,
@@ -69,10 +71,12 @@ class MongoCollectionsTest {
     record IgnoreTest(@JsonProperty("ignore_me_not") String ignoreMeNot,
                       @MongoIgnore @JsonProperty("ignore_me") String ignoreMe) {}
 
-    record IdGenerationTest(String id) implements MongoEntity {}
+    record IdGenerationTest(@Nullable @JsonProperty("id") @Id @org.mongojack.ObjectId String id)
+            implements MongoEntity {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record TimestampTest(String id, @JsonProperty("timestamp") DateTime timestamp) implements MongoEntity {}
+    record TimestampTest(@Nullable @JsonProperty("id") @Id @org.mongojack.ObjectId String id,
+                         @JsonProperty("timestamp") DateTime timestamp) implements MongoEntity {}
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
