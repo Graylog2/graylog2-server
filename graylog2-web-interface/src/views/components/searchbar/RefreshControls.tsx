@@ -21,7 +21,7 @@ import styled, { keyframes, css } from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
-import { Icon, Spinner, HoverForHelp } from 'components/common';
+import { Icon, Spinner, HoverForHelp, ProgressAnimation } from 'components/common';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -46,30 +46,10 @@ const StyledDropdownButton = styled(DropdownButton)`
   position: relative;
 `;
 
-const animateProgress = keyframes`
-  0% {
-    width: 0;
-  }
-  100% {
-    width: 100%;
-  }
-`;
-
 const Label = styled.span`
   z-index: 1;
   position: relative;
 `;
-
-const Progress = styled.div<{ $animationDuration: number }>(({ theme, $animationDuration }) => css`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  animation: linear ${animateProgress} ${$animationDuration}ms;
-  background-color: ${theme.colors.gray['80']};
-  z-index: 0;
-`);
 
 const ButtonLabel = () => {
   const { refreshConfig, intervalStartCount } = useAutoRefresh();
@@ -80,7 +60,7 @@ const ButtonLabel = () => {
 
   return (
     <>
-      {!!intervalStartCount && <Progress $animationDuration={refreshConfig.interval} key={`${refreshConfig.interval}-${intervalStartCount}`} />}
+      {!!intervalStartCount && <ProgressAnimation $animationDuration={refreshConfig.interval} key={`${refreshConfig.interval}-${intervalStartCount}`} />}
       <Label>Every <ReadableDuration duration={refreshConfig.interval} /></Label>
     </>
   );
