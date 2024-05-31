@@ -93,11 +93,11 @@ describe('MainNavbar', () => {
       await screen.findByRole('link', { name: /perpetuum mobile/i });
     });
 
-    it('prefix plugin navigation item paths with app prefix', async () => {
+    it('does not prefix plugin navigation item paths with app prefix', async () => {
       asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/my/crazy/prefix');
       render(<SUT />);
 
-      expect(await screen.findByRole('link', { name: /perpetuum mobile/i })).toHaveAttribute('href', '/my/crazy/prefix/something');
+      expect(await screen.findByRole('link', { name: /perpetuum mobile/i })).toHaveAttribute('href', '/something');
     });
 
     it('does not contain navigation elements from plugins where permissions are missing', () => {
