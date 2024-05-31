@@ -175,7 +175,8 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
             final String fieldName = fieldSpecEntry.getKey();
             if (!Message.validKey(fieldName)) {
                 validation.addError(FIELD_FIELD_SPEC,
-                        "Event Definition field_spec contains invalid message field \"" + fieldName + "\"");
+                        "Event Definition field_spec contains invalid message field \"" + fieldName + "\"." +
+                                " Valid message field characters are: a-z, A-Z, 0-9, ., -, and @. No spaces are allowed.");
             }
         }
 
