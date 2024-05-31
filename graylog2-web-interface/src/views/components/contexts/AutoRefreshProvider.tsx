@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { useMemo, useState, useEffect, useCallback } from 'react';
 
-import type { RefreshConfig } from 'views/components/contexts/AutoRefreshContext';
+import type { RefreshConfig, IntervalSetupCallback } from 'views/components/contexts/AutoRefreshContext';
 import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
 import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
@@ -31,7 +31,7 @@ const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
   const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(null);
   const startAutoRefresh = useCallback((interval: number) => setRefreshConfig({ enabled: true, interval }), []);
   const stopAutoRefresh = useCallback(() => setRefreshConfig((cur) => ({ ...cur, enabled: false })), []);
-  const [intervalStartCount, setIntervalStartCount] = useState(0);
+  const [intervalSetupCallbacks, setIntervalSetupCallbacks] = useState<Record<string, IntervalSetupCallback>>({});
   const refreshSearch = useCallback(() => {
     if (!jobIds) {
       dispatch(execute());
@@ -42,7 +42,7 @@ const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
     let refreshInterval = null;
 
     if (refreshConfig?.enabled && !jobIds) {
-      setIntervalStartCount((cur) => (cur + 1));
+      Object.values(intervalSetupCallbacks).forEach((callback) => callback());
 
       refreshInterval = setInterval(() => {
         refreshSearch();
@@ -52,18 +52,33 @@ const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
     return () => {
       clearInterval(refreshInterval);
     };
-  }, [refreshSearch, refreshConfig?.enabled, refreshConfig?.interval, jobIds]);
+  }, [refreshSearch, refreshConfig?.enabled, refreshConfig?.interval, jobIds, intervalSetupCallbacks]);
+
+  const registerIntervalSetupCallback = useCallback((callback: IntervalSetupCallback, id: string) => {
+    setIntervalSetupCallbacks((prevCallbacks) => ({ ...prevCallbacks, [id]: callback }));
+  }, []);
+
+  const unregisterIntervalSetupCallback = useCallback((id: string) => {
+    setIntervalSetupCallbacks((prevCallbacks) => {
+      const newCallbacks = { ...prevCallbacks };
+      delete newCallbacks[id];
+
+      return newCallbacks;
+    });
+  }, []);
 
   const contextValue = useMemo(() => ({
     refreshConfig,
     startAutoRefresh,
     stopAutoRefresh,
-    intervalStartCount,
+    registerIntervalSetupCallback,
+    unregisterIntervalSetupCallback,
   }), [
     refreshConfig,
+    registerIntervalSetupCallback,
     startAutoRefresh,
     stopAutoRefresh,
-    intervalStartCount,
+    unregisterIntervalSetupCallback,
   ]);
 
   return (

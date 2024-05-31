@@ -104,7 +104,8 @@ describe('MessageList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
-      intervalStartCount: 0,
+      registerIntervalSetupCallback: () => {},
+      unregisterIntervalSetupCallback: () => {},
     });
   });
 
@@ -217,7 +218,8 @@ describe('MessageList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh,
-      intervalStartCount: 0,
+      registerIntervalSetupCallback: () => {},
+      unregisterIntervalSetupCallback: () => {},
     });
 
     const dispatch = jest.fn().mockResolvedValue(finishedLoading({

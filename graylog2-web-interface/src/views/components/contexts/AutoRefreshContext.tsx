@@ -23,13 +23,14 @@ export type RefreshConfig = {
   enabled: boolean
 }
 
-export type RefreshCallback = () => void;
+export type IntervalSetupCallback = () => void;
 
 type AutoRefreshContextType = {
   refreshConfig: RefreshConfig | null,
   startAutoRefresh: (interval: number) => void
   stopAutoRefresh: () => void,
-  intervalStartCount: number,
+  registerIntervalSetupCallback: (callback: IntervalSetupCallback, id: string) => void,
+  unregisterIntervalSetupCallback: (id: string) => void,
 };
 
 const AutoRefreshContext = React.createContext<AutoRefreshContextType | null>(null);

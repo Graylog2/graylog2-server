@@ -49,7 +49,8 @@ describe('ShowDashboardInBigDisplayMode', () => {
     refreshConfig: null,
     startAutoRefresh: () => {},
     stopAutoRefresh: () => {},
-    intervalStartCount: 0,
+    registerIntervalSetupCallback: () => {},
+    unregisterIntervalSetupCallback: () => {},
   };
 
   useViewsPlugin();
@@ -65,7 +66,8 @@ describe('ShowDashboardInBigDisplayMode', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
-      intervalStartCount: 0,
+      registerIntervalSetupCallback: () => {},
+      unregisterIntervalSetupCallback: () => {},
     });
   });
 

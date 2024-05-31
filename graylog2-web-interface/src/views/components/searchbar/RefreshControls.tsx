@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
+import { v4 as uuidv4 } from 'uuid';
 
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
 import { Icon, Spinner, HoverForHelp, ProgressAnimation } from 'components/common';
@@ -88,6 +89,25 @@ const useDefaultInterval = () => {
   return defaultAutoRefreshInterval;
 };
 
+const useRefreshId = () => {
+  const [refreshId, setRefreshId] = useState<string | undefined>();
+  const { registerIntervalSetupCallback, unregisterIntervalSetupCallback } = useAutoRefresh();
+
+  useEffect(() => {
+    const callback = () => {
+      setRefreshId(uuidv4());
+    };
+
+    registerIntervalSetupCallback(callback, 'progress-animation');
+
+    return () => {
+      unregisterIntervalSetupCallback('progress-animation');
+    };
+  }, [registerIntervalSetupCallback, unregisterIntervalSetupCallback]);
+
+  return refreshId;
+};
+
 type Props = {
   disable: boolean
 }
@@ -99,10 +119,11 @@ const RefreshControls = ({ disable }: Props) => {
   const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions } } = useSearchConfiguration();
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions);
-  const { refreshConfig, startAutoRefresh, stopAutoRefresh, intervalStartCount } = useAutoRefresh();
+  const { refreshConfig, startAutoRefresh, stopAutoRefresh } = useAutoRefresh();
   const defaultInterval = useDefaultInterval();
 
   useDisableOnFormChange();
+  const refreshId = useRefreshId();
 
   const selectInterval = useCallback((interval: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
@@ -144,8 +165,8 @@ const RefreshControls = ({ disable }: Props) => {
 
   return (
     <FlexibleButtonGroup aria-label="Refresh Search Controls">
-      {refreshConfig?.enabled && !!intervalStartCount && (
-        <ProgressAnimation key={`${refreshConfig.interval}-${intervalStartCount}`}
+      {(refreshConfig?.enabled && refreshId) && (
+        <ProgressAnimation key={`${refreshConfig.interval}-${refreshId}`}
                            $animationDuration={refreshConfig.interval}
                            $increase={false} />
       )}
