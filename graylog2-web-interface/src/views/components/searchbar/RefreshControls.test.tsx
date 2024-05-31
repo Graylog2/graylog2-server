@@ -74,8 +74,6 @@ describe('RefreshControls', () => {
     refreshConfig: null,
     stopAutoRefresh: () => {},
     startAutoRefresh: () => {},
-    registerIntervalSetupCallback: () => {},
-    unregisterIntervalSetupCallback: () => {},
   };
 
   beforeEach(() => {

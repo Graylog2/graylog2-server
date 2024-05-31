@@ -18,8 +18,6 @@ const useAutoRefresh = jest.fn(() => ({
   refreshConfig: null,
   startAutoRefresh: () => {},
   stopAutoRefresh: () => {},
-  registerIntervalSetupCallback: () => {},
-  unregisterIntervalSetupCallback: () => {},
 }));
 
 export default useAutoRefresh;

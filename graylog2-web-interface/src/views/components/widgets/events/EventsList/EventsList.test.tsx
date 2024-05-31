@@ -125,8 +125,6 @@ describe('EventsList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
-      registerIntervalSetupCallback: () => {},
-      unregisterIntervalSetupCallback: () => {},
     });
   });
 
@@ -190,8 +188,6 @@ describe('EventsList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh,
-      registerIntervalSetupCallback: () => {},
-      unregisterIntervalSetupCallback: () => {},
     });
 
     const dispatch = jest.fn().mockResolvedValue(finishedLoading({
