@@ -53,14 +53,15 @@ const CollectorsAdministrationActions = ({
   const disableConfigButton = !selectedSidecarCollectorPairs.length || selectedLogCollectorsNames.length !== 1;
 
   const getConfigButtonTooltip = () => {
-    switch (true) {
-      case !selectedSidecarCollectorPairs.length:
-        return 'Incompatible collectors, please check your sidecar configuration.';
-      case selectedLogCollectorsNames.length !== 1:
-        return `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously.`;
-      default:
-        return 'Assign Configurations';
+    if (!selectedSidecarCollectorPairs.length) {
+      return 'Incompatible collectors, please check your sidecar configuration.';
     }
+
+    if (selectedLogCollectorsNames.length !== 1) {
+      return `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously.`;
+    }
+
+    return 'Assign Configurations';
   };
 
   return (
