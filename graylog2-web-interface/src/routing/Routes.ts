@@ -313,7 +313,7 @@ type RouteMap = { [routeName: string]: RouteMapEntry };
 const isLiteralRoute = (entry: RouteMapEntry): entry is string => (typeof entry === 'string');
 const isRouteFunction = (entry: RouteMapEntry): entry is RouteFunction<any> => (typeof entry === 'function');
 
-const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R => {
+export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R => {
   if (appPrefix === '/') {
     return routes;
   }
