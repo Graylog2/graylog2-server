@@ -163,7 +163,6 @@ type FieldValueProvider = {
   },
 }
 
-
 interface PluginDataWarehouse {
   DataWarehouseStatus: React.ComponentType<{
     stream: {
@@ -173,7 +172,6 @@ interface PluginDataWarehouse {
   StreamDataWarehouse: React.ComponentType<{}>,
   DataWarehouseJobs: React.ComponentType<{}>,
 }
-
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {

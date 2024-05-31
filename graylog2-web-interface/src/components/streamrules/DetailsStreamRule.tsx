@@ -56,7 +56,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
     StreamRulesInputsActions.list();
   }, []);
 
-  const _onEdit = (event: React.SyntheticEvent ) => {
+  const _onEdit = (event: React.SyntheticEvent) => {
     event.preventDefault();
     setShowStreamRuleForm(true);
   };
@@ -86,7 +86,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
   });
 
   const _formatActionItems = () => (
-    <ActionButtonsWrap className='align-right'>
+    <ActionButtonsWrap className="align-right">
       <Button bsStyle="link"
               bsSize="xsmall"
               onClick={_onDelete}
@@ -102,13 +102,14 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
     </ActionButtonsWrap>
   );
 
-    /* const matchDataStyle = () => (matchData.rules[streamRule.id] ? 'success' : 'danger'); */
+  /* const matchDataStyle = () => (matchData.rules[streamRule.id] ? 'success' : 'danger'); */
   const actionItems = isPermitted(permissions, [`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
   const description = streamRule.description ? <small>{' '}({streamRule.description})</small> : null;
-    /* const listGroupStyle = !isEmpty(matchData) ? matchDataStyle() : null; */
+  /* const listGroupStyle = !isEmpty(matchData) ? matchDataStyle() : null; */
 
   return (
     <tr key={streamRule.id}>
+      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
       <td>
         <HumanReadableStreamRule streamRule={streamRule} inputs={inputs} />
       </td>

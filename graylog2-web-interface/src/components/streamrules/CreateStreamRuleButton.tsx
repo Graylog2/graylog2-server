@@ -20,10 +20,11 @@ import React, { useCallback, useState } from 'react';
 import { Button } from 'components/bootstrap';
 import type { BsSize } from 'components/bootstrap/types';
 import type { StyleProps } from 'components/bootstrap/Button';
-import StreamRuleModal from './StreamRuleModal';
 import type { StreamRule } from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import UserNotification from 'util/UserNotification';
+
+import StreamRuleModal from './StreamRuleModal';
 
 type Props = {
   bsSize?: BsSize,
@@ -36,14 +37,12 @@ type Props = {
 const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, streamId }: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const toggleCreateModal = useCallback(() => {
-    return setShowCreateModal((cur) => !cur);
-  }, []);
+  const toggleCreateModal = useCallback(() => setShowCreateModal((cur) => !cur), []);
 
   const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(streamId, streamRule, () => {
     UserNotification.success('Stream rule was created successfully.', 'Success');
     // TODO invalidate stream query
-  }), []);
+  }), [streamId]);
 
   return (
     <>
@@ -78,6 +77,7 @@ CreateStreamRuleButton.defaultProps = {
   bsSize: undefined,
   bsStyle: undefined,
   className: undefined,
+  streamId: undefined,
 };
 
 export default CreateStreamRuleButton;
