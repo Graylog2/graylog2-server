@@ -51,7 +51,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.ImmutableSet.of;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.Collectors.toSet;
 
@@ -154,7 +153,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     public abstract Builder toBuilder();
 
     public static Builder builder() {
-        return Builder.create().parameters(of()).queries(ImmutableSet.<Query>builder().build());
+        return Builder.create().parameters(ImmutableSet.of()).queries(ImmutableSet.<Query>builder().build());
     }
 
     public Set<String> usedStreamIds() {
@@ -222,7 +221,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
             return new AutoValue_Search.Builder()
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC))
-                    .parameters(of());
+                    .parameters(ImmutableSet.of());
         }
 
         public Search build() {
