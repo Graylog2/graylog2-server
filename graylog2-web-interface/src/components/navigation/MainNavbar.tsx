@@ -67,7 +67,7 @@ const PluginRoute = ({
   return (
     <NavigationLink key={description}
                     description={BadgeComponent ? <BadgeComponent text={description} /> : description}
-                    path={appPrefixed(path)}
+                    path={path}
                     topLevel={topLevel} />
   );
 };
