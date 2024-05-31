@@ -698,6 +698,13 @@
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>
+                                <banDynamicVersions>
+                                    <ignores>
+                                        <ignore>org.graylog2</ignore>
+                                        <ignore>org.graylog</ignore>
+                                        <ignore>org.graylog.plugins</ignore>
+                                    </ignores>
+                                </banDynamicVersions>
                                 <requireMavenVersion>
                                     <!-- Enforce the same version we define in the maven wrapper -->
                                     <version>[3.9.6]</version>
