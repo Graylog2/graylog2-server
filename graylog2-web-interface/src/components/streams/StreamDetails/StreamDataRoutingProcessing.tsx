@@ -34,10 +34,10 @@ const StreamDataRoutingProcessing = () => {
         <p>Illuminate Processing step</p>
       </Section>
       <Section title="Pipelines">
-        <Table condensed>
+        <Table condensed striped hover>
           <thead>
             <tr>
-              <th>Pipeline</th>
+              <th colSpan={2}>Pipeline</th>
             </tr>
           </thead>
           <tbody>

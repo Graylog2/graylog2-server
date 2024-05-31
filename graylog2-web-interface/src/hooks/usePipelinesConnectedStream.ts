@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { qualifyUrl } from 'util/URLUtils';
+
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import type FetchError from 'logic/errors/FetchError';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
@@ -37,10 +37,6 @@ const usePipelinesConnectedStream = (streamId: string): {
     ['stream', 'pipelines', streamId],
     () => fetchPipelinesConnectedStream(streamId),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading connected pipeline for stream failed with status: ${errorThrown}`,
-          'Could not load pipeline connected to stream.');
-      },
       notifyOnChangeProps: ['data', 'error'],
     },
   );
