@@ -20,7 +20,10 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.github.joschi.jadconfig.util.Size;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.IndexingResults;
@@ -31,9 +34,6 @@ import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +54,8 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 // Singleton class
 public class BlockingBatchedESOutput extends ElasticSearchOutput {
     private static final Logger log = LoggerFactory.getLogger(BlockingBatchedESOutput.class);
-    private final int maxBufferSize;
+    private final int maxBufferCount;
+    private final long maxBufferSizeBytes;
     private final Timer processTime;
     private final Histogram batchSize;
     private final Meter bufferFlushes;
@@ -65,6 +66,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     private final ScheduledExecutorService daemonScheduler;
 
     private volatile List<MessageWithIndex> buffer;
+    private volatile long bufferSizeinBytes;
 
     private static final AtomicInteger activeFlushThreads = new AtomicInteger(0);
     private final AtomicLong lastFlushTime = new AtomicLong();
@@ -80,7 +82,8 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
                                    Cluster cluster,
                                    @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
         super(metricRegistry, messages, journal, acknowledger);
-        this.maxBufferSize = serverConfiguration.getOutputBatchSize();
+        this.maxBufferCount = serverConfiguration.getOutputBatchSizeAsCount().orElse(0);
+        this.maxBufferSizeBytes = serverConfiguration.getOutputBatchSizeAsBytes().map(Size::toBytes).orElse(0L);
         outputFlushInterval = serverConfiguration.getOutputFlushInterval();
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
@@ -91,7 +94,8 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         this.shutdownTimeoutMs = serverConfiguration.getShutdownTimeout();
         this.daemonScheduler = daemonScheduler;
 
-        buffer = new ArrayList<>(maxBufferSize);
+        buffer = new ArrayList<>(500);
+        bufferSizeinBytes = 0;
     }
 
     @Override
@@ -105,10 +109,14 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         List<MessageWithIndex> flushBatch = null;
         synchronized (this) {
             buffer.add(entry);
+            // TODO Ideally this should use the size of the serialized Message, but this is close enough?
+            bufferSizeinBytes += entry.message().getSize();
 
-            if (buffer.size() >= maxBufferSize) {
+            if ((maxBufferSizeBytes != 0 && bufferSizeinBytes > maxBufferSizeBytes) ||
+                    (maxBufferCount != 0 && buffer.size() >= maxBufferCount)
+            ) {
                 flushBatch = buffer;
-                buffer = new ArrayList<>(maxBufferSize);
+                buffer = new ArrayList<>(buffer.size());
             }
         }
         // if the current thread found it had to flush any messages, it does so but blocks.
@@ -169,7 +177,8 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         final List<MessageWithIndex> flushBatch;
         synchronized (this) {
             flushBatch = buffer;
-            buffer = new ArrayList<>(maxBufferSize);
+            buffer = new ArrayList<>(buffer.size());
+            bufferSizeinBytes = 0;
         }
         if (flushBatch != null) {
             bufferFlushesRequested.mark();
