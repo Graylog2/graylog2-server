@@ -335,6 +335,14 @@ const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R => {
   }));
 };
 
+export const prefixUrl = (route: string) => {
+  const appPrefix = AppConfig.gl2AppPathPrefix();
+
+  return (!appPrefix || appPrefix === '' || appPrefix === '/')
+    ? route
+    : prefixUrlWithoutHostname(route, appPrefix);
+};
+
 const qualifiedRoutes: typeof Routes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
 
 const unqualified = Routes;
