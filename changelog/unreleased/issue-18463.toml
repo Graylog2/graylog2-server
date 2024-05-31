@@ -1,0 +1,5 @@
+type="f"
+message="Avoid double-qualifying navigation links when path prefix is configured."
+
+issues=["18463"]
+pulls=["19511"]
