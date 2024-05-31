@@ -90,7 +90,7 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
                                         final IndexSetService indexSetService) {
         super(mongoConnection, mapper, IndexFieldTypeProfile.class, INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME);
         this.db.createIndex(new BasicDBObject(IndexFieldTypeProfile.NAME_FIELD_NAME, 1), new BasicDBObject("unique", false));
-        this.profileCollection = mongoCollections.get(INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME, IndexFieldTypeProfile.class);
+        this.profileCollection = mongoCollections.collection(INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME, IndexFieldTypeProfile.class);
         this.indexSetService = indexSetService;
         this.dbQueryCreator = new DbQueryCreator(IndexFieldTypeProfile.NAME_FIELD_NAME, ATTRIBUTES);
         this.indexFieldTypeProfileUsagesService = indexFieldTypeProfileUsagesService;
