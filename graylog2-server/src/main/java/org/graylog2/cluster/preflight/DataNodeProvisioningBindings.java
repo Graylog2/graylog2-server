@@ -16,8 +16,16 @@
  */
 package org.graylog2.cluster.preflight;
 
+import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import org.graylog2.bootstrap.preflight.CertificateSignerPeriodical;
+import org.graylog2.bootstrap.preflight.PreflightJerseyService;
+import org.graylog2.cluster.certificates.CertificateExchange;
+import org.graylog2.cluster.certificates.CertificateExchangeImpl;
+import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.shared.initializers.PeriodicalsService;
 
 public class DataNodeProvisioningBindings extends AbstractModule {
 
@@ -28,5 +36,11 @@ public class DataNodeProvisioningBindings extends AbstractModule {
 
         // this is the generic dependency used by callers
         bind(DataNodeProvisioningService.class).to(DataNodeProvisioningBusEvents.class);
+
+
+        Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
+        periodicalBinder.addBinding().to(CertificateSignerPeriodical.class);
+
+        bind(CertificateExchange.class).to(CertificateExchangeImpl.class);
     }
 }

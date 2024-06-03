@@ -21,7 +21,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.CsrGenerator;
@@ -41,6 +40,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.List;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
@@ -140,6 +141,16 @@ public class DatanodeKeystore {
 
     public synchronized PKCS10CertificationRequest createCertificateSigningRequest(String hostname, List<String> altNames) throws DatanodeKeystoreException, CSRGenerationException {
         final InMemoryKeystoreInformation keystore = new InMemoryKeystoreInformation(loadKeystore(), passwordSecret.toCharArray());
-        return CsrGenerator.generateCSR(keystore, CertConstants.DATANODE_KEY_ALIAS, hostname, altNames);
+        return CsrGenerator.generateCSR(keystore, DATANODE_KEY_ALIAS, hostname, altNames);
+    }
+
+    public Date getCertificateExpiration() {
+
+        try {
+            final X509Certificate datanodeCert = (X509Certificate) loadKeystore().getCertificate(DATANODE_KEY_ALIAS);
+            return datanodeCert.getNotAfter();
+        } catch (KeyStoreException | DatanodeKeystoreException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

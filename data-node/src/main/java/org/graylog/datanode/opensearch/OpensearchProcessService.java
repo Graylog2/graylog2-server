@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.bootstrap.preflight.DatanodeCertificateRequestHandler;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
@@ -54,6 +55,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     private final OpensearchStateMachine stateMachine;
 
+    private final DatanodeCertificateRequestHandler csrRequester;
     private boolean firstStartBanner = true;
 
 
@@ -65,7 +67,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             final NodeId nodeId,
             final DatanodeDirectoriesLockfileCheck lockfileCheck,
             final PreflightConfigService preflightConfigService,
-            final OpensearchProcess process, OpensearchStateMachine stateMachine) {
+            final OpensearchProcess process, OpensearchStateMachine stateMachine, DatanodeCertificateRequestHandler csrRequester) {
         this.configurationProvider = configurationProvider;
         this.configuration = configuration;
         this.nodeId = nodeId;
@@ -73,6 +75,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.preflightConfigService = preflightConfigService;
         this.process = process;
         this.stateMachine = stateMachine;
+        this.csrRequester = csrRequester;
         eventBus.register(this);
     }
 
@@ -92,9 +95,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 LOG.info("Startup requested by Graylog server");
                 stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
             }
-            case STORED -> {
-                LOG.info("Ignoring this event, configuration change should propagate automatically and start the process");
-            }
         }
     }
 
@@ -107,6 +107,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 case RESET -> stateMachine.fire(OpensearchEvent.RESET);
                 case STOP -> this.shutDown();
                 case START -> stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+                case REQUEST_CERTIFICATE -> csrRequester.triggerCertificateSigningRequest();
             }
         }
     }
@@ -131,7 +132,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Subscribe
     public void onOpensearchConfigurationChange(OpensearchConfigurationChangeEvent event) {
-        onConfiguration(event.config());
+        onConfiguration(event.config()); // TODO: the event won't restart the opensearch process
+
     }
 
     private void onConfiguration(OpensearchConfiguration config) {

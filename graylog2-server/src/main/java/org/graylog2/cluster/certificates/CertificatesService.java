@@ -40,6 +40,7 @@ import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
 
+@Deprecated
 public class CertificatesService {
 
     private static final String ENCRYPTED_VALUE_SUBFIELD = "encrypted_value";
@@ -94,9 +95,7 @@ public class CertificatesService {
         final Document nodeCertificate = objects.first();
         if (nodeCertificate != null) {
             final Document encryptedCertificateDocument = nodeCertificate.get(collection.encryptedCertificateField(), Document.class);
-            if (encryptedCertificateDocument != null) {
-                return true;
-            }
+            return encryptedCertificateDocument != null;
         }
         return false;
     }

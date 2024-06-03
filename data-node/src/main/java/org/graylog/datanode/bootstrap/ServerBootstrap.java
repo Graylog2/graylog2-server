@@ -129,7 +129,15 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
-        getPreflightInjector(preflightCheckModules).getInstance(PreflightCheckService.class).runChecks();
+        //final ServiceManager serviceManager = injector.getInstance(ServiceManager.class);
+        //serviceManager.startAsync().awaitHealthy();
+
+        try {
+            getPreflightInjector(preflightCheckModules).getInstance(PreflightCheckService.class).runChecks();
+
+        } finally {
+          //  serviceManager.stopAsync().awaitStopped();
+        }
     }
 
     private void runMongoPreflightCheck() {

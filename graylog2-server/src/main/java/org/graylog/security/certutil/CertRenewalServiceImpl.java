@@ -59,7 +59,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
-import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
 @Singleton
 public class CertRenewalServiceImpl implements CertRenewalService {
@@ -146,7 +145,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     private DateTime getNextRenewal() {
-        return jobTriggerService.getOneForJob(RENEWAL_JOB_ID).map(JobTriggerDto::nextTime).orElse(DateTime.now(DateTimeZone.UTC).plusMinutes(30));
+        return null; // TODO!!!
     }
 
     protected void checkCaCertificatesForRenewal(final RenewalPolicy renewalPolicy) {

@@ -70,12 +70,14 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         // startup period
         config.configure(OpensearchState.STARTING)
                 .onEntryFrom(OpensearchEvent.PROCESS_STARTED, process::start) // we don't want to re-trigger start from OpensearchEvent.HEALTH_CHECK_FAILED bellow
+                .onEntryFrom(OpensearchEvent.RESTART_PROCESS, process::start)
                 .permitDynamic(OpensearchEvent.HEALTH_CHECK_FAILED,
                         () -> startupFailuresCounter.failedTooManyTimes() ? OpensearchState.FAILED : OpensearchState.STARTING,
                         startupFailuresCounter::increment)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
-                .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED);
+                .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
+                .permitReentry(OpensearchEvent.RESTART_PROCESS);
 
         // the process is running and responding to the REST status, it's available for any usage
         config.configure(OpensearchState.AVAILABLE)
@@ -88,6 +90,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_REMOVE, OpensearchState.REMOVING)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED, process::stop) //restart if reconfigured
+                .permit(OpensearchEvent.RESTART_PROCESS, OpensearchState.STARTING)
                 .ignore(OpensearchEvent.PROCESS_STARTED);
 
         // if the REST api is not responding, we'll jump to this state and count how many times the failure
@@ -98,6 +101,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                         restFailureCounter::increment
                 )
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
+                .permit(OpensearchEvent.RESTART_PROCESS, OpensearchState.STARTING)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED);
 
@@ -105,6 +109,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         // TODO: what to do if the process fails? Reboot?
         config.configure(OpensearchState.FAILED)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
+                .permit(OpensearchEvent.RESTART_PROCESS, OpensearchState.STARTING)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED) //restart if reconfigured
@@ -113,6 +118,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         // final state, the process is not alive anymore, terminated on the operating system level
         config.configure(OpensearchState.TERMINATED)
                 .onEntry(process::stop)
+                .permit(OpensearchEvent.RESTART_PROCESS, OpensearchState.STARTING)
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING, rebootCounter::increment)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
                 .ignore(OpensearchEvent.PROCESS_STOPPED)

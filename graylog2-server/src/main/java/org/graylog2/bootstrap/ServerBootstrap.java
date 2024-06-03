@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -40,7 +41,10 @@ import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
+import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.cluster.lock.LockServiceModule;
 import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
@@ -51,6 +55,7 @@ import org.graylog2.plugin.MessageBindings;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.FreshInstallDetectionModule;
@@ -160,6 +165,12 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
+        preflightCheckModules.add(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class);
+            }
+        });
 
         if (featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_WEB_ENABLED)) {
             runPreflightWeb(preflightCheckModules);
@@ -174,8 +185,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
         modules.add(new DataNodeProvisioningBindings());
         modules.add(new PreflightWebModule(configuration));
+        modules.add(new CertificateRenewalBindings());
         modules.add(new ObjectMapperModule(chainingClassLoader));
-        modules.add(new SchedulerBindings());
         modules.add((binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
 
         final Injector preflightInjector = getPreflightInjector(modules);
@@ -275,7 +286,20 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
                 new IndexerDiscoveryModule(),
                 new ServerPreflightChecksModule(),
-                binder -> preflightCheckModules.forEach(binder::install));
+                new CertificateRenewalBindings(),
+                new AbstractModule() {
+                    @Override
+                    protected void configure() {
+                        bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
+                    }
+                },
+                new SchedulerBindings(),
+                new DataNodeProvisioningBindings(),
+
+                new LockServiceModule(),
+                new LeaderElectionModule(configuration),
+
+        binder -> preflightCheckModules.forEach(binder::install));
     }
 
     private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {

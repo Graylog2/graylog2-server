@@ -39,14 +39,13 @@ public class CertificatesServiceTest {
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private CertificatesService certificatesService;
-    private EncryptedValueService encryptedValueService;
     private MongoConnection mongoConnection;
 
 
     @Before
     public void setUp() {
         mongoConnection = mongodb.mongoConnection();
-        encryptedValueService = new EncryptedValueService("abracadabra! abracadabra!");
+        EncryptedValueService encryptedValueService = new EncryptedValueService("abracadabra! abracadabra!");
         certificatesService = new CertificatesService(mongoConnection, encryptedValueService);
     }
 

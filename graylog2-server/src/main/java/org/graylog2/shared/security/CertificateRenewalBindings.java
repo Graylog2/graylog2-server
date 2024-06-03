@@ -16,28 +16,25 @@
  */
 package org.graylog2.shared.security;
 
-import org.graylog.scheduler.schedule.CronJobSchedule;
+import com.google.common.util.concurrent.Service;
+import com.google.inject.multibindings.Multibinder;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.CaServiceImpl;
-import org.graylog.security.certutil.CertRenewalService;
-import org.graylog.security.certutil.CertRenewalServiceImpl;
-import org.graylog.security.certutil.CheckForCertRenewalJob;
 import org.graylog.security.rest.CertificateRenewalResource;
-import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioningListener;
+import org.graylog2.cluster.certificates.CertificateExchange;
+import org.graylog2.cluster.certificates.CertificateExchangeImpl;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.shared.initializers.PeriodicalsService;
 
-public class CertificateRenewalBindings  extends PluginModule {
+public class CertificateRenewalBindings extends PluginModule {
     @Override
     protected void configure() {
         bind(CaService.class).to(CaServiceImpl.class);
-        bind(CertRenewalService.class).to(CertRenewalServiceImpl.class).asEagerSingleton();
+        //bind(CertRenewalService.class).to(CertRenewalServiceImpl.class).asEagerSingleton();
         addRestResource(CertificateRenewalResource.class);
-        bind(GraylogCertificateProvisioningListener.class).asEagerSingleton();
+        bind(CertificateExchange.class).to(CertificateExchangeImpl.class);
 
-        addJobSchedulerSchedule(CronJobSchedule.TYPE_NAME, CronJobSchedule.class);
-        addSchedulerJob(CheckForCertRenewalJob.TYPE_NAME,
-                CheckForCertRenewalJob.class,
-                CheckForCertRenewalJob.Factory.class,
-                CheckForCertRenewalJob.Config.class);
+        Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
+        serviceBinder.addBinding().to(PeriodicalsService.class).asEagerSingleton();
     }
 }
