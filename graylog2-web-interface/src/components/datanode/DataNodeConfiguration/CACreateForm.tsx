@@ -65,7 +65,7 @@ const CaCreateForm = () => {
                          name="organization"
                          label="Organization Name"
                          required />
-            <Button disabled={isSubmitting || !isValid} type="submit">
+            <Button bsStyle="primary" bsSize="small" disabled={isSubmitting || !isValid} type="submit">
               {isSubmitting ? 'Creating CA...' : 'Create CA'}
             </Button>
           </Form>

@@ -22,6 +22,7 @@ import { Button, ButtonToolbar } from 'components/bootstrap';
 import { MIGRATION_ACTIONS } from 'components/datanode/Constants';
 
 const StyledButtonToolbar = styled(ButtonToolbar)`
+  margin-top: 20px;
   flex-wrap: wrap;
 `;
 
