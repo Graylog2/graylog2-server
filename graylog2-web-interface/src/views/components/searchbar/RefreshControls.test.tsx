@@ -25,6 +25,8 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import Button from 'preflight/components/common/Button';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
+import useViewsPlugin from 'views/test/testViewsPlugin';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
 import RefreshControls from './RefreshControls';
 
@@ -43,13 +45,17 @@ const autoRefreshOptions = {
 };
 
 describe('RefreshControls', () => {
+  useViewsPlugin();
+
   const SUT = ({ onSubmit, children }: { onSubmit?: () => void, children?: React.ReactNode }) => (
-    <Formik initialValues={{}} onSubmit={onSubmit}>
-      <Form>
-        <RefreshControls disable={false} />
-        {children}
-      </Form>
-    </Formik>
+    <TestStoreProvider>
+      <Formik initialValues={{}} onSubmit={onSubmit}>
+        <Form>
+          <RefreshControls disable={false} />
+          {children}
+        </Form>
+      </Formik>
+    </TestStoreProvider>
   );
 
   SUT.defaultProps = {
