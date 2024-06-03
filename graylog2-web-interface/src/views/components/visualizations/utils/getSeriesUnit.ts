@@ -14,16 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import GroupingElement from './grouping';
-import MetricElement from './metric';
-import SortElement from './sort';
-import VisualizationElement from './visualization';
-import UnitsElement from './units';
+import type Series from 'views/logic/aggregationbuilder/Series';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
+import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 
-export default [
-  GroupingElement,
-  MetricElement,
-  SortElement,
-  VisualizationElement,
-  UnitsElement,
-];
+const getSeriesUnit = (series: Array<Series>, seriesName: string, units: UnitsConfig) => {
+  const func = series.find((s) => s.config.name === seriesName || s.function === seriesName).function;
+  const { field } = parseSeries(func);
+
+  return units.getFieldUnit(field);
+};
+
+export default getSeriesUnit;

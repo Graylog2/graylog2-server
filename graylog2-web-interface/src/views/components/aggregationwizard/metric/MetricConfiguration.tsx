@@ -30,6 +30,9 @@ import { Properties } from 'views/logic/fieldtypes/FieldType';
 import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
 import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
+import useFieldTypesUnits from 'views/hooks/useFieldTypesUnits';
+import FieldUnitComponent from 'views/components/aggregationwizard/units/FieldUnitComponent';
 
 import FieldSelect from '../FieldSelect';
 
@@ -38,6 +41,10 @@ type Props = {
 }
 
 const Wrapper = styled.div``;
+
+const FieldContainer = styled.div`
+  position: relative;
+`;
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
@@ -50,6 +57,7 @@ const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) =
 };
 
 const Metric = ({ index }: Props) => {
+  const preDefinedFieldTypes = useFieldTypesUnits();
   const metricFieldSelectRef = useRef(null);
   const { data: functions, isLoading } = useAggregationFunctions();
   const functionOptions = useMemo(() => (isLoading ? [] : Object.values(functions)
@@ -76,7 +84,7 @@ const Metric = ({ index }: Props) => {
   }, [requiresNumericField]);
 
   const [functionIsSettled, setFunctionIsSettled] = useState<boolean>(false);
-  const onFunctionChange = useCallback((newValue) => {
+  const onFunctionChange = useCallback((newValue: string) => {
     setFieldValue(`metrics.${index}.function`, newValue);
     setFunctionIsSettled(true);
   }, [setFieldValue, index]);
@@ -88,6 +96,8 @@ const Metric = ({ index }: Props) => {
       metricFieldSelectRef.current.focus();
     }
   }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
+
+  const showUnitType = isFunctionAllowsUnit(currentFunction);
 
   return (
     <Wrapper data-testid={`metric-${index}`}>
@@ -110,25 +120,30 @@ const Metric = ({ index }: Props) => {
         )}
       </Field>
       {hasFieldOption && (
-      <Field name={`metrics.${index}.field`}>
-        {({ field: { name, value, onChange }, meta: { error } }) => (
-          <Input id="metric-field"
-                 label="Field"
-                 error={error}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <FieldSelect id="metric-field-select"
-                         selectRef={metricFieldSelectRef}
-                         menuPortalTarget={document.body}
-                         onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
-                         clearable={!isFieldRequired}
-                         isFieldQualified={isFieldQualified}
-                         name={name}
-                         value={value}
-                         ariaLabel="Select a field" />
-          </Input>
-        )}
-      </Field>
+        <FieldContainer>
+          <Field name={`metrics.${index}.field`}>
+            {({ field: { name, value, onChange }, meta: { error } }) => (
+              <Input id="metric-field"
+                     label="Field"
+                     error={error}
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9">
+                <FieldSelect id="metric-field-select"
+                             selectRef={metricFieldSelectRef}
+                             menuPortalTarget={document.body}
+                             onChange={(fieldName) => {
+                               onChange({ target: { name, value: fieldName } });
+                             }}
+                             clearable={!isFieldRequired}
+                             isFieldQualified={isFieldQualified}
+                             name={name}
+                             value={value}
+                             ariaLabel="Select a field" />
+              </Input>
+            )}
+          </Field>
+          {showUnitType && <FieldUnitComponent field={metrics?.[index].field} predefinedValue={preDefinedFieldTypes?.[metrics[index]?.field]} />}
+        </FieldContainer>
       )}
       {isPercentile && (
         <Field name={`metrics.${index}.percentile`}>
