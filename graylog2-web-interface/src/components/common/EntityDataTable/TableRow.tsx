@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
