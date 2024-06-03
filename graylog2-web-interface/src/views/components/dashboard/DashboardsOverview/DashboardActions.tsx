@@ -32,7 +32,7 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import type FetchError from 'logic/errors/FetchError';
 import { isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import MoreActions from 'components/common/EntityDataTable/MoreActions';
+import { MoreActions } from 'components/common/EntityDataTable';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);

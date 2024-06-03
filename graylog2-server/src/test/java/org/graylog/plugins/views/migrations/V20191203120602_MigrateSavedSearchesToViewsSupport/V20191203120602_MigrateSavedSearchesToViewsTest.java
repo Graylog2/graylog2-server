@@ -30,6 +30,7 @@ import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearches
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -94,7 +95,7 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
 
-        final SavedSearchService savedSearchService = new SavedSearchService(mongodb.mongoConnection(), mapperProvider);
+        final SavedSearchService savedSearchService = new SavedSearchService(new MongoCollections(mapperProvider, mongodb.mongoConnection()));
         final RandomObjectIdProvider randomObjectIdProvider = new StaticRandomObjectIdProvider(new Date(1575020937839L));
         final RandomUUIDProvider randomUUIDProvider = new RandomUUIDProvider(new Date(1575020937839L), 1575020937839L);
 
