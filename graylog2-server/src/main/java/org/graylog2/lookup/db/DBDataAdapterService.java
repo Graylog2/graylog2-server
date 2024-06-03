@@ -30,7 +30,6 @@ import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.DataAdapterDto;
-import org.graylog2.lookup.events.CachesUpdated;
 import org.graylog2.lookup.events.DataAdaptersDeleted;
 import org.graylog2.lookup.events.DataAdaptersUpdated;
 
@@ -96,7 +95,7 @@ public class DBDataAdapterService {
 
     public DataAdapterDto saveAndPostEvent(DataAdapterDto dataAdapter) {
         final DataAdapterDto savedDataAdapter = save(dataAdapter);
-        clusterEventBus.post(CachesUpdated.create(savedDataAdapter.id()));
+        clusterEventBus.post(DataAdaptersUpdated.create(savedDataAdapter.id()));
 
         return savedDataAdapter;
     }
