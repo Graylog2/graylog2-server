@@ -19,11 +19,14 @@ package org.graylog.datanode.bindings;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
+import org.graylog.datanode.bootstrap.preflight.DatanodeKeystoreCheck;
 import org.graylog.datanode.bootstrap.preflight.OpenSearchPreconditionsCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchBinPreflightCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync;
 import org.graylog.datanode.bootstrap.preflight.OpensearchDataDirCompatibilityCheck;
+import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
+import org.graylog2.database.MongoConnection;
 
 public class PreflightChecksBindings extends AbstractModule {
 
@@ -35,6 +38,10 @@ public class PreflightChecksBindings extends AbstractModule {
         addPreflightCheck(DatanodeDirectoriesLockfileCheck.class);
         addPreflightCheck(OpenSearchPreconditionsCheck.class);
         addPreflightCheck(OpensearchDataDirCompatibilityCheck.class);
+
+        // Mongodb is needed
+        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
+        addPreflightCheck(DatanodeKeystoreCheck.class);
     }
 
 
