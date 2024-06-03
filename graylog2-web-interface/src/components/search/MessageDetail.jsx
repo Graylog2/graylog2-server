@@ -82,13 +82,13 @@ class MessageDetail extends React.Component {
     const { message, customFieldActions } = this.props;
 
     if (!customFieldActions) {
-      return <ButtonGroup className="pull-right" bsSize="small" />;
+      return <ButtonGroup className="pull-right" />;
     }
 
     const messageUrl = message.index ? Routes.message_show(message.index, message.id) : '#';
 
     return (
-      <ButtonGroup className="pull-right" bsSize="small">
+      <ButtonGroup className="pull-right">
         <Button href={messageUrl}>Permalink</Button>
 
         <ClipboardButton title="Copy ID" bsSize="small" text={message.id} />

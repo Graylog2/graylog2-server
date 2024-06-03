@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.export;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -29,7 +30,7 @@ import org.mongojack.ObjectId;
         @JsonSubTypes.Type(value = SearchExportJob.class, name = SearchExportJob.TYPE),
         @JsonSubTypes.Type(value = SearchTypeExportJob.class, name = SearchTypeExportJob.TYPE)
 })
-public interface ExportJob {
+public interface ExportJob extends MongoEntity {
     String FIELD_TYPE = "type";
     String FIELD_ID = "_id";
     String FIELD_CREATED_AT = "created_at";

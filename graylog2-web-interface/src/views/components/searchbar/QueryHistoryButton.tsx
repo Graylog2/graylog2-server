@@ -71,7 +71,7 @@ const QueryHistoryButton = ({ editorRef }: Props) => {
 
   return (
     <ButtonContainer>
-      <IconButton name="history" onClick={showQueryHistory} />
+      <IconButton name="history" onClick={showQueryHistory} title="Open query history" />
     </ButtonContainer>
   );
 };
