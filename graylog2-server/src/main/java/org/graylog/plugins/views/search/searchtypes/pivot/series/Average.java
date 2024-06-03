@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchtypes.pivot.series;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -63,6 +64,7 @@ public abstract class Average implements SeriesSpec, HasField {
     }
 
     @AutoValue.Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder extends SeriesSpecBuilder<Average, Builder> {
         @JsonCreator
         public static Builder create() {
