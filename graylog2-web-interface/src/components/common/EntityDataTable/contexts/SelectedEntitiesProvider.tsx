@@ -23,6 +23,10 @@ import SelectEntitiesContext from './SelectEntitiesContext';
 
 import type { EntityBase } from '../types';
 
+const removeSelectedEntityId = <Entity extends EntityBase>(selectedEntities: Array<Entity['id']>, targetEntityId: Entity['id']) => (
+  selectedEntities.filter((entityId) => entityId !== targetEntityId)
+);
+
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
   initialSelection?: Array<string>,
   onChangeSelection: (selectedEntities: Array<Entity['id']>, data: Readonly<Array<Entity>>) => void,
@@ -43,23 +47,35 @@ const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initial
   }, [entities, onChangeSelection, selectedEntities]);
 
   const deselectEntity = useCallback((targetEntityId: EntityBase['id']) => (
-    _setSelectedEntities((cur) => cur.filter((entityId) => entityId !== targetEntityId))
+    _setSelectedEntities((cur) => removeSelectedEntityId(cur, targetEntityId))
   ), [_setSelectedEntities]);
 
   const selectEntity = useCallback((targetEntityId: EntityBase['id']) => (
     _setSelectedEntities((cur) => [...cur, targetEntityId])
   ), [_setSelectedEntities]);
 
+  const toggleEntitySelect = useCallback((targetEntityId: EntityBase['id']) => {
+    setSelectedEntities((cur) => {
+      if (cur.includes(targetEntityId)) {
+        return removeSelectedEntityId(cur, targetEntityId);
+      }
+
+      return [...cur, targetEntityId];
+    });
+  }, []);
+
   const contextValue = useMemo(() => ({
     setSelectedEntities: _setSelectedEntities,
     selectedEntities,
     deselectEntity,
     selectEntity,
+    toggleEntitySelect,
   }), [
     _setSelectedEntities,
     selectedEntities,
     deselectEntity,
     selectEntity,
+    toggleEntitySelect,
   ]);
 
   return (
