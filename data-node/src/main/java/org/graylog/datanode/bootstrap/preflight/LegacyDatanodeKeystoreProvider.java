@@ -18,6 +18,8 @@ package org.graylog.datanode.bootstrap.preflight;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.security.certutil.CertConstants;
@@ -29,7 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.security.Key;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -52,11 +56,14 @@ public class LegacyDatanodeKeystoreProvider {
     private final NodeId nodeId;
     private final String passwordSecret;
 
+    private final DatanodeDirectories datanodeDirectories;
+
     @Inject
-    public LegacyDatanodeKeystoreProvider(CertificatesService certificatesService, NodeId nodeId, final @Named("password_secret") String passwordSecret) {
+    public LegacyDatanodeKeystoreProvider(CertificatesService certificatesService, NodeId nodeId, final @Named("password_secret") String passwordSecret, DatanodeConfiguration datanodeConfiguration) {
         this.certificatesService = certificatesService;
         this.nodeId = nodeId;
         this.passwordSecret = passwordSecret;
+        this.datanodeDirectories = datanodeConfiguration.datanodeDirectories();
     }
 
     public Optional<KeyStore> get() throws KeyStoreStorageException {
@@ -66,7 +73,8 @@ public class LegacyDatanodeKeystoreProvider {
     private boolean isValidKeyAndCert(KeyStore keystore) {
         try {
             return hasPrivateKey(keystore) && DatanodeKeystore.isSignedCertificateChain(keystore);
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | DatanodeKeystoreException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException |
+                 DatanodeKeystoreException e) {
             LOG.warn("Failed to obtain legacy keystore, ignoring it", e);
             return false;
         }
@@ -93,5 +101,16 @@ public class LegacyDatanodeKeystoreProvider {
     private Optional<String> readEncodedCertFromDatabase() {
         KeystoreMongoLocation location = KeystoreMongoLocation.datanode(nodeId);
         return certificatesService.readCert(location);
+    }
+
+    public void deleteLocalPrivateKey() {
+        final Path localPrivateKey = datanodeDirectories.getConfigurationTargetDir().resolve("privateKey.cert");
+        if (Files.exists(localPrivateKey)) {
+            try {
+                Files.delete(localPrivateKey);
+            } catch (IOException e) {
+                LOG.warn("Failed to delete legacy datanode private key", e);
+            }
+        }
     }
 }

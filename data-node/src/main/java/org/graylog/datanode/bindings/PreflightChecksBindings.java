@@ -39,7 +39,8 @@ public class PreflightChecksBindings extends AbstractModule {
         addPreflightCheck(OpenSearchPreconditionsCheck.class);
         addPreflightCheck(OpensearchDataDirCompatibilityCheck.class);
 
-        // Mongodb is needed
+        // Mongodb is needed for legacy datanode storage, where we want to extract the certificate chain from
+        // mongodb and store it in local keystore
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         addPreflightCheck(DatanodeKeystoreCheck.class);
     }

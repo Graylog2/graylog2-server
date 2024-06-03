@@ -64,9 +64,10 @@ public class DatanodeKeystoreCheck implements PreflightCheck {
             LOG.info("Creating keystore for this data node");
             try {
                 final Optional<KeyStore> legacyKeystore = legacyDatanodeKeystoreProvider.get();
-                if(legacyKeystore.isPresent()) {
+                if (legacyKeystore.isPresent()) { // remove this branch latest with 7.0 release
                     LOG.info("Legacy keystore discovered, converting to local file");
                     datanodeKeystore.create(legacyKeystore.get());
+                    legacyDatanodeKeystoreProvider.deleteLocalPrivateKey();
                 } else {
                     datanodeKeystore.create(generateKeyPair());
                 }
