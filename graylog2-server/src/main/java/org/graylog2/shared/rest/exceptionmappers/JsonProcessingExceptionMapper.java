@@ -17,12 +17,11 @@
 package org.graylog2.shared.rest.exceptionmappers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.graylog2.plugin.rest.ApiError;
-
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import org.graylog2.plugin.rest.RequestError;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static jakarta.ws.rs.core.Response.status;
@@ -31,8 +30,9 @@ import static jakarta.ws.rs.core.Response.status;
 public class JsonProcessingExceptionMapper implements ExceptionMapper<JsonProcessingException> {
     @Override
     public Response toResponse(JsonProcessingException e) {
-        final String message = firstNonNull(e.getMessage(), "Couldn't process JSON input");
-        final ApiError apiError = ApiError.create(message);
+        final String message = firstNonNull(e.getOriginalMessage(), "Couldn't process JSON input");
+        final var location = e.getLocation();
+        final var apiError = RequestError.create(message, location.getLineNr(), location.getColumnNr(), "", null);
         return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
     }
 }

@@ -53,7 +53,6 @@ import org.graylog.security.certutil.CertConstants;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
-import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
 import org.slf4j.Logger;
@@ -194,8 +193,7 @@ public class JerseyService extends AbstractIdleService {
                 .registerClasses(
                         JacksonXmlBindJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
-                        JsonMappingExceptionMapper.class,
-                        JacksonPropertyExceptionMapper.class)
+                        JsonMappingExceptionMapper.class)
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override
