@@ -27,7 +27,7 @@ import keyBy from 'lodash/keyBy';
 import type { FieldUnitType } from 'views/types';
 import type { FieldUnitState } from 'views/logic/aggregationbuilder/FieldUnit';
 
-import supportedUnits from '../../../graylog-shared-resources/units/supported_units.json';
+import supportedUnits from '../../../graylog2-server/src/main/resources/units/supported_units.json';
 
 type UnitConversionAction = 'MULTIPLY' | 'DIVIDE'
 
