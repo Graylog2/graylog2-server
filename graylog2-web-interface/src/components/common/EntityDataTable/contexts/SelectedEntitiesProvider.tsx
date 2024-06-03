@@ -55,7 +55,7 @@ const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initial
   ), [_setSelectedEntities]);
 
   const toggleEntitySelect = useCallback((targetEntityId: EntityBase['id']) => {
-    setSelectedEntities((cur) => {
+    _setSelectedEntities((cur) => {
       if (cur.includes(targetEntityId)) {
         return removeSelectedEntityId(cur, targetEntityId);
       }
