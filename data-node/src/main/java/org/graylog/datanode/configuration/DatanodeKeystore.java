@@ -21,6 +21,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.CsrGenerator;
@@ -34,11 +35,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -53,7 +58,7 @@ public class DatanodeKeystore {
     private final String passwordSecret;
 
     public static final Path DATANODE_KEYSTORE_FILE = Path.of("keystore.jks");
-    public static String DATANODE_KEY_ALIAS = "datanode";
+    public static String DATANODE_KEY_ALIAS = CertConstants.DATANODE_KEY_ALIAS;
     private final EventBus eventBus;
 
     @Inject
@@ -77,7 +82,23 @@ public class DatanodeKeystore {
 
     public synchronized static boolean isSignedCertificateChain(KeyStore keystore) throws DatanodeKeystoreException {
         try {
-            return keystore.getCertificateChain(DATANODE_KEY_ALIAS).length > 1;  // TODO: proper certificates check!!!
+
+            final Certificate[] certificateChain = keystore.getCertificateChain(DATANODE_KEY_ALIAS);
+
+            if (certificateChain.length < 2 ) {
+                // only one cert, it's a self-signed cert!
+                return false;
+            }
+            try {
+                // let's take first cert, which is the datanode. It should be signed by a private key that belongs
+                // to the public key in the second certificate
+                certificateChain[0].verify(certificateChain[1].getPublicKey());
+                return true;
+            } catch (CertificateException | NoSuchAlgorithmException | InvalidKeyException |
+                     NoSuchProviderException | SignatureException e) {
+                return false;
+            }
+
         } catch (KeyStoreException e) {
             throw new DatanodeKeystoreException(e);
         }

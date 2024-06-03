@@ -38,7 +38,6 @@ import java.time.Duration;
 import java.util.List;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
-import static org.graylog.security.certutil.CertConstants.DATANODE_KEY_ALIAS;
 
 public class ClientCertGenerator {
     private final CaService caService;

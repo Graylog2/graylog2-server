@@ -68,7 +68,6 @@ class DatanodeKeystoreTest {
 
         datanodeKeystore.create(keyPair);
         Assertions.assertThat(datanodeKeystore.exists()).isTrue();
-        Assertions.assertThat(this.receivedEvents).hasSize(1);
 
         Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isFalse();
         final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest("my-hostname", List.of("second-hostname"));
@@ -80,6 +79,8 @@ class DatanodeKeystoreTest {
         final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(ca.certificate()));
 
         datanodeKeystore.replaceCertificatesInKeystore(certChain);
+
+        Assertions.assertThat(this.receivedEvents).hasSize(1);
 
         Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isTrue();
     }

@@ -26,7 +26,6 @@ import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.Security;
 import java.time.Duration;
@@ -43,7 +42,7 @@ import java.util.Optional;
 public class DatanodeKeystoreCheck implements PreflightCheck {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystoreCheck.class);
-    public static final Path KEYSTORE_FILE = Path.of("keystore.jks");
+    public static final Duration DEFAULT_SELFSIGNED_CERT_VALIDITY = Duration.ofDays(99 * 365);
 
     static {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -82,7 +81,7 @@ public class DatanodeKeystoreCheck implements PreflightCheck {
     private static KeyPair generateKeyPair() throws Exception {
         final CertRequest certRequest = CertRequest.selfSigned(DatanodeKeystore.DATANODE_KEY_ALIAS)
                 .isCA(false)
-                .validity(Duration.ofDays(99 * 365));
+                .validity(DEFAULT_SELFSIGNED_CERT_VALIDITY);
 
         return CertificateGenerator.generate(certRequest);
     }
