@@ -341,7 +341,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
 
                     {selectedRetentionSegment === 'data_tiering' ? (
                       <ConfigSegment>
-                        <DataTieringConfiguration valuesPrefix="index_set_config" requireRepository={false} />
+                        <DataTieringConfiguration valuesPrefix="index_set_config" />
                       </ConfigSegment>
                     )
                       : (

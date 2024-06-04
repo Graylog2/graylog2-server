@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import { useFormikContext } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -97,7 +96,7 @@ type DataTiering = {
 
 type FormValues<T extends string | undefined> = T extends undefined ? DataTiering : T extends string ? { [Key in T]: DataTiering } : never
 
-const DataTieringConfiguration = <ValuesPrefix extends string | undefined, >({ valuesPrefix, requireRepository } : { valuesPrefix?: ValuesPrefix, requireRepository?: boolean }) => {
+const DataTieringConfiguration = <ValuesPrefix extends string | undefined, >({ valuesPrefix } : { valuesPrefix?: ValuesPrefix }) => {
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === 'hot_warm'));
 
   const { values } = useFormikContext<FormValues<ValuesPrefix>>();
@@ -175,21 +174,15 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined, >({ v
                        label="Archive before deletion"
                        name={fieldName('archive_before_deletion')}
                        help="Archive this index before it is deleted?" />
-          <dataTieringPlugin.TiersConfigurationFields valuesPrefix={valuesPrefix} requireRepository={requireRepository} />
+          <dataTieringPlugin.TiersConfigurationFields valuesPrefix={valuesPrefix} />
         </>
       )}
     </>
   );
 };
 
-DataTieringConfiguration.propTypes = {
-  valuesPrefix: PropTypes.string,
-  requireRepository: PropTypes.bool,
-};
-
 DataTieringConfiguration.defaultProps = {
   valuesPrefix: undefined,
-  requireRepository: undefined,
 };
 
 export default DataTieringConfiguration;
