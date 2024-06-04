@@ -41,6 +41,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.Security;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
@@ -52,6 +53,11 @@ import java.util.List;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 public class DatanodeKeystore {
+
+    static {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    }
+
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystore.class);
     private final DatanodeDirectories datanodeDirectories;
@@ -85,7 +91,7 @@ public class DatanodeKeystore {
 
             final Certificate[] certificateChain = keystore.getCertificateChain(DATANODE_KEY_ALIAS);
 
-            if (certificateChain.length < 2 ) {
+            if (certificateChain.length < 2) {
                 // only one cert, it's a self-signed cert!
                 return false;
             }

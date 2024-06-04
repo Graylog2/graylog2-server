@@ -44,10 +44,6 @@ public class DatanodeKeystoreCheck implements PreflightCheck {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystoreCheck.class);
     public static final Duration DEFAULT_SELFSIGNED_CERT_VALIDITY = Duration.ofDays(99 * 365);
 
-    static {
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-    }
-
     private final DatanodeKeystore datanodeKeystore;
     private final LegacyDatanodeKeystoreProvider legacyDatanodeKeystoreProvider;
 
