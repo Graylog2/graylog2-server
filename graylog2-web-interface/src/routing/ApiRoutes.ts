@@ -57,6 +57,12 @@ const ApiRoutes = {
     showEntityIndex: () => ({ url: '/system/catalog' }),
     queryEntities: () => ({ url: '/system/catalog' }),
   },
+  CategoriesAPIController: {
+    index: () => ({ url: '/categories?page=1&per_page=10000&sort=status&direction=asc' }),
+    add: () => ({ url: '/categories' }),
+    update: (categoryId: string) => ({ url: `/categories/${categoryId}` }),
+    delete: (categoryId: string) => ({ url: `/categories/${categoryId}` }),
+  },
   CodecTypesController: {
     list: () => ({ url: '/system/codecs/types/all' }),
   },
