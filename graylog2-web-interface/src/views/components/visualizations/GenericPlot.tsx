@@ -96,7 +96,7 @@ export type ChartColor = {
 type Props = {
   chartData: Array<any>,
   layout?: Partial<PlotLayout>,
-  onZoom?: (from: string, to: string) => boolean,
+  onZoom?: (from: string, to: string) => void,
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor,
   onClickMarker?: (event: OnClickMarkerEvent) => void
   onHoverMarker?: (event: OnHoverMarkerEvent) => void,
@@ -220,10 +220,8 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
       const from = axis['xaxis.range[0]'];
       const to = axis['xaxis.range[1]'];
 
-      return onZoom(from, to);
+      onZoom(from, to);
     }
-
-    return true;
   }, [onZoom]);
 
   const _onHoverMarker = useCallback((event: unknown) => {
@@ -253,14 +251,14 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
                 onClick={interactive ? _onMarkerClick : () => false}
                 onHover={_onHoverMarker}
                 onUnhover={onUnhoverMarker}
-                onRelayout={interactive ? _onRelayout : () => false}
+                onRelayout={interactive ? _onRelayout : () => {}}
                 config={config} />
   );
 };
 
 GenericPlot.defaultProps = {
   layout: {},
-  onZoom: () => true,
+  onZoom: () => {},
   setChartColor: undefined,
   onClickMarker: (_event) => {},
   onHoverMarker: (_event) => {},
