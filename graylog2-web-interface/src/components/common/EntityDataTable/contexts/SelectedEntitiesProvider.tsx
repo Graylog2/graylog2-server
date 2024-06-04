@@ -62,7 +62,7 @@ const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initial
 
       return [...cur, targetEntityId];
     });
-  }, []);
+  }, [_setSelectedEntities]);
 
   const contextValue = useMemo(() => ({
     setSelectedEntities: _setSelectedEntities,
