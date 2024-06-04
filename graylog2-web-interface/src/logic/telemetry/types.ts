@@ -14,19 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import { singleton } from '../logic/singleton';
+import type { ExtractObjectValues } from 'util/UtilityTypes';
+import type { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-export type CustomizationSetting = {
-  [key: string]: boolean | string | number,
-};
+export interface EventTypes {
+  core: ExtractObjectValues<typeof TELEMETRY_EVENT_TYPE>
+}
 
-export type CustomizationType = {
-  [key: string]: CustomizationSetting,
-};
-
-const defaultCustomization = {};
-
-const CustomizationContext = React.createContext<CustomizationType>(defaultCustomization);
-export default singleton('contexts.CustomizationContext', () => CustomizationContext);
+export type EventType = EventTypes[keyof EventTypes];

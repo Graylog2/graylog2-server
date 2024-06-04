@@ -38,6 +38,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.lookup.Catalog;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -45,7 +46,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -100,8 +100,10 @@ public class StartPageServiceTest {
         };
 
         var eventbus = new EventBus();
-        var lastOpenedService = new LastOpenedService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus);
-        var recentActivityService = new RecentActivityService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, grnRegistry, permissionAndRoleResolver);
+        final var connection = mongodb.mongoConnection();
+        final var collections = new MongoCollections(mongoJackObjectMapperProvider, connection);
+        var lastOpenedService = new LastOpenedService(collections, eventbus);
+        var recentActivityService = new RecentActivityService(collections, connection, eventbus, grnRegistry, permissionAndRoleResolver);
         catalog = mock(Catalog.class);
         doReturn(Optional.of(new Catalog.Entry("", ""))).when(catalog).getEntry(any());
         startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageItemTitleRetriever(catalog, Map.of()));
@@ -109,21 +111,22 @@ public class StartPageServiceTest {
 
     @Test
     public void testCreateLastOpenedForUser() {
-        startPageService.addLastOpenedFor(ViewDTO.builder().id("id1").title("test").state(new HashMap<>()).searchId("1").build(), searchUser);
+        final var viewBuilder = ViewDTO.builder().title("test").state(Map.of()).searchId("1");
+        startPageService.addLastOpenedFor(viewBuilder.id("id1").build(), searchUser);
         var result = startPageService.findLastOpenedFor(searchUser, 1, 10);
         var list = (List<LastOpened>)result.jsonValue().get("lastOpened");
         assertThat(list.size()).isEqualTo(1);
         assertThat(list.get(0).grn().entity()).isEqualTo("id1");
 
-        startPageService.addLastOpenedFor(ViewDTO.builder().id("id2").title("test").state(new HashMap<>()).searchId("1").build(), searchUser);
+        startPageService.addLastOpenedFor(viewBuilder.id("id2").build(), searchUser);
         result = startPageService.findLastOpenedFor(searchUser, 1, 10);
         list = (List<LastOpened>)result.jsonValue().get("lastOpened");
         assertThat(list.size()).isEqualTo(2);
         assertThat(list.get(0).grn().entity()).isEqualTo("id2");
         assertThat(list.get(1).grn().entity()).isEqualTo("id1");
 
-        startPageService.addLastOpenedFor(ViewDTO.builder().id("id3").title("test").state(new HashMap<>()).searchId("1").build(), searchUser);
-        startPageService.addLastOpenedFor(ViewDTO.builder().id("id1").title("test").state(new HashMap<>()).searchId("1").build(), searchUser);
+        startPageService.addLastOpenedFor(viewBuilder.id("id3").build(), searchUser);
+        startPageService.addLastOpenedFor(viewBuilder.id("id1").build(), searchUser);
         result = startPageService.findLastOpenedFor(searchUser, 1, 10);
         list = (List<LastOpened>)result.jsonValue().get("lastOpened");
         assertThat(list.size()).isEqualTo(3);
