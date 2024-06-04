@@ -28,9 +28,10 @@ const Container = styled.div(({ theme }) => css`
 const Header = styled.div<{ $alignActionsLeft: boolean; }>(({ theme, $alignActionsLeft }) => css`
   display: flex;
   justify-content: ${$alignActionsLeft ? 'flex-start' : 'space-between'};
-  ${$alignActionsLeft ? `gap: ${theme.spacings.sm};` : ''};
+  ${$alignActionsLeft ? `gap: ${theme.spacings.sm};` : 'gap: 5px;'};
   align-items: center;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 `);
 
 type Props = React.PropsWithChildren<{

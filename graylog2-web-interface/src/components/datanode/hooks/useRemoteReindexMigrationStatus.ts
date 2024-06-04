@@ -70,13 +70,16 @@ const useRemoteReindexMigrationStatus = (
   const [migrationStatus, setMigrationStatus] = useState<RemoteReindexMigration>(undefined);
 
   useEffect(() => {
+    let interval;
+
     const fetchCurrentMigrationStatus = async () => {
       if (currentStep?.state === MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key) {
         if (
           migrationStatus?.progress === 100
-          && migrationStatus?.status === 'FINISHED'
+          && (migrationStatus?.status === 'FINISHED' || migrationStatus?.status === 'ERROR')
         ) {
           setNextSteps(currentStep?.next_steps.filter((action) => RemoteReindexFinishedStatusActions.includes(action)));
+          clearInterval(interval);
         } else {
           onTriggerStep('REQUEST_MIGRATION_STATUS').then((data) => {
             const _migrationStatus = data?.response as RemoteReindexMigration;
@@ -89,7 +92,7 @@ const useRemoteReindexMigrationStatus = (
       }
     };
 
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       fetchCurrentMigrationStatus();
     }, refetchInterval);
 

@@ -72,7 +72,12 @@ const HighlightingRules = () => {
         Any field value can be highlighted by clicking on the value and selecting &quot;Highlight this value&quot;.
         If a term or a value has more than one rule, the first matching rule is used.
       </SectionInfo>
-      <SectionSubheadline>Active highlights <IconButton className="pull-right" name="add" onClick={() => setShowForm(!showForm)} /> </SectionSubheadline>
+      <SectionSubheadline>
+        Active highlights <IconButton className="pull-right"
+                                      name="add"
+                                      onClick={() => setShowForm(!showForm)}
+                                      title="Add highlighting rule" />
+      </SectionSubheadline>
       {showForm && <HighlightForm onClose={() => setShowForm(false)} />}
       <Container $displayBorder={!!rulesWithId?.length}>
         <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />

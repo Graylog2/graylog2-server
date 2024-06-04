@@ -16,13 +16,25 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { MessagesActions } from 'stores/messages/MessagesStore';
 import type { Message } from 'views/components/messagelist/Types';
+import { Messages } from '@graylog/server-api';
+import MessageFormatter from 'logic/message/MessageFormatter';
+import UserNotification from 'preflight/util/UserNotification';
 
-const useMessage = (id: string, index: string, enabled = true): { data: Message | undefined, isInitialLoading: boolean } => {
+const fetchMessage = async (index: string, id: string) => {
+  const message = await Messages.search(index, id);
+
+  return MessageFormatter.formatResultMessage(message);
+};
+
+const useMessage = (index: string, id: string, enabled = true): { data: Message | undefined, isInitialLoading: boolean } => {
   const { data, isInitialLoading } = useQuery({
     queryKey: ['messages', index, id],
-    queryFn: () => MessagesActions.loadMessage(index, id),
+    queryFn: () => fetchMessage(index, id),
+    onError: (error) => {
+      UserNotification.error(`Loading message information failed with status: ${error}`,
+        'Could not load message information');
+    },
     enabled,
   });
 

@@ -19,12 +19,13 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
 
-import { ProgressBar } from 'components/common';
+import { ConfirmDialog, ProgressBar } from 'components/common';
 import { Alert, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
+import { MIGRATION_ACTIONS } from '../../Constants';
 
 const IndicesContainer = styled.div`
   max-height: 100px;
@@ -59,14 +60,19 @@ const getColorVariantFromLogLevel = (logLovel: string): ColorVariant|undefined =
   }
 };
 
+const RetryMigrateExistingData = 'RETRY_MIGRATE_EXISTING_DATA';
+
 const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { nextSteps, migrationStatus, handleTriggerStep } = useRemoteReindexMigrationStatus(currentStep, onTriggerStep);
   const indicesWithErrors = migrationStatus?.indices.filter((index) => index.status === 'ERROR') || [];
   const [showLogView, setShowLogView] = useState<boolean>(false);
+  const [showRetryMigrationConfirmDialog, setShowRetryMigrationConfirmDialog] = useState<boolean>(false);
+
+  const hasMigrationFailed = migrationStatus?.progress === 100 && migrationStatus?.status === 'ERROR';
 
   return (
     <>
-      We are currently migrating your existing data asynchronically,
+      We are currently migrating your existing data asynchronically (Graylog can be used while the reindexing is running),
       once the data migration is finished you will be automatically transitioned to the next step.
       <br />
       <br />
@@ -89,13 +95,26 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
           </IndicesContainer>
         </Alert>
       )}
-      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={handleTriggerStep}>
+      <MigrationStepTriggerButtonToolbar nextSteps={(nextSteps || currentStep.next_steps).filter((step) => step !== RetryMigrateExistingData)} onTriggerStep={handleTriggerStep}>
         <Button bsStyle="default" bsSize="small" onClick={() => setShowLogView(true)}>Log View</Button>
+        <Button bsStyle="default" bsSize="small" onClick={() => (hasMigrationFailed ? onTriggerStep(RetryMigrateExistingData) : setShowRetryMigrationConfirmDialog(true))}>{MIGRATION_ACTIONS[RetryMigrateExistingData]?.label}</Button>
       </MigrationStepTriggerButtonToolbar>
+      {showRetryMigrationConfirmDialog && (
+        <ConfirmDialog show={showRetryMigrationConfirmDialog}
+                       title="Retry migrating existing data"
+                       onCancel={() => setShowRetryMigrationConfirmDialog(false)}
+                       onConfirm={() => {
+                         onTriggerStep(RetryMigrateExistingData);
+                         setShowRetryMigrationConfirmDialog(false);
+                       }}>
+          Are you sure you want to stop the current running remote reindexing migration and retry migrating existing data?
+        </ConfirmDialog>
+      )}
       {showLogView && (
         <BootstrapModalWrapper showModal={showLogView}
                                onHide={() => setShowLogView(false)}
-                               bsSize="large">
+                               bsSize="large"
+                               backdrop>
           <Modal.Header closeButton>
             <Modal.Title>Remote Reindex Migration Logs</Modal.Title>
           </Modal.Header>

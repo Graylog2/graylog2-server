@@ -107,19 +107,11 @@ describe('InPlaceMigration', () => {
     });
   });
 
-  it('should render CertificatesProvisioning page step', async () => {
-    renderStep(MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key);
-
-    await screen.findByRole('button', {
-      name: /3. Certificate provisioning overview/i,
-    });
-  });
-
   it('should render CertificatesProvisioning running step', async () => {
     renderStep(MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key);
 
     await screen.findByRole('button', {
-      name: /4. Provision the Data Node's certificate./i,
+      name: /3. Provision the Data Node's certificate./i,
     });
   });
 
@@ -127,7 +119,7 @@ describe('InPlaceMigration', () => {
     renderStep(MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key);
 
     await screen.findByRole('button', {
-      name: /5. Journal size downtime warning/i,
+      name: /4. Journal size downtime warning/i,
     });
 
     await screen.findByRole('heading', { name: /Journal downtime size warning/i });
@@ -137,7 +129,7 @@ describe('InPlaceMigration', () => {
     renderStep(MIGRATION_STATE.MESSAGE_PROCESSING_STOP.key);
 
     await screen.findByRole('button', {
-      name: /6. Stop message processing/i,
+      name: /5. Stop message processing/i,
     });
 
     await screen.findByRole('heading', { name: /Stop OpenSearch/i });
@@ -147,7 +139,7 @@ describe('InPlaceMigration', () => {
     renderStep(MIGRATION_STATE.RESTART_GRAYLOG.key);
 
     await screen.findByRole('button', {
-      name: /7. Update configuration file and restart Graylog/i,
+      name: /6. Update configuration file and restart Graylog/i,
     });
 
     await screen.findByText(/please restart Graylog to finish the migration./);

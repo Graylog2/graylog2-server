@@ -38,7 +38,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import MoreActions from 'components/common/EntityDataTable/MoreActions';
+import { MoreActions } from 'components/common/EntityDataTable';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 import type { EventDefinition } from '../event-definitions-types';
@@ -95,6 +95,20 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   const isSystemEventDefinition = (): boolean => eventDefinition?.config?.type === 'system-notifications-v1';
 
   const isAggregationEventDefinition = (): boolean => eventDefinition?.config?.type === 'aggregation-v1';
+
+  const isSigmaEventDefinition = (): boolean => eventDefinition?.config?.type === 'sigma-v1';
+
+  const getDeleteActionTitle = () => {
+    if (isSystemEventDefinition()) {
+      return 'System Event Definition cannot be deleted';
+    }
+
+    if (isSigmaEventDefinition()) {
+      return 'Sigma Rules must be deleted from the Sigma Rules page';
+    }
+
+    return undefined;
+  };
 
   const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal')
     .find((entity: { key: string }) => entity.key === 'coreSigmaModal');
@@ -217,7 +231,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   };
 
   const onEditEventDefinition = () => {
-    if (eventDefinition.config.type === 'sigma-v1') {
+    if (isSigmaEventDefinition()) {
       setShowSigmaModal(true);
     } else {
       navigate(Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id));
@@ -244,7 +258,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
               Edit
             </MenuItem>
           </IfPermitted>
-          {!isSystemEventDefinition() && (
+          {!isSystemEventDefinition() && !isSigmaEventDefinition() && (
             <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
           )}
           <MenuItem divider />
@@ -257,9 +271,9 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
-              <MenuItem disabled={isSystemEventDefinition()}
-                        title={isSystemEventDefinition() ? 'System Event Definition cannot be deleted' : undefined}
-                        onClick={isSystemEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
+              <MenuItem disabled={isSystemEventDefinition() || isSigmaEventDefinition()}
+                        title={getDeleteActionTitle()}
+                        onClick={isSystemEventDefinition() || isSigmaEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
                         data-testid="delete-button">Delete
               </MenuItem>
             </IfPermitted>
