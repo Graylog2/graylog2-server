@@ -21,14 +21,13 @@ import PropTypes from 'prop-types';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
-import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
+import type { ChartConfig, PlotLayout } from 'views/components/visualizations/GenericPlot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 
@@ -71,11 +70,6 @@ const defineSingleDateBarWidth = (chartDataResult: ChartDefinition[], config: Ag
   });
 };
 
-type Layout = {
-  shapes?: Shapes;
-  barmode?: string;
-};
-
 const BarVisualization = makeVisualization(({
   config,
   data,
@@ -83,7 +77,7 @@ const BarVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
-  const _layout: Layout = {};
+  const _layout: Partial<PlotLayout> = {};
 
   if (visualizationConfig && visualizationConfig.barmode) {
     _layout.barmode = visualizationConfig?.barmode;
