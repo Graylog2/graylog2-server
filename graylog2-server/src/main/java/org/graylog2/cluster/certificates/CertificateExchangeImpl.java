@@ -23,6 +23,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -35,7 +36,6 @@ import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -135,7 +135,7 @@ public class CertificateExchangeImpl implements CertificateExchange {
                 });
     }
 
-    @NotNull
+    @Nonnull
     private <T> Optional<T> readEntry(Bson filter, BiFunction<Document, String, T> parser) {
         MongoCollection<Document> dbCollection = mongoDatabase.getCollection(COLLECTION_NAME);
         final FindIterable<Document> objects = dbCollection.find(
