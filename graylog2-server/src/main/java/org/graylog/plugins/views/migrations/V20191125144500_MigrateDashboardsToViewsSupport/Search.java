@@ -19,6 +19,7 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -31,7 +32,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-abstract class Search {
+abstract class Search implements MongoEntity {
     static final String FIELD_REQUIRES = "requires";
     private static final String FIELD_CREATED_AT = "created_at";
     static final String FIELD_OWNER = "owner";
@@ -40,7 +41,7 @@ abstract class Search {
     @ObjectId
     @Nullable
     @JsonProperty
-    abstract String id();
+    public abstract String id();
 
     @JsonProperty
     abstract Set<Query> queries();

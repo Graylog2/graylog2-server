@@ -65,7 +65,7 @@ class DefaultMongoPaginationHelperTest {
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
         mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
-        collection = mongoCollections.get("test", DTO.class);
+        collection = mongoCollections.collection("test", DTO.class);
         paginationHelper = new DefaultMongoPaginationHelper<>(collection);
 
         collection.insertMany(DTOs);

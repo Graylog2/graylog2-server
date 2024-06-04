@@ -3,7 +3,7 @@ Upgrading to Graylog 6.1.x
 
 ## Breaking Changes
 
-- tbd
+- API errors which are related to invalid requests (e.g. JSON parsing failures, invalid types, etc.) are now responded to with a type of `RequestError` instead of `APIError`.
 
 ## Java API Changes
 

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
+import jakarta.inject.Inject;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -29,8 +30,6 @@ import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.net.URL;
@@ -70,7 +69,6 @@ public class V20180906112716_RecreateThreatintelLookupTables extends Migration {
             final String[] contentPacks = {
                     "V20180906112716_RecreateThreatintelLookupTables-content_pack-OTX.json",
                     "V20180906112716_RecreateThreatintelLookupTables-content_pack-tor.json",
-                    "V20180906112716_RecreateThreatintelLookupTables-content_pack-abuse.json",
                     "V20180906112716_RecreateThreatintelLookupTables-content_pack-spamhaus.json",
                     "V20180906112716_RecreateThreatintelLookupTables-content_pack-whois.json",
             };

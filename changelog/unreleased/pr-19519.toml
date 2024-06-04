@@ -1,0 +1,6 @@
+type = "r"
+message = "Removed default Content Pack for defunct abuse.ch ransomware tracker."
+
+issues = ["Graylog2/graylog-plugin-integrations#945"]
+pulls = ["19519"]
+

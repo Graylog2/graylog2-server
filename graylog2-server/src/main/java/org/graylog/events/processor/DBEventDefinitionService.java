@@ -16,27 +16,25 @@
  */
 package org.graylog.events.processor;
 
-import com.google.common.collect.ImmutableList;
+import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
-import org.bson.types.ObjectId;
+import org.bson.conversions.Bson;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
-import org.graylog2.database.entities.ScopedDbService;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-import org.mongojack.DBUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,33 +44,46 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto> {
+import static com.mongodb.client.model.Filters.elemMatch;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
+import static org.graylog2.database.utils.MongoUtils.idEq;
+import static org.graylog2.database.utils.MongoUtils.stream;
+
+public class DBEventDefinitionService {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
 
     public static final String COLLECTION_NAME = "event_definitions";
 
+    private final MongoCollection<EventDefinitionDto> collection;
+    private final MongoUtils<EventDefinitionDto> mongoUtils;
+    private final ScopedEntityMongoUtils<EventDefinitionDto> scopedEntityMongoUtils;
+    private final MongoPaginationHelper<EventDefinitionDto> paginationHelper;
     private final DBEventProcessorStateService stateService;
     private final EntityOwnershipService entityOwnerShipService;
     private final SearchFiltersReFetcher searchFiltersRefetcher;
 
     @Inject
-    public DBEventDefinitionService(MongoConnection mongoConnection,
-                                    MongoJackObjectMapperProvider mapper,
+    public DBEventDefinitionService(MongoCollections mongoCollections,
                                     DBEventProcessorStateService stateService,
                                     EntityOwnershipService entityOwnerShipService, EntityScopeService entityScopeService, SearchFiltersReFetcher searchFiltersRefetcher) {
-        super(mongoConnection, mapper, EventDefinitionDto.class, COLLECTION_NAME, entityScopeService);
+        this.collection = mongoCollections.collection(COLLECTION_NAME, EventDefinitionDto.class);
+        this.mongoUtils = mongoCollections.utils(collection);
+        this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
+        this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.stateService = stateService;
         this.entityOwnerShipService = entityOwnerShipService;
         this.searchFiltersRefetcher = searchFiltersRefetcher;
     }
 
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
-                                                             String sortByField, String sortOrder, int page, int perPage) {
-        final DBQuery.Query dbQuery = query.toDBQuery();
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(sortOrder, sortByField);
-        final PaginatedList<EventDefinitionDto> list = findPaginatedWithQueryFilterAndSort(dbQuery, filter,
-                sortBuilder, page, perPage);
+                                                             Bson sort, int page, int perPage) {
+        final Bson dbQuery = query.toBson();
+        final PaginatedList<EventDefinitionDto> list = filter == null ?
+                paginationHelper.filter(dbQuery).sort(sort).perPage(perPage).page(page) :
+                paginationHelper.filter(dbQuery).sort(sort).perPage(perPage).page(page, filter);
         return new PaginatedList<>(
                 list.stream()
                         .map(this::getEventDefinitionWithRefetchedFilters)
@@ -89,18 +100,22 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
         return dto;
     }
 
-    @Override
     public EventDefinitionDto save(final EventDefinitionDto entity) {
         EventDefinitionDto enrichedWithUpdateDate = entity
                 .toBuilder()
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
-        return getEventDefinitionWithRefetchedFilters(super.save(enrichedWithUpdateDate));
+        if (enrichedWithUpdateDate.id() == null) {
+            final String id = scopedEntityMongoUtils.create(enrichedWithUpdateDate);
+            enrichedWithUpdateDate = enrichedWithUpdateDate.toBuilder().id(id).build();
+        } else {
+            scopedEntityMongoUtils.update(enrichedWithUpdateDate);
+        }
+        return getEventDefinitionWithRefetchedFilters(enrichedWithUpdateDate);
     }
 
-    @Override
     public Optional<EventDefinitionDto> get(String id) {
-        return super.get(id).map(this::getEventDefinitionWithRefetchedFilters);
+        return mongoUtils.getById(id).map(this::getEventDefinitionWithRefetchedFilters);
     }
 
     private EventDefinitionDto getEventDefinitionWithRefetchedFilters(final EventDefinitionDto eventDefinition) {
@@ -117,28 +132,38 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
     }
 
     public void updateMatchedAt(String id, DateTime timeStamp) {
-        db.updateById(new ObjectId(id), new DBUpdate.Builder().set(EventDefinitionDto.FIELD_MATCHED_AT, timeStamp));
+        collection.findOneAndUpdate(idEq(id), set(EventDefinitionDto.FIELD_MATCHED_AT, timeStamp));
     }
 
     public void updateState(String id, EventDefinition.State state) {
         // Strictly enabling/disabling event definitions does not require a scope check
-        db.updateById(new ObjectId(id), new DBUpdate.Builder().set(EventDefinitionDto.FIELD_STATE, state));
+        collection.findOneAndUpdate(idEq(id), set(EventDefinitionDto.FIELD_STATE, state));
     }
 
-    public int deleteUnregister(String id) {
+    public int delete(String id) {
+        return scopedEntityMongoUtils.deleteById(id) ? 1 : 0;
+    }
+
+    public void forceDelete(String id) {
+        scopedEntityMongoUtils.forceDelete(id);
+    }
+
+    public long deleteUnregister(String id) {
         // Must ensure deletability and mutability before deleting, so that de-registration is only performed if entity exists
         // and is not mutable.
         final EventDefinitionDto dto = get(id).orElseThrow(() -> new IllegalArgumentException("Event Definition not found."));
-        ensureDeletability(dto);
-        ensureMutability(dto);
-        return doDeleteUnregister(id, () -> super.delete(id));
+        scopedEntityMongoUtils.ensureDeletability(dto);
+        scopedEntityMongoUtils.ensureMutability(dto);
+
+        // We've checked that the event definition can be deleted above, so we can safely call forceDelete here.
+        return doDeleteUnregister(id, () -> scopedEntityMongoUtils.forceDelete(id));
     }
 
-    public int deleteUnregisterImmutable(String id) {
-        return doDeleteUnregister(id, () -> super.forceDelete(id));
+    public long deleteUnregisterImmutable(String id) {
+        return doDeleteUnregister(id, () -> scopedEntityMongoUtils.forceDelete(id));
     }
 
-    private int doDeleteUnregister(String id, Supplier<Integer> deleteSupplier) {
+    private long doDeleteUnregister(String id, Supplier<Long> deleteSupplier) {
         // Deregister event definition.
         try {
             stateService.deleteByEventDefinitionId(id);
@@ -159,7 +184,7 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
         final String field = String.format(Locale.US, "%s.%s",
                 EventDefinitionDto.FIELD_NOTIFICATIONS,
                 EventNotificationConfig.FIELD_NOTIFICATION_ID);
-        return ImmutableList.copyOf((db.find(DBQuery.is(field, notificationId)).iterator()));
+        return stream(collection.find(eq(field, notificationId))).toList();
     }
 
     /**
@@ -168,7 +193,7 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
      * @return the matching event definitions
      */
     public List<EventDefinitionDto> getSystemEventDefinitions() {
-        return ImmutableList.copyOf((db.find(DBQuery.is(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME)).iterator()));
+        return stream(collection.find(eq(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME))).toList();
     }
 
     /**
@@ -176,6 +201,14 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
      */
     @NotNull
     public List<EventDefinitionDto> getByArrayValue(String arrayField, String field, String value) {
-        return ImmutableList.copyOf((db.find(DBQuery.elemMatch(arrayField, DBQuery.is(field, value))).iterator()));
+        return stream(collection.find(elemMatch(arrayField, eq(field, value)))).toList();
+    }
+
+    public boolean isMutable(EventDefinitionDto eventDefinition) {
+        return scopedEntityMongoUtils.isMutable(eventDefinition);
+    }
+
+    public Stream<EventDefinitionDto> streamAll() {
+        return stream(collection.find());
     }
 }
