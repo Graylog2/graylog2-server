@@ -35,11 +35,10 @@ import org.graylog.security.certutil.CaConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.cert.CertificateChain;
-import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
-import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
-import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
 import org.graylog2.Configuration;
+import org.graylog2.cluster.certificates.CertificateExchange;
+import org.graylog2.cluster.certificates.CertificateSigningRequest;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
@@ -51,19 +50,20 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.List;
@@ -91,8 +91,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final NodeService<DataNodeDto> nodeService;
 
     private final CaConfiguration configuration;
-    private final CsrMongoStorage csrStorage;
-    private final CertChainStorage certMongoStorage;
     private final CaService caService;
     private final CsrSigner csrSigner;
     private final ClusterConfigService clusterConfigService;
@@ -102,10 +100,10 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final NotificationService notificationService;
     private final ExecutorService executor;
 
+    private final CertificateExchange certificateExchange;
+
     @Inject
     public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
-                                                    final CsrMongoStorage csrStorage,
-                                                    final CertChainMongoStorage certMongoStorage,
                                                     final CaService caService,
                                                     final Configuration configuration,
                                                     final NodeService<DataNodeDto> nodeService,
@@ -115,10 +113,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
                                                     final PreflightConfigService preflightConfigService,
                                                     final NotificationService notificationService,
-                                                    final CustomCAX509TrustManager trustManager) {
+                                                    final CustomCAX509TrustManager trustManager, CertificateExchange certificateExchange) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
-        this.csrStorage = csrStorage;
-        this.certMongoStorage = certMongoStorage;
         this.caService = caService;
         this.passwordSecret = passwordSecret;
         this.configuration = configuration;
@@ -127,6 +123,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.clusterConfigService = clusterConfigService;
         this.preflightConfigService = preflightConfigService;
         this.notificationService = notificationService;
+        this.certificateExchange = certificateExchange;
         this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
         this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager, indexerJwtAuthTokenProvider));
     }
@@ -210,29 +207,13 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     }
                 }
 
-                final var caKeystore = optKey.get();
-                final var nodesWithCSR = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.CSR, List.of());
-                final var hasNodesWithCSR = !nodesWithCSR.isEmpty();
-                if (hasNodesWithCSR) {
-                    var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, password);
-                    var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
-                    nodesWithCSR.forEach(c -> {
-                        try {
-                            var csr = csrStorage.readCsr(c.nodeId());
-                            if (csr.isEmpty()) {
-                                LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
-                                dataNodeProvisioningService.save(c.asError("Node in CSR state, but no CSR present"));
-                            } else {
-                                var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
-                                final List<X509Certificate> caCertificates = List.of(caCertificate);
-                                certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
-                            }
-                        } catch (Exception e) {
-                            LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                            dataNodeProvisioningService.save(c.asError(e.getMessage()));
-                        }
-                    });
-                }
+                optKey.ifPresent(caKeystore -> {
+                    try {
+                        certificateExchange.signPendingCertificateRequests(request -> signCertificate(request, caKeystore, password, renewalPolicy));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
                 nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_REQUESTED, List.of())
                         .forEach(c -> {
@@ -240,8 +221,20 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             executor.submit(() -> checkConnectivity(c));
                         });
             }
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException |
-                 KeyStoreStorageException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | KeyStoreStorageException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @NotNull
+    private CertificateChain signCertificate(CertificateSigningRequest request, KeyStore caKeystore, char[] password, RenewalPolicy renewalPolicy) {
+        try {
+            var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, password);
+            var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
+            var cert = csrSigner.sign(caPrivateKey, caCertificate, request.request(), renewalPolicy);
+            final List<X509Certificate> caCertificates = List.of(caCertificate);
+            return new CertificateChain(cert, caCertificates);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -345,6 +338,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
      * This record serves as a DTO for retry logic. We can't use the original Response, as we are having problems
      * closing the response between repeats and failure recoveries. Rather close the response ASAP and provide
      * only necessary information to the retryer.
+     *
      * @param success Could we connect to the datanode URL?
      * @param message What was the error message if not?
      */
