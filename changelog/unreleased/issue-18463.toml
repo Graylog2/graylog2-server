@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Preventing double prefixing of navigation items when path prefix is present."
+
+issues = ["18463"]
+pulls = ["19515"]
