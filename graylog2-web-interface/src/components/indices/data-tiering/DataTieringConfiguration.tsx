@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment';
 import { useFormikContext } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -179,6 +180,10 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined, >({ v
       )}
     </>
   );
+};
+
+DataTieringConfiguration.propTypes = {
+  valuesPrefix: PropTypes.string,
 };
 
 DataTieringConfiguration.defaultProps = {
