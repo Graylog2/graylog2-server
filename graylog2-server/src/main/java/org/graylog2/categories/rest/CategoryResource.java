@@ -22,6 +22,8 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.categories.CategoryService;
 import org.graylog2.categories.model.Category;
 import org.graylog2.database.PaginatedList;
@@ -78,6 +80,7 @@ public class CategoryResource extends RestResource implements PluginRestResource
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation("Create a new category")
     @RequiresPermissions(CategoryPermissions.CATEGORY_EDIT)
+    @AuditEvent(type = AuditEventTypes.CATEGORY_CREATE)
     public Response create(@ApiParam(name = "Category") String value) {
 
         Category category = categoryService.create(value);
@@ -89,6 +92,7 @@ public class CategoryResource extends RestResource implements PluginRestResource
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation("Update a category")
     @RequiresPermissions(CategoryPermissions.CATEGORY_EDIT)
+    @AuditEvent(type = AuditEventTypes.CATEGORY_UPDATE)
     public Response update(@ApiParam(name = "id", required = true) @PathParam("id") String id,
                            @ApiParam(name = "Category") String request) {
 
@@ -101,6 +105,7 @@ public class CategoryResource extends RestResource implements PluginRestResource
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation("Delete a category")
     @RequiresPermissions(CategoryPermissions.CATEGORY_EDIT)
+    @AuditEvent(type = AuditEventTypes.CATEGORY_DELETE)
     public Response delete(@ApiParam(name = "id", required = true) @PathParam("id") String id) {
         categoryService.delete(id);
         return Response.ok().build();

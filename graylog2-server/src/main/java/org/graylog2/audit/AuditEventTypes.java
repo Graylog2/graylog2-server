@@ -167,6 +167,11 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String TELEMETRY_USER_SETTINGS_UPDATE = PREFIX + "telemetry_user_settings:update";
     public static final String CONTENT_STREAM_USER_SETTINGS_UPDATE = PREFIX + "content_stream_user_settings:update";
 
+    public static final String CATEGORY = "category";
+    public static final String CATEGORY_CREATE = PREFIX + CATEGORY + ":create";
+    public static final String CATEGORY_UPDATE = PREFIX + CATEGORY + ":update";
+    public static final String CATEGORY_DELETE = PREFIX + CATEGORY + ":delete";
+
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(ALARM_CALLBACK_CREATE)
             .add(ALARM_CALLBACK_DELETE)
@@ -309,6 +314,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(TELEMETRY_USER_SETTINGS_UPDATE)
             .add(CONTENT_STREAM_USER_SETTINGS_UPDATE)
             .add(CERTIFICATE_RENEWAL_MANUALLY_INITIATED)
+            .add(CATEGORY_CREATE)
+            .add(CATEGORY_UPDATE)
+            .add(CATEGORY_DELETE)
             .build();
 
     @Override
