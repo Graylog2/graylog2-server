@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 
-import {  Spinner } from 'components/common';
+import { Spinner } from 'components/common';
 import useStream from 'hooks/useStream';
 import StreamDetails from 'components/streams/StreamDetails/StreamDetails';
 
