@@ -44,7 +44,7 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.configuration.RunsWithDataNode;
-import org.graylog2.datanode.DataNodeService;
+import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
@@ -65,7 +65,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 public class DataNodeManagementResource extends RestResource {
 
-    private final DataNodeService dataNodeService;
+    private final DataNodeCommandService dataNodeCommandService;
     private final NodeService<DataNodeDto> nodeService;
     private final CertRenewalService certRenewalService;
     private final Boolean runsWithDataNode;
@@ -74,12 +74,12 @@ public class DataNodeManagementResource extends RestResource {
     private final BulkExecutor<DataNodeDto, UserContext> bulkStartExecutor;
 
     @Inject
-    protected DataNodeManagementResource(DataNodeService dataNodeService,
+    protected DataNodeManagementResource(DataNodeCommandService dataNodeCommandService,
                                          NodeService<DataNodeDto> nodeService,
                                          CertRenewalService certRenewalService,
                                          @RunsWithDataNode Boolean runsWithDataNode,
                                          AuditEventSender auditEventSender, ObjectMapper objectMapper) {
-        this.dataNodeService = dataNodeService;
+        this.dataNodeCommandService = dataNodeCommandService;
         this.nodeService = nodeService;
         this.certRenewalService = certRenewalService;
         this.runsWithDataNode = runsWithDataNode;
@@ -117,7 +117,7 @@ public class DataNodeManagementResource extends RestResource {
     public DataNodeDto removeNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
                                   @Context UserContext userContext) {
         try {
-            return dataNodeService.removeNode(nodeId);
+            return dataNodeCommandService.removeNode(nodeId);
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }
@@ -148,7 +148,7 @@ public class DataNodeManagementResource extends RestResource {
     @RequiresPermissions(RestPermissions.DATANODE_RESET)
     public DataNodeDto resetNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         try {
-            return dataNodeService.resetNode(nodeId);
+            return dataNodeCommandService.resetNode(nodeId);
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }
@@ -162,7 +162,7 @@ public class DataNodeManagementResource extends RestResource {
     public DataNodeDto stopNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
                                 @Context UserContext userContext) {
         try {
-            return dataNodeService.stopNode(nodeId);
+            return dataNodeCommandService.stopNode(nodeId);
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }
@@ -195,7 +195,7 @@ public class DataNodeManagementResource extends RestResource {
     public DataNodeDto startNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
                                  @Context UserContext userContext) {
         try {
-            return dataNodeService.startNode(nodeId);
+            return dataNodeCommandService.startNode(nodeId);
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }

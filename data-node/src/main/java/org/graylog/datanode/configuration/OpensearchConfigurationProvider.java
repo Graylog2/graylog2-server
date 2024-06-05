@@ -17,6 +17,8 @@
 package org.graylog.datanode.configuration;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
@@ -27,6 +29,7 @@ import org.graylog.datanode.configuration.variants.LocalKeystoreSecureConfigurat
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
+import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.cluster.Node;
@@ -46,7 +49,7 @@ import java.util.stream.Collectors;
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
     private final Configuration localConfiguration;
     private final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration;
-    private final LocalKeystoreSecureConfiguration mongoCertSecureConfiguration;
+    private final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration;
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
@@ -57,6 +60,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
      * This configuration won't survive datanode restart. But it can be repeatedly provided to the managed opensearch
      */
     private final Map<String, Object> transientConfiguration = new ConcurrentHashMap<>();
+    private final EventBus eventBus;
 
     @Inject
     public OpensearchConfigurationProvider(final Configuration localConfiguration,
@@ -66,15 +70,25 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                                            final InSecureConfiguration inSecureConfiguration,
                                            final NodeService<DataNodeDto> nodeService,
                                            final @Named("password_secret") String passwordSecret,
-                                           final S3RepositoryConfiguration s3RepositoryConfiguration) {
+                                           final S3RepositoryConfiguration s3RepositoryConfiguration,
+                                           final EventBus eventBus) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
-        this.mongoCertSecureConfiguration = localKeystoreSecureConfiguration;
+        this.localKeystoreSecureConfiguration = localKeystoreSecureConfiguration;
         this.inSecureConfiguration = inSecureConfiguration;
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;
         this.s3RepositoryConfiguration = s3RepositoryConfiguration;
+        this.eventBus = eventBus;
+        eventBus.register(this);
+    }
+
+    @Subscribe
+    public void onKeystoreChange(DatanodeKeystoreChangedEvent event) {
+        // configuration relies on the keystore. Every change there should rebuild the configuration and restart
+        // dependent services
+        triggerConfigurationChangedEvent();
     }
 
     @Override
@@ -83,7 +97,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         List<SecurityConfigurationVariant> securityConfigurationTypes = List.of(
                 inSecureConfiguration,
                 uploadedCertFilesSecureConfiguration,
-                mongoCertSecureConfiguration
+                localKeystoreSecureConfiguration
         );
 
         Optional<SecurityConfigurationVariant> chosenSecurityConfigurationVariant = securityConfigurationTypes.stream()
@@ -140,7 +154,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         config.put("network.bind_host", localConfiguration.getBindAddress());
 
         // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
-        if(localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
+        if (localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
             config.put("path.repo", localConfiguration.getPathRepo());
         }
 
@@ -167,5 +181,17 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
     public void setTransientConfiguration(String key, Object value) {
         this.transientConfiguration.put(key, value);
+        triggerConfigurationChangedEvent();
+    }
+
+    public void removeTransientConfiguration(String key) {
+        final Object removedValue = this.transientConfiguration.remove(key);
+        if (removedValue != null) {
+            triggerConfigurationChangedEvent();
+        }
+    }
+
+    private void triggerConfigurationChangedEvent() {
+        eventBus.post(new OpensearchConfigurationChangeEvent(get()));
     }
 }

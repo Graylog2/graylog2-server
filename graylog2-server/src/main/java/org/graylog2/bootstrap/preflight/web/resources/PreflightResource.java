@@ -43,14 +43,16 @@ import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.storage.SearchVersion;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -60,7 +62,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Path(PreflightConstants.API_PREFIX)
@@ -68,25 +70,28 @@ import java.util.stream.Collectors;
 public class PreflightResource {
 
     private final NodeService<DataNodeDto> nodeService;
-    private final DataNodeProvisioningService dataNodeProvisioningService;
     private final CaService caService;
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
 
+    private final DataNodeCommandService dataNodeCommandService;
+
+    private final DatanodeConnectivityCheck datanodeConnectivityCheck;
+
     @Inject
     public PreflightResource(final NodeService<DataNodeDto> nodeService,
-                             final DataNodeProvisioningService dataNodeProvisioningService,
                              final CaService caService,
                              final ClusterConfigService clusterConfigService,
-                             final @Named("password_secret") String passwordSecret) {
+                             final @Named("password_secret") String passwordSecret, DataNodeCommandService dataNodeCommandService, DatanodeConnectivityCheck datanodeConnectivityCheck) {
         this.nodeService = nodeService;
-        this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.caService = caService;
         this.clusterConfigService = clusterConfigService;
         this.passwordSecret = passwordSecret;
+        this.dataNodeCommandService = dataNodeCommandService;
+        this.datanodeConnectivityCheck = datanodeConnectivityCheck;
     }
 
-    record DataNode(String nodeId, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg,
+    public record DataNode(String nodeId, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg,
                     String hostname, String shortNodeId, DataNodeStatus dataNodeStatus) {}
 
     @GET
@@ -94,17 +99,36 @@ public class PreflightResource {
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public List<DataNode> listDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        final var preflightDataNodes = dataNodeProvisioningService.streamAll().collect(Collectors.toMap(DataNodeProvisioningConfig::nodeId, Function.identity()));
+        return activeDataNodes.values().stream().map(n -> new DataNode(n.getNodeId(),
+                n.getTransportAddress(),
+                getPreflightState(n),
+                getErrorMessage(n),
+                n.getHostname(),
+                n.getShortNodeId(),
+                n.getDataNodeStatus())).collect(Collectors.toList());
+    }
 
-        return activeDataNodes.values().stream().map(n -> {
-            final var preflight = preflightDataNodes.get(n.getNodeId());
-            return new DataNode(n.getNodeId(),
-                    n.getTransportAddress(),
-                    preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null,
-                    n.getHostname(),
-                    n.getShortNodeId(),
-                    n.getDataNodeStatus());
-        }).collect(Collectors.toList());
+    private String getErrorMessage(DataNodeDto n) {
+        return null; // TODO!
+    }
+
+    public DataNodeProvisioningConfig.State getPreflightState(DataNodeDto n) {
+        return switch (n.getDataNodeStatus()) {
+            case AVAILABLE -> verifyActualConnection(n);
+            case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
+            case PREPARED -> DataNodeProvisioningConfig.State.CONNECTING;
+            case UNAVAILABLE -> DataNodeProvisioningConfig.State.ERROR;
+            default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
+        };
+    }
+
+    private DataNodeProvisioningConfig.State verifyActualConnection(DataNodeDto n) {
+        final Optional<SearchVersion> version = datanodeConnectivityCheck.probe(n);
+        if (version.isPresent()) {
+            return DataNodeProvisioningConfig.State.CONNECTED;
+        } else {
+            return DataNodeProvisioningConfig.State.CONNECTING;
+        }
     }
 
     @GET
@@ -173,7 +197,15 @@ public class PreflightResource {
     public void startOver() {
         caService.startOver();
         clusterConfigService.remove(RenewalPolicy.class);
-        dataNodeProvisioningService.deleteAll();
+        nodeService.allActive().values().forEach(this::stopNode);
+    }
+
+    private void stopNode(DataNodeDto node) {
+        try {
+            dataNodeCommandService.stopNode(node.getNodeId());
+        } catch (NodeNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @DELETE
@@ -182,7 +214,6 @@ public class PreflightResource {
     @NoAuditEvent("No Auditing during preflight")
     public void startOver(@PathParam("nodeID") String nodeID) {
         //TODO:  reset a specific datanode
-        dataNodeProvisioningService.delete(nodeID);
     }
 
     @POST
@@ -190,8 +221,16 @@ public class PreflightResource {
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
     public void generate() {
+
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
+
+        activeDataNodes.values().forEach(node -> {
+            try {
+                dataNodeCommandService.triggerCertificateSigningRequest(node.getNodeId());
+            } catch (NodeNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @POST
@@ -201,10 +240,7 @@ public class PreflightResource {
     @NoAuditEvent("No Auditing during preflight")
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
-        var cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeID);
-        var builder = cfg.map(DataNodeProvisioningConfig::toBuilder).orElse(DataNodeProvisioningConfig.builder().nodeId(nodeID));
-        builder.altNames(params.altNames()).validFor(params.validFor());
-        dataNodeProvisioningService.save(builder.build());
+      throw new UnsupportedOperationException("Adding cert parameters not supported yet");
 
     }
 }

@@ -17,18 +17,21 @@
 package org.graylog.security.certutil;
 
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
@@ -37,10 +40,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -61,6 +60,10 @@ import java.util.Optional;
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
+/**
+ * Datanodes should manage their own certificates, trigger notifications or CSRs depending on renewal policy.
+ */
+@Deprecated
 @Singleton
 public class CertRenewalServiceImpl implements CertRenewalService {
     private static final Logger LOG = LoggerFactory.getLogger(CertRenewalServiceImpl.class);
@@ -68,7 +71,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final ClusterConfigService clusterConfigService;
     private final KeystoreMongoStorage keystoreMongoStorage;
     private final NodeService<DataNodeDto> nodeService;
-    private final DataNodeProvisioningService dataNodeProvisioningService;
+    private final DataNodeCommandService dataNodeCommandService;
     private final NotificationService notificationService;
     private final DBJobTriggerService jobTriggerService;
     private final JobSchedulerClock clock;
@@ -82,7 +85,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     public CertRenewalServiceImpl(final ClusterConfigService clusterConfigService,
                                   final KeystoreMongoStorage keystoreMongoStorage,
                                   final NodeService<DataNodeDto> nodeService,
-                                  final DataNodeProvisioningService dataNodeProvisioningService,
+                                  final DataNodeCommandService dataNodeCommandService,
                                   final NotificationService notificationService,
                                   final DBJobTriggerService jobTriggerService,
                                   final CaService caService,
@@ -91,7 +94,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this.clusterConfigService = clusterConfigService;
         this.keystoreMongoStorage = keystoreMongoStorage;
         this.nodeService = nodeService;
-        this.dataNodeProvisioningService = dataNodeProvisioningService;
+        this.dataNodeCommandService = dataNodeCommandService;
         this.notificationService = notificationService;
         this.jobTriggerService = jobTriggerService;
         this.clock = clock;
@@ -197,10 +200,11 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     @Override
     public void initiateRenewalForNode(final String nodeId) {
         // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
-        var config = dataNodeProvisioningService.getPreflightConfigFor(nodeId)
-                .map(DataNodeProvisioningConfig::asConfigured)
-                .orElseThrow(() -> new IllegalStateException("No config found for data node " + nodeId));
-        dataNodeProvisioningService.save(config);
+        try {
+            dataNodeCommandService.triggerCertificateSigningRequest(nodeId);
+        } catch (NodeNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -210,16 +214,31 @@ public class CertRenewalServiceImpl implements CertRenewalService {
             final var keystore = loadKeyStoreForNode(node);
             final var certificate = keystore.flatMap(this::getCertificateForNode);
             final var certValidUntil = certificate.map(cert -> cert.getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            final var config = getDataNodeProvisioningConfig(node).orElseThrow(() -> new IllegalStateException("No config found for data node " + node.getNodeId()));
             return new DataNode(node.getNodeId(),
                     node.getDataNodeStatus(),
                     node.getTransportAddress(),
-                    config.state(),
-                    config.errorMsg(),
+                    state(node),
+                    errorMessage(node),
                     node.getHostname(),
                     node.getShortNodeId(),
                     certValidUntil.orElse(null));
         }).toList();
+    }
+
+    @Deprecated
+    private String errorMessage(DataNodeDto node) {
+        return null; // TODO!!!
+    }
+
+    @Deprecated
+    private DataNodeProvisioningConfig.State state(DataNodeDto node) {
+        return switch (node.getDataNodeStatus()) {
+            case AVAILABLE -> DataNodeProvisioningConfig.State.CONNECTED;
+            case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
+            case PREPARED -> DataNodeProvisioningConfig.State.CONNECTING;
+            case UNAVAILABLE -> DataNodeProvisioningConfig.State.ERROR;
+            default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
+        };
     }
 
     @Override
@@ -227,9 +246,8 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         final var keystore = loadKeyStoreForNode(node);
         final var certificate = keystore.flatMap(this::getCertificateForNode);
         final var certValidUntil = certificate.map(cert -> cert.getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        final var config = getDataNodeProvisioningConfig(node).orElseThrow(() -> new IllegalStateException("No config found for data node " + node.getNodeId()));
         return node.toBuilder().setProvisioningInformation(new CertRenewalService.ProvisioningInformation(
-                config.state(), config.errorMsg(), certValidUntil.orElse(null)
+                state(node), errorMessage(node), certValidUntil.orElse(null)
         )).build();
     }
 
@@ -239,7 +257,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     private Optional<DataNodeProvisioningConfig> getDataNodeProvisioningConfig(final Node node) {
-        return dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId());
+        return Optional.empty(); // TODO!!!
     }
 
     private void notifyManualRenewalForNode(final List<DataNodeDto> nodes) {

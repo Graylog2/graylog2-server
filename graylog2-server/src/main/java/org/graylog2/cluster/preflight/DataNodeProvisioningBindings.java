@@ -25,12 +25,6 @@ public class DataNodeProvisioningBindings extends AbstractModule {
 
     @Override
     protected void configure() {
-        // this wires the NodePreflightConfigServiceImpl delegate into the NodePreflightConfigBusEvents from above
-        bind(DataNodeProvisioningService.class).annotatedWith(Names.named(DataNodeProvisioningBusEvents.DELEGATE_NAME)).to(DataNodeProvisioningServiceImpl.class);
-
-        // this is the generic dependency used by callers
-        bind(DataNodeProvisioningService.class).to(DataNodeProvisioningBusEvents.class);
-
         bind(CertificateExchange.class).to(CertificateExchangeImpl.class);
     }
 }
