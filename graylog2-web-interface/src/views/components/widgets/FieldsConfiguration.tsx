@@ -25,7 +25,7 @@ import SelectedFieldsList from 'views/components/widgets/SelectedFieldsList';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
-const FIELD_LIST_LIMIT = 20;
+const FIELD_LIST_LIMIT = 1;
 
 const ToggleButton = styled(Button)`
   padding: 0;
