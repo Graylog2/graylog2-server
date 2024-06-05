@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.categories.model;
+package org.graylog2.entitygroups.model;
 
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
@@ -38,53 +38,53 @@ import java.util.function.Predicate;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public class DBCategoryService {
-    public static final String COLLECTION_NAME = "categories";
+public class DBEntityGroupService {
+    public static final String COLLECTION_NAME = "entity_group";
 
     private static final ImmutableMap<String, SearchQueryField> ALLOWED_FIELDS = ImmutableMap.<String, SearchQueryField>builder()
-            .put(Category.FIELD_CATEGORY, SearchQueryField.create(Category.FIELD_CATEGORY))
+            .put(EntityGroup.FIELD_ENTITIES, SearchQueryField.create(EntityGroup.FIELD_ENTITIES))
             .build();
 
-    private final MongoCollection<Category> collection;
-    private final MongoUtils<Category> mongoUtils;
-    private final ScopedEntityMongoUtils<Category> scopedEntityMongoUtils;
-    private final MongoPaginationHelper<Category> paginationHelper;
+    private final MongoCollection<EntityGroup> collection;
+    private final MongoUtils<EntityGroup> mongoUtils;
+    private final ScopedEntityMongoUtils<EntityGroup> scopedEntityMongoUtils;
+    private final MongoPaginationHelper<EntityGroup> paginationHelper;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
-    public DBCategoryService(MongoCollections mongoCollections,
-                             EntityScopeService entityScopeService) {
-        this.collection = mongoCollections.collection(COLLECTION_NAME, Category.class);
+    public DBEntityGroupService(MongoCollections mongoCollections,
+                                EntityScopeService entityScopeService) {
+        this.collection = mongoCollections.collection(COLLECTION_NAME, EntityGroup.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
-        this.searchQueryParser = new SearchQueryParser(Category.FIELD_CATEGORY, ALLOWED_FIELDS);
+        this.searchQueryParser = new SearchQueryParser(EntityGroup.FIELD_ENTITIES, ALLOWED_FIELDS);
 
         IndexOptions indexOptions = new IndexOptions().unique(true);
-        collection.createIndex(new BasicDBObject(Category.FIELD_CATEGORY, 1), indexOptions);
+        collection.createIndex(new BasicDBObject(EntityGroup.FIELD_ENTITIES, 1), indexOptions);
     }
 
-    public Optional<Category> get(String id) {
+    public Optional<EntityGroup> get(String id) {
         return mongoUtils.getById(id);
     }
 
-    public PaginatedList<Category> findPaginated(String query, int page, int perPage, Bson sort, Predicate<Category> filter) {
+    public PaginatedList<EntityGroup> findPaginated(String query, int page, int perPage, Bson sort, Predicate<EntityGroup> filter) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         return filter == null ?
                 paginationHelper.filter(searchQuery.toBson()).sort(sort).perPage(perPage).page(page) :
                 paginationHelper.filter(searchQuery.toBson()).sort(sort).perPage(perPage).page(page, filter);
     }
 
-    public Category save(Category category) {
-        if (category.id() != null) {
-            return scopedEntityMongoUtils.update(category);
+    public EntityGroup save(EntityGroup EntityGroup) {
+        if (EntityGroup.id() != null) {
+            return scopedEntityMongoUtils.update(EntityGroup);
         }
-        String newId = scopedEntityMongoUtils.create(category);
-        return category.toBuilder().id(newId).build();
+        String newId = scopedEntityMongoUtils.create(EntityGroup);
+        return EntityGroup.toBuilder().id(newId).build();
     }
 
-    public Optional<Category> getByValue(String value) {
-        final Bson query = eq(Category.FIELD_CATEGORY, value);
+    public Optional<EntityGroup> getByValue(String value) {
+        final Bson query = eq(EntityGroup.FIELD_ENTITIES, value);
 
         return Optional.ofNullable(collection.find(query).first());
     }

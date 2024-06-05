@@ -14,33 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.categories.model;
+package org.graylog2.entitygroups.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.events.contentpack.entities.EntityGroupEntity;
+import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.database.entities.ScopedEntity;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
-import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
 
 @AutoValue
-@JsonDeserialize(builder = Category.Builder.class)
-public abstract class Category extends ScopedEntity {
-    public static final String FIELD_ID = "id";
-    public static final String FIELD_CATEGORY = "category";
+@JsonDeserialize(builder = EntityCategory.Builder.class)
+@JsonTypeName(EntityCategory.NAME)
+public abstract class EntityCategory extends ScopedEntity implements EntityGroup, ContentPackable<EntityGroupEntity> {
+    public static final String NAME = "category";
 
-    @ObjectId
-    @Id
-    @Nullable
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
+    public static final String FIELD_ENTITIES = "category";
 
-    @JsonProperty(FIELD_CATEGORY)
-    public abstract String category();
+    @JsonProperty(FIELD_ENTITIES)
+    public abstract Map<String, List<String>> entities();
 
     public static Builder builder() {
         return Builder.create();
@@ -51,19 +49,14 @@ public abstract class Category extends ScopedEntity {
     @AutoValue.Builder
     @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder extends AbstractBuilder<Builder> {
-        @Id
-        @ObjectId
-        @JsonProperty(FIELD_ID)
-        public abstract Builder id(String id);
+        @JsonProperty(FIELD_ENTITIES)
+        public abstract Builder entities(Map<String, List<String>> entities);
 
-        @JsonProperty(FIELD_CATEGORY)
-        public abstract Builder category(String category);
-
-        public abstract Category build();
+        public abstract EntityCategory build();
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_Category.Builder();
+            return new AutoValue_Entity_Category.Builder();
         }
     }
 }

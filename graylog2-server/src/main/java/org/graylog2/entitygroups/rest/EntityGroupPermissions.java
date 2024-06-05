@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.categories.rest;
+package org.graylog2.entitygroups.rest;
 
-public class CategoryPermissions {
-    public static final String CATEGORY_READ = "category:read";
-    public static final String CATEGORY_EDIT = "category:edit";
+public class EntityGroupPermissions {
+    public static final String ENTITY_GROUP_READ = "category:read";
+    public static final String ENTITY_GROUP_EDIT = "category:edit";
 }

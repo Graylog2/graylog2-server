@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.categories;
+package org.graylog2.entitygroups;
 
-import org.graylog2.categories.events.CategoryDeleted;
-import org.graylog2.categories.events.CategoryUpdated;
-import org.graylog2.categories.model.Category;
-import org.graylog2.categories.model.DBCategoryService;
+import org.graylog2.entitygroups.events.CategoryDeleted;
+import org.graylog2.entitygroups.events.CategoryUpdated;
+import org.graylog2.entitygroups.model.EntityGroup;
+import org.graylog2.entitygroups.model.DBEntityGroupService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.rest.models.SortOrder;
@@ -33,36 +33,36 @@ import jakarta.ws.rs.NotFoundException;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class CategoryService {
+public class EntityGroupService {
 
-    private final DBCategoryService dbCategoryService;
+    private final DBEntityGroupService dbEntityGroupService;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public CategoryService(DBCategoryService dbCategoryService, ClusterEventBus clusterEventBus) {
-        this.dbCategoryService = dbCategoryService;
+    public EntityGroupService(DBEntityGroupService dbEntityGroupService, ClusterEventBus clusterEventBus) {
+        this.dbEntityGroupService = dbEntityGroupService;
         this.clusterEventBus = clusterEventBus;
     }
 
-    public Category create(String value) {
-        Optional<Category> existingCategory = dbCategoryService.getByValue(value);
+    public EntityGroup create(String value) {
+        Optional<EntityGroup> existingCategory = dbEntityGroupService.getByValue(value);
         if (existingCategory.isPresent()) {
             throw new BadRequestException(StringUtils.f("Category '%s' already exists", value));
         }
 
-        return dbCategoryService.save(Category.builder().category(value).build());
+        return dbEntityGroupService.save(EntityGroup.builder().category(value).build());
     }
 
-    public PaginatedList<Category> findPaginated(String query, int page, int perPage, SortOrder order,
-                                                 String sortByField, Predicate<Category> filter) {
+    public PaginatedList<EntityGroup> findPaginated(String query, int page, int perPage, SortOrder order,
+                                                       String sortByField, Predicate<EntityGroup> filter) {
 
-        return dbCategoryService.findPaginated(query, page, perPage, order.toBsonSort(sortByField), filter);
+        return dbEntityGroupService.findPaginated(query, page, perPage, order.toBsonSort(sortByField), filter);
     }
 
-    public Category update(String id, String value) {
-        Category existingCategory = dbCategoryService.get(id).orElseThrow(
+    public EntityGroup update(String id, String value) {
+        EntityGroup existingEntityGroup = dbEntityGroupService.get(id).orElseThrow(
                 () -> new NotFoundException("Unable to find category to update"));
-        Optional<Category> categoryByValue = dbCategoryService.getByValue(value);
+        Optional<EntityGroup> categoryByValue = dbEntityGroupService.getByValue(value);
 
         // Confirm no status with this value already exists
         if (categoryByValue.isPresent()) {
@@ -70,22 +70,22 @@ public class CategoryService {
                 throw new BadRequestException(StringUtils.f("Category '%s' already exists", value));
             } else {
                 // The existing value is the same as the updated value so there is nothing to do
-                return existingCategory;
+                return existingEntityGroup;
             }
         }
 
-        final Category updated = dbCategoryService.save(Category.builder().id(id).category(value).build());
-        clusterEventBus.post(new CategoryUpdated(existingCategory, updated));
+        final EntityGroup updated = dbEntityGroupService.save(EntityGroup.builder().id(id).category(value).build());
+        clusterEventBus.post(new CategoryUpdated(existingEntityGroup, updated));
 
         return updated;
     }
 
     public boolean delete(String id) {
-        Category category = dbCategoryService.get(id).orElseThrow(() -> new NotFoundException("Unable to find category to delete"));
+        EntityGroup EntityGroup = dbEntityGroupService.get(id).orElseThrow(() -> new NotFoundException("Unable to find category to delete"));
 
-        boolean wasSuccess = dbCategoryService.delete(id) == 1;
+        boolean wasSuccess = dbEntityGroupService.delete(id) == 1;
         if (wasSuccess) {
-            clusterEventBus.post(new CategoryDeleted(category));
+            clusterEventBus.post(new CategoryDeleted(EntityGroup));
         }
 
         return wasSuccess;
