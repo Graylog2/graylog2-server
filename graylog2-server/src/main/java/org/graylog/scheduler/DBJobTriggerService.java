@@ -119,7 +119,7 @@ public class DBJobTriggerService {
         this.clock = clock;
         this.schedulerCapabilitiesService = schedulerCapabilitiesService;
         this.lockExpirationDuration = lockExpirationDuration;
-        this.collection = mongoCollections.get(COLLECTION_NAME, JobTriggerDto.class);
+        this.collection = mongoCollections.collection(COLLECTION_NAME, JobTriggerDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
 
         collection.createIndex(Indexes.ascending(FIELD_JOB_DEFINITION_ID));

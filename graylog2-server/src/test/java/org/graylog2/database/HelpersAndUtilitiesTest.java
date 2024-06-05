@@ -62,7 +62,7 @@ class HelpersAndUtilitiesTest {
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
         final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
-        collection = mongoCollections.get("test", TestDTO.class);
+        collection = mongoCollections.collection("test", TestDTO.class);
         utils = mongoCollections.utils(collection);
         paginationHelper = mongoCollections.paginationHelper(collection);
     }

@@ -297,6 +297,7 @@ const CollectorsAdministration = ({
             {(configAssignments.length > 0)
               && (
               <IconButton name="edit_square"
+                          title="Edit configuration"
                           onClick={() => {
                             setSelected([collectorId]);
                             setShowConfigurationModal(true);
@@ -357,7 +358,9 @@ const CollectorsAdministration = ({
     onPageChange(page, pageSize);
   };
 
-  const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => sidecarCollectorPairs.find(({ sidecar, collector }) => sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId));
+  const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => sidecarCollectorPairs.find(
+    ({ sidecar, collector }) => sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId),
+  ).filter((sidecarCollectorPair) => !!sidecarCollectorPair?.collector && !!sidecarCollectorPair?.sidecar);
 
   let formattedCollectors;
 

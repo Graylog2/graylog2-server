@@ -52,7 +52,7 @@ class MongoUtilsTest {
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
         mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
-        collection = mongoCollections.get("test", DTO.class);
+        collection = mongoCollections.collection("test", DTO.class);
         utils = mongoCollections.utils(collection);
     }
 
@@ -76,7 +76,7 @@ class MongoUtilsTest {
 
     @Test
     void testNullInsertedId() {
-        final var rawCollection = mongoCollections.get("raw_bson_test", RawBsonDocument.class);
+        final var rawCollection = mongoCollections.nonEntityCollection("raw_bson_test", RawBsonDocument.class);
         final RawBsonDocument doc = RawBsonDocument.parse("{\"name\":\"a\"}");
         assertThatThrownBy(() -> insertedId(rawCollection.insertOne(doc)))
                 .isInstanceOf(IllegalArgumentException.class)

@@ -96,6 +96,7 @@ const RotationConfig = ({ rotationStrategies, indexSetRotationStrategy, indexSet
   return (
     <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
                                              name="rotation"
+                                             label="Rotation strategy"
                                              description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
                                              selectPlaceholder="Select rotation strategy"
                                              pluginExports={PluginStore.exports('indexRotationConfig')}
@@ -119,6 +120,7 @@ const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, inde
   return (
     <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
                                              name="retention"
+                                             label="Retention strategy"
                                              description="Graylog uses a retention strategy to clean up old indices."
                                              selectPlaceholder="Select retention strategy"
                                              pluginExports={PluginStore.exports('indexRetentionConfig')}
@@ -339,7 +341,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
 
                     {selectedRetentionSegment === 'data_tiering' ? (
                       <ConfigSegment>
-                        <DataTieringConfiguration valuesPrefix="index_set_config" requireRepository={false} />
+                        <DataTieringConfiguration valuesPrefix="index_set_config" />
                       </ConfigSegment>
                     )
                       : (

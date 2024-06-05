@@ -63,7 +63,7 @@ jest.mock('views/logic/slices/widgetActions', () => ({
 }));
 
 const openActionDropdown = async () => {
-  const actionToggle = await screen.findByTestId('widgetActionDropDown');
+  const actionToggle = await screen.findByRole('button', { name: /open actions dropdown/i });
 
   fireEvent.click(actionToggle);
   await screen.findByRole('heading', { name: 'Actions' });

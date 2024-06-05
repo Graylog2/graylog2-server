@@ -14,6 +14,8 @@ then
     set_field("add_array_to_array", string_array_add(["one", "two"], ["three", "four"]));
     set_field("add_array_to_array_empty_source", string_array_add([], ["three", "four"]));
     set_field("add_array_to_array_empty_value", string_array_add(["one", "two"], []));
+    set_field("add_value_to_null_array", string_array_add($message.null_field, ["test"]));
+    set_field("add_null_to_array", string_array_add(["test"], $message.null_field));
 
     let json = parse_json(to_string($message.json_with_arrays));
         let selectedPath = select_jsonpath(json: json,

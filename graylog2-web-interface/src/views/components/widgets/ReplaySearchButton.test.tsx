@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { asElement, render } from 'wrappedTestingLibrary';
+import { asElement, render, screen } from 'wrappedTestingLibrary';
 
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -29,36 +29,36 @@ type OptionalOverrides = {
 };
 
 describe('ReplaySearchButton', () => {
-  it('renders play button', () => {
-    const { getByTitle } = render(<ReplaySearchButton />);
+  it('renders play button', async () => {
+    render(<ReplaySearchButton />);
 
-    expect(getByTitle('Replay search')).not.toBeNull();
+    await screen.findByRole('link', { name: /replay search/i });
   });
 
   describe('generates link', () => {
-    const renderWithContext = ({ query, timerange, streams }: OptionalOverrides = {}) => {
-      const { getByTitle } = render(<ReplaySearchButton queryString={query?.query_string}
-                                                        timerange={timerange}
-                                                        streams={streams} />);
+    const renderWithContext = async ({ query, timerange, streams }: OptionalOverrides = {}) => {
+      render(<ReplaySearchButton queryString={query?.query_string}
+                                 timerange={timerange}
+                                 streams={streams} />);
 
-      return asElement(getByTitle('Replay search'), HTMLAnchorElement);
+      return asElement(await screen.findByRole('link', { name: /replay search/i }), HTMLAnchorElement);
     };
 
-    it('opening in a new page', () => {
-      const button = renderWithContext();
+    it('opening in a new page', async () => {
+      const button = await renderWithContext();
 
       expect(button.target).toEqual('_blank');
       expect(button.rel).toEqual('noopener noreferrer');
     });
 
-    it('including query string', () => {
-      const button = renderWithContext({ query: createElasticsearchQueryString('_exists_:nf_version') });
+    it('including query string', async () => {
+      const button = await renderWithContext({ query: createElasticsearchQueryString('_exists_:nf_version') });
 
       expect(button.href).toContain('q=_exists_%3Anf_version');
     });
 
-    it('including timerange', () => {
-      const button = renderWithContext({
+    it('including timerange', async () => {
+      const button = await renderWithContext({
         timerange: {
           type: 'absolute',
           from: '2020-01-10T13:23:42.000Z',
@@ -69,8 +69,8 @@ describe('ReplaySearchButton', () => {
       expect(button.href).toContain('rangetype=absolute&from=2020-01-10T13%3A23%3A42.000Z&to=2020-01-10T14%3A23%3A42.000Z');
     });
 
-    it('including streams', () => {
-      const button = renderWithContext({ streams: ['stream1', 'stream2', 'someotherstream'] });
+    it('including streams', async () => {
+      const button = await renderWithContext({ streams: ['stream1', 'stream2', 'someotherstream'] });
 
       expect(button.href).toContain('streams=stream1%2Cstream2%2Csomeotherstream');
     });

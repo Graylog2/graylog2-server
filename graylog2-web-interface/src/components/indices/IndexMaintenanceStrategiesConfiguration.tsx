@@ -64,6 +64,7 @@ type Props = {
   name: string,
   description?: string,
   selectPlaceholder: string,
+  label: string,
   pluginExports: Array<{
     type: string,
     displayName: string,
@@ -179,6 +180,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
   name,
   description,
   selectPlaceholder,
+  label,
   pluginExports,
   strategies,
   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
@@ -312,7 +314,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
           <Input id="strategy-select"
                  error={errors[`${name}_strategy_class`]}
                  name={`${name}_strategy_class`}
-                 label={selectPlaceholder}>
+                 label={label}>
             <StyledSelect placeholder={selectPlaceholder}
                           options={getAvailableSelectOptions()}
                           matchProp="label"
@@ -355,6 +357,7 @@ IndexMaintenanceStrategiesConfiguration.propTypes = {
   name: PropTypes.string.isRequired,
   description: PropTypes.string,
   selectPlaceholder: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   pluginExports: PropTypes.array.isRequired,
   strategies: PropTypes.array.isRequired,
   retentionStrategiesContext: PropTypes.shape({

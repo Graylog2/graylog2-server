@@ -14,19 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import { singleton } from '../logic/singleton';
-
-export type CustomizationSetting = {
-  [key: string]: boolean | string | number,
-};
-
-export type CustomizationType = {
-  [key: string]: CustomizationSetting,
-};
-
-const defaultCustomization = {};
-
-const CustomizationContext = React.createContext<CustomizationType>(defaultCustomization);
-export default singleton('contexts.CustomizationContext', () => CustomizationContext);
+export { default as DocumentationLink } from './DocumentationLink';
+export { default as SupportSources } from './SupportSources';
