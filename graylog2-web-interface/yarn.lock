@@ -3244,10 +3244,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/plotly.js@*", "@types/plotly.js@2.29.4":
-  version "2.29.4"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.29.4.tgz#9f240007767d9b4b0b56377cfc971bc5db1ba375"
-  integrity sha512-zmhKLPGTPai9NqgWSBGRgpAQOB6lgjA16+8X48XfVHFfhqrQyPBGV43FTsa4/d0DCydhiCNd4qSKXtF+mkaT9g==
+"@types/plotly.js@*", "@types/plotly.js@2.29.5":
+  version "2.29.5"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.29.5.tgz#5a6fa275710f3e7197e6c47c4b3e9aa9c9f6630c"
+  integrity sha512-VPaCOCUTHLbtQxur7o7RqKL7/hEDtgYZcXL41o4xe9mqZ4HVxbC70j0lTsCdiVp2SI+BYsER4oPO+ck17jtnkg==
 
 "@types/prop-types@*":
   version "15.7.3"
