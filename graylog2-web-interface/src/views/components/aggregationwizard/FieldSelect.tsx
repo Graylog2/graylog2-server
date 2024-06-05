@@ -130,7 +130,7 @@ const FieldSelect = ({
     .toArray()
     .sort(sortByLabel), [activeQuery, excludedFields, fieldTypes.queryFields, isFieldQualified]);
 
-  const _onSelectAllRest = useCallback(() => onSelectAllRest(fieldOptions.map(({ value }) => value)), [fieldOptions]);
+  const _onSelectAllRest = useCallback(() => onSelectAllRest(fieldOptions.map(({ value: fieldValue }) => fieldValue)), [fieldOptions, onSelectAllRest]);
 
   const _showSelectAllRest = !!fieldOptions?.length && showSelectAllRest && typeof _onSelectAllRest === 'function';
 
@@ -182,8 +182,8 @@ FieldSelect.defaultProps = {
   selectRef: undefined,
   size: 'small',
   menuPortalTarget: undefined,
-  onSelectAll: undefined,
-  showSelectAll: false,
+  onSelectAllRest: undefined,
+  showSelectAllRest: false,
   onDeSelectAll: undefined,
   showDeSelectAll: false,
 };
