@@ -83,6 +83,9 @@ export type EventDefinition = {
     },
     search_within_ms: number,
     execute_every_ms: number,
+    use_cron_scheduling?: boolean,
+    cron_expression?: string,
+    cron_timezone?: string,
   },
   field_spec: FieldSpec,
   key_spec: string[],
@@ -99,6 +102,7 @@ export type EventDefinition = {
   updated_at: string | null,
   matched_at?: string,
   scheduler?: Scheduler,
+  schedule_description?: string,
 }
 
 export type EventDefinitionFormControlsProps = {

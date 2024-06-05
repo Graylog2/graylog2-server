@@ -87,7 +87,7 @@ public class EventProcessorEngine {
             throw new EventProcessorException("Couldn't find event processor factory for type " + definition.config().type(), true, definitionId, definition);
         }
 
-        LOG.debug("Executing event processor <{}/{}/{}>", definition.title(), definition.id(), definition.config().type());
+        LOG.info("Executing event processor <{}/{}/{}>", definition.title(), definition.id(), definition.config().type());
 
         final EventProcessor eventProcessor = factory.create(definition);
         final EventConsumer<List<EventWithContext>> eventConsumer = eventsWithContext -> emitEvents(eventProcessor, definition, eventsWithContext);

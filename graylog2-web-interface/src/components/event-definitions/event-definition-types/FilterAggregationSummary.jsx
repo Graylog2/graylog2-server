@@ -133,6 +133,9 @@ class FilterAggregationSummary extends React.Component {
       group_by: groupBy,
       series,
       conditions,
+      use_cron_scheduling: useCronScheduling,
+      cron_expression: cronExpression,
+      cron_timezone: cronTimezone,
     } = config;
 
     const conditionType = getConditionType(config);
@@ -158,8 +161,21 @@ class FilterAggregationSummary extends React.Component {
         <dd className={styles.streamList}>{this.renderStreams(effectiveStreamIds, streamIdsWithMissingPermission)}</dd>
         <dt>Search within</dt>
         <dd>{searchWithin.duration} {searchWithin.unit.toLowerCase()}</dd>
-        <dt>Execute search every</dt>
-        <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
+        <dt>Use Cron Scheduling</dt>
+        <dd>{useCronScheduling ? 'yes' : 'no'}</dd>
+        {useCronScheduling ?
+          <>
+            <dt>Cron Expression</dt>
+            <dd>{cronExpression}</dd>
+            <dt>Timezone</dt>
+            <dd>{cronTimezone}</dd>
+          </>
+          :
+          <>
+            <dt>Execute search every</dt>
+            <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
+          </>
+        }
         <dt>Enable scheduling</dt>
         <dd>{isScheduled ? 'yes' : 'no'}</dd>
         {conditionType === 'filter' && (

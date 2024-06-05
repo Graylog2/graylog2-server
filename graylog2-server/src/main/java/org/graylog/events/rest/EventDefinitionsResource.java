@@ -204,7 +204,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final List<EventDefinitionDto> eventDefinitionDtos =
                 result.delegate()
                         .stream()
-                        .map(eventDefinition -> eventDefinition.toBuilder().schedulerCtx(schedulerCtx.get(eventDefinition.id())).build())
+                        .map(eventDefinition -> eventDefinition.toBuilder().schedulerCtx(schedulerCtx.get(eventDefinition.id())).scheduleDescription(eventDefinition.config().scheduleDescription()).build())
                         .toList();
 
         return PageListResponse.create(query, definitionDtos.pagination(),
@@ -494,5 +494,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     oldEventDefinition.config().type(), updatedEventDefinition.config().type());
             throw new ForbiddenException("Condition type not changeable");
         }
+    }
+
+    private EventDefinitionDto setScheduleDescription(EventDefinitionDto dto) {
+        return dto.toBuilder().scheduleDescription(dto.config().scheduleDescription()).build();
     }
 }

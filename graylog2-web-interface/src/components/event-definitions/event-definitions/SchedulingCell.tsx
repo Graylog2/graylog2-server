@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import moment from 'moment';
 import styled, { css } from 'styled-components';
 
 import { OverlayTrigger, Icon, Timestamp } from 'components/common';
@@ -89,25 +88,18 @@ const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) =>
 );
 
 const SchedulingInfo = ({
-  executeEveryMs,
-  searchWithinMs,
   scheduler,
   title,
   clearNotifications,
+  scheduleDescription,
 }:{
-  executeEveryMs: number,
-  searchWithinMs: number,
   scheduler: Scheduler, title: string,
-  clearNotifications: () => void
+  clearNotifications: () => void,
+  scheduleDescription: string,
 }) => {
-  const executeEveryFormatted = moment.duration(executeEveryMs)
-    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false });
-  const searchWithinFormatted = moment.duration(searchWithinMs)
-    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
-
   return (
     <>
-      {`Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}. `}
+      {scheduleDescription}
       <OverlayTrigger trigger="click"
                       rootClose
                       placement="left"
@@ -134,18 +126,14 @@ const SchedulingCell = ({ definition } : Props) => {
 
   const {
     title,
-    config: {
-      search_within_ms: searchWithinMs,
-      execute_every_ms: executeEveryMs,
-    },
     scheduler,
+    schedule_description: scheduleDescription,
   } = definition;
 
   return (
-    <SchedulingInfo executeEveryMs={executeEveryMs}
-                    searchWithinMs={searchWithinMs}
-                    title={title}
+    <SchedulingInfo title={title}
                     scheduler={scheduler}
+                    scheduleDescription={scheduleDescription}
                     clearNotifications={clearNotifications(definition)} />
   );
 };

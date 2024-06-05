@@ -16,6 +16,7 @@
  */
 package org.graylog.scheduler.schedule;
 
+import com.cronutils.descriptor.CronDescriptor;
 import com.cronutils.model.Cron;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.model.time.ExecutionTime;
@@ -34,6 +35,7 @@ import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -56,7 +58,11 @@ public abstract class CronJobSchedule implements JobSchedule {
     @JsonProperty(value = FIELD_TIMEZONE)
     abstract Optional<String> timezone();
 
-    private static CronParser newCronParser() {
+    public static CronDescriptor newCronDescriptor() {
+        return CronDescriptor.instance(Locale.ENGLISH);
+    }
+
+    public static CronParser newCronParser() {
         return new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
     }
 
@@ -65,16 +71,15 @@ public abstract class CronJobSchedule implements JobSchedule {
         final Cron cron = newCronParser().parse(cronExpression());
         final ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
-        ZonedDateTime zdt = getZonedDateTime(clock);
+        ZonedDateTime zdt = getZonedDateTime(previousExecutionTime == null ? clock.nowUTC() : previousExecutionTime);
 
         return executionTime
                 .nextExecution(zdt)
                 .map(this::toDateTime);
     }
 
-    private ZonedDateTime getZonedDateTime(JobSchedulerClock clock) {
-        final DateTime now = clock.nowUTC();
-        Instant instant = Instant.ofEpochMilli(now.getMillis());
+    private ZonedDateTime getZonedDateTime(DateTime dt) {
+        Instant instant = Instant.ofEpochMilli(dt.getMillis());
         ZoneId zoneId = ZoneId.of(timezone().orElse(DEFAULT_TIMEZONE), ZoneId.SHORT_IDS);
         return ZonedDateTime.ofInstant(instant, zoneId);
     }
