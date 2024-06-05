@@ -100,6 +100,8 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFields;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
@@ -221,6 +223,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SetFields.NAME, new SetFields());
         functions.put(RenameField.NAME, new RenameField());
         functions.put(RemoveField.NAME, new RemoveField());
+        functions.put(RemoveSingleField.NAME, new RemoveSingleField());
+        functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
         functions.put(NormalizeFields.NAME, new NormalizeFields());
 
         functions.put(DropMessage.NAME, new DropMessage());
@@ -1388,7 +1392,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("one_entropy")).isEqualTo(1.0D);
     }
 
-    @   Test
+    @Test
     public void notExpressionTypeCheck() {
         try {
             Rule rule = parser.parseRule(ruleForTest(), true);
@@ -1450,5 +1454,54 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("k4")).isEqualTo("v4");
         assertThat(message.getField("k_5")).isEqualTo("v_5");
         assertThat(message.getField("k_6")).isEqualTo("will be added with clean_fields param");
+    }
+
+    @Test
+    public void removeField() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("f2")).isNull();
+        assertThat(message.getField("f3")).isNull();
+        assertThat(message.getField("i1")).isEqualTo("i1");
+        assertThat(message.getField("i2")).isEqualTo("i2");
+    }
+
+    @Test
+    public void removeSingleField() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("a.1")).isNull();
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("a_1")).isEqualTo("a_1");
+        assertThat(message.getField("f2")).isEqualTo("f2");
+    }
+
+    @Test
+    public void removeFieldsByName() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("a.1")).isNull();
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("a_1")).isEqualTo("a_1");
+        assertThat(message.getField("f2")).isEqualTo("f2");
+    }
+
+    @Test
+    public void removeFieldsByRegex() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("a.1")).isNull();
+        assertThat(message.getField("a_1")).isNull();
+        assertThat(message.getField("f2")).isNull();
+        assertThat(message.getField("f1")).isEqualTo("f1");
     }
 }

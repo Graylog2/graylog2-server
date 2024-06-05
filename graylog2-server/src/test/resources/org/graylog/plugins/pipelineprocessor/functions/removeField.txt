@@ -1,0 +1,12 @@
+rule "remove_field"
+when true
+then
+  set_field(field: "f1", value: "f1");
+  set_field(field: "f2", value: "f2");
+  set_field(field: "f3", value: "f3");
+  set_field(field: "i1", value: "i1");
+  set_field(field: "i2", value: "i2");
+
+  remove_field(field:"f1");
+  remove_field(field:"f.");
+end
