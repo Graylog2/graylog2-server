@@ -203,6 +203,8 @@ public class OpensearchSecurityConfiguration {
                             .map(Object::toString)
                             .collect(Collectors.joining(", "));
                     LOG.info("Opensearch {} has following alternative names: {}", certificateType, alternativeNames);
+                    LOG.info("Opensearch {} has following serial number: {}", certificateType, ((X509Certificate) cert).getSerialNumber());
+                    LOG.info("Opensearch {} has following validity: {} - {}", certificateType, ((X509Certificate) cert).getNotBefore(), ((X509Certificate) cert).getNotAfter());
                 }
             }
         }
