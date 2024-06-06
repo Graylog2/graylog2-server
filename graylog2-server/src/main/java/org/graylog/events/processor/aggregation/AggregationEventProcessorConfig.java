@@ -41,6 +41,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.CronJobSchedule;
+import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -129,8 +130,8 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         final String searchWithinStr = DurationFormatUtils.formatDurationWords(searchWithinDuration.toMillis(), true, true);
         final String executeEveryStr;
         if (useCronScheduling()) {
-            Cron cron = CronJobSchedule.newCronParser().parse(cronExpression());
-            executeEveryStr = CronJobSchedule.newCronDescriptor().describe(cron);
+            Cron cron = CronUtils.getParser().parse(cronExpression());
+            executeEveryStr = CronUtils.getDescriptor().describe(cron);
         } else {
             Duration executeEveryDuration = Duration.ofMillis(executeEveryMs());
             executeEveryStr = DurationFormatUtils.formatDurationWords(executeEveryDuration.toMillis(), true, true);
@@ -286,7 +287,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
         if (useCronScheduling()) {
             try {
-                final Cron cron = CronJobSchedule.newCronParser().parse(cronExpression());
+                final Cron cron = CronUtils.getParser().parse(cronExpression());
                 cron.validate();
             } catch (Exception e) {
                 validationResult.addError(FIELD_CRON_EXPRESSION, e.getMessage());

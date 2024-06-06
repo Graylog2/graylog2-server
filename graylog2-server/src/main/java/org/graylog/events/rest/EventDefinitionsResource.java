@@ -63,6 +63,7 @@ import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog.events.processor.EventResolver;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -204,7 +205,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final List<EventDefinitionDto> eventDefinitionDtos =
                 result.delegate()
                         .stream()
-                        .map(eventDefinition -> eventDefinition.toBuilder().schedulerCtx(schedulerCtx.get(eventDefinition.id())).scheduleDescription(eventDefinition.config().scheduleDescription()).build())
+                        .map(eventDefinition -> eventDefinition.toBuilder()
+                                .schedulerCtx(schedulerCtx.get(eventDefinition.id()))
+                                .scheduleDescription(eventDefinition.config().scheduleDescription()).build())
                         .toList();
 
         return PageListResponse.create(query, definitionDtos.pagination(),
@@ -469,6 +472,16 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         return validationResult;
     }
 
+    @POST
+    @Path("/validate_cron")
+    @NoAuditEvent("Validation only")
+    @ApiOperation(value = "Validate a cron expression")
+    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
+    public CronValidationResponse validate(@ApiParam(name = "JSON body", required = true)
+                                           @Valid @NotNull CronValidationRequest toValidate) {
+        return CronUtils.validateExpression(toValidate);
+    }
+
     private void checkEventDefinitionPermissions(EventDefinitionDto dto, String action) {
         final Set<String> missingPermissions = dto.requiredPermissions().stream()
                 .filter(permission -> !isPermitted(permission))
@@ -494,9 +507,5 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     oldEventDefinition.config().type(), updatedEventDefinition.config().type());
             throw new ForbiddenException("Condition type not changeable");
         }
-    }
-
-    private EventDefinitionDto setScheduleDescription(EventDefinitionDto dto) {
-        return dto.toBuilder().scheduleDescription(dto.config().scheduleDescription()).build();
     }
 }

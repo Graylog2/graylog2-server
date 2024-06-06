@@ -16,11 +16,8 @@
  */
 package org.graylog.scheduler.schedule;
 
-import com.cronutils.descriptor.CronDescriptor;
 import com.cronutils.model.Cron;
-import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.model.time.ExecutionTime;
-import com.cronutils.parser.CronParser;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -35,11 +32,8 @@ import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
-
-import static com.cronutils.model.CronType.QUARTZ;
 
 @AutoValue
 @JsonTypeName(CronJobSchedule.TYPE_NAME)
@@ -58,17 +52,9 @@ public abstract class CronJobSchedule implements JobSchedule {
     @JsonProperty(value = FIELD_TIMEZONE)
     abstract Optional<String> timezone();
 
-    public static CronDescriptor newCronDescriptor() {
-        return CronDescriptor.instance(Locale.ENGLISH);
-    }
-
-    public static CronParser newCronParser() {
-        return new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
-    }
-
     @Override
     public Optional<DateTime> calculateNextTime(DateTime previousExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
-        final Cron cron = newCronParser().parse(cronExpression());
+        final Cron cron = CronUtils.getParser().parse(cronExpression());
         final ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
         ZonedDateTime zdt = getZonedDateTime(previousExecutionTime == null ? clock.nowUTC() : previousExecutionTime);
@@ -116,17 +102,10 @@ public abstract class CronJobSchedule implements JobSchedule {
             // Make sure the type name is correct!
             type(TYPE_NAME);
             final CronJobSchedule schedule = autoBuild();
-            validateCronExpression(schedule);
+            // make sure that we don't allow any invalid cron expression, as we are accepting plain string that could
+            // contain anything
+            CronUtils.validateExpression(schedule.cronExpression());
             return schedule;
-        }
-
-        /**
-         * make sure that we don't allow any invalid cron expression, as we are accepting plain string
-         * that could contain anything
-         */
-        private void validateCronExpression(CronJobSchedule schedule) {
-            final Cron cron = newCronParser().parse(schedule.cronExpression());
-            cron.validate();
         }
     }
 }

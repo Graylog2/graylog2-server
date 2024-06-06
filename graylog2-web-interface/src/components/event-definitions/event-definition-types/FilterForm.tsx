@@ -513,6 +513,7 @@ const FilterForm = ({
                  )}
                  value={defaultTo(currentConfig.cron_expression, '')}
                  onChange={handleCronExpressionChange} />
+            <ControlLabel >Time Zone</ControlLabel>
             <TimezoneSelect value={defaultTo(currentConfig.cron_timezone, userTimezone)}
                             name="cron_timezone"
                             clearable={false}
