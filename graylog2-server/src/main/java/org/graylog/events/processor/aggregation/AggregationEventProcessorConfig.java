@@ -287,8 +287,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
         if (useCronScheduling()) {
             try {
-                final Cron cron = CronUtils.getParser().parse(cronExpression());
-                cron.validate();
+                CronUtils.validateExpression(cronExpression());
             } catch (Exception e) {
                 validationResult.addError(FIELD_CRON_EXPRESSION, e.getMessage());
             }
@@ -349,6 +348,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                 .conditions(conditions().orElse(null))
                 .executeEveryMs(executeEveryMs())
                 .searchWithinMs(searchWithinMs())
+                .useCronScheduling(useCronScheduling())
+                .cronExpression(cronExpression())
+                .cronTimezone(cronTimezone())
                 .eventLimit(eventLimit())
                 .build();
     }
