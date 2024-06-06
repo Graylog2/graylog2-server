@@ -36,11 +36,15 @@ import java.util.List;
 import java.util.Map;
 
 import static org.graylog2.entitygroups.model.EntityGroup.FIELD_ENTITIES;
+import static org.graylog2.entitygroups.model.EntityGroup.FIELD_NAME;
 
 @JsonAutoDetect
 @AutoValue
 @JsonDeserialize(builder = EntityGroupEntity.Builder.class)
 public abstract class EntityGroupEntity extends ScopedContentPackEntity implements NativeEntityConverter<EntityGroup> {
+    @JsonProperty(FIELD_NAME)
+    public abstract String name();
+
     @JsonProperty(FIELD_ENTITIES)
     public abstract Map<EntityType, List<String>> entities();
 
@@ -53,6 +57,9 @@ public abstract class EntityGroupEntity extends ScopedContentPackEntity implemen
     @AutoValue.Builder
     @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder extends ScopedContentPackEntity.AbstractBuilder<Builder> {
+        @JsonProperty(FIELD_NAME)
+        public abstract Builder name(String name);
+
         @JsonProperty(FIELD_ENTITIES)
         public abstract Builder entities(Map<EntityType, List<String>> entities);
 
