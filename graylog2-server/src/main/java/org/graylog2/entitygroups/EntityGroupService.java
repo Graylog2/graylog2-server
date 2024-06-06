@@ -21,7 +21,6 @@ import org.graylog2.entitygroups.model.DBEntityGroupService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.entitygroups.model.EntityType;
 import org.graylog2.rest.models.SortOrder;
-import org.graylog2.shared.utilities.StringUtils;
 
 import jakarta.inject.Inject;
 

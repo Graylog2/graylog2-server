@@ -1,5 +1,0 @@
-type = "a"
-message = "Added categories feature."
-
-issues = ["graylog-plugin-enterprise#7385"]
-pulls = ["19552", "graylog-plugin-enterprise#7459"]
