@@ -46,6 +46,7 @@ import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -70,6 +71,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.not;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV,
                                    additionalConfigurationParameters = {
@@ -192,6 +194,7 @@ public class DatanodeProvisioningIT {
                 .auth().basic(basicAuth.username, basicAuth.password)
                 .delete("/startOver")
                 .then()
+                .log().ifStatusCodeMatches(Matchers.not(not(HttpStatus.SC_NO_CONTENT)))
                 .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 

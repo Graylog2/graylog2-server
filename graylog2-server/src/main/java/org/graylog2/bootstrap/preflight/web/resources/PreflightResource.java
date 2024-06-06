@@ -197,7 +197,9 @@ public class PreflightResource {
     public void startOver() {
         caService.startOver();
         clusterConfigService.remove(RenewalPolicy.class);
-        nodeService.allActive().values().forEach(this::stopNode);
+        nodeService.allActive().values().stream()
+                .filter(n -> n.getDataNodeStatus() == DataNodeStatus.AVAILABLE)
+                .forEach(this::stopNode);
     }
 
     private void stopNode(DataNodeDto node) {
