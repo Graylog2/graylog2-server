@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -67,8 +68,8 @@ class CronJobScheduleTest {
     @Test
     void testCalculateNextTime() {
         final long midnight01Jan2020Millis = 1577836800000L;
-        final DateTime midnight01Jan2020 = new DateTime(midnight01Jan2020Millis);
-        final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now());
+        final DateTime midnight01Jan2020 = new DateTime(midnight01Jan2020Millis, DateTimeZone.UTC);
+        final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         // Every hour between 0800 and 1700.
         CronJobSchedule cronJobSchedule = CronJobSchedule.builder().cronExpression("0 0 8-17 1/1 * ? *").build();
         Optional<DateTime> next = cronJobSchedule.calculateNextTime(midnight01Jan2020, null, clock);
@@ -80,6 +81,5 @@ class CronJobScheduleTest {
         next = cronJobSchedule.calculateNextTime(midnight01Jan2020, null, clock);
         assertThat(next).isPresent();
         assertThat(next.get().getMillis()).isEqualTo(midnight01Jan2020Millis + (24 * 3600000));
-
     }
 }
