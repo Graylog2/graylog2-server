@@ -20,7 +20,7 @@ import useParams from 'routing/useParams';
 import Routes from 'routing/Routes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { LinkContainer } from 'components/common/router';
-import { Button, Col, Row } from 'components/bootstrap';
+import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { IndicesPageNavigation } from 'components/indices';
 import TemplateDetails from 'components/indices/IndexSetTemplates/TemplateDetails';
 import useTemplate from 'components/indices/IndexSetTemplates/hooks/useTemplate';
@@ -37,9 +37,14 @@ const IndexSetTemplatePage = () => {
       <IndicesPageNavigation />
       <PageHeader title={title}
                   actions={(
-                    <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW}>
-                      <Button>Overview</Button>
-                    </LinkContainer>
+                    <ButtonToolbar>
+                      <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(templateId)}>
+                        <Button bsStyle="success">Edit</Button>
+                      </LinkContainer>
+                      <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW}>
+                        <Button>Overview</Button>
+                      </LinkContainer>
+                    </ButtonToolbar>
                   )}>
         <span>
           {description}

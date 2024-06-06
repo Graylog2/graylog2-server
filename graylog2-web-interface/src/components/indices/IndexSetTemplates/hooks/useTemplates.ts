@@ -49,7 +49,7 @@ const fetchIndexSetTemplates = async (searchParams: SearchParams) => {
     }));
 };
 
-const useTemplates = (searchParams: SearchParams, { enabled }): {
+const useTemplates = (searchParams: SearchParams, { enabled } = { enabled: true }): {
   data: {
     list: Readonly<Array<IndexSetTemplate>>,
     pagination: { total: number },

@@ -37,6 +37,8 @@ type LabelProps = {
   value: number,
 }
 
+const PERCENTAGE_SPACING_THRESHOLD = 20;
+
 const VisualisationWrapper = styled.div(({ theme }) => css`
   padding-left: ${theme.spacings.md};
   padding-right: ${theme.spacings.md};
@@ -102,7 +104,7 @@ const StyledTooltip = styled(Tooltip)(({ value }) => css`
   position: absolute;
   top: 0;
   
-  ${value > 20
+  ${value > PERCENTAGE_SPACING_THRESHOLD
     ? `
   right: ${100 - value}%;
 
@@ -159,14 +161,14 @@ const DataTieringVisualisation = ({ archiveData, minDays, maxDays, minDaysInHot,
             minDaysInHotPercentage === minDaysPercentage ? (
               <StyledTooltip placement="bottom"
                              id="min-days-in-hot-and-storage"
-                             arrowOffsetLeft={minDaysInHotPercentage <= 20 ? '10px' : '100%'}
+                             arrowOffsetLeft={minDaysInHotPercentage <= PERCENTAGE_SPACING_THRESHOLD ? '10px' : '100%'}
                              value={minDaysInHotPercentage}>
                 Min. # of days in Hot Tier and storage
               </StyledTooltip>
             ) : (
               <StyledTooltip placement="bottom"
                              id="min-days-in-hot"
-                             arrowOffsetLeft={minDaysInHotPercentage <= 20 ? '10px' : '100%'}
+                             arrowOffsetLeft={minDaysInHotPercentage <= PERCENTAGE_SPACING_THRESHOLD ? '10px' : '100%'}
                              value={minDaysInHotPercentage}>
                 Min. # of days in Hot Tier
               </StyledTooltip>
@@ -175,7 +177,7 @@ const DataTieringVisualisation = ({ archiveData, minDays, maxDays, minDaysInHot,
           {minDaysPercentage > 0 && showMinDaysTooltip && (
             <StyledTooltip placement="bottom"
                            id="min-days-in-storage"
-                           arrowOffsetLeft={minDaysPercentage <= 20 ? '10px' : '100%'}
+                           arrowOffsetLeft={minDaysPercentage <= PERCENTAGE_SPACING_THRESHOLD ? '10px' : '100%'}
                            value={minDaysPercentage}>
               Min. # of days in storage
             </StyledTooltip>

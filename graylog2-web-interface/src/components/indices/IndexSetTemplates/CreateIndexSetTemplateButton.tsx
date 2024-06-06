@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useMemo } from 'react';
+import * as React from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';

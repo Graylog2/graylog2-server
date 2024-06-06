@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import * as React from 'react';
+import { useEffect } from 'react';
 
 import AppConfig from 'util/AppConfig';
 import { Spinner } from 'components/common';
@@ -32,7 +33,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
   showSelectTemplateModal: boolean,
-  setShowSelectTemplateModal: (boolean) => void
+  setShowSelectTemplateModal: (value: boolean) => void
 }
 
 const CreateIndexSet = ({

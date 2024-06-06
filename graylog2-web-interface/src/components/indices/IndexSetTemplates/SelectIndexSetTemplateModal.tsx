@@ -74,7 +74,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
       pageSize: 3,
       query: 'built_in:true',
       sort: sort,
-    }, { enabled: true },
+    },
   );
 
   const {
@@ -86,7 +86,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
       pageSize: 20,
       query: 'built_in:false',
       sort: sort,
-    }, { enabled: true },
+    },
   );
 
   const trackSelectedTemplate = () => {
