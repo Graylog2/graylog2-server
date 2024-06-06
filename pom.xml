@@ -106,7 +106,7 @@
         <byte-buddy.version>1.14.17</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.172</classgraph.version>
+        <classgraph.version>4.8.173</classgraph.version>
         <commons-codec.version>1.17.0</commons-codec.version>
         <commons-csv.version>1.11.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -117,13 +117,13 @@
         <commons-io.version>2.16.1</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.28.0</error-prone.version>
-        <freemarker.version>2.3.32</freemarker.version>
+        <freemarker.version>2.3.33</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.0</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.64.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>33.2.0-jre</guava.version>
+        <guava.version>33.2.1-jre</guava.version>
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>2.2</hamcrest.version>
@@ -542,7 +542,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.3</version>
+                    <version>3.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -698,6 +698,13 @@
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>
+                                <banDynamicVersions>
+                                    <ignores>
+                                        <ignore>org.graylog2</ignore>
+                                        <ignore>org.graylog</ignore>
+                                        <ignore>org.graylog.plugins</ignore>
+                                    </ignores>
+                                </banDynamicVersions>
                                 <requireMavenVersion>
                                     <!-- Enforce the same version we define in the maven wrapper -->
                                     <version>[3.9.6]</version>
