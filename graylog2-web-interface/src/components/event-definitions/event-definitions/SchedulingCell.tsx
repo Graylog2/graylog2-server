@@ -96,21 +96,19 @@ const SchedulingInfo = ({
   scheduler: Scheduler, title: string,
   clearNotifications: () => void,
   scheduleDescription: string,
-}) => {
-  return (
-    <>
-      {scheduleDescription}
-      <OverlayTrigger trigger="click"
-                      rootClose
-                      placement="left"
-                      title={`${title} details.`}
-                      overlay={detailsPopover(scheduler, clearNotifications)}
-                      width={500}>
-        <DetailsButton bsStyle="link"><Icon name="info" /></DetailsButton>
-      </OverlayTrigger>
-    </>
-  );
-};
+}) => (
+  <>
+    {scheduleDescription}
+    <OverlayTrigger trigger="click"
+                    rootClose
+                    placement="left"
+                    title={`${title} details.`}
+                    overlay={detailsPopover(scheduler, clearNotifications)}
+                    width={500}>
+      <DetailsButton bsStyle="link"><Icon name="info" /></DetailsButton>
+    </OverlayTrigger>
+  </>
+);
 
 const SchedulingCell = ({ definition } : Props) => {
   if (!definition?.config?.search_within_ms && !definition?.config?.execute_every_ms) {

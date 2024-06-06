@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import 'moment-duration-format';
 import get from 'lodash/get';
 import styled, { css } from 'styled-components';
