@@ -39,7 +39,7 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
-import {MultiSelect, TimeUnitInput, SearchFiltersFormControls, TimezoneSelect} from 'components/common';
+import { MultiSelect, TimeUnitInput, SearchFiltersFormControls, TimezoneSelect } from 'components/common';
 import Query from 'views/logic/queries/Query';
 import type { RelativeTimeRangeWithEnd, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
@@ -500,41 +500,44 @@ const FilterForm = ({
           )}
         </FormGroup>
 
-        {currentConfig.use_cron_scheduling ?
-          <FormGroup controlId="cron-expression" validationState={validation.errors.cron_expression ? 'error' : null}>
-          <Input id="cron-expression"
-                 name="cron_expression"
-                 label="Cron Expression"
-                 type="text"
-                 help={(
-                   <span>
-                 A Quartz cron expression to determine when the event should be run.
-               </span>
-                 )}
-                 value={defaultTo(currentConfig.cron_expression, '')}
-                 onChange={handleCronExpressionChange} />
-            <ControlLabel >Time Zone</ControlLabel>
-            <TimezoneSelect value={defaultTo(currentConfig.cron_timezone, userTimezone)}
-                            name="cron_timezone"
-                            clearable={false}
-                            onChange={handleCronTimezoneChange} />
-            {validation.errors.cron_expression && (
+        {currentConfig.use_cron_scheduling
+          ? (
+            <FormGroup controlId="cron-expression" validationState={validation.errors.cron_expression ? 'error' : null}>
+              <Input id="cron-expression"
+                     name="cron_expression"
+                     label="Cron Expression"
+                     type="text"
+                     help={(
+                       <span>
+                         A Quartz cron expression to determine when the event should be run.
+                       </span>
+                   )}
+                     value={defaultTo(currentConfig.cron_expression, '')}
+                     onChange={handleCronExpressionChange} />
+              <ControlLabel>Time Zone</ControlLabel>
+              <TimezoneSelect value={defaultTo(currentConfig.cron_timezone, userTimezone)}
+                              name="cron_timezone"
+                              clearable={false}
+                              onChange={handleCronTimezoneChange} />
+              {validation.errors.cron_expression && (
               <HelpBlock>{get(validation, 'errors.cron_expression[0]')}</HelpBlock>
-            )}
-          </FormGroup> :
-        <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
-          <TimeUnitInput label="Execute search every"
-                         update={handleTimeRangeChange('execute_every_ms')}
-                         value={executeEveryMsDuration}
-                         unit={executeEveryMsUnit}
-                         units={TIME_UNITS}
-                         clearable
-                         required />
-          {validation.errors.execute_every_ms && (
-          <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
+              )}
+            </FormGroup>
+          )
+          : (
+            <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
+              <TimeUnitInput label="Execute search every"
+                             update={handleTimeRangeChange('execute_every_ms')}
+                             value={executeEveryMsDuration}
+                             unit={executeEveryMsUnit}
+                             units={TIME_UNITS}
+                             clearable
+                             required />
+              {validation.errors.execute_every_ms && (
+              <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
+              )}
+            </FormGroup>
           )}
-        </FormGroup>
-        }
         <Input id="schedule-checkbox"
                type="checkbox"
                name="_is_scheduled"

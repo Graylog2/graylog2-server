@@ -163,19 +163,21 @@ class FilterAggregationSummary extends React.Component {
         <dd>{searchWithin.duration} {searchWithin.unit.toLowerCase()}</dd>
         <dt>Use Cron Scheduling</dt>
         <dd>{useCronScheduling ? 'yes' : 'no'}</dd>
-        {useCronScheduling ?
-          <>
-            <dt>Cron Expression</dt>
-            <dd>{cronExpression}</dd>
-            <dt>Timezone</dt>
-            <dd>{cronTimezone}</dd>
-          </>
-          :
-          <>
-            <dt>Execute search every</dt>
-            <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
-          </>
-        }
+        {useCronScheduling
+          ? (
+            <>
+              <dt>Cron Expression</dt>
+              <dd>{cronExpression}</dd>
+              <dt>Timezone</dt>
+              <dd>{cronTimezone}</dd>
+            </>
+          )
+          : (
+            <>
+              <dt>Execute search every</dt>
+              <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
+            </>
+          )}
         <dt>Enable scheduling</dt>
         <dd>{isScheduled ? 'yes' : 'no'}</dd>
         {conditionType === 'filter' && (
