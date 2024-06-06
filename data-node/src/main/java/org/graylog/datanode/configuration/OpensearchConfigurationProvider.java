@@ -194,4 +194,9 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private void triggerConfigurationChangedEvent() {
         eventBus.post(new OpensearchConfigurationChangeEvent(get()));
     }
+
+    @Deprecated
+    public void triggerInitialChange() {
+        triggerConfigurationChangedEvent();
+    }
 }

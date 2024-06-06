@@ -117,7 +117,9 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
      */
     @Override
     protected void startUp() {
-        onConfigurationChange(configurationProvider.get());
+        // TODO: is there a better way to inform all components that a new configuration is available right after
+        // the start? Should OpensearchConfigurationProvider be an instance of AbstractIdleService?
+        configurationProvider.triggerInitialChange();
     }
 
     @Subscribe
