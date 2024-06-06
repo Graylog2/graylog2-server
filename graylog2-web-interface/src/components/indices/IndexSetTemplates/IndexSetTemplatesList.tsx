@@ -103,7 +103,9 @@ const IndexSetTemplatesList = () => {
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
-  const templateActions = useCallback(({ id, title, built_in, default: isDefault }: IndexSetTemplate) => <TemplateActions id={id} title={title} built_in={built_in} isDefault={isDefault} />, []);
+  const templateActions = useCallback(({ id, title, built_in, default: isDefault, enabled: isEnabled }: IndexSetTemplate) => (
+    <TemplateActions id={id} title={title} built_in={built_in} isDefault={isDefault} isEnabled={isEnabled} />
+  ), []);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
