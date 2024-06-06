@@ -271,6 +271,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
       <Col md={12}>
         <Formik<IndexSetTemplateFormValues> initialValues={prepareInitialValues()}
                                             onSubmit={handleSubmit}
+                                            enableReinitialize
                                             validate={(values) => validate(values, selectedRetentionSegment === 'legacy')}
                                             validateOnChange>
           {({ isSubmitting, isValid, isValidating, setFieldValue, values }) => (
