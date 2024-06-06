@@ -16,21 +16,15 @@
  */
 package org.graylog.security.certutil.csr;
 
-import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
+import java.security.KeyStore;
 
-import java.security.PrivateKey;
+public interface KeystoreInformation {
 
-public class InMemoryPrivateKeyStorage implements PrivateKeyEncryptedStorage {
+    KeyStore loadKeystore() throws Exception;
 
-    private PrivateKey privateKey;
+    char[] password();
 
-    @Override
-    public void writeEncryptedKey(char[] password, PrivateKey privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    @Override
-    public PrivateKey readEncryptedKey(char[] password) {
-        return privateKey;
+    default String passwordAsString() {
+        return new String(password());
     }
 }
