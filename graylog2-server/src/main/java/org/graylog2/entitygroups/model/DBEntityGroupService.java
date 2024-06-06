@@ -19,6 +19,8 @@ package org.graylog2.entitygroups.model;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Collation;
+import com.mongodb.client.model.CollationStrength;
 import com.mongodb.client.model.IndexOptions;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollections;
@@ -33,16 +35,20 @@ import org.graylog2.search.SearchQueryParser;
 
 import jakarta.inject.Inject;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.exists;
+import static com.mongodb.client.model.Filters.in;
 
 public class DBEntityGroupService {
-    public static final String COLLECTION_NAME = "entity_group";
+    public static final String COLLECTION_NAME = "entity_groups";
 
     private static final ImmutableMap<String, SearchQueryField> ALLOWED_FIELDS = ImmutableMap.<String, SearchQueryField>builder()
-            .put(EntityGroup.FIELD_ENTITIES, SearchQueryField.create(EntityGroup.FIELD_ENTITIES))
+            .put(EntityGroup.FIELD_NAME, SearchQueryField.create(EntityGroup.FIELD_NAME))
             .build();
 
     private final MongoCollection<EntityGroup> collection;
@@ -60,8 +66,10 @@ public class DBEntityGroupService {
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.searchQueryParser = new SearchQueryParser(EntityGroup.FIELD_ENTITIES, ALLOWED_FIELDS);
 
-        IndexOptions indexOptions = new IndexOptions().unique(true);
-        collection.createIndex(new BasicDBObject(EntityGroup.FIELD_ENTITIES, 1), indexOptions);
+        final IndexOptions caseInsensitiveOptions = new IndexOptions()
+                .collation(Collation.builder().locale("en").collationStrength(CollationStrength.SECONDARY).build())
+                .unique(true);
+        collection.createIndex(new BasicDBObject(EntityGroup.FIELD_NAME, 1), caseInsensitiveOptions);
     }
 
     public Optional<EntityGroup> get(String id) {
@@ -83,13 +91,25 @@ public class DBEntityGroupService {
         return EntityGroup.toBuilder().id(newId).build();
     }
 
-    public Optional<EntityGroup> getByValue(String value) {
-        final Bson query = eq(EntityGroup.FIELD_ENTITIES, value);
+    public Optional<EntityGroup> getByName(String name) {
+        final Bson query = eq(EntityGroup.FIELD_NAME, name);
 
         return Optional.ofNullable(collection.find(query).first());
     }
 
+    public List<EntityGroup> getAllForEntity(EntityType type, String entityId) {
+        final Bson query = and(
+                exists(typeField(type)),
+                in(typeField(type), entityId)
+        );
+        return MongoUtils.stream(collection.find(query)).toList();
+    }
+
     public long delete(String id) {
         return collection.deleteOne(MongoUtils.idEq(id)).getDeletedCount();
+    }
+
+    private String typeField(EntityType type) {
+        return EntityGroup.FIELD_ENTITIES + "." + type.getName();
     }
 }

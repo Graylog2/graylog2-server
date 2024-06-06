@@ -16,78 +16,66 @@
  */
 package org.graylog2.entitygroups;
 
-import org.graylog2.entitygroups.events.CategoryDeleted;
-import org.graylog2.entitygroups.events.CategoryUpdated;
 import org.graylog2.entitygroups.model.EntityGroup;
 import org.graylog2.entitygroups.model.DBEntityGroupService;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.events.ClusterEventBus;
+import org.graylog2.entitygroups.model.EntityType;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.shared.utilities.StringUtils;
 
 import jakarta.inject.Inject;
 
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 public class EntityGroupService {
-
     private final DBEntityGroupService dbEntityGroupService;
-    private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public EntityGroupService(DBEntityGroupService dbEntityGroupService, ClusterEventBus clusterEventBus) {
+    public EntityGroupService(DBEntityGroupService dbEntityGroupService) {
         this.dbEntityGroupService = dbEntityGroupService;
-        this.clusterEventBus = clusterEventBus;
-    }
-
-    public EntityGroup create(String value) {
-        Optional<EntityGroup> existingCategory = dbEntityGroupService.getByValue(value);
-        if (existingCategory.isPresent()) {
-            throw new BadRequestException(StringUtils.f("Category '%s' already exists", value));
-        }
-
-        return dbEntityGroupService.save(EntityGroup.builder().category(value).build());
     }
 
     public PaginatedList<EntityGroup> findPaginated(String query, int page, int perPage, SortOrder order,
-                                                       String sortByField, Predicate<EntityGroup> filter) {
+                                                    String sortByField, Predicate<EntityGroup> filter) {
 
         return dbEntityGroupService.findPaginated(query, page, perPage, order.toBsonSort(sortByField), filter);
     }
 
-    public EntityGroup update(String id, String value) {
-        EntityGroup existingEntityGroup = dbEntityGroupService.get(id).orElseThrow(
-                () -> new NotFoundException("Unable to find category to update"));
-        Optional<EntityGroup> categoryByValue = dbEntityGroupService.getByValue(value);
-
-        // Confirm no status with this value already exists
-        if (categoryByValue.isPresent()) {
-            if (!id.equals(categoryByValue.get().id())) {
-                throw new BadRequestException(StringUtils.f("Category '%s' already exists", value));
-            } else {
-                // The existing value is the same as the updated value so there is nothing to do
-                return existingEntityGroup;
-            }
-        }
-
-        final EntityGroup updated = dbEntityGroupService.save(EntityGroup.builder().id(id).category(value).build());
-        clusterEventBus.post(new CategoryUpdated(existingEntityGroup, updated));
-
-        return updated;
+    public Optional<EntityGroup> getByName(String groupName) {
+        return dbEntityGroupService.getByName(groupName);
     }
 
-    public boolean delete(String id) {
-        EntityGroup EntityGroup = dbEntityGroupService.get(id).orElseThrow(() -> new NotFoundException("Unable to find category to delete"));
+    public List<EntityGroup> getAllForEntity(EntityType type, String entityId) {
+        return dbEntityGroupService.getAllForEntity(type, entityId);
+    }
 
-        boolean wasSuccess = dbEntityGroupService.delete(id) == 1;
-        if (wasSuccess) {
-            clusterEventBus.post(new CategoryDeleted(EntityGroup));
+    public EntityGroup create(EntityGroup group) {
+        return dbEntityGroupService.save(group);
+    }
+
+    public EntityGroup update(String id, EntityGroup group) {
+        if (dbEntityGroupService.get(id).isEmpty()) {
+            throw new NotFoundException("Unable to find entity group to update");
         }
+        return dbEntityGroupService.save(group);
 
-        return wasSuccess;
+    }
+
+    public EntityGroup addEntityToGroup(String groupId, EntityType type, String entityId) {
+        final EntityGroup group = requireEntityGroup(groupId);
+        return dbEntityGroupService.save(group.addEntity(type, entityId));
+    }
+
+    public long delete(String id) {
+        return dbEntityGroupService.delete(id);
+    }
+
+    public EntityGroup requireEntityGroup(String id) {
+        return dbEntityGroupService.get(id)
+                .orElseThrow(() -> new IllegalArgumentException("Unable to find entity group to update"));
     }
 }
