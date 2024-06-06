@@ -28,7 +28,6 @@ const dayFields = ['index_lifetime_max', 'index_lifetime_min', 'index_hot_lifeti
 const hotWarmOnlyFormFields = ['index_hot_lifetime_min', 'warm_tier_enabled', 'warm_tier_repository_name'];
 
 const DATA_TIERING_HOT_ONLY_DEFAULTS = {
-  archive_before_deletion: false,
   index_lifetime_max: 40,
   index_lifetime_min: 30,
 };
