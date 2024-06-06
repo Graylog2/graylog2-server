@@ -57,7 +57,7 @@ public abstract class CronJobSchedule implements JobSchedule {
         final Cron cron = CronUtils.getParser().parse(cronExpression());
         final ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
-        ZonedDateTime zdt = getZonedDateTime(previousExecutionTime == null ? clock.nowUTC() : previousExecutionTime);
+        ZonedDateTime zdt = getZonedDateTime(lastNextTime == null ? clock.nowUTC() : lastNextTime);
 
         return executionTime
                 .nextExecution(zdt)
