@@ -35,7 +35,6 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Singleton
 public class IndexSetTemplateProvider implements Provider<List<IndexSetTemplate>> {
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetTemplateProvider.class);
-    private static final String CLOUD_TEMPLATE_RESOURCE = "cloud_templates.json";
     private static final String ON_PREM_TEMPLATE_RESOURCE = "on_prem_templates.json";
     protected final ObjectMapper objectMapper;
     private List<IndexSetTemplate> templates;
@@ -43,12 +42,15 @@ public class IndexSetTemplateProvider implements Provider<List<IndexSetTemplate>
     @Inject
     IndexSetTemplateProvider(ObjectMapper objectMapper, Configuration configuration) {
         this.objectMapper = objectMapper;
-        String resourceName = configuration.isCloud() ? CLOUD_TEMPLATE_RESOURCE : ON_PREM_TEMPLATE_RESOURCE;
-        try {
-            templates = objectMapper.readerForListOf(IndexSetTemplate.class).readValue(getResourceUrl(resourceName));
-        } catch (IOException e) {
-            LOG.error("Error reading index set templates from {}", resourceName, e);
+        if (configuration.isCloud()) {
             templates = Collections.emptyList();
+        }else{
+            try {
+                templates = objectMapper.readerForListOf(IndexSetTemplate.class).readValue(getResourceUrl(ON_PREM_TEMPLATE_RESOURCE));
+            } catch (IOException e) {
+                LOG.error("Error reading index set templates from {}", ON_PREM_TEMPLATE_RESOURCE, e);
+                templates = Collections.emptyList();
+            }
         }
     }
 
