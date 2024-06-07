@@ -30,9 +30,10 @@ type Props = {
   title: string,
   built_in: boolean,
   isDefault: boolean,
+  isEnabled: boolean
 }
 
-const TemplateActions = ({ id, title, built_in, isDefault } : Props) => {
+const TemplateActions = ({ id, title, built_in, isDefault, isEnabled } : Props) => {
   const { deselectEntity } = useSelectedEntities();
   const { deleteTemplate, setAsDefault } = useTemplateMutation();
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
@@ -58,7 +59,7 @@ const TemplateActions = ({ id, title, built_in, isDefault } : Props) => {
     });
   };
 
-  if (built_in) {
+  if (built_in || !isEnabled) {
     return null;
   }
 
@@ -99,6 +100,7 @@ TemplateActions.propTypes = {
   title: PropTypes.string.isRequired,
   built_in: PropTypes.bool.isRequired,
   isDefault: PropTypes.bool.isRequired,
+  isEnabled: PropTypes.bool.isRequired,
 };
 
 export default TemplateActions;

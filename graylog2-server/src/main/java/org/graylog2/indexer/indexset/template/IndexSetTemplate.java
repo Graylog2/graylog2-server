@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indexset.template;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -30,7 +31,8 @@ public record IndexSetTemplate(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @Objec
                                @JsonProperty(TITLE_FIELD_NAME) @Nonnull String title,
                                @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
                                @JsonProperty(BUILT_IN_FIELD_NAME) boolean isBuiltIn,
-                               @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetTemplateConfig indexSetConfig) {
+                               @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetTemplateConfig indexSetConfig)
+        implements MongoEntity {
 
     public static final String ID_FIELD_NAME = "id";
     public static final String TITLE_FIELD_NAME = "title";

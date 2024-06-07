@@ -27,7 +27,8 @@ const customColumnRenderers: ColumnRenderers<IndexSetTemplate> = {
       renderCell: (title: string, template: IndexSetTemplate) => (
         <TitleCell title={title}
                    id={template.id}
-                   isDefault={template.default} />
+                   isDefault={template.default}
+                   isEnabled={template.enabled} />
       ),
     },
     built_in: {
