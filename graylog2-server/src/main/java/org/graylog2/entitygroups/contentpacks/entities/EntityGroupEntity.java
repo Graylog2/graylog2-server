@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
@@ -33,6 +34,7 @@ import org.graylog2.entitygroups.model.EntityGroup;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.graylog2.entitygroups.model.EntityGroup.FIELD_ENTITIES;
 import static org.graylog2.entitygroups.model.EntityGroup.FIELD_NAME;
@@ -45,7 +47,7 @@ public abstract class EntityGroupEntity extends ScopedContentPackEntity implemen
     public abstract String name();
 
     @JsonProperty(FIELD_ENTITIES)
-    public abstract Map<String, List<String>> entities();
+    public abstract Set<EntityDescriptor> entities();
 
     public static Builder builder() {
         return Builder.create();
@@ -60,7 +62,7 @@ public abstract class EntityGroupEntity extends ScopedContentPackEntity implemen
         public abstract Builder name(String name);
 
         @JsonProperty(FIELD_ENTITIES)
-        public abstract Builder entities(Map<String, List<String>> entities);
+        public abstract Builder entities(Map<ModelType, List<String>> entities);
 
         public abstract EntityGroupEntity build();
 
