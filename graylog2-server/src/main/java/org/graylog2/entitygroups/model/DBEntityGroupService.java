@@ -17,6 +17,8 @@
 package org.graylog2.entitygroups.model;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Collation;
@@ -35,14 +37,18 @@ import org.graylog2.search.SearchQueryParser;
 
 import jakarta.inject.Inject;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 import static com.mongodb.client.model.Filters.in;
+
 
 public class DBEntityGroupService {
     public static final String COLLECTION_NAME = "entity_groups";
@@ -97,7 +103,7 @@ public class DBEntityGroupService {
         return Optional.ofNullable(collection.find(query).first());
     }
 
-    public List<EntityGroup> getAllForEntity(EntityType type, String entityId) {
+    public List<EntityGroup> getAllForEntity(String type, String entityId) {
         final Bson query = and(
                 exists(typeField(type)),
                 in(typeField(type), entityId)
@@ -105,11 +111,33 @@ public class DBEntityGroupService {
         return MongoUtils.stream(collection.find(query)).toList();
     }
 
+    // TODO: can we make this better..?
+    public Map<String, Collection<EntityGroup>> getAllForEntities(String type, Collection<String> entityIds) {
+        final Bson query = and(
+                exists(typeField(type)),
+                in(typeField(type), entityIds)
+        );
+        final List<EntityGroup> groups = MongoUtils.stream(collection.find(query)).toList();
+        final Multimap<String, EntityGroup> entityToGroupsMap = MultimapBuilder.hashKeys().hashSetValues().build();
+        for (EntityGroup group : groups) {
+            for (Map.Entry<String, Set<String>> StringEntry : group.entities().entrySet()) {
+                if (StringEntry.getKey().equals(type)) {
+                    for (String entityId : StringEntry.getValue()) {
+                        if (entityIds.contains(entityId)) {
+                            entityToGroupsMap.put(entityId, group);
+                        }
+                    }
+                }
+            }
+        }
+        return entityToGroupsMap.asMap();
+    }
+
     public long delete(String id) {
         return collection.deleteOne(MongoUtils.idEq(id)).getDeletedCount();
     }
 
-    private String typeField(EntityType type) {
-        return EntityGroup.FIELD_ENTITIES + "." + type.getName();
+    private String typeField(String type) {
+        return EntityGroup.FIELD_ENTITIES + "." + type;
     }
 }

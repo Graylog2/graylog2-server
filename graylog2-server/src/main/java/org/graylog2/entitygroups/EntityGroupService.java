@@ -19,14 +19,15 @@ package org.graylog2.entitygroups;
 import org.graylog2.entitygroups.model.EntityGroup;
 import org.graylog2.entitygroups.model.DBEntityGroupService;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.entitygroups.model.EntityType;
 import org.graylog2.rest.models.SortOrder;
 
 import jakarta.inject.Inject;
 
 import jakarta.ws.rs.NotFoundException;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -48,8 +49,12 @@ public class EntityGroupService {
         return dbEntityGroupService.getByName(groupName);
     }
 
-    public List<EntityGroup> getAllForEntity(EntityType type, String entityId) {
+    public List<EntityGroup> getAllForEntity(String type, String entityId) {
         return dbEntityGroupService.getAllForEntity(type, entityId);
+    }
+
+    public Map<String, Collection<EntityGroup>> getAllForEntities(String type, Collection<String> entities) {
+        return dbEntityGroupService.getAllForEntities(type, entities);
     }
 
     public EntityGroup create(EntityGroup group) {
@@ -64,7 +69,7 @@ public class EntityGroupService {
 
     }
 
-    public EntityGroup addEntityToGroup(String groupId, EntityType type, String entityId) {
+    public EntityGroup addEntityToGroup(String groupId, String type, String entityId) {
         final EntityGroup group = requireEntityGroup(groupId);
         return dbEntityGroupService.save(group.addEntity(type, entityId));
     }

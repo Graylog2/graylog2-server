@@ -31,9 +31,10 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.entitygroups.EntityGroupService;
+import org.graylog2.entitygroups.model.BulkEntityGroupRequest;
+import org.graylog2.entitygroups.model.BulkEntityGroupResponse;
 import org.graylog2.entitygroups.model.EntityGroup;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.entitygroups.model.EntityType;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -76,7 +77,8 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("15") int perPage,
                                                  @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                  @ApiParam(name = "sort",
-                                                           value = "The field to sort the result on")
+                                                           value = "The field to sort the result on",
+                                                           allowableValues = "name")
                                                  @QueryParam("sort") String sort,
                                                  @ApiParam(name = "direction", value = "The sort direction", allowableValues = "asc,desc")
                                                  @DefaultValue("asc") @QueryParam("direction") SortOrder order) {
@@ -99,18 +101,10 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @GET
     @Path("/get_for_entity")
     @ApiOperation(value = "Get a list of entity groups for an entity")
-    @ApiResponses(@ApiResponse(code = 400, message = "Unknown entity type"))
     @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_READ)
     public Response getAllForEntity(@ApiParam(name = "entity_type", required = true) @QueryParam("entity_type") String entityType,
                                     @ApiParam(name = "entity_id", required = true) @QueryParam("entity_id") String entityId) {
-        final EntityType type;
-        try {
-            type = EntityType.valueOfIgnoreCase(entityType);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(StringUtils.f("Unknown entity type '%s'", entityType));
-        }
-
-        return Response.ok().entity(entityGroupService.getAllForEntity(type, entityId)).build();
+        return Response.ok().entity(entityGroupService.getAllForEntity(entityType, entityId)).build();
     }
 
     @POST
@@ -151,27 +145,25 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @PUT
     @Path("/{group_id}/add_entity")
     @ApiOperation("Add an entity to an entity group")
-    @ApiResponses({
-            @ApiResponse(code = 400, message = "Unknown entity type"),
-            @ApiResponse(code = 404, message = "No such entity group")
-    })
+    @ApiResponses(@ApiResponse(code = 404, message = "No such entity group"))
     @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_EDIT)
     @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_UPDATE)
     public Response addEntityToGroup(@ApiParam(name = "group_id", required = true) @PathParam("group_id") String groupId,
                                      @ApiParam(name = "entity_type", required = true) @QueryParam("entity_type") String entityType,
                                      @ApiParam(name = "entity_id", required = true) @QueryParam("entity_id") String entityId) {
-        final EntityType type;
         try {
-            type = EntityType.valueOfIgnoreCase(entityType);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(StringUtils.f("Unknown entity type '%s'", entityType));
-        }
-
-        try {
-            return Response.ok().entity(entityGroupService.addEntityToGroup(groupId, type, entityId)).build();
+            return Response.ok().entity(entityGroupService.addEntityToGroup(groupId, entityType, entityId)).build();
         } catch (IllegalArgumentException e) {
             throw new NotFoundException(getRootCauseMessage(e), e);
         }
+    }
+
+    @PUT
+    @Path("/get_for_entities")
+    @ApiOperation("Get a list of entity groups for a list of entities")
+    @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_READ)
+    public BulkEntityGroupResponse getAllForEntity(@ApiParam(name = "JSON Body") BulkEntityGroupRequest request) {
+        return new BulkEntityGroupResponse(entityGroupService.getAllForEntities(request.type(), request.entityIds()));
     }
 
     @DELETE

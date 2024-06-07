@@ -49,7 +49,7 @@ public abstract class EntityGroup extends ScopedEntity implements ContentPackabl
 
     @Nullable
     @JsonProperty(FIELD_ENTITIES)
-    public abstract Map<EntityType, Set<String>> entities();
+    public abstract Map<String, Set<String>> entities();
 
     public static Builder builder() {
         return Builder.create();
@@ -64,7 +64,7 @@ public abstract class EntityGroup extends ScopedEntity implements ContentPackabl
         public abstract Builder name(String name);
 
         @JsonProperty(FIELD_ENTITIES)
-        public abstract Builder entities(Map<EntityType, Set<String>> entities);
+        public abstract Builder entities(Map<String, Set<String>> entities);
 
         public abstract EntityGroup build();
 
@@ -74,8 +74,8 @@ public abstract class EntityGroup extends ScopedEntity implements ContentPackabl
         }
     }
 
-    public EntityGroup addEntity(EntityType type, String entityId) {
-        final Map<EntityType, Set<String>> entities = entities() != null ? new HashMap<>(entities()) : new HashMap<>();
+    public EntityGroup addEntity(String type, String entityId) {
+        final Map<String, Set<String>> entities = entities() != null ? new HashMap<>(entities()) : new HashMap<>();
         final Set<String> entityIds = entities.get(type) != null ? new HashSet<>(entities.get(type)) : new HashSet<>();
 
         entityIds.add(entityId);
