@@ -19,9 +19,9 @@ package org.graylog.datanode.configuration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.AbstractIdleService;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.InSecureConfiguration;
@@ -46,7 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Singleton
-public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
+public class OpensearchConfigurationService extends AbstractIdleService {
     private final Configuration localConfiguration;
     private final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration;
     private final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration;
@@ -63,15 +63,15 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final EventBus eventBus;
 
     @Inject
-    public OpensearchConfigurationProvider(final Configuration localConfiguration,
-                                           final DatanodeConfiguration datanodeConfiguration,
-                                           final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
-                                           final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration,
-                                           final InSecureConfiguration inSecureConfiguration,
-                                           final NodeService<DataNodeDto> nodeService,
-                                           final @Named("password_secret") String passwordSecret,
-                                           final S3RepositoryConfiguration s3RepositoryConfiguration,
-                                           final EventBus eventBus) {
+    public OpensearchConfigurationService(final Configuration localConfiguration,
+                                          final DatanodeConfiguration datanodeConfiguration,
+                                          final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
+                                          final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration,
+                                          final InSecureConfiguration inSecureConfiguration,
+                                          final NodeService<DataNodeDto> nodeService,
+                                          final @Named("password_secret") String passwordSecret,
+                                          final S3RepositoryConfiguration s3RepositoryConfiguration,
+                                          final EventBus eventBus) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
@@ -84,6 +84,16 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         eventBus.register(this);
     }
 
+    @Override
+    protected void startUp() {
+        triggerConfigurationChangedEvent();
+    }
+
+    @Override
+    protected void shutDown() {
+
+    }
+
     @Subscribe
     public void onKeystoreChange(DatanodeKeystoreChangedEvent event) {
         // configuration relies on the keystore. Every change there should rebuild the configuration and restart
@@ -91,8 +101,19 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         triggerConfigurationChangedEvent();
     }
 
-    @Override
-    public OpensearchConfiguration get() {
+    public void setTransientConfiguration(String key, Object value) {
+        this.transientConfiguration.put(key, value);
+        triggerConfigurationChangedEvent();
+    }
+
+    public void removeTransientConfiguration(String key) {
+        final Object removedValue = this.transientConfiguration.remove(key);
+        if (removedValue != null) {
+            triggerConfigurationChangedEvent();
+        }
+    }
+
+    private OpensearchConfiguration get() {
         //TODO: at some point bind the whole list, for now there is too much experiments with order and prerequisites
         List<SecurityConfigurationVariant> securityConfigurationTypes = List.of(
                 inSecureConfiguration,
@@ -179,24 +200,9 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         return config.build();
     }
 
-    public void setTransientConfiguration(String key, Object value) {
-        this.transientConfiguration.put(key, value);
-        triggerConfigurationChangedEvent();
-    }
-
-    public void removeTransientConfiguration(String key) {
-        final Object removedValue = this.transientConfiguration.remove(key);
-        if (removedValue != null) {
-            triggerConfigurationChangedEvent();
-        }
-    }
-
     private void triggerConfigurationChangedEvent() {
         eventBus.post(new OpensearchConfigurationChangeEvent(get()));
     }
 
-    @Deprecated
-    public void triggerInitialChange() {
-        triggerConfigurationChangedEvent();
-    }
+
 }

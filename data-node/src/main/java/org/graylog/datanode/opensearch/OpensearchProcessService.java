@@ -24,7 +24,7 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
-import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
+import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
@@ -42,7 +42,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessService.class);
 
     private final OpensearchProcess process;
-    private final OpensearchConfigurationProvider configurationProvider;
+    private final OpensearchConfigurationService configurationProvider;
     private final NodeId nodeId;
     private final DatanodeDirectoriesLockfileCheck lockfileCheck;
     private final PreflightConfigService preflightConfigService;
@@ -54,7 +54,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Inject
     public OpensearchProcessService(
-            final OpensearchConfigurationProvider configurationProvider,
+            final OpensearchConfigurationService configurationProvider,
             final EventBus eventBus,
             final Configuration configuration,
             final NodeId nodeId,
@@ -109,9 +109,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
      */
     @Override
     protected void startUp() {
-        // TODO: is there a better way to inform all components that a new configuration is available right after
-        // the start? Should OpensearchConfigurationProvider be an instance of AbstractIdleService?
-        configurationProvider.triggerInitialChange();
+
     }
 
     @Subscribe
