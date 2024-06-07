@@ -314,7 +314,7 @@ const isLiteralRoute = (entry: RouteMapEntry): entry is string => (typeof entry 
 const isRouteFunction = (entry: RouteMapEntry): entry is RouteFunction<any> => (typeof entry === 'function');
 
 export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R => {
-  if (appPrefix === '/') {
+  if (!appPrefix || appPrefix === '' || appPrefix === '/') {
     return routes;
   }
 
@@ -335,7 +335,7 @@ export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R
   }));
 };
 
-const qualifiedRoutes: typeof Routes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
+const qualifiedRoutes: typeof Routes = qualifyUrls(Routes, AppConfig.gl2AppPathPrefix());
 
 const unqualified = Routes;
 
@@ -381,7 +381,7 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
     pluginRoutes[key] = route.path;
   });
 
-  const route = (AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes)[routeKey];
+  const route = (qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()))[routeKey];
 
   if (!route && throwError) {
     throw new Error(`Could not find plugin route '${routeKey}'.`);
