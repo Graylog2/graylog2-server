@@ -114,9 +114,14 @@ public class EventProcessorExecutionJob implements Job {
         try {
             eventProcessorEngine.execute(config.eventDefinitionId(), parameters);
 
+            // TODO: With cron scheduling does it makes sense/is it possible to reliably perform catch up after the
+            //   server has been down for awhile? Relying solely on JobScheduleStrategies.nextTime was not working after
+            //   server restart for cron scheduling.
+            final Optional<DateTime> nextTime = config.isCron() ?
+                    scheduleStrategies.nextTime(ctx.trigger(), to) :
+                    scheduleStrategies.nextTime(ctx.trigger());
             // By using the processingWindowSize and the processingHopSize we can implement hopping and tumbling
             // windows. (a tumbling window is simply a hopping window where windowSize and hopSize are the same)
-            final Optional<DateTime> nextTime = scheduleStrategies.nextTime(ctx.trigger());
             DateTime nextTo = config.isCron() && nextTime.isPresent() ? nextTime.get() : to.plus(config.processingHopSize());
             DateTime nextFrom = nextTo.minus(config.processingWindowSize());
 
