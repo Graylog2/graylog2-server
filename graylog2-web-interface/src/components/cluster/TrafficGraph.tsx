@@ -18,12 +18,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
+import type { PlotLayout } from 'views/components/visualizations/GenericPlot';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
 
 type Props = {
   traffic: { [key: string]: number },
   width: number,
-  layoutExtension?: {},
+  layoutExtension?: Partial<PlotLayout>,
 };
 
 const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
@@ -36,7 +37,7 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
     x: Object.keys(traffic),
     y: Object.values(traffic),
   }];
-  const layout = {
+  const layout: Partial<PlotLayout> = {
     showlegend: false,
     margin: {
       l: 60,

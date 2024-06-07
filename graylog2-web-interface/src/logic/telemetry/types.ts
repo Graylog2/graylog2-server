@@ -14,19 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Reflux from 'reflux';
 
-import { singletonActions } from 'logic/singleton';
-import type { RefluxActions } from 'stores/StoreTypes';
+import type { ExtractObjectValues } from 'util/UtilityTypes';
+import type { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-type CustomizationActionsType = RefluxActions<{
-  update: (type: string, config: {}) => Promise<unknown>,
-  get: (type: string) => Promise<unknown>,
-}>;
+export interface EventTypes {
+  core: ExtractObjectValues<typeof TELEMETRY_EVENT_TYPE>
+}
 
-const CustomizationActions: CustomizationActionsType = singletonActions('customization.actions', () => Reflux.createActions({
-  update: { asyncResult: true },
-  get: { asyncResult: true },
-}));
-
-export default CustomizationActions;
+export type EventType = EventTypes[keyof EventTypes];
