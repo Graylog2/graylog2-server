@@ -30,6 +30,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.entitygroups.EntityGroupService;
 import org.graylog2.entitygroups.model.BulkEntityGroupRequest;
 import org.graylog2.entitygroups.model.BulkEntityGroupResponse;
@@ -162,6 +163,7 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @Path("/get_for_entities")
     @ApiOperation("Get a list of entity groups for a list of entities")
     @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_READ)
+    @NoAuditEvent("Read resource - doesn't change any data")
     public BulkEntityGroupResponse getAllForEntity(@ApiParam(name = "JSON Body") BulkEntityGroupRequest request) {
         return new BulkEntityGroupResponse(entityGroupService.getAllForEntities(request.type(), request.entityIds()));
     }
