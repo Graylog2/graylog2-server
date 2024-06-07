@@ -47,10 +47,8 @@ public class DataNodeConfigurationPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-
         // always check if there are any certificates that we can accept
         certificateExchange.pollCertificate(nodeId.getNodeId(), this::processCertificateChain);
-
     }
 
     private void processCertificateChain(CertificateChain certificateChain) {

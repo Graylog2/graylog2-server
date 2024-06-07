@@ -14,16 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.preflight;
 
-import com.google.inject.AbstractModule;
-import org.graylog2.cluster.certificates.CertificateExchange;
-import org.graylog2.cluster.certificates.CertificateExchangeImpl;
+import type { ExtractObjectValues } from 'util/UtilityTypes';
+import type { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-public class DataNodeProvisioningBindings extends AbstractModule {
-
-    @Override
-    protected void configure() {
-        bind(CertificateExchange.class).to(CertificateExchangeImpl.class);
-    }
+export interface EventTypes {
+  core: ExtractObjectValues<typeof TELEMETRY_EVENT_TYPE>
 }
+
+export type EventType = EventTypes[keyof EventTypes];
