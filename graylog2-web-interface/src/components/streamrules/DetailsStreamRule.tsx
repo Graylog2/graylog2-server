@@ -107,6 +107,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
       {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
       <td>
         <HumanReadableStreamRule streamRule={streamRule} inputs={inputs} />
+        {description}
       </td>
       <td>{actionItems}</td>
       {showStreamRuleForm && (
@@ -117,7 +118,6 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
                          submitLoadingText="Updating Rule..."
                          onSubmit={_onSubmit} />
       )}
-      {description}
       {showConfirmDelete && (
         <ConfirmDialog show={showConfirmDelete}
                        onConfirm={onConfirmDelete}
