@@ -157,7 +157,7 @@ const StreamActions = ({
   return (
     <ButtonToolbar>
       <LinkContainer to={Routes.stream_view(stream.id)}>
-        <Button bsStyle="primary" bsSize="xsmall">View details</Button>
+        <Button disabled={isNotEditable} bsStyle="primary" bsSize="xsmall">View details</Button>
       </LinkContainer>
       <ShareButton entityId={stream.id}
                    entityType="stream"
