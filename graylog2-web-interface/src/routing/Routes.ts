@@ -306,6 +306,8 @@ const prefixUrlWithoutHostname = (url: string, prefix: string) => {
     .resource();
 };
 
+export const prefixUrl = <T extends string>(url: T) => prefixUrlWithoutHostname(url, AppConfig.gl2AppPathPrefix()) as QualifiedUrl<T>;
+
 type RouteFunction<P extends Array<any>> = (...args: P) => string;
 type RouteMapEntry = string | RouteFunction<any> | RouteMap;
 type RouteMap = { [routeName: string]: RouteMapEntry };
@@ -330,7 +332,7 @@ type QualifiedRoutes<T> = {
         : never;
 };
 
-export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): QualifiedRoutes<R> => {
+export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string = AppConfig.gl2AppPathPrefix()): QualifiedRoutes<R> => {
   if (!appPrefix || appPrefix === '' || appPrefix === '/') {
     return routes as QualifiedRoutes<R>;
   }
@@ -352,7 +354,7 @@ export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): Q
   }));
 };
 
-const qualifiedRoutes = qualifyUrls(Routes, AppConfig.gl2AppPathPrefix());
+const qualifiedRoutes = qualifyUrls(Routes);
 
 const unqualified = Routes;
 
@@ -398,7 +400,7 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
     pluginRoutes[key] = route.path;
   });
 
-  const route = (qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()))[routeKey];
+  const route = qualifyUrls(pluginRoutes)[routeKey];
 
   if (!route && throwError) {
     throw new Error(`Could not find plugin route '${routeKey}'.`);
