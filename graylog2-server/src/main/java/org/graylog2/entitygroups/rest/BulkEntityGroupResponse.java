@@ -14,18 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.entitygroups.model;
+package org.graylog2.entitygroups.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.entitygroups.model.EntityGroup;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 
-public record BulkEntityGroupRequest(
-        @JsonProperty(FIELD_ENTITY_TYPE)
-        String type,
-        @JsonProperty(FIELD_ENTITY_IDS)
-        List<String> entityIds
-) {
-    public static final String FIELD_ENTITY_TYPE = "entity_type";
-    public static final String FIELD_ENTITY_IDS = "entity_IDS";
+public record BulkEntityGroupResponse(@JsonProperty(EntityGroup.FIELD_ENTITIES)
+                                      Map<String, Collection<EntityGroup>> entityGroups) {
 }

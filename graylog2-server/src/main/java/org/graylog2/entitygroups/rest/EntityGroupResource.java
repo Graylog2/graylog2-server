@@ -32,8 +32,6 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.entitygroups.EntityGroupService;
-import org.graylog2.entitygroups.model.BulkEntityGroupRequest;
-import org.graylog2.entitygroups.model.BulkEntityGroupResponse;
 import org.graylog2.entitygroups.model.EntityGroup;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
