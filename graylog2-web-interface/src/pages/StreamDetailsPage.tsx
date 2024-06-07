@@ -18,14 +18,14 @@ import * as React from 'react';
 import { useParams } from 'react-router-dom';
 
 import { Spinner } from 'components/common';
-import useStream from 'hooks/useStream';
 import StreamDetails from 'components/streams/StreamDetails/StreamDetails';
+import useStream from 'components/streams/hooks/useStream';
 
 const StreamDetailsPage = () => {
   const { streamId } = useParams<{ streamId: string }>();
-  const { data: stream, isInitialLoading } = useStream(streamId);
+  const { data: stream, isFetching } = useStream(streamId);
 
-  if (isInitialLoading) {
+  if (isFetching) {
     return <Spinner />;
   }
 

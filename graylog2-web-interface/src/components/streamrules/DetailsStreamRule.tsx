@@ -14,17 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
+import UserNotification from 'util/UserNotification';
+import { isPermitted } from 'util/PermissionsMixin';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
 import { useStore } from 'stores/connect';
-import { Icon } from 'components/common';
+import { ConfirmDialog, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
-import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
-import UserNotification from 'util/UserNotification';
 import { StreamRulesInputsActions, StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import type { StreamRule as StreamRuleTypeDefinition, Stream, StreamRule } from 'stores/streams/StreamsStore';
@@ -50,31 +52,25 @@ type Props = {
 const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) => {
   const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { inputs } = useStore(StreamRulesInputsStore);
+  const queryClient = useQueryClient();
+  const STREAM_QUERY_KEY = ['stream', stream.id];
 
   useEffect(() => {
     StreamRulesInputsActions.list();
   }, []);
 
-  const _onEdit = (event: React.SyntheticEvent) => {
-    event.preventDefault();
-    setShowStreamRuleForm(true);
-  };
+  const onConfirmDelete = () => {
+    StreamRulesStore.remove(stream.id, streamRule.id, () => {
+      if (onDelete) {
+        onDelete(streamRule.id);
+      }
 
-  const _onDelete = (event: React.SyntheticEvent) => {
-    event.preventDefault();
-
-    /* TODO: Replace with custom confirmation dialog */
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Do you really want to delete this stream rule?')) {
-      StreamRulesStore.remove(stream.id, streamRule.id, () => {
-        if (onDelete) {
-          onDelete(streamRule.id);
-        }
-
-        UserNotification.success('Stream rule has been successfully deleted.', 'Success');
-      });
-    }
+      queryClient.invalidateQueries(STREAM_QUERY_KEY);
+      setShowConfirmDelete(false);
+      UserNotification.success('Stream rule has been successfully deleted.', 'Success');
+    });
   };
 
   const _onSubmit = (streamRuleId: string, data: StreamRule) => StreamRulesStore.update(stream.id, streamRuleId, data, () => {
@@ -82,6 +78,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
       onSubmit(streamRuleId, data);
     }
 
+    queryClient.invalidateQueries(STREAM_QUERY_KEY);
     UserNotification.success('Stream rule has been successfully updated.', 'Success');
   });
 
@@ -89,23 +86,21 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
     <ActionButtonsWrap className="align-right">
       <Button bsStyle="link"
               bsSize="xsmall"
-              onClick={_onDelete}
+              onClick={() => setShowConfirmDelete(true)}
               title="Delete stream rule">
         <Icon name="delete" type="regular" />
       </Button>
       <Button bsStyle="link"
               bsSize="xsmall"
-              onClick={_onEdit}
+              onClick={() => setShowStreamRuleForm(true)}
               title="Edit stream rule">
         <Icon name="edit_square" />
       </Button>
     </ActionButtonsWrap>
   );
 
-  /* const matchDataStyle = () => (matchData.rules[streamRule.id] ? 'success' : 'danger'); */
   const actionItems = isPermitted(permissions, [`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
   const description = streamRule.description ? <small>{' '}({streamRule.description})</small> : null;
-  /* const listGroupStyle = !isEmpty(matchData) ? matchDataStyle() : null; */
 
   return (
     <tr key={streamRule.id}>
@@ -123,6 +118,15 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
                          onSubmit={_onSubmit} />
       )}
       {description}
+      {showConfirmDelete && (
+        <ConfirmDialog show={showConfirmDelete}
+                       onConfirm={onConfirmDelete}
+                       onCancel={() => setShowConfirmDelete(false)}
+                       title="Delete stream rule."
+                       btnConfirmText="Ok">
+          Do you really want to delete this stream rule?
+        </ConfirmDialog>
+      )}
     </tr>
   );
 };

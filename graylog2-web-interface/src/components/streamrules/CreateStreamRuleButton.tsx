@@ -14,8 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import { useCallback, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
-import React, { useCallback, useState } from 'react';
 
 import { Button } from 'components/bootstrap';
 import type { BsSize } from 'components/bootstrap/types';
@@ -36,13 +38,13 @@ type Props = {
 
 const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, streamId }: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
-
+  const queryClient = useQueryClient();
   const toggleCreateModal = useCallback(() => setShowCreateModal((cur) => !cur), []);
 
   const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(streamId, streamRule, () => {
     UserNotification.success('Stream rule was created successfully.', 'Success');
-    // TODO invalidate stream query
-  }), [streamId]);
+    queryClient.invalidateQueries(['stream', streamId]);
+  }), [streamId, queryClient]);
 
   return (
     <>
@@ -60,6 +62,7 @@ const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, stream
                          onSubmit={onSaveStreamRule} />
 
       )}
+      {}
     </>
   );
 };
