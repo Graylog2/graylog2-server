@@ -33,6 +33,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -137,7 +138,26 @@ public class IndexSetTemplateService {
         return stream(collection.find());
     }
 
-    public List<IndexSetTemplate> getBuiltIns() {
-        return collection.find(BUILT_IN_FILTER).into(new ArrayList<>());
+    public List<IndexSetTemplate> getBuiltIns(boolean warmTierEnabled) {
+
+        String fieldWarmTierEnabled = "index_set_config.data_tiering.warm_tier_enabled";
+        Bson filter;
+        if (warmTierEnabled) {
+            filter = Filters.eq(fieldWarmTierEnabled, true);
+        }else{
+            filter = Filters.or(
+                    Filters.eq("index_set_config.data_tiering.type", "hot_only"),
+                    Filters.eq(fieldWarmTierEnabled, false)
+            );
+        }
+
+        ArrayList<IndexSetTemplate> templates = collection.find(Filters.and(
+                        BUILT_IN_FILTER,
+                        Filters.eq("index_set_config.use_legacy_rotation", false),
+                        filter
+                ))
+                .into(new ArrayList<>());
+        templates.sort(Comparator.comparing(indexSetTemplate -> indexSetTemplate.indexSetConfig().dataTieringConfig().indexLifetimeMax().getMillis()));
+        return templates;
     }
 }

@@ -126,6 +126,16 @@ public class IndexSetTemplateResource extends RestResource {
         return toPaginatedResponse(templateService.getPaginated(query, filters, page, perPage, sort, order));
     }
 
+    @GET
+    @Path("/built-in")
+    @Timed
+    @ApiOperation(value = "Gets built-in templates")
+    public List<IndexSetTemplateResponse> builtIns(@ApiParam(name = "warm_tier_enabled")
+                                                   @QueryParam("warm_tier_enabled") boolean warmTierEnabled) {
+        checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ);
+        return toResponse(templateService.getBuiltIns(warmTierEnabled));
+    }
+
     @POST
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_CREATE)
