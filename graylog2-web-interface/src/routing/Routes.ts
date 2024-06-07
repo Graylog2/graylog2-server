@@ -259,6 +259,7 @@ const Routes = {
   },
   search: (query: string, timeRange: RoutesTimeRange, resolution?: number) => Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution),
   message_show: (index: string, messageId: string) => `/messages/${index}/${messageId}`,
+  stream_view: (streamId: string) => `/streams/${streamId}/view`,
   stream_edit: (streamId: string) => `/streams/${streamId}/edit`,
   stream_edit_example: (streamId: string, index: string, messageId: string) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
   stream_outputs: (streamId: string) => `/streams/${streamId}/outputs`,

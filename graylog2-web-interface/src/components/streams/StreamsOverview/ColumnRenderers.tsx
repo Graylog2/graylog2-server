@@ -15,35 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
-import { Label } from 'components/bootstrap';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';
+import TitleCell from 'components/streams/StreamsOverview/cells/TitleCell';
 import ThroughputCell from 'components/streams/StreamsOverview/cells/ThroughputCell';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 import StatusCell from './cells/StatusCell';
 import StreamRulesCell from './cells/StreamRulesCell';
 
-const DefaultLabel = styled(Label)`
-  display: inline-flex;
-  margin-left: 5px;
-  vertical-align: inherit;
-`;
-
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   attributes: {
     title: {
-      renderCell: (title: string, stream) => (
-        <>
-          <Link to={Routes.stream_search(stream.id)}>{title}</Link>
-          {stream.is_default && <DefaultLabel bsStyle="primary" bsSize="xsmall">Default</DefaultLabel>}
-        </>
-      ),
+      renderCell: (_title: string, stream) => <TitleCell stream={stream} />,
     },
     index_set_title: {
       renderCell: (_index_set_title: string, stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
@@ -51,15 +37,15 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
     },
     throughput: {
       renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,
-      staticWidth: 120,
+      staticWidth: 130,
     },
     disabled: {
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
-      staticWidth: 100,
+      staticWidth: 130,
     },
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
-      staticWidth: 70,
+      staticWidth: 130,
     },
   },
 });

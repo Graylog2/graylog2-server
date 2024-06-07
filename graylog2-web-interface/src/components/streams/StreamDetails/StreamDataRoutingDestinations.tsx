@@ -15,18 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { Sort } from 'stores/PaginationTypes';
+import * as React from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-export const ENTITY_TABLE_ID = 'streams';
-export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'index_set_title', 'rules', 'throughput', 'disabled'],
-  columnsOrder: ['title', 'index_set_title', 'rules', 'throughput', 'disabled', 'created_at'],
+import { Section } from 'components/common';
+
+const StreamDataRoutingDestinations = () => {
+  const StreamDataWarehouseComponent = PluginStore.exports('dataWarehouse')?.[0]?.StreamDataWarehouse;
+
+  return (
+    <>
+      <Section title="Index Set">
+        <dl>
+          <dd>IndexSet Name: Default index set</dd>
+        </dl>
+
+      </Section>
+      <StreamDataWarehouseComponent />
+    </>
+  );
 };
 
-export const ADDITIONAL_ATTRIBUTES = [
-  { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
-  { id: 'throughput', title: 'Throughput' },
-  { id: 'rules', title: 'Rules' },
-];
+export default StreamDataRoutingDestinations;

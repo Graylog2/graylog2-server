@@ -14,19 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import { useParams } from 'react-router-dom';
 
-import type { Sort } from 'stores/PaginationTypes';
+import { Spinner } from 'components/common';
+import StreamDetails from 'components/streams/StreamDetails/StreamDetails';
+import useStream from 'components/streams/hooks/useStream';
 
-export const ENTITY_TABLE_ID = 'streams';
-export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'index_set_title', 'rules', 'throughput', 'disabled'],
-  columnsOrder: ['title', 'index_set_title', 'rules', 'throughput', 'disabled', 'created_at'],
+const StreamDetailsPage = () => {
+  const { streamId } = useParams<{ streamId: string }>();
+  const { data: stream, isFetching } = useStream(streamId);
+
+  if (isFetching) {
+    return <Spinner />;
+  }
+
+  return (
+    <StreamDetails stream={stream} />
+  );
 };
 
-export const ADDITIONAL_ATTRIBUTES = [
-  { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
-  { id: 'throughput', title: 'Throughput' },
-  { id: 'rules', title: 'Rules' },
-];
+export default StreamDetailsPage;

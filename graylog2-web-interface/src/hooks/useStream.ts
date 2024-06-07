@@ -17,41 +17,37 @@
 import { useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
-import type { Stream } from 'stores/streams/StreamsStore';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
+import type { Stream } from 'stores/streams/StreamsStore';
+import type FetchError from 'logic/errors/FetchError';
 
-const fetchStream = (streamId: string) => {
-  const { url } = ApiRoutes.StreamsApiController.get(streamId);
+const fetchStream = (streamId: string) => fetch('GET', qualifyUrl(ApiRoutes.StreamsApiController.get(streamId).url));
 
-  return fetch('GET', qualifyUrl(url));
-};
-
-const useStream = (streamId: string, { enabled } = { enabled: true }): {
-  data: Stream
+const useStream = (streamId: string): {
+  data: Stream,
   refetch: () => void,
-  isFetching: boolean,
-  isError,
+  isInitialLoading: boolean,
+  error: FetchError,
 } => {
-  const { data, refetch, isFetching, isError } = useQuery(
+  const { data, refetch, isInitialLoading, error } = useQuery<Stream, FetchError>(
     ['stream', streamId],
     () => fetchStream(streamId),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading stream failed with status: ${errorThrown}`,
-          'Could not load Stream');
+          'Could not load stream.');
       },
-      keepPreviousData: true,
-      enabled,
+      notifyOnChangeProps: ['data', 'error'],
     },
   );
 
   return ({
     data,
     refetch,
-    isFetching,
-    isError,
+    isInitialLoading,
+    error,
   });
 };
 

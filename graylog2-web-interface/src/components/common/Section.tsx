@@ -25,26 +25,27 @@ const Container = styled.div(({ theme }) => css`
   padding: 15px;
 `);
 
-const Header = styled.div`
+const Header = styled.div<{ $alignActionsLeft: boolean; }>(({ theme, $alignActionsLeft }) => css`
   display: flex;
-  justify-content: space-between;
+  justify-content: ${$alignActionsLeft ? 'flex-start' : 'space-between'};
+  ${$alignActionsLeft ? `gap: ${theme.spacings.sm};` : 'gap: 5px;'};
   align-items: center;
   margin-bottom: 10px;
   flex-wrap: wrap;
-  gap: 5px;
-`;
+`);
 
 type Props = React.PropsWithChildren<{
   title: React.ReactNode,
   actions?: React.ReactNode,
+  alignActionLeft?: boolean,
 }>
 
 /**
  * Simple section component. Currently only a "filled" version exists.
  */
-const Section = ({ title, actions, children }: Props) => (
+const Section = ({ title, actions, children, alignActionLeft }: Props) => (
   <Container>
-    <Header>
+    <Header $alignActionsLeft={alignActionLeft}>
       <h2>{title}</h2>
       {actions && <div>{actions}</div>}
     </Header>
@@ -54,6 +55,7 @@ const Section = ({ title, actions, children }: Props) => (
 
 Section.defaultProps = {
   actions: undefined,
+  alignActionLeft: false,
 };
 
 export default Section;
