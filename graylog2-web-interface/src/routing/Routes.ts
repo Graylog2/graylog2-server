@@ -313,9 +313,26 @@ type RouteMap = { [routeName: string]: RouteMapEntry };
 const isLiteralRoute = (entry: RouteMapEntry): entry is string => (typeof entry === 'string');
 const isRouteFunction = (entry: RouteMapEntry): entry is RouteFunction<any> => (typeof entry === 'function');
 
-export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R => {
+declare const __brand: unique symbol;
+type Brand<B> = { [__brand]: B }
+export type Branded<T, B> = T & Brand<B>
+
+export type QualifiedUrl<T extends string> = Branded<T, 'Qualified URL'>;
+type QualifiedFunction<F extends (...args: Parameters<F>) => string> = (...args: Parameters<F>) => QualifiedUrl<string>;
+
+type QualifiedRoutes<T> = {
+  [K in keyof T]: T[K] extends string
+    ? QualifiedUrl<T[K]>
+    : T[K] extends (...args: any[]) => string
+      ? QualifiedFunction<T[K]>
+      : T[K] extends object
+        ? QualifiedRoutes<T[K]>
+        : never;
+};
+
+export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): QualifiedRoutes<R> => {
   if (!appPrefix || appPrefix === '' || appPrefix === '/') {
-    return routes;
+    return routes as QualifiedRoutes<R>;
   }
 
   return Object.fromEntries(Object.entries(routes).map(([routeName, routeValue]) => {
@@ -335,7 +352,7 @@ export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R
   }));
 };
 
-const qualifiedRoutes: typeof Routes = qualifyUrls(Routes, AppConfig.gl2AppPathPrefix());
+const qualifiedRoutes = qualifyUrls(Routes, AppConfig.gl2AppPathPrefix());
 
 const unqualified = Routes;
 

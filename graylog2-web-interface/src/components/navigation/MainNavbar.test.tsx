@@ -17,6 +17,7 @@
 import { render, screen } from 'wrappedTestingLibrary';
 import Immutable from 'immutable';
 import * as React from 'react';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { defaultUser } from 'defaultMockValues';
 
@@ -74,7 +75,7 @@ describe('MainNavbar', () => {
             ],
           },
         ],
-      },
+      } as PluginExports,
     };
 
     beforeEach(() => {
