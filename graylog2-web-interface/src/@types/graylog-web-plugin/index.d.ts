@@ -49,6 +49,7 @@ type PluginNavigation = {
   perspective?: string;
   BadgeComponent?: React.ComponentType<{ text: string }>;
   position?: 'last' | undefined,
+  useIsValidLicense?: () => boolean,
 } & (PluginNavigationLink | PluginNavigationDropdown)
 
 interface PluginNavigationItems {
