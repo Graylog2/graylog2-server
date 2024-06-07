@@ -952,6 +952,7 @@
                             -Xep:IncrementInForLoopAndHeader:ERROR
                             -Xep:NonAtomicVolatileUpdate:ERROR
                             -Xep:PrimitiveAtomicReference:ERROR
+                            -Xep:WildcardImport:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
