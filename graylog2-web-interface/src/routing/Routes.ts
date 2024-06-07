@@ -306,8 +306,6 @@ const prefixUrlWithoutHostname = (url: string, prefix: string) => {
     .resource();
 };
 
-export const prefixUrl = <T extends string>(url: T) => prefixUrlWithoutHostname(url, AppConfig.gl2AppPathPrefix()) as QualifiedUrl<T>;
-
 type RouteFunction<P extends Array<any>> = (...args: P) => string;
 type RouteMapEntry = string | RouteFunction<any> | RouteMap;
 type RouteMap = { [routeName: string]: RouteMapEntry };
@@ -352,6 +350,14 @@ export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string = A
 
     return [routeName, qualifyUrls(routeValue, appPrefix)];
   }));
+};
+
+export const prefixUrl = <T extends string>(route: T): QualifiedUrl<T> => {
+  const appPrefix = AppConfig.gl2AppPathPrefix();
+
+  return ((!appPrefix || appPrefix === '' || appPrefix === '/')
+    ? route
+    : prefixUrlWithoutHostname(route, appPrefix)) as QualifiedUrl<T>;
 };
 
 const qualifiedRoutes = qualifyUrls(Routes);
