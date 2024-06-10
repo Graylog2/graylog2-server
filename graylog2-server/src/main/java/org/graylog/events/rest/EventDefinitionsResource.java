@@ -479,7 +479,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
     public CronValidationResponse validate(@ApiParam(name = "JSON body", required = true)
                                            @Valid @NotNull CronValidationRequest toValidate) {
-        return CronUtils.validateExpression(toValidate);
+        try {
+            CronUtils.validateExpression(toValidate.expression());
+            return new CronValidationResponse(null, CronUtils.describeExpression(toValidate.expression()));
+        } catch (IllegalArgumentException e) {
+            return new CronValidationResponse(e.getMessage(), null);
+        }
     }
 
     private void checkEventDefinitionPermissions(EventDefinitionDto dto, String action) {

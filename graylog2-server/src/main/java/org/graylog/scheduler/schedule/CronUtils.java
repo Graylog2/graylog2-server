@@ -20,8 +20,6 @@ import com.cronutils.descriptor.CronDescriptor;
 import com.cronutils.model.Cron;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
-import org.graylog.events.rest.CronValidationRequest;
-import org.graylog.events.rest.CronValidationResponse;
 
 import java.util.Locale;
 
@@ -51,17 +49,13 @@ public class CronUtils {
     }
 
     /**
-     * Validates a cron expression and returns a response with either the error or a description of the cron.
+     * Describes a cron expression in English
      *
-     * @param request cron expression to validate
-     * @return validation response with an error message if validation fails or a description of the cron if successful
+     * @param expression cron expression to validate
+     * @return description of the expression
      */
-    public static CronValidationResponse validateExpression(CronValidationRequest request) {
-        try {
-            final Cron cron = PARSER.parse(request.expression());
-            return new CronValidationResponse(null, DESCRIPTOR.describe(cron));
-        } catch (IllegalArgumentException e) {
-            return new CronValidationResponse(e.getMessage(), null);
-        }
+    public static String describeExpression(String expression) {
+        final Cron cron = PARSER.parse(expression);
+        return DESCRIPTOR.describe(cron);
     }
 }
