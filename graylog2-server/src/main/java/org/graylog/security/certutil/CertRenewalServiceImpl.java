@@ -241,25 +241,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         };
     }
 
-    @Override
-    public DataNodeDto addProvisioningInformation(DataNodeDto node) {
-        final var keystore = loadKeyStoreForNode(node);
-        final var certificate = keystore.flatMap(this::getCertificateForNode);
-        final var certValidUntil = certificate.map(cert -> cert.getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        return node.toBuilder().setProvisioningInformation(new CertRenewalService.ProvisioningInformation(
-                state(node), errorMessage(node), certValidUntil.orElse(null)
-        )).build();
-    }
-
-    @Override
-    public List<DataNodeDto> addProvisioningInformation(Collection<DataNodeDto> nodes) {
-        return nodes.stream().map(this::addProvisioningInformation).toList();
-    }
-
-    private Optional<DataNodeProvisioningConfig> getDataNodeProvisioningConfig(final Node node) {
-        return Optional.empty(); // TODO!!!
-    }
-
     private void notifyManualRenewalForNode(final List<DataNodeDto> nodes) {
         final var key = String.join(",", nodes.stream().map(Node::getNodeId).toList());
         if (!notificationService.isFirst(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)) {

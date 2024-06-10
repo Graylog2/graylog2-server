@@ -103,7 +103,7 @@ public class DataNodeManagementResource extends RestResource {
     @RequiresPermissions(RestPermissions.DATANODE_READ)
     public DataNodeDto getDataNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         try {
-            return certRenewalService.addProvisioningInformation(nodeService.byNodeId(nodeId));
+            return nodeService.byNodeId(nodeId);
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }
