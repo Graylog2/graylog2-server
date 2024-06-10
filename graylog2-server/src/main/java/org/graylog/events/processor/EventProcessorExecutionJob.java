@@ -114,15 +114,13 @@ public class EventProcessorExecutionJob implements Job {
         try {
             eventProcessorEngine.execute(config.eventDefinitionId(), parameters);
 
-            // TODO: With cron scheduling does it makes sense/is it possible to reliably perform catch up after the
-            //   server has been down for awhile? Relying solely on JobScheduleStrategies.nextTime was not working after
-            //   server restart for cron scheduling.
-            final Optional<DateTime> nextTime = config.isCron() ?
-                    scheduleStrategies.nextTime(ctx.trigger(), to) :
-                    scheduleStrategies.nextTime(ctx.trigger());
             // By using the processingWindowSize and the processingHopSize we can implement hopping and tumbling
-            // windows. (a tumbling window is simply a hopping window where windowSize and hopSize are the same)
-            DateTime nextTo = config.isCron() && nextTime.isPresent() ? nextTime.get() : to.plus(config.processingHopSize());
+            // windows. (a tumbling window is simply a hopping window where windowSize and hopSize are the same).
+            // If the job uses cron scheduling, we need to instead calculate the nextTo field based on the current to
+            // field as it is possible to skip contiguous time ranges with cron scheduling.
+            DateTime nextTo = config.isCron() ?
+                    scheduleStrategies.nextTime(ctx.trigger(), to).orElse(to.plus(config.processingHopSize())) :
+                    to.plus(config.processingHopSize());
             DateTime nextFrom = nextTo.minus(config.processingWindowSize());
 
             // If the event processor is catching up on old data (e.g. the server was shut down for a significant time),
@@ -149,6 +147,8 @@ public class EventProcessorExecutionJob implements Job {
                     .timerangeFrom(nextFrom)
                     .timerangeTo(nextTo)
                     .build();
+
+            final Optional<DateTime> nextTime = scheduleStrategies.nextTime(ctx.trigger());
 
             // The nextTime Optional can be empty if there will be no further executions of the trigger
             if (nextTime.isPresent()) {
