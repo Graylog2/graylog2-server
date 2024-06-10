@@ -62,7 +62,7 @@ public abstract class EntityGroupEntity extends ScopedContentPackEntity implemen
         public abstract Builder name(String name);
 
         @JsonProperty(FIELD_ENTITIES)
-        public abstract Builder entities(Map<ModelType, List<String>> entities);
+        public abstract Builder entities(Set<EntityDescriptor> entities);
 
         public abstract EntityGroupEntity build();
 
