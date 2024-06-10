@@ -21,7 +21,7 @@ import com.github.joschi.jadconfig.Validator;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.Test;
 
-import static com.github.zafarkhaja.semver.Version.*;
+import static com.github.zafarkhaja.semver.Version.forIntegers;
 import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;

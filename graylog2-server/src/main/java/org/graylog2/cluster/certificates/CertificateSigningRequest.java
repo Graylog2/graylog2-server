@@ -14,21 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datastream.policy.actions;
+package org.graylog2.cluster.certificates;
 
-import org.junit.jupiter.api.Test;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-class BytesUnitTest {
-
-    @Test
-    public void testFormat() {
-        assertEquals("10pb", BytesUnit.PEBIBYTES.format(10L));
-        assertEquals("10tb", BytesUnit.TEBIBYTES.format(10L));
-        assertEquals("10gb", BytesUnit.GIBIBYTES.format(10L));
-        assertEquals("10mb", BytesUnit.MEBIBYTES.format(10L));
-        assertEquals("10kb", BytesUnit.KIBIBYTES.format(10L));
-        assertEquals("10b", BytesUnit.BYTES.format(10L));
-    }
+public record CertificateSigningRequest(String nodeId, PKCS10CertificationRequest request) {
 }
