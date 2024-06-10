@@ -26,19 +26,22 @@ import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
+import type { Message } from 'views/components/messagelist/Types';
+import type { Stream } from 'views/stores/StreamsStore';
+import type { Input } from 'components/messageloaders/Types';
 
-const MessageActions = ({ messageIndex, messageId }) => (
+const MessageActions = ({ messageIndex, messageId }: { messageIndex: string | undefined, messageId: string }) => (
   <ButtonGroup className="pull-right">
     <MessagePermalinkButton messageIndex={messageIndex} messageId={messageId} />
 
-    <ClipboardButton title="Copy ID" bsSize="small" text={message.id} />
+    <ClipboardButton title="Copy ID" bsSize="small" text={messageId} />
   </ButtonGroup>
 );
 
-const InputName = ({ inputs, inputId }) => {
-  const input = inputs.get(inputId);
+const InputName = ({ inputs, inputId }: { inputs: Immutable.Map<string, Input> | undefined, inputId: string }) => {
+  const input = inputs?.get(inputId);
 
-  return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
+  return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : <>deleted input</>;
 };
 
 const NodeName = ({ nodes, nodeId }) => {
@@ -67,35 +70,45 @@ const NodeName = ({ nodes, nodeId }) => {
   return nodeInformation;
 };
 
-const StreamLinks = ({ messageStreams, streamIds, streams }) => {
+const StreamLinks = ({ messageStreams, streamIds, streams }: {
+  messageStreams: Array<Stream>,
+  streamIds: Immutable.Set<string>,
+  streams: Immutable.Map<string, Stream>
+}) => {
   if (messageStreams) {
-    return messageStreams.map((stream) => (<li key={stream.id}><StreamLink stream={stream} /></li>));
+    return (
+      <>
+        {messageStreams.map((stream) => (<li key={stream.id}><StreamLink stream={stream} /></li>))}
+      </>
+    );
   }
 
-  return streamIds.map((id) => {
-    const stream = streams.get(id);
+  return (
+    <>
+      {streamIds.map((id) => {
+        const stream = streams.get(id);
 
-    if (stream !== undefined) {
-      return <li key={stream.id}><StreamLink stream={stream} /></li>;
-    }
+        if (stream !== undefined) {
+          return <li key={stream.id}><StreamLink stream={stream} /></li>;
+        }
 
-    return null;
-  });
+        return null;
+      })}
+    </>
+  );
 };
 
-const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, customFieldActions }) => {
+type Props = {
+  message: Message & { streams?: Array<Stream> },
+  inputs?: Immutable.Map<string, Input>,
+  nodes?: Immutable.Map<string, unknown>,
+  streams?: Immutable.Map<string, Stream>,
+  renderForDisplay: (fieldName: string) => React.ReactNode,
+  customFieldActions?: React.ReactNode
+}
+
+const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, customFieldActions }: Props) => {
   const streamIds = Immutable.Set(message.stream_ids);
-
-  // Legacy
-  const viaRadio = message.source_radio_id
-    ? (
-      <span>
-        via <em><InputName inputs={inputs} inputId={message.source_radio_input_id} /></em> on
-        radio <NodeName nodes={nodes} nodeId={message.source_radio_id} />
-      </span>
-    )
-    : null;
-
   const rawTimestamp = message.fields.timestamp;
   const timestamp = [
     <dt key={`dt-${rawTimestamp}`}>Timestamp</dt>,
@@ -130,8 +143,17 @@ const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, cust
                 <dd>
                   <em><InputName inputs={inputs} inputId={message.source_input_id} /></em>{' '}
                   on <NodeName nodes={nodes} nodeId={message.source_node_id} />
-                  {viaRadio && <br />}
-                  {viaRadio}
+
+                  {/* Legacy */}
+                  {message.source_radio_id && (
+                    <>
+                      <br />
+                      <span>
+                        via <em><InputName inputs={inputs} inputId={message.source_radio_input_id} /></em> on
+                        radio <NodeName nodes={nodes} nodeId={message.source_radio_id} />
+                      </span>
+                    </>
+                  )}
                 </dd>
               </div>
             )}
@@ -140,14 +162,13 @@ const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, cust
             <dd>{message.index ? message.index : 'Message is not stored'}</dd>
 
             {streamIds.size > 0 && <dt>Routed into streams</dt>}
-            {streamIds.size > 0
-              && (
-                <dd className="stream-list">
-                  <ul>
-                    <StreamLinks messageStreams={message.streams} streamIds={streamIds} streams={streams} />
-                  </ul>
-                </dd>
-              )}
+            {streamIds.size > 0 && (
+              <dd className="stream-list">
+                <ul>
+                  <StreamLinks messageStreams={message.streams} streamIds={streamIds} streams={streams} />
+                </ul>
+              </dd>
+            )}
           </MessageDetailsDefinitionList>
         </Col>
         <Col md={9}>
