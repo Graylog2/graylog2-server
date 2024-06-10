@@ -50,7 +50,6 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -187,14 +186,12 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     protected List<DataNodeDto> findNodesThatNeedCertificateRenewal(final RenewalPolicy renewalPolicy) {
         final var nextRenewal = getNextRenewal();
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        return activeDataNodes.values().stream().map(node -> {
-            final var keystore = loadKeyStoreForNode(node);
-            final var certificate = keystore.flatMap(this::getCertificateForNode);
-            if (certificate.isPresent() && needsRenewal(nextRenewal, renewalPolicy, certificate.get())) {
-                return node;
-            }
-            return null;
-        }).filter(Objects::nonNull).toList();
+        return activeDataNodes.values().stream()
+                .filter(node -> node.getCertValidUntil() != null)
+                .filter(node -> {
+                    var nowPlusThreshold = calculateThreshold(renewalPolicy.certificateLifetime());
+                    return nowPlusThreshold.after(node.getCertValidUntil()) || nextRenewal.toDate().after(node.getCertValidUntil());
+                }).toList();
     }
 
     @Override
