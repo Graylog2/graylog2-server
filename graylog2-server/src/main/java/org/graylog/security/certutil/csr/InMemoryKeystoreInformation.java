@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2020 Graylog, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,16 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil;
+package org.graylog.security.certutil.csr;
 
-/**
- * Place to store constants that are not a subject of user/client configuration.
- */
-public interface CertConstants {
-    String KEY_GENERATION_ALGORITHM = "RSA";
-    String SIGNING_ALGORITHM = "SHA256withRSA";
-    String PKCS12 = "PKCS12";
-    @Deprecated
-    String DATANODE_KEY_ALIAS = "datanode";
-    String CA_KEY_ALIAS = "ca";
+import java.security.KeyStore;
+
+public class InMemoryKeystoreInformation implements KeystoreInformation {
+
+    private final KeyStore keyStore;
+    private final char[] password;
+
+    public InMemoryKeystoreInformation(KeyStore keyStore, char[] password) {
+        this.keyStore = keyStore;
+        this.password = password;
+    }
+
+    @Override
+    public KeyStore loadKeystore() throws Exception {
+        return keyStore;
+    }
+
+    @Override
+    public char[] password() {
+        return password;
+    }
 }
