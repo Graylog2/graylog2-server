@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.entitygroups.rest;
+const useAutoRefresh = jest.fn(() => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
 
-public class EntityGroupPermissions {
-    public static final String ENTITY_GROUP_READ = "entity_group:read";
-    public static final String ENTITY_GROUP_EDIT = "entity_group:edit";
-}
+export default useAutoRefresh;
