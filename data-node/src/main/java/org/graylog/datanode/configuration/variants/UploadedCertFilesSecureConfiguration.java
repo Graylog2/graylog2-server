@@ -22,6 +22,7 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
 
 import java.io.IOException;
@@ -129,8 +130,8 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
                 targetHttpKeystoreLocation);
 
         return new OpensearchSecurityConfiguration(
-                new KeystoreInformation(targetTransportKeystoreLocation.toAbsolutePath(), transportOTP),
-                new KeystoreInformation(targetHttpKeystoreLocation.toAbsolutePath(), httpOTP)
+                new FilesystemKeystoreInformation(targetTransportKeystoreLocation.toAbsolutePath(), transportOTP),
+                new FilesystemKeystoreInformation(targetHttpKeystoreLocation.toAbsolutePath(), httpOTP)
         );
     }
 

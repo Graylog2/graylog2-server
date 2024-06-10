@@ -17,11 +17,11 @@
 package org.graylog.datanode.integration;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 public class DatanodeSecurityTestUtils {
-    public static KeyStore buildTruststore(KeystoreInformation ca) throws IOException, GeneralSecurityException {
+    public static KeyStore buildTruststore(FilesystemKeystoreInformation ca) throws IOException, GeneralSecurityException {
         try (FileInputStream fis = new FileInputStream(ca.location().toFile())) {
 
             KeyStore caKeystore = KeyStore.getInstance("PKCS12");
@@ -54,17 +54,17 @@ public class DatanodeSecurityTestUtils {
         }
     }
 
-    public static KeystoreInformation generateCa(Path dir) {
+    public static FilesystemKeystoreInformation generateCa(Path dir) {
         final Path certPath = dir.resolve("test-ca.p12");
         final String password = RandomStringUtils.randomAlphabetic(10);
         final TestableConsole input = TestableConsole.empty().silent()
                 .register(CertutilCa.PROMPT_ENTER_CA_PASSWORD, password);
         final CertutilCa command = new CertutilCa(certPath.toAbsolutePath().toString(), input);
         command.run();
-        return new KeystoreInformation(certPath, password);
+        return new FilesystemKeystoreInformation(certPath, password);
     }
 
-    public static KeystoreInformation generateTransportCert(Path dir, KeystoreInformation ca, String... containerHostnames) {
+    public static FilesystemKeystoreInformation generateTransportCert(Path dir, FilesystemKeystoreInformation ca, String... containerHostnames) {
         final Path transportPath = dir.resolve("transport-" + RandomStringUtils.randomAlphabetic(10) + ".p12");
         final String password = RandomStringUtils.randomAlphabetic(10);
         TestableConsole inputCert = TestableConsole.empty().silent()
@@ -76,10 +76,10 @@ public class DatanodeSecurityTestUtils {
                 transportPath.toAbsolutePath().toString(),
                 inputCert);
         certutilCert.run();
-        return new KeystoreInformation(transportPath, password);
+        return new FilesystemKeystoreInformation(transportPath, password);
     }
 
-    public static KeystoreInformation generateHttpCert(Path dir, KeystoreInformation ca, String... containerHostnames) {
+    public static FilesystemKeystoreInformation generateHttpCert(Path dir, FilesystemKeystoreInformation ca, String... containerHostnames) {
         final Path httpPath = dir.resolve("http-" + RandomStringUtils.randomAlphabetic(10) + ".p12");
         final String password = RandomStringUtils.randomAlphabetic(10);
         TestableConsole inputHttp = TestableConsole.empty().silent()
@@ -93,6 +93,6 @@ public class DatanodeSecurityTestUtils {
                 httpPath.toAbsolutePath().toString(),
                 inputHttp);
         certutilCert.run();
-        return new KeystoreInformation(httpPath, password);
+        return new FilesystemKeystoreInformation(httpPath, password);
     }
 }

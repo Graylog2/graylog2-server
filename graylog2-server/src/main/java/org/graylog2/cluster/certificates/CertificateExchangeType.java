@@ -14,18 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.cert.storage;
+package org.graylog2.cluster.certificates;
 
-import org.bouncycastle.operator.OperatorCreationException;
-import org.graylog.security.certutil.cert.CertificateChain;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Optional;
-
-public interface CertChainStorage {
-    void writeCertChain(CertificateChain certChain, String nodeId)
-            throws IOException, OperatorCreationException;
-
-    Optional<CertificateChain> readCertChain(String nodeId) throws IOException, GeneralSecurityException;
+public enum CertificateExchangeType {
+    CSR,
+    CERT_CHAIN
 }

@@ -18,6 +18,8 @@ package org.graylog2.cluster.preflight;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
+import org.graylog2.cluster.certificates.CertificateExchange;
+import org.graylog2.cluster.certificates.CertificateExchangeImpl;
 
 public class DataNodeProvisioningBindings extends AbstractModule {
 
@@ -28,5 +30,7 @@ public class DataNodeProvisioningBindings extends AbstractModule {
 
         // this is the generic dependency used by callers
         bind(DataNodeProvisioningService.class).to(DataNodeProvisioningBusEvents.class);
+
+        bind(CertificateExchange.class).to(CertificateExchangeImpl.class);
     }
 }
