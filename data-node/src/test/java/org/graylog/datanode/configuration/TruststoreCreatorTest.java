@@ -25,8 +25,8 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.security.certutil.CertConstants;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -56,10 +56,10 @@ public class TruststoreCreatorTest {
     @Test
     void testTrustStoreCreation(@TempDir Path tempDir) throws Exception {
 
-        final KeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "root","CN=ROOT", BigInteger.ONE);
-        final KeystoreInformation boot = createKeystore(tempDir.resolve("boot.p12"), "boot","CN=BOOT", BigInteger.TWO);
+        final FilesystemKeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "root","CN=ROOT", BigInteger.ONE);
+        final FilesystemKeystoreInformation boot = createKeystore(tempDir.resolve("boot.p12"), "boot","CN=BOOT", BigInteger.TWO);
 
-        final KeystoreInformation truststore = TruststoreCreator.newTruststore()
+        final FilesystemKeystoreInformation truststore = TruststoreCreator.newTruststore()
                 .addRootCert("root", root, "root")
                 .addRootCert("boot", boot, "boot")
                 .persist(tempDir.resolve("truststore.sec"), "caramba! caramba!".toCharArray());
@@ -92,7 +92,7 @@ public class TruststoreCreatorTest {
         assertEquals(cnName, x509Certificate.getIssuerX500Principal().getName());
     }
 
-    private KeystoreInformation createKeystore(Path path, String alias, final String cnName, final BigInteger serialNumber) throws GeneralSecurityException, OperatorCreationException, IOException {
+    private FilesystemKeystoreInformation createKeystore(Path path, String alias, final String cnName, final BigInteger serialNumber) throws GeneralSecurityException, OperatorCreationException, IOException {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
         X500Name name = new X500Name(cnName);
@@ -121,6 +121,6 @@ public class TruststoreCreatorTest {
         try (final FileOutputStream fileOutputStream = new FileOutputStream(path.toFile())) {
             trustStore.store(fileOutputStream, password);
         }
-        return new KeystoreInformation(path, password);
+        return new FilesystemKeystoreInformation(path, password);
     }
 }

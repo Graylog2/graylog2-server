@@ -14,18 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.cert.storage;
 
-import org.bouncycastle.operator.OperatorCreationException;
-import org.graylog.security.certutil.cert.CertificateChain;
+import * as React from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Optional;
+import { Section } from 'components/common';
 
-public interface CertChainStorage {
-    void writeCertChain(CertificateChain certChain, String nodeId)
-            throws IOException, OperatorCreationException;
+const StreamDataRoutingDestinations = () => {
+  const StreamDataWarehouseComponent = PluginStore.exports('dataWarehouse')?.[0]?.StreamDataWarehouse;
 
-    Optional<CertificateChain> readCertChain(String nodeId) throws IOException, GeneralSecurityException;
-}
+  return (
+    <>
+      <Section title="Index Set">
+        <dl>
+          <dd>IndexSet Name: Default index set</dd>
+        </dl>
+
+      </Section>
+      <StreamDataWarehouseComponent />
+    </>
+  );
+};
+
+export default StreamDataRoutingDestinations;

@@ -14,23 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.csr;
+import * as React from 'react';
+import type { TextProps } from '@mantine/core';
+import { Text as MantineText } from '@mantine/core';
 
-import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
+type Props = {
+  children: string,
+} & TextProps;
 
-import java.security.PrivateKey;
+const Text = ({ ...props }: Props) => (
+  <MantineText {...props} />
+);
 
-public class InMemoryPrivateKeyStorage implements PrivateKeyEncryptedStorage {
-
-    private PrivateKey privateKey;
-
-    @Override
-    public void writeEncryptedKey(char[] password, PrivateKey privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    @Override
-    public PrivateKey readEncryptedKey(char[] password) {
-        return privateKey;
-    }
-}
+export default Text;

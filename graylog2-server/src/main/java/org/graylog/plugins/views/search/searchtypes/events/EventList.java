@@ -96,6 +96,11 @@ public abstract class EventList implements SearchType {
         return sort().orElse(DEFAULT_SORT);
     }
 
+    @Override
+    public boolean isExportable() {
+        return true;
+    }
+
     @JsonCreator
     public static Builder builder() {
         return new AutoValue_EventList.Builder()
