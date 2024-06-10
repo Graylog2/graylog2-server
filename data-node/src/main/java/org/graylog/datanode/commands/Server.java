@@ -25,6 +25,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.PeriodicalBindings;
@@ -34,9 +35,7 @@ import org.graylog.datanode.bootstrap.ServerBootstrap;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
-import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog2.bindings.MongoDBModule;
-import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
@@ -52,8 +51,6 @@ import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Arrays;
 import java.util.Collection;

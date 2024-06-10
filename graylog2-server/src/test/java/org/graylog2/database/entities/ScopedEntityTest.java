@@ -19,7 +19,8 @@ package org.graylog2.database.entities;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 class ScopedEntityTest {
 
@@ -45,6 +46,6 @@ class ScopedEntityTest {
         NullPointerException exception = Assertions.assertThrows(NullPointerException.class, () -> {
             TestScopedEntity.builder().title(TITLE).scope(null).build();
         });
-        Assertions.assertEquals("Null scope", exception.getMessage());
+        assertEquals("Null scope", exception.getMessage());
     }
 }
