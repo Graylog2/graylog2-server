@@ -14,14 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.streams;
+package org.graylog2.streams;
 
 public interface StreamDeletionGuard {
     void checkGuard(String streamId) throws StreamGuardException;
-
-    class StreamGuardException extends Exception {
-        public StreamGuardException(String message) {
-            super(message);
-        }
-    }
 }

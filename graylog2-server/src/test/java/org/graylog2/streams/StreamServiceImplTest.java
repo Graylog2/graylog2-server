@@ -34,6 +34,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -61,7 +63,7 @@ public class StreamServiceImplTest {
     @Before
     public void setUp() throws Exception {
         this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService,
-                outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus());
+                outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus(), Set.of());
     }
 
     @Test
