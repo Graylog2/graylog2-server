@@ -131,7 +131,7 @@ describe('RuleBlockForm', () => {
 
     fireEvent.click(helpIcon);
 
-    expect(screen.getByText('Function Syntax Help')).toBeInTheDocument();
+    await screen.findByText('Function Syntax Help');
   });
 
   it('does not add a new block and calls onCancel handler when clicking cancel button', async () => {

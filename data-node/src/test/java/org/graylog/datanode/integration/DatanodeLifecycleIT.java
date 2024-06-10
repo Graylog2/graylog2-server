@@ -16,16 +16,13 @@
  */
 package org.graylog.datanode.integration;
 
-import com.github.joschi.jadconfig.util.Duration;
-import com.github.rholder.retry.RetryException;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.configuration.variants.KeystoreInformation;
-import org.graylog.datanode.restoperations.DatanodeRestApiWait;
-import org.graylog.datanode.restoperations.DatanodeStatusChangeOperation;
-import org.graylog.datanode.restoperations.RestOperationParameters;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
+import org.graylog.testing.restoperations.DatanodeRestApiWait;
+import org.graylog.testing.restoperations.DatanodeStatusChangeOperation;
+import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.plugin.Tools;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,10 +34,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.util.concurrent.ExecutionException;
 
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
-import static org.graylog.testing.completebackend.ContainerizedGraylogBackend.ROOT_PASSWORD_PLAINTEXT;
 
 public class DatanodeLifecycleIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeLifecycleIT.class);
@@ -56,13 +51,13 @@ public class DatanodeLifecycleIT {
     void setUp() throws IOException, GeneralSecurityException {
         containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
-        KeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
+        FilesystemKeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
         trustStore = DatanodeSecurityTestUtils.buildTruststore(ca);
 
         // use the CA to generate transport certificate keystore
-        final KeystoreInformation transportCert = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, containerHostname);
+        final FilesystemKeystoreInformation transportCert = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, containerHostname);
         // use the CA to generate HTTP certificate keystore
-        final KeystoreInformation httpCert = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, containerHostname, Tools.getLocalCanonicalHostname());
+        final FilesystemKeystoreInformation httpCert = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, containerHostname, Tools.getLocalCanonicalHostname());
 
         backend = new DatanodeContainerizedBackend(containerHostname, datanodeContainer -> {
             // provide the keystore files to the docker container

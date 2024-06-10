@@ -36,7 +36,7 @@ const type = 'condition';
 
 describe('RuleBlockDisplay', () => {
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it('uses the step_title', async () => {

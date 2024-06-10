@@ -20,6 +20,8 @@ import styled from 'styled-components';
 import CarouselSlide from './CarouselSlide';
 import CarouselContext from './CarouselContext';
 
+export const CAROUSEL_CONTAINER_CLASS_NAME = 'carousel-container';
+
 const useCarouselRef = (carouselId: string) => {
   const carouselContext = useContext(CarouselContext);
 
@@ -35,12 +37,15 @@ const useCarouselRef = (carouselId: string) => {
 };
 
 /*
- * Carousel component based on embla carousel. Needs to be wrapped in CarouselProvider.
- * The CarouselProvider also allows configuring the carousel.
+ * Carousel component based on embla carousel. It needs to be wrapped with the CarouselProvider.
+ * The CarouselProvider allows accessing the carouselApi object in all children, like the carousel navigation components.
+ * The CarouselProvider also maintains the carousel configuration options.
  */
 
 type Props = {
   children: React.ReactNode,
+  className?: string
+  containerRef?: React.Ref<HTMLDivElement>
   carouselId: string
 };
 
@@ -48,7 +53,7 @@ const StyledDiv = styled.div`
   &.carousel {
     overflow: hidden;
 
-    .carousel-container {
+    .${CAROUSEL_CONTAINER_CLASS_NAME} {
       backface-visibility: hidden;
       display: flex;
       flex-direction: row;
@@ -57,16 +62,21 @@ const StyledDiv = styled.div`
   }
 `;
 
-const Carousel = ({ children, carouselId }: Props) => {
+const Carousel = ({ children, className, containerRef, carouselId }: Props) => {
   const carouselRef = useCarouselRef(carouselId);
 
   return (
-    <StyledDiv className="carousel" ref={carouselRef}>
-      <div className="carousel-container">
+    <StyledDiv className={`carousel ${className}`} ref={carouselRef}>
+      <div className={CAROUSEL_CONTAINER_CLASS_NAME} ref={containerRef}>
         {children}
       </div>
     </StyledDiv>
   );
+};
+
+Carousel.defaultProps = {
+  className: undefined,
+  containerRef: undefined,
 };
 
 Carousel.Slide = CarouselSlide;

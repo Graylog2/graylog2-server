@@ -125,6 +125,9 @@ public class ElasticsearchExportBackend implements ExportBackend {
         SearchSourceBuilder ssb = new SearchSourceBuilder()
                 .query(query)
                 .size(command.chunkSize());
+        if (!command.exportAllFields()) {
+            ssb = ssb.fetchSource(command.fieldsInOrder().toArray(new String[]{}), null);
+        }
 
         return requestStrategy.configure(ssb);
     }

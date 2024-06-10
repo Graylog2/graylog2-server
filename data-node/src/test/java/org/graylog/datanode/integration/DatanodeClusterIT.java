@@ -16,21 +16,18 @@
  */
 package org.graylog.datanode.integration;
 
-import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
-import jakarta.inject.Provider;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.configuration.variants.KeystoreInformation;
-import org.graylog.datanode.restoperations.DatanodeOpensearchWait;
-import org.graylog.datanode.restoperations.DatanodeRestApiWait;
-import org.graylog.datanode.restoperations.DatanodeStatusChangeOperation;
-import org.graylog.datanode.restoperations.OpensearchTestIndexCreation;
-import org.graylog.datanode.restoperations.RestOperationParameters;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
+import org.graylog.testing.restoperations.DatanodeOpensearchWait;
+import org.graylog.testing.restoperations.DatanodeRestApiWait;
+import org.graylog.testing.restoperations.DatanodeStatusChangeOperation;
+import org.graylog.testing.restoperations.OpensearchTestIndexCreation;
+import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -64,7 +60,7 @@ public class DatanodeClusterIT {
     static Path tempDir;
     private String hostnameNodeA;
     private KeyStore trustStore;
-    private KeystoreInformation ca;
+    private FilesystemKeystoreInformation ca;
     private Network network;
     private MongoDBTestService mongoDBTestService;
     @BeforeEach
@@ -75,8 +71,8 @@ public class DatanodeClusterIT {
         trustStore = DatanodeSecurityTestUtils.buildTruststore(ca);
 
         hostnameNodeA = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeA = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeA);
-        final KeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
+        final FilesystemKeystoreInformation transportNodeA = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeA);
+        final FilesystemKeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
 
         this.network = Network.newNetwork();
         this.mongoDBTestService = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, network);
@@ -92,8 +88,8 @@ public class DatanodeClusterIT {
 
 
         final String hostnameNodeB = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeB = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeB);
-        final KeystoreInformation httpNodeB = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeB);
+        final FilesystemKeystoreInformation transportNodeB = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeB);
+        final FilesystemKeystoreInformation httpNodeB = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeB);
 
         nodeB = createDatanodeContainer(
                 network,
@@ -130,8 +126,8 @@ public class DatanodeClusterIT {
     void testAddingNodeToExistingCluster() throws ExecutionException, RetryException {
 
         final String hostnameNodeC = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
-        final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
+        final FilesystemKeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
+        final FilesystemKeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
 
         nodeC = createDatanodeContainer(
                 network, mongoDBTestService,
@@ -150,8 +146,8 @@ public class DatanodeClusterIT {
     void testRemovingNodeReallocatesShards() throws ExecutionException, RetryException {
 
         final String hostnameNodeC = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
-        final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
+        final FilesystemKeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
+        final FilesystemKeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
 
         nodeC = createDatanodeContainer(
                 network, mongoDBTestService,
@@ -208,8 +204,8 @@ public class DatanodeClusterIT {
     private DatanodeContainerizedBackend createDatanodeContainer(Network network,
                                                                  MongoDBTestService mongodb,
                                                                  String hostname,
-                                                                 KeystoreInformation transportKeystore,
-                                                                 KeystoreInformation httpKeystore) {
+                                                                 FilesystemKeystoreInformation transportKeystore,
+                                                                 FilesystemKeystoreInformation httpKeystore) {
         return new DatanodeContainerizedBackend(
                 network,
                 mongodb,
