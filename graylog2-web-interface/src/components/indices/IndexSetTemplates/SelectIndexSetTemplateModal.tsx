@@ -23,15 +23,15 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { Row, Col, Modal, SegmentedControl } from 'components/bootstrap';
+import { Row, Col, Modal, Input, SegmentedControl } from 'components/bootstrap';
 import { ModalSubmit, Spinner, Select } from 'components/common';
 import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
+import useBuiltInTemplates from 'components/indices/IndexSetTemplates/hooks/useBuiltInTemplates';
 import useTemplates from 'components/indices/IndexSetTemplates/hooks/useTemplates';
 import TemplateDetails from 'components/indices/IndexSetTemplates/TemplateDetails';
 import IndexSetTemplateCard from 'components/indices/IndexSetTemplates/IndexSetTemplateCard';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
-import type { Sort } from 'stores/PaginationTypes';
 
 type Props = {
   show: boolean,
@@ -54,28 +54,17 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
+  const [showBuiltInWarmTier, setShowBuiltInWarmTier] = useState<boolean>(false);
 
   const templateCategorySegments: Array<{value: TemplateCategorySegment, label: string}> = [
     { value: 'built_in', label: 'Default Templates' },
     { value: 'custom', label: 'Custom Templates' },
   ];
 
-  const sort: Sort = {
-    attributeId: 'title',
-    direction: 'asc',
-  };
-
   const {
     isLoading: isLoadingBuiltIn,
-    data: { list: builtInList },
-  } = useTemplates(
-    {
-      page: 1,
-      pageSize: 3,
-      query: 'built_in:true',
-      sort: sort,
-    },
-  );
+    data: builtInList,
+  } = useBuiltInTemplates(showBuiltInWarmTier);
 
   const {
     isLoading: isLoadingCustom,
@@ -85,7 +74,10 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
       page: 1,
       pageSize: 20,
       query: 'built_in:false',
-      sort: sort,
+      sort: {
+        attributeId: 'title',
+        direction: 'asc',
+      },
     },
   );
 
@@ -164,6 +156,12 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
             <Col md={12}>
               {selectedTemplateCategory === 'built_in' && (
                 <FlexWrapper>
+
+                  <Input id="built-in-data-tiering"
+                         type="checkbox"
+                         label="Warm Tier (Enterprise)"
+                         checked={showBuiltInWarmTier}
+                         onChange={() => setShowBuiltInWarmTier(!showBuiltInWarmTier)} />
                   {isLoadingBuiltIn ? (<div><Spinner /></div>) : (
                     builtInList.map((template) => (
                       <IndexSetTemplateCard template={template}

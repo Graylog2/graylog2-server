@@ -36,13 +36,19 @@ const ButtonWrapper = styled.div`
   justify-content: end;
 `;
 
-const StyledCard = styled(Card)<{ $selected: boolean }>(({ $selected, theme }) => css`
+const StyledCard = styled(Card)<{ $selected: boolean, $disabled: boolean }>(({ $selected, $disabled, theme }) => css`
   display: flex;
   gap: ${theme.spacings.sm};
+  ${$disabled && (`color: ${theme.colors.global.textSecondary};`)}
+
   ${$selected && (`
     background-color: ${theme.colors.global.background};
     border: 2px solid ${theme.colors.contrast.default};
   `)}
+`);
+
+const Title = styled.h3<{ $disabled: boolean }>(({ $disabled, theme }) => css`
+  ${$disabled && (`color: ${theme.colors.global.textSecondary};`)}
 `);
 
 const Description = styled.p`
@@ -53,8 +59,8 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
 
   return (
-    <StyledCard $selected={isSelected}>
-      <h3>{template.title}</h3>
+    <StyledCard $selected={isSelected} $disabled={!template.enabled}>
+      <Title $disabled={!template.enabled}>{template.title}</Title>
       {template.index_set_config.use_legacy_rotation && (
         <Description>{template.description}</Description>
       )}
@@ -72,9 +78,11 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
           </Col>
         </Row>
       )}
-      <ButtonWrapper>
-        <Button onClick={() => handleCardClick(template)} disabled={isSelected}>{isSelected ? 'Selected' : 'Select'}</Button>
-      </ButtonWrapper>
+      {template.enabled && (
+        <ButtonWrapper>
+          <Button onClick={() => handleCardClick(template)} disabled={isSelected}>{isSelected ? 'Selected' : 'Select'}</Button>
+        </ButtonWrapper>
+      )}
     </StyledCard>
   );
 };
