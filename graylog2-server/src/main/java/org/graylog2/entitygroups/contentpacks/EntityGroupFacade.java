@@ -57,7 +57,7 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
     public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final EntityGroup entityGroup = dbEntityGroupService.get(entityDescriptor.id().id())
                 .orElseThrow(() -> new ContentPackException());
-        
+
         final Set<EntityDescriptor> entities = new HashSet<>();
 
         entityGroup.entities().entrySet().forEach(typeGroup -> {
