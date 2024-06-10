@@ -65,8 +65,7 @@ public class EntityGroupService {
         if (dbEntityGroupService.get(id).isEmpty()) {
             throw new NotFoundException("Unable to find entity group to update");
         }
-        return dbEntityGroupService.save(group);
-
+        return dbEntityGroupService.save(group.toBuilder().id(id).build());
     }
 
     public EntityGroup addEntityToGroup(String groupId, String type, String entityId) {

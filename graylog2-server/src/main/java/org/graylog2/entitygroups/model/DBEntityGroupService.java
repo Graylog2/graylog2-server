@@ -89,12 +89,12 @@ public class DBEntityGroupService {
                 paginationHelper.filter(searchQuery.toBson()).sort(sort).perPage(perPage).page(page, filter);
     }
 
-    public EntityGroup save(EntityGroup EntityGroup) {
-        if (EntityGroup.id() != null) {
-            return scopedEntityMongoUtils.update(EntityGroup);
+    public EntityGroup save(EntityGroup entityGroup) {
+        if (entityGroup.id() != null) {
+            return scopedEntityMongoUtils.update(entityGroup);
         }
-        String newId = scopedEntityMongoUtils.create(EntityGroup);
-        return EntityGroup.toBuilder().id(newId).build();
+        String newId = scopedEntityMongoUtils.create(entityGroup);
+        return entityGroup.toBuilder().id(newId).build();
     }
 
     public Optional<EntityGroup> getByName(String name) {

@@ -27,5 +27,5 @@ public record BulkEntityGroupRequest(
         List<String> entityIds
 ) {
     public static final String FIELD_ENTITY_TYPE = "entity_type";
-    public static final String FIELD_ENTITY_IDS = "entity_IDS";
+    public static final String FIELD_ENTITY_IDS = "entity_ids";
 }
