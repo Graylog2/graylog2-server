@@ -20,12 +20,13 @@ import Immutable from 'immutable';
 
 import { Link } from 'components/common/router';
 import { MessageDetailsDefinitionList, ClipboardButton, Icon, Timestamp } from 'components/common';
-import { Button, ButtonGroup, Col, Label, Row } from 'components/bootstrap';
+import { ButtonGroup, Col, Label, Row } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
+import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 
 class MessageDetail extends React.Component {
   static propTypes = {
@@ -85,12 +86,9 @@ class MessageDetail extends React.Component {
       return <ButtonGroup className="pull-right" />;
     }
 
-    const messageUrl = message.index ? Routes.message_show(message.index, message.id) : '#';
-
     return (
       <ButtonGroup className="pull-right">
-        <Button href={messageUrl}>Permalink</Button>
-
+        <MessagePermalinkButton messageIndex={message.index} messageId={message.id} />
         <ClipboardButton title="Copy ID" bsSize="small" text={message.id} />
       </ButtonGroup>
     );
