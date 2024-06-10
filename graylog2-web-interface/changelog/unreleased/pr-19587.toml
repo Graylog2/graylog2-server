@@ -1,4 +1,4 @@
-type = "add"
+type = "a"
 message = "Add pipeline connections management to stream details page."
 
 issues = [""]
