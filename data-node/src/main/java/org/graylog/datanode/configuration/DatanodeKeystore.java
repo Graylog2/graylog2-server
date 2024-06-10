@@ -72,7 +72,7 @@ public class DatanodeKeystore {
 
     // TODO: we could be smarter here, caching the results as long as there is no keystore change event. This requires some
     // additional code, but would perform better.
-    private final Supplier<Date> certValidUntil = Suppliers.memoizeWithExpiration(this::getCertificateExpiration, Duration.ofMinutes(1));
+    private final Supplier<Date> certValidUntil = Suppliers.memoizeWithExpiration(this::doGetCertificateExpiration, Duration.ofMinutes(1));
 
     @Inject
     public DatanodeKeystore(DatanodeConfiguration configuration, final @Named("password_secret") String passwordSecret, EventBus eventBus) {
@@ -153,7 +153,6 @@ public class DatanodeKeystore {
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
             throw new DatanodeKeystoreException(e);
         }
-        LOG.info("Invalidating certificate validity cache");
         triggerChangeEvent(keystore);
         return keystore;
     }
@@ -180,12 +179,10 @@ public class DatanodeKeystore {
     }
 
     public Date getCertificateExpiration() {
-        LOG.info("Getting cached certificate validation");
         return certValidUntil.get();
     }
 
     private Date doGetCertificateExpiration() {
-        LOG.info("Getting real certificate validation");
         try {
             final X509Certificate datanodeCert = (X509Certificate) loadKeystore().getCertificate(DATANODE_KEY_ALIAS);
             return datanodeCert.getNotAfter();
