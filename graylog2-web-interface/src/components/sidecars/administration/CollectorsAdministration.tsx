@@ -357,7 +357,9 @@ const CollectorsAdministration = ({
     onPageChange(page, pageSize);
   };
 
-  const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => sidecarCollectorPairs.find(({ sidecar, collector }) => sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId));
+  const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => sidecarCollectorPairs.find(
+    ({ sidecar, collector }) => sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId),
+  ).filter((sidecarCollectorPair) => !!sidecarCollectorPair?.collector && !!sidecarCollectorPair?.sidecar);
 
   let formattedCollectors;
 
