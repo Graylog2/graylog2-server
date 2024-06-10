@@ -14,16 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration.variants;
+package org.graylog.datanode.configuration;
 
-import java.nio.file.Path;
-
-public record KeystoreInformation(Path location, char[] password) {
-    public KeystoreInformation(Path location, String password) {
-        this(location, password.toCharArray());
-    }
-
-    public String passwordAsString() {
-        return new String(password());
+public class DatanodeKeystoreException extends Exception {
+    public DatanodeKeystoreException(Throwable cause) {
+        super(cause);
     }
 }

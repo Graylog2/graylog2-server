@@ -164,6 +164,25 @@ export class Builder {
     return this;
   }
 
+  blobFile(body, mimeType) {
+    this.body = { body: maybeStringify(body), mimeType: 'application/json' };
+    this.accept = mimeType;
+
+    this.responseHandler = (resp: { ok: boolean, blob: () => Blob }) => {
+      if (resp.ok) {
+        reportServerSuccess();
+
+        return resp.blob();
+      }
+
+      throw resp;
+    };
+
+    this.errorHandler = (error: Response) => onServerError(error);
+
+    return this;
+  }
+
   plaintext(body) {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'application/json';
@@ -287,6 +306,14 @@ export function fetchPeriodically<T = unknown>(method, url, body?): Promise<T> {
 export function fetchFile(method, url, body, mimeType = 'text/csv') {
   const promise = () => new Builder(method, url)
     .file(body, mimeType)
+    .build();
+
+  return queuePromiseIfNotLoggedin(promise)();
+}
+
+export function fetchBlobFile(method, url, body, mimeType = 'text/csv') {
+  const promise = () => new Builder(method, url)
+    .blobFile(body, mimeType)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();
