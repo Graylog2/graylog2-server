@@ -3252,9 +3252,9 @@
     "@types/geojson" "*"
 
 "@types/lodash@^4.14.165":
-  version "4.17.4"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.4.tgz#0303b64958ee070059e3a7184048a55159fe20b7"
-  integrity sha512-wYCP26ZLxaT3R39kiN2+HcJ4kTd3U1waI/cY7ivWYqFP6pW3ZNpvi6Wd6PHZx7T/t8z0vlkXMg3QYLa7DZ/IJQ==
+  version "4.17.5"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.5.tgz#e6c29b58e66995d57cd170ce3e2a61926d55ee04"
+  integrity sha512-MBIOHVZqVqgfro1euRDWX7OO0fBVUUMrN6Pwm8LQsz8cWhEpihlvR70ENj3f40j58TNxZaWv2ndSkInykNBBJw==
 
 "@types/md5@^2.3.0":
   version "2.3.5"
@@ -7250,7 +7250,7 @@ eslint-config-airbnb@19.0.4:
     eslint-plugin-compat "4.2.0"
     eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
-    eslint-plugin-jest "28.5.0"
+    eslint-plugin-jest "28.6.0"
     eslint-plugin-jest-dom "5.4.0"
     eslint-plugin-jest-formatting "3.1.0"
     eslint-plugin-jsx-a11y "6.8.0"
@@ -7340,10 +7340,10 @@ eslint-plugin-jest-formatting@3.1.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-jest-formatting/-/eslint-plugin-jest-formatting-3.1.0.tgz#b26dd5a40f432b642dcc880021a771bb1c93dcd2"
   integrity sha512-XyysraZ1JSgGbLSDxjj5HzKKh0glgWf+7CkqxbTqb7zEhW7X2WHo5SBQ8cGhnszKN+2Lj3/oevBlHNbHezoc/A==
 
-eslint-plugin-jest@28.5.0:
-  version "28.5.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-28.5.0.tgz#b497b795de37f671eaccd38bd83030186ff5dc8d"
-  integrity sha512-6np6DGdmNq/eBbA7HOUNV8fkfL86PYwBfwyb8n23FXgJNTR8+ot3smRHjza9LGsBBZRypK3qyF79vMjohIL8eQ==
+eslint-plugin-jest@28.6.0:
+  version "28.6.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-28.6.0.tgz#8410588d60bcafa68a91b6ec272e4a415502302a"
+  integrity sha512-YG28E1/MIKwnz+e2H7VwYPzHUYU4aMa19w0yGcwXnnmJH6EfgHahTJ2un3IyraUxNfnz/KUhJAFXNNwWPo12tg==
   dependencies:
     "@typescript-eslint/utils" "^6.0.0 || ^7.0.0"
 
