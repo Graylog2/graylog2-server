@@ -1,0 +1,4 @@
+type = "a"
+message = "Added support for scheduling Event Definitions using cron expressions."
+
+pulls = ["19563"]
