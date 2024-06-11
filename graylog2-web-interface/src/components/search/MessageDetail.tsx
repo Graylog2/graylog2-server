@@ -160,7 +160,7 @@ const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, cust
             <dt>Stored in index</dt>
             <dd>{message.index ? message.index : 'Message is not stored'}</dd>
 
-            {!!streamIds.size && (
+            {streamIds.size > 0 && (
               <>
                 <dt>Routed into streams</dt>
                 <dd className="stream-list">
