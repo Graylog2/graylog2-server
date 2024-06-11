@@ -29,6 +29,8 @@ import javax.annotation.Nullable;
 import java.util.SortedSet;
 import java.util.stream.Stream;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 @AutoValue
 public abstract class Pipeline {
 
@@ -37,7 +39,9 @@ public abstract class Pipeline {
 
     @Nullable
     public abstract String id();
+
     public abstract String name();
+
     public abstract SortedSet<Stage> stages();
 
     public static Builder builder() {
@@ -62,10 +66,11 @@ public abstract class Pipeline {
      * Register the metrics attached to this pipeline.
      *
      * @param metricRegistry the registry to add the metrics to
+     * @param namePrefix     optional metric name prefix
      */
-    public void registerMetrics(MetricRegistry metricRegistry) {
+    public void registerMetrics(MetricRegistry metricRegistry, @Nullable String namePrefix) {
         if (id() != null) {
-            metricName = MetricRegistry.name(Pipeline.class, id(), "executed");
+            metricName = MetricRegistry.name(firstNonNull(namePrefix, Pipeline.class.getName()), id(), "executed");
             executed = metricRegistry.meter(metricName);
         }
     }
@@ -83,6 +88,7 @@ public abstract class Pipeline {
         return new MetricUtils.SingleMetricFilter(metricName);
 
     }
+
     public void markExecution() {
         if (executed != null) {
             executed.mark();

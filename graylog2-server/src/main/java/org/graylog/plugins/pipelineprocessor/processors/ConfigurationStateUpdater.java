@@ -17,13 +17,14 @@
 package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
@@ -35,23 +36,10 @@ import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEv
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
-import org.graylog.plugins.pipelineprocessor.parser.ParseException;
-import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 
-import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
@@ -60,10 +48,6 @@ import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpret
 public class ConfigurationStateUpdater {
     private static final RateLimitedLog log = getRateLimitedLog(ConfigurationStateUpdater.class);
 
-    private final RuleService ruleService;
-    private final PipelineService pipelineService;
-    private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
-    private final PipelineRuleParser pipelineRuleParser;
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final MetricRegistry metricRegistry;
     private final ScheduledExecutorService scheduler;
@@ -73,26 +57,32 @@ public class ConfigurationStateUpdater {
      * non-null if the update has successfully loaded a state
      */
     private final AtomicReference<PipelineInterpreter.State> latestState = new AtomicReference<>();
+    private final PipelineResolver pipelineResolver;
 
     @Inject
     public ConfigurationStateUpdater(RuleService ruleService,
                                      PipelineService pipelineService,
                                      PipelineStreamConnectionsService pipelineStreamConnectionsService,
-                                     PipelineRuleParser pipelineRuleParser,
+                                     PipelineResolver.Factory pipelineResolverFactory,
                                      RuleMetricsConfigService ruleMetricsConfigService,
                                      MetricRegistry metricRegistry,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                      EventBus serverEventBus,
                                      PipelineInterpreter.State.Factory stateFactory) {
-        this.ruleService = ruleService;
-        this.pipelineService = pipelineService;
-        this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
-        this.pipelineRuleParser = pipelineRuleParser;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.metricRegistry = metricRegistry;
         this.scheduler = scheduler;
         this.serverEventBus = serverEventBus;
         this.stateFactory = stateFactory;
+        this.pipelineResolver = pipelineResolverFactory.create(
+                PipelineResolverConfig.of(
+                        // TODO: Implement a #streamAll method in the services to get a real database cursor instead of
+                        //       loading all entries into memory.
+                        () -> ruleService.loadAll().stream(),
+                        () -> pipelineService.loadAll().stream(),
+                        () -> pipelineStreamConnectionsService.loadAll().stream()
+                )
+        );
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
@@ -103,43 +93,8 @@ public class ConfigurationStateUpdater {
     // only the singleton instance should mutate itself, others are welcome to reload a new state, but we don't
     // currently allow direct global state updates from external sources (if you need to, send an event on the bus instead)
     private synchronized PipelineInterpreter.State reloadAndSave() {
-        // read all rules and parse them
-        Map<String, Rule> ruleNameMap = Maps.newHashMap();
-        ruleService.loadAll().forEach(ruleDao -> {
-            Rule rule;
-            try {
-                rule = pipelineRuleParser.parseRule(ruleDao.id(), ruleDao.source(), false);
-            } catch (ParseException e) {
-                log.warn("Ignoring non parseable rule <{}/{}> with errors <{}>", ruleDao.title(), ruleDao.id(), e.getErrors());
-                rule = Rule.alwaysFalse("Failed to parse rule: " + ruleDao.id());
-            }
-            ruleNameMap.put(rule.name(), rule);
-        });
-
-        // read all pipelines and parse them
-        ImmutableMap.Builder<String, Pipeline> pipelineIdMap = ImmutableMap.builder();
-        pipelineService.loadAll().forEach(pipelineDao -> {
-            Pipeline pipeline;
-            try {
-                pipeline = pipelineRuleParser.parsePipeline(pipelineDao.id(), pipelineDao.source());
-            } catch (ParseException e) {
-                pipeline = Pipeline.empty("Failed to parse pipeline" + pipelineDao.id());
-            }
-            //noinspection ConstantConditions
-            pipelineIdMap.put(pipelineDao.id(), resolvePipeline(pipeline, ruleNameMap));
-        });
-
-        final ImmutableMap<String, Pipeline> currentPipelines = pipelineIdMap.build();
-
-        // read all stream connections of those pipelines to allow processing messages through them
-        final HashMultimap<String, Pipeline> connections = HashMultimap.create();
-        for (PipelineConnections streamConnection : pipelineStreamConnectionsService.loadAll()) {
-            streamConnection.pipelineIds().stream()
-                    .map(currentPipelines::get)
-                    .filter(Objects::nonNull)
-                    .forEach(pipeline -> connections.put(streamConnection.streamId(), pipeline));
-        }
-        ImmutableSetMultimap<String, Pipeline> streamPipelineConnections = ImmutableSetMultimap.copyOf(connections);
+        final ImmutableMap<String, Pipeline> currentPipelines = pipelineResolver.resolvePipelines();
+        final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections = pipelineResolver.resolveStreamConnections(currentPipelines);
 
         final RuleMetricsConfigDto ruleMetricsConfig = ruleMetricsConfigService.get();
         final PipelineInterpreter.State newState = stateFactory.newState(currentPipelines, streamPipelineConnections, ruleMetricsConfig);
@@ -156,34 +111,6 @@ public class ConfigurationStateUpdater {
      */
     public PipelineInterpreter.State getLatestState() {
         return latestState.get();
-    }
-
-    @Nonnull
-    private Pipeline resolvePipeline(Pipeline pipeline, Map<String, Rule> ruleNameMap) {
-        log.debug("Resolving pipeline {}", pipeline.name());
-
-        pipeline.stages().forEach(stage -> {
-            final List<Rule> resolvedRules = stage.ruleReferences().stream()
-                    .map(ref -> {
-                        Rule rule = ruleNameMap.get(ref);
-                        if (rule == null) {
-                            rule = Rule.alwaysFalse("Unresolved rule " + ref);
-                        }
-                        // make a copy so that the metrics match up (we don't share actual objects between stages)
-                        rule = rule.copy();
-                        log.debug("Resolved rule `{}` to {}", ref, rule);
-                        // include back reference to stage
-                        rule.registerMetrics(metricRegistry, pipeline.id(), String.valueOf(stage.stage()));
-                        return rule;
-                    })
-                    .collect(Collectors.toList());
-            stage.setRules(resolvedRules);
-            stage.setPipeline(pipeline);
-            stage.registerMetrics(metricRegistry, pipeline.id());
-        });
-
-        pipeline.registerMetrics(metricRegistry);
-        return pipeline;
     }
 
     // TODO avoid reloading everything on every change, certain changes can get away with doing less work

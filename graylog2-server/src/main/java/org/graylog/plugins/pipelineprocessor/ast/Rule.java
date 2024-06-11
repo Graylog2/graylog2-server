@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 @AutoValue
@@ -76,38 +77,40 @@ public abstract class Rule {
      * Register the metrics attached to this pipeline.
      *
      * @param metricRegistry the registry to add the metrics to
+     * @param namePrefix     optional metric name prefix
      */
-    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId) {
+    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId, @Nullable String namePrefix) {
         if (id() == null) {
             LOG.debug("Not registering metrics for unsaved rule {}", name());
             return;
         }
         if (id() != null) {
-            globalExecuted = registerGlobalMeter(metricRegistry, "executed");
-            localExecuted = registerLocalMeter(metricRegistry, pipelineId, stageId, "executed");
+            globalExecuted = registerGlobalMeter(metricRegistry, "executed", namePrefix);
+            localExecuted = registerLocalMeter(metricRegistry, pipelineId, stageId, "executed", namePrefix);
 
-            globalFailed = registerGlobalMeter(metricRegistry, "failed");
-            localFailed = registerLocalMeter(metricRegistry, pipelineId, stageId, "failed");
+            globalFailed = registerGlobalMeter(metricRegistry, "failed", namePrefix);
+            localFailed = registerLocalMeter(metricRegistry, pipelineId, stageId, "failed", namePrefix);
 
-            globalMatched = registerGlobalMeter(metricRegistry, "matched");
-            localMatched = registerLocalMeter(metricRegistry, pipelineId, stageId, "matched");
+            globalMatched = registerGlobalMeter(metricRegistry, "matched", namePrefix);
+            localMatched = registerLocalMeter(metricRegistry, pipelineId, stageId, "matched", namePrefix);
 
-            globalNotMatched = registerGlobalMeter(metricRegistry, "not-matched");
-            localNotMatched = registerLocalMeter(metricRegistry, pipelineId, stageId, "not-matched");
+            globalNotMatched = registerGlobalMeter(metricRegistry, "not-matched", namePrefix);
+            localNotMatched = registerLocalMeter(metricRegistry, pipelineId, stageId, "not-matched", namePrefix);
 
         }
     }
 
-    private Meter registerGlobalMeter(MetricRegistry metricRegistry, String type) {
-        final String name = MetricRegistry.name(Rule.class, id(), type);
+    private Meter registerGlobalMeter(MetricRegistry metricRegistry, String type, @Nullable String namePrefix) {
+        final String name = MetricRegistry.name(firstNonNull(namePrefix, Rule.class.getName()), id(), type);
         metricNames.add(name);
         return metricRegistry.meter(name);
     }
 
     private Meter registerLocalMeter(MetricRegistry metricRegistry,
                                      String pipelineId,
-                                     String stageId, String type) {
-        final String name = MetricRegistry.name(Rule.class, id(), pipelineId, stageId, type);
+                                     String stageId, String type,
+                                     @Nullable String namePrefix) {
+        final String name = MetricRegistry.name(firstNonNull(namePrefix, Rule.class.getName()), id(), pipelineId, stageId, type);
         metricNames.add(name);
         return metricRegistry.meter(name);
     }

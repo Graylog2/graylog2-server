@@ -20,11 +20,13 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import org.graylog2.shared.metrics.MetricUtils;
 
 import java.util.List;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 public abstract class Stage implements Comparable<Stage> {
@@ -67,9 +69,10 @@ public abstract class Stage implements Comparable<Stage> {
      * Register the metrics attached to this stage.
      *
      * @param metricRegistry the registry to add the metrics to
+     * @param namePrefix     optional metric name prefix
      */
-    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId) {
-        meterName = name(Pipeline.class, pipelineId, "stage", String.valueOf(stage()), "executed");
+    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, @Nullable String namePrefix) {
+        meterName = name(firstNonNull(namePrefix, Pipeline.class.getName()), pipelineId, "stage", String.valueOf(stage()), "executed");
         executed = metricRegistry.meter(meterName);
     }
 
@@ -86,6 +89,7 @@ public abstract class Stage implements Comparable<Stage> {
         return new MetricUtils.SingleMetricFilter(meterName);
 
     }
+
     public void markExecution() {
         if (executed != null) {
             executed.mark();
