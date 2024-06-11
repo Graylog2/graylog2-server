@@ -54,7 +54,8 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
-  const [showBuiltInWarmTier, setShowBuiltInWarmTier] = useState<boolean>(false);
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
+  const [showBuiltInWarmTier, setShowBuiltInWarmTier] = useState<boolean>(!!dataTieringPlugin);
 
   const templateCategorySegments: Array<{value: TemplateCategorySegment, label: string}> = [
     { value: 'built_in', label: 'Default Templates' },
@@ -127,7 +128,6 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   };
 
   const selectedCustomTemplate = customList.find((template) => template.id === tempSelectedTemplate?.id);
-  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
 
   return (
     <Modal show={show}
