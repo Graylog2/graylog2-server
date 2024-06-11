@@ -34,6 +34,7 @@ import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.datanode.DataNodeCommandService;
+import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
@@ -192,12 +193,12 @@ public class MigrationActionsImpl implements MigrationActions {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().stream()
                 .filter(node -> node.getDataNodeStatus() != DataNodeStatus.AVAILABLE)
-                .forEach(this::triggerCSR);
+                .forEach(nodeDto -> triggerCSR(nodeDto, DatanodeStartType.MANUALLY));
     }
 
-    private void triggerCSR(DataNodeDto nodeDto) {
+    private void triggerCSR(DataNodeDto nodeDto, DatanodeStartType startType) {
             try {
-                dataNodeCommandService.triggerCertificateSigningRequest(nodeDto.getNodeId());
+                dataNodeCommandService.triggerCertificateSigningRequest(nodeDto.getNodeId(), startType);
             } catch (NodeNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -208,12 +209,17 @@ public class MigrationActionsImpl implements MigrationActions {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().stream()
                 .filter(node -> node.getDataNodeStatus() != DataNodeStatus.AVAILABLE)
-                .forEach(this::triggerCSR);
+                .forEach(nodeDto -> triggerCSR(nodeDto, DatanodeStartType.AUTOMATICALLY));
     }
 
     @Override
     public boolean provisioningFinished() {
         return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
+    }
+
+    @Override
+    public boolean allDatanodesPrepared() {
+        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.PREPARED);
     }
 
     @Override

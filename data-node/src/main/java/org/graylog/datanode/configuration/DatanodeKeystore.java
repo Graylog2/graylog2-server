@@ -51,6 +51,7 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
@@ -184,8 +185,13 @@ public class DatanodeKeystore {
 
     private Date doGetCertificateExpiration() {
         try {
-            final X509Certificate datanodeCert = (X509Certificate) loadKeystore().getCertificate(DATANODE_KEY_ALIAS);
-            return datanodeCert.getNotAfter();
+            final KeyStore keystore = loadKeystore();
+            if (isSignedCertificateChain(keystore)) {
+                final X509Certificate datanodeCert = (X509Certificate) keystore.getCertificate(DATANODE_KEY_ALIAS);
+                return datanodeCert.getNotAfter();
+            } else {
+                return null;
+            }
         } catch (KeyStoreException | DatanodeKeystoreException e) {
             throw new RuntimeException(e);
         }

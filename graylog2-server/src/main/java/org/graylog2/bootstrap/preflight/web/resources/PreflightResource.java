@@ -49,6 +49,7 @@ import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.datanode.DataNodeCommandService;
+import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
@@ -228,7 +229,7 @@ public class PreflightResource {
 
         activeDataNodes.values().forEach(node -> {
             try {
-                dataNodeCommandService.triggerCertificateSigningRequest(node.getNodeId());
+                dataNodeCommandService.triggerCertificateSigningRequest(node.getNodeId(), DatanodeStartType.AUTOMATICALLY);
             } catch (NodeNotFoundException e) {
                 throw new RuntimeException(e);
             }

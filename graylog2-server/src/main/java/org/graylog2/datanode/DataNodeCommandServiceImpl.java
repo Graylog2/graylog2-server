@@ -71,9 +71,14 @@ public class DataNodeCommandServiceImpl implements DataNodeCommandService {
 
 
     @Override
-    public DataNodeDto triggerCertificateSigningRequest(String nodeId) throws NodeNotFoundException {
+    public DataNodeDto triggerCertificateSigningRequest(String nodeId, DatanodeStartType startType) throws NodeNotFoundException {
         final DataNodeDto node = nodeService.byNodeId(nodeId);
-        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REQUEST_CSR);
+
+        DataNodeLifecycleEvent e = switch (startType) {
+            case AUTOMATICALLY -> DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REQUEST_CSR_WITH_AUTOSTART);
+            case MANUALLY -> DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REQUEST_CSR);
+        };
+
         clusterEventBus.post(e);
         return node;
     }
@@ -92,7 +97,8 @@ public class DataNodeCommandServiceImpl implements DataNodeCommandService {
     @Override
     public DataNodeDto startNode(String nodeId) throws NodeNotFoundException {
         final DataNodeDto node = nodeService.byNodeId(nodeId);
-        if (node.getDataNodeStatus() != DataNodeStatus.UNAVAILABLE) {
+
+        if (node.getDataNodeStatus() != DataNodeStatus.UNAVAILABLE && node.getDataNodeStatus() != DataNodeStatus.PREPARED) {
             throw new IllegalArgumentException("Only stopped data nodes can be started.");
         }
         DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.START);

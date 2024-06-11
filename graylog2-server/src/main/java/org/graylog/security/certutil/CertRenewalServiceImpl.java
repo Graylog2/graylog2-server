@@ -32,6 +32,7 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.datanode.DataNodeCommandService;
+import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
@@ -198,7 +199,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     public void initiateRenewalForNode(final String nodeId) {
         // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
         try {
-            dataNodeCommandService.triggerCertificateSigningRequest(nodeId);
+            dataNodeCommandService.triggerCertificateSigningRequest(nodeId, DatanodeStartType.AUTOMATICALLY);
         } catch (NodeNotFoundException e) {
             throw new RuntimeException(e);
         }

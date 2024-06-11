@@ -69,6 +69,7 @@ public abstract class DataNodeDto extends NodeDto {
         DataNodeProvisioningConfig.State state = switch (getDataNodeStatus()) {
             case AVAILABLE -> DataNodeProvisioningConfig.State.CONNECTED;
             case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
+            case PREPARED -> DataNodeProvisioningConfig.State.STARTUP_PREPARED;
             default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
         };
 

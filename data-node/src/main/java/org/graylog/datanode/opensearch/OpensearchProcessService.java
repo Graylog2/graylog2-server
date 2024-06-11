@@ -27,6 +27,7 @@ import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
@@ -50,6 +51,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     private final OpensearchStateMachine stateMachine;
     private final CsrRequester csrRequester;
+    private boolean processAutostart = true;
 
 
     @Inject
@@ -76,7 +78,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
         switch (event.action()) {
-            case ADD -> this.configurationProvider.setTransientConfiguration("reindex.remote.allowlist", event.allowlist());
+            case ADD ->
+                    this.configurationProvider.setTransientConfiguration("reindex.remote.allowlist", event.allowlist());
             case REMOVE -> this.configurationProvider.removeTransientConfiguration("reindex.remote.allowlist");
         }
     }
@@ -90,7 +93,14 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 case RESET -> stateMachine.fire(OpensearchEvent.RESET);
                 case STOP -> this.shutDown();
                 case START -> stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
-                case REQUEST_CSR -> csrRequester.triggerCsr();
+                case REQUEST_CSR -> {
+                    this.processAutostart = false;
+                    csrRequester.triggerCsr();
+                }
+                case REQUEST_CSR_WITH_AUTOSTART -> {
+                    this.processAutostart = true;
+                    csrRequester.triggerCsr();
+                }
             }
         }
     }
@@ -124,7 +134,12 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             checkWritePreflightFinishedOnInsecureStartup();
             try {
                 lockfileCheck.checkDatanodeLock(config.datanodeDirectories().getDataTargetDir());
-                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+                if (stateMachine.isInState(OpensearchState.WAITING_FOR_CONFIGURATION) && !this.processAutostart) {
+                    stateMachine.fire(OpensearchEvent.PROCESS_PREPARED);
+                    this.processAutostart = true; // reset to default
+                } else {
+                    stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+                }
             } catch (Exception e) {
                 LOG.error("Could not start up data node", e);
             }
