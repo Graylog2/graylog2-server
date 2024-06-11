@@ -99,10 +99,10 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        doRun(needsFullRefresh());
+        doRun(false);
     }
 
-    private void doRun(boolean fullRefresh) {
+    private void doRun(boolean forceFullRefresh) {
         if (serverIsNotRunning()) {
             return;
         }
@@ -129,7 +129,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
             lastPoll.keySet().retainAll(allConfigs.stream().map(IndexSetConfig::id).collect(Collectors.toSet()));
         }
 
-        if (fullRefresh) {
+        if (forceFullRefresh || needsFullRefresh()) {
             try {
                 refreshFieldTypes(allConfigs);
             } finally {
