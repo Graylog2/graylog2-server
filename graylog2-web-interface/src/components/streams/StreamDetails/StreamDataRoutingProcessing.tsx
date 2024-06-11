@@ -36,22 +36,21 @@ const StreamDataRoutingProcessing = () => {
   const { streamId } = useParams<{streamId: string}>();
   const { data: connectedPipelines, isInitialLoading: isLoadingConnectPipelines } = usePipelinesConnectedStream(streamId);
   const hasConnectedPipelines = !isLoadingConnectPipelines && connectedPipelines?.length > 0;
-  const { data: pipelines, isInitialLoading: isLoadingPipelines } = usePipelines();
-  const canShowConnectButton = !isLoadingConnectPipelines && !isLoadingPipelines;
+  const { data: pipelines } = usePipelines();
 
   return (
     <>
-      <Section title="Illuminate Processing"
-               actions={canShowConnectButton && (
-               <IfPermitted permissions="streams:create">
-                 <StreamPipelinesConnectionForm streamId={streamId}
-                                                pipelines={pipelines}
-                                                connectedPipelines={connectedPipelines} />
-               </IfPermitted>
-               )}>
+      <Section title="Illuminate Processing">
         <p>Illuminate Processing step</p>
       </Section>
-      <Section title="Pipelines">
+      <Section title="Pipelines"
+               actions={(
+                 <IfPermitted permissions="streams:create">
+                   <StreamPipelinesConnectionForm streamId={streamId}
+                                                  pipelines={pipelines}
+                                                  connectedPipelines={connectedPipelines} />
+                 </IfPermitted>
+               )}>
         <Table condensed striped hover>
           <thead>
             <tr>

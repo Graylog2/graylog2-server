@@ -30,7 +30,7 @@ const usePipelines = ({ enabled }: Options = { enabled: true }) : {
   refetch: () => void,
   isInitialLoading: boolean,
 } => {
-  const { data = [], refetch, isInitialLoading } = useQuery<Array<PipelineType>, FetchError>(
+  const { data, refetch, isInitialLoading } = useQuery<Array<PipelineType>, FetchError>(
     ['pipelines'],
     () => PipelinesPipelines.getAll(),
     {
@@ -44,7 +44,7 @@ const usePipelines = ({ enabled }: Options = { enabled: true }) : {
   );
 
   return ({
-    data,
+    data: data ?? [],
     refetch,
     isInitialLoading,
   });

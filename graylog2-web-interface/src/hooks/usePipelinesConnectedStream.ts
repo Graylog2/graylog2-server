@@ -41,7 +41,7 @@ const usePipelinesConnectedStream = (streamId: string): {
   );
 
   return ({
-    data,
+    data: data ?? [],
     refetch,
     isInitialLoading,
     error,

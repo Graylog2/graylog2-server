@@ -30,14 +30,14 @@ import useStreamPipelinesConnectionMutation from 'components/streams/hooks/useSt
 type Props = {
   streamId: string,
   pipelines: Array<PipelineType>,
-  connectedPipelines: any,
+  connectedPipelines: Array<Pick<PipelineType, 'id' | 'title'>>,
 };
 type FormattedPipelines = {
   value: string,
   label: string,
 }
 
-const formatPipelines = (pipelines: Array<PipelineType>): Array<FormattedPipelines> => pipelines
+const formatPipelines = (pipelines: Array<Partial<PipelineType>>): Array<FormattedPipelines> => pipelines
   .map((s) => ({ value: s.id, label: s.title }))
   .sort((s1, s2) => naturalSort(s1.label, s2.label));
 
@@ -45,8 +45,8 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
   const [showModal, setShowModal] = useState<boolean>(false);
   const currentUser = useCurrentUser();
   const { onSaveStreamPipelinesConnection } = useStreamPipelinesConnectionMutation();
-  const formattedConnectedPipelines = formatPipelines(connectedPipelines);
-  const [updatedPipelines, setUpdatePipelines] = useState<Array<FormattedPipelines>>(formattedConnectedPipelines || []);
+  const formattedConnectedPipelines = formatPipelines(connectedPipelines || []);
+  const [updatedPipelines, setUpdatePipelines] = useState<Array<FormattedPipelines>>(formattedConnectedPipelines);
   const notConnectedPipelines = useMemo(() => pipelines.filter((s) => !updatedPipelines.some((cs) => cs.value.toLowerCase() === s.id.toLowerCase())), [pipelines, updatedPipelines]);
 
   const openModal = () => {
