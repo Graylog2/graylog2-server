@@ -40,7 +40,7 @@ const useStreamPipelinesConnectionMutation = (): {
     onSuccess: () => {
       queryClient.invalidateQueries(['stream', 'pipelines', 'connections']);
 
-      UserNotification.success('Saving stream pipelines connection was successful:',
+      UserNotification.success('Saving stream pipelines connection was successful.',
         'Saving stream pipeline connection.');
     },
     onError: (errorThrown) => {

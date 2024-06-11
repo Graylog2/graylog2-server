@@ -33,6 +33,7 @@ type Props = {
   pipelines: Array<PipelineType>,
   connectedPipelines: Array<Pick<PipelineType, 'id' | 'title'>>,
 };
+
 type FormattedPipelines = {
   value: string,
   label: string,
@@ -63,6 +64,11 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
     setShowModal(false);
   };
 
+  const onCancel = () => {
+    setUpdatePipelines(formattedConnectedPipelines);
+    onCloseModal();
+  };
+
   const onSave = () => {
     onSaveStreamPipelinesConnection({ streamId, pipelineIds: updatedPipelines.map((p) => p.value) }).then(() => {
       queryClient.invalidateQueries(['stream', 'pipelines', streamId]);
@@ -89,7 +95,7 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
       <BootstrapModalForm show={showModal}
                           title={<span>Edit connections for <em>stream</em></span>}
                           onSubmitForm={onSave}
-                          onCancel={onCloseModal}
+                          onCancel={onCancel}
                           submitButtonText="Update connections">
         <fieldset>
           <FormGroup id="pipelinesConnections">
