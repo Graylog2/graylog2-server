@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { BootstrapModalForm, Button, ControlLabel, HelpBlock, FormGroup } from 'components/bootstrap';
@@ -44,6 +45,7 @@ const formatPipelines = (pipelines: Array<Partial<PipelineType>>): Array<Formatt
 const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const currentUser = useCurrentUser();
+  const queryClient = useQueryClient();
   const { onSaveStreamPipelinesConnection } = useStreamPipelinesConnectionMutation();
   const formattedConnectedPipelines = formatPipelines(connectedPipelines || []);
   const [updatedPipelines, setUpdatePipelines] = useState<Array<FormattedPipelines>>(formattedConnectedPipelines);
@@ -62,7 +64,10 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
   };
 
   const onSave = () => {
-    onSaveStreamPipelinesConnection({ streamId, pipelineIds: updatedPipelines.map((p) => p.value) });
+    onSaveStreamPipelinesConnection({ streamId, pipelineIds: updatedPipelines.map((p) => p.value) }).then(() => {
+      queryClient.invalidateQueries(['stream', 'pipelines', streamId]);
+    });
+
     setShowModal(false);
   };
 
