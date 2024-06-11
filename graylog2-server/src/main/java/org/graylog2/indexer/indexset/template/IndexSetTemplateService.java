@@ -19,6 +19,7 @@ package org.graylog2.indexer.indexset.template;
 import com.google.common.primitives.Ints;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
@@ -70,6 +71,7 @@ public class IndexSetTemplateService {
     @Inject
     public IndexSetTemplateService(final MongoCollections mongoCollections) {
         this.collection = mongoCollections.collection(INDEX_SET_TEMPLATE_MONGO_COLLECTION_NAME, IndexSetTemplate.class);
+        collection.createIndex(Indexes.ascending(TITLE_FIELD_NAME));
         this.mongoUtils = mongoCollections.utils(collection);
         this.dbQueryCreator = new DbQueryCreator(IndexSetTemplate.TITLE_FIELD_NAME, ATTRIBUTES);
     }
