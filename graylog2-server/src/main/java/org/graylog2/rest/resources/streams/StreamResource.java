@@ -99,6 +99,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.PaginatedStreamService;
 import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamGuardException;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
@@ -164,7 +165,6 @@ public class StreamResource extends RestResource {
     private final PipelineService pipelineService;
 
     private final DbQueryCreator dbQueryCreator;
-    private final Set<StreamDeletionGuard> streamDeletionGuards;
 
     @Inject
     public StreamResource(StreamService streamService,
@@ -175,7 +175,6 @@ public class StreamResource extends RestResource {
                           RecentActivityService recentActivityService,
                           AuditEventSender auditEventSender,
                           MessageFactory messageFactory,
-                          Set<StreamDeletionGuard> streamDeletionGuards,
                           PipelineStreamConnectionsService pipelineStreamConnectionsService,
                           PipelineService pipelineService) {
         this.streamService = streamService;
@@ -197,8 +196,6 @@ public class StreamResource extends RestResource {
         this.bulkStreamDeleteExecutor = new SequentialBulkExecutor<>(this::deleteInner, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
         this.bulkStreamStartExecutor = new SequentialBulkExecutor<>(this::resumeInner, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
         this.bulkStreamStopExecutor = new SequentialBulkExecutor<>(this::pauseInner, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
-        this.streamDeletionGuards = streamDeletionGuards;
-
     }
 
     @POST
@@ -393,17 +390,16 @@ public class StreamResource extends RestResource {
     private Stream deleteInner(String streamId, UserContext userContext) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditableStream(streamId, "The stream cannot be deleted.");
-        streamDeletionGuards.forEach(guard -> {
-            try {
-                guard.checkGuard(streamId);
-            } catch (StreamDeletionGuard.StreamGuardException e) {
-                throw new BadRequestException(e.getMessage());
-            }
-        });
 
         final Stream stream = streamService.load(streamId);
+
+        try {
+            streamService.destroy(stream);
+        } catch (StreamGuardException e) {
+            throw new BadRequestException(e.getMessage());
+        }
         recentActivityService.delete(streamId, GRNTypes.STREAM, stream.getTitle(), userContext.getUser());
-        streamService.destroy(stream);
+
         return stream;
     }
 

@@ -14,15 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.streams;
+package org.graylog2.streams;
 
-import jakarta.inject.Singleton;
-
-@Singleton
-public class DefaultStreamDeletionGuard implements StreamDeletionGuard {
-
-    @Override
-    public void checkGuard(String streamId) {
-        // Do nothing in graylog open
-    }
+public interface StreamDeletionGuard {
+    void checkGuard(String streamId) throws StreamGuardException;
 }
