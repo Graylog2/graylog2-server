@@ -16,21 +16,22 @@
  */
 import * as React from 'react';
 
-import { singleton } from 'logic/singleton';
+import { Button } from 'components/bootstrap';
+import Routes from 'routing/Routes';
 
-export type RefreshConfig = {
-  interval: number,
-  enabled: boolean
+type Props = {
+  messageIndex: string | undefined,
+  messageId: string,
 }
 
-export type IntervalSetupCallback = () => void;
+const MessagePermalinkButton = ({ messageIndex, messageId }: Props) => {
+  const messageUrl = messageIndex ? Routes.message_show(messageIndex, messageId) : '#';
 
-type AutoRefreshContextType = {
-  refreshConfig: RefreshConfig | null,
-  startAutoRefresh: (interval: number) => void
-  stopAutoRefresh: () => void,
+  return (
+    <Button href={messageUrl} disabled={!messageIndex} bsSize="small">
+      Permalink
+    </Button>
+  );
 };
 
-const AutoRefreshContext = React.createContext<AutoRefreshContextType | null>(null);
-
-export default singleton('contexts.AutoRefreshContext', () => AutoRefreshContext);
+export default MessagePermalinkButton;

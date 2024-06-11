@@ -27,7 +27,6 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
-import { appPrefixed } from 'util/URLUtils';
 import isActiveRoute from 'components/navigation/util/isActiveRoute';
 import { navigation as securityNavigation } from 'components/security/bindings';
 
@@ -67,7 +66,7 @@ const PluginRoute = ({
   return (
     <NavigationLink key={description}
                     description={BadgeComponent ? <BadgeComponent text={description} /> : description}
-                    path={appPrefixed(path)}
+                    path={path}
                     topLevel={topLevel} />
   );
 };

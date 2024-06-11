@@ -28,6 +28,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
+import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
   const sendTelemetry = useSendTelemetry();
@@ -115,8 +116,6 @@ const MessageActions = ({
     return <ButtonGroup />;
   }
 
-  const messageUrl = index ? Routes.message_show(index, id) : '#';
-
   const { timestamp, ...remainingFields } = fields;
 
   const surroundingSearchButton = disableSurroundingSearch || (
@@ -132,7 +131,7 @@ const MessageActions = ({
   return (
     <ButtonGroup>
       {showChanges}
-      <Button bsSize="small" href={messageUrl}>Permalink</Button>
+      <MessagePermalinkButton messageIndex={index} messageId={id} />
       {pluggableActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />

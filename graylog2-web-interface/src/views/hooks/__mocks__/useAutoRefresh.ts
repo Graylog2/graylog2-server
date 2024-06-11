@@ -14,23 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+const useAutoRefresh = jest.fn(() => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
 
-import { singleton } from 'logic/singleton';
-
-export type RefreshConfig = {
-  interval: number,
-  enabled: boolean
-}
-
-export type IntervalSetupCallback = () => void;
-
-type AutoRefreshContextType = {
-  refreshConfig: RefreshConfig | null,
-  startAutoRefresh: (interval: number) => void
-  stopAutoRefresh: () => void,
-};
-
-const AutoRefreshContext = React.createContext<AutoRefreshContextType | null>(null);
-
-export default singleton('contexts.AutoRefreshContext', () => AutoRefreshContext);
+export default useAutoRefresh;

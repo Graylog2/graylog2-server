@@ -28,16 +28,9 @@ import { selectJobIds } from 'views/logic/slices/searchExecutionSelectors';
 const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
   const dispatch = useAppDispatch();
   const jobIds = useAppSelector(selectJobIds);
-
   const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(null);
   const startAutoRefresh = useCallback((interval: number) => setRefreshConfig({ enabled: true, interval }), []);
   const stopAutoRefresh = useCallback(() => setRefreshConfig((cur) => ({ ...cur, enabled: false })), []);
-  const contextValue = useMemo(() => ({
-    refreshConfig,
-    startAutoRefresh,
-    stopAutoRefresh,
-  }), [refreshConfig, startAutoRefresh, stopAutoRefresh]);
-
   const refreshSearch = useCallback(() => {
     if (!jobIds) {
       dispatch(execute());
@@ -45,12 +38,28 @@ const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
   }, [jobIds, dispatch]);
 
   useEffect(() => {
-    const refreshInterval = refreshConfig?.enabled && !jobIds
-      ? setInterval(() => refreshSearch(), refreshConfig.interval)
-      : null;
+    let refreshInterval = null;
 
-    return () => clearInterval(refreshInterval);
-  }, [jobIds, refreshSearch, refreshConfig?.enabled, refreshConfig?.interval]);
+    if (refreshConfig?.enabled && !jobIds) {
+      refreshInterval = setInterval(() => {
+        refreshSearch();
+      }, refreshConfig.interval);
+    }
+
+    return () => {
+      clearInterval(refreshInterval);
+    };
+  }, [refreshSearch, refreshConfig?.enabled, refreshConfig?.interval, jobIds]);
+
+  const contextValue = useMemo(() => ({
+    refreshConfig,
+    startAutoRefresh,
+    stopAutoRefresh,
+  }), [
+    refreshConfig,
+    startAutoRefresh,
+    stopAutoRefresh,
+  ]);
 
   return (
     <AutoRefreshContext.Provider value={contextValue}>
