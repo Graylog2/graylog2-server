@@ -205,8 +205,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final List<EventDefinitionDto> eventDefinitionDtos =
                 result.delegate()
                         .stream()
-                        .map(eventDefinition -> eventDefinition.toBuilder()
-                                .schedulerCtx(schedulerCtx.get(eventDefinition.id())).build())
+                        .map(eventDefinition -> eventDefinition.toBuilder().schedulerCtx(schedulerCtx.get(eventDefinition.id())).build())
                         .toList();
 
         return PageListResponse.create(query, definitionDtos.pagination(),

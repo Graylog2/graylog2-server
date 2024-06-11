@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import cronstrue from 'cronstrue';
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import upperFirst from 'lodash/upperFirst';
@@ -168,6 +169,8 @@ class FilterAggregationSummary extends React.Component {
             <>
               <dt>Cron Expression</dt>
               <dd>{cronExpression}</dd>
+              <dt>Cron Description</dt>
+              <dd>{cronstrue.toString(cronExpression)}</dd>
               <dt>Timezone</dt>
               <dd>{cronTimezone}</dd>
             </>
