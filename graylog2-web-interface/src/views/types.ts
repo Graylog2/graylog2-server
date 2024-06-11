@@ -22,7 +22,7 @@ import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import type { VisualizationComponent } from 'views/components/aggregationbuilder/AggregationBuilder';
-import type { WidgetActionType, WidgetMenuActionComponentProps } from 'views/components/widgets/Types';
+import type { WidgetActionType } from 'views/components/widgets/Types';
 import type { Creator } from 'views/components/sidebar/create/AddWidgetButton';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
@@ -474,7 +474,6 @@ declare module 'graylog-web-plugin/plugin' {
       key: string,
     }>;
     'views.components.widgets.events.actions'?: Array<EventWidgetAction>;
-    'views.components.widgets.exportAction'?: Array<() => React.ComponentType<WidgetMenuActionComponentProps> | null>;
     'views.components.searchActions'?: Array<SearchAction>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
@@ -492,6 +491,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
+    'views.widgets.exportAction'?: Array<() => WidgetActionType | null>;
     'views.reducers'?: Array<ViewsReducer>;
     'views.requires.provided'?: Array<string>;
     'views.queryInput.commands'?: Array<CustomCommand>;

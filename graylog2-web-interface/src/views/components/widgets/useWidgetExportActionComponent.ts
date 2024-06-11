@@ -15,11 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import usePluginEntities from 'hooks/usePluginEntities';
+import { type WidgetActionType } from 'views/components/widgets/Types';
+import type Widget from 'views/logic/widgets/Widget';
 
-const useWidgetExportActionComponent = () => {
-  const exportAction = usePluginEntities('views.components.widgets.exportAction')?.[0];
+const useWidgetExportActionComponent = (widget: Widget) => {
+  const exportActions = usePluginEntities('views.widgets.exportAction');
 
-  return exportAction && exportAction();
+  const widgetExportAction = exportActions
+    .map((fn: () => WidgetActionType) => fn())
+    .filter((action) => action && (typeof action.isHidden !== 'function' || !action.isHidden(widget)));
+
+  return widgetExportAction?.[0]?.component;
 };
 
 export default useWidgetExportActionComponent;
