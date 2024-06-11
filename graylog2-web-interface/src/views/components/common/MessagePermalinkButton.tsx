@@ -14,18 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.cert.storage;
+import * as React from 'react';
 
-import org.bouncycastle.operator.OperatorCreationException;
-import org.graylog.security.certutil.cert.CertificateChain;
+import { Button } from 'components/bootstrap';
+import Routes from 'routing/Routes';
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Optional;
-
-public interface CertChainStorage {
-    void writeCertChain(CertificateChain certChain, String nodeId)
-            throws IOException, OperatorCreationException;
-
-    Optional<CertificateChain> readCertChain(String nodeId) throws IOException, GeneralSecurityException;
+type Props = {
+  messageIndex: string | undefined,
+  messageId: string,
 }
+
+const MessagePermalinkButton = ({ messageIndex, messageId }: Props) => {
+  const messageUrl = messageIndex ? Routes.message_show(messageIndex, messageId) : '#';
+
+  return (
+    <Button href={messageUrl} disabled={!messageIndex} bsSize="small">
+      Permalink
+    </Button>
+  );
+};
+
+export default MessagePermalinkButton;

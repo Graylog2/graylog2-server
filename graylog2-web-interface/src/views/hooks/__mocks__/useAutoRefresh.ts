@@ -14,23 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.csr;
+const useAutoRefresh = jest.fn(() => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
 
-import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
-
-import java.security.PrivateKey;
-
-public class InMemoryPrivateKeyStorage implements PrivateKeyEncryptedStorage {
-
-    private PrivateKey privateKey;
-
-    @Override
-    public void writeEncryptedKey(char[] password, PrivateKey privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    @Override
-    public PrivateKey readEncryptedKey(char[] password) {
-        return privateKey;
-    }
-}
+export default useAutoRefresh;

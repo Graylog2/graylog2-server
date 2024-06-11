@@ -112,18 +112,18 @@
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.4.0</commons-exec.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
-        <commons-net.version>3.11.0</commons-net.version>
+        <commons-net.version>3.11.1</commons-net.version>
         <commons-validator.version>1.9.0</commons-validator.version>
         <commons-io.version>2.16.1</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.28.0</error-prone.version>
-        <freemarker.version>2.3.32</freemarker.version>
+        <freemarker.version>2.3.33</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.0</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.64.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>33.2.0-jre</guava.version>
+        <guava.version>33.2.1-jre</guava.version>
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>2.2</hamcrest.version>
@@ -148,8 +148,8 @@
         <kafka.version>3.7.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.23.1</log4j.version>
-        <lucene.version>9.10.0</lucene.version>
-        <metrics.version>4.2.25</metrics.version>
+        <lucene.version>9.11.0</lucene.version>
+        <metrics.version>4.2.26</metrics.version>
         <mongodb-driver.version>5.1.0</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
@@ -542,7 +542,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.3</version>
+                    <version>3.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -952,6 +952,7 @@
                             -Xep:IncrementInForLoopAndHeader:ERROR
                             -Xep:NonAtomicVolatileUpdate:ERROR
                             -Xep:PrimitiveAtomicReference:ERROR
+                            -Xep:WildcardImport:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>

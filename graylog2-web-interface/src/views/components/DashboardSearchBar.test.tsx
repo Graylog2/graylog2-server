@@ -32,11 +32,7 @@ jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 
-jest.mock('views/hooks/useAutoRefresh', () => () => ({
-  refreshConfig: null,
-  startAutoRefresh: () => {},
-  stopAutoRefresh: () => {},
-}));
+jest.mock('views/hooks/useAutoRefresh');
 
 jest.mock('views/hooks/useMinimumRefreshInterval', () => () => ({
   data: 'PT1S',

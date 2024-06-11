@@ -18,23 +18,15 @@ package org.graylog.datanode.bootstrap.preflight;
 
 import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import org.bouncycastle.operator.OperatorException;
-import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.security.certutil.CertConstants;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.graylog.datanode.configuration.DatanodeKeystore;
+import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.security.certutil.cert.CertificateChain;
-import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
-import org.graylog.security.certutil.cert.storage.CertChainStorage;
-import org.graylog.security.certutil.csr.CertificateAndPrivateKeyMerger;
-import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
-import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
-import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
-import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.certificates.CertificateExchange;
+import org.graylog2.cluster.certificates.CertificateSigningRequest;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
@@ -47,8 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.file.Path;
-import java.security.KeyStore;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,36 +52,21 @@ public class DataNodeConfigurationPeriodical extends Periodical {
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
-    private final PrivateKeyEncryptedFileStorage privateKeyEncryptedStorage;
-    private final CsrMongoStorage csrStorage;
-    private final CsrGenerator csrGenerator;
-    private final CertChainStorage certMongoStorage;
-    private final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger;
-    private final char[] passwordSecret;
 
-    private final KeystoreMongoStorage mongoKeyStorage;
+    private final CertificateExchange certificateExchange;
+    private final DatanodeKeystore datanodeKeystore;
 
     @Inject
     public DataNodeConfigurationPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
                                            final NodeService<DataNodeDto> nodeService,
                                            final NodeId nodeId,
-                                           final CsrMongoStorage csrStorage,
-                                           final CsrGenerator csrGenerator,
-                                           final CertChainMongoStorage certMongoStorage,
-                                           final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
-                                           final @Named("password_secret") String passwordSecret,
-                                           final DatanodeConfiguration datanodeConfiguration, KeystoreMongoStorage mongoKeyStorage) throws IOException {
+                                           CertificateExchange certificateExchange,
+                                           DatanodeKeystore datanodeKeystore) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
-        this.csrStorage = csrStorage;
-        this.csrGenerator = csrGenerator;
-        this.certMongoStorage = certMongoStorage;
-        this.certificateAndPrivateKeyMerger = certificateAndPrivateKeyMerger;
-        // TODO: merge with real storage
-        this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(datanodeConfiguration.datanodeDirectories().createConfigurationFile(Path.of("privateKey.cert")));
-        this.passwordSecret = passwordSecret.toCharArray();
-        this.mongoKeyStorage = mongoKeyStorage;
+        this.certificateExchange = certificateExchange;
+        this.datanodeKeystore = datanodeKeystore;
     }
 
     @Override
@@ -108,38 +83,24 @@ public class DataNodeConfigurationPeriodical extends Periodical {
             if (state == null) {
                 return;
             }
+
+            // always check if there are any certificates that we can accept
+            certificateExchange.pollCertificate(nodeId.getNodeId(), this::processCertificateChain);
+
             switch (state) {
                 case CONFIGURED -> writeCsr(c);
-                case SIGNED -> readSignedCertificate(c);
-                case STARTUP_TRIGGER ->  dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
+                case STARTUP_TRIGGER ->
+                        dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
             }
         });
     }
 
-    private void readSignedCertificate(DataNodeProvisioningConfig cfg) {
-        if (cfg.certificate() == null) {
-            LOG.error("Config entry in signed state, but no certificate data present in Mongo");
-        } else {
-            try {
-                final Optional<CertificateChain> certificateChain = certMongoStorage.readCertChain(nodeId.getNodeId());
-                if (certificateChain.isPresent()) {
-                    final char[] secret = passwordSecret;
-                    KeyStore nodeKeystore = certificateAndPrivateKeyMerger.merge(
-                            certificateChain.get(),
-                            privateKeyEncryptedStorage,
-                            secret,
-                            secret,
-                            CertConstants.DATANODE_KEY_ALIAS
-                    );
-
-                    mongoKeyStorage.writeKeyStore(KeystoreMongoLocation.datanode(nodeId), nodeKeystore, secret, secret);
-
-                    //should be in one transaction, but we miss transactions...
-                    dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STORED);
-                }
-            } catch (Exception ex) {
-                LOG.error("Config entry in signed state, but wrong certificate data present in Mongo");
-            }
+    private void processCertificateChain(CertificateChain certificateChain) {
+        try {
+            datanodeKeystore.replaceCertificatesInKeystore(certificateChain);
+            dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STORED);
+        } catch (DatanodeKeystoreException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -150,10 +111,10 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                     .addAll(Optional.ofNullable(cfg.altNames()).orElse(Collections.emptyList()))
                     .addAll(determineAltNames())
                     .build();
-            final var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), altNames, privateKeyEncryptedStorage);
-            csrStorage.writeCsr(csr, nodeId.getNodeId());
+            final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest(node.getHostname(), altNames);
+            certificateExchange.requestCertificate(new CertificateSigningRequest(nodeId.getNodeId(), csr));
             LOG.info("created CSR for this node");
-        } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
+        } catch (CSRGenerationException | IOException | NodeNotFoundException | DatanodeKeystoreException ex) {
             LOG.error("error generating a CSR: " + ex.getMessage(), ex);
             dataNodeProvisioningService.save(cfg.asError(ex.getMessage()));
         }
