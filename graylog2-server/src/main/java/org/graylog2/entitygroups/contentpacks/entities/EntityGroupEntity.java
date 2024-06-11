@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.NativeEntityConverter;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
@@ -32,8 +31,10 @@ import org.graylog2.contentpacks.model.entities.ScopedContentPackEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.entitygroups.model.EntityGroup;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.graylog2.entitygroups.model.EntityGroup.FIELD_ENTITIES;
@@ -47,7 +48,7 @@ public abstract class EntityGroupEntity extends ScopedContentPackEntity implemen
     public abstract String name();
 
     @JsonProperty(FIELD_ENTITIES)
-    public abstract Set<EntityDescriptor> entities();
+    public abstract Map<String, Set<EntityDescriptor>> entities();
 
     public static Builder builder() {
         return Builder.create();
@@ -62,7 +63,7 @@ public abstract class EntityGroupEntity extends ScopedContentPackEntity implemen
         public abstract Builder name(String name);
 
         @JsonProperty(FIELD_ENTITIES)
-        public abstract Builder entities(Set<EntityDescriptor> entities);
+        public abstract Builder entities(Map<String, Set<EntityDescriptor>> entities);
 
         public abstract EntityGroupEntity build();
 
@@ -72,9 +73,18 @@ public abstract class EntityGroupEntity extends ScopedContentPackEntity implemen
         }
     }
 
+    public EntityGroupEntity addEntity(String type, EntityDescriptor descriptor) {
+        final Map<String, Set<EntityDescriptor>> entities = entities() != null ? new HashMap<>(entities()) : new HashMap<>();
+        final Set<EntityDescriptor> entityIds = entities.get(type) != null ? new HashSet<>(entities.get(type)) : new HashSet<>();
+
+        entityIds.add(descriptor);
+        entities.put(type, entityIds);
+        return this.toBuilder().entities(entities).build();
+    }
+
     @Override
     public EntityGroup toNativeEntity(Map<String, ValueReference> parameters,
-                                               Map<EntityDescriptor, Object> nativeEntities) {
+                                      Map<EntityDescriptor, Object> nativeEntities) {
         // TODO: Need to convert content pack IDs to DB object IDs for the entities map here.
         return null;
     }
@@ -84,7 +94,10 @@ public abstract class EntityGroupEntity extends ScopedContentPackEntity implemen
                                        Map<String, ValueReference> parameters,
                                        Map<EntityDescriptor, Entity> entities,
                                        MutableGraph<Entity> graph) {
-        // TODO: Need to flag all entity dependencies in the entities map so that they get installed first.
-        // TODO: They will need to exist in the DB with IDs we can reference once this `toNativeEntity` is called.
+        entities().entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream())
+                .map(entities::get)
+                .filter(Objects::nonNull)
+                .forEach(descriptor -> graph.putEdge(entity, descriptor));
     }
 }

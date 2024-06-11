@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
-import jakarta.annotation.Nullable;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -31,6 +30,7 @@ import org.graylog2.entitygroups.contentpacks.entities.EntityGroupEntity;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.database.entities.ScopedEntity;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -47,7 +47,6 @@ public abstract class EntityGroup extends ScopedEntity implements ContentPackabl
     @JsonProperty(FIELD_NAME)
     public abstract String name();
 
-    @Nullable
     @JsonProperty(FIELD_ENTITIES)
     public abstract Map<String, Set<String>> entities();
 
@@ -94,10 +93,11 @@ public abstract class EntityGroup extends ScopedEntity implements ContentPackabl
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
 //        entities().entrySet().forEach(typeGroup -> {
 //            typeGroup.getValue().forEach(entityId -> {
-//                final EntityDescriptor depNotification = EntityDescriptor.builder()
+//                final EntityDescriptor depEntity = EntityDescriptor.builder()
 //                        .id(ModelId.of(entityId))
-//                        .type(typeGroup.getKey())
+//                        .type(EntityGroupItemFacade.TYPE_V1)
 //                        .build();
+//                mutableGraph.putEdge(entityDescriptor, depEntity);
 //            });
 //        });
     }

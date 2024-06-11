@@ -24,6 +24,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationStrength;
 import com.mongodb.client.model.IndexOptions;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -43,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -82,6 +84,14 @@ public class DBEntityGroupService {
         return mongoUtils.getById(id);
     }
 
+    public Stream<EntityGroup> streamAll() {
+        return stream(new Document());
+    }
+
+    public Stream<EntityGroup> stream(Bson query) {
+        return MongoUtils.stream(collection.find(query));
+    }
+
     public PaginatedList<EntityGroup> findPaginated(String query, int page, int perPage, Bson sort, Predicate<EntityGroup> filter) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         return filter == null ?
@@ -97,12 +107,25 @@ public class DBEntityGroupService {
         return entityGroup.toBuilder().id(newId).build();
     }
 
+    /**
+     * Returns the entity group with the given name.
+     *
+     * @param name the entity group name
+     * @return the entity group with the given name
+     */
     public Optional<EntityGroup> getByName(String name) {
         final Bson query = eq(EntityGroup.FIELD_NAME, name);
 
         return Optional.ofNullable(collection.find(query).first());
     }
 
+    /**
+     * Returns all entity groups that contain the given entity ID for the given type.
+     *
+     * @param type     the type of entity that the ID is for
+     * @param entityId the ID of the entity
+     * @return the entity groups that contain the given entity ID for the given type
+     */
     public List<EntityGroup> getAllForEntity(String type, String entityId) {
         final Bson query = and(
                 exists(typeField(type)),
@@ -112,6 +135,14 @@ public class DBEntityGroupService {
     }
 
     // TODO: can we make this better..?
+
+    /**
+     * Returns all entity groups that contain the given entity IDs for the given type.
+     *
+     * @param type      the type of entity that the IDs are for
+     * @param entityIds the IDs of the entities
+     * @return the entity groups that contain the given entity IDs for the given type
+     */
     public Map<String, Collection<EntityGroup>> getAllForEntities(String type, Collection<String> entityIds) {
         final Bson query = and(
                 exists(typeField(type)),

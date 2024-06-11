@@ -52,6 +52,7 @@ import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.database.entities.EntityScope;
+import org.graylog2.entitygroups.entities.GroupableEntity;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
@@ -452,5 +453,17 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addTelemetryMetricProvider(String eventId, TelemetryMetricSupplier eventSupplier) {
         telemetryMetricSupplierBinder().addBinding(eventId).toInstance(eventSupplier);
+    }
+
+    protected void addEntityGroupEntityType(String entityTypeName, Class<? extends GroupableEntity> entityClass) {
+        groupableEntityTypeBinder().addBinding(entityTypeName).to(entityClass);
+    }
+
+    protected MapBinder<String, GroupableEntity> groupableEntityTypeBinder() {
+        return MapBinder.newMapBinder(
+                binder(),
+                TypeLiteral.get(String.class),
+                TypeLiteral.get(GroupableEntity.class)
+        );
     }
 }
