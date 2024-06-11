@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
+import { useQueryParam, StringParam } from 'use-query-params';
 
 import { ConfirmDialog, ProgressBar } from 'components/common';
 import { Alert, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
@@ -67,6 +68,18 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
   const indicesWithErrors = migrationStatus?.indices.filter((index) => index.status === 'ERROR') || [];
   const [showLogView, setShowLogView] = useState<boolean>(false);
   const [showRetryMigrationConfirmDialog, setShowRetryMigrationConfirmDialog] = useState<boolean>(false);
+  const [showLogsQuery, setShowLogsQuery] = useQueryParam('show_logs', StringParam);
+
+  useEffect(() => {
+    if (showLogsQuery === 'true' && !showLogView) {
+      setShowLogView(true);
+    }
+  }, [showLogsQuery, showLogView]);
+
+  const handleCloseLogView = () => {
+    setShowLogView(false);
+    setShowLogsQuery(undefined);
+  };
 
   const hasMigrationFailed = migrationStatus?.progress === 100 && migrationStatus?.status === 'ERROR';
 
@@ -112,7 +125,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
       )}
       {showLogView && (
         <BootstrapModalWrapper showModal={showLogView}
-                               onHide={() => setShowLogView(false)}
+                               onHide={handleCloseLogView}
                                bsSize="large"
                                backdrop>
           <Modal.Header closeButton>
