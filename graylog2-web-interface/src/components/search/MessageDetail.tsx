@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import Immutable from 'immutable';
+import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
 import { MessageDetailsDefinitionList, ClipboardButton, Icon, Timestamp } from 'components/common';
@@ -30,6 +31,10 @@ import type { Message } from 'views/components/messagelist/Types';
 import type { Stream } from 'views/stores/StreamsStore';
 import type { Input } from 'components/messageloaders/Types';
 
+const Span = styled.span`
+  word-break: break-word;
+`;
+
 const MessageActions = ({ messageIndex, messageId }: { messageIndex: string | undefined, messageId: string }) => (
   <ButtonGroup className="pull-right">
     <MessagePermalinkButton messageIndex={messageIndex} messageId={messageId} />
@@ -41,11 +46,11 @@ const MessageActions = ({ messageIndex, messageId }: { messageIndex: string | un
 const InputName = ({ inputs, inputId }: { inputs: Immutable.Map<string, Input> | undefined, inputId: string }) => {
   const input = inputs?.get(inputId);
 
-  return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : <>deleted input</>;
+  return input ? <Span>{input.title}</Span> : <>deleted input</>;
 };
 
-const NodeName = ({ nodes, nodeId }) => {
-  const node = nodes.get(nodeId);
+const NodeName = ({ nodes, nodeId }: { nodes: Immutable.Map<string, { short_node_id: string, hostname: string }> | undefined, nodeId: string }) => {
+  const node = nodes?.get(nodeId);
   let nodeInformation;
 
   if (node) {
@@ -55,8 +60,8 @@ const NodeName = ({ nodes, nodeId }) => {
       <>
         <Icon name="fork_right" />
         &nbsp;
-        <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;
-        <span style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
+        <Span>{node.short_node_id}</Span>&nbsp;/&nbsp;
+        <Span>{node.hostname}</Span>
       </>
     );
 
@@ -64,7 +69,7 @@ const NodeName = ({ nodes, nodeId }) => {
       ? nodeContent
       : <a href={nodeURL}>{nodeContent}</a>;
   } else {
-    nodeInformation = <span style={{ wordBreak: 'break-word' }}>stopped node</span>;
+    nodeInformation = <Span>stopped node</Span>;
   }
 
   return nodeInformation;
@@ -85,15 +90,9 @@ const StreamLinks = ({ messageStreams, streamIds, streams }: {
 
   return (
     <>
-      {streamIds.map((id) => {
-        const stream = streams.get(id);
-
-        if (stream !== undefined) {
-          return <li key={stream.id}><StreamLink stream={stream} /></li>;
-        }
-
-        return null;
-      })}
+      {streamIds.map((id) => streams.get(id))
+        .filter((stream) => !!stream)
+        .map((stream) => <li key={stream.id}><StreamLink stream={stream} /></li>)}
     </>
   );
 };
@@ -101,7 +100,7 @@ const StreamLinks = ({ messageStreams, streamIds, streams }: {
 type Props = {
   message: Message & { streams?: Array<Stream> },
   inputs?: Immutable.Map<string, Input>,
-  nodes?: Immutable.Map<string, unknown>,
+  nodes?: Immutable.Map<string, { short_node_id: string, hostname: string }>,
   streams?: Immutable.Map<string, Stream>,
   renderForDisplay: (fieldName: string) => React.ReactNode,
   customFieldActions?: React.ReactNode
@@ -161,13 +160,15 @@ const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, cust
             <dt>Stored in index</dt>
             <dd>{message.index ? message.index : 'Message is not stored'}</dd>
 
-            {streamIds.size > 0 && <dt>Routed into streams</dt>}
-            {streamIds.size > 0 && (
-              <dd className="stream-list">
-                <ul>
-                  <StreamLinks messageStreams={message.streams} streamIds={streamIds} streams={streams} />
-                </ul>
-              </dd>
+            {!!streamIds.size && (
+              <>
+                <dt>Routed into streams</dt>
+                <dd className="stream-list">
+                  <ul>
+                    <StreamLinks messageStreams={message.streams} streamIds={streamIds} streams={streams} />
+                  </ul>
+                </dd>
+              </>
             )}
           </MessageDetailsDefinitionList>
         </Col>
