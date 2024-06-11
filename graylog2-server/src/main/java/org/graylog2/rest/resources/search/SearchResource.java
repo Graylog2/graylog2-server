@@ -36,7 +36,6 @@ import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
