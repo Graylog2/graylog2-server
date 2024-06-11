@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import cronstrue from 'cronstrue';
+import moment from 'moment';
 import styled, { css } from 'styled-components';
 
 import { OverlayTrigger, Icon, Timestamp } from 'components/common';
@@ -59,6 +61,18 @@ const getTimeRange = (scheduler: Scheduler) => {
   );
 };
 
+const describeSchedule = (isCron: boolean, value: number | string) => {
+  if (isCron) {
+    const cronDescription = cronstrue.toString(value as string);
+
+    // Lower case the A in At or the E in Every
+    return cronDescription.charAt(0).toLowerCase() + cronDescription.slice(1);
+  }
+
+  return `every ${moment.duration(value)
+    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false })}`;
+};
+
 const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) => (
   <dl>
     <DetailTitle>Status:</DetailTitle>
@@ -88,27 +102,40 @@ const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) =>
 );
 
 const SchedulingInfo = ({
+  executeEveryMs,
+  searchWithinMs,
+  useCronScheduling,
+  cronExpression,
   scheduler,
   title,
   clearNotifications,
-  scheduleDescription,
 }:{
-  scheduler: Scheduler, title: string,
+  executeEveryMs: number,
+  searchWithinMs: number,
+  useCronScheduling: boolean,
+  cronExpression: string,
+  scheduler: Scheduler,
+  title: string,
   clearNotifications: () => void,
-  scheduleDescription: string,
-}) => (
-  <>
-    {scheduleDescription}
-    <OverlayTrigger trigger="click"
-                    rootClose
-                    placement="left"
-                    title={`${title} details.`}
-                    overlay={detailsPopover(scheduler, clearNotifications)}
-                    width={500}>
-      <DetailsButton bsStyle="link"><Icon name="info" /></DetailsButton>
-    </OverlayTrigger>
-  </>
-);
+}) => {
+  const executeEveryFormatted = describeSchedule(useCronScheduling, useCronScheduling ? cronExpression : executeEveryMs);
+  const searchWithinFormatted = moment.duration(searchWithinMs)
+    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
+
+  return (
+    <>
+      {`Runs ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}. `}
+      <OverlayTrigger trigger="click"
+                      rootClose
+                      placement="left"
+                      title={`${title} details.`}
+                      overlay={detailsPopover(scheduler, clearNotifications)}
+                      width={500}>
+        <DetailsButton bsStyle="link"><Icon name="info" /></DetailsButton>
+      </OverlayTrigger>
+    </>
+  );
+};
 
 const SchedulingCell = ({ definition } : Props) => {
   if (!definition?.config?.search_within_ms && !definition?.config?.execute_every_ms) {
@@ -124,14 +151,22 @@ const SchedulingCell = ({ definition } : Props) => {
 
   const {
     title,
+    config: {
+      search_within_ms: searchWithinMs,
+      execute_every_ms: executeEveryMs,
+      use_cron_scheduling: useCronScheduling,
+      cron_expression: cronExpression,
+    },
     scheduler,
-    schedule_description: scheduleDescription,
   } = definition;
 
   return (
-    <SchedulingInfo title={title}
+    <SchedulingInfo executeEveryMs={executeEveryMs}
+                    searchWithinMs={searchWithinMs}
+                    useCronScheduling={useCronScheduling}
+                    cronExpression={cronExpression}
+                    title={title}
                     scheduler={scheduler}
-                    scheduleDescription={scheduleDescription}
                     clearNotifications={clearNotifications(definition)} />
   );
 };

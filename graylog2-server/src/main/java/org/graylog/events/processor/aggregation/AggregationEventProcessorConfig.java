@@ -16,7 +16,6 @@
  */
 package org.graylog.events.processor.aggregation;
 
-import com.cronutils.model.Cron;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -24,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.SeriesSpecEntity;
@@ -54,7 +52,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -123,24 +120,6 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @JsonProperty(FIELD_EVENT_LIMIT)
     public abstract int eventLimit();
-
-    @Override
-    public String scheduleDescription() {
-        final Duration searchWithinDuration = Duration.ofMillis(searchWithinMs());
-        final String searchWithinStr = DurationFormatUtils.formatDurationWords(searchWithinDuration.toMillis(), true, true);
-        final String executeEveryStr;
-        if (useCronScheduling()) {
-            Cron cron = CronUtils.getParser().parse(cronExpression());
-            executeEveryStr = CronUtils.getDescriptor().describe(cron);
-        } else {
-            Duration executeEveryDuration = Duration.ofMillis(executeEveryMs());
-            executeEveryStr = DurationFormatUtils.formatDurationWords(executeEveryDuration.toMillis(), true, true);
-        }
-        return f("Runs %s%s, searching within the last %s.",
-                executeEveryStr.startsWith("every") || executeEveryStr.startsWith("at") ? "" : "every ",
-                executeEveryStr,
-                searchWithinStr);
-    }
 
     @Override
     public Set<String> requiredPermissions() {

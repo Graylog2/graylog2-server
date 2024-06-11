@@ -206,8 +206,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 result.delegate()
                         .stream()
                         .map(eventDefinition -> eventDefinition.toBuilder()
-                                .schedulerCtx(schedulerCtx.get(eventDefinition.id()))
-                                .scheduleDescription(eventDefinition.config().scheduleDescription()).build())
+                                .schedulerCtx(schedulerCtx.get(eventDefinition.id())).build())
                         .toList();
 
         return PageListResponse.create(query, definitionDtos.pagination(),
@@ -473,7 +472,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     }
 
     @POST
-    @Path("/validate_cron")
+    @Path("/validate/cron_expression")
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate a cron expression")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)

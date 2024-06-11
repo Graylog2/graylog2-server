@@ -112,11 +112,6 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
         return true;
     }
 
-    @JsonIgnore
-    default String scheduleDescription() {
-        return "Not Scheduled.";
-    }
-
     default EventProcessorConfig updateFilters(List<UsedSearchFilter> filters) {
         return null;
     }
