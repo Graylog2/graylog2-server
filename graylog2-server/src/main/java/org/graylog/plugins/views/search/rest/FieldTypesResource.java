@@ -78,7 +78,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     }
 
     @POST
-    @ApiOperation(value = "Retrieve the field list of a given set of streams")
+    @ApiOperation(value = "Trigger a full refresh of field types")
     @Path("/poll")
     @RequiresPermissions("*")
     @AuditEvent(type = FIELD_TYPE_POLLING_TRIGGERED)
