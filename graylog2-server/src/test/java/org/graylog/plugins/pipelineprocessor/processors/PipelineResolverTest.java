@@ -124,11 +124,11 @@ class PipelineResolverTest {
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.5.not-matched",
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.5.matched",
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.5.failed",
+                "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.5.executed",
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.matched",
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.not-matched",
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.failed",
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.executed",
-                "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.5.executed",
                 "org.graylog.plugins.pipelineprocessor.ast.Pipeline.pipeline-1.executed",
                 "org.graylog.plugins.pipelineprocessor.ast.Pipeline.pipeline-1.stage.5.executed"
         );
@@ -154,11 +154,11 @@ class PipelineResolverTest {
                 "RULE.rule-1.pipeline-1.5.not-matched",
                 "RULE.rule-1.pipeline-1.5.matched",
                 "RULE.rule-1.pipeline-1.5.failed",
+                "RULE.rule-1.pipeline-1.5.executed",
                 "RULE.rule-1.matched",
                 "RULE.rule-1.not-matched",
                 "RULE.rule-1.failed",
                 "RULE.rule-1.executed",
-                "RULE.rule-1.pipeline-1.5.executed",
                 "PIPELINE.pipeline-1.executed",
                 "PIPELINE.pipeline-1.stage.5.executed"
         );
