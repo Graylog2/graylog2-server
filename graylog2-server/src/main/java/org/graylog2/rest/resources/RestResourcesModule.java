@@ -165,7 +165,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(RemoteReindexResource.class);
         addSystemRestResource(CAResource.class);
         addSystemRestResource(CAClientResource.class);
-	    addSystemRestResource(EntityGroupResource.class);
+        addSystemRestResource(EntityGroupResource.class);
     }
 
     private void addDebugResources() {
