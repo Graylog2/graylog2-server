@@ -50,7 +50,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final Configuration configuration;
 
     private final OpensearchStateMachine stateMachine;
-    private final CsrRequester csrRequester;
+    private final CsrRequesterImpl csrRequester;
     private boolean processAutostart = true;
 
 
@@ -62,7 +62,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             final NodeId nodeId,
             final DatanodeDirectoriesLockfileCheck lockfileCheck,
             final PreflightConfigService preflightConfigService,
-            final OpensearchProcess process, CsrRequester csrRequester, OpensearchStateMachine stateMachine) {
+            final OpensearchProcess process, CsrRequesterImpl csrRequester, OpensearchStateMachine stateMachine) {
         this.configurationProvider = configurationProvider;
         this.configuration = configuration;
         this.nodeId = nodeId;
