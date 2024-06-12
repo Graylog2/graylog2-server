@@ -16,6 +16,19 @@
  */
 package org.graylog2.datanode;
 
-public enum DataNodeLifecycleTrigger {
-    REMOVE, RESET, STOP, START, REMOVED, STOPPED, STARTED, CLEAR, REQUEST_CSR, REQUEST_CSR_WITH_AUTOSTART
+import com.google.inject.ImplementedBy;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.nodes.DataNodeDto;
+
+@ImplementedBy(DataNodeCommandServiceImpl.class)
+public interface DataNodeCommandService {
+    DataNodeDto removeNode(String nodeId) throws NodeNotFoundException;
+
+    DataNodeDto resetNode(String nodeId) throws NodeNotFoundException;
+
+    DataNodeDto stopNode(String nodeId) throws NodeNotFoundException;
+
+    DataNodeDto startNode(String nodeId) throws NodeNotFoundException;
+
+    DataNodeDto triggerCertificateSigningRequest(String nodeId, DatanodeStartType startType) throws NodeNotFoundException;
 }

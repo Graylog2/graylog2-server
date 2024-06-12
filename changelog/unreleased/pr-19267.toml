@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixing full page refreshes for buttons with href."
+
+pulls = ["19267"]
