@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
@@ -213,6 +213,14 @@ const IndexSetConfigurationForm = ({
 
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
+  useEffect(() => {
+    if (indexSet?.use_legacy_rotation) {
+      setSelectedRetentionSegment('legacy');
+    } else {
+      setSelectedRetentionSegment('data_tiering');
+    }
+  }, [indexSet]);
+
   const prepareRetentionConfigBeforeSubmit = useCallback((values: IndexSetFormValues) : IndexSet => {
     const legacyConfig = { ...values, data_tiering: indexSetTemplateDefaults.data_tiering, use_legacy_rotation: true };
 
@@ -312,7 +320,7 @@ const IndexSetConfigurationForm = ({
                                    help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
                                    required />
                       <FormikInput type="checkbox"
-                                   id="index_optimization_disabled"
+                                   id="index-optimization-disabled"
                                    label="Disable index optimization after rotation"
                                    name="index_optimization_disabled"
                                    help="Disable Elasticsearch index optimization (force merge) after rotation." />

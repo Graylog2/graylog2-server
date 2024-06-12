@@ -16,15 +16,36 @@
  */
 
 import * as React from 'react';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
 
-const CreateIndexSetTemplateButton = () => (
-  <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.CREATE}>
-    <Button bsStyle="success">Create template</Button>
-  </LinkContainer>
-);
+const CreateIndexSetTemplateButton = () => {
+  const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
+  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    sendTelemetry(
+      TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.SELECT_OPENED,
+      {
+        app_pathname: telemetryPathName,
+        app_action_value: 'select-index-set-template-opened',
+      });
+
+    navigate(Routes.SYSTEM.INDICES.TEMPLATES.CREATE);
+  };
+
+  return (
+    <Button bsStyle="success" onClick={handleClick}>Create template</Button>
+  );
+};
 
 export default CreateIndexSetTemplateButton;

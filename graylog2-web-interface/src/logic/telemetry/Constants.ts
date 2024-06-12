@@ -484,6 +484,9 @@ export const TELEMETRY_EVENT_TYPE = {
     EDIT_OPENED: 'Index Set Template Edit Opened',
     EDIT_CANCELLED: 'Index Set Template Edit Cancelled',
     EDIT: 'Index Set Template Edited',
+    SELECTED: 'Index Set Template Selected',
+    SELECT_OPENED: 'Index Set Template Selected Opened',
+    SELECT_CLOSED: 'Index Set Template Selected Cancelled',
   },
 } as const;
 

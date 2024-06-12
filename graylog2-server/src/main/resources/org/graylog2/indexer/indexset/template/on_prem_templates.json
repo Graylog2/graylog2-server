@@ -1,1 +1,71 @@
-[]
+[
+  {
+    "title": "7 Days Hot - Minimal Historical Searches",
+    "description": "This configuration maintains a minimum of 7 days of logs in the Hot Tier for fast access. Logs older than this will graduate to the Warm tier, where they will kept until at least 90 days old. This configuration is good choice for minimising database overhead and Hot Tier storage provision, and suitable for data that is normally only relavent for a few days.",
+    "built_in": true,
+    "index_set_config": {
+      "index_analyzer": "standard",
+      "shards": 1,
+      "replicas": 0,
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "field_type_refresh_interval": 5000,
+      "data_tiering": {
+        "type": "hot_warm",
+        "index_lifetime_min": "P90D",
+        "index_lifetime_max": "P93D",
+        "warm_tier_enabled": true,
+        "index_hot_lifetime_min": "P7D",
+        "warm_tier_repository_name": null,
+        "archive_before_deletion": false
+      },
+      "use_legacy_rotation": false
+    }
+  },
+  {
+    "title": "14 Days Hot - Infrequent or Shallow Historical Searches",
+    "description": "This configuration maintains a minimum of 14 days of logs in the Hot Tier for fast access. Logs older than this will graduate to the Warm tier, and will be kept until at least 90 days old. This configuration is a good balance for faster deep searches, while still keeping database overhead and Hot Tier storage requirement moderate.",
+    "built_in": true,
+    "index_set_config": {
+      "index_analyzer": "standard",
+      "shards": 1,
+      "replicas": 0,
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "field_type_refresh_interval": 5000,
+      "data_tiering": {
+        "type": "hot_warm",
+        "index_lifetime_min": "P90D",
+        "index_lifetime_max": "P96D",
+        "warm_tier_enabled": true,
+        "index_hot_lifetime_min": "P14D",
+        "warm_tier_repository_name": null,
+        "archive_before_deletion": false
+      },
+      "use_legacy_rotation": false
+    }
+  },
+  {
+    "title": "30 days Hot - Frequent or Deep Historical Searches",
+    "description": "This configuration maintains a minimum of 30 days of logs in the Hot Tier for fast access. Logs older than this will graduate to the Warm tier, and will be kept until at least 90 days old. This configuration maximizes deep historical search performance, but the 30 day Hot Tier requires a significant storage provision and resource overhead.",
+    "built_in": true,
+    "index_set_config": {
+      "index_analyzer": "standard",
+      "shards": 1,
+      "replicas": 0,
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "field_type_refresh_interval": 5000,
+      "data_tiering": {
+        "type": "hot_warm",
+        "index_lifetime_min": "P90D",
+        "index_lifetime_max": "P100D",
+        "warm_tier_enabled": true,
+        "index_hot_lifetime_min": "P30D",
+        "warm_tier_repository_name": null,
+        "archive_before_deletion": false
+      },
+      "use_legacy_rotation": false
+    }
+  }
+]
