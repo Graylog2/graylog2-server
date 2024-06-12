@@ -22,7 +22,7 @@ import CarouselContext from './CarouselContext';
 
 type Props = React.PropsWithChildren<{
   carouselId: string,
-  options?: Partial<{ align: 'start' }>
+  options?: Partial<{ align: 'start', slidesToScroll: number }>
 }>
 
 const CarouselProvider = ({ carouselId, children, options } : Props) => {
