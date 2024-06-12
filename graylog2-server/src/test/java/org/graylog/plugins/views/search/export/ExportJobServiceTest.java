@@ -20,6 +20,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -36,8 +37,7 @@ class ExportJobServiceTest {
                 "000000000000000000000003",
                 ResultFormat.empty());
 
-        final ExportJobService service = new ExportJobService(mongoDBTestService.mongoConnection(),
-                mongoJackObjectMapperProvider);
+        final ExportJobService service = new ExportJobService(new MongoCollections(mongoJackObjectMapperProvider, mongoDBTestService.mongoConnection()));
 
         assertThat(service.get(service.save(job))).isNotEmpty().containsInstanceOf(SearchTypeExportJob.class);
     }

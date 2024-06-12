@@ -71,6 +71,7 @@ public abstract class LookupTableDto extends ScopedEntity {
         return new AutoValue_LookupTableDto.Builder();
     }
 
+    public abstract Builder toBuilder();
 
     @JsonAutoDetect
     @AutoValue.Builder

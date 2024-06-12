@@ -45,7 +45,7 @@ public class ScopedEntityMongoUtilsTest {
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
         MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
-        collection = mongoCollections.get("test", ScopedDTO.class);
+        collection = mongoCollections.collection("test", ScopedDTO.class);
         EntityScopeService scopeService = new EntityScopeService(Set.of(
                 new DefaultEntityScope(),
                 new ImmutableScope(),

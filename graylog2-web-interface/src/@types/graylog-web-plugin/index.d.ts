@@ -18,6 +18,7 @@ import type * as React from 'react';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
+import type { QualifiedUrl } from 'routing/Routes';
 
 interface PluginRoute {
   path: string;
@@ -35,7 +36,7 @@ interface PluginNavigationDropdownItem {
 }
 
 type PluginNavigationLink = {
-  path: string;
+  path: QualifiedUrl<string>;
 }
 
 type PluginNavigationDropdown = {
@@ -48,6 +49,7 @@ type PluginNavigation = {
   perspective?: string;
   BadgeComponent?: React.ComponentType<{ text: string }>;
   position?: 'last' | undefined,
+  useIsValidLicense?: () => boolean,
 } & (PluginNavigationLink | PluginNavigationDropdown)
 
 interface PluginNavigationItems {

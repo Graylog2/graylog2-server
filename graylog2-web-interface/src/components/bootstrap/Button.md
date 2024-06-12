@@ -1,6 +1,5 @@
-```js
-import { MenuItem } from 'components/bootstrap';
-
+#### Variants
+```tsx
 const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Link', 'Default'];
 
 styles.map((style, i) => {
@@ -12,4 +11,13 @@ styles.map((style, i) => {
     </p>
   )
 })
+```
+
+#### Button with a link
+```tsx
+<Button href="https://www.graylog.org"
+        target="_blank"
+        rel="noopener noreferrer">
+  graylog.org
+</Button>
 ```

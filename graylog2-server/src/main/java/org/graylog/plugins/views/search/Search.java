@@ -34,6 +34,7 @@ import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -50,16 +51,15 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.ImmutableSet.of;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.Collectors.toSet;
 
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = Search.Builder.class)
-public abstract class Search implements ContentPackable<SearchEntity>, ParameterProvider {
+public abstract class Search implements ContentPackable<SearchEntity>, ParameterProvider, MongoEntity {
     public static final String FIELD_REQUIRES = "requires";
-    static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
 
     // generated during build to help quickly find a parameter by name.
@@ -153,7 +153,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     public abstract Builder toBuilder();
 
     public static Builder builder() {
-        return Builder.create().parameters(of()).queries(ImmutableSet.<Query>builder().build());
+        return Builder.create().parameters(ImmutableSet.of()).queries(ImmutableSet.<Query>builder().build());
     }
 
     public Set<String> usedStreamIds() {
@@ -221,7 +221,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
             return new AutoValue_Search.Builder()
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC))
-                    .parameters(of());
+                    .parameters(ImmutableSet.of());
         }
 
         public Search build() {
