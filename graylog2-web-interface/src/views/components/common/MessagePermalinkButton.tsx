@@ -14,19 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode;
+import * as React from 'react';
 
-import com.google.inject.ImplementedBy;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.nodes.DataNodeDto;
+import { Button } from 'components/bootstrap';
+import Routes from 'routing/Routes';
 
-@ImplementedBy(DataNodeServiceImpl.class)
-public interface DataNodeService {
-    DataNodeDto removeNode(String nodeId) throws NodeNotFoundException;
-
-    DataNodeDto resetNode(String nodeId) throws NodeNotFoundException;
-
-    DataNodeDto stopNode(String nodeId) throws NodeNotFoundException;
-
-    DataNodeDto startNode(String nodeId) throws NodeNotFoundException;
+type Props = {
+  messageIndex: string | undefined,
+  messageId: string,
 }
+
+const MessagePermalinkButton = ({ messageIndex, messageId }: Props) => {
+  const messageUrl = messageIndex ? Routes.message_show(messageIndex, messageId) : '#';
+
+  return (
+    <Button href={messageUrl} disabled={!messageIndex} bsSize="small">
+      Permalink
+    </Button>
+  );
+};
+
+export default MessagePermalinkButton;
