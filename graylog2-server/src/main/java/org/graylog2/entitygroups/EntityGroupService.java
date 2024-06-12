@@ -26,10 +26,15 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class EntityGroupService {
     private final DBEntityGroupService dbEntityGroupService;
@@ -70,7 +75,9 @@ public class EntityGroupService {
 
     public EntityGroup addEntityToGroup(String groupId, String type, String entityId) {
         final EntityGroup group = requireEntityGroup(groupId);
-        return dbEntityGroupService.save(group.addEntity(type, entityId));
+        final Map<String, Set<String>> entities = new HashMap<>(firstNonNull(group.entities(), Map.of()));
+        addEntityToMap(entities, type, entityId);
+        return dbEntityGroupService.save(group.toBuilder().entities(entities).build());
     }
 
     public long delete(String id) {
@@ -80,5 +87,12 @@ public class EntityGroupService {
     public EntityGroup requireEntityGroup(String id) {
         return dbEntityGroupService.get(id)
                 .orElseThrow(() -> new IllegalArgumentException("Unable to find entity group to update"));
+    }
+
+    public static void addEntityToMap(Map<String, Set<String>> entities, String type, String entityId) {
+        final Set<String> entityIds = new HashSet<>(entities.getOrDefault(type, Set.of()));
+
+        entityIds.add(entityId);
+        entities.put(type, entityIds);
     }
 }

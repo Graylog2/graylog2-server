@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.entitygroups;
+package org.graylog2.entitygroups.handlers;
 
-import org.graylog2.entitygroups.contentpacks.EntityGroupFacade;
-import org.graylog2.entitygroups.handlers.GroupableStreamHandler;
-import org.graylog2.entitygroups.rest.EntityGroupResource;
-import org.graylog2.plugin.PluginModule;
+import org.graylog2.contentpacks.model.ModelType;
 
-public class EntityGroupsModule extends PluginModule {
-    @Override
-    protected void configure() {
-        addSystemRestResource(EntityGroupResource.class);
-        addEntityFacade(EntityGroupFacade.TYPE_V1, EntityGroupFacade.class);
-        addGroupableEntityHandler(GroupableStreamHandler.TYPE_NAME, GroupableStreamHandler.class);
+public interface GroupableEntityHandler {
+    // The name that will be used for grouping entities of this type.
+    String entityTypeName();
+
+    // The ModelType to be used for content pack handling for entities of this type.
+    default ModelType modelType() {
+        throw new UnsupportedOperationException("Content pack support is not implemented for " + entityTypeName());
     }
+
+    String getEntityId(Object entity);
 }

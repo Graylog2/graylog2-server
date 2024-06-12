@@ -35,7 +35,6 @@ import org.graylog.events.processor.modifier.EventModifier;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
-import org.graylog.plugins.views.search.db.StaticReferencedSearch;
 import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
@@ -52,7 +51,7 @@ import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.database.entities.EntityScope;
-import org.graylog2.entitygroups.entities.GroupableEntity;
+import org.graylog2.entitygroups.handlers.GroupableEntityHandler;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
@@ -455,15 +454,15 @@ public abstract class PluginModule extends Graylog2Module {
         telemetryMetricSupplierBinder().addBinding(eventId).toInstance(eventSupplier);
     }
 
-    protected void addEntityGroupEntityType(String entityTypeName, Class<? extends GroupableEntity> entityClass) {
-        groupableEntityTypeBinder().addBinding(entityTypeName).to(entityClass);
+    protected void addGroupableEntityHandler(String entityTypeName, Class<? extends GroupableEntityHandler> entityClass) {
+        groupableEntityHandlerBinder().addBinding(entityTypeName).to(entityClass);
     }
 
-    protected MapBinder<String, GroupableEntity> groupableEntityTypeBinder() {
+    protected MapBinder<String, GroupableEntityHandler> groupableEntityHandlerBinder() {
         return MapBinder.newMapBinder(
                 binder(),
                 TypeLiteral.get(String.class),
-                TypeLiteral.get(GroupableEntity.class)
+                TypeLiteral.get(GroupableEntityHandler.class)
         );
     }
 }

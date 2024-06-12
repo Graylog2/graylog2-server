@@ -24,8 +24,6 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import jakarta.inject.Inject;
-import org.graylog.events.contentpack.entities.EventDefinitionEntity;
-import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
@@ -38,20 +36,23 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.entitygroups.contentpacks.entities.EntityGroupEntity;
 import org.graylog2.entitygroups.model.DBEntityGroupService;
 import org.graylog2.entitygroups.model.EntityGroup;
-import org.graylog2.entitygroups.entities.GroupableEntity;
+import org.graylog2.entitygroups.handlers.GroupableEntityHandler;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.graylog2.entitygroups.EntityGroupService.addEntityToMap;
 
 public class EntityGroupFacade implements EntityFacade<EntityGroup> {
     private static final Logger LOG = LoggerFactory.getLogger(EntityGroupFacade.class);
@@ -60,15 +61,15 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
 
     private final ObjectMapper objectMapper;
     private final DBEntityGroupService dbEntityGroupService;
-    private final Map<String, GroupableEntity> groupableEntityTypes;
+    private final Map<String, GroupableEntityHandler> groupableEntityHandlers;
 
     @Inject
     public EntityGroupFacade(ObjectMapper objectMapper,
                              DBEntityGroupService dbEntityGroupService,
-                             Map<String, GroupableEntity> groupableEntityTypes) {
+                             Map<String, GroupableEntityHandler> groupableEntityHandlers) {
         this.objectMapper = objectMapper;
         this.dbEntityGroupService = dbEntityGroupService;
-        this.groupableEntityTypes = groupableEntityTypes;
+        this.groupableEntityHandlers = groupableEntityHandlers;
     }
 
     @Override
@@ -83,23 +84,22 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
     }
 
     public Entity exportNativeEntity(EntityGroup entityGroup, EntityDescriptorIds entityDescriptorIds) {
-        EntityGroupEntity contentPackEntity = EntityGroupEntity.builder()
-                .name(entityGroup.name())
-                .entities(Map.of())
-                .build();
+        final Map<String, Set<String>> entities = new HashMap<>();
 
         for (Map.Entry<String, Set<String>> typeGroup : entityGroup.entities().entrySet()) {
-            final ModelType modelType = groupableEntityTypes.get(typeGroup.getKey()).modelType();
+            final ModelType modelType = groupableEntityHandlers.get(typeGroup.getKey()).modelType();
             for (String nativeEntityId : typeGroup.getValue()) {
                 Optional<String> descriptorId = entityDescriptorIds.get(EntityDescriptor.create(nativeEntityId, modelType));
                 if (descriptorId.isPresent()) {
-                    contentPackEntity = contentPackEntity.addEntity(typeGroup.getKey(), EntityDescriptor.create(descriptorId.get(), modelType));
+                    addEntityToMap(entities, typeGroup.getKey(), descriptorId.get());
                 } else {
                     LOG.debug("Couldn't find {} entity with ID {}", typeGroup.getKey(), nativeEntityId);
                 }
             }
         }
 
+        final EntityGroupEntity contentPackEntity = entityGroup.toContentPackEntity(entityDescriptorIds)
+                .toBuilder().entities(entities).build();
         final JsonNode data = objectMapper.convertValue(contentPackEntity, JsonNode.class);
         return EntityV1.builder()
                 .id(ModelId.of(entityDescriptorIds.getOrThrow(entityGroup.id(), EntityGroupFacade.TYPE_V1)))
@@ -111,62 +111,57 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
     }
 
     @Override
-    public NativeEntity<EntityGroup> createNativeEntity(Entity entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities, String username) throws InvalidRangeParametersException {
+    public NativeEntity<EntityGroup> createNativeEntity(Entity entity,
+                                                        Map<String, ValueReference> parameters,
+                                                        Map<EntityDescriptor, Object> nativeEntities,
+                                                        String username) throws InvalidRangeParametersException {
         if (entity instanceof EntityV1) {
-            return decode((EntityV1) entity, nativeEntities);
+            return decode((EntityV1) entity, parameters, nativeEntities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
     private NativeEntity<EntityGroup> decode(EntityV1 entity,
+                                             Map<String, ValueReference> parameters,
                                              Map<EntityDescriptor, Object> nativeEntities) {
-        final EntityGroupEntity entityGroupEntity = objectMapper.convertValue(entity.data(), EntityGroupEntity.class);
-        final EntityGroup nativeGroup = EntityGroup.builder()
-                .name(entityGroupEntity.name())
-                .entities(Map.of())
-                .build();
+        final EntityGroupEntity contentPackGroupEntity = objectMapper.convertValue(entity.data(), EntityGroupEntity.class);
+        final Optional<EntityGroup> existingGroup = dbEntityGroupService.getByName(contentPackGroupEntity.name());
 
-        for (Map.Entry<String, Set<EntityDescriptor>> typeGroup : entityGroupEntity.entities().entrySet()) {
-            for (EntityDescriptor descriptor : typeGroup.getValue()) {
-                final ContentPackable<?> nativeEntity = (ContentPackable<?>) nativeEntities.get(descriptor);
-                nativeGroup.addEntity(typeGroup.getKey(), nativeEntity.id());
+        final Map<String, Set<String>> entities;
+        if (existingGroup.isPresent() && existingGroup.get().entities() != null) {
+            entities = new HashMap<>(existingGroup.get().entities());
+        } else {
+            entities = new HashMap<>();
+        }
+
+        for (Map.Entry<String, Set<String>> typeGroup : contentPackGroupEntity.entities().entrySet()) {
+            final GroupableEntityHandler entityHandler = groupableEntityHandlers.get(typeGroup.getKey());
+            final ModelType modelType = entityHandler.modelType();
+            for (String entityId : typeGroup.getValue()) {
+                final EntityDescriptor descriptor = EntityDescriptor.create(entityId, modelType);
+                final Object nativeEntity = nativeEntities.get(descriptor);
+                addEntityToMap(entities, typeGroup.getKey(), entityHandler.getEntityId(nativeEntity));
             }
         }
 
-        final EntityGroup savedGroup = dbEntityGroupService.save(nativeGroup);
+        final String groupId = existingGroup.map(MongoEntity::id).orElse(null);
+        final EntityGroup group = contentPackGroupEntity.toNativeEntity(parameters, nativeEntities).toBuilder()
+                .id(groupId)
+                .entities(entities)
+                .build();
+        final EntityGroup savedGroup = dbEntityGroupService.save(group);
         return NativeEntity.create(entity.id(), savedGroup.id(), EntityGroupFacade.TYPE_V1, savedGroup.name(), savedGroup);
     }
-
-//    @Override
-//    public Optional<NativeEntity<EntityGroup>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
-//        if (entity instanceof EntityV1) {
-//            return findExisting((EntityV1) entity);
-//        } else {
-//            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
-//        }
-//    }
-//
-//    private Optional<NativeEntity<EntityGroup>> findExisting(EntityV1 entity) {
-//
-//        final EntityGroupEntity entityGroupEntity = objectMapper.convertValue(entity.data(), EntityGroupEntity.class);
-//        group = dbEntityGroupService.getByName(entityGroupEntity.name());
-//
-//        if (group.isPresent()) {
-//            return Optional.of(NativeEntity.create(entity.id(), group.get().id(), EntityGroupFacade.TYPE_V1, group.get().name(), group.get()));
-//        }
-//        return Optional.empty();
-//    }
 
     @Override
     public Optional<NativeEntity<EntityGroup>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
         final Optional<EntityGroup> group = dbEntityGroupService.get(nativeEntityDescriptor.id().id());
-        if (group.isPresent()) {
-            return Optional.of(NativeEntity.create(nativeEntityDescriptor, group.get()));
-        }
-        return Optional.empty();
+        return group.map(entityGroup -> NativeEntity.create(nativeEntityDescriptor, entityGroup));
     }
 
+    // TODO: do we want to delete groups when a content pack is uninstalled?
+    // We should probably check if there are any left over entity dependencies first at least.
     @Override
     public void delete(EntityGroup nativeEntity) {
         dbEntityGroupService.delete(nativeEntity.id());
@@ -197,8 +192,8 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
         final Optional<EntityGroup> entityGroup = dbEntityGroupService.get(modelId.id());
         if (entityGroup.isPresent()) {
             for (Map.Entry<String, Set<String>> typeGroup : entityGroup.get().entities().entrySet()) {
-                final GroupableEntity groupable = groupableEntityTypes.get(typeGroup.getKey());
-                final ModelType modelType = groupable.modelType();
+                final GroupableEntityHandler entityHandler = groupableEntityHandlers.get(typeGroup.getKey());
+                final ModelType modelType = entityHandler.modelType();
                 for (String nativeEntityId : typeGroup.getValue()) {
                     final EntityDescriptor depEntity = EntityDescriptor.builder()
                             .id(ModelId.of(nativeEntityId))
@@ -215,22 +210,25 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
     @Override
     public Graph<Entity> resolveForInstallation(Entity entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Entity> entities) {
         if (entity instanceof EntityV1) {
-            return resolveForInstallationV1((EntityV1) entity, parameters, entities);
+            return resolveForInstallationV1((EntityV1) entity, entities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private Graph<Entity> resolveForInstallationV1(EntityV1 entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Entity> entities) {
+    private Graph<Entity> resolveForInstallationV1(EntityV1 entity, Map<EntityDescriptor, Entity> entities) {
         final MutableGraph<Entity> graph = GraphBuilder.directed().build();
         graph.addNode(entity);
 
         final EntityGroupEntity entityGroupEntity = objectMapper.convertValue(entity.data(), EntityGroupEntity.class);
-        entityGroupEntity.entities().entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream())
-                .map(entities::get)
-                .filter(Objects::nonNull)
-                .forEach(descriptor -> graph.putEdge(entity, descriptor));
+
+        for (Map.Entry<String, Set<String>> typeGroup : entityGroupEntity.entities().entrySet()) {
+            final GroupableEntityHandler entityHandler = groupableEntityHandlers.get(typeGroup.getKey());
+            final ModelType modelType = entityHandler.modelType();
+            for (String entityId : typeGroup.getValue()) {
+                graph.putEdge(entity, entities.get(EntityDescriptor.create(entityId, modelType)));
+            }
+        }
 
         return ImmutableGraph.copyOf(graph);
     }
