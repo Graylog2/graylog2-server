@@ -141,4 +141,9 @@ public class MigrationActionsAdapter implements MigrationActions {
     public void startDataNodes() {
 
     }
+
+    @Override
+    public boolean allDatanodesPrepared() {
+        return false;
+    }
 }

@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.datanode;
 
-import org.graylog2.datanode.DataNodeService;
-import org.graylog2.datanode.DataNodeServiceImpl;
+import org.graylog2.datanode.DataNodeCommandService;
+import org.graylog2.datanode.DataNodeCommandServiceImpl;
 import org.graylog2.migrations.V20231107164300_CreateDataNodeManagerRole;
 import org.graylog2.plugin.PluginModule;
 
@@ -25,7 +25,7 @@ public class DataNodeModule extends PluginModule {
 
     @Override
     protected void configure() {
-        bind(DataNodeService.class).to(DataNodeServiceImpl.class);
+        bind(DataNodeCommandService.class).to(DataNodeCommandServiceImpl.class);
         addMigration(V20231107164300_CreateDataNodeManagerRole.class);
     }
 

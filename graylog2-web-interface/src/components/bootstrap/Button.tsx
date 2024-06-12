@@ -19,6 +19,7 @@ import type { ColorVariant } from '@graylog/sawmill';
 import { Button as MantineButton } from '@mantine/core';
 import type { DefaultTheme } from 'styled-components';
 import styled, { useTheme, css } from 'styled-components';
+import { Link } from 'react-router-dom';
 
 import type { BsSize } from 'components/bootstrap/types';
 
@@ -211,8 +212,8 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
 
     if (href) {
       return (
-        <StyledButton component="a"
-                      href={href}
+        <StyledButton component={Link}
+                      to={href}
                       target={target}
                       rel={rel}
                       onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
