@@ -27,8 +27,6 @@ import MessageDetail from 'views/components/messagelist/MessageDetail';
 import withParams from 'routing/withParams';
 import type { Stream } from 'views/stores/StreamsStore';
 import type { Input } from 'components/messageloaders/Types';
-import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
@@ -37,6 +35,7 @@ import { isLocalNode } from 'views/hooks/useIsLocalNode';
 import PluggableStoreProvider from 'components/PluggableStoreProvider';
 import View from 'views/logic/views/View';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import SingleMessageFieldTypesProvider from 'views/components/fieldtypes/SingleMessageFieldTypesProvider';
 
 type Props = {
   params: {
@@ -85,27 +84,6 @@ const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | un
   return inputs;
 };
 
-type FieldTypesProviderProps = {
-  children: React.ReactNode,
-  streams: Array<string>,
-  timestamp: string,
-};
-
-const FieldTypesProvider = ({ streams, timestamp, children }: FieldTypesProviderProps) => {
-  const { data: fieldTypes } = useFieldTypes(streams, { type: 'absolute', from: timestamp, to: timestamp });
-  const types = useMemo(() => {
-    const fieldTypesList = Immutable.List(fieldTypes);
-
-    return ({ all: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) });
-  }, [fieldTypes]);
-
-  return (
-    <FieldTypesContext.Provider value={types}>
-      {children}
-    </FieldTypesContext.Provider>
-  );
-};
-
 type MessageFields = {
   streams: Array<string>,
   timestamp: string,
@@ -140,7 +118,7 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
           <Row className="content" id="sticky-augmentations-container">
             <Col md={12}>
               <WindowDimensionsContextProvider>
-                <FieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
+                <SingleMessageFieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
                   <InteractiveContext.Provider value={false}>
                     <MessageDetail fields={Immutable.List()}
                                    streams={streams}
@@ -149,7 +127,7 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
                                    inputs={inputs}
                                    message={message} />
                   </InteractiveContext.Provider>
-                </FieldTypesProvider>
+                </SingleMessageFieldTypesProvider>
               </WindowDimensionsContextProvider>
             </Col>
           </Row>
