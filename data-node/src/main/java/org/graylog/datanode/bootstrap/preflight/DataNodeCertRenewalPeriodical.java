@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 public class DataNodeCertRenewalPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeCertRenewalPeriodical.class);
     private static final long CERT_RENEWAL_THRESHOLD_PERCENTAGE = 10;
-    public static final Duration PERIODICAL_DURATION = Duration.ofSeconds(60);
+    public static final Duration PERIODICAL_DURATION = Duration.ofMinutes(30);
 
     private final DatanodeKeystore datanodeKeystore;
     private final Supplier<RenewalPolicy> renewalPolicySupplier;
