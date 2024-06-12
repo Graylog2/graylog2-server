@@ -70,11 +70,10 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
     }
 
     private void manualRenewal() {
-        LOG.info("Manual renewal, ignoring on the datanode side for now");
+        LOG.debug("Manual renewal, ignoring on the datanode side for now");
     }
 
     private void automaticRenewal() {
-        LOG.info("Automatic renewal, triggering CSR");
         csrRequester.triggerCsr();
     }
 
@@ -88,8 +87,11 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
         final Instant renewalMoment = expiration.toInstant()
                 .minus(threshold)
                 .minus(PERIODICAL_DURATION);
-        LOG.info("Certificate will be renewed at " + renewalMoment.toString());
-        return Instant.now().isAfter(renewalMoment);
+        final boolean expiresSoon = Instant.now().isAfter(renewalMoment);
+        if (expiresSoon) {
+            LOG.info("Datanode certificate will be renewed now, expiring soon (" + expiration + ")");
+        }
+        return expiresSoon;
     }
 
     private Optional<RenewalPolicy> getRenewalPolicy() {
