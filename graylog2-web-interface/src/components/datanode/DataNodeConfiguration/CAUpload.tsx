@@ -23,7 +23,7 @@ import { Formik, Form, Field } from 'formik';
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { FormikInput, Icon } from 'components/common';
-import { Input, Button, Label } from 'components/bootstrap';
+import { Button, Label, Alert } from 'components/bootstrap';
 import { Dropzone } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
@@ -156,7 +156,7 @@ const CAUpload = () => {
                     </File>
                   ))}
                 </Files>
-                {error && <Input.Error>{error}</Input.Error>}
+                {error && <Alert bsStyle="warning">{error}</Alert>}
               </>
             )}
           </Field>

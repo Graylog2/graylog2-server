@@ -23,7 +23,7 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.InSecureConfiguration;
-import org.graylog.datanode.configuration.variants.MongoCertSecureConfiguration;
+import org.graylog.datanode.configuration.variants.LocalKeystoreSecureConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
     private final Configuration localConfiguration;
     private final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration;
-    private final MongoCertSecureConfiguration mongoCertSecureConfiguration;
+    private final LocalKeystoreSecureConfiguration mongoCertSecureConfiguration;
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
@@ -62,7 +62,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     public OpensearchConfigurationProvider(final Configuration localConfiguration,
                                            final DatanodeConfiguration datanodeConfiguration,
                                            final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
-                                           final MongoCertSecureConfiguration mongoCertSecureConfiguration,
+                                           final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration,
                                            final InSecureConfiguration inSecureConfiguration,
                                            final NodeService<DataNodeDto> nodeService,
                                            final @Named("password_secret") String passwordSecret,
@@ -70,7 +70,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
-        this.mongoCertSecureConfiguration = mongoCertSecureConfiguration;
+        this.mongoCertSecureConfiguration = localKeystoreSecureConfiguration;
         this.inSecureConfiguration = inSecureConfiguration;
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;

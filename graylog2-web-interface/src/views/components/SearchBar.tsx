@@ -207,7 +207,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                             )}
                           </Field>
 
-                          <RefreshControls />
+                          <RefreshControls disable={!isValid} />
                         </StreamsAndRefresh>
                       </TimeRangeRow>
                       <SearchQueryRow>
