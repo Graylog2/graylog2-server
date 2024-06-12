@@ -76,6 +76,15 @@ public abstract class Pipeline {
     }
 
     /**
+     * Register the metrics attached to this pipeline.
+     *
+     * @param metricRegistry the registry to add the metrics to
+     */
+    public void registerMetrics(MetricRegistry metricRegistry) {
+        registerMetrics(metricRegistry, null);
+    }
+
+    /**
      * The metric filter matching all metrics that have been registered by this pipeline.
      * Commonly used to remove the relevant metrics from the registry upon deletion of the pipeline.
      *

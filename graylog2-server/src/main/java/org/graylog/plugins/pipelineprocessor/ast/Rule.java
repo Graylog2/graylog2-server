@@ -77,6 +77,8 @@ public abstract class Rule {
      * Register the metrics attached to this pipeline.
      *
      * @param metricRegistry the registry to add the metrics to
+     * @param pipelineId     the pipeline ID
+     * @param stageId        the pipeline stage ID
      * @param namePrefix     optional metric name prefix
      */
     public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId, @Nullable String namePrefix) {
@@ -98,6 +100,17 @@ public abstract class Rule {
             localNotMatched = registerLocalMeter(metricRegistry, pipelineId, stageId, "not-matched", namePrefix);
 
         }
+    }
+
+    /**
+     * Register the metrics attached to this pipeline.
+     *
+     * @param metricRegistry the registry to add the metrics to
+     * @param pipelineId     the pipeline ID
+     * @param stageId        the pipeline stage ID
+     */
+    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId) {
+        registerMetrics(metricRegistry, pipelineId, stageId, null);
     }
 
     private Meter registerGlobalMeter(MetricRegistry metricRegistry, String type, @Nullable String namePrefix) {

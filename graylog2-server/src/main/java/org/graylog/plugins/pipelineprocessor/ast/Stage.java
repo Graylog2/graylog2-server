@@ -69,11 +69,22 @@ public abstract class Stage implements Comparable<Stage> {
      * Register the metrics attached to this stage.
      *
      * @param metricRegistry the registry to add the metrics to
+     * @param pipelineId     the pipeline ID
      * @param namePrefix     optional metric name prefix
      */
     public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, @Nullable String namePrefix) {
         meterName = name(firstNonNull(namePrefix, Pipeline.class.getName()), pipelineId, "stage", String.valueOf(stage()), "executed");
         executed = metricRegistry.meter(meterName);
+    }
+
+    /**
+     * Register the metrics attached to this stage.
+     *
+     * @param metricRegistry the registry to add the metrics to
+     * @param pipelineId     the pipeline ID
+     */
+    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId) {
+        registerMetrics(metricRegistry, pipelineId, null);
     }
 
     /**
