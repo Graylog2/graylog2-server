@@ -20,8 +20,8 @@ import com.google.inject.ImplementedBy;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 
-@ImplementedBy(DataNodeServiceImpl.class)
-public interface DataNodeService {
+@ImplementedBy(DataNodeCommandServiceImpl.class)
+public interface DataNodeCommandService {
     DataNodeDto removeNode(String nodeId) throws NodeNotFoundException;
 
     DataNodeDto resetNode(String nodeId) throws NodeNotFoundException;
@@ -29,4 +29,6 @@ public interface DataNodeService {
     DataNodeDto stopNode(String nodeId) throws NodeNotFoundException;
 
     DataNodeDto startNode(String nodeId) throws NodeNotFoundException;
+
+    DataNodeDto triggerCertificateSigningRequest(String nodeId, DatanodeStartType startType) throws NodeNotFoundException;
 }

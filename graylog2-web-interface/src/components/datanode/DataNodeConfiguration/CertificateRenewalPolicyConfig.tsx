@@ -91,12 +91,10 @@ const smallestUnit = (duration: string) => {
 const fetchCurrentConfig = () => ConfigurationsActions.list(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG) as Promise<RenewalPolicy>;
 
 const NoExistingPolicy = ({ createPolicy }: { createPolicy: () => void }) => (
-  <span>There is no Certificate Renewal Policy yet. Click&nbsp;
-    <Button onClick={createPolicy}
-            bsSize="xsmall"
-            bsStyle="primary">here
-    </Button> to create one.
-  </span>
+  <Button onClick={createPolicy}
+          bsSize="small"
+          bsStyle="primary">Configure Certificate Renewal Policy
+  </Button>
 );
 
 const certicateRenewalModes = ['AUTOMATIC', 'MANUAL'].map((mode) => ({ label: capitalize(mode), value: mode }));
@@ -201,8 +199,8 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
 
           <p className="no-bm">
             <IfPermitted permissions="indices:changestate">
-              <Button bsStyle="info"
-                      bsSize="xs"
+              <Button bsStyle="primary"
+                      bsSize="small"
                       onClick={() => {
                         setShowModal(true);
                       }}>Edit configuration
