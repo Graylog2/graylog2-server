@@ -171,7 +171,7 @@ class FilterAggregationSummary extends React.Component {
               <dd>{cronExpression}</dd>
               <dt>Cron Description</dt>
               <dd>{cronstrue.toString(cronExpression)}</dd>
-              <dt>Timezone</dt>
+              <dt>Time Zone</dt>
               <dd>{cronTimezone}</dd>
             </>
           )

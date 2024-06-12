@@ -473,13 +473,6 @@ const FilterForm = ({
                        value={defaultTo(eventDefinition.config.streams, []).join(',')} />
           <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
         </FormGroup>
-        <Input id="is-cron-checkbox"
-               type="checkbox"
-               name="use_cron_scheduling"
-               label="Use Cron Scheduling"
-               help="Schedule this event with a Quartz cron expression"
-               checked={defaultTo(eventDefinition.config.use_cron_scheduling, false)}
-               onChange={handleEnabledChange} />
 
         {isSearchingWarmTier(warmTierRanges) && (
         <Alert bsStyle="danger" title="Warm Tier Warning">
@@ -502,27 +495,32 @@ const FilterForm = ({
 
         {currentConfig.use_cron_scheduling
           ? (
-            <FormGroup controlId="cron-expression" validationState={validation.errors.cron_expression ? 'error' : null}>
-              <Input id="cron-expression"
-                     name="cron_expression"
-                     label="Cron Expression"
-                     type="text"
-                     help={(
-                       <span>
-                         A Quartz cron expression to determine when the event should be run.
-                       </span>
+            <>
+              <FormGroup controlId="cron-expression" validationState={validation.errors.cron_expression ? 'error' : null}>
+                <Input id="cron-expression"
+                       name="cron_expression"
+                       label="Cron Expression"
+                       type="text"
+                       help={(
+                         <span>
+                           A Quartz cron expression to determine when the event should be run.
+                         </span>
                    )}
-                     value={defaultTo(currentConfig.cron_expression, '')}
-                     onChange={handleCronExpressionChange} />
-              <ControlLabel>Time Zone</ControlLabel>
-              <TimezoneSelect value={defaultTo(currentConfig.cron_timezone, userTimezone)}
-                              name="cron_timezone"
-                              clearable={false}
-                              onChange={handleCronTimezoneChange} />
-              {validation.errors.cron_expression && (
-              <HelpBlock>{get(validation, 'errors.cron_expression[0]')}</HelpBlock>
-              )}
-            </FormGroup>
+                       value={defaultTo(currentConfig.cron_expression, '')}
+                       onChange={handleCronExpressionChange} />
+                {validation.errors.cron_expression && (
+                <HelpBlock>{get(validation, 'errors.cron_expression[0]')}</HelpBlock>
+                )}
+              </FormGroup>
+              <FormGroup>
+                <ControlLabel>Cron Time Zone</ControlLabel>
+                <TimezoneSelect value={defaultTo(currentConfig.cron_timezone, userTimezone)}
+                                name="cron_timezone"
+                                clearable={false}
+                                onChange={handleCronTimezoneChange} />
+
+              </FormGroup>
+            </>
           )
           : (
             <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
@@ -538,6 +536,14 @@ const FilterForm = ({
               )}
             </FormGroup>
           )}
+        <Input id="is-cron-checkbox"
+               type="checkbox"
+               name="use_cron_scheduling"
+               label="Use Cron Scheduling"
+               help="Schedule this event with a Quartz cron expression"
+               checked={defaultTo(eventDefinition.config.use_cron_scheduling, false)}
+               onChange={handleEnabledChange} />
+
         <Input id="schedule-checkbox"
                type="checkbox"
                name="_is_scheduled"
