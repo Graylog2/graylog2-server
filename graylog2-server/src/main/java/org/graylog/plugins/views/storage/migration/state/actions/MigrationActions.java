@@ -47,6 +47,8 @@ public interface MigrationActions {
 
     boolean provisioningFinished();
 
+    boolean allDatanodesPrepared();
+
     void startDataNodes();
 
     boolean dataNodeStartupFinished();
