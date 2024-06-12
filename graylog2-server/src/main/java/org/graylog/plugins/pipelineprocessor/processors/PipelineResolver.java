@@ -77,6 +77,15 @@ public class PipelineResolver {
     }
 
     /**
+     * Returns the pipeline resolver configuration.
+     *
+     * @return the configuration
+     */
+    public PipelineResolverConfig config() {
+        return config;
+    }
+
+    /**
      * Resolves the rule and pipeline DAO objects into AST objects.
      *
      * @return a map of pipeline ID to pipeline instances

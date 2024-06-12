@@ -26,7 +26,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
-import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
@@ -118,7 +117,7 @@ public class ConfigurationStateUpdater {
     public void handleRuleChanges(RulesChangedEvent event) {
         event.deletedRuleIds().forEach(id -> {
             log.debug("Invalidated rule {}", id);
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(Rule.class, id)));
+            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(pipelineResolver.config().ruleMetricPrefix(), id)));
         });
         event.updatedRuleIds().forEach(id -> log.debug("Refreshing rule {}", id));
         scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
@@ -128,7 +127,7 @@ public class ConfigurationStateUpdater {
     public void handlePipelineChanges(PipelinesChangedEvent event) {
         event.deletedPipelineIds().forEach(id -> {
             log.debug("Invalidated pipeline {}", id);
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(Pipeline.class, id)));
+            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(pipelineResolver.config().pipelineMetricPrefix(), id)));
         });
         event.updatedPipelineIds().forEach(id -> log.debug("Refreshing pipeline {}", id));
         scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);

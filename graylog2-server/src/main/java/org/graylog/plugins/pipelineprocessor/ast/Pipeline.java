@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 import java.util.SortedSet;
 import java.util.stream.Stream;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @AutoValue
 public abstract class Pipeline {
@@ -68,9 +68,9 @@ public abstract class Pipeline {
      * @param metricRegistry the registry to add the metrics to
      * @param namePrefix     optional metric name prefix
      */
-    public void registerMetrics(MetricRegistry metricRegistry, @Nullable String namePrefix) {
+    public void registerMetrics(MetricRegistry metricRegistry, String namePrefix) {
         if (id() != null) {
-            metricName = MetricRegistry.name(firstNonNull(namePrefix, Pipeline.class.getName()), id(), "executed");
+            metricName = MetricRegistry.name(requireNonBlank(namePrefix), id(), "executed");
             executed = metricRegistry.meter(metricName);
         }
     }
@@ -80,8 +80,10 @@ public abstract class Pipeline {
      *
      * @param metricRegistry the registry to add the metrics to
      */
+    // TODO: Remove once dependent code has been updated
+    @Deprecated
     public void registerMetrics(MetricRegistry metricRegistry) {
-        registerMetrics(metricRegistry, null);
+        registerMetrics(metricRegistry, Pipeline.class.getName());
     }
 
     /**

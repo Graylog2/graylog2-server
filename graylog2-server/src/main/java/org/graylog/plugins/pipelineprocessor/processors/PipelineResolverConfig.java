@@ -16,14 +16,19 @@
  */
 package org.graylog.plugins.pipelineprocessor.processors;
 
-import jakarta.annotation.Nullable;
+import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 /**
  * Pipeline resolver configuration.
@@ -37,12 +42,18 @@ import java.util.stream.Stream;
 public record PipelineResolverConfig(Supplier<Stream<RuleDao>> rulesSupplier,
                                      Supplier<Stream<PipelineDao>> pipelinesSupplier,
                                      Supplier<Stream<PipelineConnections>> pipelineConnectionsSupplier,
-                                     @Nullable String ruleMetricPrefix,
-                                     @Nullable String pipelineMetricPrefix) {
+                                     String ruleMetricPrefix,
+                                     String pipelineMetricPrefix) {
+    // The default prefixes are Rule and Pipeline for backwards compatibility.
+    private static final String DEFAULT_RULE_METRIC_PREFIX = Rule.class.getName();
+    private static final String DEFAULT_PIPELINE_METRIC_PREFIX = Pipeline.class.getName();
+
     public PipelineResolverConfig {
-        Objects.requireNonNull(rulesSupplier);
-        Objects.requireNonNull(pipelinesSupplier);
-        Objects.requireNonNull(pipelineConnectionsSupplier);
+        requireNonNull(rulesSupplier);
+        requireNonNull(pipelinesSupplier);
+        requireNonNull(pipelineConnectionsSupplier);
+        requireNonBlank(ruleMetricPrefix);
+        requireNonBlank(pipelineMetricPrefix);
     }
 
     public static PipelineResolverConfig of(Supplier<Stream<RuleDao>> rulesSupplier,
@@ -56,11 +67,11 @@ public record PipelineResolverConfig(Supplier<Stream<RuleDao>> rulesSupplier,
     public static PipelineResolverConfig of(Supplier<Stream<RuleDao>> rulesSupplier,
                                             Supplier<Stream<PipelineDao>> pipelinesSupplier,
                                             Supplier<Stream<PipelineConnections>> pipelineConnectionsSupplier) {
-        return new PipelineResolverConfig(rulesSupplier, pipelinesSupplier, pipelineConnectionsSupplier, null, null);
+        return new PipelineResolverConfig(rulesSupplier, pipelinesSupplier, pipelineConnectionsSupplier, DEFAULT_RULE_METRIC_PREFIX, DEFAULT_PIPELINE_METRIC_PREFIX);
     }
 
     public static PipelineResolverConfig of(Supplier<Stream<RuleDao>> rulesSupplier,
                                             Supplier<Stream<PipelineDao>> pipelinesSupplier) {
-        return new PipelineResolverConfig(rulesSupplier, pipelinesSupplier, Stream::of, null, null);
+        return new PipelineResolverConfig(rulesSupplier, pipelinesSupplier, Stream::of, DEFAULT_RULE_METRIC_PREFIX, DEFAULT_PIPELINE_METRIC_PREFIX);
     }
 }

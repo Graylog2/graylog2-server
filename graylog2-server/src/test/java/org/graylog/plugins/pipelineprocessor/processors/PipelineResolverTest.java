@@ -90,6 +90,22 @@ class PipelineResolverTest {
     }
 
     @Test
+    void accessConfig() {
+        final PipelineResolverConfig config = PipelineResolverConfig.of(
+                () -> Stream.of(rule1),
+                () -> Stream.of(pipeline1),
+                () -> Stream.of(connections1, connections2)
+        );
+        final var resolver = new PipelineResolver(
+                new PipelineRuleParser(new FunctionRegistry(Map.of())),
+                metricRegistry,
+                config
+        );
+
+        assertThat(resolver.config()).isEqualTo(config);
+    }
+
+    @Test
     void resolvePipelines() {
         final var resolver = new PipelineResolver(
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),

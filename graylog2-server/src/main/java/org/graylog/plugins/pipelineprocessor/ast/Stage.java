@@ -20,13 +20,12 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
-import jakarta.annotation.Nullable;
 import org.graylog2.shared.metrics.MetricUtils;
 
 import java.util.List;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @AutoValue
 public abstract class Stage implements Comparable<Stage> {
@@ -72,8 +71,8 @@ public abstract class Stage implements Comparable<Stage> {
      * @param pipelineId     the pipeline ID
      * @param namePrefix     optional metric name prefix
      */
-    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, @Nullable String namePrefix) {
-        meterName = name(firstNonNull(namePrefix, Pipeline.class.getName()), pipelineId, "stage", String.valueOf(stage()), "executed");
+    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String namePrefix) {
+        meterName = name(requireNonBlank(namePrefix), pipelineId, "stage", String.valueOf(stage()), "executed");
         executed = metricRegistry.meter(meterName);
     }
 
@@ -83,8 +82,10 @@ public abstract class Stage implements Comparable<Stage> {
      * @param metricRegistry the registry to add the metrics to
      * @param pipelineId     the pipeline ID
      */
+    // TODO: Remove once dependent code has been updated
+    @Deprecated
     public void registerMetrics(MetricRegistry metricRegistry, String pipelineId) {
-        registerMetrics(metricRegistry, pipelineId, null);
+        registerMetrics(metricRegistry, pipelineId, Pipeline.class.getName());
     }
 
     /**

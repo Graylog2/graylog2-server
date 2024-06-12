@@ -32,8 +32,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @AutoValue
 public abstract class Rule {
@@ -81,7 +81,7 @@ public abstract class Rule {
      * @param stageId        the pipeline stage ID
      * @param namePrefix     optional metric name prefix
      */
-    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId, @Nullable String namePrefix) {
+    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId, String namePrefix) {
         if (id() == null) {
             LOG.debug("Not registering metrics for unsaved rule {}", name());
             return;
@@ -109,12 +109,14 @@ public abstract class Rule {
      * @param pipelineId     the pipeline ID
      * @param stageId        the pipeline stage ID
      */
+    // TODO: Remove once dependent code has been updated
+    @Deprecated
     public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId) {
-        registerMetrics(metricRegistry, pipelineId, stageId, null);
+        registerMetrics(metricRegistry, pipelineId, stageId, Rule.class.getName());
     }
 
-    private Meter registerGlobalMeter(MetricRegistry metricRegistry, String type, @Nullable String namePrefix) {
-        final String name = MetricRegistry.name(firstNonNull(namePrefix, Rule.class.getName()), id(), type);
+    private Meter registerGlobalMeter(MetricRegistry metricRegistry, String type, String namePrefix) {
+        final String name = MetricRegistry.name(requireNonBlank(namePrefix), id(), type);
         metricNames.add(name);
         return metricRegistry.meter(name);
     }
@@ -122,8 +124,8 @@ public abstract class Rule {
     private Meter registerLocalMeter(MetricRegistry metricRegistry,
                                      String pipelineId,
                                      String stageId, String type,
-                                     @Nullable String namePrefix) {
-        final String name = MetricRegistry.name(firstNonNull(namePrefix, Rule.class.getName()), id(), pipelineId, stageId, type);
+                                     String namePrefix) {
+        final String name = MetricRegistry.name(requireNonBlank(namePrefix), id(), pipelineId, stageId, type);
         metricNames.add(name);
         return metricRegistry.meter(name);
     }
