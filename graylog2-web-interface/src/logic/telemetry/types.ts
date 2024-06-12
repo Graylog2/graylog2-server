@@ -14,23 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.csr;
 
-import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
+import type { ExtractObjectValues } from 'util/UtilityTypes';
+import type { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import java.security.PrivateKey;
-
-public class InMemoryPrivateKeyStorage implements PrivateKeyEncryptedStorage {
-
-    private PrivateKey privateKey;
-
-    @Override
-    public void writeEncryptedKey(char[] password, PrivateKey privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    @Override
-    public PrivateKey readEncryptedKey(char[] password) {
-        return privateKey;
-    }
+export interface EventTypes {
+  core: ExtractObjectValues<typeof TELEMETRY_EVENT_TYPE>
 }
+
+export type EventType = EventTypes[keyof EventTypes];

@@ -67,11 +67,7 @@ const searchExplainContext = (searchedIndexRanges = [
 
 jest.mock('views/components/useWidgetResults');
 
-jest.mock('views/hooks/useAutoRefresh', () => () => ({
-  refreshConfig: null,
-  startAutoRefresh: () => {},
-  stopAutoRefresh: () => {},
-}));
+jest.mock('views/hooks/useAutoRefresh');
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
