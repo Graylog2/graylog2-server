@@ -238,7 +238,7 @@ public class MigrationStateMachineBuilderTest {
         when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
         stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
         verify(migrationActions, times(1)).provisioningFinished();
-        Mockito.when(migrationActions.provisioningFinished()).thenReturn(true);
+        Mockito.when(migrationActions.allDatanodesPrepared()).thenReturn(true);
         stateMachine.fire(MigrationStep.CALCULATE_JOURNAL_SIZE);
         verify(migrationActions, times(1)).calculateTrafficEstimate();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);

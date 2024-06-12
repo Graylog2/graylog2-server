@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DataNodeServiceImplTest {
+public class DataNodeCommandServiceImplTest {
 
     @Mock
     private ClusterEventBus clusterEventBus;
@@ -45,12 +45,12 @@ public class DataNodeServiceImplTest {
     private EventBus eventBus;
     private NodeService<DataNodeDto> nodeService;
 
-    private DataNodeServiceImpl classUnderTest;
+    private DataNodeCommandServiceImpl classUnderTest;
 
     @Before
     public void setUp() {
         this.nodeService = new TestDataNodeNodeClusterService();
-        this.classUnderTest = new DataNodeServiceImpl(clusterEventBus, nodeService, eventBus);
+        this.classUnderTest = new DataNodeCommandServiceImpl(clusterEventBus, nodeService, eventBus);
     }
 
     private DataNodeDto buildTestNode(String nodeId, DataNodeStatus status) {
