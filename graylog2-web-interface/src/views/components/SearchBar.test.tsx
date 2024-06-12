@@ -53,12 +53,7 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('stores/useAppDispatch');
-
-jest.mock('views/hooks/useAutoRefresh', () => () => ({
-  refreshConfig: null,
-  startAutoRefresh: () => {},
-  stopAutoRefresh: () => {},
-}));
+jest.mock('views/hooks/useAutoRefresh');
 
 const query = MockQuery.builder()
   .timerange({ type: 'relative', from: 300 })
