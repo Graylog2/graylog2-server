@@ -112,7 +112,7 @@
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.4.0</commons-exec.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
-        <commons-net.version>3.11.0</commons-net.version>
+        <commons-net.version>3.11.1</commons-net.version>
         <commons-validator.version>1.9.0</commons-validator.version>
         <commons-io.version>2.16.1</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
@@ -130,7 +130,7 @@
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hk2.version>3.1.0</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.17.1</jackson.version>
-        <jadconfig.version>0.14.0</jadconfig.version>
+        <jadconfig.version>0.15.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
@@ -148,12 +148,12 @@
         <kafka.version>3.7.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.23.1</log4j.version>
-        <lucene.version>9.10.0</lucene.version>
+        <lucene.version>9.11.0</lucene.version>
         <metrics.version>4.2.26</metrics.version>
         <mongodb-driver.version>5.1.0</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.110.Final</netty.version>
+        <netty.version>4.1.111.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.65.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
