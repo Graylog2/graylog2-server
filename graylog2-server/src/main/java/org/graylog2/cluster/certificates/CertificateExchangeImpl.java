@@ -94,7 +94,7 @@ public class CertificateExchangeImpl implements CertificateExchange {
     @Override
     public void signPendingCertificateRequests(Function<CertificateSigningRequest, CertificateChain> signingFunction) throws IOException {
         MongoCollection<Document> dbCollection = mongoDatabase.getCollection(COLLECTION_NAME);
-        final FindIterable<Document> objects = dbCollection.find(eq(FIELD_ENTRY_TYPE, CertificateExchangeType.CSR.name()));
+        final FindIterable<Document> objects = dbCollection.find(eq(FIELD_ENTRY_TYPE, CertificateExchangeType.CSR));
         try (final MongoCursor<Document> cursor = objects.cursor()) {
             while (cursor.hasNext()) {
                 try {
@@ -129,7 +129,7 @@ public class CertificateExchangeImpl implements CertificateExchange {
         final UpdateResult result = dbCollection.updateOne(
                 Filters.and(
                         eq(FIELD_NODE_ID, nodeId),
-                        eq(FIELD_ENTRY_TYPE, type.name())
+                        eq(FIELD_ENTRY_TYPE, type)
                 ),
                 Updates.combine(
                         set(FIELD_NODE_ID, nodeId),
@@ -165,7 +165,7 @@ public class CertificateExchangeImpl implements CertificateExchange {
         MongoCollection<Document> dbCollection = mongoDatabase.getCollection(COLLECTION_NAME);
         final Bson filter = Filters.and(
                 eq(FIELD_NODE_ID, nodeId),
-                eq(FIELD_ENTRY_TYPE, CertificateExchangeType.CERT_CHAIN.name()));
+                eq(FIELD_ENTRY_TYPE, CertificateExchangeType.CERT_CHAIN));
         final FindIterable<Document> objects = dbCollection.find(filter).limit(1);
         return Optional.ofNullable(objects.first());
     }
@@ -194,7 +194,7 @@ public class CertificateExchangeImpl implements CertificateExchange {
         MongoCollection<Document> dbCollection = mongoDatabase.getCollection(COLLECTION_NAME);
         final Bson filter = Filters.and(
                 eq(FIELD_NODE_ID, nodeId),
-                eq(FIELD_ENTRY_TYPE, type.name())
+                eq(FIELD_ENTRY_TYPE, type)
         );
         var result = dbCollection.deleteOne(filter);
         if (result.getDeletedCount() != 1) {
