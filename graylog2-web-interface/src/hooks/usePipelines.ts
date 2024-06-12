@@ -38,7 +38,6 @@ const usePipelines = ({ enabled }: Options = { enabled: true }) : {
         UserNotification.error(`Loading pipelines failed with status: ${errorThrown}`,
           'Could not load pipelines');
       },
-      keepPreviousData: true,
       enabled,
     },
   );

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -48,9 +48,13 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
   const currentUser = useCurrentUser();
   const queryClient = useQueryClient();
   const { onSaveStreamPipelinesConnection } = useStreamPipelinesConnectionMutation();
-  const formattedConnectedPipelines = formatPipelines(connectedPipelines || []);
+  const formattedConnectedPipelines = formatPipelines(connectedPipelines);
   const [updatedPipelines, setUpdatePipelines] = useState<Array<FormattedPipelines>>(formattedConnectedPipelines);
   const notConnectedPipelines = useMemo(() => pipelines.filter((s) => !updatedPipelines.some((cs) => cs.value.toLowerCase() === s.id.toLowerCase())), [pipelines, updatedPipelines]);
+
+  useEffect(() => {
+    setUpdatePipelines(formatPipelines(connectedPipelines));
+  }, [connectedPipelines]);
 
   const openModal = () => {
     setShowModal(true);
