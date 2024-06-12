@@ -16,6 +16,7 @@
  */
 package org.graylog2.datanode;
 
-public enum DataNodeLifecycleTrigger {
-    REMOVE, RESET, STOP, START, REMOVED, STOPPED, STARTED, CLEAR, REQUEST_CSR, REQUEST_CSR_WITH_AUTOSTART
+public enum DatanodeStartType {
+    AUTOMATICALLY,
+    MANUALLY
 }

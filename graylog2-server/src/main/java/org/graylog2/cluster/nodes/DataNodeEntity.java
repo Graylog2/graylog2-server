@@ -20,9 +20,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.joda.time.DateTime;
+import org.joda.time.base.AbstractInstant;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @DbEntity(collection = "datanodes", titleField = "node_id")
 public class DataNodeEntity extends AbstractNode<DataNodeDto> {
@@ -42,6 +46,11 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
 
     public String getRestApiAddress() {
         return (String) fields.get("rest_api_address");
+    }
+
+    public Date getCertValidTill() {
+        final DateTime dateTime = (DateTime) fields.get(DataNodeDto.FIELD_CERT_VALID_UNTIL);
+        return Optional.ofNullable(dateTime).map(AbstractInstant::toDate).orElse(null);
     }
 
     public DataNodeLifecycleTrigger getActionQueue() {
@@ -71,6 +80,7 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
                 .setDataNodeStatus(this.getDataNodeStatus())
                 .setRestApiAddress(this.getRestApiAddress())
                 .setActionQueue(this.getActionQueue())
+                .setCertValidUntil(this.getCertValidTill())
                 .build();
     }
 
