@@ -112,11 +112,11 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @ApiResponses(@ApiResponse(code = 400, message = "An entity group already exists with id or name"))
     @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_EDIT)
     @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_CREATE)
-    public Response create(@ApiParam(name = "JSON Body") EntityGroup entityGroup) {
+    public Response create(@ApiParam(name = "JSON Body") EntityGroupRequest request) {
         try {
-            return Response.ok().entity(entityGroupService.create(entityGroup)).build();
+            return Response.ok().entity(entityGroupService.create(request.toEntityGroup())).build();
         } catch (DuplicateKeyException | MongoWriteException e) {
-            throw new BadRequestException(StringUtils.f("Entity group '%s' already exists", entityGroup.name()));
+            throw new BadRequestException(StringUtils.f("Entity group '%s' already exists", request.name()));
         }
     }
 
@@ -131,13 +131,13 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_EDIT)
     @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_UPDATE)
     public Response update(@ApiParam(name = "id", required = true) @PathParam("id") String id,
-                           @ApiParam(name = "JSON Body") EntityGroup entityGroup) {
+                           @ApiParam(name = "JSON Body") EntityGroupRequest request) {
         try {
-            return Response.ok().entity(entityGroupService.update(id, entityGroup)).build();
+            return Response.ok().entity(entityGroupService.update(id, request.toEntityGroup())).build();
         } catch (IllegalArgumentException e) {
             throw new NotFoundException(getRootCauseMessage(e), e);
         } catch (DuplicateKeyException | MongoWriteException e) {
-            throw new BadRequestException(StringUtils.f("Entity group '%s' already exists", entityGroup.name()));
+            throw new BadRequestException(StringUtils.f("Entity group '%s' already exists", request.name()));
         }
     }
 

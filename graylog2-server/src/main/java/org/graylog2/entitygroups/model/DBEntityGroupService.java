@@ -135,7 +135,6 @@ public class DBEntityGroupService {
     }
 
     // TODO: can we make this better..?
-
     /**
      * Returns all entity groups that contain the given entity IDs for the given type.
      *

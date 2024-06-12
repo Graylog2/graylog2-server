@@ -27,5 +27,6 @@ public interface GroupableEntityHandler {
         throw new UnsupportedOperationException("Content pack support is not implemented for " + entityTypeName());
     }
 
+    // Handles obtaining the DB id for a groupable entity.
     String getEntityId(Object entity);
 }
