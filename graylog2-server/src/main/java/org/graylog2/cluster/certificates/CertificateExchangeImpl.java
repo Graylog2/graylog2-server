@@ -18,10 +18,12 @@ package org.graylog2.cluster.certificates;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -36,6 +38,8 @@ import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,16 +52,16 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Indexes.ascending;
-import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
 public class CertificateExchangeImpl implements CertificateExchange {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CertificateExchangeImpl.class);
 
     private static final String ENCRYPTED_VALUE_SUBFIELD = "encrypted_value";
     private static final String SALT_SUBFIELD = "salt";
@@ -82,8 +86,41 @@ public class CertificateExchangeImpl implements CertificateExchange {
         dbCollection.createIndex(ascending(FIELD_NODE_ID, FIELD_ENTRY_TYPE), new IndexOptions().unique(true));
     }
 
+    @Override
+    public void requestCertificate(CertificateSigningRequest request) throws IOException {
+        writeToDatabase(request.nodeId(), serializeCsr(request.request()), CertificateExchangeType.CSR);
+    }
+
+    @Override
+    public void signPendingCertificateRequests(Function<CertificateSigningRequest, CertificateChain> signingFunction) throws IOException {
+        MongoCollection<Document> dbCollection = mongoDatabase.getCollection(COLLECTION_NAME);
+        final FindIterable<Document> objects = dbCollection.find(eq(FIELD_ENTRY_TYPE, CertificateExchangeType.CSR.name()));
+        try (final MongoCursor<Document> cursor = objects.cursor()) {
+            while (cursor.hasNext()) {
+                try {
+                    final CertificateSigningRequest csr = documentToCsr(cursor.next());
+                    writeCertificate(csr.nodeId(), signingFunction.apply(csr));
+                    removeCertificateSigningRequest(csr.nodeId());
+                } catch (Exception e) {
+                    LOG.error("Failed to sign CSR for node, skipping it for now.", e);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void pollCertificate(String nodeId, Consumer<CertificateChain> chainConsumer) {
+        readCertChain(nodeId)
+                .ifPresent(certificateChain -> {
+                    chainConsumer.accept(certificateChain);
+                    // if the consumer fails (to store the chain), the an exception will prevent removal of
+                    // the chain of the datanbase.
+                    removeCertificateChain(nodeId);
+                });
+    }
+
     private void writeCertificate(String nodeId, CertificateChain certificateChain) throws IOException {
-        writeToDatabase(nodeId, toString(certificateChain), CertificateExchangeType.CERT_CHAIN);
+        writeToDatabase(nodeId, serializeChain(certificateChain), CertificateExchangeType.CERT_CHAIN);
     }
 
     private void writeToDatabase(String nodeId, String serializedValue, CertificateExchangeType type) {
@@ -94,7 +131,7 @@ public class CertificateExchangeImpl implements CertificateExchange {
                         eq(FIELD_NODE_ID, nodeId),
                         eq(FIELD_ENTRY_TYPE, type.name())
                 ),
-                combine(
+                Updates.combine(
                         set(FIELD_NODE_ID, nodeId),
                         set(FIELD_ENCRYPTED_VALUE + "." + ENCRYPTED_VALUE_SUBFIELD, encrypted.value()),
                         set(FIELD_ENCRYPTED_VALUE + "." + SALT_SUBFIELD, encrypted.salt())
@@ -103,88 +140,69 @@ public class CertificateExchangeImpl implements CertificateExchange {
         );
         final boolean updated = result.getModifiedCount() > 0 || result.getUpsertedId() != null;
         if (!updated) {
-            throw new RuntimeException("Failed to write certificateChain");
+            throw new RuntimeException("Failed to write entry to certificate exchange collection!");
         }
     }
 
-    @Override
-    public void signPendingCertificateRequests(Function<CertificateSigningRequest, CertificateChain> signingFunction) throws IOException {
-        Optional<CertificateSigningRequest> req = getNextCertificateSigningRequest();
-        while (req.isPresent()) {
-            final CertificateSigningRequest csr = req.get();
-            writeCertificate(csr.nodeId(), signingFunction.apply(csr));
-            removeCertificateSigningRequest(csr.nodeId());
-            req = getNextCertificateSigningRequest();
-        }
+    private CertificateSigningRequest documentToCsr(Document document) {
+        final String nodeID = document.getString(FIELD_NODE_ID);
+        final String decryptedValue = decryptedValue(document);
+        return new CertificateSigningRequest(nodeID, parseCSR(decryptedValue));
+
     }
 
-    @Override
-    public void requestCertificate(CertificateSigningRequest request) throws IOException {
-        writeToDatabase(request.nodeId(), toString(request.request()), CertificateExchangeType.CSR);
-    }
-
-    @Override
-    public void pollCertificate(String nodeId, Consumer<CertificateChain> chainConsumer) {
-        readEntry(
-                Filters.and(
-                        eq(FIELD_NODE_ID, nodeId),
-                        eq(FIELD_ENTRY_TYPE, CertificateExchangeType.CERT_CHAIN.name())), (document, decryptedValue) -> parseCertificateChain(decryptedValue))
-                .ifPresent(certificateChain -> {
-                    chainConsumer.accept(certificateChain);
-                    removeCertificateChain(nodeId);
+    @Nonnull
+    private Optional<CertificateChain> readCertChain(String nodeId) {
+        return findCertChain(nodeId)
+                .map(document -> {
+                    final String decryptedValue = decryptedValue(document);
+                    return parseCertificateChain(decryptedValue);
                 });
     }
 
     @Nonnull
-    private <T> Optional<T> readEntry(Bson filter, BiFunction<Document, String, T> parser) {
+    private Optional<Document> findCertChain(String nodeId) {
         MongoCollection<Document> dbCollection = mongoDatabase.getCollection(COLLECTION_NAME);
-        final FindIterable<Document> objects = dbCollection.find(
-                filter
-        );
-        final Document document = objects.first();
+        final Bson filter = Filters.and(
+                eq(FIELD_NODE_ID, nodeId),
+                eq(FIELD_ENTRY_TYPE, CertificateExchangeType.CERT_CHAIN.name()));
+        final FindIterable<Document> objects = dbCollection.find(filter).limit(1);
+        return Optional.ofNullable(objects.first());
+    }
 
-        if (document != null) {
-            final Document encryptedCertificateDocument = document.get(FIELD_ENCRYPTED_VALUE, Document.class);
-            if (encryptedCertificateDocument != null) {
-                final EncryptedValue encryptedCertificate = EncryptedValue.builder()
-                        .value(encryptedCertificateDocument.getString(ENCRYPTED_VALUE_SUBFIELD))
-                        .salt(encryptedCertificateDocument.getString(SALT_SUBFIELD))
+    private String decryptedValue(Document document) {
+        return Optional.ofNullable(document.get(FIELD_ENCRYPTED_VALUE, Document.class))
+                .map(encryptedDocument -> EncryptedValue.builder()
+                        .value(encryptedDocument.getString(ENCRYPTED_VALUE_SUBFIELD))
+                        .salt(encryptedDocument.getString(SALT_SUBFIELD))
                         .isDeleteValue(false)
                         .isKeepValue(false)
-                        .build();
-
-                final String decryptedValue = encryptionService.decrypt(encryptedCertificate);
-                return Optional.ofNullable(parser.apply(document, decryptedValue));
-            }
-        }
-        return Optional.empty();
+                        .build())
+                .map(encryptionService::decrypt)
+                .orElseThrow(() -> new IllegalStateException("This document should contain encrypted value! " + document.toJson()));
     }
 
-    private Optional<CertificateSigningRequest> getNextCertificateSigningRequest() {
-        return readEntry(eq(FIELD_ENTRY_TYPE, CertificateExchangeType.CSR.name()), (document, decryptedValue) -> new CertificateSigningRequest(document.getString(FIELD_NODE_ID), parseCSR(decryptedValue)));
+    private void removeCertificateChain(String nodeId) {
+        removeEntry(nodeId, CertificateExchangeType.CERT_CHAIN);
     }
 
-    private boolean removeCertificateChain(String nodeId) {
-        return removeEntry(nodeId, CertificateExchangeType.CERT_CHAIN);
+    private void removeCertificateSigningRequest(String nodeId) {
+        removeEntry(nodeId, CertificateExchangeType.CSR);
     }
 
-    private boolean removeCertificateSigningRequest(String nodeId) {
-        return removeEntry(nodeId, CertificateExchangeType.CSR);
-    }
-
-    private boolean removeEntry(String nodeId, CertificateExchangeType type) {
+    private void removeEntry(String nodeId, CertificateExchangeType type) {
         MongoCollection<Document> dbCollection = mongoDatabase.getCollection(COLLECTION_NAME);
-        var result = dbCollection.deleteOne(
-                Filters.and(
-                        eq(FIELD_NODE_ID, nodeId),
-                        eq(FIELD_ENTRY_TYPE, type.name())
-                )
+        final Bson filter = Filters.and(
+                eq(FIELD_NODE_ID, nodeId),
+                eq(FIELD_ENTRY_TYPE, type.name())
         );
-        return result.getDeletedCount() > 0;
+        var result = dbCollection.deleteOne(filter);
+        if (result.getDeletedCount() != 1) {
+            throw new IllegalStateException("removeEntry hasn't deleted any entry, should delete one!");
+        }
     }
 
-
-    private static String toString(PKCS10CertificationRequest csr) throws IOException {
+    private static String serializeCsr(PKCS10CertificationRequest csr) throws IOException {
         StringWriter writer = new StringWriter();
         try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
             jcaPEMWriter.writeObject(csr);
@@ -192,7 +210,7 @@ public class CertificateExchangeImpl implements CertificateExchange {
         return writer.toString();
     }
 
-    private static String toString(CertificateChain certChain) throws IOException {
+    private static String serializeChain(CertificateChain certChain) throws IOException {
         StringWriter writer = new StringWriter();
         try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
             for (Certificate c : certChain.toCertificateChainArray()) {
@@ -246,5 +264,4 @@ public class CertificateExchangeImpl implements CertificateExchange {
             throw new RuntimeException(e);
         }
     }
-
 }
