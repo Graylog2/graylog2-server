@@ -55,9 +55,10 @@ describe('<EntityDataTable />', () => {
 
   it('should render selected columns and table headers', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onColumnsChange={() => {}}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /title/i });
@@ -72,8 +73,9 @@ describe('<EntityDataTable />', () => {
 
   it('should render default cell renderer', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             columnDefinitions={columnDefinitions} />);
 
@@ -83,8 +85,9 @@ describe('<EntityDataTable />', () => {
 
   it('should render custom cell and header renderer', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             columnRenderers={{
                               attributes: {
@@ -102,8 +105,9 @@ describe('<EntityDataTable />', () => {
 
   it('should merge attribute and type column renderers renderer', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             columnRenderers={{
                               attributes: {
@@ -128,10 +132,11 @@ describe('<EntityDataTable />', () => {
 
   it('should render row actions', async () => {
     render(<EntityDataTable<{ id: string, title: string }> visibleColumns={visibleColumns}
-                                                           data={data}
+                                                           entities={data}
                                                            onSortChange={() => {}}
+                                                           entityAttributesAreCamelCase
                                                            onColumnsChange={() => {}}
-                                                           rowActions={(row) => `Custom actions for ${row.title}`}
+                                                           entityActions={(entity) => `Custom actions for ${entity.title}`}
                                                            columnDefinitions={columnDefinitions} />);
 
     await screen.findByText('Custom actions for Entity title');
@@ -141,8 +146,9 @@ describe('<EntityDataTable />', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             columnDefinitions={columnDefinitions} />);
 
@@ -152,8 +158,9 @@ describe('<EntityDataTable />', () => {
 
   it('should display active sort', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             activeSort={{
                               attributeId: 'description',
@@ -168,7 +175,8 @@ describe('<EntityDataTable />', () => {
     const onSortChange = jest.fn();
 
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
+                            entityAttributesAreCamelCase
                             onSortChange={onSortChange}
                             onColumnsChange={() => {}}
                             columnDefinitions={columnDefinitions} />);
@@ -192,8 +200,9 @@ describe('<EntityDataTable />', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             bulkSelection={{ actions: <BulkActions /> }}
                             columnDefinitions={columnDefinitions} />);
@@ -214,8 +223,9 @@ describe('<EntityDataTable />', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             bulkSelection={{ actions: <div /> }}
                             columnDefinitions={columnDefinitions} />);
@@ -240,8 +250,9 @@ describe('<EntityDataTable />', () => {
     const onColumnsChange = jest.fn();
 
     render(<EntityDataTable visibleColumns={['description', 'status']}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={onColumnsChange}
                             columnDefinitions={columnDefinitions} />);
 
@@ -264,8 +275,9 @@ describe('<EntityDataTable />', () => {
     ];
 
     render(<EntityDataTable visibleColumns={[...visibleColumns, 'created_at']}
-                            data={dataWithCamelCaseAttributes}
+                            entities={dataWithCamelCaseAttributes}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             columnRenderers={{
                               attributes: {
