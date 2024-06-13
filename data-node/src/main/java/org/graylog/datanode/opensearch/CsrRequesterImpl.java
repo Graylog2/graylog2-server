@@ -19,6 +19,8 @@ package org.graylog.datanode.opensearch;
 import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
@@ -42,31 +44,30 @@ public class CsrRequesterImpl implements CsrRequester {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessService.class);
 
-    private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
 
     private final DatanodeKeystore datanodeKeystore;
 
     private final CertificateExchange certificateExchange;
+    private final String hostname;
 
     @Inject
-    public CsrRequesterImpl(NodeService<DataNodeDto> nodeService, NodeId nodeId, DatanodeKeystore datanodeKeystore, CertificateExchange certificateExchange) {
-        this.nodeService = nodeService;
+    public CsrRequesterImpl(Configuration datanodeConfiguration, NodeId nodeId, DatanodeKeystore datanodeKeystore, CertificateExchange certificateExchange) {
+        this.hostname = datanodeConfiguration.getHostname();
         this.nodeId = nodeId;
         this.datanodeKeystore = datanodeKeystore;
         this.certificateExchange = certificateExchange;
     }
 
-    public void triggerCsr() {
+    public void triggerCertificateSigningRequest() {
         try {
-            final var node = nodeService.byNodeId(nodeId);
             final var altNames = ImmutableList.<String>builder()
                     .addAll(determineAltNames())
                     .build();
-            final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest(node.getHostname(), altNames);
+            final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest(hostname, altNames);
             certificateExchange.requestCertificate(new CertificateSigningRequest(nodeId.getNodeId(), csr));
-            LOG.info("created CSR for this node");
-        } catch (CSRGenerationException | IOException | NodeNotFoundException | DatanodeKeystoreException ex) {
+            LOG.info("Triggered certificate signing request for this datanode");
+        } catch (CSRGenerationException | IOException | DatanodeKeystoreException ex) {
             throw new RuntimeException(ex);
         }
     }

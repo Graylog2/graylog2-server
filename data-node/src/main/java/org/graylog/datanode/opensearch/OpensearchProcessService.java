@@ -50,7 +50,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final Configuration configuration;
 
     private final OpensearchStateMachine stateMachine;
-    private final CsrRequesterImpl csrRequester;
+    private final CsrRequester csrRequester;
     private boolean processAutostart = true;
 
 
@@ -62,7 +62,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             final NodeId nodeId,
             final DatanodeDirectoriesLockfileCheck lockfileCheck,
             final PreflightConfigService preflightConfigService,
-            final OpensearchProcess process, CsrRequesterImpl csrRequester, OpensearchStateMachine stateMachine) {
+            final OpensearchProcess process, CsrRequester csrRequester, OpensearchStateMachine stateMachine) {
         this.configurationProvider = configurationProvider;
         this.configuration = configuration;
         this.nodeId = nodeId;
@@ -95,11 +95,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 case START -> stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
                 case REQUEST_CSR -> {
                     this.processAutostart = false;
-                    csrRequester.triggerCsr();
+                    csrRequester.triggerCertificateSigningRequest();
                 }
                 case REQUEST_CSR_WITH_AUTOSTART -> {
                     this.processAutostart = true;
-                    csrRequester.triggerCsr();
+                    csrRequester.triggerCertificateSigningRequest();
                 }
             }
         }

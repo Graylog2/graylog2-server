@@ -74,7 +74,7 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
     }
 
     private void automaticRenewal() {
-        csrRequester.triggerCsr();
+        csrRequester.triggerCertificateSigningRequest();
     }
 
     private boolean needsNewCertificate(RenewalPolicy renewalPolicy) {

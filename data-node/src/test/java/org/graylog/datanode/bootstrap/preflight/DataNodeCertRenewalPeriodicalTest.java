@@ -56,7 +56,7 @@ class DataNodeCertRenewalPeriodicalTest {
         final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
         final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(1)), csrRequester);
         periodical.doRun();
-        Mockito.verify(csrRequester, Mockito.times(1)).triggerCsr();
+        Mockito.verify(csrRequester, Mockito.times(1)).triggerCertificateSigningRequest();
     }
 
 
@@ -66,7 +66,7 @@ class DataNodeCertRenewalPeriodicalTest {
         final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
         final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(1)), csrRequester);
         periodical.doRun();
-        Mockito.verify(csrRequester, Mockito.times(1)).triggerCsr();
+        Mockito.verify(csrRequester, Mockito.times(1)).triggerCertificateSigningRequest();
     }
 
 
@@ -76,7 +76,7 @@ class DataNodeCertRenewalPeriodicalTest {
         final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
         final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(30)), csrRequester);
         periodical.doRun();
-        Mockito.verify(csrRequester, Mockito.never()).triggerCsr();
+        Mockito.verify(csrRequester, Mockito.never()).triggerCertificateSigningRequest();
     }
 
     @Nonnull

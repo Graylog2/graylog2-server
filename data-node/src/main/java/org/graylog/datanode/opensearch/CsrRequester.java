@@ -17,5 +17,5 @@
 package org.graylog.datanode.opensearch;
 
 public interface CsrRequester {
-    void triggerCsr();
+    void triggerCertificateSigningRequest();
 }
