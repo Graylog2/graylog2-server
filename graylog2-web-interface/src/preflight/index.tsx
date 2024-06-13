@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { BrowserRouter } from "react-router-dom";
 import { createRoot } from 'react-dom/client';
 import { Notifications } from '@mantine/notifications';
 
@@ -29,7 +30,7 @@ import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dropzone/styles.css';
 
-const appContainer = document.querySelector('app-root');
+const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);
 
 root.render((
@@ -37,10 +38,10 @@ root.render((
     <GlobalThemeStyles />
     <DefaultQueryClientProvider>
       <ThemeWrapper>
-        <>
+        <BrowserRouter>
           <Notifications />
           <App />
-        </>
+        </BrowserRouter>
       </ThemeWrapper>
     </DefaultQueryClientProvider>
   </PreflightThemeProvider>
