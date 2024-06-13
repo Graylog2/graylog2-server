@@ -18,7 +18,8 @@ import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import usePipelinesConnectedStream, { type StreamConnectedPipelines } from 'hooks/usePipelinesConnectedStream';
 import { Table, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { IfPermitted, Section, Icon } from 'components/common';
@@ -37,6 +38,7 @@ const StreamDataRoutingProcessing = () => {
   const { data: connectedPipelines, isInitialLoading: isLoadingConnectPipelines } = usePipelinesConnectedStream(streamId);
   const hasConnectedPipelines = !isLoadingConnectPipelines && connectedPipelines?.length > 0;
   const { data: pipelines } = usePipelines();
+  const sortPipelines = (pipelinesList: StreamConnectedPipelines) => pipelinesList.sort((s1, s2) => naturalSort(s1.title, s2.title));
 
   return (
     <>
@@ -58,7 +60,7 @@ const StreamDataRoutingProcessing = () => {
             </tr>
           </thead>
           <tbody>
-            {hasConnectedPipelines && connectedPipelines.map((pipeline) => (
+            {hasConnectedPipelines && sortPipelines(connectedPipelines).map((pipeline) => (
               <tr key={pipeline.id}>
                 <td>
                   {pipeline.title}
