@@ -314,9 +314,26 @@ type RouteMap = { [routeName: string]: RouteMapEntry };
 const isLiteralRoute = (entry: RouteMapEntry): entry is string => (typeof entry === 'string');
 const isRouteFunction = (entry: RouteMapEntry): entry is RouteFunction<any> => (typeof entry === 'function');
 
-export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R => {
-  if (appPrefix === '/') {
-    return routes;
+declare const __brand: unique symbol;
+type Brand<B> = { [__brand]: B }
+export type Branded<T, B> = T & Brand<B>
+
+export type QualifiedUrl<T extends string> = Branded<T, 'Qualified URL'>;
+type QualifiedFunction<F extends (...args: Parameters<F>) => string> = (...args: Parameters<F>) => QualifiedUrl<string>;
+
+type QualifiedRoutes<T> = {
+  [K in keyof T]: T[K] extends string
+    ? QualifiedUrl<T[K]>
+    : T[K] extends (...args: any[]) => string
+      ? QualifiedFunction<T[K]>
+      : T[K] extends object
+        ? QualifiedRoutes<T[K]>
+        : never;
+};
+
+export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string = AppConfig.gl2AppPathPrefix()): QualifiedRoutes<R> => {
+  if (!appPrefix || appPrefix === '' || appPrefix === '/') {
+    return routes as QualifiedRoutes<R>;
   }
 
   return Object.fromEntries(Object.entries(routes).map(([routeName, routeValue]) => {
@@ -336,15 +353,15 @@ export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R
   }));
 };
 
-export const prefixUrl = (route: string) => {
+export const prefixUrl = <T extends string>(route: T): QualifiedUrl<T> => {
   const appPrefix = AppConfig.gl2AppPathPrefix();
 
-  return (!appPrefix || appPrefix === '' || appPrefix === '/')
+  return ((!appPrefix || appPrefix === '' || appPrefix === '/')
     ? route
-    : prefixUrlWithoutHostname(route, appPrefix);
+    : prefixUrlWithoutHostname(route, appPrefix)) as QualifiedUrl<T>;
 };
 
-const qualifiedRoutes: typeof Routes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
+const qualifiedRoutes = qualifyUrls(Routes);
 
 const unqualified = Routes;
 
@@ -390,7 +407,7 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
     pluginRoutes[key] = route.path;
   });
 
-  const route = (AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes)[routeKey];
+  const route = qualifyUrls(pluginRoutes)[routeKey];
 
   if (!route && throwError) {
     throw new Error(`Could not find plugin route '${routeKey}'.`);

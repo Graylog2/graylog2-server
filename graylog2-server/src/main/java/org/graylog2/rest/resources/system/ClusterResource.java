@@ -137,10 +137,9 @@ public class ClusterResource extends RestResource {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<DataNodeDto> result = dataNodePaginatedService.searchPaginated(searchQuery, sort, order, page, perPage);
 
-        final List<DataNodeDto> dataNodes = certRenewalService.addProvisioningInformation(result.delegate());
 
         return PageListResponse.create(query, result.pagination(),
-                result.grandTotal().orElse(0L), sort, order, dataNodes, attributes, settings);
+                result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
     }
 
     @GET

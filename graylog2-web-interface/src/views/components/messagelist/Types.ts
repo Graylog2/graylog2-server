@@ -21,6 +21,10 @@ export type Message = {
   formatted_fields?: { [key: string]: any },
   highlight_ranges?: { [key: string]: any },
   source_input_id?: string,
+  source_radio_id?: string,
+  source_radio_input_id?: string,
+  stream_ids?: Array<string>,
+  source_node_id?: string,
   decoration_stats?: {
     added_fields: { [key: string]: any },
     changed_fields: { [key: string]: any },
