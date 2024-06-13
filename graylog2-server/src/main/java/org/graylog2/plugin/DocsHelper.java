@@ -20,7 +20,7 @@ public enum DocsHelper {
     PAGE_SENDING_JSONPATH("getting_in_log_data/json_path_from_http_api_input.html"),
     PAGE_SENDING_IPFIXPATH("getting_in_log_data/ipfix_input.html"),
     PAGE_ES_CONFIGURATION("setting_up_graylog/elasticsearch.htm"),
-    PAGE_ES_VERSIONS("setting_up_graylog/elasticsearch.htm#ElasticsearchVersions"),
+    PAGE_ES_VERSIONS("/downloading_and_installing_graylog/installing_graylog.html#CompatibilityMatrix"),
     REPORTING_HELP("interacting_with_your_log_data/reporting.html");
 
     private static final String SERVER = "https://go2docs.graylog.org";
