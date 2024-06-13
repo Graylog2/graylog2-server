@@ -28,6 +28,7 @@ import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -61,15 +62,12 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
 
     private final ObjectMapper objectMapper;
     private final DBEntityGroupService dbEntityGroupService;
-    private final Map<String, GroupableEntityHandler> groupableEntityHandlers;
 
     @Inject
     public EntityGroupFacade(ObjectMapper objectMapper,
-                             DBEntityGroupService dbEntityGroupService,
-                             Map<String, GroupableEntityHandler> groupableEntityHandlers) {
+                             DBEntityGroupService dbEntityGroupService) {
         this.objectMapper = objectMapper;
         this.dbEntityGroupService = dbEntityGroupService;
-        this.groupableEntityHandlers = groupableEntityHandlers;
     }
 
     @Override
@@ -87,7 +85,7 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
         final Map<String, Set<String>> entities = new HashMap<>();
 
         for (Map.Entry<String, Set<String>> typeGroup : entityGroup.entities().entrySet()) {
-            final ModelType modelType = groupableEntityHandlers.get(typeGroup.getKey()).modelType();
+            final ModelType modelType = TYPE_V1;//groupableEntityHandlers.get(typeGroup.getKey()).modelType();
             for (String nativeEntityId : typeGroup.getValue()) {
                 Optional<String> descriptorId = entityDescriptorIds.get(EntityDescriptor.create(nativeEntityId, modelType));
                 if (descriptorId.isPresent()) {
@@ -136,12 +134,12 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
         }
 
         for (Map.Entry<String, Set<String>> typeGroup : contentPackGroupEntity.entities().entrySet()) {
-            final GroupableEntityHandler entityHandler = groupableEntityHandlers.get(typeGroup.getKey());
-            final ModelType modelType = entityHandler.modelType();
+            //final GroupableEntityHandler entityHandler = groupableEntityHandlers.get(typeGroup.getKey());
+            final ModelType modelType = TYPE_V1;//entityHandler.modelType();
             for (String entityId : typeGroup.getValue()) {
                 final EntityDescriptor descriptor = EntityDescriptor.create(entityId, modelType);
                 final Object nativeEntity = nativeEntities.get(descriptor);
-                addEntityToMap(entities, typeGroup.getKey(), entityHandler.getEntityId(nativeEntity));
+                addEntityToMap(entities, typeGroup.getKey(), "");//entityHandler.getEntityId(nativeEntity));
             }
         }
 
@@ -192,8 +190,8 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
         final Optional<EntityGroup> entityGroup = dbEntityGroupService.get(modelId.id());
         if (entityGroup.isPresent()) {
             for (Map.Entry<String, Set<String>> typeGroup : entityGroup.get().entities().entrySet()) {
-                final GroupableEntityHandler entityHandler = groupableEntityHandlers.get(typeGroup.getKey());
-                final ModelType modelType = entityHandler.modelType();
+                //final GroupableEntityHandler entityHandler = groupableEntityHandlers.get(typeGroup.getKey());
+                final ModelType modelType = TYPE_V1;//entityHandler.modelType();
                 for (String nativeEntityId : typeGroup.getValue()) {
                     final EntityDescriptor depEntity = EntityDescriptor.builder()
                             .id(ModelId.of(nativeEntityId))
@@ -223,8 +221,8 @@ public class EntityGroupFacade implements EntityFacade<EntityGroup> {
         final EntityGroupEntity entityGroupEntity = objectMapper.convertValue(entity.data(), EntityGroupEntity.class);
 
         for (Map.Entry<String, Set<String>> typeGroup : entityGroupEntity.entities().entrySet()) {
-            final GroupableEntityHandler entityHandler = groupableEntityHandlers.get(typeGroup.getKey());
-            final ModelType modelType = entityHandler.modelType();
+            //final GroupableEntityHandler entityHandler = groupableEntityHandlers.get(typeGroup.getKey());
+            final ModelType modelType = TYPE_V1;//entityHandler.modelType();
             for (String entityId : typeGroup.getValue()) {
                 graph.putEdge(entity, entities.get(EntityDescriptor.create(entityId, modelType)));
             }

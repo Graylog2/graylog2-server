@@ -16,6 +16,7 @@
  */
 package org.graylog2.entitygroups;
 
+import com.google.inject.name.Named;
 import org.graylog2.entitygroups.model.EntityGroup;
 import org.graylog2.entitygroups.model.DBEntityGroupService;
 import org.graylog2.database.PaginatedList;
@@ -38,10 +39,13 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class EntityGroupService {
     private final DBEntityGroupService dbEntityGroupService;
+    private final Map<String, String> groupedEntityTypes;
 
     @Inject
-    public EntityGroupService(DBEntityGroupService dbEntityGroupService) {
+    public EntityGroupService(DBEntityGroupService dbEntityGroupService,
+                              @Named("grouped_entity_types") Map<String, String> groupedEntityTypes) {
         this.dbEntityGroupService = dbEntityGroupService;
+        this.groupedEntityTypes = groupedEntityTypes;
     }
 
     public PaginatedList<EntityGroup> findPaginated(String query, int page, int perPage, SortOrder order,
@@ -56,6 +60,13 @@ public class EntityGroupService {
 
     public List<EntityGroup> getAllForEntity(String type, String entityId) {
         return dbEntityGroupService.getAllForEntity(type, entityId);
+    }
+
+    public List<String> getAllNamesForEntity(String nativeEntityType, String entityId) {
+        final String type = groupedEntityTypes.get(nativeEntityType);
+        return dbEntityGroupService.getAllForEntity(type, entityId).stream()
+                .map(EntityGroup::name)
+                .toList();
     }
 
     public Map<String, Collection<EntityGroup>> getAllForEntities(String type, Collection<String> entities) {

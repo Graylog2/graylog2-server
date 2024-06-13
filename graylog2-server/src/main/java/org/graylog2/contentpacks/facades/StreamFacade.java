@@ -38,11 +38,13 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.StreamAlarmCallbackEntity;
 import org.graylog2.contentpacks.model.entities.StreamAlertConditionEntity;
-import org.graylog2.contentpacks.model.entities.StreamEntity;
+import org.graylog2.contentpacks.model.entities.StreamEntityUnscoped;
 import org.graylog2.contentpacks.model.entities.StreamRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.entitygroups.EntityGroupService;
+import org.graylog2.entitygroups.contentpacks.entities.GroupableEntity;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -55,6 +57,7 @@ import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
@@ -84,19 +87,22 @@ public class StreamFacade implements EntityFacade<Stream> {
     private final V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration;
     private final IndexSetService indexSetService;
     private final UserService userService;
+    private final EntityGroupService entityGroupService;
 
     @Inject
     public StreamFacade(ObjectMapper objectMapper,
                         StreamService streamService,
                         StreamRuleService streamRuleService,
                         V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration,
-                        IndexSetService indexSetService, UserService userService) {
+                        IndexSetService indexSetService, UserService userService,
+                        EntityGroupService entityGroupService) {
         this.objectMapper = objectMapper;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.legacyAlertsMigration = legacyAlertsMigration;
         this.indexSetService = indexSetService;
         this.userService = userService;
+        this.entityGroupService = entityGroupService;
     }
 
     @VisibleForTesting
@@ -108,7 +114,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(output -> entityDescriptorIds.getOrThrow(output.getId(), ModelTypes.OUTPUT_V1))
                 .map(ValueReference::of)
                 .collect(Collectors.toSet());
-        final StreamEntity streamEntity = StreamEntity.create(
+        final StreamEntityUnscoped streamEntity = StreamEntityUnscoped.create(
                 ValueReference.of(stream.getTitle()),
                 ValueReference.of(stream.getDescription()),
                 ValueReference.of(stream.getDisabled()),
@@ -118,7 +124,8 @@ public class StreamFacade implements EntityFacade<Stream> {
                 Collections.emptyList(), // Kept for backwards compatibility
                 outputIds,
                 ValueReference.of(stream.isDefaultStream()),
-                ValueReference.of(stream.getRemoveMatchesFromDefaultStream()));
+                ValueReference.of(stream.getRemoveMatchesFromDefaultStream()),
+                entityGroupService.getAllNamesForEntity(StreamDTO.class.getTypeName(), stream.getId()));
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         return EntityV1.builder()
@@ -154,7 +161,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                                         Map<String, ValueReference> parameters,
                                         Map<EntityDescriptor, Object> nativeEntities,
                                         User user) {
-        final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
+        final StreamEntityUnscoped streamEntity = objectMapper.convertValue(entity.data(), StreamEntityUnscoped.class);
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.create(
                 streamEntity.title().asString(parameters),
                 streamEntity.description().asString(parameters),
@@ -338,7 +345,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
 
-        final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
+        final StreamEntityUnscoped streamEntity = objectMapper.convertValue(entity.data(), StreamEntityUnscoped.class);
 
         streamEntity.outputs().stream()
                 .map(valueReference -> valueReference.asString(parameters))

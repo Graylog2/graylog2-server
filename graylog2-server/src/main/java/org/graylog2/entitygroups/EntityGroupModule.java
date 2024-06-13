@@ -21,6 +21,7 @@ import org.graylog2.entitygroups.rest.EntityGroupResource;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.shared.utilities.StringUtils;
+import org.graylog2.streams.StreamDTO;
 
 public class EntityGroupModule extends PluginModule {
     private static final String FEATURE_FLAG = "entity_groups";
@@ -38,6 +39,7 @@ public class EntityGroupModule extends PluginModule {
                 .anyMatch(s -> s.equals(FEATURE_FLAG)) && featureFlags.isOn(FEATURE_FLAG)) {
             addSystemRestResource(EntityGroupResource.class);
             addEntityFacade(EntityGroupFacade.TYPE_V1, EntityGroupFacade.class);
+            addGroupableEntityType(StreamDTO.class.getTypeName(), "streams");
         }
     }
 }

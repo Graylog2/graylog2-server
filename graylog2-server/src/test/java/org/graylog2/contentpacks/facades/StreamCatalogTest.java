@@ -32,13 +32,12 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.StreamEntity;
+import org.graylog2.contentpacks.model.entities.StreamEntityUnscoped;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -112,7 +111,7 @@ public class StreamCatalogTest {
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );
 
-        facade = new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService);
+        facade = new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService, null);
     }
 
     @Test
@@ -147,7 +146,7 @@ public class StreamCatalogTest {
         assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
-        final StreamEntity streamEntity = objectMapper.convertValue(entityV1.data(), StreamEntity.class);
+        final StreamEntityUnscoped streamEntity = objectMapper.convertValue(entityV1.data(), StreamEntityUnscoped.class);
         assertThat(streamEntity.title()).isEqualTo(ValueReference.of("Stream Title"));
         assertThat(streamEntity.description()).isEqualTo(ValueReference.of("Stream Description"));
         assertThat(streamEntity.disabled()).isEqualTo(ValueReference.of(false));
@@ -200,7 +199,7 @@ public class StreamCatalogTest {
         final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
         assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
-        final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
+        final StreamEntityUnscoped streamEntity = objectMapper.convertValue(entity.data(), StreamEntityUnscoped.class);
         assertThat(streamEntity.title()).isEqualTo(ValueReference.of("Test"));
         assertThat(streamEntity.description()).isEqualTo(ValueReference.of("Description"));
         assertThat(streamEntity.matchingType()).isEqualTo(ValueReference.of(Stream.MatchingType.AND));
