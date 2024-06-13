@@ -108,7 +108,8 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED) //restart if reconfigured
-                .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED);
+                .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
+                .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING);
 
         // final state, the process is not alive anymore, terminated on the operating system level
         config.configure(OpensearchState.TERMINATED)
