@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Update \"Jackson\" to version 2.17.1 to prevent potential memory issues."
+
+pulls = ["19629"]
