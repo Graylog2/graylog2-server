@@ -35,6 +35,7 @@ import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEv
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
+import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +63,7 @@ public class ConfigurationStateUpdater {
     public ConfigurationStateUpdater(RuleService ruleService,
                                      PipelineService pipelineService,
                                      PipelineStreamConnectionsService pipelineStreamConnectionsService,
+                                     PipelineRuleParser pipelineRuleParser,
                                      PipelineResolver.Factory pipelineResolverFactory,
                                      RuleMetricsConfigService ruleMetricsConfigService,
                                      MetricRegistry metricRegistry,
@@ -80,7 +82,8 @@ public class ConfigurationStateUpdater {
                         () -> ruleService.loadAll().stream(),
                         () -> pipelineService.loadAll().stream(),
                         () -> pipelineStreamConnectionsService.loadAll().stream()
-                )
+                ),
+                pipelineRuleParser
         );
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes

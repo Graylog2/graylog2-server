@@ -49,10 +49,11 @@ public class PipelineResolver {
         /**
          * Creates a new instance for the given suppliers.
          *
-         * @param config the resolver params
+         * @param config     the resolver params
+         * @param ruleParser the pipeline rule parser to use
          * @return the new pipeline resolver instance
          */
-        PipelineResolver create(PipelineResolverConfig config);
+        PipelineResolver create(PipelineResolverConfig config, PipelineRuleParser ruleParser);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(PipelineResolver.class);
@@ -65,7 +66,7 @@ public class PipelineResolver {
     private final Supplier<Stream<PipelineConnections>> pipelineConnectionsSupplier;
 
     @Inject
-    public PipelineResolver(PipelineRuleParser ruleParser,
+    public PipelineResolver(@Assisted PipelineRuleParser ruleParser,
                             MetricRegistry metricRegistry,
                             @Assisted PipelineResolverConfig config) {
         this.ruleParser = ruleParser;
