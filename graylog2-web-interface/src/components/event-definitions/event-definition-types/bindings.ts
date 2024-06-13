@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { PluginExports } from 'graylog-web-plugin/plugin';
+
 import FilterAggregationFormContainer from './FilterAggregationFormContainer';
 import FilterAggregationForm from './FilterAggregationForm';
 import FilterAggregationSummary from './FilterAggregationSummary';
-import {PluginExports} from 'graylog-web-plugin/plugin';
 
 const bindings: PluginExports = {
   eventDefinitionTypes: [
