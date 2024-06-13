@@ -17,10 +17,10 @@
 package org.graylog2.plugin;
 
 public enum DocsHelper {
-    PAGE_SENDING_JSONPATH("json"),
-    PAGE_SENDING_IPFIXPATH("ipfix-input"),
-    PAGE_ES_CONFIGURATION("elasticsearch"),
-    PAGE_ES_VERSIONS("elasticsearch#elasticsearch-versions"),
+    PAGE_SENDING_JSONPATH("getting_in_log_data/json_path_from_http_api_input.html"),
+    PAGE_SENDING_IPFIXPATH("getting_in_log_data/ipfix_input.html"),
+    PAGE_ES_CONFIGURATION("setting_up_graylog/elasticsearch.htm"),
+    PAGE_ES_VERSIONS("setting_up_graylog/elasticsearch.htm#ElasticsearchVersions"),
     REPORTING_HELP("interacting_with_your_log_data/reporting.html");
 
     private static final String SERVER = "https://go2docs.graylog.org";
