@@ -60,6 +60,7 @@ describe('IndexSetFieldTypesList', () => {
       setSelectedEntities: () => {},
       selectEntity: () => {},
       deselectEntity: () => {},
+      toggleEntitySelect: () => {},
     });
 
     asMock(useRemoveCustomFieldTypeMutation).mockReturnValue({

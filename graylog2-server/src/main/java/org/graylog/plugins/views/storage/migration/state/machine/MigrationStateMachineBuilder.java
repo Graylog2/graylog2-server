@@ -106,7 +106,7 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, () -> migrationActions.directoryCompatibilityCheckOk() && migrationActions.provisioningFinished());
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING)
-                .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
+                .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::allDatanodesPrepared);
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
                 .onEntry(migrationActions::calculateTrafficEstimate)
