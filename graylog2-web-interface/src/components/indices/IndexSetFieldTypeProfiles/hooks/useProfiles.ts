@@ -33,7 +33,9 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
-const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
+export const keyFn = (searchParams: SearchParams) => (['indexSetFieldTypeProfiles', searchParams]);
+
+export const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
   const indexSetFieldTypeUrl = qualifyUrl('/system/indices/index_sets/profiles/paginated');
   const url = PaginationURL(
     indexSetFieldTypeUrl,
@@ -72,7 +74,7 @@ const useProfiles = (searchParams: SearchParams, { enabled }): {
   refetch: () => void,
 } => {
   const { data, isLoading, refetch } = useQuery(
-    ['indexSetFieldTypeProfiles', searchParams],
+    keyFn(searchParams),
     () => fetchIndexSetFieldTypeProfiles(searchParams),
     {
       onError: (errorThrown) => {
