@@ -22,6 +22,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.fields.providers.FieldValueProvider;
@@ -51,7 +52,6 @@ import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.database.entities.EntityScope;
-import org.graylog2.entitygroups.handlers.GroupableEntityHandler;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
@@ -454,15 +454,16 @@ public abstract class PluginModule extends Graylog2Module {
         telemetryMetricSupplierBinder().addBinding(eventId).toInstance(eventSupplier);
     }
 
-    protected void addGroupableEntityHandler(String entityTypeName, Class<? extends GroupableEntityHandler> entityClass) {
-        groupableEntityHandlerBinder().addBinding(entityTypeName).to(entityClass);
+    protected void addGroupableEntityType(String nativeEntityType, String entityTypeName) {
+        addGroupableEntityTypeBinder().addBinding(nativeEntityType).toInstance(entityTypeName);
     }
 
-    protected MapBinder<String, GroupableEntityHandler> groupableEntityHandlerBinder() {
+    protected MapBinder<String, String> addGroupableEntityTypeBinder() {
         return MapBinder.newMapBinder(
                 binder(),
-                TypeLiteral.get(String.class),
-                TypeLiteral.get(GroupableEntityHandler.class)
+                String.class,
+                String.class,
+                Names.named("grouped_entity_types")
         );
     }
 }

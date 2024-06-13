@@ -25,6 +25,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.graylog2.entitygroups.contentpacks.entities.GroupableEntity;
 
 import java.util.List;
 import java.util.Set;
@@ -32,7 +33,7 @@ import java.util.Set;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class StreamEntity {
+public abstract class StreamEntity implements GroupableEntity {
     @JsonProperty("title")
     @NotBlank
     public abstract ValueReference title();
@@ -80,8 +81,10 @@ public abstract class StreamEntity {
             @JsonProperty("alarm_callbacks") @NotNull List<StreamAlarmCallbackEntity> streamAlarmCallbacks,
             @JsonProperty("outputs") @NotNull Set<ValueReference> outputs,
             @JsonProperty("default_stream") ValueReference defaultStream,
-            @JsonProperty("remove_matches") ValueReference removeMatches) {
+            @JsonProperty("remove_matches") ValueReference removeMatches,
+            @JsonProperty(GroupableEntity.FIELD_ENTITY_GROUPS) List<String> entityGroups) {
         return new AutoValue_StreamEntity(
+                entityGroups,
                 title,
                 description,
                 disabled,

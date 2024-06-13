@@ -38,13 +38,12 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.StreamAlarmCallbackEntity;
 import org.graylog2.contentpacks.model.entities.StreamAlertConditionEntity;
-import org.graylog2.contentpacks.model.entities.StreamEntityUnscoped;
+import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.StreamRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.entitygroups.EntityGroupService;
-import org.graylog2.entitygroups.contentpacks.entities.GroupableEntity;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -114,7 +113,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(output -> entityDescriptorIds.getOrThrow(output.getId(), ModelTypes.OUTPUT_V1))
                 .map(ValueReference::of)
                 .collect(Collectors.toSet());
-        final StreamEntityUnscoped streamEntity = StreamEntityUnscoped.create(
+        final StreamEntity streamEntity = StreamEntity.create(
                 ValueReference.of(stream.getTitle()),
                 ValueReference.of(stream.getDescription()),
                 ValueReference.of(stream.getDisabled()),
@@ -161,7 +160,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                                         Map<String, ValueReference> parameters,
                                         Map<EntityDescriptor, Object> nativeEntities,
                                         User user) {
-        final StreamEntityUnscoped streamEntity = objectMapper.convertValue(entity.data(), StreamEntityUnscoped.class);
+        final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.create(
                 streamEntity.title().asString(parameters),
                 streamEntity.description().asString(parameters),
@@ -345,7 +344,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
 
-        final StreamEntityUnscoped streamEntity = objectMapper.convertValue(entity.data(), StreamEntityUnscoped.class);
+        final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
 
         streamEntity.outputs().stream()
                 .map(valueReference -> valueReference.asString(parameters))
