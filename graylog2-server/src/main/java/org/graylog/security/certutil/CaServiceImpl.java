@@ -29,7 +29,7 @@ import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
 import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.Configuration;
-import org.graylog2.bootstrap.preflight.web.resources.model.CA;
+import org.graylog2.bootstrap.preflight.web.resources.model.CertificateAuthorityInformation;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
 import org.graylog2.cluster.certificates.CertificatesService;
 import org.graylog2.events.ClusterEventBus;
@@ -54,11 +54,10 @@ import java.util.Optional;
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
+@Deprecated
 @Singleton
-public class CaServiceImpl implements CaService {
+class CaServiceImpl  {
     private static final Logger LOG = LoggerFactory.getLogger(CaServiceImpl.class);
-
-
 
     private final KeystoreMongoStorage mongoKeystore;
     private final KeystoreFileStorage fileKeystore;
@@ -84,19 +83,17 @@ public class CaServiceImpl implements CaService {
         this.eventBus = eventBus;
     }
 
-    @Override
-    public CA get() throws KeyStoreStorageException {
+    public CertificateAuthorityInformation get() throws KeyStoreStorageException {
         if (configuration.configuredCaExists()) {
-            return new CA("local CA", CAType.LOCAL);
+            return new CertificateAuthorityInformation("local CA", CAType.LOCAL);
         } else {
             var keystore = mongoKeystore.readKeyStore(KeystoreMongoLocation.certificateAuthority(), passwordSecret.toCharArray());
-            return keystore.map(c -> new CA(KeystoreMongoLocation.CA_KEYSTORE_ID, CAType.GENERATED)).orElse(null);
+            return keystore.map(c -> new CertificateAuthorityInformation(KeystoreMongoLocation.CA_KEYSTORE_ID, CAType.GENERATED)).orElse(null);
         }
     }
 
-    @Override
-    public CA create(final String organization, final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException, KeyStoreException {
-        final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY : daysValid);
+    public CertificateAuthorityInformation create(final String organization, final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException, KeyStoreException {
+        final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? CaKeystore.DEFAULT_SELFSIGNED_VALIDITY_DAYS : daysValid);
         KeyStore keyStore = CAKeyPair.create(organization, passwordSecret.toCharArray(), certificateValidity).toKeyStore();
         mongoKeystore.writeKeyStore(KeystoreMongoLocation.certificateAuthority(), keyStore, passwordSecret.toCharArray(), password);
         LOG.debug("Generated a new CA.");
@@ -104,7 +101,6 @@ public class CaServiceImpl implements CaService {
         return get();
     }
 
-    @Override
     public void upload(@Nullable String password, List<FormDataBodyPart> parts) throws CACreationException {
         final var passwordCharArray = password == null ? null : password.toCharArray();
         // TODO: if the upload consists of more than one file, handle accordingly
@@ -134,7 +130,6 @@ public class CaServiceImpl implements CaService {
         }
     }
 
-    @Override
     public void startOver() {
         certificatesService.removeCert(KeystoreMongoLocation.certificateAuthority());
     }
@@ -144,7 +139,6 @@ public class CaServiceImpl implements CaService {
         eventBus.post(new CertificateAuthorityChangedEvent());
     }
 
-    @Override
     public Optional<KeyStore> loadKeyStore() throws KeyStoreStorageException {
         if (configuration.configuredCaExists()) {
             return fileKeystore.readKeyStore(configuration.getCaKeystoreFile(), configuration.getCaPassword().toCharArray());

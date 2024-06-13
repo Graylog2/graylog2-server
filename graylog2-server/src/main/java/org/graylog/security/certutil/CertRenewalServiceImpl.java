@@ -44,9 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -54,10 +51,8 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
-import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
 /**
@@ -75,7 +70,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final NotificationService notificationService;
     private final DBJobTriggerService jobTriggerService;
     private final JobSchedulerClock clock;
-    private final CaService caService;
+    private final CaKeystore caKeystore;
     private final char[] passwordSecret;
 
     // TODO: convert to config?
@@ -88,7 +83,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final DataNodeCommandService dataNodeCommandService,
                                   final NotificationService notificationService,
                                   final DBJobTriggerService jobTriggerService,
-                                  final CaService caService,
+                                  final CaKeystore caKeystore,
                                   final JobSchedulerClock clock,
                                   final @Named("password_secret") String passwordSecret) {
         this.clusterConfigService = clusterConfigService;
@@ -98,7 +93,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this.notificationService = notificationService;
         this.jobTriggerService = jobTriggerService;
         this.clock = clock;
-        this.caService = caService;
+        this.caKeystore = caKeystore;
         this.passwordSecret = passwordSecret.toCharArray();
     }
 
@@ -111,20 +106,10 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         return this.clusterConfigService.get(RenewalPolicy.class);
     }
 
-    boolean needsRenewal(final DateTime nextRenewal, final RenewalPolicy renewalPolicy, final X509Certificate cert) {
+    boolean needsRenewal(final DateTime nextRenewal, final RenewalPolicy renewalPolicy, final Date cert) {
         // calculate renewal threshold
         var threshold = calculateThreshold(renewalPolicy.certificateLifetime());
-
-        try {
-            cert.checkValidity(threshold);
-            cert.checkValidity(nextRenewal.toDate());
-        } catch (CertificateExpiredException e) {
-            LOG.debug("Certificate about to expire.");
-            return true;
-        } catch (CertificateNotYetValidException e) {
-            LOG.debug("Certificate not yet valid - which is surprising, but ignoring it.");
-        }
-        return false;
+        return threshold.after(cert) || nextRenewal.toDate().after(cert);
     }
 
     Date convertToDateViaInstant(LocalDateTime dateToConvert) {
@@ -153,18 +138,12 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     protected void checkCaCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
-        try {
-            final var keystore = caService.loadKeyStore();
-            if (keystore.isPresent()) {
-                final var ks = keystore.get();
-                final var nextRenewal = getNextRenewal();
-                final var caCert = ks.getCertificate(CA_KEY_ALIAS);
-                if (needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) caCert)) {
-                    notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "ca cert");
-                }
+        final Optional<Date> expiration = caKeystore.getCertificateExpiration();
+        if (expiration.isPresent()) {
+            final var nextRenewal = getNextRenewal();
+            if (needsRenewal(nextRenewal, renewalPolicy, expiration.get())) {
+                notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "ca cert");
             }
-        } catch (KeyStoreException | KeyStoreStorageException | NoSuchAlgorithmException e) {
-            LOG.error("Could not read CA keystore: {}", e.getMessage());
         }
     }
 

@@ -36,14 +36,14 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CaKeystore;
+import org.graylog.security.certutil.CaKeystoreException;
 import org.graylog.security.certutil.audit.CaAuditEventTypes;
-import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.csr.ClientCertGenerator;
 import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.bootstrap.preflight.web.resources.model.CA;
+import org.graylog2.bootstrap.preflight.web.resources.model.CertificateAuthorityInformation;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
 import org.graylog2.plugin.rest.ApiError;
@@ -52,7 +52,6 @@ import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
 import java.net.URI;
-import java.security.KeyStoreException;
 import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -62,15 +61,15 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @RequiresAuthentication
 @Api(value = "CA", description = "Certificate Authority", tags = {CLOUD_VISIBLE})
 public class CAResource extends RestResource {
-    private final CaService caService;
+    private final CaKeystore caKeystore;
     private final String passwordSecret;
     private final ClientCertGenerator clientCertGenerator;
 
     @Inject
-    public CAResource(final CaService caService,
+    public CAResource(CaKeystore caKeystore,
                       final @Named("password_secret") String passwordSecret,
                       final ClientCertGenerator clientCertGenerator) {
-        this.caService = caService;
+        this.caKeystore = caKeystore;
         this.passwordSecret = passwordSecret;
         this.clientCertGenerator = clientCertGenerator;
     }
@@ -78,8 +77,8 @@ public class CAResource extends RestResource {
     @GET
     @ApiOperation("Returns the CA")
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_READ)
-    public CA get() throws KeyStoreStorageException {
-        return caService.get();
+    public CertificateAuthorityInformation get() throws KeyStoreStorageException {
+        return caKeystore.getInformation().orElse(null);
     }
 
     @POST
@@ -87,8 +86,8 @@ public class CAResource extends RestResource {
     @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
     @ApiOperation("Creates a CA")
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
-    public Response createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException {
-        final CA ca = caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
+    public Response createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) {
+        final CertificateAuthorityInformation ca = caKeystore.createSelfSigned(request.organization());
         final URI caUri = getUriBuilderToSelf()
                 .path(CAResource.class)
                 .build();
@@ -104,9 +103,9 @@ public class CAResource extends RestResource {
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
     public Response uploadCA(@ApiParam(name = "password") @FormDataParam("password") String password, @ApiParam(name = "files") @FormDataParam("files") List<FormDataBodyPart> files) {
         try {
-            caService.upload(password, files);
+            caKeystore.createFromUpload(password, files);
             return Response.ok().build();
-        } catch (CACreationException e) {
+        } catch (CaKeystoreException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();
         }
     }
