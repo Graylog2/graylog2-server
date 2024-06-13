@@ -135,7 +135,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
         } = response;
 
         return {
-          elements,
+          list: elements,
           attributes,
           pagination: {
             count,

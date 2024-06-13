@@ -60,6 +60,7 @@ describe('DashboardActions', () => {
       setSelectedEntities: () => {},
       selectEntity: () => {},
       deselectEntity: () => {},
+      toggleEntitySelect: () => {},
     });
   });
 
