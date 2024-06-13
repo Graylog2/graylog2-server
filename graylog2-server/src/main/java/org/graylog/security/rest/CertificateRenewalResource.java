@@ -19,7 +19,6 @@ package org.graylog.security.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -30,40 +29,21 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.security.RestPermissions;
-
-import java.util.List;
 
 @Api(value = "Certificates")
 @Path("/certrenewal")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class CertificateRenewalResource implements PluginRestResource {
-    private final NodeService<DataNodeDto> nodeService;
     private final DataNodeCommandService dataNodeCommandService;
 
     @Inject
-    public CertificateRenewalResource(NodeService<DataNodeDto> nodeService, DataNodeCommandService dataNodeCommandService) {
-        this.nodeService = nodeService;
+    public CertificateRenewalResource(DataNodeCommandService dataNodeCommandService) {
         this.dataNodeCommandService = dataNodeCommandService;
-    }
-
-    /**
-     * This method is not used anywhere.
-     * Use {@link org.graylog2.rest.resources.system.ClusterResource#dataNodes(int, int, String, String, String)} instead
-     */
-    @Deprecated
-    @GET
-    // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
-    @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
-    public List<DataNodeDto> listDataNodes() {
-        // Nodes are not filtered right now so that you can manually initiate a renewal for every node available
-        return nodeService.allActive().values().stream().toList();
     }
 
     @POST
