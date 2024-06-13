@@ -14,15 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useContext } from 'react';
 
-import type { Sort } from 'stores/PaginationTypes';
+import TableFetchContext from './TableFetchContext';
 
-// eslint-disable-next-line import/prefer-default-export
-export const DEFAULT_LAYOUT = (isEvidenceModal: boolean) => ({
-  entityTableId: 'dashboards',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: isEvidenceModal ? ['title', 'description', 'summary'] : ['title', 'description', 'summary', 'favorite'],
-});
+const useTableFetchContext = () => {
+  const tableFetchContext = useContext(TableFetchContext);
 
-export const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'];
+  if (!tableFetchContext) {
+    throw new Error('useTableFetchContext hook needs to be used inside TableFetchContext.Provider');
+  }
+
+  return tableFetchContext;
+};
+
+export default useTableFetchContext;
