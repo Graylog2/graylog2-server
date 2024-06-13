@@ -48,7 +48,7 @@ jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() =>
 jest.mock('components/datanode/hooks/useDataNodes', () => jest.fn(() => ({
   data: {
     attributes: [],
-    elements: [{
+    list: [{
       cert_valid_until: '2053-11-02T13:20:58',
       error_msg: null,
       hostname: 'datanode1',
