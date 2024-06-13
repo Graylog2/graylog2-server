@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 
 import HelpMenu from 'preflight/navigation/HelpMenu';
 import { Group, AppShell, Text } from 'preflight/components/common';
+import NavigationBrand from 'components/perspectives/DefaultBrand';
 
-import NavigationBrand from './NavigationBrand';
 import ThemeModeToggle from './ThemeModeToggle';
 
 type StyledMantineTextProps = TextProps & {
