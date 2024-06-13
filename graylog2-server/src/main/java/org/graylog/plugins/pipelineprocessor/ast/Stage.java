@@ -77,18 +77,6 @@ public abstract class Stage implements Comparable<Stage> {
     }
 
     /**
-     * Register the metrics attached to this stage.
-     *
-     * @param metricRegistry the registry to add the metrics to
-     * @param pipelineId     the pipeline ID
-     */
-    // TODO: Remove once dependent code has been updated
-    @Deprecated
-    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId) {
-        registerMetrics(metricRegistry, pipelineId, Pipeline.class.getName());
-    }
-
-    /**
      * The metric filter matching all metrics that have been registered by this pipeline.
      * Commonly used to remove the relevant metrics from the registry upon deletion of the pipeline.
      *

@@ -102,19 +102,6 @@ public abstract class Rule {
         }
     }
 
-    /**
-     * Register the metrics attached to this pipeline.
-     *
-     * @param metricRegistry the registry to add the metrics to
-     * @param pipelineId     the pipeline ID
-     * @param stageId        the pipeline stage ID
-     */
-    // TODO: Remove once dependent code has been updated
-    @Deprecated
-    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId) {
-        registerMetrics(metricRegistry, pipelineId, stageId, Rule.class.getName());
-    }
-
     private Meter registerGlobalMeter(MetricRegistry metricRegistry, String type, String namePrefix) {
         final String name = MetricRegistry.name(requireNonBlank(namePrefix), id(), type);
         metricNames.add(name);
