@@ -20,15 +20,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -39,19 +36,17 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaKeystore;
 import org.graylog.security.certutil.CaKeystoreException;
 import org.graylog.security.certutil.audit.CaAuditEventTypes;
+import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog.security.certutil.csr.ClientCertGenerator;
-import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertificateAuthorityInformation;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
-import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
 import org.graylog2.plugin.rest.ApiError;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import java.io.IOException;
 import java.net.URI;
+import java.security.KeyStoreException;
 import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -62,16 +57,10 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "CA", description = "Certificate Authority", tags = {CLOUD_VISIBLE})
 public class CAResource extends RestResource {
     private final CaKeystore caKeystore;
-    private final String passwordSecret;
-    private final ClientCertGenerator clientCertGenerator;
 
     @Inject
-    public CAResource(CaKeystore caKeystore,
-                      final @Named("password_secret") String passwordSecret,
-                      final ClientCertGenerator clientCertGenerator) {
+    public CAResource(final CaKeystore caKeystore) {
         this.caKeystore = caKeystore;
-        this.passwordSecret = passwordSecret;
-        this.clientCertGenerator = clientCertGenerator;
     }
 
     @GET
@@ -86,7 +75,8 @@ public class CAResource extends RestResource {
     @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
     @ApiOperation("Creates a CA")
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
-    public Response createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) {
+    public Response createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException {
+
         final CertificateAuthorityInformation ca = caKeystore.createSelfSigned(request.organization());
         final URI caUri = getUriBuilderToSelf()
                 .path(CAResource.class)
@@ -110,33 +100,4 @@ public class CAResource extends RestResource {
         }
     }
 
-    @POST
-    @Path("clientcert")
-    @AuditEvent(type = CaAuditEventTypes.CLIENTCERT_CREATE)
-    @ApiOperation("Creates a client certificate")
-    @Produces(MediaType.APPLICATION_JSON)
-    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_CREATE)
-    public Response createClientCert(@ApiParam(name = "request", required = true) @NotNull @Valid CreateClientCertRequest request) {
-        try {
-            var cert = clientCertGenerator.generateClientCert(request.principal(), request.role(), request.password().toCharArray());
-            return Response.ok().entity(cert).build();
-        } catch (ClientCertGenerationException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();
-        }
-    }
-
-    @DELETE
-    @Path("clientcert/{role}/{principal}")
-    @AuditEvent(type = CaAuditEventTypes.CLIENTCERT_DELETE)
-    @ApiOperation("removes the cert and the user from the role")
-    @Produces(MediaType.APPLICATION_JSON)
-    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_DELETE)
-    public Response deleteClientCert(@ApiParam(name = "role", required = true) @PathParam("role") String role, @ApiParam(name = "principal", required = true) @PathParam("principal") String principal) {
-        try {
-            clientCertGenerator.removeCertFor(role, principal);
-            return Response.ok().build();
-        } catch (IOException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();
-        }
-    }
 }

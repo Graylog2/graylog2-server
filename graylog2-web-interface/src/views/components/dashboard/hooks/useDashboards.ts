@@ -30,6 +30,11 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
+export const KEY_PREFIX = ['dashboards', 'overview'];
+export const keyFn = (searchParams: SearchParams) => [...KEY_PREFIX, searchParams];
+
+const dashboardsUrl = qualifyUrl('/dashboards');
+
 type PaginatedDashboardsResponse = PaginatedListJSON & {
   elements: Array<ViewJson>,
   attributes: Array<Attribute>,
@@ -39,9 +44,7 @@ type Options = {
   enabled: boolean,
 }
 
-const dashboardsUrl = qualifyUrl('/dashboards');
-
-const fetchDashboards = (searchParams: SearchParams) => {
+export const fetchDashboards = (searchParams: SearchParams) => {
   const url = PaginationURL(
     dashboardsUrl,
     searchParams.page,
@@ -68,7 +71,7 @@ const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enab
   isInitialLoading: boolean,
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
-    ['dashboards', 'overview', searchParams],
+    keyFn(searchParams),
     () => fetchDashboards(searchParams),
     {
       onError: (errorThrown) => {
