@@ -115,7 +115,8 @@ public class PipelineResolver {
                 try {
                     pipeline = ruleParser.parsePipeline(pipelineDao.id(), pipelineDao.source());
                 } catch (ParseException e) {
-                    pipeline = Pipeline.empty("Failed to parse pipeline" + pipelineDao.id());
+                    LOG.warn("Ignoring non parseable pipeline <{}/{}> with errors <{}>", pipelineDao.title(), pipelineDao.id(), e.getErrors());
+                    pipeline = Pipeline.empty("Failed to parse pipeline: " + pipelineDao.id());
                 }
                 //noinspection ConstantConditions
                 pipelineIdMap.put(pipelineDao.id(), resolvePipeline(pipeline, ruleNameMap));
@@ -149,18 +150,20 @@ public class PipelineResolver {
 
     @Nonnull
     private Pipeline resolvePipeline(Pipeline pipeline, Map<String, Rule> ruleNameMap) {
-        LOG.debug("Resolving pipeline {}", pipeline.name());
+        LOG.debug("Resolving pipeline <{}>", pipeline.name());
 
         pipeline.stages().forEach(stage -> {
             final List<Rule> resolvedRules = stage.ruleReferences().stream()
                     .map(ref -> {
                         Rule rule = ruleNameMap.get(ref);
                         if (rule == null) {
+                            LOG.warn("Cannot resolve rule <{}> referenced by stage #{} within pipeline <{}>",
+                                    ref, stage.stage(), pipeline.id());
                             rule = Rule.alwaysFalse("Unresolved rule " + ref);
                         }
                         // make a copy so that the metrics match up (we don't share actual objects between stages)
                         rule = rule.copy();
-                        LOG.debug("Resolved rule `{}` to {}", ref, rule);
+                        LOG.debug("Resolved rule <{}> to <{}>", ref, rule);
                         // include back reference to stage
                         rule.registerMetrics(metricRegistry, pipeline.id(), String.valueOf(stage.stage()), config.ruleMetricPrefix());
                         return rule;
