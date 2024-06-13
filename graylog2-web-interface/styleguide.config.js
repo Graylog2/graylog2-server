@@ -36,6 +36,7 @@ module.exports = {
     'bootstrap/less/bootstrap.less',
     'toastr/toastr.less',
     'stylesheets/typeahead.less',
+    'stylesheets/paged-print.css',
     './fetch-mock',
   ],
   sections: [
