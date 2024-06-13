@@ -21,7 +21,7 @@ import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-import useFetchEntities from 'components/common/PageEntityTable/useFetchEntities';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -49,7 +49,7 @@ const renderIndexSetFieldTypesPage = () => render(
 );
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
-jest.mock('components/common/PageEntityTable/useFetchEntities', () => jest.fn());
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 

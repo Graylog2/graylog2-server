@@ -19,7 +19,7 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
 import {
-  PageEntityTable,
+  PaginatedEntityTable,
 } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import type {
@@ -48,15 +48,15 @@ const ProfilesList = () => {
   const customColumnRenderers = useCustomColumnRenderers(normalizedIndexSetsTitles);
 
   return (
-    <PageEntityTable<IndexSetFieldTypeProfile> humanName="index set profiles"
-                                               columnsOrder={COLUMNS_ORDER}
-                                               entityActions={profileActions}
-                                               tableLayout={DEFAULT_LAYOUT}
-                                               fetchEntities={fetchIndexSetFieldTypeProfiles}
-                                               keyFn={keyFn}
-                                               entityAttributesAreCamelCase
-                                               expandedSectionsRenderer={expandedSectionsRenderer}
-                                               columnRenderers={customColumnRenderers} />
+    <PaginatedEntityTable<IndexSetFieldTypeProfile> humanName="index set profiles"
+                                                    columnsOrder={COLUMNS_ORDER}
+                                                    entityActions={profileActions}
+                                                    tableLayout={DEFAULT_LAYOUT}
+                                                    fetchEntities={fetchIndexSetFieldTypeProfiles}
+                                                    keyFn={keyFn}
+                                                    entityAttributesAreCamelCase
+                                                    expandedSectionsRenderer={expandedSectionsRenderer}
+                                                    columnRenderers={customColumnRenderers} />
   );
 };
 

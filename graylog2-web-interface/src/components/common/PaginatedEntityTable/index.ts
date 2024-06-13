@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import PageEntityTable from './PageEntityTable';
+import PaginatedEntityTable from './PaginatedEntityTable';
 import useTableFetchContext from './useTableFetchContext';
 
 export { useTableFetchContext };
 
-export default PageEntityTable;
+export default PaginatedEntityTable;

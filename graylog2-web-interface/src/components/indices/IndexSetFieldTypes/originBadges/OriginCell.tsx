@@ -18,7 +18,7 @@ import React, { useMemo } from 'react';
 import keyBy from 'lodash/keyBy';
 
 import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
-import { useTableFetchContext } from 'components/common/PageEntityTable';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 import OriginBadge from './OriginBadge';
 

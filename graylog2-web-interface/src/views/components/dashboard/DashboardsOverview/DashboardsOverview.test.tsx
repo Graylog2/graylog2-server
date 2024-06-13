@@ -22,14 +22,14 @@ import { useQueryParam, QueryParamProvider } from 'use-query-params';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { asMock } from 'helpers/mocking';
-import useFetchEntities from 'components/common/PageEntityTable/useFetchEntities';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 import DashboardsOverview from './DashboardsOverview';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
-jest.mock('components/common/PageEntityTable/useFetchEntities');
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 jest.mock('views/stores/ViewManagementStore', () => ({

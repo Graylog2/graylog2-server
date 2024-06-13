@@ -17,7 +17,7 @@
 import React from 'react';
 
 import type { DataNode, DataNodeStatus } from 'preflight/types';
-import { RelativeTime, PageEntityTable } from 'components/common';
+import { RelativeTime, PaginatedEntityTable } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Sort } from 'stores/PaginationTypes';
@@ -70,25 +70,25 @@ const entityActions = (dataNode: DataNode) => (
 );
 
 const DataNodeList = () => (
-  <PageEntityTable<DataNode> humanName="data nodes"
-                             columnsOrder={COLUMNS_ORDER}
-                             additionalAttributes={additionalAttributes}
-                             queryHelpComponent={(
-                               <QueryHelper entityName="datanode"
-                                            commonFields={['name']}
-                                            example={(
-                                              <p>
-                                                Find entities with a description containing node:<br />
-                                                <code>name:node</code><br />
-                                              </p>
+  <PaginatedEntityTable<DataNode> humanName="data nodes"
+                                  columnsOrder={COLUMNS_ORDER}
+                                  additionalAttributes={additionalAttributes}
+                                  queryHelpComponent={(
+                                    <QueryHelper entityName="datanode"
+                                                 commonFields={['name']}
+                                                 example={(
+                                                   <p>
+                                                     Find entities with a description containing node:<br />
+                                                     <code>name:node</code><br />
+                                                   </p>
                                             )} />
                              )}
-                             entityActions={entityActions}
-                             tableLayout={DEFAULT_LAYOUT}
-                             fetchEntities={fetchDataNodes}
-                             keyFn={keyFn}
-                             entityAttributesAreCamelCase={false}
-                             columnRenderers={columnRenderers} />
+                                  entityActions={entityActions}
+                                  tableLayout={DEFAULT_LAYOUT}
+                                  fetchEntities={fetchDataNodes}
+                                  keyFn={keyFn}
+                                  entityAttributesAreCamelCase={false}
+                                  columnRenderers={columnRenderers} />
 
 );
 

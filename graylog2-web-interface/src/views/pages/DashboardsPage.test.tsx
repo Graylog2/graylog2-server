@@ -21,7 +21,7 @@ import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import DashboardsPage from './DashboardsPage';
 
-jest.mock('components/common/PageEntityTable/useFetchEntities', () => () => ({
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => () => ({
   data: {
     pagination: {
       total: 0,

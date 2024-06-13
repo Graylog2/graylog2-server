@@ -20,7 +20,7 @@ import { useCallback } from 'react';
 import {
   QueryHelper,
   RelativeTime,
-  PageEntityTable,
+  PaginatedEntityTable,
 } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -72,17 +72,17 @@ const EventDefinitionsContainer = () => {
   ), []);
 
   return (
-    <PageEntityTable<EventDefinition> humanName="event definitions"
-                                      columnsOrder={COLUMNS_ORDER}
-                                      additionalAttributes={ADDITIONAL_ATTRIBUTES}
-                                      queryHelpComponent={<QueryHelper entityName="event definition" />}
-                                      tableLayout={DEFAULT_LAYOUT}
-                                      fetchEntities={fetchEventDefinitions}
-                                      entityActions={renderEventDefinitionActions}
-                                      keyFn={keyFn}
-                                      entityAttributesAreCamelCase={false}
-                                      filterValueRenderers={FilterValueRenderers}
-                                      columnRenderers={columnRenderers} />
+    <PaginatedEntityTable<EventDefinition> humanName="event definitions"
+                                           columnsOrder={COLUMNS_ORDER}
+                                           additionalAttributes={ADDITIONAL_ATTRIBUTES}
+                                           queryHelpComponent={<QueryHelper entityName="event definition" />}
+                                           tableLayout={DEFAULT_LAYOUT}
+                                           fetchEntities={fetchEventDefinitions}
+                                           entityActions={renderEventDefinitionActions}
+                                           keyFn={keyFn}
+                                           entityAttributesAreCamelCase={false}
+                                           filterValueRenderers={FilterValueRenderers}
+                                           columnRenderers={columnRenderers} />
   );
 };
 

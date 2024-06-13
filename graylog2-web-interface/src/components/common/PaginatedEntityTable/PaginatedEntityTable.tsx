@@ -29,9 +29,9 @@ import type { EntityBase } from 'components/common/EntityDataTable/types';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
-import TableFetchContextProvider from 'components/common/PageEntityTable/TableFetchContextProvider';
-import type { PaginatedResponse } from 'components/common/PageEntityTable/useFetchEntities';
-import useFetchEntities from 'components/common/PageEntityTable/useFetchEntities';
+import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 const SearchRow = styled.div`
   margin-bottom: 5px;
@@ -71,7 +71,7 @@ const INITIAL_DATA = {
  * It contains all the required logic to e.g. sync the URL query params.
  * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
  */
-const PageEntityTable = <T extends EntityBase>({
+const PaginatedEntityTable = <T extends EntityBase>({
   actionsCellWidth, columnsOrder, entityActions, tableLayout, fetchEntities, keyFn,
   humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
   expandedSectionsRenderer, bulkSelection, additionalAttributes,
@@ -171,7 +171,7 @@ const PageEntityTable = <T extends EntityBase>({
   );
 };
 
-PageEntityTable.defaultProps = {
+PaginatedEntityTable.defaultProps = {
   actionsCellWidth: 160,
   additionalAttributes: [],
   bulkSelection: undefined,
@@ -181,4 +181,4 @@ PageEntityTable.defaultProps = {
   topRightCol: undefined,
 };
 
-export default PageEntityTable;
+export default PaginatedEntityTable;

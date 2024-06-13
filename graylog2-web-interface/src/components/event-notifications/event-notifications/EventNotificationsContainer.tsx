@@ -21,7 +21,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import {
   QueryHelper,
-  PageEntityTable,
+  PaginatedEntityTable,
 } from 'components/common';
 import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
 import {
@@ -79,16 +79,16 @@ const EventNotificationsContainer = () => {
   ), [handleTest, isLoadingTest]);
 
   return (
-    <PageEntityTable<EventNotification> humanName="event notifications"
-                                        columnsOrder={COLUMNS_ORDER}
-                                        queryHelpComponent={<QueryHelper entityName="notification" />}
-                                        entityActions={renderEvenNotificationActions}
-                                        tableLayout={DEFAULT_LAYOUT}
-                                        fetchEntities={fetchEventNotifications}
-                                        keyFn={keyFn}
-                                        bulkSelection={{ actions: <BulkActions /> }}
-                                        entityAttributesAreCamelCase
-                                        columnRenderers={columnRenderers} />
+    <PaginatedEntityTable<EventNotification> humanName="event notifications"
+                                             columnsOrder={COLUMNS_ORDER}
+                                             queryHelpComponent={<QueryHelper entityName="notification" />}
+                                             entityActions={renderEvenNotificationActions}
+                                             tableLayout={DEFAULT_LAYOUT}
+                                             fetchEntities={fetchEventNotifications}
+                                             keyFn={keyFn}
+                                             bulkSelection={{ actions: <BulkActions /> }}
+                                             entityAttributesAreCamelCase
+                                             columnRenderers={columnRenderers} />
   );
 };
 

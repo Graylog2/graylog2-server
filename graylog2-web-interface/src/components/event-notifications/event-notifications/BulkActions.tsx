@@ -31,7 +31,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useLocation from 'routing/useLocation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import { useTableFetchContext } from 'components/common/PageEntityTable';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 const BulkActions = () => {
   const queryClient = useQueryClient();

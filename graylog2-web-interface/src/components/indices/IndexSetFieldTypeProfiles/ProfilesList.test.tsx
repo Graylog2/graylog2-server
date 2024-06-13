@@ -27,7 +27,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
 import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
-import useFetchEntities from 'components/common/PageEntityTable/useFetchEntities';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 const getData = (list = [profile1]) => (
   {
@@ -49,7 +49,7 @@ const renderIndexSetFieldTypeProfilesList = () => render(
 
 jest.mock('routing/useParams', () => jest.fn());
 
-jest.mock('components/common/PageEntityTable/useFetchEntities', () => jest.fn());
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');

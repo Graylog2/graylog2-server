@@ -30,7 +30,7 @@ import {
 } from 'components/streams/StreamsOverview/Constants';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
-import PageEntityTable from 'components/common/PageEntityTable';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
 import CustomColumnRenderers from './ColumnRenderers';
 
@@ -58,19 +58,19 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const columnRenderers = useMemo(() => CustomColumnRenderers(indexSets), [indexSets]);
 
   return (
-    <PageEntityTable<Stream> humanName="streams"
-                             columnsOrder={COLUMNS_ORDER}
-                             additionalAttributes={ADDITIONAL_ATTRIBUTES}
-                             queryHelpComponent={<QueryHelper entityName="stream" />}
-                             entityActions={entityActions}
-                             tableLayout={DEFAULT_LAYOUT}
-                             fetchEntities={fetchStreams}
-                             keyFn={keyFn}
-                             expandedSectionsRenderer={expandedSections}
-                             bulkSelection={{ actions: bulkActions }}
-                             entityAttributesAreCamelCase={false}
-                             filterValueRenderers={FilterValueRenderers}
-                             columnRenderers={columnRenderers} />
+    <PaginatedEntityTable<Stream> humanName="streams"
+                                  columnsOrder={COLUMNS_ORDER}
+                                  additionalAttributes={ADDITIONAL_ATTRIBUTES}
+                                  queryHelpComponent={<QueryHelper entityName="stream" />}
+                                  entityActions={entityActions}
+                                  tableLayout={DEFAULT_LAYOUT}
+                                  fetchEntities={fetchStreams}
+                                  keyFn={keyFn}
+                                  expandedSectionsRenderer={expandedSections}
+                                  bulkSelection={{ actions: bulkActions }}
+                                  entityAttributesAreCamelCase={false}
+                                  filterValueRenderers={FilterValueRenderers}
+                                  columnRenderers={columnRenderers} />
   );
 };
 

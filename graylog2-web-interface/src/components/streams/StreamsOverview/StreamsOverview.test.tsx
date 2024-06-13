@@ -22,7 +22,7 @@ import { QueryParamProvider } from 'use-query-params';
 
 import { indexSets } from 'fixtures/indexSets';
 import { asMock, MockStore } from 'helpers/mocking';
-import useFetchEntities from 'components/common/PageEntityTable/useFetchEntities';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import { stream } from 'fixtures/streams';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
@@ -31,7 +31,7 @@ import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 
 import StreamsOverview from './StreamsOverview';
 
-jest.mock('components/common/PageEntityTable/useFetchEntities');
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/streams/hooks/useStreamRuleTypes');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 

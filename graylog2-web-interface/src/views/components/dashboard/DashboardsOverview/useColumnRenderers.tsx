@@ -23,7 +23,7 @@ import type View from 'views/logic/views/View';
 import TitleCell from 'views/components/dashboard/DashboardsOverview/TitleCell';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { createGRN } from 'logic/permissions/GRN';
-import { useTableFetchContext } from 'components/common/PageEntityTable';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean, dashboardId: string }) => {
   const queryClient = useQueryClient();

@@ -31,7 +31,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
-import { useTableFetchContext } from 'components/common/PageEntityTable';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 type Props = {
   isTestLoading: boolean,

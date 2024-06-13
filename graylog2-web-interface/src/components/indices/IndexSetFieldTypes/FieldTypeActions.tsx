@@ -24,7 +24,7 @@ import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/Chang
 import hasOverride from 'components/indices/helpers/hasOverride';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
-import { useTableFetchContext } from 'components/common/PageEntityTable';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 type Props = {
   fieldType: IndexSetFieldType,

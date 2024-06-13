@@ -22,7 +22,7 @@ import { fetchDashboards, keyFn } from 'views/components/dashboard/hooks/useDash
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import useColumnRenderers from 'views/components/dashboard/DashboardsOverview/useColumnRenderers';
 import { DEFAULT_LAYOUT, COLUMNS_ORDER } from 'views/components/dashboard/DashboardsOverview/Constants';
-import PageEntityTable from 'components/common/PageEntityTable';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
 import BulkActions from './BulkActions';
 
@@ -38,16 +38,16 @@ const DashboardsOverview = ({ isEvidenceModal }: Props) => {
   ), [isEvidenceModal]);
 
   return (
-    <PageEntityTable<View> humanName="dashboards"
-                           columnsOrder={COLUMNS_ORDER}
-                           queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
-                           entityActions={renderDashboardActions}
-                           tableLayout={DEFAULT_LAYOUT(isEvidenceModal)}
-                           fetchEntities={fetchDashboards}
-                           keyFn={keyFn}
-                           entityAttributesAreCamelCase
-                           bulkSelection={{ actions: <BulkActions /> }}
-                           columnRenderers={customColumnRenderers} />
+    <PaginatedEntityTable<View> humanName="dashboards"
+                                columnsOrder={COLUMNS_ORDER}
+                                queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
+                                entityActions={renderDashboardActions}
+                                tableLayout={DEFAULT_LAYOUT(isEvidenceModal)}
+                                fetchEntities={fetchDashboards}
+                                keyFn={keyFn}
+                                entityAttributesAreCamelCase
+                                bulkSelection={{ actions: <BulkActions /> }}
+                                columnRenderers={customColumnRenderers} />
   );
 };
 

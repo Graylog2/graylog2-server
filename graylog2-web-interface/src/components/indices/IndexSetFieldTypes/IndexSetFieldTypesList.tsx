@@ -21,7 +21,7 @@ import keyBy from 'lodash/keyBy';
 
 import { fetchIndexSetFieldTypes, keyFn } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
-import { Icon, PageEntityTable } from 'components/common';
+import { Icon, PaginatedEntityTable } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
 import expandedSections from 'components/indices/IndexSetFieldTypes/originExpandedSections/expandedSections';
@@ -98,18 +98,18 @@ const IndexSetFieldTypesList = () => {
   }), [indexSetId, selectedEntitiesData]);
 
   return (
-    <PageEntityTable<IndexSetFieldType> humanName="index set field types"
-                                        columnsOrder={COLUMNS_ORDER}
-                                        entityActions={indexFieldTypeChangeAllowed && renderActions}
-                                        tableLayout={DEFAULT_LAYOUT}
-                                        topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile />}
-                                        fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
-                                        keyFn={keyFn}
-                                        bulkSelection={bulkSelection}
-                                        expandedSectionsRenderer={expandedSections}
-                                        entityAttributesAreCamelCase
-                                        filterValueRenderers={FilterValueRenderers}
-                                        columnRenderers={customColumnRenderers} />
+    <PaginatedEntityTable<IndexSetFieldType> humanName="index set field types"
+                                             columnsOrder={COLUMNS_ORDER}
+                                             entityActions={indexFieldTypeChangeAllowed && renderActions}
+                                             tableLayout={DEFAULT_LAYOUT}
+                                             topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile />}
+                                             fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
+                                             keyFn={keyFn}
+                                             bulkSelection={bulkSelection}
+                                             expandedSectionsRenderer={expandedSections}
+                                             entityAttributesAreCamelCase
+                                             filterValueRenderers={FilterValueRenderers}
+                                             columnRenderers={customColumnRenderers} />
   );
 };
 

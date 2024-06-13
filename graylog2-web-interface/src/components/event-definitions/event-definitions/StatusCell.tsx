@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { Label, BootstrapModalConfirm } from 'components/bootstrap';
 import { Icon } from 'components/common';
-import { useTableFetchContext } from 'components/common/PageEntityTable';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 import type { EventDefinition } from '../event-definitions-types';
 
