@@ -53,6 +53,7 @@ describe('SavedSearches BulkActions', () => {
       setSelectedEntities: () => {},
       selectEntity: () => {},
       deselectEntity: () => {},
+      toggleEntitySelect: () => {},
     });
   });
 
@@ -65,6 +66,7 @@ describe('SavedSearches BulkActions', () => {
       setSelectedEntities,
       selectEntity: () => {},
       deselectEntity: () => {},
+      toggleEntitySelect: () => {},
     });
 
     render(<BulkActions />);
@@ -98,6 +100,7 @@ describe('SavedSearches BulkActions', () => {
       setSelectedEntities,
       selectEntity: () => {},
       deselectEntity: () => {},
+      toggleEntitySelect: () => {},
     });
 
     render(<BulkActions />);

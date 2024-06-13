@@ -24,14 +24,16 @@ import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/Chang
 import hasOverride from 'components/indices/helpers/hasOverride';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 type Props = {
   fieldType: IndexSetFieldType,
   indexSetId: string,
-  onSubmitCallback: (props: FieldTypePutResponse) => void,
+  onSubmitCallback: (props: FieldTypePutResponse, refetchFieldTypes: () => void) => void,
 }
 
 const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) => {
+  const { refetch: refetchFieldTypes } = useTableFetchContext();
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
@@ -79,7 +81,7 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) =>
                               onClose={toggleEditModal}
                               show
                               showSelectionTable={false}
-                              onSubmitCallback={onSubmitCallback}
+                              onSubmitCallback={(newFieldType) => onSubmitCallback(newFieldType, refetchFieldTypes)}
                               showFieldSelect={false} />
       )}
     </>

@@ -14,15 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import { Spoiler as MantineSpoiler } from '@mantine/core';
 
-import type { Sort } from 'stores/PaginationTypes';
+type Props = React.PropsWithChildren<{
+  maxHeight: number,
+  className?: string,
+  showLabel?: string,
+  hideLabel?: string,
+}>
 
-// eslint-disable-next-line import/prefer-default-export
-export const DEFAULT_LAYOUT = (isEvidenceModal: boolean) => ({
-  entityTableId: 'dashboards',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: isEvidenceModal ? ['title', 'description', 'summary'] : ['title', 'description', 'summary', 'favorite'],
-});
+const Spoiler = ({ maxHeight, children, className, showLabel, hideLabel }: Props) => (
+  <MantineSpoiler maxHeight={maxHeight}
+                  showLabel={showLabel}
+                  hideLabel={hideLabel}
+                  className={className}>
+    {children}
+  </MantineSpoiler>
+);
 
-export const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'];
+Spoiler.defaultProps = {
+  className: undefined,
+  showLabel: 'Show more',
+  hideLabel: 'Hide',
+};
+
+export default Spoiler;

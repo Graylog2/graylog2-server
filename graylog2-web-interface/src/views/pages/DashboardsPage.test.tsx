@@ -21,7 +21,7 @@ import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import DashboardsPage from './DashboardsPage';
 
-jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => () => ({
   data: {
     pagination: {
       total: 0,
@@ -46,6 +46,6 @@ describe('DashboardsPage', () => {
       </QueryParamProvider>);
 
     await screen.findByRole('heading', { name: /dashboards/i });
-    await screen.findByText('No dashboards have been created yet.');
+    await screen.findByText('No dashboards have been found.');
   });
 });
