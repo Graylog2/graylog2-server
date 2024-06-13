@@ -17,18 +17,41 @@
 import React, { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import type { SearchParams } from 'stores/PaginationTypes';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type View from 'views/logic/views/View';
 import TitleCell from 'views/components/dashboard/DashboardsOverview/TitleCell';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { createGRN } from 'logic/permissions/GRN';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
-export const useColumnRenderers = (
-  { searchParams }: { searchParams: SearchParams },
-) => {
+const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean, dashboardId: string }) => {
   const queryClient = useQueryClient();
+  const { searchParams } = useTableFetchContext();
+
+  return (
+    <FavoriteIcon isFavorite={favorite}
+                  grn={createGRN('dashboard', dashboardId)}
+                  onChange={(newValue) => {
+                    queryClient.setQueriesData(['dashboards', 'overview', searchParams], (cur: {
+                      list: Readonly<Array<View>>,
+                      pagination: { total: number }
+                    }) => ({
+                      ...cur,
+                      list: cur.list.map((view) => {
+                        if (view.id === dashboardId) {
+                          return view.toBuilder().favorite(newValue).build();
+                        }
+
+                        return view;
+                      }),
+                    }
+                    ));
+                  }} />
+  );
+};
+
+export const useColumnRenderers = () => {
   const requirementsProvided = usePluginEntities('views.requires.provided');
   const customColumnRenderers: ColumnRenderers<View> = useMemo(() => ({
     attributes: {
@@ -37,28 +60,11 @@ export const useColumnRenderers = (
       },
       favorite: {
         renderCell: (favorite: boolean, dashboard) => (
-          <FavoriteIcon isFavorite={favorite}
-                        grn={createGRN('dashboard', dashboard.id)}
-                        onChange={(newValue) => {
-                          queryClient.setQueriesData(['dashboards', 'overview', searchParams], (cur: {
-                            list: Readonly<Array<View>>,
-                            pagination: { total: number }
-                          }) => ({
-                            ...cur,
-                            list: cur.list.map((view) => {
-                              if (view.id === dashboard.id) {
-                                return view.toBuilder().favorite(newValue).build();
-                              }
-
-                              return view;
-                            }),
-                          }
-                          ));
-                        }} />
+          <DashboardFavoriteItem dashboardId={dashboard.id} favorite={favorite} />
         ),
       },
     },
-  }), [queryClient, requirementsProvided, searchParams]);
+  }), [requirementsProvided]);
 
   return customColumnRenderers;
 };

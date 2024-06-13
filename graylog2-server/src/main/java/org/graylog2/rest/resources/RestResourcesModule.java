@@ -22,7 +22,6 @@ import org.graylog.security.rest.CAClientResource;
 import org.graylog.security.rest.CAResource;
 import org.graylog.security.rest.CertificateRenewalResource;
 import org.graylog2.Configuration;
-import org.graylog2.entitygroups.rest.EntityGroupResource;
 import org.graylog2.contentstream.rest.ContentStreamResource;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.resources.cluster.ClusterDeflectorResource;
@@ -165,7 +164,6 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(RemoteReindexResource.class);
         addSystemRestResource(CAResource.class);
         addSystemRestResource(CAClientResource.class);
-        addSystemRestResource(EntityGroupResource.class);
     }
 
     private void addDebugResources() {
