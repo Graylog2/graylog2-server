@@ -30,6 +30,7 @@ import StreamsContext from 'contexts/StreamsContext';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
+import type { Stream } from 'logic/streams/types';
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
@@ -120,7 +121,7 @@ describe('Create a new dashboard', () => {
     <DefaultProviders>
       <DefaultQueryClientProvider>
         <CurrentUserProvider>
-          <StreamsContext.Provider value={[{ id: 'stream-1', title: 'Stream 1' }]}>
+          <StreamsContext.Provider value={[{ id: 'stream-1', title: 'Stream 1' } as Stream]}>
             <AppRouter />
           </StreamsContext.Provider>
         </CurrentUserProvider>

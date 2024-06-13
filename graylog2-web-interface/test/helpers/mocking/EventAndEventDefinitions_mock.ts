@@ -81,6 +81,7 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
   priority: 2,
   alert: true,
   config: {
+    event_limit: 1000,
     type: 'aggregation-v1',
     query: 'http_method: GET',
     query_parameters: [],

@@ -18,8 +18,9 @@
 import FilterAggregationFormContainer from './FilterAggregationFormContainer';
 import FilterAggregationForm from './FilterAggregationForm';
 import FilterAggregationSummary from './FilterAggregationSummary';
+import {PluginExports} from 'graylog-web-plugin/plugin';
 
-export default {
+const bindings: PluginExports = {
   eventDefinitionTypes: [
     {
       type: 'aggregation-v1',
@@ -33,3 +34,5 @@ export default {
     },
   ],
 };
+
+export default bindings;

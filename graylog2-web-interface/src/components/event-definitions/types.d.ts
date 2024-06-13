@@ -18,6 +18,8 @@
 import type React from 'react';
 
 import type { SearchBarControl } from 'views/types';
+import type User from 'logic/users/User';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 interface EventDefinitionType {
   type: string,
@@ -31,7 +33,11 @@ interface EventDefinitionType {
     validation: { errors: { [key: string]: Array<string> } },
     onChange: (name: string, newConfig: EventDefinition['config']) => void,
     action: string,
-  }>>
+  }>>,
+  summaryComponent: React.ComponentType<{
+    currentUser: User,
+    config: EventDefinition['config'],
+  }>
 }
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {

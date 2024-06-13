@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import upperFirst from 'lodash/upperFirst';
 
@@ -26,13 +26,13 @@ import { isPermitted } from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'views/stores/StreamsStore';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
+import StreamsContext from 'contexts/StreamsContext';
 
 import AggregationConditionSummary from './AggregationConditionSummary';
-import withStreams from './withStreams';
 import { TIME_UNITS } from './FilterForm';
 import styles from './FilterAggregationSummary.css';
 
@@ -125,7 +125,8 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
   );
 };
 
-const FilterAggregationSummary = ({ streams, config, currentUser }: Props) => {
+const FilterAggregationSummary = ({ config, currentUser }: Props) => {
+  const streams = useContext(StreamsContext);
   const {
     query,
     query_parameters: queryParameters,
@@ -196,10 +197,4 @@ const FilterAggregationSummary = ({ streams, config, currentUser }: Props) => {
   );
 };
 
-FilterAggregationSummary.propTypes = {
-  config: PropTypes.object.isRequired,
-  currentUser: PropTypes.object.isRequired,
-  streams: PropTypes.array.isRequired,
-};
-
-export default withStreams(FilterAggregationSummary);
+export default FilterAggregationSummary;
