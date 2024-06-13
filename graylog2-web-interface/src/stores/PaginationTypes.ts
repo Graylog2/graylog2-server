@@ -76,13 +76,13 @@ export type Attribute = {
   id: string,
   title: string,
   type?: 'BOOLEAN' | 'STRING' | 'DATE' | 'OBJECT_ID',
-  sortable: boolean,
+  sortable?: boolean,
   hidden?: boolean,
   searchable?: boolean,
   filterable?: true,
   filter_options?: Array<{ value: string, title: string }>
   related_collection?: string,
-
+  permissions?: Array<string>,
 }
 
 export type Attributes = Array<Attribute>

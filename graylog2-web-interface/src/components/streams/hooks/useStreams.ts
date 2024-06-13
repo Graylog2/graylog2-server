@@ -28,13 +28,27 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
+export const KEY_PREFIX = ['streams', 'overview'];
+export const keyFn = (searchParams: SearchParams) => [...KEY_PREFIX, searchParams];
+
+export const fetchStreams = (searchParams: SearchParams) => StreamsStore.searchPaginated(
+  searchParams.page,
+  searchParams.pageSize,
+  searchParams.query,
+  {
+    sort: searchParams?.sort.attributeId,
+    order: searchParams?.sort.direction,
+    filters: FiltersForQueryParams(searchParams.filters),
+  },
+);
+
 type Options = {
   enabled: boolean,
 }
 
 const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
-    elements: Array<Stream>,
+    list: Array<Stream>,
     pagination: { total: number }
     attributes: Array<Attribute>
   },
@@ -42,17 +56,8 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
   isInitialLoading: boolean,
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
-    ['streams', 'overview', searchParams],
-    () => StreamsStore.searchPaginated(
-      searchParams.page,
-      searchParams.pageSize,
-      searchParams.query,
-      {
-        sort: searchParams?.sort.attributeId,
-        order: searchParams?.sort.direction,
-        filters: FiltersForQueryParams(searchParams.filters),
-      },
-    ),
+    keyFn(searchParams),
+    () => fetchStreams(searchParams),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
