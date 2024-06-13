@@ -492,7 +492,13 @@ const FilterForm = ({
           <HelpBlock>{get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
           )}
         </FormGroup>
-
+        <Input id="is-cron-checkbox"
+               type="checkbox"
+               name="use_cron_scheduling"
+               label="Use Cron Scheduling"
+               help="Schedule this event with a Quartz cron expression"
+               checked={defaultTo(eventDefinition.config.use_cron_scheduling, false)}
+               onChange={handleEnabledChange} />
         {currentConfig.use_cron_scheduling
           ? (
             <>
@@ -536,13 +542,6 @@ const FilterForm = ({
               )}
             </FormGroup>
           )}
-        <Input id="is-cron-checkbox"
-               type="checkbox"
-               name="use_cron_scheduling"
-               label="Use Cron Scheduling"
-               help="Schedule this event with a Quartz cron expression"
-               checked={defaultTo(eventDefinition.config.use_cron_scheduling, false)}
-               onChange={handleEnabledChange} />
 
         <Input id="schedule-checkbox"
                type="checkbox"
