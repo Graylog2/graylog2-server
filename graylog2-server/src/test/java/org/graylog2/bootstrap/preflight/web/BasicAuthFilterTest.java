@@ -17,6 +17,7 @@
 package org.graylog2.bootstrap.preflight.web;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.HttpStatus;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.server.ContainerRequest;
 import jakarta.annotation.Nonnull;
@@ -29,6 +30,7 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.Response;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
@@ -42,7 +44,7 @@ class BasicAuthFilterTest {
 
     @Test
     void testLoginPath() throws IOException {
-        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", "login"::equals);
+        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", URI.create("/login"));
         final ContainerRequest request = mockRequest("login", null, null);
         filter.filter(request);
         final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
@@ -51,46 +53,43 @@ class BasicAuthFilterTest {
 
     @Test
     void testMissingCredentials() throws IOException {
-        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", path -> false);
+        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", URI.create("/login"));
         final ContainerRequest request = mockRequest("/", null, null);
         filter.filter(request);
         final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
         Mockito.verify(request, times(1)).abortWith(captor.capture());
         final Response response = captor.getValue();
-        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(401);
-        Assertions.assertThat(response.getStatusInfo().getReasonPhrase()).isEqualTo("Unauthorized");
-        Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, missing authorization header!");
+        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
+        Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, missing or invalid authorization header!");
     }
 
     @Test
     void testInvalidCredentials() throws IOException {
-        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", path -> false);
+        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", URI.create("/login"));
         final ContainerRequest request = mockRequest("/", "admin", "admin1");
         filter.filter(request);
         final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
         Mockito.verify(request, times(1)).abortWith(captor.capture());
         final Response response = captor.getValue();
-        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(401);
-        Assertions.assertThat(response.getStatusInfo().getReasonPhrase()).isEqualTo("Unauthorized");
-        Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, invalid username/password combination!");
+        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
+        Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, missing or invalid authorization header!");
     }
 
     @Test
     void testMissingPassword() throws IOException {
-        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", path -> false);
+        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", URI.create("/login"));
         final ContainerRequest request = mockRequest("/", "admin", "");
         filter.filter(request);
         final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
         Mockito.verify(request, times(1)).abortWith(captor.capture());
         final Response response = captor.getValue();
-        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(401);
-        Assertions.assertThat(response.getStatusInfo().getReasonPhrase()).isEqualTo("Unauthorized");
-        Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, invalid username/password combination!");
+        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
+        Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, missing or invalid authorization header!");
     }
 
     @Test
     void testCorrectCredentials() throws IOException {
-        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", path -> false);
+        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", URI.create("/login"));
         final ContainerRequest request = mockRequest("/", "admin", "admin");
         filter.filter(request);
         Mockito.verify(request, Mockito.never()).abortWith(Mockito.any());

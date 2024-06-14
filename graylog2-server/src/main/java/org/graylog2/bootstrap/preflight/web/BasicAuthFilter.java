@@ -16,19 +16,19 @@
  */
 package org.graylog2.bootstrap.preflight.web;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.bouncycastle.util.encoders.Base64;
-
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.encoders.Base64;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class BasicAuthFilter implements ContainerRequestFilter {
 
@@ -37,57 +37,59 @@ public class BasicAuthFilter implements ContainerRequestFilter {
     private final String adminUsername;
     private final String adminPasswordHash;
     private final String realm;
-    private final Predicate<String> bypassAuthForLogin;
+    private final URI loginPage;
 
 
-    public BasicAuthFilter(String adminUsername, String adminPasswordHash, String realm, Predicate<String> bypassLogin) {
+    public BasicAuthFilter(String adminUsername, String adminPasswordHash, String realm, URI loginPage) {
         this.adminUsername = adminUsername;
         this.adminPasswordHash = adminPasswordHash;
         this.realm = realm;
-        this.bypassAuthForLogin = bypassLogin;
+
+        this.loginPage = loginPage;
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         final MultivaluedMap<String, String> headers = requestContext.getHeaders();
 
+        if (!hasValidCrendentials(headers) && !isLoginScreen(requestContext)) {
+            abortRequestUnauthorized(requestContext);
+        }
+    }
+
+    private boolean isLoginScreen(ContainerRequestContext requestContext) {
+        final String path = requestContext.getUriInfo().getPath();
+        // the only url that doesn't require basic auth
+        return path.equals(StringUtils.stripStart(loginPage.getPath(), "/"));
+    }
+
+
+    private boolean hasValidCrendentials(MultivaluedMap<String, String> headers) {
         final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY);
-
         if (authorization == null || authorization.isEmpty()) {
-
-            final String path = requestContext.getUriInfo().getPath();
-            if(bypassAuthForLogin.test(path)) { // the only url that doesn't require basic auth
-                return;
-            }
-
-            abortRequestUnauthorized(requestContext, "You cannot access this resource, missing authorization header!");
-            return;
+            return false;
         }
 
         final String encodedUserPassword = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", "");
-
         String usernameAndPassword = new String(Base64.decode(encodedUserPassword.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 
         final String[] parts = usernameAndPassword.split(":");
 
         if (parts.length != 2) {
-            abortRequestUnauthorized(requestContext, "You cannot access this resource, invalid username/password combination!");
-            return;
+            return false;
         }
 
         final String username = parts[0];
         final String password = parts[1];
 
-        if (!isUserMatching(username, password)) {
-            abortRequestUnauthorized(requestContext, "You cannot access this resource, invalid username/password combination!");
-        }
+        return isUserMatching(username, password);
     }
 
-    private void abortRequestUnauthorized(ContainerRequestContext requestContext, String message) {
-        requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-                .entity(message)
+    private void abortRequestUnauthorized(ContainerRequestContext requestContext) {
+        requestContext.abortWith(Response.status(Response.Status.FOUND) //(=moved temporarily)
+                .location(loginPage)
+                .entity("You cannot access this resource, missing or invalid authorization header!")
                 .type(MediaType.TEXT_PLAIN_TYPE)
-                .header("WWW-Authenticate", "Basic realm=" + this.realm)
                 .build());
     }
 
