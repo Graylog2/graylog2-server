@@ -36,6 +36,7 @@ import java.io.StringWriter;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
+ import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -45,6 +46,11 @@ import java.util.Optional;
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 
 public class CaKeystore {
+
+    static {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(CaKeystore.class);
     private final CaService caService;
     private final String passwordSecret;

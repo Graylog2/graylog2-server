@@ -51,7 +51,6 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
