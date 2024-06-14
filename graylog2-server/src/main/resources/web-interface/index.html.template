@@ -12,7 +12,6 @@
   </head>
   <body>
     <div id="app-root" />
-    <div id="report-contents" />
     <script nonce="${nonce}" src="${appPrefix}config.js"></script>
     ${foreach jsFiles jsFile}
     <script nonce="${nonce}" src="${appPrefix}assets/${jsFile}"></script>
