@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-import type { Sort } from 'stores/PaginationTypes';
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
+import { singleton } from 'logic/singleton';
 
-// eslint-disable-next-line import/prefer-default-export
-export const DEFAULT_LAYOUT = (isEvidenceModal: boolean) => ({
-  entityTableId: 'dashboards',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: isEvidenceModal ? ['title', 'description', 'summary'] : ['title', 'description', 'summary', 'favorite'],
-});
+export type ContextValue = {
+  searchParams: SearchParams,
+  refetch: () => void,
+  attributes: Array<Attribute>,
+};
 
-export const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'];
+const TableFetchContext = React.createContext<ContextValue | undefined>(undefined);
+export default singleton('contexts.TableFetchContext', () => TableFetchContext);
