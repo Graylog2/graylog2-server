@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -54,6 +55,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.graylog2.shared.utilities.StringUtils;
 
+import static org.graylog2.entitygroups.rest.EntityGroupPermissions.ENTITY_GROUP_CREATE;
+import static org.graylog2.entitygroups.rest.EntityGroupPermissions.ENTITY_GROUP_DELETE;
+import static org.graylog2.entitygroups.rest.EntityGroupPermissions.ENTITY_GROUP_EDIT;
+import static org.graylog2.entitygroups.rest.EntityGroupPermissions.ENTITY_GROUP_READ;
 import static org.graylog2.shared.utilities.ExceptionUtils.getRootCauseMessage;
 
 @Api(value = "EntityGroups", description = "Manage Entity Groups")
@@ -71,7 +76,7 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
 
     @GET
     @ApiOperation(value = "Get a list of entity groups")
-    @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_READ)
+    @RequiresPermissions(ENTITY_GROUP_READ)
     public PaginatedList<EntityGroup> listGroups(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("15") int perPage,
                                                  @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
@@ -88,8 +93,11 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @Path("/{id}")
     @ApiOperation(value = "Get a single entity group")
     @ApiResponses(@ApiResponse(code = 404, message = "No such entity group"))
-    @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_READ)
+    @RequiresPermissions(ENTITY_GROUP_READ)
     public Response get(@ApiParam(name = "id", required = true) @PathParam("id") String id) {
+        if (!isPermitted(ENTITY_GROUP_READ, id)) {
+            throw new ForbiddenException("Not allowed to read group id " + id);
+        }
         try {
             return Response.ok().entity(entityGroupService.requireEntityGroup(id)).build();
         } catch (IllegalArgumentException e) {
@@ -100,23 +108,34 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @GET
     @Path("/get_for_entity")
     @ApiOperation(value = "Get a list of entity groups for an entity")
-    @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_READ)
-    public Response getAllForEntity(@ApiParam(name = "entity_type", required = true) @QueryParam("entity_type") String entityType,
-                                    @ApiParam(name = "entity_id", required = true) @QueryParam("entity_id") String entityId) {
-        return Response.ok().entity(entityGroupService.getAllForEntity(entityType, entityId)).build();
+    @RequiresPermissions(ENTITY_GROUP_READ)
+    public PaginatedList<EntityGroup> listGroupsForEntity(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("15") int perPage,
+                                                 @ApiParam(name = "entity_type", required = true) @QueryParam("entity_type") String entityType,
+                                                 @ApiParam(name = "entity_id", required = true) @QueryParam("entity_id") String entityId,
+                                                 @ApiParam(name = "sort",
+                                                           value = "The field to sort the result on",
+                                                           allowableValues = "name")
+                                                 @QueryParam("sort") String sort,
+                                                 @ApiParam(name = "direction", value = "The sort direction", allowableValues = "asc,desc")
+                                                 @DefaultValue("asc") @QueryParam("direction") SortOrder order) {
+        if (!isPermitted(ENTITY_GROUP_READ, entityId)) {
+            throw new ForbiddenException("Not allowed to read group id " + entityId);
+        }
+        return entityGroupService.findPaginatedForEntity(entityType, entityId, page, perPage, order, sort);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation("Create a new entity group")
     @ApiResponses(@ApiResponse(code = 400, message = "An entity group already exists with id or name"))
-    @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_EDIT)
+    @RequiresPermissions(ENTITY_GROUP_CREATE)
     @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_CREATE)
-    public Response create(@ApiParam(name = "JSON Body") EntityGroup entityGroup) {
+    public Response create(@ApiParam(name = "JSON Body") EntityGroupRequest request) {
         try {
-            return Response.ok().entity(entityGroupService.create(entityGroup)).build();
+            return Response.ok().entity(entityGroupService.create(request.toEntityGroup())).build();
         } catch (DuplicateKeyException | MongoWriteException e) {
-            throw new BadRequestException(StringUtils.f("Entity group '%s' already exists", entityGroup.name()));
+            throw new BadRequestException(StringUtils.f("Entity group '%s' already exists", request.name()));
         }
     }
 
@@ -128,16 +147,19 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
             @ApiResponse(code = 400, message = "An entity group already exists with id or name"),
             @ApiResponse(code = 404, message = "No such entity group")
     })
-    @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_EDIT)
+    @RequiresPermissions(ENTITY_GROUP_EDIT)
     @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_UPDATE)
     public Response update(@ApiParam(name = "id", required = true) @PathParam("id") String id,
-                           @ApiParam(name = "JSON Body") EntityGroup entityGroup) {
+                           @ApiParam(name = "JSON Body") EntityGroupRequest request) {
+        if (!isPermitted(ENTITY_GROUP_EDIT, id)) {
+            throw new ForbiddenException("Not allowed to edit group id " + id);
+        }
         try {
-            return Response.ok().entity(entityGroupService.update(id, entityGroup)).build();
+            return Response.ok().entity(entityGroupService.update(id, request.toEntityGroup())).build();
         } catch (IllegalArgumentException e) {
             throw new NotFoundException(getRootCauseMessage(e), e);
         } catch (DuplicateKeyException | MongoWriteException e) {
-            throw new BadRequestException(StringUtils.f("Entity group '%s' already exists", entityGroup.name()));
+            throw new BadRequestException(StringUtils.f("Entity group '%s' already exists", request.name()));
         }
     }
 
@@ -145,11 +167,15 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @Path("/{group_id}/add_entity")
     @ApiOperation("Add an entity to an entity group")
     @ApiResponses(@ApiResponse(code = 404, message = "No such entity group"))
-    @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_EDIT)
+    @RequiresPermissions(ENTITY_GROUP_EDIT)
     @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_UPDATE)
     public Response addEntityToGroup(@ApiParam(name = "group_id", required = true) @PathParam("group_id") String groupId,
                                      @ApiParam(name = "entity_type", required = true) @QueryParam("entity_type") String entityType,
                                      @ApiParam(name = "entity_id", required = true) @QueryParam("entity_id") String entityId) {
+        if (!isPermitted(ENTITY_GROUP_EDIT, groupId)) {
+            throw new ForbiddenException("Not allowed to edit group id " + groupId);
+        }
+
         try {
             return Response.ok().entity(entityGroupService.addEntityToGroup(groupId, entityType, entityId)).build();
         } catch (IllegalArgumentException e) {
@@ -160,7 +186,7 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @PUT
     @Path("/get_for_entities")
     @ApiOperation("Get a list of entity groups for a list of entities")
-    @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_READ)
+    @RequiresPermissions(ENTITY_GROUP_READ)
     @NoAuditEvent("Read resource - doesn't change any data")
     public BulkEntityGroupResponse getAllForEntity(@ApiParam(name = "JSON Body") BulkEntityGroupRequest request) {
         return new BulkEntityGroupResponse(entityGroupService.getAllForEntities(request.type(), request.entityIds()));
@@ -170,9 +196,12 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation("Delete an entity group")
-    @RequiresPermissions(EntityGroupPermissions.ENTITY_GROUP_EDIT)
+    @RequiresPermissions(ENTITY_GROUP_DELETE)
     @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_DELETE)
     public void delete(@ApiParam(name = "id", required = true) @PathParam("id") String id) {
+        if (!isPermitted(ENTITY_GROUP_DELETE, id)) {
+            throw new ForbiddenException("Not allowed to delete group id " + id);
+        }
         entityGroupService.delete(id);
     }
 }

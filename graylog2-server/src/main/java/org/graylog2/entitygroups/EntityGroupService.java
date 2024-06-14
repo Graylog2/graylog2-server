@@ -26,10 +26,10 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class EntityGroupService {
     private final DBEntityGroupService dbEntityGroupService;
@@ -45,16 +45,21 @@ public class EntityGroupService {
         return dbEntityGroupService.findPaginated(query, page, perPage, order.toBsonSort(sortByField), filter);
     }
 
+    public PaginatedList<EntityGroup> findPaginatedForEntity(String type, String entityId, int page, int perPage, SortOrder order,
+                                                             String sortByField) {
+        return dbEntityGroupService.findPaginatedForEntity(type, entityId, page, perPage, order.toBsonSort(sortByField));
+    }
+
     public Optional<EntityGroup> getByName(String groupName) {
         return dbEntityGroupService.getByName(groupName);
     }
 
-    public List<EntityGroup> getAllForEntity(String type, String entityId) {
-        return dbEntityGroupService.getAllForEntity(type, entityId);
+    public Stream<EntityGroup> streamAllForEntity(String type, String entityId) {
+        return dbEntityGroupService.streamAllForEntity(type, entityId);
     }
 
     public Map<String, Collection<EntityGroup>> getAllForEntities(String type, Collection<String> entities) {
-        return dbEntityGroupService.getAllForEntities(type, entities);
+        return dbEntityGroupService.getAllForEntities(type, entities).asMap();
     }
 
     public EntityGroup create(EntityGroup group) {
@@ -62,15 +67,15 @@ public class EntityGroupService {
     }
 
     public EntityGroup update(String id, EntityGroup group) {
-        if (dbEntityGroupService.get(id).isEmpty()) {
-            throw new NotFoundException("Unable to find entity group to update");
+        final EntityGroup saved = dbEntityGroupService.update(group.toBuilder().id(id).build());
+        if (saved == null) {
+            throw new NotFoundException("Unable to find mutable entity group to update");
         }
-        return dbEntityGroupService.save(group.toBuilder().id(id).build());
+        return saved;
     }
 
     public EntityGroup addEntityToGroup(String groupId, String type, String entityId) {
-        final EntityGroup group = requireEntityGroup(groupId);
-        return dbEntityGroupService.save(group.addEntity(type, entityId));
+        return dbEntityGroupService.addEntityToGroup(groupId, type, entityId);
     }
 
     public long delete(String id) {

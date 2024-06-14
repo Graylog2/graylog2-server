@@ -18,5 +18,7 @@ package org.graylog2.entitygroups.rest;
 
 public class EntityGroupPermissions {
     public static final String ENTITY_GROUP_READ = "entity_group:read";
+    public static final String ENTITY_GROUP_CREATE = "entity_group:create";
     public static final String ENTITY_GROUP_EDIT = "entity_group:edit";
+    public static final String ENTITY_GROUP_DELETE = "entity_group:delete";
 }

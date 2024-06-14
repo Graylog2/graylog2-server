@@ -23,7 +23,9 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationStrength;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.ReturnDocument;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -38,16 +40,16 @@ import org.graylog2.search.SearchQueryParser;
 import jakarta.inject.Inject;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Updates.addToSet;
 
 
 public class DBEntityGroupService {
@@ -76,6 +78,13 @@ public class DBEntityGroupService {
                 .collation(Collation.builder().locale("en").collationStrength(CollationStrength.SECONDARY).build())
                 .unique(true);
         collection.createIndex(new BasicDBObject(EntityGroup.FIELD_NAME, 1), caseInsensitiveOptions);
+
+        final IndexOptions entityTypeOptions = new IndexOptions()
+                .collation(Collation.builder().locale("en").collationStrength(CollationStrength.SECONDARY).build())
+                .unique(false)
+                .sparse(true);
+        // Add wildcard index on the entities map keys so that indices are created for any entity types that are added.
+        collection.createIndex(new BasicDBObject(EntityGroup.FIELD_ENTITIES + ".*", 1), entityTypeOptions);
     }
 
     public Optional<EntityGroup> get(String id) {
@@ -89,12 +98,28 @@ public class DBEntityGroupService {
                 paginationHelper.filter(searchQuery.toBson()).sort(sort).perPage(perPage).page(page, filter);
     }
 
+    public PaginatedList<EntityGroup> findPaginatedForEntity(String type, String entityId, int page, int perPage, Bson sort) {
+        final Bson query = and(
+                exists(typeField(type)),
+                in(typeField(type), entityId)
+        );
+
+        return paginationHelper.filter(query).sort(sort).perPage(perPage).page(page);
+    }
+
     public EntityGroup save(EntityGroup entityGroup) {
-        if (entityGroup.id() != null) {
-            return scopedEntityMongoUtils.update(entityGroup);
-        }
-        String newId = scopedEntityMongoUtils.create(entityGroup);
+        final String newId = scopedEntityMongoUtils.create(entityGroup);
         return entityGroup.toBuilder().id(newId).build();
+    }
+
+    public EntityGroup update(EntityGroup entityGroup) {
+        return scopedEntityMongoUtils.update(entityGroup);
+    }
+
+    public EntityGroup addEntityToGroup(String groupId, String type, String entityId) {
+        return collection.findOneAndUpdate(MongoUtils.idEq(groupId),
+                addToSet(typeField(type), entityId),
+                new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER));
     }
 
     public Optional<EntityGroup> getByName(String name) {
@@ -103,34 +128,30 @@ public class DBEntityGroupService {
         return Optional.ofNullable(collection.find(query).first());
     }
 
-    public List<EntityGroup> getAllForEntity(String type, String entityId) {
+    public Stream<EntityGroup> streamAllForEntity(String type, String entityId) {
         final Bson query = and(
                 exists(typeField(type)),
                 in(typeField(type), entityId)
         );
-        return MongoUtils.stream(collection.find(query)).toList();
+        return MongoUtils.stream(collection.find(query));
     }
 
-    // TODO: can we make this better..?
-    public Map<String, Collection<EntityGroup>> getAllForEntities(String type, Collection<String> entityIds) {
+    public Multimap<String, EntityGroup> getAllForEntities(String type, Collection<String> entityIds) {
         final Bson query = and(
                 exists(typeField(type)),
                 in(typeField(type), entityIds)
         );
-        final List<EntityGroup> groups = MongoUtils.stream(collection.find(query)).toList();
         final Multimap<String, EntityGroup> entityToGroupsMap = MultimapBuilder.hashKeys().hashSetValues().build();
-        for (EntityGroup group : groups) {
-            for (Map.Entry<String, Set<String>> StringEntry : group.entities().entrySet()) {
-                if (StringEntry.getKey().equals(type)) {
-                    for (String entityId : StringEntry.getValue()) {
-                        if (entityIds.contains(entityId)) {
-                            entityToGroupsMap.put(entityId, group);
-                        }
-                    }
+        MongoUtils.stream(collection.find(query)).forEach(group -> {
+            final Set<String> ids = group.entities().get(type);
+            for (String entityId : ids) {
+                if (entityIds.contains(entityId)) {
+                    entityToGroupsMap.put(entityId, group);
                 }
             }
-        }
-        return entityToGroupsMap.asMap();
+        });
+
+        return entityToGroupsMap;
     }
 
     public long delete(String id) {
