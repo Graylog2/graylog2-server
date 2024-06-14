@@ -1,0 +1,5 @@
+type = "f"
+message = "Propagate search errors in legacy search REST API endpoint."
+
+issues=["14646"]
+pulls = ["19598"]

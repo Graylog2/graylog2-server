@@ -17,7 +17,6 @@
 
 import type { Sort } from 'stores/PaginationTypes';
 
-// eslint-disable-next-line import/prefer-default-export
 export const DEFAULT_LAYOUT = (isEvidenceModal: boolean) => ({
   entityTableId: 'dashboards',
   defaultPageSize: 20,
