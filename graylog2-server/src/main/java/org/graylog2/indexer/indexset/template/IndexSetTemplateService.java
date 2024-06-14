@@ -27,6 +27,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
@@ -146,9 +147,9 @@ public class IndexSetTemplateService {
         Bson filter;
         if (warmTierEnabled) {
             filter = Filters.eq(fieldWarmTierEnabled, true);
-        }else{
+        } else {
             filter = Filters.or(
-                    Filters.eq("index_set_config.data_tiering.type", "hot_only"),
+                    Filters.eq("index_set_config.data_tiering.type", HotOnlyDataTieringConfig.TYPE),
                     Filters.eq(fieldWarmTierEnabled, false)
             );
         }

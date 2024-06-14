@@ -19,7 +19,6 @@ package org.graylog2.indexer.indexset.template;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog2.Configuration;
 import org.slf4j.Logger;
@@ -33,7 +32,7 @@ import java.util.List;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
-public class IndexSetTemplateProvider implements Provider<List<IndexSetTemplate>> {
+public class IndexSetTemplateProvider {
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetTemplateProvider.class);
     private static final String ON_PREM_TEMPLATE_RESOURCE = "on_prem_templates.json";
     protected final ObjectMapper objectMapper;
@@ -44,7 +43,7 @@ public class IndexSetTemplateProvider implements Provider<List<IndexSetTemplate>
         this.objectMapper = objectMapper;
         if (configuration.isCloud()) {
             templates = Collections.emptyList();
-        }else{
+        } else {
             try {
                 templates = objectMapper.readerForListOf(IndexSetTemplate.class).readValue(getResourceUrl(ON_PREM_TEMPLATE_RESOURCE));
             } catch (IOException e) {
@@ -54,7 +53,6 @@ public class IndexSetTemplateProvider implements Provider<List<IndexSetTemplate>
         }
     }
 
-    @Override
     public List<IndexSetTemplate> get() {
         return templates;
     }
