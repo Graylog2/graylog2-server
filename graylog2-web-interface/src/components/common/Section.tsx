@@ -23,6 +23,7 @@ const Container = styled.div(({ theme }) => css`
   border: 1px solid ${theme.colors.section.filled.border};
   border-radius: 10px;
   padding: 15px;
+  margin-bottom: ${theme.spacings.xxs};
 `);
 
 const Header = styled.div<{ $alignActionsLeft: boolean; }>(({ theme, $alignActionsLeft }) => css`
