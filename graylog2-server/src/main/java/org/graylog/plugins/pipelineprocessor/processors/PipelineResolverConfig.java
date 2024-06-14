@@ -25,8 +25,6 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
