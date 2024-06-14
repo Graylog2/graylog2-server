@@ -41,21 +41,24 @@ const SearchRow = styled.div`
   align-items: center;
 `;
 
+type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
+
 type Props<T> = {
-  actionsCellWidth?: React.ComponentProps<typeof EntityDataTable>['actionsCellWidth'],
-  bulkSelection?: React.ComponentProps<typeof EntityDataTable>['bulkSelection'],
-  columnRenderers: React.ComponentProps<typeof EntityDataTable>['columnRenderers'],
-  columnsOrder: React.ComponentProps<typeof EntityDataTable>['columnsOrder'],
-  entityActions: React.ComponentProps<typeof EntityDataTable>['entityActions'],
-  expandedSectionsRenderer?: React.ComponentProps<typeof EntityDataTable>['expandedSectionsRenderer'],
+  actionsCellWidth?: EntityDataTableProps['actionsCellWidth'],
+  additionalAttributes?: Array<Attribute>,
+  bulkSelection?: EntityDataTableProps['bulkSelection'],
+  columnRenderers: EntityDataTableProps['columnRenderers'],
+  columnsOrder: EntityDataTableProps['columnsOrder'],
+  entityActions: EntityDataTableProps['entityActions'],
+  entityAttributesAreCamelCase: boolean,
+  expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'],
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T>>,
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'],
   humanName: string,
   keyFn: (options: SearchParams) => Array<unknown>,
   queryHelpComponent?: React.ReactNode,
+  searchPlaceholder?: string,
   tableLayout: Parameters<typeof useTableLayout>[0],
-  additionalAttributes?: Array<Attribute>,
-  entityAttributesAreCamelCase: boolean,
   topRightCol?: React.ReactNode,
 }
 
@@ -75,7 +78,7 @@ const PaginatedEntityTable = <T extends EntityBase>({
   actionsCellWidth, columnsOrder, entityActions, tableLayout, fetchEntities, keyFn,
   humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
   expandedSectionsRenderer, bulkSelection, additionalAttributes,
-  entityAttributesAreCamelCase, topRightCol,
+  entityAttributesAreCamelCase, topRightCol, searchPlaceholder,
 }: Props<T>) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
@@ -135,6 +138,7 @@ const PaginatedEntityTable = <T extends EntityBase>({
           <SearchForm onSearch={onSearch}
                       onReset={onSearchReset}
                       query={query}
+                      placeholder={searchPlaceholder ?? `Search for ${humanName}`}
                       queryHelpComponent={queryHelpComponent}>
             <div style={{ marginBottom: 5 }}>
               <EntityFilters attributes={attributes}
