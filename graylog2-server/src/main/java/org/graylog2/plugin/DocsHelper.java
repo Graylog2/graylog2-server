@@ -16,6 +16,8 @@
  */
 package org.graylog2.plugin;
 
+import org.graylog2.shared.ServerVersion;
+
 public enum DocsHelper {
     PAGE_SENDING_JSONPATH("getting_in_log_data/json_path_from_http_api_input.html"),
     PAGE_SENDING_IPFIXPATH("getting_in_log_data/ipfix_input.html"),
@@ -24,7 +26,6 @@ public enum DocsHelper {
     REPORTING_HELP("interacting_with_your_log_data/reporting.html");
 
     private static final String SERVER = "https://go2docs.graylog.org";
-    private static final String VERSION = "current";
 
     private final String path;
 
@@ -34,7 +35,16 @@ public enum DocsHelper {
 
     @Override
     public String toString() {
-        return SERVER + "/" + VERSION + "/" + path;
+        return SERVER + "/" + version() + "/" + path;
+    }
+
+    private String version() {
+        final var version = ServerVersion.VERSION.getVersion();
+        if(version.toString().contains("SNAPSHOT")) {
+            return "current";
+        } else {
+            return version.getMajorVersion() + "-" + version.getMinorVersion();
+        }
     }
 
     public String toLink(String title) {
