@@ -50,7 +50,7 @@ public class InMemoryRuleServiceTest {
 
     @Test
     public void storeRetrieve() {
-        RuleDao rule = RuleDao.create(null, "test", "description", "rule \"test\" when true then end", null, null, null, null);
+        RuleDao rule = RuleDao.create(null, "test", "description", null, "rule \"test\" when true then end", null, null, null, null);
         final RuleDao savedRule = service.save(rule);
 
         // saving should create a copy with an id
@@ -77,7 +77,7 @@ public class InMemoryRuleServiceTest {
 
     @Test
     public void loadByName() throws NotFoundException {
-        RuleDao rule = RuleDao.create(null, "test", "description", "rule \"test\" when true then end", null, null, null, null);
+        RuleDao rule = RuleDao.create(null, "test", "description", null, "rule \"test\" when true then end", null, null, null, null);
         final RuleDao savedRule = service.save(rule);
         final RuleDao loadedRule = service.loadByName(savedRule.title());
         assertThat(loadedRule).isEqualTo(savedRule);
@@ -92,10 +92,11 @@ public class InMemoryRuleServiceTest {
 
     @Test
     public void uniqueTitles() {
-        RuleDao rule = RuleDao.create(null, "test", "description", "rule \"test\" when true then end", null, null, null, null);
+        RuleDao rule = RuleDao.create(null, "test", "description", null, "rule \"test\" when true then end", null, null, null, null);
         RuleDao rule2 = RuleDao.create(null,
                 "test",
                 "some other description",
+                null,
                 "rule \"test\" when false then end",
                 null,
                 null, null, null);
@@ -125,10 +126,10 @@ public class InMemoryRuleServiceTest {
     @Test
     public void loadMultiple() {
 
-        RuleDao rule1 = service.save(RuleDao.create(null, "test1", "description", "rule \"test1\" when true then end", null, null, null, null));
-        RuleDao rule2 = service.save(RuleDao.create(null, "test2", "description", "rule \"test2\" when true then end", null, null, null, null));
-        RuleDao rule3 = service.save(RuleDao.create(null, "test3", "description", "rule \"test3\" when true then end", null, null, null, null));
-        RuleDao rule4 = service.save(RuleDao.create(null, "test4", "description", "rule \"test4\" when true then end", null, null, null, null));
+        RuleDao rule1 = service.save(RuleDao.create(null, "test1", "description", null, "rule \"test1\" when true then end", null, null, null, null));
+        RuleDao rule2 = service.save(RuleDao.create(null, "test2", "description", null, "rule \"test2\" when true then end", null, null, null, null));
+        RuleDao rule3 = service.save(RuleDao.create(null, "test3", "description", null, "rule \"test3\" when true then end", null, null, null, null));
+        RuleDao rule4 = service.save(RuleDao.create(null, "test4", "description", null, "rule \"test4\" when true then end", null, null, null, null));
 
         assertThat(service.loadAll()).containsExactlyInAnyOrder(rule1, rule2, rule3, rule4);
 

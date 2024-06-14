@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.db;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
@@ -31,6 +32,7 @@ public abstract class RuleDao {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_CONTENT_TYPE = "content_type";
     public static final String FIELD_SOURCE = "source";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_MODFIED_AT = "modfied_at";
@@ -49,6 +51,9 @@ public abstract class RuleDao {
     @JsonProperty
     @Nullable
     public abstract String description();
+
+    @JsonProperty
+    public abstract RuleContentType contentType();
 
     @JsonProperty
     public abstract String source();
@@ -70,7 +75,8 @@ public abstract class RuleDao {
     public abstract String simulatorMessage();
 
     public static Builder builder() {
-        return new AutoValue_RuleDao.Builder();
+        return new AutoValue_RuleDao.Builder()
+                .contentType(RuleContentType.GL_PIPELINE_LANGUAGE);
     }
 
     public abstract Builder toBuilder();
@@ -79,6 +85,7 @@ public abstract class RuleDao {
     public static RuleDao create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
                                  @JsonProperty(FIELD_TITLE) String title,
                                  @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
+                                 @JsonProperty(FIELD_CONTENT_TYPE) @Nullable RuleContentType contentType,
                                  @JsonProperty(FIELD_SOURCE) String source,
                                  @JsonProperty(FIELD_CREATED_AT) @Nullable DateTime createdAt,
                                  @JsonProperty(FIELD_MODFIED_AT) @Nullable DateTime modifiedAt,
@@ -87,6 +94,7 @@ public abstract class RuleDao {
         return builder()
                 .id(id)
                 .source(source)
+                .contentType(contentType == null ? RuleContentType.GL_PIPELINE_LANGUAGE : contentType)
                 .title(title)
                 .description(description)
                 .createdAt(createdAt)
@@ -105,6 +113,8 @@ public abstract class RuleDao {
         public abstract Builder title(String title);
 
         public abstract Builder description(String description);
+
+        public abstract Builder contentType(RuleContentType contentType);
 
         public abstract Builder source(String source);
 

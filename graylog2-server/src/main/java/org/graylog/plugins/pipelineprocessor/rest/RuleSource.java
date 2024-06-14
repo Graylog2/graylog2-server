@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.joda.time.DateTime;
@@ -51,6 +52,9 @@ public abstract class RuleSource {
     public abstract String description();
 
     @JsonProperty
+    public abstract RuleContentType contentType();
+
+    @JsonProperty
     public abstract String source();
 
     @JsonProperty
@@ -74,7 +78,8 @@ public abstract class RuleSource {
     public abstract String simulatorMessage();
 
     public static Builder builder() {
-        return new AutoValue_RuleSource.Builder();
+        return new AutoValue_RuleSource.Builder()
+                .contentType(RuleContentType.GL_PIPELINE_LANGUAGE);
     }
 
     public abstract Builder toBuilder();
@@ -83,12 +88,14 @@ public abstract class RuleSource {
     public static RuleSource create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
                                     @JsonProperty("title") String title,
                                     @JsonProperty("description") @Nullable String description,
+                                    @JsonProperty("content_type") @Nullable RuleContentType contentType,
                                     @JsonProperty("source") String source,
                                     @JsonProperty("simulator_message") @Nullable String simulatorMessage,
                                     @JsonProperty("created_at") @Nullable DateTime createdAt,
                                     @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
         return builder()
                 .id(id)
+                .contentType(contentType == null ? RuleContentType.GL_PIPELINE_LANGUAGE : contentType)
                 .source(source)
                 .title(title)
                 .description(description)
@@ -101,7 +108,7 @@ public abstract class RuleSource {
     public static RuleSource fromDao(PipelineRuleParser parser, RuleDao dao) {
         Set<ParseError> errors = null;
         try {
-            parser.parseRule(dao.id(), dao.source(), false);
+            parser.parseRule(dao.contentType(), dao.id(), dao.source(), false);
 
         } catch (ParseException e) {
             errors = e.getErrors();
@@ -109,6 +116,7 @@ public abstract class RuleSource {
 
         return builder()
                 .id(dao.id())
+                .contentType(dao.contentType())
                 .source(dao.source())
                 .title(dao.title())
                 .description(dao.description())
@@ -129,6 +137,8 @@ public abstract class RuleSource {
         public abstract Builder title(String title);
 
         public abstract Builder description(String description);
+
+        public abstract Builder contentType(RuleContentType contentType);
 
         public abstract Builder source(String source);
 

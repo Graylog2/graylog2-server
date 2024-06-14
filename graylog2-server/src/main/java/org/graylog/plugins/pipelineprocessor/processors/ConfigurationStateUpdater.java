@@ -24,6 +24,9 @@ import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
@@ -40,11 +43,6 @@ import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -108,7 +106,7 @@ public class ConfigurationStateUpdater {
         ruleService.loadAll().forEach(ruleDao -> {
             Rule rule;
             try {
-                rule = pipelineRuleParser.parseRule(ruleDao.id(), ruleDao.source(), false);
+                rule = pipelineRuleParser.parseRule(ruleDao.contentType(), ruleDao.id(), ruleDao.source(), false);
             } catch (ParseException e) {
                 log.warn("Ignoring non parseable rule <{}/{}> with errors <{}>", ruleDao.title(), ruleDao.id(), e.getErrors());
                 rule = Rule.alwaysFalse("Failed to parse rule: " + ruleDao.id());
@@ -143,7 +141,18 @@ public class ConfigurationStateUpdater {
 
         final RuleMetricsConfigDto ruleMetricsConfig = ruleMetricsConfigService.get();
         final PipelineInterpreter.State newState = stateFactory.newState(currentPipelines, streamPipelineConnections, ruleMetricsConfig);
-        latestState.set(newState);
+
+        // TODO: I don't expect this to work as intended.
+        //  Wouldn't we need to keep the context open until we can be sure that it's not accessed anymore? I.e. that
+        //  there are no messages in the process buffer that are evaluated in a pipeline that is still using the old
+        //   state
+        final PipelineInterpreter.State oldState = latestState.getAndSet(newState);
+        if (oldState != null) {
+            oldState.getCurrentPipelines().values().stream().flatMap(pipeline ->
+                    pipeline.stages().stream().flatMap(stage ->
+                            stage.getRules().stream())).forEach(rule -> rule.shutDownHook().run());
+        }
+
         return newState;
     }
 

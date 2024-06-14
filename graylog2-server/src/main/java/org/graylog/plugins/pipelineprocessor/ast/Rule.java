@@ -58,8 +58,14 @@ public abstract class Rule {
 
     public abstract Collection<Statement> then();
 
+    public abstract Runnable initializer();
+
+    public abstract Runnable shutDownHook();
+
     public static Builder builder() {
-        return new AutoValue_Rule.Builder();
+        return new AutoValue_Rule.Builder()
+                .initializer(() -> {})
+                .shutDownHook(() -> {});
     }
 
     public abstract Builder toBuilder();
@@ -173,6 +179,10 @@ public abstract class Rule {
         public abstract Builder when(LogicalExpression condition);
 
         public abstract Builder then(Collection<Statement> actions);
+
+        public abstract Builder initializer(Runnable initializer);
+
+        public abstract Builder shutDownHook(Runnable shutDownHook);
 
         public abstract Rule build();
     }

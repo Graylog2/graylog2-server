@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
+import jakarta.annotation.Nonnull;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -60,7 +61,6 @@ import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
-import jakarta.annotation.Nonnull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -73,9 +73,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.pipelineprocessor.functions.FunctionsSnippetsTest.GRAYLOG_EPOCH;
+import static org.graylog.plugins.pipelineprocessor.parser.RuleContentType.JAVASCRIPT_MODULE;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -404,6 +407,53 @@ class PipelineRuleParserTest extends BaseParserTest {
         }
     }
 
+    @Test
+    void jsTest() throws InterruptedException {
+        final var source = """
+                export default {
+                    "name" : "javascript test",
+                    "when" : (msg) => {
+                        return msg.run_rule;
+                    },
+                    "then" : (msg, {set_field}) => {
+                        let value = msg.message.replace('orig', 'new');
+                        set_field('set_by_set_field', value, null, null, msg, null, null);
+                        msg.set_directly = value;
+                    }
+                };
+                """;
+
+        final Rule rule = parser.parseRule(JAVASCRIPT_MODULE, source, false);
+        assertThat(rule.name()).isEqualTo("javascript test");
+
+        // Test multithreaded rule execution
+        final CopyOnWriteArrayList<Message> processedMessages = new CopyOnWriteArrayList<>();
+
+        final var thread1 = new Thread(() -> {
+            final Message msg = messageFactory.createMessage("orig msg1", "source", DateTime.now(DateTimeZone.UTC));
+            msg.addField("run_rule", true);
+            processedMessages.add(evaluateRule(rule, msg));
+        });
+
+        final var thread2 = new Thread(() -> {
+            final Message msg = messageFactory.createMessage("orig msg2", "source", DateTime.now(DateTimeZone.UTC));
+            msg.addField("run_rule", true);
+            processedMessages.add(evaluateRule(rule, msg));
+        });
+
+        thread1.start();
+        thread2.start();
+        thread1.join();
+        thread2.join();
+
+        assertThat(processedMessages).extracting(m -> m.getField("set_by_set_field"))
+                .containsExactlyInAnyOrder("new msg1", "new msg2");
+        assertThat(processedMessages).extracting(m -> m.getField("set_directly"))
+                .containsExactlyInAnyOrder("new msg1", "new msg2");
+
+        rule.shutDownHook().run();
+    }
+
     public static class CustomObject {
         private final String id;
 
@@ -707,7 +757,7 @@ class PipelineRuleParserTest extends BaseParserTest {
 
         @Override
         protected ImmutableList<ParameterDescriptor> params() {
-            return ImmutableList.of();
+            return of();
         }
 
         @Nonnull
