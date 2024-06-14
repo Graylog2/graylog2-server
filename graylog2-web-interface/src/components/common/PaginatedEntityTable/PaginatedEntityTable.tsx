@@ -183,6 +183,7 @@ PaginatedEntityTable.defaultProps = {
   filterValueRenderers: undefined,
   queryHelpComponent: undefined,
   topRightCol: undefined,
+  searchPlaceholder: undefined,
 };
 
 export default PaginatedEntityTable;
