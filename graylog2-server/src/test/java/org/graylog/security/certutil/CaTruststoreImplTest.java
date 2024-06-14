@@ -16,9 +16,9 @@
  */
 package org.graylog.security.certutil;
 
+import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -53,14 +53,14 @@ class CaTruststoreImplTest {
                 });
     }
 
-    @NotNull
+    @Nonnull
     private static CaService mockCaService(KeyStore keystore) throws KeyStoreStorageException {
         final CaService caService = Mockito.mock(CaService.class);
         Mockito.when(caService.loadKeyStore()).thenReturn(Optional.of(keystore));
         return caService;
     }
 
-    @NotNull
+    @Nonnull
     private static KeyPair generateCaKeys() throws Exception {
         return CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(999)));
     }
