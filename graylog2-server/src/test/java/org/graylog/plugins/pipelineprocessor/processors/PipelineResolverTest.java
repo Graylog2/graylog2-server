@@ -18,6 +18,8 @@ package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
@@ -98,7 +100,6 @@ class PipelineResolverTest {
         );
         final var resolver = new PipelineResolver(
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
-                metricRegistry,
                 config
         );
 
@@ -107,9 +108,9 @@ class PipelineResolverTest {
 
     @Test
     void resolvePipelines() {
+        final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
         final var resolver = new PipelineResolver(
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
-                metricRegistry,
                 PipelineResolverConfig.of(
                         () -> Stream.of(rule1),
                         () -> Stream.of(pipeline1),
@@ -117,7 +118,7 @@ class PipelineResolverTest {
                 )
         );
 
-        final var pipelines = resolver.resolvePipelines();
+        final var pipelines = resolver.resolvePipelines(registry);
 
         assertThat(pipelines).hasSize(1);
         assertThat(pipelines.get("pipeline-1")).satisfies(pipeline -> {
@@ -152,19 +153,17 @@ class PipelineResolverTest {
 
     @Test
     void resolvePipelinesWithMetricPrefix() {
+        final var registry = PipelineMetricRegistry.create(metricRegistry, "PIPELINE", "RULE");
         final var resolver = new PipelineResolver(
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
-                metricRegistry,
                 PipelineResolverConfig.of(
                         () -> Stream.of(rule1),
                         () -> Stream.of(pipeline1),
-                        () -> Stream.of(connections1, connections2),
-                        "RULE",
-                        "PIPELINE"
+                        () -> Stream.of(connections1, connections2)
                 )
         );
 
-        resolver.resolvePipelines();
+        resolver.resolvePipelines(registry);
 
         assertThat(metricRegistry.getMetrics().keySet()).containsExactlyInAnyOrder(
                 "RULE.rule-1.pipeline-1.5.not-matched",
@@ -182,13 +181,13 @@ class PipelineResolverTest {
 
     @Test
     void resolvePipelinesWithMissingRule() {
+        final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
         final var resolver = new PipelineResolver(
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
-                metricRegistry,
                 PipelineResolverConfig.of(Stream::of, () -> Stream.of(pipeline1))
         );
 
-        final var pipelines = resolver.resolvePipelines();
+        final var pipelines = resolver.resolvePipelines(registry);
 
         assertThat(pipelines).hasSize(1);
         assertThat(pipelines.get("pipeline-1")).satisfies(pipeline -> {
@@ -215,9 +214,9 @@ class PipelineResolverTest {
 
     @Test
     void resolveStreamConnections() {
+        final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
         final var resolver = new PipelineResolver(
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
-                metricRegistry,
                 PipelineResolverConfig.of(
                         () -> Stream.of(rule1),
                         () -> Stream.of(pipeline1),
@@ -225,7 +224,7 @@ class PipelineResolverTest {
                 )
         );
 
-        final var pipelines = resolver.resolvePipelines();
+        final var pipelines = resolver.resolvePipelines(registry);
         final var streamConnections = resolver.resolveStreamConnections(pipelines);
 
         assertThat(streamConnections.size()).isEqualTo(2);

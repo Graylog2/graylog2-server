@@ -26,6 +26,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
@@ -41,7 +42,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 @Singleton
@@ -49,7 +49,6 @@ public class ConfigurationStateUpdater {
     private static final RateLimitedLog log = getRateLimitedLog(ConfigurationStateUpdater.class);
 
     private final RuleMetricsConfigService ruleMetricsConfigService;
-    private final MetricRegistry metricRegistry;
     private final ScheduledExecutorService scheduler;
     private final EventBus serverEventBus;
     private final PipelineInterpreter.State.Factory stateFactory;
@@ -58,6 +57,7 @@ public class ConfigurationStateUpdater {
      */
     private final AtomicReference<PipelineInterpreter.State> latestState = new AtomicReference<>();
     private final PipelineResolver pipelineResolver;
+    private final PipelineMetricRegistry pipelineMetricRegistry;
 
     @Inject
     public ConfigurationStateUpdater(RuleService ruleService,
@@ -71,7 +71,6 @@ public class ConfigurationStateUpdater {
                                      EventBus serverEventBus,
                                      PipelineInterpreter.State.Factory stateFactory) {
         this.ruleMetricsConfigService = ruleMetricsConfigService;
-        this.metricRegistry = metricRegistry;
         this.scheduler = scheduler;
         this.serverEventBus = serverEventBus;
         this.stateFactory = stateFactory;
@@ -85,6 +84,7 @@ public class ConfigurationStateUpdater {
                 ),
                 pipelineRuleParser
         );
+        this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
@@ -95,7 +95,7 @@ public class ConfigurationStateUpdater {
     // only the singleton instance should mutate itself, others are welcome to reload a new state, but we don't
     // currently allow direct global state updates from external sources (if you need to, send an event on the bus instead)
     private synchronized PipelineInterpreter.State reloadAndSave() {
-        final ImmutableMap<String, Pipeline> currentPipelines = pipelineResolver.resolvePipelines();
+        final ImmutableMap<String, Pipeline> currentPipelines = pipelineResolver.resolvePipelines(pipelineMetricRegistry);
         final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections = pipelineResolver.resolveStreamConnections(currentPipelines);
 
         final RuleMetricsConfigDto ruleMetricsConfig = ruleMetricsConfigService.get();
@@ -120,7 +120,7 @@ public class ConfigurationStateUpdater {
     public void handleRuleChanges(RulesChangedEvent event) {
         event.deletedRuleIds().forEach(id -> {
             log.debug("Invalidated rule {}", id);
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(pipelineResolver.config().ruleMetricPrefix(), id)));
+            pipelineMetricRegistry.removeRuleMetrics(id);
         });
         event.updatedRuleIds().forEach(id -> log.debug("Refreshing rule {}", id));
         scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
@@ -130,7 +130,7 @@ public class ConfigurationStateUpdater {
     public void handlePipelineChanges(PipelinesChangedEvent event) {
         event.deletedPipelineIds().forEach(id -> {
             log.debug("Invalidated pipeline {}", id);
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(pipelineResolver.config().pipelineMetricPrefix(), id)));
+            pipelineMetricRegistry.removePipelineMetrics(id);
         });
         event.updatedPipelineIds().forEach(id -> log.debug("Refreshing pipeline {}", id));
         scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);

@@ -59,7 +59,6 @@ public class PipelineResolver {
     private static final Logger LOG = LoggerFactory.getLogger(PipelineResolver.class);
 
     private final PipelineRuleParser ruleParser;
-    private final MetricRegistry metricRegistry;
     private final PipelineResolverConfig config;
     private final Supplier<Stream<RuleDao>> ruleDaoSupplier;
     private final Supplier<Stream<PipelineDao>> pipelineDaoSupplier;
@@ -67,10 +66,8 @@ public class PipelineResolver {
 
     @Inject
     public PipelineResolver(@Assisted PipelineRuleParser ruleParser,
-                            MetricRegistry metricRegistry,
                             @Assisted PipelineResolverConfig config) {
         this.ruleParser = ruleParser;
-        this.metricRegistry = metricRegistry;
         this.config = config;
         this.ruleDaoSupplier = config.rulesSupplier();
         this.pipelineDaoSupplier = config.pipelinesSupplier();
@@ -91,7 +88,7 @@ public class PipelineResolver {
      *
      * @return a map of pipeline ID to pipeline instances
      */
-    public ImmutableMap<String, Pipeline> resolvePipelines() {
+    public ImmutableMap<String, Pipeline> resolvePipelines(PipelineMetricRegistry pipelineMetricRegistry) {
         // Read all rules and parse them
         final Map<String, Rule> ruleNameMap = Maps.newHashMap();
         try (final var ruleStream = ruleDaoSupplier.get()) {
@@ -119,7 +116,7 @@ public class PipelineResolver {
                     pipeline = Pipeline.empty("Failed to parse pipeline: " + pipelineDao.id());
                 }
                 //noinspection ConstantConditions
-                pipelineIdMap.put(pipelineDao.id(), resolvePipeline(pipeline, ruleNameMap));
+                pipelineIdMap.put(pipelineDao.id(), resolvePipeline(pipelineMetricRegistry, pipeline, ruleNameMap));
             });
         }
 
@@ -149,7 +146,9 @@ public class PipelineResolver {
     }
 
     @Nonnull
-    private Pipeline resolvePipeline(Pipeline pipeline, Map<String, Rule> ruleNameMap) {
+    private Pipeline resolvePipeline(PipelineMetricRegistry pipelineMetricRegistry,
+                                     Pipeline pipeline,
+                                     Map<String, Rule> ruleNameMap) {
         LOG.debug("Resolving pipeline <{}>", pipeline.name());
 
         pipeline.stages().forEach(stage -> {
@@ -165,17 +164,19 @@ public class PipelineResolver {
                         rule = rule.copy();
                         LOG.debug("Resolved rule <{}> to <{}>", ref, rule);
                         // include back reference to stage
-                        rule.registerMetrics(metricRegistry, pipeline.id(), String.valueOf(stage.stage()), config.ruleMetricPrefix());
+                        rule.registerMetrics(pipelineMetricRegistry, pipeline.id(), stage.stage());
                         return rule;
                     })
                     .collect(Collectors.toList());
             stage.setRules(resolvedRules);
             stage.setPipeline(pipeline);
-            stage.registerMetrics(metricRegistry, pipeline.id(), config.pipelineMetricPrefix());
+            stage.registerMetrics(pipelineMetricRegistry, pipeline.id());
         });
 
-        pipeline.registerMetrics(metricRegistry, config.pipelineMetricPrefix());
+        pipeline.registerMetrics(pipelineMetricRegistry);
 
         return pipeline;
     }
+
+    public record Result(MetricRegistry metrics, ImmutableMap<String, Pipeline> pipelines) {}
 }

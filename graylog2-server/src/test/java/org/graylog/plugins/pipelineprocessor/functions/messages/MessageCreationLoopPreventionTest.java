@@ -135,7 +135,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
-                (config, ruleParser) -> new PipelineResolver(ruleParser, metricRegistry, config),
+                (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
                 metricRegistry,
                 Executors.newScheduledThreadPool(1),

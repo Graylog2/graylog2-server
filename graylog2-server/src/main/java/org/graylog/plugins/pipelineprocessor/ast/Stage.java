@@ -17,15 +17,10 @@
 package org.graylog.plugins.pipelineprocessor.ast;
 
 import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
-import org.graylog2.shared.metrics.MetricUtils;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineMetricRegistry;
 
 import java.util.List;
-
-import static com.codahale.metrics.MetricRegistry.name;
-import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @AutoValue
 public abstract class Stage implements Comparable<Stage> {
@@ -37,7 +32,6 @@ public abstract class Stage implements Comparable<Stage> {
     // not an autovalue property, because it introduces a cycle in hashCode() and we have no way of excluding it
     private transient Pipeline pipeline;
     private transient Meter executed;
-    private transient String meterName;
 
     public abstract int stage();
 
@@ -69,25 +63,9 @@ public abstract class Stage implements Comparable<Stage> {
      *
      * @param metricRegistry the registry to add the metrics to
      * @param pipelineId     the pipeline ID
-     * @param namePrefix     optional metric name prefix
      */
-    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String namePrefix) {
-        meterName = name(requireNonBlank(namePrefix), pipelineId, "stage", String.valueOf(stage()), "executed");
-        executed = metricRegistry.meter(meterName);
-    }
-
-    /**
-     * The metric filter matching all metrics that have been registered by this pipeline.
-     * Commonly used to remove the relevant metrics from the registry upon deletion of the pipeline.
-     *
-     * @return the filter matching this pipeline's metrics
-     */
-    public MetricFilter metricsFilter() {
-        if (meterName == null) {
-            return (name, metric) -> false;
-        }
-        return new MetricUtils.SingleMetricFilter(meterName);
-
+    public void registerMetrics(PipelineMetricRegistry metricRegistry, String pipelineId) {
+        executed = metricRegistry.registerStageMeter(pipelineId, stage(), "executed");
     }
 
     public void markExecution() {

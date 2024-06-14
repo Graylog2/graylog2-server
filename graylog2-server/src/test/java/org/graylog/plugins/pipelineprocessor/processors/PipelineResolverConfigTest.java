@@ -20,18 +20,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PipelineResolverConfigTest {
-    @Test
-    void defaults() {
-        final var empty = PipelineResolverConfig.of(Stream::of, Stream::of, Stream::of);
-
-        assertThat(empty.ruleMetricPrefix()).isEqualTo("org.graylog.plugins.pipelineprocessor.ast.Rule");
-        assertThat(empty.pipelineMetricPrefix()).isEqualTo("org.graylog.plugins.pipelineprocessor.ast.Pipeline");
-    }
-
     @Test
     void validations() {
         assertThatThrownBy(() -> PipelineResolverConfig.of(null, Stream::of, Stream::of))
@@ -40,14 +31,5 @@ class PipelineResolverConfigTest {
                 .isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> PipelineResolverConfig.of(Stream::of, Stream::of, null))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> PipelineResolverConfig.of(Stream::of, Stream::of, Stream::of, null, "p"))
-                .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> PipelineResolverConfig.of(Stream::of, Stream::of, Stream::of, "r", null))
-                .isInstanceOf(IllegalArgumentException.class);
-
-        assertThatThrownBy(() -> PipelineResolverConfig.of(Stream::of, Stream::of, Stream::of, "", "p"))
-                .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> PipelineResolverConfig.of(Stream::of, Stream::of, Stream::of, "r", ""))
-                .isInstanceOf(IllegalArgumentException.class);
     }
 }
