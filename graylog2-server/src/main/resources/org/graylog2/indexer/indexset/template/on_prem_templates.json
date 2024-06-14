@@ -79,13 +79,9 @@
       "index_optimization_disabled": false,
       "field_type_refresh_interval": 5000,
       "data_tiering": {
-        "type": "hot_warm",
+        "type": "hot_only",
         "index_lifetime_min": "P7D",
-        "index_lifetime_max": "P9D",
-        "warm_tier_enabled": false,
-        "index_hot_lifetime_min": "P7D",
-        "warm_tier_repository_name": null,
-        "archive_before_deletion": false
+        "index_lifetime_max": "P9D"
       },
       "use_legacy_rotation": false
     }
@@ -102,13 +98,9 @@
       "index_optimization_disabled": false,
       "field_type_refresh_interval": 5000,
       "data_tiering": {
-        "type": "hot_warm",
+        "type": "hot_only",
         "index_lifetime_min": "P14D",
-        "index_lifetime_max": "P18D",
-        "warm_tier_enabled": false,
-        "index_hot_lifetime_min": "P14D",
-        "warm_tier_repository_name": null,
-        "archive_before_deletion": false
+        "index_lifetime_max": "P18D"
       },
       "use_legacy_rotation": false
     }
@@ -125,13 +117,9 @@
       "index_optimization_disabled": false,
       "field_type_refresh_interval": 5000,
       "data_tiering": {
-        "type": "hot_warm",
+        "type": "hot_only",
         "index_lifetime_min": "P30D",
-        "index_lifetime_max": "P40D",
-        "warm_tier_enabled": false,
-        "index_hot_lifetime_min": "P30D",
-        "warm_tier_repository_name": null,
-        "archive_before_deletion": false
+        "index_lifetime_max": "P40D"
       },
       "use_legacy_rotation": false
     }
