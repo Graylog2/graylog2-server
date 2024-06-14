@@ -38,9 +38,11 @@ const IndexSetTemplatePage = () => {
       <PageHeader title={title}
                   actions={(
                     <ButtonToolbar>
-                      <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(templateId)}>
-                        <Button bsStyle="success">Edit</Button>
-                      </LinkContainer>
+                      {!data.built_in && (
+                        <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(templateId)}>
+                          <Button bsStyle="success">Edit</Button>
+                        </LinkContainer>
+                      )}
                       <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW}>
                         <Button>Overview</Button>
                       </LinkContainer>
