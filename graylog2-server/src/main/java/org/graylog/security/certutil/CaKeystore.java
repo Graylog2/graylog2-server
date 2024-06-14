@@ -126,7 +126,10 @@ public class CaKeystore {
         }
     }
 
-    public Optional<String> getPublicKey() {
+    /**
+     * @return PEM encoded public key of the CA.
+     */
+    public Optional<String> getEncodedCertificate() {
         return loadKeystore().map(ks -> {
             final Certificate caPublicKey;
             try {

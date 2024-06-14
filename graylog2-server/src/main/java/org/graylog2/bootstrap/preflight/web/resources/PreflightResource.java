@@ -17,7 +17,6 @@
 package org.graylog2.bootstrap.preflight.web.resources;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -138,7 +137,7 @@ public class PreflightResource {
     @Produces(MediaType.TEXT_PLAIN)
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public String getCaCertificate() {
-        return caKeystore.getPublicKey().orElseThrow(() -> new IllegalStateException("CA keystore not available"));
+        return caKeystore.getEncodedCertificate().orElseThrow(() -> new IllegalStateException("CA keystore not available"));
     }
 
 

@@ -56,9 +56,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         LOG.debug("checking if there are configuration steps to take care of");
 
         try {
-            // only load nodes that are in a state that need sth done
-
-
             if (!caKeystore.exists()) {
                 LOG.debug("No CA keystore available.");
                 return;

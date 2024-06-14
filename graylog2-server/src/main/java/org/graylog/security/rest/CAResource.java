@@ -36,7 +36,6 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaKeystore;
 import org.graylog.security.certutil.CaKeystoreException;
 import org.graylog.security.certutil.audit.CaAuditEventTypes;
-import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertificateAuthorityInformation;
@@ -46,7 +45,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.net.URI;
-import java.security.KeyStoreException;
 import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -75,8 +73,7 @@ public class CAResource extends RestResource {
     @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
     @ApiOperation("Creates a CA")
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
-    public Response createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException {
-
+    public Response createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) {
         final CertificateAuthorityInformation ca = caKeystore.createSelfSigned(request.organization());
         final URI caUri = getUriBuilderToSelf()
                 .path(CAResource.class)
