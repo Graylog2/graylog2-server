@@ -19,7 +19,6 @@ import { useState, useMemo } from 'react';
 import { Formik, Form } from 'formik';
 import { useQueryClient } from '@tanstack/react-query';
 
-
 import { Button, Modal } from 'components/bootstrap';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { StreamsStore, type Stream } from 'stores/streams/StreamsStore';
