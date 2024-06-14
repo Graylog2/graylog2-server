@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import org.graylog.security.certutil.CaTruststore;
+import org.graylog.security.certutil.CaTruststoreException;
 import org.graylog.security.certutil.CertificateAuthorityChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class CustomCAX509TrustManager implements X509TrustManager {
             trustManagers = new ArrayList<>();
             trustManagers.add(getDefaultTrustManager());
             caTruststore.getTrustStore().ifPresent(keystore -> trustManagers.add(getTrustManager(keystore)));
-        } catch (KeyStoreException | NoSuchAlgorithmException k) {
+        } catch (CaTruststoreException | KeyStoreException | NoSuchAlgorithmException k) {
             LOG.error("Could not add Graylog CA to TrustManagers: {}", k.getMessage(), k);
         }
     }

@@ -16,6 +16,7 @@
  */
 package org.graylog.security.certutil;
 
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
@@ -34,7 +35,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -44,18 +44,18 @@ import java.util.Optional;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 
-public class CaKeystore implements CaTruststore {
+public class CaKeystore {
     private static final Logger LOG = LoggerFactory.getLogger(CaKeystore.class);
-    private final CaServiceImpl caService;
+    private final CaService caService;
     private final String passwordSecret;
     private final CsrSigner csrSigner;
 
     public static final int DEFAULT_SELFSIGNED_VALIDITY_DAYS = 10 * 365;
 
     @Inject
-    public CaKeystore(final CaServiceImpl caService,
+    public CaKeystore(final CaService caService,
                       final @Named("password_secret") String passwordSecret,
-                      final @Named("ca_password") String configuredCaPassword,
+                      @Nullable final @Named("ca_password") String configuredCaPassword,
                       final CsrSigner csrSigner) {
         this.caService = caService;
         this.passwordSecret = configuredCaPassword != null ? configuredCaPassword : passwordSecret;
@@ -92,6 +92,10 @@ public class CaKeystore implements CaTruststore {
         }
     }
 
+    /**
+     * NEVER EVER allow the keystore to escape this abstraction. It contains a private key for the
+     * CA and we need to protect it.
+     */
     private Optional<KeyStore> loadKeystore() throws CaKeystoreException {
         try {
             return caService.loadKeyStore();
@@ -149,11 +153,5 @@ public class CaKeystore implements CaTruststore {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    @Override
-    public Optional<KeyStore> getTrustStore() {
-        // TODO: filter out private keys, they should never leave CaKeystore!
-        return loadKeystore();
     }
 }

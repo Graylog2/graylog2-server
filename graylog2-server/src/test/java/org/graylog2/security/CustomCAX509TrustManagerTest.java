@@ -17,6 +17,7 @@
 package org.graylog2.security;
 
 import com.google.common.eventbus.EventBus;
+import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.graylog.security.certutil.CaTruststore;
 import org.graylog.security.certutil.CertutilCa;
@@ -26,7 +27,6 @@ import org.graylog2.plugin.Tools;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import jakarta.annotation.Nonnull;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;

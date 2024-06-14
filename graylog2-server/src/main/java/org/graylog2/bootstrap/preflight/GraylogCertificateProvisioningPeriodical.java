@@ -20,7 +20,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.security.certutil.CaKeystore;
-import org.graylog2.Configuration;
 import org.graylog2.cluster.certificates.CertificateExchange;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;

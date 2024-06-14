@@ -16,9 +16,12 @@
  */
 package org.graylog.security.certutil;
 
-import java.security.KeyStore;
-import java.util.Optional;
+import com.google.inject.AbstractModule;
 
-public interface CaTruststore {
-    Optional<KeyStore> getTrustStore() throws CaTruststoreException;
+public class CertificateAuthorityBindings extends AbstractModule {
+    @Override
+    protected void configure() {
+        bind(CaTruststore.class).to(CaTruststoreImpl.class).asEagerSingleton();
+        bind(CaKeystore.class).asEagerSingleton();
+    }
 }

@@ -56,8 +56,8 @@ import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 @Deprecated
 @Singleton
-class CaServiceImpl  {
-    private static final Logger LOG = LoggerFactory.getLogger(CaServiceImpl.class);
+class CaService {
+    private static final Logger LOG = LoggerFactory.getLogger(CaService.class);
 
     private final KeystoreMongoStorage mongoKeystore;
     private final KeystoreFileStorage fileKeystore;
@@ -70,10 +70,10 @@ class CaServiceImpl  {
     private final ClusterEventBus eventBus;
 
     @Inject
-    public CaServiceImpl(KeystoreMongoStorage keystoreMongoStorage, KeystoreFileStorage keystoreFileStorage, final Configuration configuration,
-                         final PemCaReader pemCaReader,
-                         final CertificatesService certificatesService,
-                         final @Named("password_secret") String passwordSecret, ClusterEventBus eventBus) {
+    public CaService(KeystoreMongoStorage keystoreMongoStorage, KeystoreFileStorage keystoreFileStorage, final Configuration configuration,
+                     final PemCaReader pemCaReader,
+                     final CertificatesService certificatesService,
+                     final @Named("password_secret") String passwordSecret, ClusterEventBus eventBus) {
         this.mongoKeystore = keystoreMongoStorage;
         this.fileKeystore = keystoreFileStorage;
         this.pemCaReader = pemCaReader;

@@ -16,9 +16,10 @@
  */
 package org.graylog.security.certutil;
 
-import java.security.KeyStore;
-import java.util.Optional;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 
-public interface CaTruststore {
-    Optional<KeyStore> getTrustStore() throws CaTruststoreException;
+public class CaTruststoreException extends RuntimeException {
+    public CaTruststoreException(KeyStoreStorageException cause) {
+        super(cause);
+    }
 }
