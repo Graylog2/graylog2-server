@@ -15,10 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import URI from 'urijs';
 
 import Routes from 'routing/Routes';
 import {
@@ -29,13 +31,20 @@ import {
   Row,
   SegmentedControl,
 } from 'components/bootstrap';
+import UserNotification from 'util/UserNotification';
 import { Icon, IfPermitted } from 'components/common';
-import type { Stream } from 'stores/streams/StreamsStore';
+import { StreamsStore, type Stream } from 'stores/streams/StreamsStore';
 import SectionGrid from 'components/common/Section/SectionGrid';
+import { useStore } from 'stores/connect';
+import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useHistory from 'routing/useHistory';
+import useQuery from 'routing/useQuery';
 
 import StreamDataRoutingIntake from './StreamDataRoutingIntake';
 import StreamDataRoutingProcessing from './StreamDataRoutingProcessing';
 import StreamDataRoutingDestinations from './StreamDataRoutingDestinations';
+
+import StreamModal from '../StreamModal';
 
 type Props = {
   stream: Stream,
@@ -59,7 +68,7 @@ const SEGMENTS_DETAILS = [
   },
 ];
 
-type DetailsSegments = 'intake' | 'processing' | 'destinations';
+type DetailsSegment = 'intake' | 'processing' | 'destinations';
 
 const Container = styled.div`
   display: flex;
@@ -110,8 +119,37 @@ const StyledSectionGrid = styled(SectionGrid)`
 
 const StreamDetails = ({ stream }: Props) => {
   const navigate = useNavigate();
-  const [currentSegment, setCurrentSegment] = useState<DetailsSegments>(INTAKE_SEGMENT);
+  const { segment } = useQuery();
+  const [currentSegment, setCurrentSegment] = useState<DetailsSegment>(segment as DetailsSegment || INTAKE_SEGMENT);
   const DataWarehouseJobComponent = PluginStore.exports('dataWarehouse')?.[0]?.DataWarehouseJobs;
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const { indexSets } = useStore(IndexSetsStore);
+  const queryClient = useQueryClient();
+  const history = useHistory();
+
+  const updateURLStepQueryParam = (nextSegment: DetailsSegment) => {
+    const newUrl = new URI(window.location.href).removeSearch('segment').addQuery('segment', nextSegment);
+    history.replace(newUrl.resource());
+  };
+
+  const onSegmentChange = (nextSegment: DetailsSegment) => {
+    setCurrentSegment(nextSegment);
+    updateURLStepQueryParam(nextSegment);
+  };
+
+  useEffect(() => {
+    IndexSetsActions.list(false);
+  }, []);
+
+  const toggleUpdateModal = useCallback(() => {
+    setShowUpdateModal((cur) => !cur);
+  }, []);
+  const onUpdate = useCallback((newStream: Stream) => StreamsStore.update(stream.id, newStream, (response) => {
+    UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
+    queryClient.invalidateQueries(['stream', stream.id]);
+
+    return response;
+  }), [stream.id, queryClient]);
 
   return (
     <>
@@ -123,11 +161,11 @@ const StreamDetails = ({ stream }: Props) => {
               <Icon name="arrow_left_alt" size="sm" /> Back
             </Button>
 
-            <h1>{stream.title}</h1>
+            <h1>Stream: {stream.title}</h1>
 
             <IfPermitted permissions="stream:edit">
               <DropdownButton title={<Icon name="more_horiz" />} id="stream-actions" noCaret bsSize="xs">
-                <MenuItem onClick={() => {}}>Edit</MenuItem>
+                <MenuItem onClick={() => toggleUpdateModal()}>Edit</MenuItem>
               </DropdownButton>
             </IfPermitted>
           </LeftCol>
@@ -139,9 +177,9 @@ const StreamDetails = ({ stream }: Props) => {
             <StyledSectionGrid $columns="1fr 8fr">
               <h3>Data Routing</h3>
               <MainDetailsRow>
-                <SegmentedControl<DetailsSegments> data={SEGMENTS_DETAILS}
-                                                   value={currentSegment}
-                                                   onChange={setCurrentSegment} />
+                <SegmentedControl<DetailsSegment> data={SEGMENTS_DETAILS}
+                                                  value={currentSegment}
+                                                  onChange={onSegmentChange} />
               </MainDetailsRow>
             </StyledSectionGrid>
           </Col>
@@ -150,9 +188,19 @@ const StreamDetails = ({ stream }: Props) => {
           <FullHeightCol xs={12}>
             {currentSegment === INTAKE_SEGMENT && <StreamDataRoutingIntake stream={stream} />}
             {currentSegment === PROCESSING_SEGMENT && <StreamDataRoutingProcessing />}
-            {currentSegment === DESTINATIONS_SEGMENT && <StreamDataRoutingDestinations />}
+            {currentSegment === DESTINATIONS_SEGMENT && <StreamDataRoutingDestinations stream={stream} />}
           </FullHeightCol>
         </SegmentContainer>
+        {showUpdateModal && (
+        <StreamModal title="Editing Stream"
+                     onSubmit={onUpdate}
+                     onClose={toggleUpdateModal}
+                     submitButtonText="Update stream"
+                     submitLoadingText="Updating stream..."
+                     initialValues={stream}
+                     indexSets={indexSets} />
+        )}
+
       </Container>
     </>
   );

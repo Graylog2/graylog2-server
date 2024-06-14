@@ -18,19 +18,23 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Section } from 'components/common';
+import type { Stream } from 'stores/streams/StreamsStore';
+import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 
-const StreamDataRoutingDestinations = () => {
+import DestinationIndexSetSection from './routing-destination/DestinationIndexSetSection';
+
+type Props = {
+  stream: Stream;
+};
+
+const StreamDataRoutingDestinations = ({ stream }: Props) => {
+  const { index_set_id: indexSetId } = stream;
+  const { data: indexSet, isSuccess } = useSingleIndexSet(indexSetId);
   const StreamDataWarehouseComponent = PluginStore.exports('dataWarehouse')?.[0]?.StreamDataWarehouse;
 
   return (
     <>
-      <Section title="Index Set">
-        <dl>
-          <dd>IndexSet Name: Default index set</dd>
-        </dl>
-
-      </Section>
+      {isSuccess && <DestinationIndexSetSection indexSet={indexSet} stream={stream} />}
       <StreamDataWarehouseComponent />
     </>
   );
