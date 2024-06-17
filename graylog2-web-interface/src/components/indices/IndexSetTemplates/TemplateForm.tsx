@@ -339,7 +339,6 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
                     <SegmentedControl<RetentionConfigSegment> data={retentionConfigSegments}
                                                               value={selectedRetentionSegment}
                                                               onChange={setSelectedRetentionSegment} />
-
                     {selectedRetentionSegment === 'data_tiering' ? (
                       <ConfigSegment>
                         <DataTieringConfiguration valuesPrefix="index_set_config" />
@@ -347,8 +346,13 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
                     )
                       : (
                         <ConfigSegment>
-                          <RotationConfig rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />
-                          <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} indexSetRetentionStrategyClass={values.retention_strategy_class} />
+                          <RotationConfig rotationStrategies={rotationStrategies}
+                                          indexSetRotationStrategy={values.rotation_strategy}
+                                          indexSetRotationStrategyClass={values.rotation_strategy_class} />
+                          <RetentionConfig retentionStrategies={retentionStrategies}
+                                           retentionStrategiesContext={retentionStrategiesContext}
+                                           indexSetRetentionStrategy={values.retention_strategy}
+                                           indexSetRetentionStrategyClass={values.retention_strategy_class} />
                         </ConfigSegment>
                       )}
 
