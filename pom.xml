@@ -99,9 +99,9 @@
         <auto-value.version>1.11.0</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.25.6</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.26.1</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.1.0</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.1.1</aws-msk-iam-auth.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
         <byte-buddy.version>1.14.17</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
@@ -130,7 +130,7 @@
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hk2.version>3.1.0</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.17.1</jackson.version>
-        <jadconfig.version>0.14.0</jadconfig.version>
+        <jadconfig.version>0.15.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
@@ -150,10 +150,10 @@
         <log4j.version>2.23.1</log4j.version>
         <lucene.version>9.11.0</lucene.version>
         <metrics.version>4.2.26</metrics.version>
-        <mongodb-driver.version>5.1.0</mongodb-driver.version>
+        <mongodb-driver.version>5.1.1</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.110.Final</netty.version>
+        <netty.version>4.1.111.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.65.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -567,7 +567,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -582,12 +582,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

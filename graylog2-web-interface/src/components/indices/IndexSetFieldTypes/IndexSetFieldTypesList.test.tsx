@@ -22,7 +22,7 @@ import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { MockStore } from 'helpers/mocking';
 import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
-import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -72,8 +72,8 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
 }));
 
 jest.mock('routing/useParams', () => jest.fn());
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
-jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings');
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfile');
@@ -149,8 +149,8 @@ describe('IndexSetFieldTypesList', () => {
 
   describe('Shows list of set field types with correct data', () => {
     it('for field with INDEX origin', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData(),
       });
@@ -168,8 +168,8 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     it('for field with OVERRIDDEN_INDEX origin', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([overriddenIndexField]),
       });
@@ -186,8 +186,8 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     it('for field with OVERRIDDEN_PROFILE origin', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([overriddenProfileField]),
       });
@@ -204,8 +204,8 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     it('for field with PROFILE origin', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([profileField]),
       });
@@ -222,8 +222,8 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     it('for field with non reserved type', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([defaultField]),
       });
@@ -235,8 +235,8 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     it('for field with reserved type', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([reservedField]),
       });
@@ -260,8 +260,8 @@ describe('IndexSetFieldTypesList', () => {
         customFieldMappingsByField: { 'field-3': 'String type' },
       });
 
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([overriddenIndexField]),
       });
@@ -285,8 +285,8 @@ describe('IndexSetFieldTypesList', () => {
         customFieldMappingsByField: { 'field-2': 'Boolean' },
       });
 
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([overriddenProfileField]),
       });
@@ -305,8 +305,8 @@ describe('IndexSetFieldTypesList', () => {
 
   describe('Shows expanded row on origin bage click', () => {
     it('for origin index', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([defaultField]),
       });
@@ -327,8 +327,8 @@ describe('IndexSetFieldTypesList', () => {
         customFieldMappingsByField: { 'field-3': 'String' },
       });
 
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([profileField]),
       });
@@ -342,8 +342,8 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     it('for origin overridden index', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([overriddenIndexField]),
       });
@@ -357,8 +357,8 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     it('for origin overridden profile', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([overriddenProfileField]),
       });
@@ -381,8 +381,8 @@ describe('IndexSetFieldTypesList', () => {
 
   describe('Index filed type profile', () => {
     it('shown profile name when index set has profile', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([defaultField]),
       });
@@ -401,8 +401,8 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     it('shown Not set when index set has no profile', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([defaultField]),
       });
@@ -421,8 +421,8 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     it('shows set profile modal on button click', async () => {
-      asMock(useIndexSetFieldTypes).mockReturnValue({
-        isLoading: false,
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
         refetch: () => {},
         data: getData([defaultField]),
       });

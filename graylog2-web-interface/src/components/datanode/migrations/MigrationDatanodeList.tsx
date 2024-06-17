@@ -39,7 +39,7 @@ const MigrationDatanodeList = ({ showProvisioningState }: Props) => {
 
   return (
     <div>
-      {(!dataNodes || dataNodes?.elements.length === 0) ? (
+      {(!dataNodes || dataNodes?.list.length === 0) ? (
         <>
           <p><StyledIcon name="info" />There are no Data Nodes found.</p>
           <Alert bsStyle="warning" title="No Data Nodes found">
@@ -49,7 +49,7 @@ const MigrationDatanodeList = ({ showProvisioningState }: Props) => {
         </>
       ) : (
         <>
-          <h4>Data Nodes found: {dataNodes?.elements.length}</h4>
+          <h4>Data Nodes found: {dataNodes?.list.length}</h4>
           <br />
           <Table bordered condensed striped hover>
             <thead>
@@ -61,7 +61,7 @@ const MigrationDatanodeList = ({ showProvisioningState }: Props) => {
               </tr>
             </thead>
             <tbody>
-              {dataNodes.elements.map((datanode) => (
+              {dataNodes.list.map((datanode) => (
                 <tr key={datanode.id}>
                   <td>{datanode.hostname}</td>
                   <td>{datanode.transport_address}</td>

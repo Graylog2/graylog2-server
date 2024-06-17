@@ -27,15 +27,15 @@ import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DataNodeServiceImpl implements DataNodeService {
+public class DataNodeCommandServiceImpl implements DataNodeCommandService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataNodeServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataNodeCommandServiceImpl.class);
 
     private final ClusterEventBus clusterEventBus;
     private final NodeService<DataNodeDto> nodeService;
 
     @Inject
-    public DataNodeServiceImpl(ClusterEventBus clusterEventBus, NodeService<DataNodeDto> nodeService, EventBus eventBus) {
+    public DataNodeCommandServiceImpl(ClusterEventBus clusterEventBus, NodeService<DataNodeDto> nodeService, EventBus eventBus) {
         this.clusterEventBus = clusterEventBus;
         this.nodeService = nodeService;
         eventBus.register(this);
@@ -69,6 +69,20 @@ public class DataNodeServiceImpl implements DataNodeService {
         return node;
     }
 
+
+    @Override
+    public DataNodeDto triggerCertificateSigningRequest(String nodeId, DatanodeStartType startType) throws NodeNotFoundException {
+        final DataNodeDto node = nodeService.byNodeId(nodeId);
+
+        DataNodeLifecycleEvent e = switch (startType) {
+            case AUTOMATICALLY -> DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REQUEST_CSR_WITH_AUTOSTART);
+            case MANUALLY -> DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REQUEST_CSR);
+        };
+
+        clusterEventBus.post(e);
+        return node;
+    }
+
     @Override
     public DataNodeDto stopNode(String nodeId) throws NodeNotFoundException {
         final DataNodeDto node = nodeService.byNodeId(nodeId);
@@ -83,7 +97,8 @@ public class DataNodeServiceImpl implements DataNodeService {
     @Override
     public DataNodeDto startNode(String nodeId) throws NodeNotFoundException {
         final DataNodeDto node = nodeService.byNodeId(nodeId);
-        if (node.getDataNodeStatus() != DataNodeStatus.UNAVAILABLE) {
+
+        if (node.getDataNodeStatus() != DataNodeStatus.UNAVAILABLE && node.getDataNodeStatus() != DataNodeStatus.PREPARED) {
             throw new IllegalArgumentException("Only stopped data nodes can be started.");
         }
         DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.START);

@@ -15,15 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { MigrationActions, OnTriggerStepFunction, StepArgs } from 'components/datanode/Types';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { MIGRATION_ACTIONS } from 'components/datanode/Constants';
 
-const StyledButtonToolbar = styled(ButtonToolbar)`
+const StyledButtonToolbar = styled(ButtonToolbar)(({ theme }) => css`
+  margin-top: ${theme.spacings.md};
   flex-wrap: wrap;
-`;
+`);
 
 const getSortedNextSteps = (nextSteps: MigrationActions[]) => nextSteps.reduce((sortedNextSteps, step) => {
   if (!MIGRATION_ACTIONS[step]?.label) {
