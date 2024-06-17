@@ -953,6 +953,7 @@
                             -Xep:NonAtomicVolatileUpdate:ERROR
                             -Xep:PrimitiveAtomicReference:ERROR
                             -Xep:WildcardImport:ERROR
+                            -Xep:StreamResourceLeak:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
