@@ -38,7 +38,7 @@ const IndexSetTemplatePage = () => {
       <PageHeader title={title}
                   actions={(
                     <ButtonToolbar>
-                      {!data.built_in && (
+                      {!isFetching && !data.built_in && (
                         <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(templateId)}>
                           <Button bsStyle="success">Edit</Button>
                         </LinkContainer>

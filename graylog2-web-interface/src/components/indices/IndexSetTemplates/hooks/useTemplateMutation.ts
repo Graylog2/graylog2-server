@@ -84,6 +84,7 @@ const useTemplate = () => {
     },
     onSuccess: () => {
       UserNotification.success('Index set template has been successfully updated.', 'Success!');
+      queryClient.invalidateQueries(['indexSetTemplate']);
 
       return queryClient.refetchQueries({ queryKey: ['indexSetTemplates'], type: 'active' });
     },

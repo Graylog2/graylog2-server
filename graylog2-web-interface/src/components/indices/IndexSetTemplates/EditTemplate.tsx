@@ -62,10 +62,12 @@ const EditTemplate = ({
     navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
   }, [navigate, sendTelemetry, telemetryPathName]);
 
-  const initialValues = useMemo(() => template, [template]);
-
   return (
-    <TemplateForm onCancel={onCancel} submitButtonText="Update template" submitLoadingText="Updating template..." onSubmit={onSubmit} initialValues={initialValues} />
+    <TemplateForm onCancel={onCancel}
+                  submitButtonText="Update template"
+                  submitLoadingText="Updating template..."
+                  onSubmit={onSubmit}
+                  initialValues={template} />
   );
 };
 

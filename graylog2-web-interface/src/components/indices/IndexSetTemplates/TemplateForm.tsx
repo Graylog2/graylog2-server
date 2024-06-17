@@ -21,6 +21,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { useStore } from 'stores/connect';
 import type {
@@ -227,14 +228,10 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
   };
 
   const prepareInitialValues = () => {
-    const values = { index_set_config: indexSetTemplateDefaults, ...initialValues };
+    const existingTemplate = cloneDeep(initialValues);
+    const values = { index_set_config: indexSetTemplateDefaults, ...existingTemplate };
 
-    const { rotation_strategy, rotation_strategy_class, retention_strategy, retention_strategy_class } = values.index_set_config;
-
-    delete values.index_set_config.rotation_strategy;
-    delete values.index_set_config.rotation_strategy_class;
-    delete values.index_set_config.retention_strategy;
-    delete values.index_set_config.retention_strategy_class;
+    const { rotation_strategy, rotation_strategy_class, retention_strategy, retention_strategy_class, ...indexSetConfig } = values.index_set_config;
 
     const data_tiering = prepareDataTieringInitialValues(values.index_set_config.data_tiering, PluginStore);
 
@@ -245,7 +242,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
       retention_strategy,
       retention_strategy_class,
       index_set_config: {
-        ...values.index_set_config,
+        ...indexSetConfig,
         data_tiering,
       },
     } as unknown as IndexSetTemplateFormValues;
