@@ -14,137 +14,41 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo } from 'react';
-import styled, { css } from 'styled-components';
-import { useQueryParam, StringParam } from 'use-query-params';
+import React, { useCallback } from 'react';
 
-import {
-  NoEntitiesExist,
-  PaginatedList, SearchForm,
-  Spinner,
-} from 'components/common';
-import EntityDataTable from 'components/common/EntityDataTable';
-import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import { PaginatedEntityTable } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
-import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-import EntityFilters from 'components/common/EntityFilters';
-import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
-import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSetTemplate }
   from 'components/indices/IndexSetTemplates/types';
-import useTemplates
+import { fetchIndexSetTemplates, keyFn }
   from 'components/indices/IndexSetTemplates/hooks/useTemplates';
 import TemplateActions from 'components/indices/IndexSetTemplates/TemplateActions';
 import customColumnRenderers from 'components/indices/IndexSetTemplates/helpers/customColumnRenderers';
 
-export const ENTITY_TABLE_ID = 'index-set-template';
 export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'built_in', 'description'],
-  columnsOrder: ['title', 'built_in', 'description'],
+  entityTableId: 'index-set-template',
+  defaultPageSize: 20,
+  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
+  defaultDisplayedAttributes: ['title', 'built_in', 'description'],
 };
 
-const SearchWrapper = styled.div(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
-`);
+const COLUMNS_ORDER = ['title', 'built_in', 'description'];
 
 const IndexSetTemplatesList = () => {
-  const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
-  const [query, setQuery] = useQueryParam('query', StringParam);
-  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
-    entityTableId: ENTITY_TABLE_ID,
-    defaultPageSize: DEFAULT_LAYOUT.pageSize,
-    defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
-    defaultSort: DEFAULT_LAYOUT.sort,
-  });
-  const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
-  const searchParams = useMemo(() => ({
-    query,
-    page: paginationQueryParameter.page,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-    filters: urlQueryFilters,
-  }), [paginationQueryParameter.page, layoutConfig.pageSize, layoutConfig.sort, query, urlQueryFilters]);
-  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
-
-  const onSortChange = useCallback((newSort: Sort) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
-
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
-
-  const {
-    isLoading,
-    data: { list, pagination, attributes },
-  } = useTemplates(
-    searchParams,
-    { enabled: !isLoadingLayoutPreferences },
-  );
-
-  const onSearch = useCallback((val: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(val);
-  }, [paginationQueryParameter, setQuery]);
-
-  const onSearchReset = useCallback(() => setQuery(''), [setQuery]);
-
-  const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
-    paginationQueryParameter.resetPage();
-    setUrlQueryFilters(newUrlQueryFilters);
-  }, [paginationQueryParameter, setUrlQueryFilters]);
-
   const templateActions = useCallback(({ id, title, built_in, default: isDefault, enabled: isEnabled }: IndexSetTemplate) => (
     <TemplateActions id={id} title={title} built_in={built_in} isDefault={isDefault} isEnabled={isEnabled} />
   ), []);
 
-  if (isLoadingLayoutPreferences || isLoading) {
-    return <Spinner />;
-  }
-
   return (
-    <PaginatedList totalItems={pagination?.total}
-                   pageSize={layoutConfig.pageSize}
-                   showPageSizeSelect={false}>
-      <SearchWrapper>
-        <SearchForm onSearch={onSearch}
-                    onReset={onSearchReset}
-                    query={query}
-                    placeholder="Search for index set template...">
-          <EntityFilters attributes={attributes}
-                         urlQueryFilters={urlQueryFilters}
-                         setUrlQueryFilters={onChangeFilters} />
-        </SearchForm>
-      </SearchWrapper>
-      {pagination?.total === 0 ? (
-        <NoEntitiesExist>
-          No index set templates have been found.
-        </NoEntitiesExist>
-      ) : (
-        <EntityDataTable<IndexSetTemplate> data={list}
-                                           visibleColumns={layoutConfig.displayedAttributes}
-                                           columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                           onColumnsChange={onColumnsChange}
-                                           onSortChange={onSortChange}
-                                           activeSort={layoutConfig.sort}
-                                           pageSize={searchParams.pageSize}
-                                           onPageSizeChange={onPageSizeChange}
-                                           actionsCellWidth={120}
-                                           columnRenderers={customColumnRenderers}
-                                           columnDefinitions={attributes}
-                                           entityAttributesAreCamelCase={false}
-                                           rowActions={templateActions} />
-      )}
-    </PaginatedList>
+    <PaginatedEntityTable<IndexSetTemplate> humanName="index set templates"
+                                            columnsOrder={COLUMNS_ORDER}
+                                            entityActions={templateActions}
+                                            tableLayout={DEFAULT_LAYOUT}
+                                            fetchEntities={fetchIndexSetTemplates}
+                                            keyFn={keyFn}
+                                            entityAttributesAreCamelCase
+                                            columnRenderers={customColumnRenderers}
+                                            searchPlaceholder="Search for index set template" />
   );
 };
 

@@ -32,7 +32,7 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
-const fetchIndexSetTemplates = async (searchParams: SearchParams) => {
+export const fetchIndexSetTemplates = async (searchParams: SearchParams) => {
   const indexSetTemplateUrl = qualifyUrl('/system/indices/index_sets/templates/paginated');
   const url = PaginationURL(
     indexSetTemplateUrl,
@@ -49,6 +49,8 @@ const fetchIndexSetTemplates = async (searchParams: SearchParams) => {
     }));
 };
 
+export const keyFn = (searchParams: SearchParams) => (['indexSetTemplates', searchParams]);
+
 const useTemplates = (searchParams: SearchParams, { enabled } = { enabled: true }): {
   data: {
     list: Readonly<Array<IndexSetTemplate>>,
@@ -59,7 +61,7 @@ const useTemplates = (searchParams: SearchParams, { enabled } = { enabled: true 
   refetch: () => void,
 } => {
   const { data, isLoading, refetch } = useQuery(
-    ['indexSetTemplates', searchParams],
+    keyFn(searchParams),
     () => fetchIndexSetTemplates(searchParams),
     {
       onError: (errorThrown) => {
