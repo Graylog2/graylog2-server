@@ -24,6 +24,7 @@ import { Alert, BootstrapModalWrapper, Button, Modal } from 'components/bootstra
 
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
+import type { MigrationStatus } from '../../hooks/useRemoteReindexMigrationStatus';
 import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
 import { MIGRATION_ACTIONS } from '../../Constants';
 
@@ -60,6 +61,19 @@ const getColorVariantFromLogLevel = (logLovel: string): ColorVariant|undefined =
   }
 };
 
+const displayStatus = (status: MigrationStatus): string => {
+  switch (status) {
+    case 'NOT_STARTED':
+      return 'LOADING...';
+    case 'STARTING':
+      return 'STARTING...';
+    case 'RUNNING':
+      return 'RUNNING...';
+    default:
+      return status || '';
+  }
+};
+
 const RetryMigrateExistingData = 'RETRY_MIGRATE_EXISTING_DATA';
 
 const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
@@ -81,7 +95,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
         striped: true,
         value: migrationStatus?.progress || 0,
         bsStyle: 'info',
-        label: `${migrationStatus?.status || ''} ${migrationStatus?.progress || 0}%`,
+        label: `${displayStatus(migrationStatus?.status)} ${migrationStatus?.progress || 0}%`,
       }]} />
       {(indicesWithErrors.length > 0) && (
         <Alert title="Migration failed" bsStyle="danger">

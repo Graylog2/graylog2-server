@@ -33,7 +33,7 @@ const EventDefinitionFilter = ({ value, onSelect, selectedValues }: Props) => {
     sort: { attributeId: 'title', direction: 'asc' },
   });
 
-  const eventDefinitionOptions = eventDefinitions?.elements.map(({ title, id }) => ({
+  const eventDefinitionOptions = eventDefinitions?.list.map(({ title, id }) => ({
     label: title,
     value: id,
     disabled: selectedValues.includes(id),

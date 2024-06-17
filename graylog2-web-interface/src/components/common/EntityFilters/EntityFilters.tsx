@@ -41,7 +41,6 @@ const FilterCreation = styled.div`
 
 type Props = {
   attributes: Attributes,
-
   urlQueryFilters: UrlQueryFilters | undefined,
   setUrlQueryFilters: (urlQueryFilters: UrlQueryFilters) => void,
   filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode };
