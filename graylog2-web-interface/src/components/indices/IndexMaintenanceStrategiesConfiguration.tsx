@@ -24,6 +24,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import type {
   RetentionStrategyConfig,
   RotationStrategy,
+  RetentionStrategy,
   TimeBasedRotationStrategyConfig,
   JsonSchema,
   StrategyConfig,
@@ -47,6 +48,7 @@ type IndexMaintenanceStrategiesFormValues = {
   rotation_strategy?: RotationStrategy,
   rotation_strategy_class?: string,
   retention_strategy_class?: string,
+  retention_strategy?: RetentionStrategy,
 }
 
 interface ConfigComponentProps extends SystemConfigurationComponentProps {
@@ -195,6 +197,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
       rotation_strategy: rotationStrategy,
       rotation_strategy_class: rotationStrategyClass,
       retention_strategy_class: retentionStrategyClass,
+      retention_strategy: retentionStrategy,
     },
     errors,
   } = useFormikContext<IndexMaintenanceStrategiesFormValues>();
@@ -341,7 +344,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
             getActiveSelection(),
             pluginExports,
             strategies,
-            strategy,
+            retentionStrategy,
             config,
             _onConfigUpdate,
             () => [maxNumberOfIndices, setMaxNumberOfIndices],
