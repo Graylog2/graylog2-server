@@ -158,7 +158,7 @@ const getConfigurationComponent = (
     return null;
   }
 
-  const strategyType = typeof strategy === 'string' ? strategy : strategy.type;
+  const strategyType = typeof strategy === 'string' ? strategy : strategy?.type;
 
   const strategyConfig = getStrategyConfig(configTypeName, selectedStrategy, strategyType, config, strategies);
 
@@ -197,7 +197,6 @@ const IndexMaintenanceStrategiesConfiguration = ({
       rotation_strategy: rotationStrategy,
       rotation_strategy_class: rotationStrategyClass,
       retention_strategy_class: retentionStrategyClass,
-      retention_strategy: retentionStrategy,
     },
     errors,
   } = useFormikContext<IndexMaintenanceStrategiesFormValues>();
@@ -344,7 +343,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
             getActiveSelection(),
             pluginExports,
             strategies,
-            retentionStrategy,
+            strategy,
             config,
             _onConfigUpdate,
             () => [maxNumberOfIndices, setMaxNumberOfIndices],
