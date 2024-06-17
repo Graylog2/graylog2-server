@@ -14,12 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { CopyButton, Tooltip } from '@mantine/core';
+import * as React from 'react';
+import { useCallback, useState } from 'react';
+import { Tooltip } from '@mantine/core';
+import { useTimeout } from '@mantine/hooks';
 
 import { Button } from 'components/bootstrap';
 import type { BsSize } from 'components/bootstrap/types';
 import type { StyleProps } from 'components/bootstrap/Button';
+import copyToClipboard from 'util/copyToClipboard';
 
 /**
  * Component that renders a button to copy some text in the clipboard when pressed.
@@ -36,6 +39,24 @@ type Props = {
   text: string,
   title: React.ReactNode,
 }
+
+type Args = {
+  copied: boolean,
+  copy: () => void,
+}
+type CopyButtonProps = {
+  value: string,
+  timeout: number,
+  children: (args: Args) => React.ReactElement,
+};
+
+const CopyButton = ({ children, value, timeout }: CopyButtonProps) => {
+  const [copied, setCopied] = useState(false);
+  const { start } = useTimeout(() => setCopied(false), timeout);
+  const copy = useCallback(() => copyToClipboard(value).then(() => { setCopied(true); start(); }), [start, value]);
+
+  return children({ copied, copy });
+};
 
 const ClipboardButton = ({ bsSize, bsStyle, buttonTitle, className, disabled, onSuccess, text, title }: Props) => {
   const button = (copy: () => void) => (
