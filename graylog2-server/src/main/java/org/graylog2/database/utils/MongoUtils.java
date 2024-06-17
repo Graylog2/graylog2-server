@@ -18,6 +18,7 @@ package org.graylog2.database.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Filters;
@@ -125,12 +126,13 @@ public class MongoUtils<T extends MongoEntity> {
      * Create a stream of entries from the given {@link MongoIterable}. Using this method will create a stream that
      * properly closes the underlying MongoDB cursor when the stream is closed.
      * <p>
-     * <b> The stream should be closed to free underlying resources.</b>
+     * <b>The stream must be closed to free underlying resources.</b>
      *
      * @param mongoIterable The iterable to create the stream from.
      * @param <T>           document type of the underlying collection
      * @return A stream that should be used in a try-with-resources statement or closed manually to free underlying resources.
      */
+    @MustBeClosed
     public static <T> Stream<T> stream(@Nonnull MongoIterable<T> mongoIterable) {
         final var cursor = mongoIterable.cursor();
         return Streams.stream(cursor).onClose(cursor::close);
