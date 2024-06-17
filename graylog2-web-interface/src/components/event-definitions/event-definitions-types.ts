@@ -86,6 +86,7 @@ export type EventDefinition = {
     use_cron_scheduling?: boolean,
     cron_expression?: string,
     cron_timezone?: string,
+    event_limit: number,
   },
   field_spec: FieldSpec,
   key_spec: string[],
