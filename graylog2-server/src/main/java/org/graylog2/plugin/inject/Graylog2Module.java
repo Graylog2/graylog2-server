@@ -56,7 +56,6 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
 import org.graylog2.plugin.validate.ClusterConfigValidator;
-import org.graylog2.streams.StreamDeletionGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
