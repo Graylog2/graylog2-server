@@ -25,9 +25,22 @@ type Options = {
   enabled: boolean,
 }
 
+export const fetchEventNotifications = (searchParams: SearchParams) => EventNotificationsStore.searchPaginated(
+  searchParams.page,
+  searchParams.pageSize,
+  searchParams.query,
+  { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
+).then(({ elements, pagination, attributes }) => ({
+  list: elements,
+  pagination,
+  attributes,
+}));
+
+export const keyFn = (searchParams?: SearchParams | undefined) => (['eventNotifications', 'overview', ...(searchParams ? [searchParams] : [])]);
+
 const useEventNotifications = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
-    elements: Array<EventNotification>,
+    list: Array<EventNotification>,
     pagination: { total: number }
     attributes: Array<{ id: string, title: string, sortable: boolean }>
   } | undefined,
@@ -35,13 +48,8 @@ const useEventNotifications = (searchParams: SearchParams, { enabled }: Options 
   isInitialLoading: boolean,
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
-    ['eventNotifications', 'overview', searchParams],
-    () => EventNotificationsStore.searchPaginated(
-      searchParams.page,
-      searchParams.pageSize,
-      searchParams.query,
-      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
-    ),
+    keyFn(searchParams),
+    () => fetchEventNotifications(searchParams),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading event notifications failed with status: ${errorThrown}`,

@@ -24,6 +24,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertConstants;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,12 +54,12 @@ public class OpensearchSecurityConfiguration {
     private static final String TRUSTSTORE_FORMAT = "PKCS12";
     private static final Path TRUSTSTORE_FILE = Path.of("datanode-truststore.p12");
 
-    private final KeystoreInformation transportCertificate;
-    private final KeystoreInformation httpCertificate;
-    private KeystoreInformation truststore;
+    private final FilesystemKeystoreInformation transportCertificate;
+    private final FilesystemKeystoreInformation httpCertificate;
+    private FilesystemKeystoreInformation truststore;
     private String opensearchHeap;
 
-    public OpensearchSecurityConfiguration(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
+    public OpensearchSecurityConfiguration(FilesystemKeystoreInformation transportCertificate, FilesystemKeystoreInformation httpCertificate) {
         this.transportCertificate = transportCertificate;
         this.httpCertificate = httpCertificate;
     }
@@ -156,15 +157,15 @@ public class OpensearchSecurityConfiguration {
         return !Objects.isNull(httpCertificate) && !Objects.isNull(transportCertificate);
     }
 
-    public KeystoreInformation getTransportCertificate() {
+    public FilesystemKeystoreInformation getTransportCertificate() {
         return transportCertificate;
     }
 
-    public KeystoreInformation getHttpCertificate() {
+    public FilesystemKeystoreInformation getHttpCertificate() {
         return httpCertificate;
     }
 
-    public KeystoreInformation getTruststore() {
+    public FilesystemKeystoreInformation getTruststore() {
         return truststore;
     }
 
@@ -188,7 +189,7 @@ public class OpensearchSecurityConfiguration {
         return config.build();
     }
 
-    private void logCertificateInformation(String certificateType, KeystoreInformation keystore) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
+    private void logCertificateInformation(String certificateType, FilesystemKeystoreInformation keystore) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
         final KeyStore instance = KeyStore.getInstance(KEYSTORE_FORMAT);
         try (final FileInputStream is = new FileInputStream(keystore.location().toFile())) {
             instance.load(is, keystore.password());
@@ -202,6 +203,8 @@ public class OpensearchSecurityConfiguration {
                             .map(Object::toString)
                             .collect(Collectors.joining(", "));
                     LOG.info("Opensearch {} has following alternative names: {}", certificateType, alternativeNames);
+                    LOG.info("Opensearch {} has following serial number: {}", certificateType, ((X509Certificate) cert).getSerialNumber());
+                    LOG.info("Opensearch {} has following validity: {} - {}", certificateType, ((X509Certificate) cert).getNotBefore(), ((X509Certificate) cert).getNotAfter());
                 }
             }
         }

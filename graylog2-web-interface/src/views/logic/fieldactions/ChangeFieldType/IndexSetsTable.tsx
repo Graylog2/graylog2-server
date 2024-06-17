@@ -123,9 +123,10 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
                                            columnDefinitions={attributes}
                                            columnRenderers={columnRenderers}
                                            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                           data={list}
+                                           entities={list}
                                            onColumnsChange={onColumnsChange}
                                            onPageSizeChange={onPageSizeChange}
+                                           entityAttributesAreCamelCase
                                            onSortChange={onSortChange}
                                            pageSize={layoutConfig.pageSize}
                                            visibleColumns={layoutConfig.displayedAttributes} />
