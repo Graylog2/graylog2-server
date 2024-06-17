@@ -59,7 +59,7 @@ class BasicAuthFilterTest {
         final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
         Mockito.verify(request, times(1)).abortWith(captor.capture());
         final Response response = captor.getValue();
-        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
+        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(HttpStatus.SC_UNAUTHORIZED);
         Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, missing or invalid authorization header!");
     }
 
@@ -71,8 +71,8 @@ class BasicAuthFilterTest {
         final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
         Mockito.verify(request, times(1)).abortWith(captor.capture());
         final Response response = captor.getValue();
-        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
-        Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, missing or invalid authorization header!");
+        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(HttpStatus.SC_UNAUTHORIZED);
+         Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, missing or invalid authorization header!");
     }
 
     @Test
@@ -83,7 +83,7 @@ class BasicAuthFilterTest {
         final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
         Mockito.verify(request, times(1)).abortWith(captor.capture());
         final Response response = captor.getValue();
-        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
+        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(HttpStatus.SC_UNAUTHORIZED);
         Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, missing or invalid authorization header!");
     }
 
