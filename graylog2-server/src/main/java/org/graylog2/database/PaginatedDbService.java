@@ -18,6 +18,7 @@ package org.graylog2.database;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.client.model.Sorts;
@@ -210,6 +211,7 @@ public abstract class PaginatedDbService<DTO> {
      *
      * @return stream of all database entries
      */
+    @MustBeClosed
     public Stream<DTO> streamAll() {
         return streamQuery(DBQuery.empty());
     }
@@ -222,6 +224,7 @@ public abstract class PaginatedDbService<DTO> {
      * @param idSet set of IDs to query
      * @return stream of database entries for the given IDs
      */
+    @MustBeClosed
     public Stream<DTO> streamByIds(Set<String> idSet) {
         final List<ObjectId> objectIds = idSet.stream()
                 .map(ObjectId::new)
@@ -238,6 +241,7 @@ public abstract class PaginatedDbService<DTO> {
      * @param query the query to execute
      * @return stream of database entries that match the query
      */
+    @MustBeClosed
     protected Stream<DTO> streamQuery(Bson query) {
         final DBCursor<DTO> cursor = db.find(query);
         return Streams.stream((Iterable<DTO>) cursor).onClose(cursor::close);
@@ -252,6 +256,7 @@ public abstract class PaginatedDbService<DTO> {
      * @param sort  the sort order for the query
      * @return stream of database entries that match the query
      */
+    @MustBeClosed
     protected Stream<DTO> streamQueryWithSort(Bson query, Bson sort) {
         final DBCursor<DTO> cursor = db.find(query).sort(sort);
         return Streams.stream((Iterable<DTO>) cursor).onClose(cursor::close);
