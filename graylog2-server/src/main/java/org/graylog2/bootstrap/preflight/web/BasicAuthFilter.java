@@ -86,9 +86,10 @@ public class BasicAuthFilter implements ContainerRequestFilter {
     }
 
     private void abortRequestUnauthorized(ContainerRequestContext requestContext) {
-        requestContext.abortWith(Response.status(Response.Status.FOUND) //(=moved temporarily)
+        requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED) //(=moved temporarily)
                 .location(loginPage)
                 .entity("You cannot access this resource, missing or invalid authorization header!")
+                .header("WWW-Authenticate", "Basic realm=" + this.realm)
                 .type(MediaType.TEXT_PLAIN_TYPE)
                 .build());
     }
