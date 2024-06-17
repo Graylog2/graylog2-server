@@ -36,6 +36,7 @@ import {
   mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
+import type { Stream } from 'logic/streams/types';
 
 const mockView = createSearch();
 
@@ -69,7 +70,7 @@ jest.mock('views/logic/Widgets', () => ({
 
 describe('EventReplaySearchPage', () => {
   const SimpleReplaySearchPage = () => (
-    <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' }]}>
+    <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' } as Stream]}>
       <EventReplaySearchPage />
     </StreamsContext.Provider>
   );
