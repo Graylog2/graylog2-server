@@ -15,34 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useContext } from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
+import { useMemo } from 'react';
 
-import CarouselContext from './CarouselContext';
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
+
+import TableFetchContext from './TableFetchContext';
 
 type Props = React.PropsWithChildren<{
-  carouselId: string,
-  options?: Partial<{ align: 'start', slidesToScroll: number }>
+  attributes: Array<Attribute>,
+  refetch: () => void,
+  searchParams: SearchParams,
 }>
 
-const CarouselProvider = ({ carouselId, children, options } : Props) => {
-  const existingContextValue = useContext(CarouselContext);
-  const [ref, api] = useEmblaCarousel(options);
-
-  const value = useMemo(() => ({
-    ...(existingContextValue ?? {}),
-    [carouselId]: { ref, api },
-  }), [api, carouselId, existingContextValue, ref]);
+const TableFetchContextProvider = ({ children, searchParams, refetch, attributes }: Props) => {
+  const contextValue = useMemo(() => ({
+    searchParams,
+    refetch,
+    attributes,
+  }), [searchParams, refetch, attributes]);
 
   return (
-    <CarouselContext.Provider value={value}>
+    <TableFetchContext.Provider value={contextValue}>
       {children}
-    </CarouselContext.Provider>
+    </TableFetchContext.Provider>
   );
 };
 
-CarouselProvider.defaultProps = {
-  options: {},
-};
-
-export default CarouselProvider;
+export default TableFetchContextProvider;

@@ -15,20 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { SetStateAction } from 'react';
+import { Spoiler as MantineSpoiler } from '@mantine/core';
 
-import { singleton } from 'logic/singleton';
+type Props = React.PropsWithChildren<{
+  maxHeight: number,
+  className?: string,
+  showLabel?: string,
+  hideLabel?: string,
+}>
 
-import type { EntityBase } from '../types';
+const Spoiler = ({ maxHeight, children, className, showLabel, hideLabel }: Props) => (
+  <MantineSpoiler maxHeight={maxHeight}
+                  showLabel={showLabel}
+                  hideLabel={hideLabel}
+                  className={className}>
+    {children}
+  </MantineSpoiler>
+);
 
-type ContextValue = {
-  selectedEntities: Array<EntityBase['id']>,
-  setSelectedEntities: (setSelectedEntitiesArgument: SetStateAction<EntityBase['id'][]>) => void,
-  selectEntity: (entityId: EntityBase['id']) => void,
-  deselectEntity: (entityId: EntityBase['id']) => void,
-  toggleEntitySelect: (entityId: EntityBase['id']) => void,
-} | undefined
+Spoiler.defaultProps = {
+  className: undefined,
+  showLabel: 'Show more',
+  hideLabel: 'Hide',
+};
 
-const SelectEntitiesContext = React.createContext<ContextValue>(undefined);
-
-export default singleton('contexts.SelectEntitiesContext', () => SelectEntitiesContext);
+export default Spoiler;

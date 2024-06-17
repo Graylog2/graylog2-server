@@ -15,20 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { SetStateAction } from 'react';
 
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import { singleton } from 'logic/singleton';
 
-import type { EntityBase } from '../types';
+export type ContextValue = {
+  searchParams: SearchParams,
+  refetch: () => void,
+  attributes: Array<Attribute>,
+};
 
-type ContextValue = {
-  selectedEntities: Array<EntityBase['id']>,
-  setSelectedEntities: (setSelectedEntitiesArgument: SetStateAction<EntityBase['id'][]>) => void,
-  selectEntity: (entityId: EntityBase['id']) => void,
-  deselectEntity: (entityId: EntityBase['id']) => void,
-  toggleEntitySelect: (entityId: EntityBase['id']) => void,
-} | undefined
-
-const SelectEntitiesContext = React.createContext<ContextValue>(undefined);
-
-export default singleton('contexts.SelectEntitiesContext', () => SelectEntitiesContext);
+const TableFetchContext = React.createContext<ContextValue | undefined>(undefined);
+export default singleton('contexts.TableFetchContext', () => TableFetchContext);

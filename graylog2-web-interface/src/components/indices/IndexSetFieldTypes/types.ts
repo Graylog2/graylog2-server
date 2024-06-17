@@ -68,7 +68,7 @@ export type RemoveProfileFromIndexSetBodyJson = {
 }
 
 export type IndexSetFieldTypesQueryData = {
-  list: Readonly<Array<IndexSetFieldType>>,
+  list: Array<IndexSetFieldType>,
   pagination: { total: number },
   attributes: Array<Attribute>
 };

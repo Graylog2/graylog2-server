@@ -103,17 +103,18 @@ const SavedSearchesOverview = ({
         </NoSearchResult>
       )}
       {!!savedSearches?.length && (
-        <EntityDataTable<View> data={savedSearches}
+        <EntityDataTable<View> entities={savedSearches}
                                visibleColumns={layoutConfig.displayedAttributes}
                                columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                onColumnsChange={onColumnsChange}
                                bulkSelection={{ actions: <BulkActions /> }}
                                onSortChange={onSortChange}
                                activeSort={layoutConfig.sort}
+                               entityAttributesAreCamelCase
                                pageSize={searchParams.pageSize}
                                onPageSizeChange={onPageSizeChange}
                                actionsCellWidth={120}
-                               rowActions={renderSavedSearchActions}
+                               entityActions={renderSavedSearchActions}
                                columnRenderers={customColumnRenderers}
                                columnDefinitions={attributes} />
       )}

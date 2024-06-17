@@ -14,13 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Sort } from 'stores/PaginationTypes';
+import { useContext } from 'react';
 
-export const DEFAULT_LAYOUT = {
-  entityTableId: 'event_notifications',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['title', 'description', 'type', 'created_at'],
+import TableFetchContext from './TableFetchContext';
+
+const useTableFetchContext = () => {
+  const tableFetchContext = useContext(TableFetchContext);
+
+  if (!tableFetchContext) {
+    throw new Error('useTableFetchContext hook needs to be used inside TableFetchContext.Provider');
+  }
+
+  return tableFetchContext;
 };
 
-export const COLUMNS_ORDER = ['title', 'description', 'type', 'created_at'];
+export default useTableFetchContext;

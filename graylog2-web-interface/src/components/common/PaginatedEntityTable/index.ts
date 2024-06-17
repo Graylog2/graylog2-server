@@ -14,13 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Sort } from 'stores/PaginationTypes';
 
-export const DEFAULT_LAYOUT = {
-  entityTableId: 'event_notifications',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['title', 'description', 'type', 'created_at'],
-};
+import PaginatedEntityTable from './PaginatedEntityTable';
+import useTableFetchContext from './useTableFetchContext';
 
-export const COLUMNS_ORDER = ['title', 'description', 'type', 'created_at'];
+export { useTableFetchContext };
+
+export default PaginatedEntityTable;
