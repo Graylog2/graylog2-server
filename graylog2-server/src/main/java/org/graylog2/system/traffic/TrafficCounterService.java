@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -29,6 +30,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBUpdate;
@@ -37,8 +39,6 @@ import org.mongojack.WriteResult;
 import org.mongojack.internal.update.SingleUpdateOperationValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -102,6 +102,15 @@ public class TrafficCounterService {
     }
 
     /**
+     * Queries traffic since specified date (beginning of day).
+     */
+    public TrafficHistogram clusterTrafficSince(DateTime start, Interval interval) {
+        Period period = new Period(start, Tools.nowUTC());
+        Duration duration = Duration.millis(period.getMillis());
+        return clusterTrafficOfLastDays(duration, interval, true);
+    }
+
+    /**
      * Queries traffic for the specified duration.
      * <BR>
      * The from-date is considered to be the start of the day that the duration intersects with in the past.
@@ -146,10 +155,6 @@ public class TrafficCounterService {
                 decodedHistogram = aggregateToDaily(decodedHistogram);
             }
             return TrafficHistogram.create(from, to, inputHistogram, outputHistogram, decodedHistogram);
-        } catch (Exception e) {
-            // TODO: remove this diagnostic logging after fixing https://github.com/Graylog2/graylog2-server/issues/9559
-            LOG.error("Unable to load traffic data range {} to {}", from, to);
-            throw e;
         }
     }
 
