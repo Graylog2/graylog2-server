@@ -16,13 +16,13 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import { Tooltip } from '@mantine/core';
 import { useTimeout } from '@mantine/hooks';
 
 import { Button } from 'components/bootstrap';
 import type { BsSize } from 'components/bootstrap/types';
 import type { StyleProps } from 'components/bootstrap/Button';
 import copyToClipboard from 'util/copyToClipboard';
+import Tooltip from 'components/common/Tooltip';
 
 /**
  * Component that renders a button to copy some text in the clipboard when pressed.
