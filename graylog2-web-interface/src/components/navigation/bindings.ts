@@ -63,6 +63,7 @@ const navigationBindings: PluginExports = {
             { path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW, description: 'Lookup Tables', permissions: ['lookuptables:read'] },
             { path: Routes.SYSTEM.PIPELINES.OVERVIEW, description: 'Pipelines', permissions: ['pipeline:read', 'pipeline_connection:read'] },
             { path: Routes.SYSTEM.SIDECARS.OVERVIEW, description: 'Sidecars', permissions: ['sidecars:read'] },
+            { path: Routes.SYSTEM.CATEGORIES.OVERVIEW, description: 'Manage Categories' },
           ],
           AppConfig.isCloud() && !AppConfig.isFeatureEnabled('cloud_inputs') ? [Routes.SYSTEM.INPUTS] : [],
         ),

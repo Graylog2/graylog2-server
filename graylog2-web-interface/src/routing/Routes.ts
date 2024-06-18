@@ -200,6 +200,9 @@ const Routes = {
       NEW_COLLECTOR: '/system/sidecars/collector/new',
       EDIT_COLLECTOR: (collectorId: string) => `/system/sidecars/collector/edit/${collectorId}`,
     },
+    CATEGORIES: {
+      OVERVIEW: '/system/categories',
+    },
   },
   VIEWS: {
     LIST: viewsPath,

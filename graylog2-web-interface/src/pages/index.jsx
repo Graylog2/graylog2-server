@@ -24,6 +24,7 @@ const AuthenticationOverviewPage = loadAsync(() => import('./AuthenticationOverv
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const AuthenticatorsPage = loadAsync(() => import('./AuthenticatorsPage'));
 const AuthenticatorsEditPage = loadAsync(() => import('./AuthenticatorsEditPage'));
+const CategoriesPage = loadAsync(() => import('pages/CategoriesPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
@@ -117,6 +118,7 @@ export {
   AuthenticationOverviewPage,
   AuthenticatorsPage,
   AuthenticatorsEditPage,
+  CategoriesPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
