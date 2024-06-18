@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 
 import HelpMenu from 'preflight/navigation/HelpMenu';
 import { Group, AppShell, Text } from 'preflight/components/common';
+import NavigationBrand from 'components/perspectives/DefaultBrand';
 
-import NavigationBrand from './NavigationBrand';
 import ThemeModeToggle from './ThemeModeToggle';
 
 type StyledMantineTextProps = TextProps & {
@@ -45,7 +45,7 @@ const Navigation = () => (
     <NavigationContainer>
       <Group gap="xs">
         <NavigationBrand />
-        <StyledText fw={700} size="lg" mr={1}>Graylog Initial Setup</StyledText>
+        <StyledText fw={500} size="xs" mr={1}>Graylog Initial Setup</StyledText>
       </Group>
       <Group justify="flex-end">
         <HelpMenu />
