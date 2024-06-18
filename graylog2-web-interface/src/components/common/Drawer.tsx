@@ -8,6 +8,6 @@ const StyledDrawer = styled(MantineDrawer)(({ theme }) => css`
   }
 `);
 type Props = Pick<React.ComponentProps<typeof MantineDrawer>, 'opened' | 'onClose' | 'position' | 'size' | 'children' | 'title'>;
-const Drawer = ({ title, ...props }: Props) => <StyledDrawer offset={15} padding="lg" radius={5} zIndex={1032} title={<h1>{title}</h1>} {...props} />;
+const Drawer = ({ title, ...props }: Props) => <StyledDrawer offset={15} padding="lg" radius={5} zIndex={1032} title={title} {...props} />;
 
 export default Drawer;
