@@ -1598,9 +1598,9 @@
     xmlbuilder2 "^3.0.2"
 
 "@cyclonedx/webpack-plugin@^3.9.1":
-  version "3.11.0"
-  resolved "https://registry.yarnpkg.com/@cyclonedx/webpack-plugin/-/webpack-plugin-3.11.0.tgz#6fdc1bfc32cc5f47e326790d4001aea1a80dbb5d"
-  integrity sha512-mZW66ZZFxfJc2jinBEoSIT2L9bvtL6KmNE5lXgvDp6oGlrXyDcSCXapjHG+9V/xqP/WIRPFEgEFLKDhWWEyfUQ==
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@cyclonedx/webpack-plugin/-/webpack-plugin-3.12.0.tgz#2ae843f66da92bb94ed5e8941f15df66f2e4d951"
+  integrity sha512-S4JqGGUzl6A2U/jSUsaIqy2MEY7nxG51gLJ1aZokLjIrjP0A5PmutpwILADwwn9/XEluYzvgF5QZdSindEJnOA==
   dependencies:
     "@cyclonedx/cyclonedx-library" "^6.6.0"
     normalize-package-data "^3||^4||^5||^6"
