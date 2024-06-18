@@ -21,19 +21,20 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
+import org.graylog2.outputs.filter.FilteredMessage;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,9 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 // Singleton class
-public class BlockingBatchedESOutput extends ElasticSearchOutput {
+public class BlockingBatchedESOutput extends ElasticSearchOutput implements FilteredMessageOutput {
+    public static final String FILTER_KEY = "blocking-batched-es-output";
+
     private static final Logger log = LoggerFactory.getLogger(BlockingBatchedESOutput.class);
     private final int maxBufferSize;
     private final Timer processTime;
@@ -92,6 +95,13 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         this.daemonScheduler = daemonScheduler;
 
         buffer = new ArrayList<>(maxBufferSize);
+    }
+
+    @Override
+    public void writeFiltered(FilteredMessage message) throws Exception {
+        if (message.outputs().contains(FILTER_KEY)) {
+            write(message.message());
+        }
     }
 
     @Override

@@ -25,8 +25,10 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
+import org.graylog2.outputs.filter.DefaultFilteredMessage;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.journal.NoopJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
@@ -39,12 +41,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -110,6 +114,25 @@ public class BlockingBatchedESOutputTest {
         final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSize());
 
         verify(messages, times(1)).bulkIndex(eq(messageList));
+    }
+
+    @Test
+    public void writeFiltered() throws Exception {
+        final List<MessageWithIndex> messageList = buildMessages(2);
+        final Stream stream = mock(Stream.class);
+
+        when(stream.getIndexSet()).thenReturn(indexSet);
+
+        messageList.get(0).message().addStream(stream);
+        messageList.get(1).message().addStream(stream);
+
+        // The first message should not be written to the output because the output's filter key is not included.
+        output.writeFiltered(new DefaultFilteredMessage(messageList.get(0).message(), Set.of("foo")));
+        output.writeFiltered(new DefaultFilteredMessage(messageList.get(1).message(), Set.of("foo", BlockingBatchedESOutput.FILTER_KEY)));
+
+        output.forceFlushIfTimedout();
+
+        verify(messages, times(1)).bulkIndex(eq(messageList.subList(1, 2)));
     }
 
     @Test
