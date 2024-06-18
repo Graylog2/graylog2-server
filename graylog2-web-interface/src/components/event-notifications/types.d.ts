@@ -14,6 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { ErrorType } from 'integrations/event-notifications/types';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+
 export type HttpEventNotificationV2 = EventNotification & {
   config: HttpNotificationConfigV2,
 };
@@ -48,21 +52,21 @@ export type HttpNotificationValidationV2 = {
 interface EventNotificationTypes {
   type: string,
   displayName: string,
-  formComponent: React.ComponentType<React.ComponentProps<{
+  formComponent: React.ComponentType<{
     config: EventNotification['config'],
     validation: { errors: { [key: string]: Array<string> } },
     onChange: (newConfig: EventNotification['config']) => void,
-  }>>,
-  summaryComponent: React.ComponentType<React.ComponentProps<{
+  }>,
+  summaryComponent: React.ComponentType<{
+    type: string,
+    notification: EventNotification,
+    definitionNotification: EventDefinition['notifications'][number],
+  }>,
+  detailsComponent: React.ComponentType<{
     config: EventNotification['config'],
     validation: { errors: { [key: string]: Array<string> } },
     onChange: (newConfig: EventNotification['config']) => void,
-  }>>,
-  detailsComponent: React.ComponentType<React.ComponentProps<{
-    config: EventNotification['config'],
-    validation: { errors: { [key: string]: Array<string> } },
-    onChange: (newConfig: EventNotification['config']) => void,
-  }>>,
+  }>,
   defaultConfig: EventNotification['config'],
 }
 
