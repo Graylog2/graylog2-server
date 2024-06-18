@@ -35,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EventListEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.database.filtering.AttributeFilter;
+import org.graylog2.database.filtering.HasAttributeFilter;
 import org.graylog2.plugin.Message;
 
 import javax.annotation.Nullable;
@@ -51,7 +52,7 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID
 @AutoValue
 @JsonTypeName(EventList.NAME)
 @JsonDeserialize(builder = EventList.Builder.class)
-public abstract class EventList implements SearchType {
+public abstract class EventList implements SearchType, HasAttributeFilter {
     public static final int DEFAULT_PAGE_SIZE = 10;
     public static final String NAME = "events";
     public static final Set<String> KNOWN_ATTRIBUTES = Set.of("priority", "event_definition_id", "alert");
@@ -86,6 +87,7 @@ public abstract class EventList implements SearchType {
     @JsonProperty
     public abstract Optional<Integer> perPage();
 
+    @Override
     @JsonProperty
     public abstract List<AttributeFilter> attributes();
 
