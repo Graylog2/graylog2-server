@@ -20,7 +20,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.assertj.core.api.Assertions;
 import org.graylog2.storage.versionprobe.VersionProbeListener;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.net.ConnectException;
@@ -50,7 +49,7 @@ class VersionProbeMessageCollectorTest {
             }
 
             @Override
-            public void onError(@NotNull String message, @Nullable Throwable cause) {
+            public void onError(@Nonnull String message, @Nullable Throwable cause) {
             }
         };
     }
