@@ -22,6 +22,7 @@ import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.MessageFactory;
@@ -43,7 +44,7 @@ import java.util.concurrent.Executors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -57,6 +58,12 @@ public class BlockingBatchedESOutputTest {
 
     @Mock
     private Messages messages;
+
+    @Mock
+    private IndexingResults indexingResults;
+
+    @Mock
+    private IndexSet indexSet;
 
     @Mock
     private MessageQueueAcknowledger acknowledger;
@@ -88,6 +95,9 @@ public class BlockingBatchedESOutputTest {
 
         output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal, acknowledger, cluster, Executors.newSingleThreadScheduledExecutor());
         output.initialize();
+
+        lenient().when(indexingResults.errors()).thenReturn(ImmutableList.of());
+        lenient().when(messages.bulkIndex(any())).thenReturn(indexingResults);
     }
 
     @AfterEach
@@ -155,8 +165,12 @@ public class BlockingBatchedESOutputTest {
 
         when(messages.bulkIndex(any())).thenAnswer(invocation -> {
             // this will block until interrupted
-            new CountDownLatch(1).await();
-            return null;
+            try {
+                new CountDownLatch(1).await();
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+            return indexingResults;
         });
 
         final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSize() - 1);
@@ -170,7 +184,7 @@ public class BlockingBatchedESOutputTest {
     private List<MessageWithIndex> buildMessages(final int count) {
         final ImmutableList.Builder<MessageWithIndex> builder = ImmutableList.builder();
         for (int i = 0; i < count; i++) {
-            builder.add(new MessageWithIndex(messageFactory.createMessage("message" + i, "test", Tools.nowUTC()), mock(IndexSet.class)));
+            builder.add(new MessageWithIndex(messageFactory.createMessage("message" + i, "test", Tools.nowUTC()), indexSet));
         }
 
         return builder.build();
