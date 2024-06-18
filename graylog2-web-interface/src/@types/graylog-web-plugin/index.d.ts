@@ -18,6 +18,9 @@ import type * as React from 'react';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
+import type { QualifiedUrl } from 'routing/Routes';
+import type User from 'logic/users/User';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 interface PluginRoute {
   path: string;
@@ -35,7 +38,7 @@ interface PluginNavigationDropdownItem {
 }
 
 type PluginNavigationLink = {
-  path: string;
+  path: QualifiedUrl<string>;
 }
 
 type PluginNavigationDropdown = {
@@ -48,6 +51,7 @@ type PluginNavigation = {
   perspective?: string;
   BadgeComponent?: React.ComponentType<{ text: string }>;
   position?: 'last' | undefined,
+  useIsValidLicense?: () => boolean,
 } & (PluginNavigationLink | PluginNavigationDropdown)
 
 interface PluginNavigationItems {
@@ -141,7 +145,12 @@ type FieldValueProvider = {
   type: string,
   displayName: string,
   formComponent: React.ComponentType,
-  summaryComponent: React.ComponentType,
+  summaryComponent: React.ComponentType<{
+    fieldName: string,
+    keys: Array<string>,
+    currentUser: User,
+    config: EventDefinition['field_spec'][number],
+  }>,
   defaultConfig: {
     template?: string,
     table_name?: string,

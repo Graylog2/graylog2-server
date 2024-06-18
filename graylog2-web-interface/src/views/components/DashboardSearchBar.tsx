@@ -154,7 +154,7 @@ const DashboardSearchBar = () => {
                                              limitDuration={limitDuration}
                                              hasErrorOnMount={!!errors.timerange}
                                              noOverride />
-                      <RefreshControls />
+                      <RefreshControls disable={!isValid} />
                     </TimeRangeRow>
 
                     <SearchQueryRow>

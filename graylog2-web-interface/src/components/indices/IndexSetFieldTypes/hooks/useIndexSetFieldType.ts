@@ -30,6 +30,8 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
+export const keyFn = (searchParams: SearchParams) => (['indexSetFieldTypes', searchParams]);
+
 export const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchParams): Promise<IndexSetFieldTypesQueryData> => {
   const indexSetFieldTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
   const url = PaginationURL(
@@ -59,7 +61,7 @@ const useIndexSetFieldTypes = (indexSetId: string, searchParams: SearchParams, {
   refetch: () => void,
 } => {
   const { data, isLoading, refetch } = useQuery(
-    ['indexSetFieldTypes', searchParams],
+    keyFn(searchParams),
     () => fetchIndexSetFieldTypes(indexSetId, searchParams),
     {
       onError: (errorThrown) => {

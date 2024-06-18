@@ -25,7 +25,7 @@ const CreateClientCertificateButton = () => {
 
   return (
     <>
-      <Button bsStyle="info" bsSize="xs" onClick={() => setShowCertificateForm(true)}>
+      <Button bsStyle="primary" bsSize="small" onClick={() => setShowCertificateForm(true)}>
         Generate client certificate
       </Button>
       {showCertificateForm && (

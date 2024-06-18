@@ -26,6 +26,7 @@ type ContextValue = {
   setSelectedEntities: (setSelectedEntitiesArgument: SetStateAction<EntityBase['id'][]>) => void,
   selectEntity: (entityId: EntityBase['id']) => void,
   deselectEntity: (entityId: EntityBase['id']) => void,
+  toggleEntitySelect: (entityId: EntityBase['id']) => void,
 } | undefined
 
 const SelectEntitiesContext = React.createContext<ContextValue>(undefined);

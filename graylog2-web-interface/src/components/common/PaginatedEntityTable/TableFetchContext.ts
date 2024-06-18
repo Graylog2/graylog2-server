@@ -14,19 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode;
+import * as React from 'react';
 
-import com.google.inject.ImplementedBy;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.nodes.DataNodeDto;
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
+import { singleton } from 'logic/singleton';
 
-@ImplementedBy(DataNodeServiceImpl.class)
-public interface DataNodeService {
-    DataNodeDto removeNode(String nodeId) throws NodeNotFoundException;
+export type ContextValue = {
+  searchParams: SearchParams,
+  refetch: () => void,
+  attributes: Array<Attribute>,
+};
 
-    DataNodeDto resetNode(String nodeId) throws NodeNotFoundException;
-
-    DataNodeDto stopNode(String nodeId) throws NodeNotFoundException;
-
-    DataNodeDto startNode(String nodeId) throws NodeNotFoundException;
-}
+const TableFetchContext = React.createContext<ContextValue | undefined>(undefined);
+export default singleton('contexts.TableFetchContext', () => TableFetchContext);

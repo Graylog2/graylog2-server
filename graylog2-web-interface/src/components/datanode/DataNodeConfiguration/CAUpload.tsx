@@ -167,7 +167,7 @@ const CAUpload = () => {
                        type="password"
                        label="Password" />
           <UnsecureConnectionAlert renderIfSecure={<br />} />
-          <Button disabled={!isValid} type="submit">
+          <Button bsStyle="primary" bsSize="small" disabled={!isValid} type="submit">
             {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
           </Button>
         </Form>

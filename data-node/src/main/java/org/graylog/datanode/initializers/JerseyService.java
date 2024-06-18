@@ -282,6 +282,7 @@ public class JerseyService extends AbstractIdleService {
     }
 
     private static KeyStore readKeystore(FilesystemKeystoreInformation keystoreInformation) {
+        LOG.info("Jersey is using keystore located in {}", keystoreInformation.location().toAbsolutePath());
         try (var in = Files.newInputStream(keystoreInformation.location())) {
             KeyStore caKeystore = KeyStore.getInstance(CertConstants.PKCS12);
             caKeystore.load(in, keystoreInformation.password());
