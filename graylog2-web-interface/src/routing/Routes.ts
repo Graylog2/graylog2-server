@@ -92,6 +92,12 @@ const Routes = {
     INDICES: {
       LIST: '/system/indices',
       FAILURES: '/system/indices/failures',
+      TEMPLATES: {
+        view: (templateId: string) => `/system/indices/templates/${templateId}`,
+        OVERVIEW: '/system/indices/templates',
+        CREATE: '/system/indices/templates/create',
+        edit: (templateId: string) => `/system/indices/templates/edit/${templateId}`,
+      },
       FIELD_TYPE_PROFILES: {
         OVERVIEW: '/system/indices/field-type-profiles',
         edit: (profileId: string) => `/system/indices/field-type-profiles/${profileId}`,
