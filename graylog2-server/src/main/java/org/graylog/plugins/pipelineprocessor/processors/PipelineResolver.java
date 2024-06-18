@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.processors;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -177,6 +176,4 @@ public class PipelineResolver {
 
         return pipeline;
     }
-
-    public record Result(MetricRegistry metrics, ImmutableMap<String, Pipeline> pipelines) {}
 }
