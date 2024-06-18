@@ -29,7 +29,7 @@ import org.graylog2.storage.versionprobe.VersionProbe;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.Optional;
+import java.util.List;
 
 @Singleton
 public class DatanodeConnectivityCheck {
@@ -40,8 +40,11 @@ public class DatanodeConnectivityCheck {
         this.versionProbe = new VersionProbe(objectMapper, okHttpClient, 1, Duration.seconds(1), true, opensearchUseJwtAuthentication, indexerJwtAuthTokenProvider);
     }
 
-
-    public Optional<SearchVersion> probe(DataNodeDto node) {
-        return versionProbe.probe(Collections.singletonList(URI.create(node.getTransportAddress())));
+    public ConnectionCheckResult probe(DataNodeDto node) {
+        final List<URI> hosts = Collections.singletonList(URI.create(node.getTransportAddress()));
+        final VersionProbeMessageCollector messageCollector = new VersionProbeMessageCollector();
+        return versionProbe.probe(hosts, messageCollector)
+                .map(ConnectionCheckResult::success)
+                .orElse(ConnectionCheckResult.failure(messageCollector.joinedMessages()));
     }
 }
