@@ -48,7 +48,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
 
     @Override
     public void retain(IndexSet indexSet) {
-        if (indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig timeBasedConfig) {
+        if (indexSet.getConfig().rotationStrategyConfig() instanceof TimeBasedSizeOptimizingStrategyConfig timeBasedConfig) {
             retainTimeBased(indexSet, timeBasedConfig);
         } else {
             retainCountBased(indexSet);
