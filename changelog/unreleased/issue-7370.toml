@@ -2,4 +2,4 @@ type = "fixed"
 message = "Fixed routing of home nav icon to open the active perspective welcome page."
 
 issues = ["Graylog2/graylog-plugin-enterprise#7370"]
-pulls = [""]
+pulls = ["19673"]
