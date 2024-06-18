@@ -25,9 +25,15 @@ import java.util.List;
 
 public class VersionProbeMessageCollector implements VersionProbeListener {
 
+    private final VersionProbeListener delegate;
     private final List<String> messages = new LinkedList<>();
 
+    public VersionProbeMessageCollector(VersionProbeListener delegate) {
+        this.delegate = delegate;
+    }
+
     public void onRetry(long attemptNumber, long configuredAttempts, @Nullable Throwable cause) {
+        delegate.onRetry(attemptNumber, configuredAttempts, cause);
         if (cause != null) {
             messages.add(cause.getMessage());
         }
@@ -35,6 +41,7 @@ public class VersionProbeMessageCollector implements VersionProbeListener {
 
     @Override
     public void onError(@Nonnull String message, @Nullable Throwable cause) {
+        delegate.onError(message, cause);
         if (cause != null) {
             messages.add(message + ": " + cause.getMessage());
         } else {

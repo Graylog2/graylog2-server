@@ -31,9 +31,9 @@ public class VersionProbeLogger implements VersionProbeListener {
     @Override
     public void onRetry(long attemptNumber, long connectionAttempts, @Nullable Throwable cause) {
         if (connectionAttempts == 0) {
-            logger.info("OpenSearch/Elasticsearch is not available. Retry #{}", attemptNumber);
+            logger.info("Indexer is not available. Retry #{}", attemptNumber);
         } else {
-            logger.info("OpenSearch/Elasticsearch is not available. Retry #{}/{}", attemptNumber, connectionAttempts);
+            logger.info("Indexer is not available. Retry #{}/{}", attemptNumber, connectionAttempts);
         }
     }
 
