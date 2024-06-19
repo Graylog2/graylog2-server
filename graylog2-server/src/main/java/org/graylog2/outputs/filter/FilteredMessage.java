@@ -24,4 +24,6 @@ public interface FilteredMessage {
     Message message();
 
     Set<String> outputs();
+
+    boolean isIndexed();
 }

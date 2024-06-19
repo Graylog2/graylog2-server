@@ -16,6 +16,7 @@
  */
 package org.graylog2.outputs.filter;
 
+import org.graylog2.outputs.BlockingBatchedESOutput;
 import org.graylog2.plugin.Message;
 
 import java.util.Set;
@@ -26,5 +27,11 @@ public record DefaultFilteredMessage(Message message, Set<String> outputs) imple
     public DefaultFilteredMessage {
         requireNonNull(message, "message cannot be null");
         requireNonNull(outputs, "outputs cannot be null");
+    }
+
+    @Override
+    public boolean isIndexed() {
+        // We consider a message indexed if it is written to the indexer output.
+        return outputs.contains(BlockingBatchedESOutput.FILTER_KEY);
     }
 }
