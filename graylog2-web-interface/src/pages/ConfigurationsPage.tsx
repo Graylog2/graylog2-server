@@ -20,7 +20,6 @@ import styled from 'styled-components';
 import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
 import URI from 'urijs';
 
-import AppConfig from 'util/AppConfig';
 import { isPermitted } from 'util/PermissionsMixin';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { Col, Nav, NavItem } from 'components/bootstrap';
@@ -30,7 +29,6 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
-import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaultsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
@@ -77,7 +75,6 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
 
 const ConfigurationsPage = () => {
   const currentUser = useCurrentUser();
-  const isCloud = AppConfig.isCloud();
 
   const configurationSections: Array<{
     name: string,
@@ -146,15 +143,6 @@ const ConfigurationsPage = () => {
       },
     },
     {
-      name: 'Index Set Defaults',
-      hide: isCloud,
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: IndexSetsDefaultsConfig,
-        title: 'Index Set Defaults',
-      },
-    },
-    {
       name: 'Users',
       SectionComponent: ConfigurationSection,
       props: {
@@ -168,7 +156,7 @@ const ConfigurationsPage = () => {
       showCaret: true,
       catchAll: true,
     },
-  ].filter(({ hide }) => !hide), [currentUser?.permissions, isCloud]);
+  ].filter(({ hide }) => !hide), [currentUser?.permissions]);
 
   return (
     <DocumentTitle title="Configurations">

@@ -90,6 +90,10 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String INDEX_SET_CREATE = PREFIX + "index_set:create";
     public static final String INDEX_SET_DELETE = PREFIX + "index_set:delete";
     public static final String INDEX_SET_UPDATE = PREFIX + "index_set:update";
+    public static final String INDEX_SET_TEMPLATE_CREATE = PREFIX + "index_set_template:create";
+    public static final String INDEX_SET_TEMPLATE_DELETE = PREFIX + "index_set_template:delete";
+    public static final String INDEX_SET_TEMPLATE_UPDATE = PREFIX + "index_set_template:update";
+    public static final String INDEX_SET_DEFAULT_TEMPLATE_UPDATE = PREFIX + "index_set_default_template:update";
     public static final String LOAD_BALANCER_STATUS_UPDATE = PREFIX + "load_balancer_status:update";
     public static final String LOG_LEVEL_UPDATE = PREFIX + "log_level:update";
     public static final String LOOKUP_ADAPTER_CREATE = PREFIX + "lut_adapter:create";
@@ -233,6 +237,10 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(INDEX_SET_CREATE)
             .add(INDEX_SET_DELETE)
             .add(INDEX_SET_UPDATE)
+            .add(INDEX_SET_TEMPLATE_CREATE)
+            .add(INDEX_SET_TEMPLATE_DELETE)
+            .add(INDEX_SET_TEMPLATE_UPDATE)
+            .add(INDEX_SET_DEFAULT_TEMPLATE_UPDATE)
             .add(LOAD_BALANCER_STATUS_UPDATE)
             .add(LOG_LEVEL_UPDATE)
             .add(LOOKUP_ADAPTER_CREATE)

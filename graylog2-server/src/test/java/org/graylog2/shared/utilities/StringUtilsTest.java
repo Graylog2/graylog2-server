@@ -84,4 +84,30 @@ public class StringUtilsTest {
 
 
     }
+
+    @Test
+    public void requireNonBlank() {
+        assertThat(StringUtils.requireNonBlank("foo")).isEqualTo("foo");
+        assertThat(StringUtils.requireNonBlank("foo", "a message")).isEqualTo("foo");
+
+        assertThatThrownBy(() -> StringUtils.requireNonBlank(null))
+                .hasMessageContaining("string cannot be blank")
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> StringUtils.requireNonBlank(""))
+                .hasMessageContaining("string cannot be blank")
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> StringUtils.requireNonBlank("  \t"))
+                .hasMessageContaining("string cannot be blank")
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> StringUtils.requireNonBlank(null, "test"))
+                .hasMessageContaining("test")
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> StringUtils.requireNonBlank("", "test"))
+                .hasMessageContaining("test")
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> StringUtils.requireNonBlank("  \t", "test"))
+                .hasMessageContaining("test")
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }

@@ -19,6 +19,8 @@ import type * as React from 'react';
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
 import type { QualifiedUrl } from 'routing/Routes';
+import type User from 'logic/users/User';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 interface PluginRoute {
   path: string;
@@ -133,17 +135,23 @@ interface LogoutHook {
 
 type DataTiering = {
   type: string,
-  TiersConfigurationFields: React.ComponentType<{}>,
+  TiersConfigurationFields: React.ComponentType<{valuesPrefix?: string}>,
   TiersSummary: React.ComponentType<{
     config: DataTieringConfig
   }>,
+  WarmTierReadinessInfo: React.ComponentType,
 }
 
 type FieldValueProvider = {
   type: string,
   displayName: string,
   formComponent: React.ComponentType,
-  summaryComponent: React.ComponentType,
+  summaryComponent: React.ComponentType<{
+    fieldName: string,
+    keys: Array<string>,
+    currentUser: User,
+    config: EventDefinition['field_spec'][number],
+  }>,
   defaultConfig: {
     template?: string,
     table_name?: string,
