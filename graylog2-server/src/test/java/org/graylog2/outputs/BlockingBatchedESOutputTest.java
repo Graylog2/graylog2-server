@@ -17,6 +17,7 @@
 package org.graylog2.outputs;
 
 import com.codahale.metrics.MetricRegistry;
+import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.ImmutableList;
 import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.Configuration;
@@ -38,6 +39,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 
@@ -53,6 +55,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MessagesExtension.class)
 public class BlockingBatchedESOutputTest {
 
+    @Mock
     private Configuration config;
 
     @Mock
@@ -74,17 +77,12 @@ public class BlockingBatchedESOutputTest {
 
         MetricRegistry metricRegistry = new MetricRegistry();
         NoopJournal journal = new NoopJournal();
-        this.config = new Configuration() {
-            @Override
-            public int getOutputBatchSize() {
-                return 3;
-            }
 
-            @Override
-            public int getShutdownTimeout() {
-                return "true".equals(System.getenv("CI")) ? 500 : 100; // be more graceful when running on ci infrastructure
-            }
-        };
+        when(config.getOutputFlushInterval()).thenReturn(1);
+        when(config.getOutputBatchSizeAsCount()).thenReturn(Optional.of(3));
+        when(config.getShutdownTimeout()).thenReturn(
+                "true".equals(System.getenv("CI")) ? 500 : 100 // be more graceful when running on ci infrastructure
+        );
 
         output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal, acknowledger, cluster, Executors.newSingleThreadScheduledExecutor());
         output.initialize();
@@ -97,14 +95,30 @@ public class BlockingBatchedESOutputTest {
 
     @Test
     public void write() throws Exception {
-        final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSize());
+        final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSizeAsCount().get());
+
+        verify(messages, times(1)).bulkIndex(eq(messageList));
+    }
+
+    @Test
+    public void writeSizeBasedBatch() throws Exception {
+        when(config.getOutputBatchSizeAsCount()).thenReturn(Optional.empty());
+        when(config.getOutputBatchSizeAsBytes()).thenReturn(Optional.of(Size.bytes(800)));
+
+        // TODO this test doesn't work yet and also could be a more elegant
+        MetricRegistry metricRegistry = new MetricRegistry();
+        NoopJournal journal = new NoopJournal();
+        output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal, acknowledger, cluster, Executors.newSingleThreadScheduledExecutor());
+        output.initialize();
+
+        final List<MessageWithIndex> messageList = sendMessages(output, 2, (int) config.getOutputBatchSizeAsBytes().get().toBytes() * 2);
 
         verify(messages, times(1)).bulkIndex(eq(messageList));
     }
 
     @Test
     public void forceFlushIfTimedOut() throws Exception {
-        final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSize() - 1);
+        final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSizeAsCount().get() - 1);
 
         // Should flush the buffer even though the batch size is not reached yet
         output.forceFlushIfTimedout();
@@ -114,7 +128,7 @@ public class BlockingBatchedESOutputTest {
 
     @Test
     public void flushWithService() throws Exception {
-        final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSize() - 1);
+        final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSizeAsCount().get() - 1);
 
         Thread.sleep(config.getOutputFlushInterval() * 1000L + 100); // let the flushservice run
 
@@ -126,7 +140,7 @@ public class BlockingBatchedESOutputTest {
         when(cluster.isConnected()).thenReturn(true);
         when(cluster.isDeflectorHealthy()).thenReturn(true);
 
-        final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSize() - 1);
+        final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSizeAsCount().get() - 1);
 
         output.stop();
 
@@ -138,7 +152,7 @@ public class BlockingBatchedESOutputTest {
     public void stop_withDisconnectedCluster() throws Exception {
         when(cluster.isConnected()).thenReturn(false);
 
-        sendMessages(output, config.getOutputBatchSize() - 1);
+        sendMessages(output, config.getOutputBatchSizeAsCount().get() - 1);
         output.stop();
 
         verifyNoInteractions(messages);
@@ -159,7 +173,7 @@ public class BlockingBatchedESOutputTest {
             return null;
         });
 
-        final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSize() - 1);
+        final List<MessageWithIndex> messageList = sendMessages(output, config.getOutputBatchSizeAsCount().get() - 1);
 
         // shutdown timeout is < test timeout
         output.stop();
@@ -167,17 +181,21 @@ public class BlockingBatchedESOutputTest {
         verify(messages, times(1)).bulkIndex(eq(messageList));
     }
 
-    private List<MessageWithIndex> buildMessages(final int count) {
+    private List<MessageWithIndex> buildMessages(final int count, final int size) {
         final ImmutableList.Builder<MessageWithIndex> builder = ImmutableList.builder();
+        var messageString = "A".repeat(size);
         for (int i = 0; i < count; i++) {
-            builder.add(new MessageWithIndex(messageFactory.createMessage("message" + i, "test", Tools.nowUTC()), mock(IndexSet.class)));
+            builder.add(new MessageWithIndex(messageFactory.createMessage(messageString + i, "test", Tools.nowUTC()), mock(IndexSet.class)));
         }
 
         return builder.build();
     }
 
     private List<MessageWithIndex> sendMessages(BlockingBatchedESOutput output, int count) throws Exception {
-        final List<MessageWithIndex> messageList = buildMessages(count);
+        return sendMessages(output, count, 8);
+    }
+    private List<MessageWithIndex> sendMessages(BlockingBatchedESOutput output, int count, int messagesize) throws Exception {
+        final List<MessageWithIndex> messageList = buildMessages(count, messagesize);
 
         for (MessageWithIndex entry : messageList) {
             output.writeMessageEntry(entry);

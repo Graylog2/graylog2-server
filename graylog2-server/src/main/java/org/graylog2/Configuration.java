@@ -20,9 +20,12 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
+import com.github.joschi.jadconfig.converters.IntegerConverter;
+import com.github.joschi.jadconfig.converters.SizeConverter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
@@ -82,8 +85,8 @@ public class Configuration extends CaConfiguration {
     @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
     private String passwordSecret;
 
-    @Parameter(value = "output_batch_size", required = true, validators = PositiveIntegerValidator.class)
-    private int outputBatchSize = 500;
+    @Parameter(value = "output_batch_size", required = true, validators = BatchSizeOrCountValidator.class)
+    private String outputBatchSize = "500";
 
     @Parameter(value = "output_flush_interval", required = true, validators = PositiveIntegerValidator.class)
     private int outputFlushInterval = 1;
@@ -322,8 +325,28 @@ public class Configuration extends CaConfiguration {
         return passwordSecret.trim();
     }
 
-    public int getOutputBatchSize() {
+    /**
+     * @deprecated Don't use directly!
+     * Use {@link Configuration#getOutputBatchSizeAsBytes()} or {@link Configuration#getOutputBatchSizeAsCount()}
+     */
+    public String getOutputBatchSize() {
         return outputBatchSize;
+    }
+
+    public Optional<Size> getOutputBatchSizeAsBytes() {
+        try {
+            return Optional.of(new SizeConverter().convertFrom(outputBatchSize));
+        } catch (Exception ignored) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Integer> getOutputBatchSizeAsCount() {
+        try {
+            return Optional.of(new IntegerConverter().convertFrom(outputBatchSize));
+        } catch (Exception ignored) {
+            return Optional.empty();
+        }
     }
 
     public int getOutputFlushInterval() {
@@ -618,6 +641,22 @@ public class Configuration extends CaConfiguration {
             }
             if (set.stream().anyMatch(StringUtils::isBlank)) {
                 throw new ValidationException(f("\"%s\" must only contain non-empty class name prefixes.", name));
+            }
+        }
+    }
+
+    public static class BatchSizeOrCountValidator implements Validator<String> {
+        @Override
+        public void validate(String name, String sizeOrCountValue) throws ValidationException {
+            try {
+                final Size size = Size.parse(sizeOrCountValue);
+                if (size.toMegabytes() > 90) {
+                    throw new ValidationException(
+                            "Parameter <%s> should not be greater than 90MB. (Found <%s>)".formatted(name, size));
+                }
+            } catch (Exception ignored) {
+                final Integer intValue = new IntegerConverter().convertFrom(sizeOrCountValue);
+                new PositiveIntegerValidator().validate(name, intValue);
             }
         }
     }

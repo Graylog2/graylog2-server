@@ -47,7 +47,7 @@ public abstract class ExposedConfiguration {
     public abstract int outputBufferProcessors();
 
     @JsonProperty("output_batch_size")
-    public abstract int outputBatchSize();
+    public abstract String outputBatchSize();
 
     @JsonProperty("processor_wait_strategy")
     public abstract String processorWaitStrategy();
@@ -132,7 +132,7 @@ public abstract class ExposedConfiguration {
             @JsonProperty("inputbuffer_processors") int inputBufferProcessors,
             @JsonProperty("processbuffer_processors") int processBufferProcessors,
             @JsonProperty("outputbuffer_processors") int outputBufferProcessors,
-            @JsonProperty("output_batch_size") int outputBatchSize,
+            @JsonProperty("output_batch_size") String outputBatchSize,
             @JsonProperty("processor_wait_strategy") String processorWaitStrategy,
             @JsonProperty("inputbuffer_wait_strategy") String inputBufferWaitStrategy,
             @JsonProperty("inputbuffer_ring_size") int inputBufferRingSize,
