@@ -22,10 +22,13 @@ import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { singletonStore } from 'logic/singleton';
 
-type Output = {
+export type Output = {
   id: string,
   title: string,
   type: string,
+  configuration?: {
+    [_key: string]: any,
+  }
 };
 
 // eslint-disable-next-line import/prefer-default-export
