@@ -16,11 +16,12 @@
  */
 package org.graylog.datanode.docs.printers;
 
-import java.io.Closeable;
-import java.io.Flushable;
+import org.graylog.datanode.docs.ConfigurationEntry;
+
 import java.util.List;
 
-public interface DocsPrinter extends Flushable, Closeable {
-
-    void write(List<ConfigurationSection> sections);
+public record ConfigurationSection(String heading, String description, List<ConfigurationSection> sections, List<ConfigurationEntry> entries) {
+    public boolean hasPriority() {
+        return entries.stream().anyMatch(ConfigurationEntry::hasPriority);
+    }
 }

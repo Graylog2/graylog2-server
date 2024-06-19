@@ -27,6 +27,7 @@ import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.docs.printers.CsvDocsPrinter;
 import org.graylog2.configuration.Documentation;
+import org.graylog2.configuration.DocumentationSection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -87,6 +88,7 @@ class GenerateConfigDocumentationTest {
         Assertions.assertThat(content).contains("#node_id_file = data/node-id");
     }
 
+    @DocumentationSection(heading = "my-test-config", description = "this is how you configure your app")
     private static class DummyConfiguration {
         @Documentation("""
                 The auto-generated node ID will be stored in this file and read after restarts. It is a good idea
@@ -109,8 +111,8 @@ class GenerateConfigDocumentationTest {
         @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
         private String passwordSecret;
 
+        @DocumentationSection(heading = "OpenSearch JWT token usage", description = "Communication between Graylog and OpenSearch is secured by JWT.")
         @Documentation("""
-            communication between Graylog and OpenSearch is secured by JWT.
             This configuration defines interval between token regenerations.
             """)
         @Parameter(value = "indexer_jwt_auth_token_caching_duration")

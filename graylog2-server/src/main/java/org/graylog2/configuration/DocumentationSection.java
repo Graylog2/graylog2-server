@@ -14,13 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.docs.printers;
+package org.graylog2.configuration;
 
-import java.io.Closeable;
-import java.io.Flushable;
-import java.util.List;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface DocsPrinter extends Flushable, Closeable {
-
-    void write(List<ConfigurationSection> sections);
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.FIELD})
+public @interface DocumentationSection {
+    String heading();
+    String description();
 }

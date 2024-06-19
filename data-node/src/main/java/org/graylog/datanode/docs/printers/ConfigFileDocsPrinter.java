@@ -21,62 +21,17 @@ import org.graylog.datanode.docs.ConfigurationEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ConfigFileDocsPrinter implements DocsPrinter {
-
-    public static final String DATANODE_CONFIG_HEADER = """
-            #####################################
-            # GRAYLOG DATANODE CONFIGURATION FILE
-            #####################################
-            #
-            # This is the Graylog DataNode configuration file. The file has to use ISO 8859-1/Latin-1 character encoding.
-            # Characters that cannot be directly represented in this encoding can be written using Unicode escapes
-            # as defined in https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.3, using the \\u prefix.
-            # For example, \\u002c.
-            #
-            # * Entries are generally expected to be a single line of the form, one of the following:
-            #
-            # propertyName=propertyValue
-            # propertyName:propertyValue
-            #
-            # * White space that appears between the property name and property value is ignored,
-            #   so the following are equivalent:
-            #
-            # name=Stephen
-            # name = Stephen
-            #
-            # * White space at the beginning of the line is also ignored.
-            #
-            # * Lines that start with the comment characters ! or # are ignored. Blank lines are also ignored.
-            #
-            # * The property value is generally terminated by the end of the line. White space following the
-            #   property value is not ignored, and is treated as part of the property value.
-            #
-            # * A property value can span several lines if each line is terminated by a backslash (‘\\’) character.
-            #   For example:
-            #
-            # targetCities=\\
-            #         Detroit,\\
-            #         Chicago,\\
-            #         Los Angeles
-            #
-            #   This is equivalent to targetCities=Detroit,Chicago,Los Angeles (white space at the beginning of lines is ignored).
-            #
-            # * The characters newline, carriage return, and tab can be inserted with characters \\n, \\r, and \\t, respectively.
-            #
-            # * The backslash character must be escaped as a double backslash. For example:
-            #
-            # path=c:\\\\docs\\\\doc1
-            #
-
-
-            """;
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigFileDocsPrinter.class);
 
@@ -96,17 +51,50 @@ public class ConfigFileDocsPrinter implements DocsPrinter {
         writer.flush();
     }
 
-
-    public void writeHeader() throws IOException {
-        writer.append(DATANODE_CONFIG_HEADER);
-    }
-
     @Override
-    public void writeField(ConfigurationEntry field) throws IOException {
-        writer.append(toString(field));
+    public void write(List<ConfigurationSection> configurationSections) {
+        configurationSections.forEach(section -> doWriteSection(section, 1));
     }
 
-    private String toString(ConfigurationEntry field) {
+    private void doWriteSection(ConfigurationSection configurationSection, int level) {
+        heading(configurationSection.heading(), level).ifPresent(this::append);
+        description(configurationSection.description()).ifPresent(this::append);
+        configurationSection.entries().stream().map(this::fieldToString).forEach(this::append);
+        configurationSection.sections().forEach(section -> doWriteSection(section, level + 1));
+    }
+
+    private Optional<String> description(String description) {
+        return Optional.ofNullable(description)
+                .map(text -> text.lines().map(l -> "# " + l.trim()).collect(Collectors.joining("\n")))
+                .map(text -> text + "\n\n");
+    }
+
+    private Writer append(String formatted) {
+        try {
+            return writer.append(formatted);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Optional<String> heading(String heading, int level) {
+        return Optional.ofNullable(heading).map(h -> headingTemplate(level).formatted(heading));
+    }
+
+    @Nonnull
+    private static String headingTemplate(int level) {
+        if(level == 1) {
+            return """
+                    #####################################
+                    # %s
+                    #####################################
+                    """;
+        } else {
+            return "#### %s\n";
+        }
+    }
+
+    private String fieldToString(ConfigurationEntry field) {
         // enabled with empty value, force to fill in
         final boolean forceFillIn = field.required() && field.defaultValue() == null;
 
@@ -126,14 +114,10 @@ public class ConfigFileDocsPrinter implements DocsPrinter {
 
     private static String formatDocumentation(ConfigurationEntry field) {
         final String[] lines = field.documentation().split("\n");
-        return Arrays.stream(lines)
-                .map(String::trim)
-                .peek(line -> {
-                    if (line.length() > 120) {
-                        LOG.warn("Documentation line of " + field.configurationBean().getName() + "." + field.fieldName() + " too long, consider splitting into more lines: " + WordUtils.abbreviate(line, 120, 130, "..."));
-                    }
-                })
-                .map(line -> "# " + line)
-                .collect(Collectors.joining("\n"));
+        return Arrays.stream(lines).map(String::trim).peek(line -> {
+            if (line.length() > 120) {
+                LOG.warn("Documentation line of " + field.configurationBean().getName() + "." + field.fieldName() + " too long, consider splitting into more lines: " + WordUtils.abbreviate(line, 120, 130, "..."));
+            }
+        }).map(line -> "# " + line).collect(Collectors.joining("\n"));
     }
 }

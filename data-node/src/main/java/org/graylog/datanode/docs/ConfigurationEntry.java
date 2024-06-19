@@ -37,7 +37,7 @@ public record ConfigurationEntry(
         String documentation
 ) {
 
-    public boolean isPriority() {
+    public boolean hasPriority() {
         return required && defaultValue == null;
     }
 }

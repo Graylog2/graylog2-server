@@ -22,6 +22,7 @@ import org.graylog.datanode.docs.ConfigurationEntry;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.List;
 
 public class CsvDocsPrinter implements DocsPrinter {
 
@@ -38,13 +39,31 @@ public class CsvDocsPrinter implements DocsPrinter {
     }
 
     @Override
-    public void writeHeader() throws IOException {
-        csvPRinter.printRecord(HEADERS);
+    public void write(List<ConfigurationSection> sections) {
+        printHeaders();
+        sections.forEach(this::doWriteSection);
     }
 
-    @Override
-    public void writeField(ConfigurationEntry f) throws IOException {
-        this.csvPRinter.printRecord(f.configName(), f.type(), f.required(), f.defaultValue(), f.documentation());
+    private void printHeaders() {
+        try {
+            csvPRinter.printRecord(HEADERS);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void doWriteSection(ConfigurationSection section) {
+        section.entries().forEach(this::writeField);
+        section.sections().forEach(this::doWriteSection);
+    }
+
+
+    private void writeField(ConfigurationEntry f) {
+        try {
+            this.csvPRinter.printRecord(f.configName(), f.type(), f.required(), f.defaultValue(), f.documentation());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
