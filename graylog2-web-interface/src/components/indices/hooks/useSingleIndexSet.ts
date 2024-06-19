@@ -36,8 +36,8 @@ const useSingleIndexSet = (indexSetId: string) : {
     () => fetchIndexSet(indexSetId),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading pipeline with id: ${indexSetId} failed with status: ${errorThrown}`,
-          'Could not load pipeline');
+        UserNotification.error(`Loading index set with id: ${indexSetId} failed with status: ${errorThrown}`,
+          'Could not load index set');
       },
       keepPreviousData: true,
     },

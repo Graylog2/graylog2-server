@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
 import { Icon, Section } from 'components/common';
@@ -33,10 +33,10 @@ type Props = {
   stream: Stream,
 };
 
-const ActionButtonsWrap = styled.span`
-  margin-right: 6px;
+const ActionButtonsWrap = styled.span(({ theme }) => css`
+  margin-right: ${theme.spacings.sm};
   float: right;
-`;
+`);
 
 const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
   const archivingEnabled = indexSet.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY || indexSet?.data_tiering?.archive_before_deletion;
@@ -55,7 +55,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
           <tr>
             <td>{indexSet?.title}</td>
             <td>
-              <Badge bsStyle={archivingEnabled ? 'success' : 'default'}>
+              <Badge bsStyle={archivingEnabled ? 'success' : 'warning'}>
                 {archivingEnabled ? 'enabled' : 'disabled'}
               </Badge>
             </td>
