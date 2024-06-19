@@ -146,7 +146,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
     }
 
     public PaginatedList<ViewDTO> searchPaginatedByType(ViewDTO.Type type,
-                                                        SearchQuery query,
+                                                        Bson query,
                                                         Predicate<ViewDTO> filter,
                                                         SortOrder order,
                                                         String sortField,
@@ -156,7 +156,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
         return searchPaginatedWithGrandTotal(
                 Filters.and(
                         Filters.or(Filters.eq(ViewDTO.FIELD_TYPE, type), Filters.not(Filters.exists(ViewDTO.FIELD_TYPE))),
-                        query.toBson()
+                        query
                 ),
                 filter,
                 order,
