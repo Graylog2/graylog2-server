@@ -54,10 +54,12 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 // Singleton class
 public class BlockingBatchedESOutput extends ElasticSearchOutput implements FilteredMessageOutput {
-    public static final String FILTER_KEY = "blocking-batched-es-output";
+    public static final String FILTER_KEY = "indexer";
 
     private static final Logger log = LoggerFactory.getLogger(BlockingBatchedESOutput.class);
     private final int maxBufferSize;
+    private final Meter writes;
+    private final Meter ignores;
     private final Timer processTime;
     private final Histogram batchSize;
     private final Meter bufferFlushes;
@@ -85,6 +87,8 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput implements Filt
         super(metricRegistry, messages, journal, acknowledger);
         this.maxBufferSize = serverConfiguration.getOutputBatchSize();
         outputFlushInterval = serverConfiguration.getOutputFlushInterval();
+        this.writes = metricRegistry.meter(name(FilteredMessageOutput.class, FILTER_KEY, "writes"));
+        this.ignores = metricRegistry.meter(name(FilteredMessageOutput.class, FILTER_KEY, "ignores"));
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
         this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
@@ -101,6 +105,9 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput implements Filt
     public void writeFiltered(FilteredMessage message) throws Exception {
         if (message.outputs().contains(FILTER_KEY)) {
             write(message.message());
+            writes.mark();
+        } else {
+            ignores.mark();
         }
     }
 
