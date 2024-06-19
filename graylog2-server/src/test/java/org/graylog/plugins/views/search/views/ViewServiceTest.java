@@ -29,6 +29,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.SortOrder;
@@ -43,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,6 +58,7 @@ public class ViewServiceTest {
 
     private SearchUser searchUser;
     private MongoDBTestService mongodb;
+    private final DbQueryCreator dbQueryCreator = new DbQueryCreator(ViewDTO.FIELD_TITLE, List.of());
 
     @BeforeEach
     public void setUp(MongoDBTestService mongodb, ObjectMapper objectMapper) throws Exception {
@@ -249,11 +252,9 @@ public class ViewServiceTest {
         dbService.save(ViewDTO.builder().type(ViewDTO.Type.SEARCH).title("View D").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
         dbService.save(ViewDTO.builder().type(ViewDTO.Type.SEARCH).title("View E").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
 
-        final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, searchFieldMapping);
-
         final PaginatedList<ViewDTO> result1 = dbService.searchPaginatedByType(
                 ViewDTO.Type.DASHBOARD,
-                queryParser.parse("A B D"),
+                dbQueryCreator.createDbQuery(List.of(), "A B D"),
                 view -> true, SortOrder.DESCENDING,
                 "title",
                 1,
@@ -269,7 +270,7 @@ public class ViewServiceTest {
 
         final PaginatedList<ViewDTO> result2 = dbService.searchPaginatedByType(
                 ViewDTO.Type.DASHBOARD,
-                queryParser.parse("A B D"),
+                dbQueryCreator.createDbQuery(List.of(), "A B D"),
                 view -> view.title().contains("B") || view.title().contains("D"), SortOrder.DESCENDING,
                 "title",
                 1,
@@ -285,7 +286,7 @@ public class ViewServiceTest {
 
         final PaginatedList<ViewDTO> result3 = dbService.searchPaginatedByType(
                 ViewDTO.Type.SEARCH,
-                queryParser.parse(""),
+                dbQueryCreator.createDbQuery(List.of(), ""),
                 view -> true, SortOrder.ASCENDING,
                 "title",
                 1,
