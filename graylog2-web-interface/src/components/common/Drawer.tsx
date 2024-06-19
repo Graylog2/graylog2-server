@@ -7,7 +7,7 @@ const StyledDrawer = styled(MantineDrawer)(({ theme }) => css`
     background-color: ${theme.colors.global.contentBackground};
   }
 `);
-type Props = Pick<React.ComponentProps<typeof MantineDrawer>, 'opened' | 'onClose' | 'position' | 'size' | 'children' | 'title'>;
+type Props = Pick<React.ComponentProps<typeof MantineDrawer>, 'opened' | 'onClose' | 'position' | 'size' | 'children' | 'title' | 'closeOnClickOutside'>;
 const Drawer = ({ title, ...props }: Props) => <StyledDrawer offset={15} padding="lg" radius={5} zIndex={1032} title={title} {...props} />;
 
 export default Drawer;
