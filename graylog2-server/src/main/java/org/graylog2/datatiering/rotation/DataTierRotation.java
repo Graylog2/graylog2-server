@@ -93,7 +93,7 @@ public class DataTierRotation {
         }
 
         // If no retention is selected, we have an "indefinite" optimization leeway
-        if (!(indexSet.getConfig().retentionStrategy() instanceof NoopRetentionStrategyConfig)) {
+        if (!(indexSet.getConfig().retentionStrategyConfig() instanceof NoopRetentionStrategyConfig)) {
             Period leeWay = indexLifetimeConfig.indexLifetimeMax().minus(indexLifetimeConfig.indexLifetimeMin());
             if (indexExceedsLeeWay(creationDate, leeWay)) {
                 return createResult(true,
