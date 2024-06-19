@@ -39,6 +39,7 @@ import type {
 } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import type { Stream } from 'logic/streams/types';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -71,7 +72,7 @@ const FailureStreamLink = () => {
 
   return (
     <span>
-      <StreamLink stream={isErrorFailureStream ? { id: failureStreamId, title: 'Processing and Indexing Failures' } : failureStream} />
+      <StreamLink stream={isErrorFailureStream ? { id: failureStreamId, title: 'Processing and Indexing Failures' } as Stream : failureStream} />
       <i> (<Link to={Routes.SYSTEM.ENTERPRISE}>Enterprise Plugin</Link> required)</i>
     </span>
   );
