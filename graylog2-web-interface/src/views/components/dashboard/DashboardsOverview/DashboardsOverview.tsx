@@ -34,7 +34,7 @@ const DashboardsOverview = ({ isEvidenceModal }: Props) => {
   const customColumnRenderers = useColumnRenderers();
 
   const renderDashboardActions = useCallback((dashboard: View) => (
-    <DashboardActions dashboard={dashboard} refetchDashboards={() => {}} isEvidenceModal={isEvidenceModal} />
+    <DashboardActions dashboard={dashboard} isEvidenceModal={isEvidenceModal} />
   ), [isEvidenceModal]);
 
   return (

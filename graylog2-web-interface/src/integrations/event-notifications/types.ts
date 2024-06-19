@@ -39,11 +39,16 @@ export type ValidationType = {
 }
 
 export interface ErrorType {
-    webhook_url: string[],
-    color: string[],
-    icon_url: string,
-    backlog_size: number,
-    custom_message: string,
+  webhook_url: string[],
+  color: string[],
+  icon_url: string,
+  backlog_size: number,
+  custom_message: string,
+  url: string,
+  api_key: string,
+  api_secret: string,
+  headers: string[],
+  body_template: string,
 }
 
 export type SlackNotificationSummaryType = {
