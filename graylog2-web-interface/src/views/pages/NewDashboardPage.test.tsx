@@ -28,6 +28,7 @@ import StreamsContext from 'contexts/StreamsContext';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import useCreateSearch from 'views/hooks/useCreateSearch';
+import type { Stream } from 'logic/streams/types';
 
 import NewDashboardPage from './NewDashboardPage';
 
@@ -39,7 +40,7 @@ jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
 
 const SimpleNewDashboardPage = () => (
-  <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' }]}>
+  <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' } as Stream]}>
     <NewDashboardPage />
   </StreamsContext.Provider>
 );
