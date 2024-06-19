@@ -32,6 +32,7 @@ import { createSearch } from 'fixtures/searches';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import type View from 'views/logic/views/View';
+import type { Stream } from 'logic/streams/types';
 
 import StreamSearchPage from './StreamSearchPage';
 
@@ -55,7 +56,7 @@ describe('StreamSearchPage', () => {
   };
   const streamId = 'stream-id-1';
   const SimpleStreamSearchPage = () => (
-    <StreamsContext.Provider value={[{ id: streamId, title: 'Teststream' }]}>
+    <StreamsContext.Provider value={[{ id: streamId, title: 'Teststream' } as Stream]}>
       <StreamSearchPage />
     </StreamsContext.Provider>
   );

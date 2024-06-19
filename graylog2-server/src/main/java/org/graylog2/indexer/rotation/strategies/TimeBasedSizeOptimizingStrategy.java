@@ -94,8 +94,8 @@ public class TimeBasedSizeOptimizingStrategy implements RotationStrategy {
         final DateTime creationDate = indices.indexCreationDate(index).orElseThrow(() -> new IllegalStateException("No index creation date"));
         final Long sizeInBytes = indices.getStoreSizeInBytes(index).orElseThrow(() -> new IllegalStateException("No index size"));
 
-        if (!(indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
-            throw new IllegalStateException(f("Unsupported RotationStrategyConfig type <%s>", indexSet.getConfig().rotationStrategy()));
+        if (!(indexSet.getConfig().rotationStrategyConfig() instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
+            throw new IllegalStateException(f("Unsupported RotationStrategyConfig type <%s>", indexSet.getConfig().rotationStrategyConfig()));
         }
 
         if (indices.numberOfMessages(index) == 0) {
@@ -112,7 +112,7 @@ public class TimeBasedSizeOptimizingStrategy implements RotationStrategy {
         }
 
         // If no retention is selected, we have an "indefinite" optimization leeway
-        if (!(indexSet.getConfig().retentionStrategy() instanceof NoopRetentionStrategyConfig)) {
+        if (!(indexSet.getConfig().retentionStrategyConfig() instanceof NoopRetentionStrategyConfig)) {
             Period leeWay = config.indexLifetimeMax().minus(config.indexLifetimeMin());
             if (indexExceedsLeeWay(creationDate, leeWay)) {
                 return createResult(true,

@@ -28,6 +28,7 @@ import Search from 'views/logic/search/Search';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { Stream } from 'logic/streams/types';
 
 import ShowViewPage from './ShowViewPage';
 
@@ -61,7 +62,7 @@ describe('ShowViewPage', () => {
     .search(Search.create().toBuilder().parameters([]).build())
     .build();
   const SimpleShowViewPage = () => (
-    <StreamsContext.Provider value={[{ id: 'stream-id-1', title: 'Stream 1' }]}>
+    <StreamsContext.Provider value={[{ id: 'stream-id-1', title: 'Stream 1' } as Stream]}>
       <ShowViewPage />
     </StreamsContext.Provider>
   );
