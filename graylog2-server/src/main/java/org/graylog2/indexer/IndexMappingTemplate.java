@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer;
 
-import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indices.Template;
 
 /**
@@ -30,7 +30,7 @@ public interface IndexMappingTemplate {
      * @param order          the order value of the index template
      * @return the index template
      */
-    Template toTemplate(TemplateIndexSetConfig indexSetConfig, Long order);
+    Template toTemplate(IndexSetMappingTemplate indexSetConfig, Long order);
 
     /**
      * Returns the index template as a map. (with a default order of -1)
@@ -38,7 +38,7 @@ public interface IndexMappingTemplate {
      * @param indexSetConfig template-related index set configuration
      * @return the index template
      */
-    default Template toTemplate(TemplateIndexSetConfig indexSetConfig) {
+    default Template toTemplate(IndexSetMappingTemplate indexSetConfig) {
         return toTemplate(indexSetConfig, -1L);
     }
 }
