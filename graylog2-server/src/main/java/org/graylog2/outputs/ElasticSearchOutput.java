@@ -94,6 +94,9 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
 
     @Override
     public void write(List<Message> messageList) throws Exception {
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Writing {} messages to [{}]", messageList.size(), NAME);
+        }
         writeMessageEntries(messageList);
     }
 

@@ -131,15 +131,17 @@ public class BatchedMessageFilterOutput implements MessageOutput {
 
     private void flush(List<FilteredMessage> filteredMessages) {
         if (filteredMessages.isEmpty()) {
-            LOG.debug("Skipping buffer flush with empty buffer");
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Skipping buffer flush with empty buffer");
+            }
             return;
         }
 
         batchSize.update(filteredMessages.size());
 
         activeFlushThreads.incrementAndGet();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Starting flushing {} messages, flush threads active {}",
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Starting flushing {} messages, flush threads active {}",
                     filteredMessages.size(),
                     activeFlushThreads.get());
         }
@@ -147,7 +149,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
         try (var ignored = processTime.time()) {
             for (final var output : outputs.values()) {
                 try {
-                    if (LOG.isDebugEnabled()) {
+                    if (LOG.isTraceEnabled()) {
                         LOG.trace("Writing {} message(s) to output <{}>", filteredMessages.size(), output);
                     }
                     output.writeFiltered(filteredMessages);
@@ -166,8 +168,8 @@ public class BatchedMessageFilterOutput implements MessageOutput {
         }
 
         activeFlushThreads.decrementAndGet();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Flushing {} messages completed", filteredMessages.size());
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Flushing {} messages completed", filteredMessages.size());
         }
     }
 
@@ -178,8 +180,8 @@ public class BatchedMessageFilterOutput implements MessageOutput {
 
     @Override
     public void write(List<Message> messages) throws Exception {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Writing {} messages", messages.size());
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Writing {} messages", messages.size());
         }
         for (final var message : messages) {
             write(message);
@@ -188,13 +190,13 @@ public class BatchedMessageFilterOutput implements MessageOutput {
 
     @Override
     public void write(Message message) throws Exception {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Running output filter on message: {}", message);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Running output filter on message: {}", message);
         }
         final var filteredMessage = outputFilter.apply(message);
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Appending filtered message <{}> to buffer", filteredMessage);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Appending filtered message <{}> to buffer", filteredMessage);
         }
         buffer.appendAndFlush(filteredMessage, this::flush);
     }
