@@ -35,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.entitygroups.EntityGroupService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -91,6 +92,8 @@ public class StreamCatalogTest {
     private EntityOwnershipService entityOwnershipService;
     @Mock
     private UserService userService;
+    @Mock
+    private EntityGroupService entityGroupService;
     private StreamFacade facade;
 
     @Before
@@ -111,7 +114,7 @@ public class StreamCatalogTest {
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );
 
-        facade = new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService, null);
+        facade = new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService, entityGroupService);
     }
 
     @Test

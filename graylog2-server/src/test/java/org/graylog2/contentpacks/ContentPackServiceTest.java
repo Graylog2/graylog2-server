@@ -79,6 +79,7 @@ import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.entitygroups.EntityGroupService;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -171,6 +172,8 @@ public class ContentPackServiceTest {
     private ContentPackInstallationPersistenceService contentPackInstallService;
     @Mock
     private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
+    @Mock
+    private EntityGroupService entityGroupService;
 
     @Mock
     InputService inputService;
@@ -212,7 +215,7 @@ public class ContentPackServiceTest {
         outputFactories2 = new HashMap<>();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
-                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService, null),
+                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService, entityGroupService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
                 ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService),
                 ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService),
