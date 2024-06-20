@@ -5,9 +5,9 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.outputs.filter.AllOutputsFilter;
 import org.graylog2.outputs.filter.DefaultFilteredMessage;
 import org.graylog2.outputs.filter.FilteredMessage;
-import org.graylog2.outputs.filter.StaticOutputFilter;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -64,8 +65,8 @@ class BatchedMessageFilterOutputTest {
         this.messageFactory = messageFactory;
         this.outputBatchSize = 3;
         this.output = new BatchedMessageFilterOutput(
-                Set.of(targetOutput1),
-                new StaticOutputFilter(),
+                Map.of("targetOutput1", targetOutput1),
+                new AllOutputsFilter(Map.of()),
                 new MetricRegistry(),
                 cluster,
                 acknowledger,

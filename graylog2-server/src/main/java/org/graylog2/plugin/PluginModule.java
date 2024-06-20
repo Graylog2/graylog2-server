@@ -126,8 +126,8 @@ public abstract class PluginModule extends Graylog2Module {
         serviceBinder.addBinding().to(initializerClass);
     }
 
-    protected void addFilteredMessageOutput(Class<? extends FilteredMessageOutput> filteredMessageOutputClass) {
-        filteredOutputsMultibinder().addBinding().to(filteredMessageOutputClass);
+    protected void addFilteredMessageOutput(String name, Class<? extends FilteredMessageOutput> filteredMessageOutputClass) {
+        filteredOutputsMapBinder().addBinding(name).to(filteredMessageOutputClass);
     }
 
     // This should only be used by plugins that have been built before Graylog 3.0.1.

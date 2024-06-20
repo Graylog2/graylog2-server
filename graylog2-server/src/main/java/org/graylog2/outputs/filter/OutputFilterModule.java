@@ -22,6 +22,6 @@ import com.google.inject.Scopes;
 public class OutputFilterModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(OutputFilter.class).to(StaticOutputFilter.class).in(Scopes.SINGLETON);
+        bind(OutputFilter.class).to(AllOutputsFilter.class).in(Scopes.SINGLETON);
     }
 }

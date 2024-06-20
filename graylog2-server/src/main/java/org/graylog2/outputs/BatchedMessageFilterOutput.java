@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,7 +53,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class BatchedMessageFilterOutput implements MessageOutput {
     private static final Logger LOG = LoggerFactory.getLogger(BatchedMessageFilterOutput.class);
 
-    private final Set<FilteredMessageOutput> outputs;
+    private final Map<String, FilteredMessageOutput> outputs;
     private final OutputFilter outputFilter;
     private final Duration outputFlushInterval;
     private final Duration shutdownTimeout;
@@ -73,7 +73,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
     private final IndexSetAwareMessageOutputBuffer buffer;
 
     @Inject
-    public BatchedMessageFilterOutput(Set<FilteredMessageOutput> outputs,
+    public BatchedMessageFilterOutput(Map<String, FilteredMessageOutput> outputs,
                                       OutputFilter outputFilter,
                                       MetricRegistry metricRegistry,
                                       Cluster cluster,
@@ -140,7 +140,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
         }
 
         try (var ignored = processTime.time()) {
-            for (final var output : outputs) {
+            for (final var output : outputs.values()) {
                 try {
                     if (LOG.isDebugEnabled()) {
                         LOG.trace("Writing {} message(s) to output <{}>", filteredMessages.size(), output);

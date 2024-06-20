@@ -297,8 +297,8 @@ public abstract class Graylog2Module extends AbstractModule {
         installOutput(outputMapBinder, target, factoryClass);
     }
 
-    protected Multibinder<FilteredMessageOutput> filteredOutputsMultibinder() {
-        return Multibinder.newSetBinder(binder(), FilteredMessageOutput.class);
+    protected MapBinder<String, FilteredMessageOutput> filteredOutputsMapBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, FilteredMessageOutput.class);
     }
 
     protected Multibinder<PluginPermissions> permissionsBinder() {

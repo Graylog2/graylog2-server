@@ -16,14 +16,28 @@
  */
 package org.graylog2.outputs.filter;
 
-import org.graylog2.outputs.ElasticSearchOutput;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.outputs.FilteredMessageOutput;
 
+import java.util.Map;
 import java.util.Set;
 
-public class StaticOutputFilter implements OutputFilter {
+/**
+ * Adds all registered {@link FilteredMessageOutput} instances as output targets to a message.
+ */
+@Singleton
+public class AllOutputsFilter implements OutputFilter {
+    private final Set<String> outputNames;
+
+    @Inject
+    public AllOutputsFilter(Map<String, FilteredMessageOutput> outputs) {
+        this.outputNames = outputs.keySet();
+    }
+
     @Override
     public FilteredMessage apply(Message msg) {
-        return new DefaultFilteredMessage(msg, Set.of(ElasticSearchOutput.FILTER_KEY));
+        return new DefaultFilteredMessage(msg, outputNames);
     }
 }
