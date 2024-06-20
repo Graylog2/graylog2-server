@@ -24,7 +24,6 @@ const addStreamOutput = async ({ streamId, outputs }: { streamId: string, output
 const removeStreamOutput = async ({ streamId, outputId }: { streamId: string, outputId: string}) => StreamOutputs.remove(streamId, outputId);
 
 const useStreamOutputMutation = () => {
-
   const addMutation = useMutation(addStreamOutput, {
     onError: (errorThrown) => {
       UserNotification.error(`Adding output to stream failed with status: ${errorThrown}`,

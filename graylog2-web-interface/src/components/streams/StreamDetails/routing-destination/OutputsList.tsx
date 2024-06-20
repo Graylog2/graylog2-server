@@ -26,19 +26,18 @@ import type { ConfigurationFormData } from 'components/configurationforms';
 
 import OutputItem from './OutputItem';
 
-import useAvailableOutputTypes from '../../useAvailableOutputTypes';
+import type { AvailableOutputRequestedConfiguration } from '../../useAvailableOutputTypes';
 
 type Props = {
   outputs: Array<Output>,
   streamId: string,
+  getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration,
+  isLoadingOutputTypes: boolean,
 }
 
-const OutputsList = ({ outputs, streamId }: Props) => {
-  const { data: availableOutputType, isInitialLoading: isLoadingOutputTypes } = useAvailableOutputTypes();
+const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputTypes }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const queryClient = useQueryClient();
-
-  const getTypeDefinition = (type: string) => availableOutputType.types[type]?.requested_configuration;
 
   const handleUpdate = (output: Output, data: ConfigurationFormData<Output['configuration']>) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_UPDATED, {

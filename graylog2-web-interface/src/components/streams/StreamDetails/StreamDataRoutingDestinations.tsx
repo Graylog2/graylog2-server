@@ -22,7 +22,7 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 
 import DestinationIndexSetSection from './routing-destination/DestinationIndexSetSection';
-import OutputsDestination from './routing-destination/OutputsDestination';
+import DestinationOutputs from './routing-destination/DestinationOutputs';
 
 type Props = {
   stream: Stream;
@@ -37,7 +37,7 @@ const StreamDataRoutingDestinations = ({ stream }: Props) => {
     <>
       {isSuccess && <DestinationIndexSetSection indexSet={indexSet} stream={stream} />}
       <StreamDataWarehouseComponent />
-      <OutputsDestination stream={stream} />
+      <DestinationOutputs stream={stream} />
     </>
   );
 };
