@@ -35,12 +35,12 @@ const UnsecureConnectionAlert = ({ renderIfSecure }: Props) => {
     <Alert bsStyle="warning">
       {connectionIsSecure === 'NO' && (
         <>
-          Your connection is not secure. Please be aware the information will be send to the server unencrypted.
+          Your connection is not secure. Please be aware the information will be sent to the server unencrypted.
         </>
       )}
       {connectionIsSecure === 'MAYBE' && (
         <>
-          Your connection may not be secure. Please be aware the information may be send to the server unencrypted.
+          Your connection may not be secure. Please be aware the information may be sent to the server unencrypted.
         </>
       )}
     </Alert>
