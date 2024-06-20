@@ -20,6 +20,9 @@ import org.graylog2.outputs.filter.FilteredMessage;
 
 import java.util.List;
 
+/**
+ * Classes that implement this interface accept batches of {@link FilteredMessage}s.
+ */
 public interface FilteredMessageOutput {
     /**
      * Write the given filtered messages. Based on the filtered messages attributes, the output can decide

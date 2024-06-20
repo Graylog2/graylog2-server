@@ -49,6 +49,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
+/**
+ * A message output that filters incoming messages and writes batches of filtered messages to all
+ * registered {@link FilteredMessageOutput} outputs.
+ */
 @Singleton
 public class BatchedMessageFilterOutput implements MessageOutput {
     private static final Logger LOG = LoggerFactory.getLogger(BatchedMessageFilterOutput.class);
@@ -69,7 +73,6 @@ public class BatchedMessageFilterOutput implements MessageOutput {
     private final Meter outputWriteFailures;
     private final Timer processTime;
     private ScheduledFuture<?> flushTask;
-    private final int maxBufferSize;
     private final IndexSetAwareMessageOutputBuffer buffer;
 
     @Inject
@@ -82,8 +85,6 @@ public class BatchedMessageFilterOutput implements MessageOutput {
                                       @Named("output_flush_interval") int outputFlushInterval,
                                       @Named("shutdown_timeout") int shutdownTimeoutMs,
                                       @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
-        this.cluster = cluster;
-        this.acknowledger = acknowledger;
         if (outputs.isEmpty()) {
             // We want to fail hard if we don't have any outputs!
             throw new IllegalStateException("No registered outputs found!");
@@ -91,17 +92,17 @@ public class BatchedMessageFilterOutput implements MessageOutput {
 
         this.outputs = outputs;
         this.outputFilter = outputFilter;
+        this.cluster = cluster;
+        this.acknowledger = acknowledger;
         this.outputFlushInterval = Duration.ofSeconds(outputFlushInterval);
         this.shutdownTimeout = Duration.ofMillis(shutdownTimeoutMs);
         this.daemonScheduler = daemonScheduler;
-        this.maxBufferSize = outputBatchSize;
 
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
         this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
         this.bufferFlushFailures = metricRegistry.meter(name(this.getClass(), "bufferFlushFailures"));
         this.bufferFlushesRequested = metricRegistry.meter(name(this.getClass(), "bufferFlushesRequested"));
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
-
         this.outputWriteFailures = metricRegistry.meter(name(this.getClass(), "outputWriteFailures"));
 
         this.buffer = new IndexSetAwareMessageOutputBuffer(outputBatchSize);
@@ -132,6 +133,8 @@ public class BatchedMessageFilterOutput implements MessageOutput {
             return;
         }
 
+        batchSize.update(filteredMessages.size());
+
         activeFlushThreads.incrementAndGet();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Starting flushing {} messages, flush threads active {}",
@@ -151,12 +154,14 @@ public class BatchedMessageFilterOutput implements MessageOutput {
                     outputWriteFailures.mark();
                 }
             }
-        }
-        // We only flush once all outputs are done writing messages.
-        acknowledger.acknowledge(filteredMessages.stream().map(FilteredMessage::message).toList());
 
-        bufferFlushes.mark();
-        batchSize.update(filteredMessages.size());
+            bufferFlushes.mark();
+            // We only acknowledge messages once all outputs are done writing messages.
+            acknowledger.acknowledge(filteredMessages.stream().map(FilteredMessage::message).toList());
+        } catch (Exception e) {
+            LOG.error("Error while flushing messages", e);
+            bufferFlushFailures.mark();
+        }
 
         activeFlushThreads.decrementAndGet();
         LOG.debug("Flushing {} messages completed", filteredMessages.size());
@@ -164,7 +169,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
 
     @Override
     public boolean isRunning() {
-        return true; // TODO: Is this okay for the default output?
+        return true;
     }
 
     @Override

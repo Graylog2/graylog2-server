@@ -20,10 +20,28 @@ import org.graylog2.plugin.Message;
 
 import java.util.Set;
 
+/**
+ * A filtered message that contains output target information.
+ */
 public interface FilteredMessage {
+    /**
+     * The Message object.
+     *
+     * @return the message
+     */
     Message message();
 
+    /**
+     * A set of output targets names.
+     *
+     * @return set of output targets
+     */
     Set<String> outputs();
 
+    /**
+     * Whether the message has been indexed or not.
+     *
+     * @return true if the message has been indexed. Otherwise, false.
+     */
     boolean isIndexed();
 }
