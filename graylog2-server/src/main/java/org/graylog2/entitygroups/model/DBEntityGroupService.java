@@ -98,13 +98,16 @@ public class DBEntityGroupService {
                 paginationHelper.filter(searchQuery.toBson()).sort(sort).perPage(perPage).page(page, filter);
     }
 
-    public PaginatedList<EntityGroup> findPaginatedForEntity(String type, String entityId, int page, int perPage, Bson sort) {
+    public PaginatedList<EntityGroup> findPaginatedForEntity(String type, String entityId, int page, int perPage, Bson sort,
+                                                             Predicate<EntityGroup> filter) {
         final Bson query = and(
                 exists(typeField(type)),
                 in(typeField(type), entityId)
         );
 
-        return paginationHelper.filter(query).sort(sort).perPage(perPage).page(page);
+        return filter == null ?
+                paginationHelper.filter(query).sort(sort).perPage(perPage).page(page) :
+                paginationHelper.filter(query).sort(sort).perPage(perPage).page(page, filter);
     }
 
     public EntityGroup save(EntityGroup entityGroup) {
@@ -142,14 +145,16 @@ public class DBEntityGroupService {
                 in(typeField(type), entityIds)
         );
         final Multimap<String, EntityGroup> entityToGroupsMap = MultimapBuilder.hashKeys().hashSetValues().build();
-        MongoUtils.stream(collection.find(query)).forEach(group -> {
-            final Set<String> ids = group.entities().get(type);
-            for (String entityId : ids) {
-                if (entityIds.contains(entityId)) {
-                    entityToGroupsMap.put(entityId, group);
+        try (final Stream<EntityGroup> stream = MongoUtils.stream(collection.find(query))) {
+            stream.forEach(group -> {
+                final Set<String> ids = group.entities().get(type);
+                for (String entityId : ids) {
+                    if (entityIds.contains(entityId)) {
+                        entityToGroupsMap.put(entityId, group);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         return entityToGroupsMap;
     }

@@ -46,8 +46,8 @@ public class EntityGroupService {
     }
 
     public PaginatedList<EntityGroup> findPaginatedForEntity(String type, String entityId, int page, int perPage, SortOrder order,
-                                                             String sortByField) {
-        return dbEntityGroupService.findPaginatedForEntity(type, entityId, page, perPage, order.toBsonSort(sortByField));
+                                                             String sortByField, Predicate<EntityGroup> filter) {
+        return dbEntityGroupService.findPaginatedForEntity(type, entityId, page, perPage, order.toBsonSort(sortByField), filter);
     }
 
     public Optional<EntityGroup> getByName(String groupName) {
