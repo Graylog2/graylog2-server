@@ -14,18 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil;
+import { useDebouncedValue } from '@mantine/hooks';
 
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-
-import java.time.LocalDateTime;
-
-@Deprecated
-public interface CertRenewalService {
-
-    record ProvisioningInformation(DataNodeProvisioningConfig.State status, String errorMsg,
-                                   LocalDateTime certValidUntil) {
-    }
-
-    void checkCertificatesForRenewal();
-}
+export default useDebouncedValue;
