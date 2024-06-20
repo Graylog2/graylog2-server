@@ -81,8 +81,8 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
                 .indexPrefix("prefix")
                 .shards(1)
                 .replicas(0)
-                .rotationStrategy(rotationStrategyConfig)
-                .retentionStrategy(retentionStrategyConfig)
+                .rotationStrategyConfig(rotationStrategyConfig)
+                .retentionStrategyConfig(retentionStrategyConfig)
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
                 .indexAnalyzer("standard")
                 .indexTemplateName("prefix-template")
@@ -128,8 +128,8 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
         assertThat(capturedDefaultIndexSetConfig.indexPrefix()).isEqualTo("prefix");
         assertThat(capturedDefaultIndexSetConfig.shards()).isEqualTo(1);
         assertThat(capturedDefaultIndexSetConfig.replicas()).isEqualTo(0);
-        assertThat(capturedDefaultIndexSetConfig.rotationStrategy()).isEqualTo(rotationStrategyConfig);
-        assertThat(capturedDefaultIndexSetConfig.retentionStrategy()).isEqualTo(retentionStrategyConfig);
+        assertThat(capturedDefaultIndexSetConfig.rotationStrategyConfig()).isEqualTo(rotationStrategyConfig);
+        assertThat(capturedDefaultIndexSetConfig.retentionStrategyConfig()).isEqualTo(retentionStrategyConfig);
         assertThat(capturedDefaultIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
         assertThat(capturedDefaultIndexSetConfig.indexTemplateName()).isEqualTo(elasticsearchConfiguration.getDefaultIndexTemplateName());
         assertThat(capturedDefaultIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
@@ -142,8 +142,8 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
         assertThat(capturedAdditionalIndexSetConfig.indexPrefix()).isEqualTo("foo");
         assertThat(capturedAdditionalIndexSetConfig.shards()).isEqualTo(1);
         assertThat(capturedAdditionalIndexSetConfig.replicas()).isEqualTo(0);
-        assertThat(capturedAdditionalIndexSetConfig.rotationStrategy()).isEqualTo(rotationStrategyConfig);
-        assertThat(capturedAdditionalIndexSetConfig.retentionStrategy()).isEqualTo(retentionStrategyConfig);
+        assertThat(capturedAdditionalIndexSetConfig.rotationStrategyConfig()).isEqualTo(rotationStrategyConfig);
+        assertThat(capturedAdditionalIndexSetConfig.retentionStrategyConfig()).isEqualTo(retentionStrategyConfig);
         assertThat(capturedAdditionalIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
         assertThat(capturedAdditionalIndexSetConfig.indexTemplateName()).isEqualTo("foo-template");
         assertThat(capturedAdditionalIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
