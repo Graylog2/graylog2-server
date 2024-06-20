@@ -55,13 +55,13 @@ import java.util.function.Consumer;
 
 public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
+    private final VersionProbeListener loggingListener = new VersionProbeLogger(LOG);
     private final ObjectMapper objectMapper;
     private final OkHttpClient okHttpClient;
     private final int connectionAttempts;
     private final Duration delayBetweenAttempts;
     private final boolean isJwtAuthentication;
     private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
-    private final VersionProbeListener loggingListener;
 
     @Inject
     public VersionProbe(ObjectMapper objectMapper,
@@ -77,7 +77,6 @@ public class VersionProbe {
         this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
         this.isJwtAuthentication = runsWithDataNode || opensearchUseJwtAuthentication;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
-        this.loggingListener = new VersionProbeLogger(LOG);
     }
 
     public Optional<SearchVersion> probe(final Collection<URI> hosts) {
