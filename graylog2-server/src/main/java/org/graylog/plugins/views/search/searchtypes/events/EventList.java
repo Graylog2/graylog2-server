@@ -119,6 +119,13 @@ public abstract class EventList implements SearchType {
             state.page().ifPresent(builder::page);
             state.perPage().ifPresent(builder::perPage);
             return builder.build();
+        } else if (state.limit().isPresent() &&
+                (state.offset().isEmpty() || state.offset().get().equals(0))
+        ) {
+            final var builder = toBuilder();
+            builder.page(1);
+            builder.perPage(state.limit().get());
+            return builder.build();
         }
 
         return this;
