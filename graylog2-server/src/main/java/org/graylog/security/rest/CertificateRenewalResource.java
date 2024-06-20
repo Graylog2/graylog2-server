@@ -19,7 +19,6 @@ package org.graylog.security.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -27,32 +26,24 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.datanode.DataNodeCommandService;
+import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.security.RestPermissions;
-
-import java.util.List;
 
 @Api(value = "Certificates")
 @Path("/certrenewal")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class CertificateRenewalResource implements PluginRestResource {
-    private final CertRenewalService certRenewalService;
+    private final DataNodeCommandService dataNodeCommandService;
 
     @Inject
-    public CertificateRenewalResource(final CertRenewalService certRenewalService) {
-        this.certRenewalService = certRenewalService;
-    }
-
-    @GET
-    // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
-    @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
-    public List<CertRenewalService.DataNode> listDataNodes() {
-        // Nodes are not filtered right now so that you can manually initiate a renewal for every node available
-        return certRenewalService.findNodes();
+    public CertificateRenewalResource(DataNodeCommandService dataNodeCommandService) {
+        this.dataNodeCommandService = dataNodeCommandService;
     }
 
     @POST
@@ -60,7 +51,7 @@ public class CertificateRenewalResource implements PluginRestResource {
     @AuditEvent(type = AuditEventTypes.CERTIFICATE_RENEWAL_MANUALLY_INITIATED)
     // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
     @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
-    public void initiateCertRenewalForNode(@ApiParam(name = "nodeID") @PathParam("nodeID") String nodeID) {
-        certRenewalService.initiateRenewalForNode(nodeID);
+    public void initiateCertRenewalForNode(@ApiParam(name = "nodeID") @PathParam("nodeID") String nodeID) throws NodeNotFoundException {
+        dataNodeCommandService.triggerCertificateSigningRequest(nodeID, DatanodeStartType.AUTOMATICALLY);
     }
 }

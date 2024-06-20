@@ -56,7 +56,8 @@ const ProfilesList = () => {
                                                     keyFn={keyFn}
                                                     entityAttributesAreCamelCase
                                                     expandedSectionsRenderer={expandedSectionsRenderer}
-                                                    columnRenderers={customColumnRenderers} />
+                                                    columnRenderers={customColumnRenderers}
+                                                    searchPlaceholder="Search for profile name" />
   );
 };
 
