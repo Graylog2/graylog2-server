@@ -136,7 +136,7 @@ describe('DashboardsOverview', () => {
 
     render(<SUT />);
 
-    const searchInput = await screen.findByPlaceholderText('Enter search query...');
+    const searchInput = await screen.findByPlaceholderText('Search for dashboards');
 
     expect(searchInput).toHaveValue('example query');
   });

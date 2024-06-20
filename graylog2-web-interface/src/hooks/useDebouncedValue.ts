@@ -14,13 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.indexset;
+import { useDebouncedValue } from '@mantine/hooks';
 
-/**
- * Part of {@link IndexSetConfig} and {@link org.graylog2.indexer.IndexSet} needed by index template building.
- */
-public record TemplateIndexSetConfig(String indexAnalyzer,
-                                     String indexWildcard,
-                                     CustomFieldMappings customFieldMappings) {
-
-}
+export default useDebouncedValue;

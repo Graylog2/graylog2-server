@@ -25,13 +25,9 @@ import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hook
 
 const StyledAlert = styled(Alert)`
   overflow: auto;
-  margin-right: 15px;
-  margin-left: 15px;
 `;
+
 const StyledSelect = styled(Select)`
-  margin-bottom: 10px;
-`;
-const StyledH3 = styled.h3`
   margin-bottom: 10px;
 `;
 
@@ -41,7 +37,6 @@ const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string,
 
   return (
     <div>
-      <StyledH3>Index Set Profile</StyledH3>
       <StyledAlert>
         With index set field type <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW}>profiles</Link> you can bundle up custom field types into profiles.
         You can assign any profile to this index set. To see and use profile setting for index set, you have to rotate indices.
@@ -49,8 +44,6 @@ const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string,
       <Row>
         <Col md={12}>
           <Input id={name}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9"
                  label="Index field type mapping profile">
             <StyledSelect placeholder="Select index field type profile"
                           inputId={name}

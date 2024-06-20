@@ -76,6 +76,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_ORDER_UPDATE = PREFIX + "extractor_order:update";
     public static final String FIELD_TYPE_MAPPING_CREATE = PREFIX + "field_type_mapping:create";
     public static final String FIELD_TYPE_MAPPING_DELETE = PREFIX + "field_type_mapping:delete";
+    public static final String FIELD_TYPE_POLLING_TRIGGERED = PREFIX + "field_type_polling:trigger";
 
     public static final String INDEX_FIELD_TYPE_PROFILE_CREATE = PREFIX + "index_field_type_profile:create";
     public static final String INDEX_FIELD_TYPE_PROFILE_UPDATE = PREFIX + "index_field_type_profile:update";
@@ -90,6 +91,10 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String INDEX_SET_CREATE = PREFIX + "index_set:create";
     public static final String INDEX_SET_DELETE = PREFIX + "index_set:delete";
     public static final String INDEX_SET_UPDATE = PREFIX + "index_set:update";
+    public static final String INDEX_SET_TEMPLATE_CREATE = PREFIX + "index_set_template:create";
+    public static final String INDEX_SET_TEMPLATE_DELETE = PREFIX + "index_set_template:delete";
+    public static final String INDEX_SET_TEMPLATE_UPDATE = PREFIX + "index_set_template:update";
+    public static final String INDEX_SET_DEFAULT_TEMPLATE_UPDATE = PREFIX + "index_set_default_template:update";
     public static final String LOAD_BALANCER_STATUS_UPDATE = PREFIX + "load_balancer_status:update";
     public static final String LOG_LEVEL_UPDATE = PREFIX + "log_level:update";
     public static final String LOOKUP_ADAPTER_CREATE = PREFIX + "lut_adapter:create";
@@ -225,6 +230,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(EXTRACTOR_UPDATE)
             .add(FIELD_TYPE_MAPPING_CREATE)
             .add(FIELD_TYPE_MAPPING_DELETE)
+            .add(FIELD_TYPE_POLLING_TRIGGERED)
             .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
             .add(GRANTS_UPDATE)
             .add(GROK_PATTERN_CREATE)
@@ -237,6 +243,10 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(INDEX_SET_CREATE)
             .add(INDEX_SET_DELETE)
             .add(INDEX_SET_UPDATE)
+            .add(INDEX_SET_TEMPLATE_CREATE)
+            .add(INDEX_SET_TEMPLATE_DELETE)
+            .add(INDEX_SET_TEMPLATE_UPDATE)
+            .add(INDEX_SET_DEFAULT_TEMPLATE_UPDATE)
             .add(LOAD_BALANCER_STATUS_UPDATE)
             .add(LOG_LEVEL_UPDATE)
             .add(LOOKUP_ADAPTER_CREATE)

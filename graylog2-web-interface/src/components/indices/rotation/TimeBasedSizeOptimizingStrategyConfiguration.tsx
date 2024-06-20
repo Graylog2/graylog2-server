@@ -102,8 +102,6 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({
     <div>
       <RangeInput label="Lifetime in days"
                   id="lifetime-range"
-                  labelClassName="col-sm-3"
-                  wrapperClassName="col-sm-9"
                   value={timeSizeOptimizingFixedLeeway ? indexLifetimeRange[0] : indexLifetimeRange}
                   help={isValidRange(indexLifetimeRange) ? `The ${rangeHelpTitle} number of days the data in this index is kept before it is retained. ${maxRotationPeriodHelpText} ${fixedLeewayHint}` : errorMessage}
                   min={1}

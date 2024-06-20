@@ -1,0 +1,5 @@
+type = "a"
+message = "Adds support for user-configurable index set templates."
+
+issues = [""]
+pulls = ["18956"]

@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.mock;
 
 public class FieldTypesResourceTest {
 
@@ -46,7 +48,7 @@ public class FieldTypesResourceTest {
             return streamIds.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
         };
 
-        final FieldTypesResource resource = new FieldTypesResource(fieldTypesService);
+        final FieldTypesResource resource = new FieldTypesResource(fieldTypesService, mock(IndexFieldTypePollerPeriodical.class));
         final Set<MappedFieldTypeDTO> fields = resource.allFieldTypes(searchUser);
 
         // field for allowed stream has to be present
@@ -72,7 +74,7 @@ public class FieldTypesResourceTest {
             }
         };
 
-        final FieldTypesResource resource = new FieldTypesResource(fieldTypesService);
+        final FieldTypesResource resource = new FieldTypesResource(fieldTypesService, mock(IndexFieldTypePollerPeriodical.class));
         final Set<MappedFieldTypeDTO> result = resource.allFieldTypes(searchUser);
 
         assertThat(result)
@@ -105,7 +107,7 @@ public class FieldTypesResourceTest {
             }
         };
 
-        final FieldTypesResource resource = new FieldTypesResource(mappedFieldTypesService);
+        final FieldTypesResource resource = new FieldTypesResource(mappedFieldTypesService, mock(IndexFieldTypePollerPeriodical.class));
         final Set<MappedFieldTypeDTO> result = resource.byStreams(request, searchUser);
 
         assertThat(result)
@@ -131,7 +133,7 @@ public class FieldTypesResourceTest {
                     .collect(Collectors.toSet());
         };
 
-        final FieldTypesResource resource = new FieldTypesResource(fieldTypesService);
+        final FieldTypesResource resource = new FieldTypesResource(fieldTypesService, mock(IndexFieldTypePollerPeriodical.class));
         final Set<MappedFieldTypeDTO> fields = resource.byStreams(req, searchUser);
 
         assertThat(fields)
@@ -162,7 +164,7 @@ public class FieldTypesResourceTest {
                 .streams(ImmutableSet.of("2323", "4242"))
                 .build();
 
-        final Set<MappedFieldTypeDTO> result = new FieldTypesResource(fieldTypesService).byStreams(
+        final Set<MappedFieldTypeDTO> result = new FieldTypesResource(fieldTypesService, mock(IndexFieldTypePollerPeriodical.class)).byStreams(
                 request,
                 searchUser
         );
@@ -185,7 +187,7 @@ public class FieldTypesResourceTest {
                 .streams(ImmutableSet.of("2323", "4242"))
                 .build();
 
-        final FieldTypesResource resource = new FieldTypesResource((streamIds, timeRange) -> Collections.emptySet());
+        final FieldTypesResource resource = new FieldTypesResource((streamIds, timeRange) -> Collections.emptySet(), mock(IndexFieldTypePollerPeriodical.class));
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> resource.byStreams(req, searchUser))
                 .satisfies(ex -> assertThat(ex.streamsWithMissingPermissions()).contains("2323"));

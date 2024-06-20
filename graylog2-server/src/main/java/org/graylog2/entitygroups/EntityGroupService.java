@@ -16,7 +16,6 @@
  */
 package org.graylog2.entitygroups;
 
-import com.google.inject.name.Named;
 import org.graylog2.entitygroups.model.EntityGroup;
 import org.graylog2.entitygroups.model.DBEntityGroupService;
 import org.graylog2.database.PaginatedList;
@@ -27,25 +26,17 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
+import java.util.stream.Stream;
 
 public class EntityGroupService {
     private final DBEntityGroupService dbEntityGroupService;
-    private final Map<String, String> groupedEntityTypes;
 
     @Inject
-    public EntityGroupService(DBEntityGroupService dbEntityGroupService,
-                              @Named("grouped_entity_types") Map<String, String> groupedEntityTypes) {
+    public EntityGroupService(DBEntityGroupService dbEntityGroupService) {
         this.dbEntityGroupService = dbEntityGroupService;
-        this.groupedEntityTypes = groupedEntityTypes;
     }
 
     public PaginatedList<EntityGroup> findPaginated(String query, int page, int perPage, SortOrder order,
@@ -54,23 +45,21 @@ public class EntityGroupService {
         return dbEntityGroupService.findPaginated(query, page, perPage, order.toBsonSort(sortByField), filter);
     }
 
+    public PaginatedList<EntityGroup> findPaginatedForEntity(String type, String entityId, int page, int perPage, SortOrder order,
+                                                             String sortByField, Predicate<EntityGroup> filter) {
+        return dbEntityGroupService.findPaginatedForEntity(type, entityId, page, perPage, order.toBsonSort(sortByField), filter);
+    }
+
     public Optional<EntityGroup> getByName(String groupName) {
         return dbEntityGroupService.getByName(groupName);
     }
 
-    public List<EntityGroup> getAllForEntity(String type, String entityId) {
-        return dbEntityGroupService.getAllForEntity(type, entityId);
-    }
-
-    public List<String> getAllNamesForEntity(String nativeEntityType, String entityId) {
-        final String type = groupedEntityTypes.get(nativeEntityType);
-        return dbEntityGroupService.getAllForEntity(type, entityId).stream()
-                .map(EntityGroup::name)
-                .toList();
+    public Stream<EntityGroup> streamAllForEntity(String type, String entityId) {
+        return dbEntityGroupService.streamAllForEntity(type, entityId);
     }
 
     public Map<String, Collection<EntityGroup>> getAllForEntities(String type, Collection<String> entities) {
-        return dbEntityGroupService.getAllForEntities(type, entities);
+        return dbEntityGroupService.getAllForEntities(type, entities).asMap();
     }
 
     public EntityGroup create(EntityGroup group) {
@@ -78,17 +67,15 @@ public class EntityGroupService {
     }
 
     public EntityGroup update(String id, EntityGroup group) {
-        if (dbEntityGroupService.get(id).isEmpty()) {
-            throw new NotFoundException("Unable to find entity group to update");
+        final EntityGroup saved = dbEntityGroupService.update(group.toBuilder().id(id).build());
+        if (saved == null) {
+            throw new NotFoundException("Unable to find mutable entity group to update");
         }
-        return dbEntityGroupService.save(group.toBuilder().id(id).build());
+        return saved;
     }
 
     public EntityGroup addEntityToGroup(String groupId, String type, String entityId) {
-        final EntityGroup group = requireEntityGroup(groupId);
-        final Map<String, Set<String>> entities = new HashMap<>(firstNonNull(group.entities(), Map.of()));
-        addEntityToMap(entities, type, entityId);
-        return dbEntityGroupService.save(group.toBuilder().entities(entities).build());
+        return dbEntityGroupService.addEntityToGroup(groupId, type, entityId);
     }
 
     public long delete(String id) {
@@ -98,12 +85,5 @@ public class EntityGroupService {
     public EntityGroup requireEntityGroup(String id) {
         return dbEntityGroupService.get(id)
                 .orElseThrow(() -> new IllegalArgumentException("Unable to find entity group to update"));
-    }
-
-    public static void addEntityToMap(Map<String, Set<String>> entities, String type, String entityId) {
-        final Set<String> entityIds = new HashSet<>(entities.getOrDefault(type, Set.of()));
-
-        entityIds.add(entityId);
-        entities.put(type, entityIds);
     }
 }
