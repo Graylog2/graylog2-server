@@ -77,7 +77,7 @@ class BatchedMessageFilterOutputTest {
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    void setUp(MessageFactory messageFactory) throws Exception {
+    void setUp(MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
         this.outputBatchSize = 3;
         this.output = new BatchedMessageFilterOutput(
