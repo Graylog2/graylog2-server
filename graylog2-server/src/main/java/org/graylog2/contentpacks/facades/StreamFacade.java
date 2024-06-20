@@ -123,7 +123,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 outputIds,
                 ValueReference.of(stream.isDefaultStream()),
                 ValueReference.of(stream.getRemoveMatchesFromDefaultStream()),
-                entityGroupService.getAllNamesForEntity(stream));
+                entityGroupService.getAllGroupNamesForEntity(StreamEntity.ENTITY_GROUP_TYPE_NAME, stream.getId()));
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         return EntityV1.builder()
@@ -190,7 +190,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .collect(Collectors.toSet());
         streamService.addOutputs(new ObjectId(savedStreamId), outputIds);
 
-        entityGroupService.handleEntityGroups(savedStreamId, stream.entityTypeName(), streamEntity);
+        entityGroupService.handleEntityGroups(savedStreamId, streamEntity.groupedEntityTypeName(), streamEntity);
 
         return NativeEntity.create(entity.id(), savedStreamId, TYPE_V1, stream.getTitle(), stream);
     }

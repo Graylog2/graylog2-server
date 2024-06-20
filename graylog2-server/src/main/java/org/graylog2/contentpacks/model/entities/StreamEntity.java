@@ -34,6 +34,8 @@ import java.util.Set;
 @WithBeanGetter
 @JsonAutoDetect
 public abstract class StreamEntity implements GroupableEntity {
+    public static String ENTITY_GROUP_TYPE_NAME = "streams";
+
     @JsonProperty("title")
     @NotBlank
     public abstract ValueReference title();
@@ -95,5 +97,9 @@ public abstract class StreamEntity implements GroupableEntity {
                 outputs,
                 defaultStream,
                 removeMatches);
+    }
+
+    public String groupedEntityTypeName() {
+        return ENTITY_GROUP_TYPE_NAME;
     }
 }

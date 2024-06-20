@@ -150,10 +150,6 @@ public class DBEntityGroupService {
         return Optional.ofNullable(collection.find(query).first());
     }
 
-    public Stream<EntityGroup> streamAll() {
-        return MongoUtils.stream(collection.find(new Document()));
-    }
-
     public Stream<EntityGroup> streamAllForEntity(String type, String entityId) {
         final Bson query = and(
                 exists(typeField(type)),

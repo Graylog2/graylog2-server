@@ -12,4 +12,7 @@ public interface GroupableEntity {
     @Nullable
     @JsonProperty(FIELD_ENTITY_GROUPS)
     List<String> entityGroups();
+
+    @JsonIgnore
+    String groupedEntityTypeName();
 }

@@ -20,7 +20,6 @@ import org.graylog2.entitygroups.contentpacks.entities.GroupableEntity;
 import org.graylog2.entitygroups.model.EntityGroup;
 import org.graylog2.entitygroups.model.DBEntityGroupService;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.entitygroups.model.Groupable;
 import org.graylog2.rest.models.SortOrder;
 
 import jakarta.inject.Inject;
@@ -65,8 +64,8 @@ public class EntityGroupService {
         return dbEntityGroupService.getAllForEntities(type, entities).asMap();
     }
 
-    public List<String> getAllNamesForEntity(Groupable groupable) {
-        try (final Stream<EntityGroup> stream = dbEntityGroupService.streamAllForEntity(groupable.entityTypeName(), groupable.id())) {
+    public List<String> getAllGroupNamesForEntity(String type, String entityId) {
+        try (final Stream<EntityGroup> stream = dbEntityGroupService.streamAllForEntity(type, entityId)) {
             return stream
                     .map(EntityGroup::name)
                     .toList();

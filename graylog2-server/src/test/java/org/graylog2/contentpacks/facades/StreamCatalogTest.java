@@ -32,7 +32,7 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.StreamEntityUnscoped;
+import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
@@ -146,7 +146,7 @@ public class StreamCatalogTest {
         assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
-        final StreamEntityUnscoped streamEntity = objectMapper.convertValue(entityV1.data(), StreamEntityUnscoped.class);
+        final StreamEntity streamEntity = objectMapper.convertValue(entityV1.data(), StreamEntity.class);
         assertThat(streamEntity.title()).isEqualTo(ValueReference.of("Stream Title"));
         assertThat(streamEntity.description()).isEqualTo(ValueReference.of("Stream Description"));
         assertThat(streamEntity.disabled()).isEqualTo(ValueReference.of(false));
@@ -199,7 +199,7 @@ public class StreamCatalogTest {
         final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
         assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
-        final StreamEntityUnscoped streamEntity = objectMapper.convertValue(entity.data(), StreamEntityUnscoped.class);
+        final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         assertThat(streamEntity.title()).isEqualTo(ValueReference.of("Test"));
         assertThat(streamEntity.description()).isEqualTo(ValueReference.of("Description"));
         assertThat(streamEntity.matchingType()).isEqualTo(ValueReference.of(Stream.MatchingType.AND));

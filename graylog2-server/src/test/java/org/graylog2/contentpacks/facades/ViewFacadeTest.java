@@ -65,7 +65,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
-import org.graylog2.contentpacks.model.entities.StreamEntityUnscoped;
+import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -279,7 +279,7 @@ public class ViewFacadeTest {
     }
 
     private EntityV1 createStreamEntity() {
-        final StreamEntityUnscoped streamEntity = StreamEntityUnscoped.create(
+        final StreamEntity streamEntity = StreamEntity.create(
                 ValueReference.of("title"),
                 ValueReference.of("description"),
                 ValueReference.of(false),
@@ -289,7 +289,8 @@ public class ViewFacadeTest {
                 ImmutableList.of(),
                 ImmutableSet.of(),
                 ValueReference.of(false),
-                ValueReference.of(true)
+                ValueReference.of(true),
+                ImmutableList.of()
         );
         return EntityV1.builder()
                 .id(ModelId.of(newStreamId))
