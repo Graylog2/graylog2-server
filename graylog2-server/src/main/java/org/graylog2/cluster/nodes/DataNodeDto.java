@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.Null;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
@@ -43,6 +44,7 @@ import java.util.Optional;
 public abstract class DataNodeDto extends NodeDto {
 
     public static final String FIELD_CERT_VALID_UNTIL = "cert_valid_until";
+    public static final String FIELD_DATANODE_VERSION = "datanode_version";
 
     @Nullable
     @JsonProperty("cluster_address")
@@ -62,6 +64,11 @@ public abstract class DataNodeDto extends NodeDto {
     @jakarta.annotation.Nullable
     @JsonProperty(FIELD_CERT_VALID_UNTIL)
     public abstract Date getCertValidUntil();
+
+    @jakarta.annotation.Nullable
+    @JsonProperty(FIELD_DATANODE_VERSION)
+    public abstract String getDatanodeVersion();
+
 
     @Nullable
     @JsonUnwrapped
@@ -106,6 +113,10 @@ public abstract class DataNodeDto extends NodeDto {
             params.put(FIELD_CERT_VALID_UNTIL, getCertValidUntil());
         }
 
+        if(Objects.nonNull(getDatanodeVersion())) {
+            params.put(FIELD_DATANODE_VERSION, getDatanodeVersion());
+        }
+
         return params;
     }
 
@@ -135,6 +146,9 @@ public abstract class DataNodeDto extends NodeDto {
 
         @JsonProperty(FIELD_CERT_VALID_UNTIL)
         public abstract Builder setCertValidUntil(Date certValidUntil);
+
+        @JsonProperty(FIELD_DATANODE_VERSION)
+        public abstract Builder setDatanodeVersion(String datanodeVersion);
 
         public abstract DataNodeDto build();
     }

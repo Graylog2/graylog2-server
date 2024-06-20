@@ -24,6 +24,7 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.plugin.Version;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.function.Supplier;
 
@@ -47,6 +47,8 @@ public class NodePingPeriodical extends Periodical {
     private final Supplier<OpensearchState> processState;
 
     private final Supplier<Date> certValidUntil;
+
+    private final Version version = Version.CURRENT_CLASSPATH;
 
 
     @Inject
@@ -134,6 +136,7 @@ public class NodePingPeriodical extends Periodical {
                 .setHostname(configuration.getHostname())
                 .setRestApiAddress(datanodeRestApiUri.get())
                 .setCertValidUntil(certValidUntil.get())
+                .setDatanodeVersion(version.getVersion().toString())
                 .build();
 
         nodeService.ping(dto);
