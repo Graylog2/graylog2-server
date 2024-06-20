@@ -110,6 +110,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
 
     @Override
     public void initialize() throws Exception {
+        LOG.debug("Starting buffer flush task to run every {} milliseconds", outputFlushInterval.toMillis());
         this.flushTask = daemonScheduler.scheduleAtFixedRate(() -> {
             try {
                 if (buffer.shouldFlush(outputFlushInterval)) {
@@ -123,13 +124,14 @@ public class BatchedMessageFilterOutput implements MessageOutput {
 
     @VisibleForTesting
     void forceFlush() {
+        LOG.debug("Force-flushing the buffer");
         bufferFlushesRequested.mark();
         buffer.flush(this::flush);
     }
 
     private void flush(List<FilteredMessage> filteredMessages) {
-        // Never try to flush an empty buffer
         if (filteredMessages.isEmpty()) {
+            LOG.debug("Skipping buffer flush with empty buffer");
             return;
         }
 
@@ -164,7 +166,9 @@ public class BatchedMessageFilterOutput implements MessageOutput {
         }
 
         activeFlushThreads.decrementAndGet();
-        LOG.debug("Flushing {} messages completed", filteredMessages.size());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Flushing {} messages completed", filteredMessages.size());
+        }
     }
 
     @Override
@@ -174,6 +178,9 @@ public class BatchedMessageFilterOutput implements MessageOutput {
 
     @Override
     public void write(List<Message> messages) throws Exception {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Writing {} messages", messages.size());
+        }
         for (final var message : messages) {
             write(message);
         }
@@ -181,20 +188,28 @@ public class BatchedMessageFilterOutput implements MessageOutput {
 
     @Override
     public void write(Message message) throws Exception {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Running output filter on message: {}", message);
+        }
         final var filteredMessage = outputFilter.apply(message);
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Appending filtered message <{}> to buffer", filteredMessage);
+        }
         buffer.appendAndFlush(filteredMessage, this::flush);
     }
 
     @VisibleForTesting
     void cancelFlushTask() {
         if (flushTask != null) {
+            LOG.debug("Cancelling flush task");
             flushTask.cancel(false);
         }
     }
 
     @Override
     public void stop() {
+        LOG.debug("Stopping output filter");
         cancelFlushTask();
 
         if (cluster.isConnected() && cluster.isDeflectorHealthy()) {
@@ -202,6 +217,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
             final ExecutorService executorService = Executors.newSingleThreadExecutor(
                     new ThreadFactoryBuilder().setNameFormat("batched-message-filter-output-shutdown-flush").build());
             try {
+                LOG.debug("Flushing the current buffer for shutdown");
                 executorService.submit(this::forceFlush).get(shutdownTimeout.toMillis(), TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 // OK, we are shutting down anyway
