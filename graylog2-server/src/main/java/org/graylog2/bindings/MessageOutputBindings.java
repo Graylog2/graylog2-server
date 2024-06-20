@@ -22,11 +22,11 @@ import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.Configuration;
-import org.graylog2.outputs.BlockingBatchedESOutput;
+import org.graylog2.outputs.BatchedMessageFilterOutput;
 import org.graylog2.outputs.DefaultMessageOutput;
+import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.outputs.GelfOutput;
 import org.graylog2.outputs.LoggingOutput;
-import org.graylog2.outputs.MessageFilterOutput;
 import org.graylog2.outputs.filter.OutputFilterModule;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -50,7 +50,7 @@ public class MessageOutputBindings extends Graylog2Module {
 
     @Override
     protected void configure() {
-        final Class<? extends MessageOutput> defaultMessageOutputClass = getDefaultMessageOutputClass(MessageFilterOutput.class);
+        final Class<? extends MessageOutput> defaultMessageOutputClass = getDefaultMessageOutputClass(BatchedMessageFilterOutput.class);
         LOG.debug("Using default message output class: {}", defaultMessageOutputClass.getCanonicalName());
         OptionalBinder.newOptionalBinder(binder(), Key.get(MessageOutput.class, DefaultMessageOutput.class))
                 .setDefault().to(defaultMessageOutputClass).in(Scopes.SINGLETON);
@@ -59,8 +59,8 @@ public class MessageOutputBindings extends Graylog2Module {
 
         filteredOutputsMultibinder(); // Ensure initialization of the multi-binder for filtered outputs
 
-        bind(BlockingBatchedESOutput.class).in(Scopes.SINGLETON);
-        filteredOutputsMultibinder().addBinding().to(BlockingBatchedESOutput.class);
+        bind(ElasticSearchOutput.class).in(Scopes.SINGLETON);
+        filteredOutputsMultibinder().addBinding().to(ElasticSearchOutput.class);
 
         final MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputMapBinder = outputsMapBinder();
         installOutput(outputMapBinder, GelfOutput.class, GelfOutput.Factory.class);

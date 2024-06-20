@@ -18,13 +18,15 @@ package org.graylog2.plugin.outputs;
 
 import org.graylog2.outputs.filter.FilteredMessage;
 
+import java.util.List;
+
 public interface FilteredMessageOutput {
     /**
-     * Write the given filtered message. Based on the filtered message attributes, the output can decide
+     * Write the given filtered messages. Based on the filtered messages attributes, the output can decide
      * to discard the message.
      *
-     * @param message the filtered message
-     * @throws Exception if writing the message fails
+     * @param filteredMessages the filtered messages
+     * @throws Exception if writing the messages fails
      */
-    void writeFiltered(FilteredMessage message) throws Exception;
+    void writeFiltered(List<FilteredMessage> filteredMessages) throws Exception;
 }

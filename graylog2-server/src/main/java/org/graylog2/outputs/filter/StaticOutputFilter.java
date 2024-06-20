@@ -16,18 +16,14 @@
  */
 package org.graylog2.outputs.filter;
 
-import org.graylog2.outputs.BlockingBatchedESOutput;
+import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
 public class StaticOutputFilter implements OutputFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(StaticOutputFilter.class);
-
     @Override
     public FilteredMessage apply(Message msg) {
-        return new DefaultFilteredMessage(msg, Set.of(BlockingBatchedESOutput.FILTER_KEY));
+        return new DefaultFilteredMessage(msg, Set.of(ElasticSearchOutput.FILTER_KEY));
     }
 }
