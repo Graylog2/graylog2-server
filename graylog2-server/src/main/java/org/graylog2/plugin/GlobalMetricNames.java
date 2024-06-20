@@ -20,7 +20,8 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public final class GlobalMetricNames {
 
-    private GlobalMetricNames() {}
+    private GlobalMetricNames() {
+    }
 
     public static final String OLDEST_SEGMENT_SUFFIX = "oldest-segment";
     public static final String RATE_SUFFIX = "1-sec-rate";
@@ -43,6 +44,7 @@ public final class GlobalMetricNames {
 
     public static final String OUTPUT_BUFFER_USAGE = "org.graylog2.buffers.output.usage";
     public static final String OUTPUT_BUFFER_SIZE = "org.graylog2.buffers.output.size";
+    public static final String OUTPUT_BUFFER_RATELIMIT = "org.graylog2.buffers.output.ratelimit";
 
     public static final String JOURNAL_APPEND_RATE = name("org.graylog2.journal.append", RATE_SUFFIX);
     public static final String JOURNAL_READ_RATE = name("org.graylog2.journal.read", RATE_SUFFIX);

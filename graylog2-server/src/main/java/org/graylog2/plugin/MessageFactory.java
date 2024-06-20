@@ -16,6 +16,9 @@
  */
 package org.graylog2.plugin;
 
+import jakarta.annotation.Nullable;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.IndexingResultCallback;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -47,6 +50,22 @@ public interface MessageFactory {
      * @return the new message object
      */
     Message createMessage(String id, Map<String, Object> newFields);
+
+    /**
+     * Return a new {@link SystemMessage} object which can be used for System purposes like restoring Archives.
+     * The message has the following properties:
+     * <ul>
+     *  <li>A size of 0, so its traffic is not accounted</li>
+     *  <li>A single predetermined IndexSet</li>
+     *  <li>No streams, so it will only be routed to the {@link org.graylog2.outputs.DefaultMessageOutput}</li>
+     * </ul>
+     *
+     * @param indexSet       the predetermined indexSet where the message will be indexed
+     * @param fields         the map of fields
+     * @param resultCallback an optional {@link IndexingResultCallback} that will be called once the Message is indexed
+     * @return the new SystemMessage object
+     */
+    public SystemMessage createSystemMessage(IndexSet indexSet, Map<String, Object> fields, @Nullable IndexingResultCallback resultCallback);
 
     /**
      * Returns a fake {@link Message}. This message must not be used for real message processing!

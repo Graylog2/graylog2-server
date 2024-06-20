@@ -21,19 +21,17 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
-import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -75,11 +72,10 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     public BlockingBatchedESOutput(MetricRegistry metricRegistry,
                                    Messages messages,
                                    org.graylog2.Configuration serverConfiguration,
-                                   Journal journal,
                                    MessageQueueAcknowledger acknowledger,
                                    Cluster cluster,
                                    @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
-        super(metricRegistry, messages, journal, acknowledger);
+        super(metricRegistry, messages, acknowledger);
         this.maxBufferSize = serverConfiguration.getOutputBatchSize();
         outputFlushInterval = serverConfiguration.getOutputFlushInterval();
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
@@ -133,9 +129,9 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         }
 
         try {
-            indexMessageBatch(messages);
+            var indexingResults = indexMessageBatch(messages);
             // This does not exclude failedMessageIds, because we don't know if ES is ever gonna accept these messages.
-            acknowledger.acknowledge(messages.stream().map(MessageWithIndex::message).collect(Collectors.toList()));
+            acknowledger.acknowledge(indexingResults);
         } catch (Exception e) {
             log.error("Unable to flush message buffer", e);
             bufferFlushFailures.mark();
@@ -145,13 +141,15 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     }
 
     protected IndexingResults indexMessageBatch(List<MessageWithIndex> messages) throws Exception {
+        IndexingResults indexingResults;
         try (Timer.Context ignored = processTime.time()) {
             lastFlushTime.set(System.nanoTime());
-            final IndexingResults indexingResults = writeMessageEntries(messages);
+            indexingResults = writeMessageEntries(messages);
             batchSize.update(messages.size());
             bufferFlushes.mark();
-            return indexingResults;
         }
+
+        return indexingResults;
     }
 
     public void forceFlushIfTimedout() {

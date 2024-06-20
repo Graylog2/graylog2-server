@@ -16,6 +16,9 @@
  */
 package org.graylog2.plugin;
 
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.IndexingResultCallback;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -38,5 +41,10 @@ public class TestMessageFactory implements MessageFactory {
     @Override
     public Message createMessage(String id, Map<String, Object> newFields) {
         return new Message(id, newFields);
+    }
+
+    @Override
+    public SystemMessage createSystemMessage(IndexSet indexSet, Map<String, Object> fields, @Nullable IndexingResultCallback resultCallback) {
+        return new SystemMessage(indexSet, fields, resultCallback);
     }
 }

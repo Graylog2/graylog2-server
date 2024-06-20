@@ -19,12 +19,13 @@ package org.graylog2.shared.messageq;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
+import jakarta.inject.Inject;
+import org.graylog2.indexer.messages.IndexingResult;
+import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.SystemMessage;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.util.List;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -36,6 +37,17 @@ public interface MessageQueueAcknowledger {
     void acknowledge(Message message);
 
     void acknowledge(List<Message> messages);
+
+    default void acknowledge(IndexingResults indexingResults) {
+        var messages = indexingResults.allResults().stream().map(IndexingResult::message).filter(Message.class::isInstance).map(Message.class::cast).toList();
+        acknowledge(messages);
+
+        // SystemMessages
+        indexingResults.allResults().stream().filter(ir -> ir.message() instanceof SystemMessage).forEach(ir -> {
+            var systemMessage = (SystemMessage) ir.message();
+            systemMessage.runIndexingResultCallback(ir);
+        });
+    }
 
     @AutoValue
     abstract class Metrics {

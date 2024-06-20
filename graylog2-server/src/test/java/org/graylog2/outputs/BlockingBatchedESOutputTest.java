@@ -27,7 +27,6 @@ import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
-import org.graylog2.shared.journal.NoopJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,7 +72,6 @@ public class BlockingBatchedESOutputTest {
         this.messageFactory = messageFactory;
 
         MetricRegistry metricRegistry = new MetricRegistry();
-        NoopJournal journal = new NoopJournal();
         this.config = new Configuration() {
             @Override
             public int getOutputBatchSize() {
@@ -86,7 +84,7 @@ public class BlockingBatchedESOutputTest {
             }
         };
 
-        output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal, acknowledger, cluster, Executors.newSingleThreadScheduledExecutor());
+        output = new BlockingBatchedESOutput(metricRegistry, messages, config, acknowledger, cluster, Executors.newSingleThreadScheduledExecutor());
         output.initialize();
     }
 
