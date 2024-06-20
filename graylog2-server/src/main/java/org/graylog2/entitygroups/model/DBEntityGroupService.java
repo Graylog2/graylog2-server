@@ -26,6 +26,7 @@ import com.mongodb.client.model.CollationStrength;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.ReturnDocument;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -40,6 +41,7 @@ import org.graylog2.search.SearchQueryParser;
 import jakarta.inject.Inject;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -50,7 +52,6 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Updates.addToSet;
-
 
 public class DBEntityGroupService {
     public static final String COLLECTION_NAME = "entity_groups";
@@ -125,10 +126,32 @@ public class DBEntityGroupService {
                 new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER));
     }
 
+    public EntityGroup addEntityToGroupNameOrCreate(String groupName, String type, String entityId) {
+        final Bson filter = eq(EntityGroup.FIELD_NAME, groupName);
+        final Bson update = addToSet(typeField(type), entityId);
+
+        EntityGroup group = collection.findOneAndUpdate(filter, update,
+                new FindOneAndUpdateOptions()
+                        .returnDocument(ReturnDocument.AFTER));
+
+        if (group == null) {
+            group = save(EntityGroup.builder()
+                    .name(groupName)
+                    .entities(Map.of(type, Set.of(entityId)))
+                    .build());
+        }
+
+        return group;
+    }
+
     public Optional<EntityGroup> getByName(String name) {
         final Bson query = eq(EntityGroup.FIELD_NAME, name);
 
         return Optional.ofNullable(collection.find(query).first());
+    }
+
+    public Stream<EntityGroup> streamAll() {
+        return MongoUtils.stream(collection.find(new Document()));
     }
 
     public Stream<EntityGroup> streamAllForEntity(String type, String entityId) {

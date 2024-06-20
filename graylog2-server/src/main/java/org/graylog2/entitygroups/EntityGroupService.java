@@ -16,9 +16,11 @@
  */
 package org.graylog2.entitygroups;
 
+import org.graylog2.entitygroups.contentpacks.entities.GroupableEntity;
 import org.graylog2.entitygroups.model.EntityGroup;
 import org.graylog2.entitygroups.model.DBEntityGroupService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.entitygroups.model.Groupable;
 import org.graylog2.rest.models.SortOrder;
 
 import jakarta.inject.Inject;
@@ -26,6 +28,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -62,6 +65,14 @@ public class EntityGroupService {
         return dbEntityGroupService.getAllForEntities(type, entities).asMap();
     }
 
+    public List<String> getAllNamesForEntity(Groupable groupable) {
+        try (final Stream<EntityGroup> stream = dbEntityGroupService.streamAllForEntity(groupable.entityTypeName(), groupable.id())) {
+            return stream
+                    .map(EntityGroup::name)
+                    .toList();
+        }
+    }
+
     public EntityGroup create(EntityGroup group) {
         return dbEntityGroupService.save(group);
     }
@@ -78,6 +89,10 @@ public class EntityGroupService {
         return dbEntityGroupService.addEntityToGroup(groupId, type, entityId);
     }
 
+    public EntityGroup addEntityToGroupNameOrCreate(String groupName, String type, String entityId) {
+        return dbEntityGroupService.addEntityToGroupNameOrCreate(groupName, type, entityId);
+    }
+
     public long delete(String id) {
         return dbEntityGroupService.delete(id);
     }
@@ -85,5 +100,13 @@ public class EntityGroupService {
     public EntityGroup requireEntityGroup(String id) {
         return dbEntityGroupService.get(id)
                 .orElseThrow(() -> new IllegalArgumentException("Unable to find entity group to update"));
+    }
+
+    public void handleEntityGroups(String nativeEntityId, String type, GroupableEntity groupableEntity) {
+        if (groupableEntity.entityGroups() != null) {
+            for (String groupName : groupableEntity.entityGroups()) {
+                addEntityToGroupNameOrCreate(groupName, type, nativeEntityId);
+            }
+        }
     }
 }

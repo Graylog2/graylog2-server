@@ -269,4 +269,14 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public void setIndexSetId(String indexSetId) {
         fields.put(FIELD_INDEX_SET_ID, indexSetId);
     }
+
+    @Override
+    public String id() {
+        return ((ObjectId) fields.get(FIELD_ID)).toHexString();
+    }
+
+    @Override
+    public String entityTypeName() {
+        return "streams";
+    }
 }

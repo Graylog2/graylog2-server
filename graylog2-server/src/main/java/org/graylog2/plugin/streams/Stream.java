@@ -18,6 +18,7 @@ package org.graylog2.plugin.streams;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.entitygroups.model.Groupable;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.database.Persisted;
 
@@ -27,7 +28,7 @@ import java.util.Set;
 
 import static com.google.common.base.Strings.emptyToNull;
 
-public interface Stream extends Persisted {
+public interface Stream extends Persisted, Groupable {
     /**
      * The ID of the default message stream for all messages.
      */

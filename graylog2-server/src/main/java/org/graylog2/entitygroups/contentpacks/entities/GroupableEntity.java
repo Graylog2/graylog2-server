@@ -1,5 +1,6 @@
 package org.graylog2.entitygroups.contentpacks.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 

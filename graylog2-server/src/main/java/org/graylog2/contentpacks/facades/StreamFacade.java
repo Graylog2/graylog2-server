@@ -56,7 +56,6 @@ import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
@@ -124,7 +123,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 outputIds,
                 ValueReference.of(stream.isDefaultStream()),
                 ValueReference.of(stream.getRemoveMatchesFromDefaultStream()),
-                entityGroupService.getAllNamesForEntity(StreamDTO.class.getTypeName(), stream.getId()));
+                entityGroupService.getAllNamesForEntity(stream));
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         return EntityV1.builder()
@@ -190,6 +189,8 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         streamService.addOutputs(new ObjectId(savedStreamId), outputIds);
+
+        entityGroupService.handleEntityGroups(savedStreamId, stream.entityTypeName(), streamEntity);
 
         return NativeEntity.create(entity.id(), savedStreamId, TYPE_V1, stream.getTitle(), stream);
     }

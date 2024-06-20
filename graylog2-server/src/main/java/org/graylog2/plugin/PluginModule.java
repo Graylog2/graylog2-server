@@ -453,17 +453,4 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addTelemetryMetricProvider(String eventId, TelemetryMetricSupplier eventSupplier) {
         telemetryMetricSupplierBinder().addBinding(eventId).toInstance(eventSupplier);
     }
-
-    protected void addGroupableEntityType(String nativeEntityType, String entityTypeName) {
-        addGroupableEntityTypeBinder().addBinding(nativeEntityType).toInstance(entityTypeName);
-    }
-
-    protected MapBinder<String, String> addGroupableEntityTypeBinder() {
-        return MapBinder.newMapBinder(
-                binder(),
-                String.class,
-                String.class,
-                Names.named("grouped_entity_types")
-        );
-    }
 }
