@@ -79,7 +79,7 @@ public class DatanodeKeystore {
         this(configuration.datanodeDirectories(), passwordSecret, eventBus);
     }
 
-    DatanodeKeystore(DatanodeDirectories datanodeDirectories, String passwordSecret, EventBus eventBus) {
+    public DatanodeKeystore(DatanodeDirectories datanodeDirectories, String passwordSecret, EventBus eventBus) {
         this.datanodeDirectories = datanodeDirectories;
         this.passwordSecret = passwordSecret;
         this.eventBus = eventBus;

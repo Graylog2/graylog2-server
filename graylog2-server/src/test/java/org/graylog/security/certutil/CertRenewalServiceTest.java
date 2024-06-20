@@ -32,8 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CertRenewalServiceTest {
-    private Date notAfter(final DateTime now, final int subtractMinutes, final int addMinutes) throws OperatorCreationException, CertificateException, NoSuchAlgorithmException {
-        return now.plusMinutes(addMinutes).toDate();
+    private Date notAfter(final DateTime now, final int subtractMinutes, final int addMinutes) {
+        return now.plusMinutes(addMinutes).minusMinutes(subtractMinutes).toDate();
     }
 
     @Test
@@ -41,7 +41,7 @@ public class CertRenewalServiceTest {
         final var now = DateTime.now(DateTimeZone.UTC);
         final JobSchedulerClock clock = new JobSchedulerTestClock(now);
         final var nextRun = clock.nowUTC().plusMinutes(30);
-        final var service = new CertRenewalServiceImpl(clock);
+        final var service = new CertRenewalServiceImpl(null, null, null, null, clock, null);
         // 2 hours is our smalles interval in the FE, so I'm testing only small intervals and expect larger intervals to work accordingly
         // with a threshold of 10%, a cert should either be invalid if it's no longer valid in 12min (10% of 120min) or if it get's invalid until the next run of the cert checker
         final var policy = new RenewalPolicy(RenewalPolicy.Mode.MANUAL, "PT2H");
