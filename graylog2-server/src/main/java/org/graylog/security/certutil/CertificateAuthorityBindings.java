@@ -16,16 +16,12 @@
  */
 package org.graylog.security.certutil;
 
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import com.google.inject.AbstractModule;
 
-import java.time.LocalDateTime;
-
-@Deprecated
-public interface CertRenewalService {
-
-    record ProvisioningInformation(DataNodeProvisioningConfig.State status, String errorMsg,
-                                   LocalDateTime certValidUntil) {
+public class CertificateAuthorityBindings extends AbstractModule {
+    @Override
+    protected void configure() {
+        bind(CaTruststore.class).to(CaTruststoreImpl.class).asEagerSingleton();
+        bind(CaKeystore.class).asEagerSingleton();
     }
-
-    void checkCertificatesForRenewal();
 }

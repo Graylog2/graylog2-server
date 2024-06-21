@@ -16,16 +16,10 @@
  */
 package org.graylog.security.certutil;
 
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 
-import java.time.LocalDateTime;
-
-@Deprecated
-public interface CertRenewalService {
-
-    record ProvisioningInformation(DataNodeProvisioningConfig.State status, String errorMsg,
-                                   LocalDateTime certValidUntil) {
+public class CaTruststoreException extends RuntimeException {
+    public CaTruststoreException(KeyStoreStorageException cause) {
+        super(cause);
     }
-
-    void checkCertificatesForRenewal();
 }

@@ -14,10 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight.web.resources.model;
+import { useDebouncedValue } from '@mantine/hooks';
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public record CA(@JsonProperty String id,
-                 @JsonProperty CAType type) {
-}
+export default useDebouncedValue;

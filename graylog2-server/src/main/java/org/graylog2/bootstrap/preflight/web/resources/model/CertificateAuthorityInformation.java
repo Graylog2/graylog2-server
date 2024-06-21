@@ -14,18 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil;
+package org.graylog2.bootstrap.preflight.web.resources.model;
 
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.LocalDateTime;
-
-@Deprecated
-public interface CertRenewalService {
-
-    record ProvisioningInformation(DataNodeProvisioningConfig.State status, String errorMsg,
-                                   LocalDateTime certValidUntil) {
-    }
-
-    void checkCertificatesForRenewal();
+public record CertificateAuthorityInformation(@JsonProperty String id,
+                                              @JsonProperty CAType type) {
 }

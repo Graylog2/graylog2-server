@@ -14,18 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil;
+package org.graylog2.storage.versionprobe;
 
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
-import java.time.LocalDateTime;
-
-@Deprecated
-public interface CertRenewalService {
-
-    record ProvisioningInformation(DataNodeProvisioningConfig.State status, String errorMsg,
-                                   LocalDateTime certValidUntil) {
-    }
-
-    void checkCertificatesForRenewal();
+public interface VersionProbeListener {
+    void onRetry(long attemptNumber, long connectionAttempts, @Nullable Throwable cause);
+    void onError(@Nonnull String message, @Nullable Throwable cause);
 }
