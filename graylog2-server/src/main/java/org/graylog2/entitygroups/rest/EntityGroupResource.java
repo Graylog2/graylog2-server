@@ -55,6 +55,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.graylog2.shared.utilities.StringUtils;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static org.graylog2.entitygroups.rest.EntityGroupPermissions.ENTITY_GROUP_CREATE;
@@ -184,10 +187,16 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @PUT
     @Path("/get_for_entities")
     @ApiOperation("Get a list of entity groups for a list of entities")
-    @RequiresPermissions(ENTITY_GROUP_READ)
     @NoAuditEvent("Read resource - doesn't change any data")
     public BulkEntityGroupResponse getAllForEntity(@ApiParam(name = "JSON Body") BulkEntityGroupRequest request) {
-        return new BulkEntityGroupResponse(entityGroupService.getAllForEntities(request.type(), request.entityIds()));
+        final Map<String, Collection<EntityGroup>> permittedGroups = new HashMap<>();
+        entityGroupService.getAllForEntities(request.type(), request.entityIds()).entrySet().stream().forEach(entry -> {
+            permittedGroups.put(entry.getKey(), entry.getValue().stream()
+                    .filter(group -> isPermitted(ENTITY_GROUP_READ, group.id()))
+                    .toList());
+        });
+
+        return new BulkEntityGroupResponse(permittedGroups);
     }
 
     @DELETE
