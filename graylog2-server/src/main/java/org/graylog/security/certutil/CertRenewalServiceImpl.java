@@ -64,7 +64,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final NotificationService notificationService;
     private final DBJobTriggerService jobTriggerService;
     private final JobSchedulerClock clock;
-    private final CaService caService;
+    private final CaKeystore caKeystore;
 
     // TODO: convert to config?
     private long CERT_RENEWAL_THRESHOLD_PERCENTAGE = 10;
@@ -74,39 +74,23 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final NodeService<DataNodeDto> nodeService,
                                   final NotificationService notificationService,
                                   final DBJobTriggerService jobTriggerService,
-                                  final CaService caService,
-                                  final JobSchedulerClock clock) {
+                                  final JobSchedulerClock clock, CaKeystore caKeystore) {
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
         this.notificationService = notificationService;
         this.jobTriggerService = jobTriggerService;
         this.clock = clock;
-        this.caService = caService;
-    }
-
-    @VisibleForTesting
-    CertRenewalServiceImpl(final JobSchedulerClock clock) {
-        this(null, null, null, null, null, clock);
+        this.caKeystore = caKeystore;
     }
 
     private Optional<RenewalPolicy> getRenewalPolicy() {
         return Optional.ofNullable(this.clusterConfigService.get(RenewalPolicy.class));
     }
 
-    boolean needsRenewal(final DateTime nextRenewal, final RenewalPolicy renewalPolicy, final X509Certificate cert) {
+    boolean needsRenewal(final DateTime nextRenewal, final RenewalPolicy renewalPolicy, final Date cert) {
         // calculate renewal threshold
         var threshold = calculateThreshold(renewalPolicy.certificateLifetime());
-
-        try {
-            cert.checkValidity(threshold);
-            cert.checkValidity(nextRenewal.toDate());
-        } catch (CertificateExpiredException e) {
-            LOG.debug("Certificate about to expire.");
-            return true;
-        } catch (CertificateNotYetValidException e) {
-            LOG.debug("Certificate not yet valid - which is surprising, but ignoring it.");
-        }
-        return false;
+        return threshold.after(cert) || nextRenewal.toDate().after(cert);
     }
 
     Date convertToDateViaInstant(LocalDateTime dateToConvert) {
@@ -132,18 +116,12 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     protected void checkCaCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
-        try {
-            final var keystore = caService.loadKeyStore();
-            if (keystore.isPresent()) {
-                final var ks = keystore.get();
-                final var nextRenewal = getNextRenewal();
-                final var caCert = ks.getCertificate(CA_KEY_ALIAS);
-                if (needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) caCert)) {
-                    notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "ca cert");
-                }
+        final Optional<Date> expiration = caKeystore.getCertificateExpiration();
+        if (expiration.isPresent()) {
+            final var nextRenewal = getNextRenewal();
+            if (needsRenewal(nextRenewal, renewalPolicy, expiration.get())) {
+                notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "ca cert");
             }
-        } catch (KeyStoreException | KeyStoreStorageException | NoSuchAlgorithmException e) {
-            LOG.error("Could not read CA keystore: {}", e.getMessage());
         }
     }
 
