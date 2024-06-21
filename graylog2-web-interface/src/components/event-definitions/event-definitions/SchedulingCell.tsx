@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import cronstrue from 'cronstrue';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
+import { describeExpression } from 'util/CronUtils';
 import { OverlayTrigger, Icon, Timestamp } from 'components/common';
 import Button from 'components/bootstrap/Button';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
@@ -63,7 +63,7 @@ const getTimeRange = (scheduler: Scheduler) => {
 
 const describeSchedule = (isCron: boolean, value: number | string) => {
   if (isCron) {
-    const cronDescription = cronstrue.toString(value as string);
+    const cronDescription = describeExpression(value as string);
 
     // Lower case the A in At or the E in Every
     return cronDescription.charAt(0).toLowerCase() + cronDescription.slice(1);

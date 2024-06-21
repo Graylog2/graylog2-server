@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import upperFirst from 'lodash/upperFirst';
-import cronstrue from 'cronstrue';
 
+import { describeExpression } from 'util/CronUtils';
 import { Link } from 'components/common/router';
 import { Alert } from 'components/bootstrap';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
@@ -154,6 +154,14 @@ const FilterAggregationSummary = ({ config, currentUser }: Props) => {
 
   const validationResults = validateExpression(conditions.expression, series);
 
+  const renderCronExpression = (expression) => {
+    if (expression) {
+      return describeExpression(expression);
+    }
+
+    return 'Error: no cron expression specified!';
+  };
+
   return (
     <dl>
       <dt>Type</dt>
@@ -175,7 +183,7 @@ const FilterAggregationSummary = ({ config, currentUser }: Props) => {
             <dt>Cron Expression</dt>
             <dd>{cronExpression}</dd>
             <dt>Cron Description</dt>
-            <dd>{cronstrue.toString(cronExpression)}</dd>
+            <dd>{renderCronExpression(cronExpression)}</dd>
             <dt>Time Zone</dt>
             <dd>{cronTimezone}</dd>
           </>

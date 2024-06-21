@@ -32,6 +32,7 @@ import moment from 'moment';
 import { OrderedMap } from 'immutable';
 import type { $PropertyType } from 'utility-types';
 
+import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import * as FormsUtils from 'util/FormsUtils';
@@ -128,6 +129,8 @@ const FilterForm = ({
     () => isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS),
     [currentUser.permissions],
   );
+
+  const [cronDescription, setCronDescription] = useState<string>(currentConfig.cron_expression ? describeExpression(currentConfig.cron_expression) : '');
 
   const validateQueryString = useCallback(
     (queryString: ElasticsearchQueryString | string,
@@ -509,10 +512,11 @@ const FilterForm = ({
                        type="text"
                        help={(
                          <span>
-                           A Quartz cron expression to determine when the event should be run.
+                           {cronDescription || 'A Quartz cron expression to determine when the event should be run.'}
                          </span>
                    )}
                        value={defaultTo(currentConfig.cron_expression, '')}
+                       onBlur={() => setCronDescription(describeExpression(currentConfig.cron_expression))}
                        onChange={handleCronExpressionChange} />
                 {validation.errors.cron_expression && (
                 <HelpBlock>{get(validation, 'errors.cron_expression[0]')}</HelpBlock>

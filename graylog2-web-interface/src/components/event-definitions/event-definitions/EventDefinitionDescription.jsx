@@ -16,12 +16,12 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import cronstrue from 'cronstrue';
 import moment from 'moment';
 import 'moment-duration-format';
 import get from 'lodash/get';
 import styled, { css } from 'styled-components';
 
+import { describeExpression } from 'util/CronUtils';
 import { Button, Col, Row } from 'components/bootstrap';
 import { Icon, Pluralize, Timestamp } from 'components/common';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
@@ -57,7 +57,7 @@ class EventDefinitionDescription extends React.Component {
 
   static describeSchedule = (isCron, value) => {
     if (isCron) {
-      const cronDescription = cronstrue.toString(value);
+      const cronDescription = describeExpression(value);
 
       // Lower case the A in At or the E in Every
       return cronDescription.charAt(0).toLowerCase() + cronDescription.slice(1);
