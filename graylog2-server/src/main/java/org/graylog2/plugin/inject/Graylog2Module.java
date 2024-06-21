@@ -26,6 +26,9 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.graylog.plugins.views.search.db.StaticReferencedSearch;
@@ -56,16 +59,12 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
 import org.graylog2.plugin.validate.ClusterConfigValidator;
+import org.graylog2.streams.StreamDeletionGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.ws.rs.container.ContainerResponseFilter;
-import jakarta.ws.rs.container.DynamicFeature;
-import jakarta.ws.rs.ext.ExceptionMapper;
-
 import java.lang.annotation.Annotation;
 
 public abstract class Graylog2Module extends AbstractModule {
@@ -531,5 +530,9 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected Multibinder<StaticReferencedSearch> staticReferencedSearchBinder() {
         return Multibinder.newSetBinder(binder(), StaticReferencedSearch.class);
+    }
+
+    protected Multibinder<StreamDeletionGuard> streamDeletionGuardBinder() {
+        return Multibinder.newSetBinder(binder(), StreamDeletionGuard.class);
     }
 }
