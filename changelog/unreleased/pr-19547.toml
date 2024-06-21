@@ -2,4 +2,5 @@ type = "a"
 message = "Added entity groups feature."
 
 issues = ["graylog-plugin-enterprise#7385"]
-pulls = ["19547", "19620"]
+
+pulls = ["19547", "graylog-plugin-enterprise#7585", "19620"]
