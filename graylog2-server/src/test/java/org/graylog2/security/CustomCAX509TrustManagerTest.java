@@ -17,15 +17,12 @@
 package org.graylog2.security;
 
 import com.google.common.eventbus.EventBus;
+import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CaTruststore;
 import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
-import org.graylog.security.certutil.ca.exceptions.CACreationException;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.console.TestableConsole;
-import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.plugin.Tools;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -41,7 +38,6 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.Optional;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
@@ -51,33 +47,6 @@ public class CustomCAX509TrustManagerTest {
     @TempDir
     static Path tempDir;
 
-    static class DummyCaService implements CaService {
-        private final Optional<KeyStore> keyStore;
-        public DummyCaService(KeyStore keyStore) {
-            this.keyStore = Optional.ofNullable(keyStore);
-        }
-
-        @Override
-        public CA get() throws KeyStoreStorageException {
-            return null;
-        }
-
-        @Override
-        public CA create(String organization, Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException {
-            return null;
-        }
-
-        @Override
-        public void upload(String pass, List<FormDataBodyPart> parts) throws CACreationException {}
-
-        @Override
-        public void startOver() {}
-
-        @Override
-        public Optional<KeyStore> loadKeyStore() throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
-            return this.keyStore;
-        }
-    }
 
     @Test
     public void testCA() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
@@ -123,8 +92,8 @@ public class CustomCAX509TrustManagerTest {
                 .contains("CN=Graylog CA", "CN=" + hostname);
 
         // additional Tests
-        final var noAdditionalKeystore = new DummyCaService(null);
-        final var additionalKeystore = new DummyCaService(caKeyStore);
+        final var noAdditionalKeystore = trustoreOf(null);
+        final var additionalKeystore = trustoreOf(caKeyStore);
 
         final EventBus serverEventBus = new EventBus();
         final var defaultTM = new CustomCAX509TrustManager(noAdditionalKeystore, serverEventBus);
@@ -147,5 +116,10 @@ public class CustomCAX509TrustManagerTest {
         Assertions.assertThatCode(() ->
                 customTM.checkClientTrusted(new X509Certificate[]{cert}, "ANY")
         ).doesNotThrowAnyException();
+    }
+
+    @Nonnull
+    private static CaTruststore trustoreOf(KeyStore caKeyStore) {
+        return () -> Optional.ofNullable(caKeyStore);
     }
 }
