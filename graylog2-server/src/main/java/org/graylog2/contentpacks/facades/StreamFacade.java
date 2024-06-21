@@ -43,6 +43,7 @@ import org.graylog2.contentpacks.model.entities.StreamRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.entitygroups.EntityGroupService;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -84,19 +85,22 @@ public class StreamFacade implements EntityFacade<Stream> {
     private final V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration;
     private final IndexSetService indexSetService;
     private final UserService userService;
+    private final EntityGroupService entityGroupService;
 
     @Inject
     public StreamFacade(ObjectMapper objectMapper,
                         StreamService streamService,
                         StreamRuleService streamRuleService,
                         V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration,
-                        IndexSetService indexSetService, UserService userService) {
+                        IndexSetService indexSetService, UserService userService,
+                        EntityGroupService entityGroupService) {
         this.objectMapper = objectMapper;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.legacyAlertsMigration = legacyAlertsMigration;
         this.indexSetService = indexSetService;
         this.userService = userService;
+        this.entityGroupService = entityGroupService;
     }
 
     @VisibleForTesting
@@ -118,7 +122,8 @@ public class StreamFacade implements EntityFacade<Stream> {
                 Collections.emptyList(), // Kept for backwards compatibility
                 outputIds,
                 ValueReference.of(stream.isDefaultStream()),
-                ValueReference.of(stream.getRemoveMatchesFromDefaultStream()));
+                ValueReference.of(stream.getRemoveMatchesFromDefaultStream()),
+                entityGroupService.getAllGroupNamesForEntity(StreamEntity.ENTITY_GROUP_TYPE_NAME, stream.getId()));
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         return EntityV1.builder()
@@ -184,6 +189,8 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         streamService.addOutputs(new ObjectId(savedStreamId), outputIds);
+
+        entityGroupService.handleEntityGroups(savedStreamId, streamEntity.groupedEntityTypeName(), streamEntity);
 
         return NativeEntity.create(entity.id(), savedStreamId, TYPE_V1, stream.getTitle(), stream);
     }

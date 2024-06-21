@@ -16,7 +16,6 @@
  */
 package org.graylog2.entitygroups;
 
-import org.graylog2.entitygroups.contentpacks.EntityGroupFacade;
 import org.graylog2.entitygroups.rest.EntityGroupResource;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.PluginModule;
@@ -38,7 +37,6 @@ public class EntityGroupModule extends PluginModule {
                 .anyMatch(s -> s.equals(FEATURE_FLAG)) && featureFlags.isOn(FEATURE_FLAG)) {
             addSystemRestResource(EntityGroupResource.class);
             addAuditEventTypes(EntityGroupAuditEventTypes.class);
-            addEntityFacade(EntityGroupFacade.TYPE_V1, EntityGroupFacade.class);
         }
     }
 }

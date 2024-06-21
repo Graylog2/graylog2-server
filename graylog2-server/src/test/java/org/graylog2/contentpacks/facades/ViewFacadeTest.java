@@ -289,7 +289,8 @@ public class ViewFacadeTest {
                 ImmutableList.of(),
                 ImmutableSet.of(),
                 ValueReference.of(false),
-                ValueReference.of(true)
+                ValueReference.of(true),
+                ImmutableList.of()
         );
         return EntityV1.builder()
                 .id(ModelId.of(newStreamId))

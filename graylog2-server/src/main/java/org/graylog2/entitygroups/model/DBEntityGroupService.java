@@ -40,6 +40,7 @@ import org.graylog2.search.SearchQueryParser;
 import jakarta.inject.Inject;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -50,7 +51,6 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Updates.addToSet;
-
 
 public class DBEntityGroupService {
     public static final String COLLECTION_NAME = "entity_groups";
@@ -123,6 +123,24 @@ public class DBEntityGroupService {
         return collection.findOneAndUpdate(MongoUtils.idEq(groupId),
                 addToSet(typeField(type), entityId),
                 new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER));
+    }
+
+    public EntityGroup addEntityToGroupNameOrCreate(String groupName, String type, String entityId) {
+        final Bson filter = eq(EntityGroup.FIELD_NAME, groupName);
+        final Bson update = addToSet(typeField(type), entityId);
+
+        EntityGroup group = collection.findOneAndUpdate(filter, update,
+                new FindOneAndUpdateOptions()
+                        .returnDocument(ReturnDocument.AFTER));
+
+        if (group == null) {
+            group = save(EntityGroup.builder()
+                    .name(groupName)
+                    .entities(Map.of(type, Set.of(entityId)))
+                    .build());
+        }
+
+        return group;
     }
 
     public Optional<EntityGroup> getByName(String name) {
