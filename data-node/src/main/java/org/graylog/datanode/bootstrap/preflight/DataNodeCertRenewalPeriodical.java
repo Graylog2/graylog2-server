@@ -53,7 +53,7 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
     }
 
     private static boolean isInPreflight(PreflightConfigService preflightConfigService) {
-        return preflightConfigService.getPreflightConfigResult() != PreflightConfigResult.FINISHED && preflightConfigService.getPreflightConfigResult() != PreflightConfigResult.SKIPPED;
+        return preflightConfigService.getPreflightConfigResult() != PreflightConfigResult.FINISHED;
     }
 
     protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode) {
