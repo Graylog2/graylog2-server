@@ -33,15 +33,16 @@ const DEFAULT_LAYOUT = {
   entityTableId: 'datanodes',
   defaultPageSize: 10,
   defaultSort: { attributeId: 'hostname', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'],
+  defaultDisplayedAttributes: ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until', 'datanode_version'],
 };
 
-const COLUMNS_ORDER = ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'];
+const COLUMNS_ORDER = ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until', 'datanode_version'];
 
 const additionalAttributes = [
   { id: 'transport_address', title: 'Transport address' },
   { id: 'status', title: 'Status', sortable: false },
   { id: 'cert_valid_until', title: 'Certificate valid until', sortable: false },
+  { id: 'datanode_version', title: 'Datanode version', sortable: false }
 ];
 
 const columnRenderers: ColumnRenderers<DataNode> = {
