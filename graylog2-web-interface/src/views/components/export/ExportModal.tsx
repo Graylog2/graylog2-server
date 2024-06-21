@@ -35,6 +35,8 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 import ExportSettings from './ExportSettings';
 import ExportStrategy from './ExportStrategy';
@@ -89,6 +91,8 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
     downloadFile,
   } = ExportStrategy.createExportStrategy(view.type);
   const exportableWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.isExportable).toList()).toList().flatten(true) as List<Widget>;
+  const currentUser = useCurrentUser();
+  const currentQuery = useCurrentQuery();
 
   const [loading, setLoading] = useState(false);
   const initialSelectedWidget = initialWidget(exportableWidgets, directExportWidgetId);
@@ -104,7 +108,7 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
 
     setLoading(true);
 
-    return startDownload(format, downloadFile, view, executionState, selectedWidget, selectedFields, limit, customSettings)
+    return startDownload(format, downloadFile, view, executionState, selectedWidget, selectedFields, limit, customSettings, currentUser, currentQuery)
       .then(closeModal)
       .finally(() => setLoading(false));
   };

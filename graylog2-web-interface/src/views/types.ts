@@ -58,6 +58,7 @@ import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
+import type { ExportPayload } from 'util/MessagesExportUtils';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -182,12 +183,13 @@ interface SearchType<T, R> {
   defaults: {};
 }
 
-interface ExportFormat {
+export interface ExportFormat {
   type: string;
   displayName: () => string;
   disabled?: () => boolean;
   mimeType: string;
   fileExtension: string;
+  formatSpecificFileDownloader?: (format: string, widget: Widget, view: View, executionState: SearchExecutionState, currentUser: User, currentQuery: Query, exportPayload: ExportPayload,) => Promise<void>
 }
 
 export interface SystemConfigurationComponentProps {
