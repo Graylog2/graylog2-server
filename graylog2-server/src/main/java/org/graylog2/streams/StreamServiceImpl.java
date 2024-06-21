@@ -81,6 +81,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final MongoIndexSet.Factory indexSetFactory;
     private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
+    private final Set<StreamDeletionGuard> streamDeletionGuards;
 
     @Inject
     public StreamServiceImpl(MongoConnection mongoConnection,
@@ -89,7 +90,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              IndexSetService indexSetService,
                              MongoIndexSet.Factory indexSetFactory,
                              EntityOwnershipService entityOwnershipService,
-                             ClusterEventBus clusterEventBus) {
+                             ClusterEventBus clusterEventBus,
+                             Set<StreamDeletionGuard> streamDeletionGuards) {
         super(mongoConnection);
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
@@ -97,6 +99,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.indexSetFactory = indexSetFactory;
         this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
+        this.streamDeletionGuards = streamDeletionGuards;
     }
 
     @Nullable
@@ -304,7 +307,9 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public void destroy(Stream stream) throws NotFoundException {
+    public void destroy(Stream stream) throws NotFoundException, StreamGuardException {
+        checkDeletionguards(stream.getId());
+
         for (StreamRule streamRule : streamRuleService.loadForStream(stream)) {
             super.destroy(streamRule);
         }
@@ -317,6 +322,12 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
         clusterEventBus.post(StreamDeletedEvent.create(streamId));
         entityOwnershipService.unregisterStream(streamId);
+    }
+
+    private void checkDeletionguards(String streamId) throws StreamGuardException {
+        for (StreamDeletionGuard guard : streamDeletionGuards) {
+            guard.checkGuard(streamId);
+        }
     }
 
     public void update(Stream stream, @Nullable String title, @Nullable String description) throws ValidationException {

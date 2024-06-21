@@ -30,5 +30,7 @@ public class StreamsModule extends AbstractModule {
 
         Multibinder<StreamRuleInputsProvider> uriBinder = Multibinder.newSetBinder(binder(), StreamRuleInputsProvider.class);
         uriBinder.addBinding().to(StreamRuleServerInputsProvider.class);
+
+        Multibinder.newSetBinder(binder(), StreamDeletionGuard.class);
     }
 }
