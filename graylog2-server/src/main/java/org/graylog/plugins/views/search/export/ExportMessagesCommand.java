@@ -20,6 +20,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog2.database.filtering.AttributeFilter;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -66,6 +67,8 @@ public abstract class ExportMessagesCommand {
 
     public abstract Collection<UsedSearchFilter> usedSearchFilters();
 
+    public abstract List<AttributeFilter> attributeFilters();
+
     public abstract LinkedHashSet<String> fieldsInOrder();
 
     public abstract List<Decorator> decorators();
@@ -93,6 +96,8 @@ public abstract class ExportMessagesCommand {
         public abstract Builder streams(Set<String> streams);
 
         public abstract Builder usedSearchFilters(final Collection<UsedSearchFilter> usedSearchFilters);
+
+        public abstract Builder attributeFilters(final List<AttributeFilter> attributeFilters);
 
         public Builder streams(String... streams) {
             return streams(ImmutableSet.copyOf(streams));
@@ -126,6 +131,7 @@ public abstract class ExportMessagesCommand {
                     .streams(DEFAULT_STREAMS)
                     .queryString(DEFAULT_QUERY)
                     .usedSearchFilters(List.of())
+                    .attributeFilters(List.of())
                     .fieldsInOrder(DEFAULT_FIELDS)
                     .decorators(Collections.emptyList())
                     .chunkSize(DEFAULT_CHUNK_SIZE)

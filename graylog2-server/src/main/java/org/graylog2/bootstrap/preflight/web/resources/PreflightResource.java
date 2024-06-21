@@ -53,7 +53,6 @@ import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
-import org.graylog2.storage.SearchVersion;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -63,7 +62,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Path(PreflightConstants.API_PREFIX)
@@ -100,36 +98,32 @@ public class PreflightResource {
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public List<DataNode> listDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        return activeDataNodes.values().stream().map(n -> new DataNode(n.getNodeId(),
-                n.getTransportAddress(),
-                getPreflightState(n),
-                getErrorMessage(n),
-                n.getHostname(),
-                n.getShortNodeId(),
-                n.getDataNodeStatus())).collect(Collectors.toList());
+        return activeDataNodes.values().stream().map(n -> {
+            final ProvisioningState provisioningState = getProvisioningState(n);
+            return new DataNode(n.getNodeId(),
+                    n.getTransportAddress(),
+                    provisioningState.state(),
+                    provisioningState.error(),
+                    n.getHostname(),
+                    n.getShortNodeId(),
+                    n.getDataNodeStatus());
+        }).collect(Collectors.toList());
     }
 
-    private String getErrorMessage(DataNodeDto n) {
-        return null; // TODO!
-    }
-
-    public DataNodeProvisioningConfig.State getPreflightState(DataNodeDto n) {
+    public ProvisioningState getProvisioningState(DataNodeDto n) {
         return switch (n.getDataNodeStatus()) {
             case AVAILABLE -> verifyActualConnection(n);
-            case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
-            case PREPARED -> DataNodeProvisioningConfig.State.CONNECTING;
-            case UNAVAILABLE -> DataNodeProvisioningConfig.State.ERROR;
-            default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
+            case STARTING -> new ProvisioningState(DataNodeProvisioningConfig.State.CONNECTING);
+            case PREPARED -> new ProvisioningState(DataNodeProvisioningConfig.State.STARTUP_PREPARED);
+            case UNAVAILABLE -> new ProvisioningState(DataNodeProvisioningConfig.State.ERROR);
+            default -> new ProvisioningState(DataNodeProvisioningConfig.State.UNCONFIGURED);
         };
     }
 
-    private DataNodeProvisioningConfig.State verifyActualConnection(DataNodeDto n) {
-        final Optional<SearchVersion> version = datanodeConnectivityCheck.probe(n);
-        if (version.isPresent()) {
-            return DataNodeProvisioningConfig.State.CONNECTED;
-        } else {
-            return DataNodeProvisioningConfig.State.CONNECTING;
-        }
+    private ProvisioningState verifyActualConnection(DataNodeDto n) {
+        final ConnectionCheckResult result = datanodeConnectivityCheck.probe(n);
+        final DataNodeProvisioningConfig.State state = result.succeeded() ? DataNodeProvisioningConfig.State.CONNECTED : DataNodeProvisioningConfig.State.CONNECTING;
+        return new ProvisioningState(state, result.errorMessage());
     }
 
     @GET
@@ -243,7 +237,7 @@ public class PreflightResource {
     @NoAuditEvent("No Auditing during preflight")
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
-      throw new UnsupportedOperationException("Adding cert parameters not supported yet");
+        throw new UnsupportedOperationException("Adding cert parameters not supported yet");
 
     }
 }
