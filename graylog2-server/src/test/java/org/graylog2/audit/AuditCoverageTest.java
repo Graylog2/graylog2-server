@@ -28,6 +28,7 @@ import org.graylog.security.SecurityAuditEventTypes;
 import org.graylog.security.certutil.audit.CaAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.entitygroups.EntityGroupAuditEventTypes;
 import org.junit.Test;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -61,6 +62,7 @@ public class AuditCoverageTest {
                 .addAll(new SecurityAuditEventTypes().auditEventTypes())
                 .addAll(new IntegrationsAuditEventTypes().auditEventTypes())
                 .addAll(new CaAuditEventTypes().auditEventTypes())
+                .addAll(new EntityGroupAuditEventTypes().auditEventTypes())
                 .build();
         final Reflections reflections = new Reflections(configurationBuilder);
 
