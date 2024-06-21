@@ -78,7 +78,6 @@ const IndicesConfiguration = ({ indexSet } : Props) => {
           <dataTieringPlugin.TiersSummary config={dataTieringConfig} />
         </Col>
       )}
-
     </Row>
   );
 };
