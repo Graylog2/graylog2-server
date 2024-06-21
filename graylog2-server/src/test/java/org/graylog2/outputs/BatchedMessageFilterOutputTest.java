@@ -50,6 +50,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -82,7 +83,7 @@ class BatchedMessageFilterOutputTest {
         this.outputBatchSize = 3;
         this.output = new BatchedMessageFilterOutput(
                 Map.of("targetOutput1", targetOutput1),
-                new AllOutputsFilter(Map.of()),
+                new AllOutputsFilter(Map.of(ElasticSearchOutput.FILTER_KEY, mock(FilteredMessageOutput.class))),
                 new MetricRegistry(),
                 cluster,
                 acknowledger,
