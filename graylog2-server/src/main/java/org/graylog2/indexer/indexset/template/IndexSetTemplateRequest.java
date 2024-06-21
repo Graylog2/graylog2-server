@@ -14,10 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight.web.resources.model;
+package org.graylog2.indexer.indexset.template;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record CA(@JsonProperty String id,
-                 @JsonProperty CAType type) {
+import javax.annotation.Nonnull;
+
+import static org.graylog2.indexer.indexset.template.IndexSetTemplate.DESCRIPTION_FIELD_NAME;
+import static org.graylog2.indexer.indexset.template.IndexSetTemplate.INDEX_SET_CONFIG_FIELD_NAME;
+import static org.graylog2.indexer.indexset.template.IndexSetTemplate.TITLE_FIELD_NAME;
+
+public record IndexSetTemplateRequest(@JsonProperty(TITLE_FIELD_NAME) String title,
+                                      @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
+                                      @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetTemplateConfig indexSetConfig) {
 }

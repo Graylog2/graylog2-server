@@ -29,6 +29,7 @@ import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import StreamsContext from 'contexts/StreamsContext';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { defaultPerspective as mockDefaultPerspective } from 'fixtures/perspectives';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import type { Stream } from 'logic/streams/types';
 
@@ -98,6 +99,13 @@ jest.mock('hooks/useSearchConfiguration', () => () => ({
     default_auto_refresh_option: 'PT5S',
   },
   refresh: jest.fn(),
+}));
+
+jest.mock('components/perspectives/hooks/useActivePerspective', () => ({
+  __esModule: true,
+  default: () => ({
+    activePerspective: mockDefaultPerspective,
+  }),
 }));
 
 jest.mock('react-router-dom', () => ({

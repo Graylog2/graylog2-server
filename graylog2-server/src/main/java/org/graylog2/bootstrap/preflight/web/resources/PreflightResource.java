@@ -17,7 +17,6 @@
 package org.graylog2.bootstrap.preflight.web.resources;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -30,18 +29,17 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.graylog.security.certutil.CaService;
-import org.graylog.security.certutil.CertConstants;
+import org.graylog.security.certutil.CaKeystore;
+import org.graylog.security.certutil.CaKeystoreException;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
-import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
+import org.graylog2.bootstrap.preflight.web.resources.model.CertificateAuthorityInformation;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -53,17 +51,12 @@ import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
-import org.graylog2.storage.SearchVersion;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URI;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Path(PreflightConstants.API_PREFIX)
@@ -71,72 +64,66 @@ import java.util.stream.Collectors;
 public class PreflightResource {
 
     private final NodeService<DataNodeDto> nodeService;
-    private final CaService caService;
+    private final CaKeystore caKeystore;
     private final ClusterConfigService clusterConfigService;
-    private final String passwordSecret;
-
     private final DataNodeCommandService dataNodeCommandService;
 
     private final DatanodeConnectivityCheck datanodeConnectivityCheck;
 
     @Inject
     public PreflightResource(final NodeService<DataNodeDto> nodeService,
-                             final CaService caService,
+                             CaKeystore caKeystore,
                              final ClusterConfigService clusterConfigService,
-                             final @Named("password_secret") String passwordSecret, DataNodeCommandService dataNodeCommandService, DatanodeConnectivityCheck datanodeConnectivityCheck) {
+                             DataNodeCommandService dataNodeCommandService, DatanodeConnectivityCheck datanodeConnectivityCheck) {
         this.nodeService = nodeService;
-        this.caService = caService;
+        this.caKeystore = caKeystore;
         this.clusterConfigService = clusterConfigService;
-        this.passwordSecret = passwordSecret;
         this.dataNodeCommandService = dataNodeCommandService;
         this.datanodeConnectivityCheck = datanodeConnectivityCheck;
     }
 
-    public record DataNode(String nodeId, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg,
-                    String hostname, String shortNodeId, DataNodeStatus dataNodeStatus) {}
+    public record DataNode(String nodeId, String transportAddress, DataNodeProvisioningConfig.State status,
+                           String errorMsg,
+                           String hostname, String shortNodeId, DataNodeStatus dataNodeStatus) {}
 
     @GET
     @Path("/data_nodes")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public List<DataNode> listDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        return activeDataNodes.values().stream().map(n -> new DataNode(n.getNodeId(),
-                n.getTransportAddress(),
-                getPreflightState(n),
-                getErrorMessage(n),
-                n.getHostname(),
-                n.getShortNodeId(),
-                n.getDataNodeStatus())).collect(Collectors.toList());
+        return activeDataNodes.values().stream().map(n -> {
+            final ProvisioningState provisioningState = getProvisioningState(n);
+            return new DataNode(n.getNodeId(),
+                    n.getTransportAddress(),
+                    provisioningState.state(),
+                    provisioningState.error(),
+                    n.getHostname(),
+                    n.getShortNodeId(),
+                    n.getDataNodeStatus());
+        }).collect(Collectors.toList());
     }
 
-    private String getErrorMessage(DataNodeDto n) {
-        return null; // TODO!
-    }
-
-    public DataNodeProvisioningConfig.State getPreflightState(DataNodeDto n) {
+    public ProvisioningState getProvisioningState(DataNodeDto n) {
         return switch (n.getDataNodeStatus()) {
             case AVAILABLE -> verifyActualConnection(n);
-            case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
-            case PREPARED -> DataNodeProvisioningConfig.State.CONNECTING;
-            case UNAVAILABLE -> DataNodeProvisioningConfig.State.ERROR;
-            default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
+            case STARTING -> new ProvisioningState(DataNodeProvisioningConfig.State.CONNECTING);
+            case PREPARED -> new ProvisioningState(DataNodeProvisioningConfig.State.STARTUP_PREPARED);
+            case UNAVAILABLE -> new ProvisioningState(DataNodeProvisioningConfig.State.ERROR);
+            default -> new ProvisioningState(DataNodeProvisioningConfig.State.UNCONFIGURED);
         };
     }
 
-    private DataNodeProvisioningConfig.State verifyActualConnection(DataNodeDto n) {
-        final Optional<SearchVersion> version = datanodeConnectivityCheck.probe(n);
-        if (version.isPresent()) {
-            return DataNodeProvisioningConfig.State.CONNECTED;
-        } else {
-            return DataNodeProvisioningConfig.State.CONNECTING;
-        }
+    private ProvisioningState verifyActualConnection(DataNodeDto n) {
+        final ConnectionCheckResult result = datanodeConnectivityCheck.probe(n);
+        final DataNodeProvisioningConfig.State state = result.succeeded() ? DataNodeProvisioningConfig.State.CONNECTED : DataNodeProvisioningConfig.State.CONNECTING;
+        return new ProvisioningState(state, result.errorMessage());
     }
 
     @GET
     @Path("/ca")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
-    public CA get() throws KeyStoreStorageException {
-        return caService.get();
+    public CertificateAuthorityInformation get() throws KeyStoreStorageException {
+        return caKeystore.getInformation().orElse(null);
     }
 
     @GET
@@ -144,36 +131,16 @@ public class PreflightResource {
     @Produces(MediaType.TEXT_PLAIN)
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public String getCaCertificate() {
-        try {
-            return caService.loadKeyStore().map(ks -> {
-                final Certificate caPublicKey;
-                try {
-                    caPublicKey = ks.getCertificate(CertConstants.CA_KEY_ALIAS);
-                    return encode(caPublicKey);
-                } catch (KeyStoreException | IOException e) {
-                    throw new RuntimeException("Failed to obtain CA public key", e);
-                }
-            }).orElseThrow(() -> new IllegalStateException("CA keystore not available"));
-        } catch (KeyStoreException | KeyStoreStorageException | NoSuchAlgorithmException e) {
-            throw new RuntimeException("Failed to obtain CA public key", e);
-        }
+        return caKeystore.getEncodedCertificate().orElseThrow(() -> new IllegalStateException("CA keystore not available"));
     }
 
-    private static String encode(final Object o) throws IOException {
-        var writer = new StringWriter();
-        try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
-            jcaPEMWriter.writeObject(o);
-        }
-        return writer.toString();
-    }
 
     @POST
     @Path("/ca/create")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
     public Response createCA(@NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException, NoSuchAlgorithmException {
-        // TODO: get validity from preflight UI
-        final CA ca = caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
+        final CertificateAuthorityInformation ca = caKeystore.createSelfSigned(request.organization());
         return Response.created(URI.create("/api/ca")).entity(ca).build();
     }
 
@@ -184,9 +151,9 @@ public class PreflightResource {
     @NoAuditEvent("No Auditing during preflight")
     public Response uploadCA(@FormDataParam("password") String password, @FormDataParam("files") List<FormDataBodyPart> bodyParts) {
         try {
-            caService.upload(password, bodyParts);
+            caKeystore.createFromUpload(password, bodyParts);
             return Response.ok().build();
-        } catch (CACreationException e) {
+        } catch (CaKeystoreException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();
         }
     }
@@ -196,7 +163,7 @@ public class PreflightResource {
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
     public void startOver() {
-        caService.startOver();
+        caKeystore.reset();
         clusterConfigService.remove(RenewalPolicy.class);
         nodeService.allActive().values().stream()
                 .filter(n -> n.getDataNodeStatus() == DataNodeStatus.AVAILABLE)
@@ -243,7 +210,7 @@ public class PreflightResource {
     @NoAuditEvent("No Auditing during preflight")
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
-      throw new UnsupportedOperationException("Adding cert parameters not supported yet");
+        throw new UnsupportedOperationException("Adding cert parameters not supported yet");
 
     }
 }
