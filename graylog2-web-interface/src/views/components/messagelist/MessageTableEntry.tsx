@@ -190,7 +190,7 @@ const MessageTableEntry = ({
 
         {expanded && (
           <MessageDetailRow>
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+            {}
             <td colSpan={colSpanFixup}>
               <MessageDetail message={message}
                              fields={fields}
