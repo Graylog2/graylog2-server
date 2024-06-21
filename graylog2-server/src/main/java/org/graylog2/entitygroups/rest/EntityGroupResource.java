@@ -29,9 +29,9 @@ import jakarta.ws.rs.NotFoundException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
-import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.entitygroups.EntityGroupAuditEventTypes;
 import org.graylog2.entitygroups.EntityGroupService;
 import org.graylog2.entitygroups.model.EntityGroup;
 import org.graylog2.database.PaginatedList;
@@ -84,6 +84,7 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
                                                  @ApiParam(name = "sort",
                                                            value = "The field to sort the result on",
                                                            allowableValues = "name")
+                                                 @DefaultValue(EntityGroup.FIELD_NAME)
                                                  @QueryParam("sort") String sort,
                                                  @ApiParam(name = "direction", value = "The sort direction", allowableValues = "asc,desc")
                                                  @DefaultValue("asc") @QueryParam("direction") SortOrder order) {
@@ -110,15 +111,16 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @Path("/get_for_entity")
     @ApiOperation(value = "Get a list of entity groups for an entity")
     public PaginatedList<EntityGroup> listGroupsForEntity(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("15") int perPage,
-                                                 @ApiParam(name = "entity_type", required = true) @QueryParam("entity_type") String entityType,
-                                                 @ApiParam(name = "entity_id", required = true) @QueryParam("entity_id") String entityId,
-                                                 @ApiParam(name = "sort",
-                                                           value = "The field to sort the result on",
-                                                           allowableValues = "name")
-                                                 @QueryParam("sort") String sort,
-                                                 @ApiParam(name = "direction", value = "The sort direction", allowableValues = "asc,desc")
-                                                 @DefaultValue("asc") @QueryParam("direction") SortOrder order) {
+                                                          @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("15") int perPage,
+                                                          @ApiParam(name = "entity_type", required = true) @QueryParam("entity_type") String entityType,
+                                                          @ApiParam(name = "entity_id", required = true) @QueryParam("entity_id") String entityId,
+                                                          @ApiParam(name = "sort",
+                                                                    value = "The field to sort the result on",
+                                                                    allowableValues = "name")
+                                                          @DefaultValue(EntityGroup.FIELD_NAME)
+                                                          @QueryParam("sort") String sort,
+                                                          @ApiParam(name = "direction", value = "The sort direction", allowableValues = "asc,desc")
+                                                          @DefaultValue("asc") @QueryParam("direction") SortOrder order) {
         final Predicate<EntityGroup> filter = entityGroup -> isPermitted(ENTITY_GROUP_READ, entityGroup.id());
         return entityGroupService.findPaginatedForEntity(entityType, entityId, page, perPage, order, sort, filter);
     }
@@ -128,7 +130,7 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @ApiOperation("Create a new entity group")
     @ApiResponses(@ApiResponse(code = 400, message = "An entity group already exists with id or name"))
     @RequiresPermissions(ENTITY_GROUP_CREATE)
-    @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_CREATE)
+    @AuditEvent(type = EntityGroupAuditEventTypes.ENTITY_GROUP_CREATE)
     public Response create(@ApiParam(name = "JSON Body") EntityGroupRequest request) {
         try {
             return Response.ok().entity(entityGroupService.create(request.toEntityGroup())).build();
@@ -145,7 +147,7 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
             @ApiResponse(code = 400, message = "An entity group already exists with id or name"),
             @ApiResponse(code = 404, message = "No such entity group")
     })
-    @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_UPDATE)
+    @AuditEvent(type = EntityGroupAuditEventTypes.ENTITY_GROUP_UPDATE)
     public Response update(@ApiParam(name = "id", required = true) @PathParam("id") String id,
                            @ApiParam(name = "JSON Body") EntityGroupRequest request) {
         if (!isPermitted(ENTITY_GROUP_EDIT, id)) {
@@ -164,7 +166,7 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @Path("/{group_id}/add_entity")
     @ApiOperation("Add an entity to an entity group")
     @ApiResponses(@ApiResponse(code = 404, message = "No such entity group"))
-    @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_UPDATE)
+    @AuditEvent(type = EntityGroupAuditEventTypes.ENTITY_GROUP_ADD_ENTITY)
     public Response addEntityToGroup(@ApiParam(name = "group_id", required = true) @PathParam("group_id") String groupId,
                                      @ApiParam(name = "entity_type", required = true) @QueryParam("entity_type") String entityType,
                                      @ApiParam(name = "entity_id", required = true) @QueryParam("entity_id") String entityId) {
@@ -192,7 +194,7 @@ public class EntityGroupResource extends RestResource implements PluginRestResou
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation("Delete an entity group")
-    @AuditEvent(type = AuditEventTypes.ENTITY_GROUP_DELETE)
+    @AuditEvent(type = EntityGroupAuditEventTypes.ENTITY_GROUP_DELETE)
     public void delete(@ApiParam(name = "id", required = true) @PathParam("id") String id) {
         if (!isPermitted(ENTITY_GROUP_DELETE, id)) {
             throw new ForbiddenException("Not allowed to delete group id " + id);

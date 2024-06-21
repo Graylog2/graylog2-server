@@ -37,6 +37,7 @@ public class EntityGroupModule extends PluginModule {
                 .map(StringUtils::toLowerCase)
                 .anyMatch(s -> s.equals(FEATURE_FLAG)) && featureFlags.isOn(FEATURE_FLAG)) {
             addSystemRestResource(EntityGroupResource.class);
+            addAuditEventTypes(EntityGroupAuditEventTypes.class);
             addEntityFacade(EntityGroupFacade.TYPE_V1, EntityGroupFacade.class);
         }
     }
