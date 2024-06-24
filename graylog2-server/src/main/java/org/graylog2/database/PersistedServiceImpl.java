@@ -236,13 +236,13 @@ public class PersistedServiceImpl implements PersistedService {
             try {
                 ValidationResult validationResult = v.validate(fields.get(field));
                 if (validationResult instanceof ValidationResult.ValidationFailed) {
-                    LOG.info("Validation failure: [{}] on field [{}]", v.getClass().getCanonicalName(), field);
+                    LOG.debug("Validation failure: [{}] on field [{}]", v.getClass().getCanonicalName(), field);
                     validationErrors.computeIfAbsent(field, k -> new ArrayList<>());
                     validationErrors.get(field).add(validationResult);
                 }
             } catch (Exception e) {
                 final String error = "Error while trying to validate <" + field + ">, got exception: " + e;
-                LOG.info(error);
+                LOG.debug(error);
                 validationErrors.computeIfAbsent(field, k -> new ArrayList<>());
                 validationErrors.get(field).add(new ValidationResult.ValidationFailed(error));
             }
