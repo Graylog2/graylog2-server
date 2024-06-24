@@ -259,7 +259,7 @@ ConfigurationForm.propTypes = {
   typeName: PropTypes.string,
   values: PropTypes.object,
   wrapperComponent: PropTypes.any,
-  submitButtonText: PropTypes.string.isRequired,
+  submitButtonText: PropTypes.string,
 };
 
 ConfigurationForm.defaultProps = {
