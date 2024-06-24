@@ -1,0 +1,4 @@
+type = "a"
+message = "Add `FilteredMessageOutput` and `OutputFilter` Java interfaces."
+
+pulls = ["19672"]

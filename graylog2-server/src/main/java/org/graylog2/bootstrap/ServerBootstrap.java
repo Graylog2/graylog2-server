@@ -29,6 +29,7 @@ import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Types;
+import org.graylog.security.certutil.CertificateAuthorityBindings;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
@@ -275,6 +276,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
                 new IndexerDiscoveryModule(),
                 new ServerPreflightChecksModule(),
+                new CertificateAuthorityBindings(),
                 binder -> preflightCheckModules.forEach(binder::install));
     }
 
@@ -434,7 +436,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new IndexerDiscoveryModule());
         result.add(new CertificateRenewalBindings());
         result.add(new DataNodeProvisioningBindings());
-
+        result.add(new CertificateAuthorityBindings());
         return result;
     }
 

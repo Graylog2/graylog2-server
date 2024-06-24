@@ -83,6 +83,7 @@ export type EventDefinition = {
     },
     search_within_ms: number,
     execute_every_ms: number,
+    event_limit: number,
   },
   field_spec: FieldSpec,
   key_spec: string[],
