@@ -35,6 +35,7 @@ import View from 'views/logic/views/View';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import SingleMessageFieldTypesProvider from 'views/components/fieldtypes/SingleMessageFieldTypesProvider';
 import StreamsContext from 'contexts/StreamsContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 type Props = {
   params: {
@@ -100,14 +101,18 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
             <Col md={12}>
               <WindowDimensionsContextProvider>
                 <SingleMessageFieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
-                  <InteractiveContext.Provider value={false}>
-                    <MessageDetail fields={Immutable.List()}
-                                   streams={streamsMap}
-                                   allStreams={streamsList}
-                                   disableSurroundingSearch
-                                   inputs={inputs}
-                                   message={message} />
-                  </InteractiveContext.Provider>
+                  <FieldTypesContext.Consumer>
+                    {({ all }) => (
+                      <InteractiveContext.Provider value={false}>
+                        <MessageDetail fields={all}
+                                       streams={streamsMap}
+                                       allStreams={streamsList}
+                                       disableSurroundingSearch
+                                       inputs={inputs}
+                                       message={message} />
+                      </InteractiveContext.Provider>
+                    )}
+                  </FieldTypesContext.Consumer>
                 </SingleMessageFieldTypesProvider>
               </WindowDimensionsContextProvider>
             </Col>

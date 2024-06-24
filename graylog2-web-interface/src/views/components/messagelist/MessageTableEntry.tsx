@@ -190,7 +190,6 @@ const MessageTableEntry = ({
 
         {expanded && (
           <MessageDetailRow>
-            {}
             <td colSpan={colSpanFixup}>
               <MessageDetail message={message}
                              fields={fields}

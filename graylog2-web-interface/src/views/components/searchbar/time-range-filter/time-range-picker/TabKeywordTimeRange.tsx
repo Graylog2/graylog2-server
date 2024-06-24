@@ -81,14 +81,12 @@ const KeywordTimeRangePreview = () => {
       <tbody>
         <tr>
           <td>From</td>
-          {}
           <td>
             <TimePreview dateTime={data?.from} isLoading={isFetching} />
           </td>
         </tr>
         <tr>
           <td>To</td>
-          {}
           <td>
             <TimePreview dateTime={data?.to} isLoading={isFetching} />
           </td>
