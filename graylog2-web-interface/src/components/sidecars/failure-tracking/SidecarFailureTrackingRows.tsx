@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/control-has-associated-label */
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
