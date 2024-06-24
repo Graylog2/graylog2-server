@@ -16,24 +16,43 @@
  */
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 
-import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
-import { Table } from 'components/bootstrap';
-import { Link } from 'components/common/router';
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import usePipelinesConnectedStream, { type StreamConnectedPipelines } from 'hooks/usePipelinesConnectedStream';
+import { Table, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { Section } from 'components/common';
+import { IfPermitted, Section, Icon } from 'components/common';
+import usePipelines from 'hooks/usePipelines';
+import { LinkContainer } from 'components/common/router';
+
+import StreamPipelinesConnectionForm from './StreamPipelinesConnectionForm';
+
+const ActionButtonsWrap = styled.span`
+  margin-right: 6px;
+  float: right;
+`;
 
 const StreamDataRoutingProcessing = () => {
   const { streamId } = useParams<{streamId: string}>();
-  const { data: connectedPipelines, isInitialLoading } = usePipelinesConnectedStream(streamId);
-  const hasConnectedPipelines = !isInitialLoading && connectedPipelines?.length;
+  const { data: connectedPipelines, isInitialLoading: isLoadingConnectPipelines } = usePipelinesConnectedStream(streamId);
+  const hasConnectedPipelines = !isLoadingConnectPipelines && connectedPipelines?.length > 0;
+  const { data: pipelines } = usePipelines();
+  const sortPipelines = (pipelinesList: StreamConnectedPipelines) => pipelinesList.sort((s1, s2) => naturalSort(s1.title, s2.title));
 
   return (
     <>
       <Section title="Illuminate Processing">
         <p>Illuminate Processing step</p>
       </Section>
-      <Section title="Pipelines">
+      <Section title="Pipelines"
+               actions={(
+                 <IfPermitted permissions="streams:create">
+                   <StreamPipelinesConnectionForm streamId={streamId}
+                                                  pipelines={pipelines}
+                                                  connectedPipelines={connectedPipelines} />
+                 </IfPermitted>
+               )}>
         <Table condensed striped hover>
           <thead>
             <tr>
@@ -41,10 +60,22 @@ const StreamDataRoutingProcessing = () => {
             </tr>
           </thead>
           <tbody>
-            {hasConnectedPipelines && connectedPipelines.map((pipeline) => (
+            {hasConnectedPipelines && sortPipelines(connectedPipelines).map((pipeline) => (
               <tr key={pipeline.id}>
                 <td>
-                  <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)} target="_blank">{pipeline.title}</Link>
+                  {pipeline.title}
+                </td>
+                {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                <td>
+                  <ActionButtonsWrap className="align-right">
+                    <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
+                      <Button bsStyle="link"
+                              bsSize="xsmall"
+                              title="View">
+                        <Icon name="pageview" type="regular" />
+                      </Button>
+                    </LinkContainer>
+                  </ActionButtonsWrap>
                 </td>
               </tr>
             ))}

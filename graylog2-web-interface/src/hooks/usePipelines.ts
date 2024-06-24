@@ -16,27 +16,29 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
+import { type PipelineType } from 'stores/pipelines/PipelinesStore';
+import UserNotification from 'util/UserNotification';
+import { PipelinesPipelines } from '@graylog/server-api';
 import type FetchError from 'logic/errors/FetchError';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 
-export type StreamConnectedPipelines = Array<Pick<PipelineType, 'id' | 'title'>>
+type Options = {
+  enabled: boolean,
+}
 
-const fetchPipelinesConnectedStream = (streamId: string) => fetch('GET', qualifyUrl(ApiRoutes.StreamsApiController.stream_connected_pipelines(streamId).url));
-
-const usePipelinesConnectedStream = (streamId: string): {
-  data: StreamConnectedPipelines,
+const usePipelines = ({ enabled }: Options = { enabled: true }) : {
+  data: Array<PipelineType>,
   refetch: () => void,
   isInitialLoading: boolean,
-  error: FetchError,
 } => {
-  const { data, refetch, isInitialLoading, error } = useQuery<StreamConnectedPipelines, FetchError>(
-    ['stream', 'pipelines', streamId],
-    () => fetchPipelinesConnectedStream(streamId),
+  const { data, refetch, isInitialLoading } = useQuery<Array<PipelineType>, FetchError>(
+    ['pipelines'],
+    () => PipelinesPipelines.getAll(),
     {
-      notifyOnChangeProps: ['data', 'error'],
+      onError: (errorThrown) => {
+        UserNotification.error(`Loading pipelines failed with status: ${errorThrown}`,
+          'Could not load pipelines');
+      },
+      enabled,
     },
   );
 
@@ -44,8 +46,7 @@ const usePipelinesConnectedStream = (streamId: string): {
     data: data ?? [],
     refetch,
     isInitialLoading,
-    error,
   });
 };
 
-export default usePipelinesConnectedStream;
+export default usePipelines;
