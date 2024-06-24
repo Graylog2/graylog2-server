@@ -77,7 +77,6 @@ const ContentPackVersionItem = ({
 
   return (
     <tr key={pack.id + pack.rev}>
-      {}
       <td>
         <input type="radio"
                value={pack.rev}
