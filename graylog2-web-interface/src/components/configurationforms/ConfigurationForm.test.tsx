@@ -31,9 +31,10 @@ describe('ConfigurationForm', () => {
         <ConfigurationForm submitAction={submitAction}
                            title="Edit entity"
                            titleValue="Entity title"
-                           ref={formRef}
                            submitButtonText="Update entity"
-                           typeName="placeholder" />
+                           typeName="placeholder"
+                           cancelAction={() => {}}
+                           values={{}} />
         <button type="button" onClick={openForm}>Open modal</button>
       </>
     );
