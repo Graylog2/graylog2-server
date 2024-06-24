@@ -17,12 +17,10 @@
 package org.graylog.plugins.pipelineprocessor.ast;
 
 import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.Sets;
-import org.graylog2.shared.metrics.MetricUtils;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineMetricRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,12 +30,13 @@ import java.util.stream.Stream;
 @AutoValue
 public abstract class Pipeline {
 
-    private String metricName;
     private transient Meter executed;
 
     @Nullable
     public abstract String id();
+
     public abstract String name();
+
     public abstract SortedSet<Stage> stages();
 
     public static Builder builder() {
@@ -63,26 +62,12 @@ public abstract class Pipeline {
      *
      * @param metricRegistry the registry to add the metrics to
      */
-    public void registerMetrics(MetricRegistry metricRegistry) {
+    public void registerMetrics(PipelineMetricRegistry metricRegistry) {
         if (id() != null) {
-            metricName = MetricRegistry.name(Pipeline.class, id(), "executed");
-            executed = metricRegistry.meter(metricName);
+            executed = metricRegistry.registerPipelineMeter(id(), "executed");
         }
     }
 
-    /**
-     * The metric filter matching all metrics that have been registered by this pipeline.
-     * Commonly used to remove the relevant metrics from the registry upon deletion of the pipeline.
-     *
-     * @return the filter matching this pipeline's metrics
-     */
-    public MetricFilter metricsFilter() {
-        if (id() == null) {
-            return (name, metric) -> false;
-        }
-        return new MetricUtils.SingleMetricFilter(metricName);
-
-    }
     public void markExecution() {
         if (executed != null) {
             executed.mark();

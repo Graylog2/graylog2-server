@@ -1,0 +1,5 @@
+type="f"
+message="Fixing copying to clipboard in non-secure contexts."
+
+issues=["19643"]
+pulls=["19654"]

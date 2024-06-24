@@ -22,14 +22,14 @@ import { useQueryParam, QueryParamProvider } from 'use-query-params';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { asMock } from 'helpers/mocking';
-import useDashboards from 'views/components/dashboard/hooks/useDashboards';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 import DashboardsOverview from './DashboardsOverview';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
-jest.mock('views/components/dashboard/hooks/useDashboards');
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 jest.mock('views/stores/ViewManagementStore', () => ({
@@ -105,20 +105,20 @@ describe('DashboardsOverview', () => {
 
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
-    asMock(useDashboards).mockReturnValue(loadDashboardsResponse(0));
+    asMock(useFetchEntities).mockReturnValue(loadDashboardsResponse(0));
     asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
   });
 
   it('should render empty', async () => {
-    asMock(useDashboards).mockReturnValue(loadDashboardsResponse(0));
+    asMock(useFetchEntities).mockReturnValue(loadDashboardsResponse(0));
 
     render(<SUT />);
 
-    await screen.findByText('No dashboards have been created yet.');
+    await screen.findByText('No dashboards have been found.');
   });
 
   it('should render list', async () => {
-    asMock(useDashboards).mockReturnValue(loadDashboardsResponse(3));
+    asMock(useFetchEntities).mockReturnValue(loadDashboardsResponse(3));
 
     render(<SUT />);
 
@@ -136,7 +136,7 @@ describe('DashboardsOverview', () => {
 
     render(<SUT />);
 
-    const searchInput = await screen.findByPlaceholderText('Enter search query...');
+    const searchInput = await screen.findByPlaceholderText('Search for dashboards');
 
     expect(searchInput).toHaveValue('example query');
   });

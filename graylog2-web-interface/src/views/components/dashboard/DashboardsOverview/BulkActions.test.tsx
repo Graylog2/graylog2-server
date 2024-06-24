@@ -39,6 +39,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
     setSelectedEntities: () => {},
     selectEntity: () => {},
     deselectEntity: () => {},
+    toggleEntitySelect: () => {},
   };
 
   const openActionsDropdown = async () => {

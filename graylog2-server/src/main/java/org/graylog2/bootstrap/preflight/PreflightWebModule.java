@@ -22,8 +22,6 @@ import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog.security.certutil.CaService;
-import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
@@ -77,7 +75,6 @@ public class PreflightWebModule extends Graylog2Module {
         bind(new TypeLiteral<NodeService<ServerNodeDto>>() {}).to(ServerNodeClusterService.class);
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class);
-        bind(CaService.class).to(CaServiceImpl.class);
 
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(PreflightBoot.class).asEagerSingleton();

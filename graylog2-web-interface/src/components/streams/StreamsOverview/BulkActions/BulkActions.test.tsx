@@ -48,6 +48,7 @@ describe('StreamsOverview BulkActionsRow', () => {
     setSelectedEntities: () => {},
     selectEntity: () => {},
     deselectEntity: () => {},
+    toggleEntitySelect: () => {},
   };
 
   const openActionsDropdown = async () => userEvent.click(await screen.findByRole('button', {

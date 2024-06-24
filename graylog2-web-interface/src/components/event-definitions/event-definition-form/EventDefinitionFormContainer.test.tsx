@@ -169,13 +169,6 @@ jest.mock('stores/users/CurrentUserStore', () => ({
   },
 }));
 
-jest.mock('../event-definition-types/withStreams', () => ({
-  __esModule: true,
-  default: (Component: React.FC) => (props: any) => (
-    <Component {...props} streams={[{ id: 'stream-id', title: 'stream-title' }]} />
-  ),
-}));
-
 jest.mock('logic/telemetry/withTelemetry', () => ({
   __esModule: true,
   default: (Component: React.FC) => (props: any) => (

@@ -40,6 +40,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
 import usePluginEntities from 'hooks/usePluginEntities';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 import type { EventDefinition } from '../event-definitions-types';
 
@@ -49,7 +50,6 @@ type SigmaEventDefinitionConfig = EventDefinition['config'] & {
 
 type Props = {
   eventDefinition: EventDefinition,
-  refetchEventDefinitions: () => void,
 }
 
 const DIALOG_TYPES = {
@@ -78,7 +78,8 @@ const DIALOG_TEXT = {
   },
 };
 
-const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Props) => {
+const EventDefinitionActions = ({ eventDefinition }: Props) => {
+  const { refetch: refetchEventDefinitions } = useTableFetchContext();
   const { deselectEntity } = useSelectedEntities();
   const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
   const [currentDefinition, setCurrentDefinition] = useState(null);

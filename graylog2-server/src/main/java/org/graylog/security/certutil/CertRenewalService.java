@@ -16,28 +16,16 @@
  */
 package org.graylog.security.certutil;
 
-import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
+@Deprecated
 public interface CertRenewalService {
 
     record ProvisioningInformation(DataNodeProvisioningConfig.State status, String errorMsg,
                                    LocalDateTime certValidUntil) {
     }
 
-    record DataNode(String nodeId, DataNodeStatus dataNodeStatus, String transportAddress,
-                    DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId,
-                    LocalDateTime certValidUntil) {
-        public String getId() {
-            return nodeId;
-        }
-    }
-
     void checkCertificatesForRenewal();
-    void initiateRenewalForNode(String nodeId);
-    List<DataNode> findNodes();
-
 }

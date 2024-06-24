@@ -269,11 +269,10 @@ public class StreamFacade implements EntityFacade<Stream> {
             return;
         }
         try {
-            LOG.debug("WTF");
             streamService.destroy(nativeEntity);
         } catch (NotFoundException ignore) {
         } catch (StreamGuardException e) {
-            LOG.error("Error deleting stream entity {}", nativeEntity.getTitle());
+            LOG.error("Error deleting stream entity {}. Reason: {}", nativeEntity.getTitle(), e.getMessage());
             throw new IllegalStateException(e.getMessage(), e);
         }
     }

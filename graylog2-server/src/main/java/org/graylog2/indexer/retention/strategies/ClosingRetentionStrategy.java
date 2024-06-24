@@ -18,6 +18,7 @@ package org.graylog2.indexer.retention.strategies;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IndexSet;
@@ -29,8 +30,6 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +59,7 @@ public class ClosingRetentionStrategy extends AbstractIndexRetentionStrategy {
     @Override
     protected Optional<Integer> getMaxNumberOfIndices(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
-        final RetentionStrategyConfig strategyConfig = indexSetConfig.retentionStrategy();
+        final RetentionStrategyConfig strategyConfig = indexSetConfig.retentionStrategyConfig();
 
         if (!(strategyConfig instanceof ClosingRetentionStrategyConfig)) {
             throw new IllegalStateException("Invalid retention strategy config <" + strategyConfig.getClass().getCanonicalName() + "> for index set <" + indexSetConfig.id() + ">");
