@@ -27,7 +27,6 @@ import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
-import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -93,10 +92,10 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     public abstract boolean useCronScheduling();
 
     @JsonProperty(FIELD_CRON_EXPRESSION)
-    public abstract String cronExpression();
+    public abstract Optional<String> cronExpression();
 
     @JsonProperty(FIELD_CRON_TIMEZONE)
-    public abstract String cronTimezone();
+    public abstract Optional<String> cronTimezone();
 
     @JsonProperty(FIELD_EVENT_LIMIT)
     public abstract int eventLimit();
@@ -116,8 +115,6 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                     .type(TYPE_NAME)
                     .filters(Collections.emptyList())
                     .useCronScheduling(false)
-                    .cronExpression("")
-                    .cronTimezone(CronJobSchedule.DEFAULT_TIMEZONE)
                     .eventLimit(0);
         }
 
@@ -149,10 +146,10 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
         public abstract Builder useCronScheduling(boolean useCronScheduling);
 
         @JsonProperty(FIELD_CRON_EXPRESSION)
-        public abstract Builder cronExpression(String cronExpression);
+        public abstract Builder cronExpression(@Nullable String cronExpression);
 
         @JsonProperty(FIELD_CRON_TIMEZONE)
-        public abstract Builder cronTimezone(String cronTimezone);
+        public abstract Builder cronTimezone(@Nullable String cronTimezone);
 
         @JsonProperty(FIELD_EVENT_LIMIT)
         public abstract Builder eventLimit(Integer eventLimit);
@@ -189,8 +186,8 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                 .executeEveryMs(executeEveryMs())
                 .searchWithinMs(searchWithinMs())
                 .useCronScheduling(useCronScheduling())
-                .cronExpression(cronExpression())
-                .cronTimezone(cronTimezone())
+                .cronExpression(cronExpression().orElse(null))
+                .cronTimezone(cronTimezone().orElse(null))
                 .eventLimit(eventLimit())
                 .build();
     }

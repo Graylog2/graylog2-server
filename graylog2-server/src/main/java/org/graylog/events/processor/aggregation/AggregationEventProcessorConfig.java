@@ -112,9 +112,11 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     @JsonProperty(FIELD_USE_CRON_SCHEDULING)
     public abstract boolean useCronScheduling();
 
+    @Nullable
     @JsonProperty(FIELD_CRON_EXPRESSION)
     public abstract String cronExpression();
 
+    @Nullable
     @JsonProperty(FIELD_CRON_TIMEZONE)
     public abstract String cronTimezone();
 
@@ -181,8 +183,6 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .filters(Collections.emptyList())
                     .type(TYPE_NAME)
                     .useCronScheduling(false)
-                    .cronExpression("")
-                    .cronTimezone(CronJobSchedule.DEFAULT_TIMEZONE)
                     .eventLimit(0);
         }
 
@@ -265,10 +265,14 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                 });
 
         if (useCronScheduling()) {
-            try {
-                CronUtils.validateExpression(cronExpression());
-            } catch (Exception e) {
-                validationResult.addError(FIELD_CRON_EXPRESSION, e.getMessage());
+            if (cronExpression() == null || cronExpression().isEmpty()) {
+                validationResult.addError(FIELD_CRON_EXPRESSION, "Cron expression must not be empty when using cron scheduling");
+            } else {
+                try {
+                    CronUtils.validateExpression(cronExpression());
+                } catch (Exception e) {
+                    validationResult.addError(FIELD_CRON_EXPRESSION, e.getMessage());
+                }
             }
         }
 

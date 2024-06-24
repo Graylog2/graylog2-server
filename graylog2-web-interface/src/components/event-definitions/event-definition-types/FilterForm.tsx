@@ -321,6 +321,24 @@ const FilterForm = ({
     handleConfigChange(name, newConfig);
   };
 
+  const handleUseCronSchedulingChange = (event) => {
+    const { name } = event.target;
+    const value = FormsUtils.getValueFromInput(event.target);
+    const newConfig = cloneDeep(eventDefinition.config);
+    newConfig[name] = value;
+
+    if (value) {
+      newConfig.cron_expression = '';
+      newConfig.cron_timezone = userTimezone;
+    } else {
+      newConfig.cron_expression = null;
+      newConfig.cron_timezone = null;
+    }
+
+    setCurrentConfig(newConfig);
+    propagateChange(newConfig);
+  };
+
   const hideFiltersPreview = (value) => {
     Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, value);
     setSearchFiltersHidden(value);
@@ -501,7 +519,7 @@ const FilterForm = ({
                label="Use Cron Scheduling"
                help="Schedule this event with a Quartz cron expression"
                checked={defaultTo(eventDefinition.config.use_cron_scheduling, false)}
-               onChange={handleEnabledChange} />
+               onChange={handleUseCronSchedulingChange} />
         {currentConfig.use_cron_scheduling
           ? (
             <>
