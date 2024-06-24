@@ -55,6 +55,7 @@ import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
+import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
@@ -295,6 +296,10 @@ public abstract class Graylog2Module extends AbstractModule {
         }
 
         installOutput(outputMapBinder, target, factoryClass);
+    }
+
+    protected MapBinder<String, FilteredMessageOutput> filteredOutputsMapBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, FilteredMessageOutput.class);
     }
 
     protected Multibinder<PluginPermissions> permissionsBinder() {
