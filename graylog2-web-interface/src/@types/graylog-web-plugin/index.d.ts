@@ -151,6 +151,15 @@ interface PluginDataWarehouse {
   StreamDataWarehouse: React.ComponentType<{}>,
 }
 
+interface PluginDataWarehouse {
+  DataWarehouseStatus: React.ComponentType<{
+    stream: {
+      enabled_status: boolean;
+    }
+  }>,
+  StreamDataWarehouse: React.ComponentType<{}>,
+}
+
 type FieldValueProvider = {
   type: string,
   displayName: string,
