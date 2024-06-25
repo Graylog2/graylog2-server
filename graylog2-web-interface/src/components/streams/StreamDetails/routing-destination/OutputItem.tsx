@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { Output } from 'stores/outputs/OutputsStore';
 import type { ConfigurationFormData } from 'components/configurationforms';
@@ -33,10 +33,10 @@ type Props = {
   getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration,
 };
 
-const ActionButtonsWrap = styled.span`
-  margin-right: 6px;
+const ActionButtonsWrap = styled.span(({ theme }) => css`
+  margin-right: ${theme.spacings.xs};
   float: right;
-`;
+`);
 
 const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeDefinition }: Props) => (
   <tr>
