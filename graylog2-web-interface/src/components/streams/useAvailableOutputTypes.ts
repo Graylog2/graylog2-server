@@ -17,16 +17,17 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { SystemOutputs } from '@graylog/server-api';
 import UserNotification from 'util/UserNotification';
+import type { ConfigurationField } from 'components/configurationforms';
+import ApiRoutes from 'routing/ApiRoutes';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 
 export const KEY_PREFIX = ['outputs', 'types'];
 export const keyFn = () => [...KEY_PREFIX];
 
 export type AvailableOutputRequestedConfiguration = {
-  [_key: string]: {
-      [_key: string]: {};
-  };
+  [key: string]: ConfigurationField,
 };
 export type AvailableOutputSummary = {
   human_name: string;
@@ -41,7 +42,11 @@ export type AvailableOutputTypes = {
   };
 };
 
-export const fetchOutputsTypes = () => SystemOutputs.available();
+export const fetchOutputsTypes = () => {
+  const url = qualifyUrl(ApiRoutes.OutputsApiController.availableTypes().url);
+
+  return fetch('GET', url);
+};
 
 type Options = {
   enabled: boolean,

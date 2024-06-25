@@ -17,14 +17,21 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { StreamOutputs } from '@graylog/server-api';
 import UserNotification from 'util/UserNotification';
 import type { Output } from 'stores/outputs/OutputsStore';
+import ApiRoutes from 'routing/ApiRoutes';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 
 export const KEY_PREFIX = ['outputs', 'overview'];
 export const keyFn = (streamId: string) => [...KEY_PREFIX, streamId];
 
-export const fetchStreamOutputs = (streamId: string) => StreamOutputs.get(streamId);
+export const fetchStreamOutputs = (streamId: string) => {
+  const url = qualifyUrl(ApiRoutes.StreamOutputsApiController.index(streamId).url);
+
+  return fetch('GET', url);
+};
+
 type Options = {
   enabled: boolean,
 }
@@ -36,8 +43,9 @@ const useStreamOutputs = (streamId: string, { enabled }: Options = { enabled: tr
   }
   refetch: () => void,
   isInitialLoading: boolean,
+  isError: boolean,
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
+  const { data, refetch, isInitialLoading, isError } = useQuery(
     keyFn(streamId),
     () => fetchStreamOutputs(streamId),
     {
@@ -54,6 +62,7 @@ const useStreamOutputs = (streamId: string, { enabled }: Options = { enabled: tr
     data,
     refetch,
     isInitialLoading,
+    isError,
   });
 };
 

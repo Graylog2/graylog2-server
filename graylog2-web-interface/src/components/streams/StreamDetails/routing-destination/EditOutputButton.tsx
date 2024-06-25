@@ -39,13 +39,13 @@ type Props = {
 const EditOutputButton = ({ output, disabled, onUpdate, getTypeDefinition }: Props) => {
   const currentUser = useCurrentUser();
   const [typeDefinition, setTypeDefinition] = useState<AvailableOutputRequestedConfiguration>(undefined);
-  const configFormRef = useRef<typeof ConfigurationForm>();
+  const configFormRef = useRef(null);
 
   const onClick = () => {
     setTypeDefinition(getTypeDefinition(output.type));
 
     if (configFormRef.current) {
-      configFormRef.current.open();
+      configFormRef.current?.open();
     }
   };
 

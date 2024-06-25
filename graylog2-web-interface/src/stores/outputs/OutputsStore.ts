@@ -16,6 +16,7 @@
  */
 import Reflux from 'reflux';
 
+import type { ConfigurationField } from 'components/configurationforms';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import * as URLUtils from 'util/URLUtils';
@@ -26,10 +27,10 @@ export type Output = {
   id: string,
   title: string,
   type: string,
-  configuration?: {
-    [_key: string]: any,
-  }
-};
+  configuration: {
+    [key: string]: ConfigurationField,
+  },
+}
 
 // eslint-disable-next-line import/prefer-default-export
 export const OutputsStore = singletonStore(
