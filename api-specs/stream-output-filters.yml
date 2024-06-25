@@ -246,6 +246,7 @@ components:
           description: "The filter description"
         status:
           type: "string"
+          description: "The filter status"
           enum:
             - "enabled"
             - "disabled"
