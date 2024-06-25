@@ -16,16 +16,9 @@
  */
 package org.graylog.security.certutil;
 
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import java.security.KeyStore;
+import java.util.Optional;
 
-import java.time.LocalDateTime;
-
-@Deprecated
-public interface CertRenewalService {
-
-    record ProvisioningInformation(DataNodeProvisioningConfig.State status, String errorMsg,
-                                   LocalDateTime certValidUntil) {
-    }
-
-    void checkCertificatesForRenewal();
+public interface CaTruststore {
+    Optional<KeyStore> getTrustStore() throws CaTruststoreException;
 }

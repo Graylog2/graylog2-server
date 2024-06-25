@@ -19,13 +19,12 @@ package org.graylog2.security;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.graylog.security.certutil.CaService;
+import jakarta.inject.Inject;
+import org.graylog.security.certutil.CaTruststore;
+import org.graylog.security.certutil.CaTruststoreException;
 import org.graylog.security.certutil.CertificateAuthorityChangedEvent;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -40,12 +39,12 @@ import java.util.List;
 
 public class CustomCAX509TrustManager implements X509TrustManager {
     private static final Logger LOG = LoggerFactory.getLogger(CustomCAX509TrustManager.class);
-    private final CaService caService;
+    private final CaTruststore caTruststore;
     private List<X509TrustManager> trustManagers = new ArrayList<>();
 
     @Inject
-    public CustomCAX509TrustManager(CaService caService, EventBus serverEventBus) {
-        this.caService = caService;
+    public CustomCAX509TrustManager(CaTruststore caTruststore, EventBus serverEventBus) {
+        this.caTruststore = caTruststore;
         serverEventBus.register(this);
         this.refresh();
     }
@@ -60,8 +59,8 @@ public class CustomCAX509TrustManager implements X509TrustManager {
         try {
             trustManagers = new ArrayList<>();
             trustManagers.add(getDefaultTrustManager());
-            caService.loadKeyStore().ifPresent(keystore -> trustManagers.add(getTrustManager(keystore)));
-        } catch (KeyStoreException | KeyStoreStorageException | NoSuchAlgorithmException k) {
+            caTruststore.getTrustStore().ifPresent(keystore -> trustManagers.add(getTrustManager(keystore)));
+        } catch (CaTruststoreException | KeyStoreException | NoSuchAlgorithmException k) {
             LOG.error("Could not add Graylog CA to TrustManagers: {}", k.getMessage(), k);
         }
     }
