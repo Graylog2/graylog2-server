@@ -40,7 +40,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -120,7 +119,7 @@ class LegacyDatanodeKeystoreProviderTest {
         );
     }
 
-    @NotNull
+    @Nonnull
     private static KeyStore createSignedKeystore(String passwordSecret) throws Exception {
         final KeyPair keyPair = generateKeyPair();
         final KeyStore keystore = keyPair.toKeystore("datanode", passwordSecret.toCharArray());
