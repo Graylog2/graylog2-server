@@ -151,6 +151,7 @@ public class NodePingPeriodical extends Periodical {
                 .setHostname(configuration.getHostname())
                 .setDataNodeStatus(DataNodeStatus.STARTING)
                 .setCertValidUntil(certValidUntil.get())
+                .setDatanodeVersion(version.getVersion().toString())
                 .build());
 
         if (!registrationSucceeded) {
