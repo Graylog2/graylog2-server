@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.shares.GranteeSharesService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.ObjectMapperExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -60,6 +61,7 @@ class ViewOwnershipToGrantsMigrationTest {
     private ViewOwnerShipToGrantsMigration migration;
     private DBGrantService grantService;
     private UserService userService;
+    private GranteeSharesService granteeSharesService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
@@ -71,8 +73,9 @@ class ViewOwnershipToGrantsMigrationTest {
 
         this.userService = userService;
         this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry);
+        this.granteeSharesService = mock(GranteeSharesService.class);
 
-        final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
+        final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry, granteeSharesService, userService);
         final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         final TestViewService viewService = new TestViewService(clusterConfigService, entityOwnershipService, viewSummaryService, mongoCollections);
 

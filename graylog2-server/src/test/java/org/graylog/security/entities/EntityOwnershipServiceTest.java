@@ -23,7 +23,9 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
+import org.graylog.security.shares.GranteeSharesService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -40,12 +42,16 @@ class EntityOwnershipServiceTest {
     private EntityOwnershipService entityOwnershipService;
     private DBGrantService dbGrantService;
     private GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
+    private GranteeSharesService granteeSharesService;
+    private UserService userService;
     private InOrder grnRegistryInOrderVerification;
 
     @BeforeEach
     void setUp() {
         this.dbGrantService = mock(DBGrantService.class);
-        this.entityOwnershipService = new EntityOwnershipService(dbGrantService, grnRegistry);
+        this.granteeSharesService = mock(GranteeSharesService.class);
+        this.userService = mock(UserService.class);
+        this.entityOwnershipService = new EntityOwnershipService(dbGrantService, grnRegistry, granteeSharesService, userService);
         this.grnRegistryInOrderVerification = Mockito.inOrder(dbGrantService);
     }
 
