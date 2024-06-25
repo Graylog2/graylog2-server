@@ -23,12 +23,17 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
+import org.graylog.security.shares.GranteeSharesService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.util.Optional;
+import java.util.Set;
 
 @Singleton
 public class EntityOwnershipService {
@@ -36,13 +41,19 @@ public class EntityOwnershipService {
 
     private final DBGrantService dbGrantService;
     private final GRNRegistry grnRegistry;
+    private final GranteeSharesService granteeSharesService;
+    private final UserService userService;
 
 
     @Inject
-    public EntityOwnershipService(DBGrantService dbGrantService,
-                                  GRNRegistry grnRegistry) {
+    public EntityOwnershipService(final DBGrantService dbGrantService,
+                                  final GRNRegistry grnRegistry,
+                                  final GranteeSharesService granteeSharesService,
+                                  final UserService userService) {
         this.dbGrantService = dbGrantService;
         this.grnRegistry = grnRegistry;
+        this.granteeSharesService = granteeSharesService;
+        this.userService = userService;
     }
 
     public void registerNewEventDefinition(String id, User user) {
@@ -118,5 +129,12 @@ public class EntityOwnershipService {
     private void removeGrantsForTarget(GRN target) {
         LOG.debug("Removing grants for <{}>", target);
         dbGrantService.deleteForTarget(target);
+    }
+
+    public Optional<User> getOwnerForEntityWithId(GRN grn) {
+        return granteeSharesService
+                .getTargetOwners(Set.of(grn))
+                .values().stream().findFirst()
+                .flatMap(owners -> owners.stream().findFirst().map(grantee -> userService.loadById(grantee.grn().entity())));
     }
 }

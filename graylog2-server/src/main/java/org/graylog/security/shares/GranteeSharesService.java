@@ -134,7 +134,7 @@ public class GranteeSharesService {
         );
     }
 
-    private Map<GRN, Set<Grantee>> getTargetOwners(Set<GRN> targets) {
+    public Map<GRN, Set<Grantee>> getTargetOwners(Set<GRN> targets) {
         return grantService.getOwnersForTargets(targets).entrySet()
                 .stream()
                 .map(entry -> Maps.immutableEntry(entry.getKey(), getOwners(entry)))
