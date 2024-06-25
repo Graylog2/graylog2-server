@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.shares.GranteeSharesService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.ObjectMapperExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -80,7 +81,8 @@ class ViewSharingToGrantsMigrationTest {
                GRNRegistry grnRegistry,
                @Mock ClusterConfigService clusterConfigService,
                @Mock UserService userService,
-               @Mock RoleService roleService) {
+               @Mock RoleService roleService,
+               @Mock GranteeSharesService granteeSharesService) {
 
         this.dbCollection = mongodb.mongoCollection("view_sharings");
         this.userService = userService;
@@ -92,7 +94,7 @@ class ViewSharingToGrantsMigrationTest {
             return createUser(argument);
         });
 
-        final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
+        final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry, granteeSharesService, userService);
         final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         final TestViewService viewService = new TestViewService(clusterConfigService, entityOwnershipService, mongoCollections);
 

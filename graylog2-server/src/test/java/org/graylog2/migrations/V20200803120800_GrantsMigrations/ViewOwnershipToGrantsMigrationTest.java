@@ -61,7 +61,6 @@ class ViewOwnershipToGrantsMigrationTest {
     private ViewOwnerShipToGrantsMigration migration;
     private DBGrantService grantService;
     private UserService userService;
-    private GranteeSharesService granteeSharesService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
@@ -69,11 +68,11 @@ class ViewOwnershipToGrantsMigrationTest {
                GRNRegistry grnRegistry,
                @Mock ClusterConfigService clusterConfigService,
                @Mock UserService userService,
-               @Mock ViewSummaryService viewSummaryService) {
+               @Mock ViewSummaryService viewSummaryService,
+               @Mock GranteeSharesService granteeSharesService) {
 
         this.userService = userService;
         this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry);
-        this.granteeSharesService = mock(GranteeSharesService.class);
 
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry, granteeSharesService, userService);
         final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
