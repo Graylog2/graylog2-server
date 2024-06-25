@@ -1934,6 +1934,17 @@
     chroma-js "^2.1.2"
     lodash "^4.17.21"
 
+"@graylog/sawmill@^2.0.18":
+  version "2.0.18"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.18.tgz#184a82f2fd1b268dbc02a954e64f9416a14cb04e"
+  integrity sha512-U0MbL6qZ/dKHb024iX3DqJrmLVvRgTOOSbMM+TZwFPbabEf+jKO2VMbCOAc2CtL8JsNngadwWIJPwwtYuOfGMQ==
+  dependencies:
+    "@openfonts/dm-sans_latin" "^1.0.2"
+    "@openfonts/source-sans-pro_latin" "^1.44.2"
+    "@openfonts/ubuntu-mono_latin" "^1.44.1"
+    chroma-js "^2.1.2"
+    lodash "^4.17.21"
+
 "@humanwhocodes/config-array@^0.11.14":
   version "0.11.14"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.14.tgz#d78e481a039f7566ecc9660b4ea7fe6b1fec442b"
