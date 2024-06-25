@@ -14,17 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+package org.graylog2.plugin.outputs;
 
-import jakarta.annotation.Nullable;
+import org.graylog2.outputs.filter.FilteredMessage;
 
-import java.net.URI;
 import java.util.List;
 
-public record RemoteReindexRequest(@Nullable String allowlist,
-                                   URI uri,
-                                   String username,
-                                   String password,
-                                   List<String> indices,
-                                   int threadsCount) {
+/**
+ * Classes that implement this interface accept batches of {@link FilteredMessage}s.
+ */
+public interface FilteredMessageOutput {
+    /**
+     * Write the given filtered messages. Based on the filtered messages attributes, the output can decide
+     * to discard the message.
+     *
+     * @param filteredMessages the filtered messages
+     * @throws Exception if writing the messages fails
+     */
+    void writeFiltered(List<FilteredMessage> filteredMessages) throws Exception;
 }

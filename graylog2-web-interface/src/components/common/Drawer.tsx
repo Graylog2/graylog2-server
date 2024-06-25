@@ -14,17 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+import * as React from 'react';
+import { Drawer as MantineDrawer } from '@mantine/core';
+import styled, { css } from 'styled-components';
 
-import jakarta.annotation.Nullable;
+const StyledDrawer = styled(MantineDrawer)(({ theme }) => css`
+  .mantine-Drawer-content, .mantine-Drawer-header {
+    background-color: ${theme.colors.global.contentBackground};
+  }
+`);
+type Props = Pick<React.ComponentProps<typeof MantineDrawer>, 'opened' | 'onClose' | 'position' | 'size' | 'children' | 'title' | 'closeOnClickOutside'>;
+const Drawer = ({ title, ...props }: Props) => <StyledDrawer offset={15} padding="lg" radius={5} zIndex={1032} title={title} {...props} />;
 
-import java.net.URI;
-import java.util.List;
-
-public record RemoteReindexRequest(@Nullable String allowlist,
-                                   URI uri,
-                                   String username,
-                                   String password,
-                                   List<String> indices,
-                                   int threadsCount) {
-}
+export default Drawer;

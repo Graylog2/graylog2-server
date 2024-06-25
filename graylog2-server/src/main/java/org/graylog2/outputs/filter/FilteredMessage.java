@@ -14,17 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+package org.graylog2.outputs.filter;
 
-import jakarta.annotation.Nullable;
+import org.graylog2.plugin.Message;
 
-import java.net.URI;
-import java.util.List;
+import java.util.Set;
 
-public record RemoteReindexRequest(@Nullable String allowlist,
-                                   URI uri,
-                                   String username,
-                                   String password,
-                                   List<String> indices,
-                                   int threadsCount) {
+/**
+ * A filtered message that contains output target information.
+ */
+public interface FilteredMessage {
+    /**
+     * The Message object.
+     *
+     * @return the message
+     */
+    Message message();
+
+    /**
+     * A set of output targets names.
+     *
+     * @return set of output targets
+     */
+    Set<String> outputs();
+
+    /**
+     * Whether the message has been indexed or not.
+     *
+     * @return true if the message has been indexed. Otherwise, false.
+     */
+    boolean isIndexed();
 }

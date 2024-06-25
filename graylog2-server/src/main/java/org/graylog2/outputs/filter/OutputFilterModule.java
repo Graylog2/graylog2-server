@@ -14,17 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+package org.graylog2.outputs.filter;
 
-import jakarta.annotation.Nullable;
+import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 
-import java.net.URI;
-import java.util.List;
-
-public record RemoteReindexRequest(@Nullable String allowlist,
-                                   URI uri,
-                                   String username,
-                                   String password,
-                                   List<String> indices,
-                                   int threadsCount) {
+public class OutputFilterModule extends AbstractModule {
+    @Override
+    protected void configure() {
+        bind(OutputFilter.class).to(AllOutputsFilter.class).in(Scopes.SINGLETON);
+    }
 }

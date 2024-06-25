@@ -26,6 +26,9 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.graylog.plugins.views.search.db.StaticReferencedSearch;
@@ -52,6 +55,7 @@ import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
+import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
@@ -61,11 +65,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.ws.rs.container.ContainerResponseFilter;
-import jakarta.ws.rs.container.DynamicFeature;
-import jakarta.ws.rs.ext.ExceptionMapper;
-
 import java.lang.annotation.Annotation;
 
 public abstract class Graylog2Module extends AbstractModule {
@@ -296,6 +295,10 @@ public abstract class Graylog2Module extends AbstractModule {
         }
 
         installOutput(outputMapBinder, target, factoryClass);
+    }
+
+    protected MapBinder<String, FilteredMessageOutput> filteredOutputsMapBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, FilteredMessageOutput.class);
     }
 
     protected Multibinder<PluginPermissions> permissionsBinder() {
