@@ -34,9 +34,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -72,6 +74,26 @@ public class StreamServiceImplTest {
         assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a537197af2"))).hasSize(1);
         assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a5deadbeef"))).isEmpty();
         assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a537197af2", "565f02223b0c25a5deadbeef"))).hasSize(1);
+    }
+
+    @Test
+    @MongoDBFixtures("someStreamsWithAlertConditions.json")
+    public void loadStreamTitles() {
+        final var result = streamService.loadStreamTitles(Set.of("565f02223b0c25a537197af2", "559d14663b0cf26a15ee0f01"));
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get("565f02223b0c25a537197af2")).isEqualTo("Logins");
+        assertThat(result.get("559d14663b0cf26a15ee0f01")).isEqualTo("footitle");
+
+        assertThat(streamService.loadStreamTitles(Set.of())).isEmpty();
+
+        // Invalid ObjectIds throw an error
+        assertThatThrownBy(() -> streamService.loadStreamTitles(Set.of("foo")))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> streamService.loadStreamTitles(Collections.singleton(null)))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> streamService.loadStreamTitles(Collections.singleton("")))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

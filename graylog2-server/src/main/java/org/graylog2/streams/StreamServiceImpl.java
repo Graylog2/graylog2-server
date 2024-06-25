@@ -179,6 +179,23 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
+    public Map<String, String> loadStreamTitles(Collection<String> streamIds) {
+        if (streamIds.isEmpty()) {
+            return Map.of();
+        }
+
+        final var streamObjectIds = streamIds.stream().map(ObjectId::new).toList();
+        final var cursor = collection(StreamImpl.class).find(
+                new BasicDBObject("_id", new BasicDBObject("$in", streamObjectIds)),
+                new BasicDBObject("_id", 1).append("title", 1)
+        );
+        try (cursor) {
+            return cursorToList(cursor).stream()
+                    .collect(Collectors.toMap(i -> i.get("_id").toString(), i -> i.get("title").toString()));
+        }
+    }
+
+    @Override
     public List<Stream> loadAll() {
         return loadAll(Collections.emptyMap());
     }
