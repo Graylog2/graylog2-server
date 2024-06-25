@@ -131,7 +131,7 @@ class AddDecoratorButton extends React.Component<Props, State> {
                                                 title={`Create new ${typeDefinition.name}`}
                                                 typeName={typeName}
                                                 includeTitleField={false}
-                                                wrapperComponent={wrapperComponent}
+                                                wrapperComponent={wrapperComponent as React.ComponentProps<typeof ConfigurationForm>['wrapperComponent']}
                                                 submitAction={this._handleSubmit}
                                                 cancelAction={this._handleCancel} />
       ) : null);
