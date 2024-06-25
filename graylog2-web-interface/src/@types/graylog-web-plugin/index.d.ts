@@ -190,6 +190,11 @@ interface PluginDataWarehouse {
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
   DataWarehouseJobs: React.ComponentType<{}>,
+  streamDataWarehouseTableElements: {
+    attributeName: string,
+    attributes: any,
+    columnRenderer: any,
+  }
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -199,7 +204,6 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
-    dataWarehouse?: Array<PluginDataWarehouse>
     globalNotifications?: Array<GlobalNotification>;
     fieldValueProviders?:Array<FieldValueProvider>;
     // Global context providers allow to fetch and process data once
