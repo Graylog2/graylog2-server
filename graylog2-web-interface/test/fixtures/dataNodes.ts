@@ -28,6 +28,7 @@ export const dataNodes = [
     type: 'DATANODE',
     status: 'UNCONFIGURED' as const,
     cert_valid_until: '2020-02-10T20:40:00.000Z',
+    datanode_version: '6.1',
   },
   {
     hostname: '192.168.0.11',
@@ -41,6 +42,7 @@ export const dataNodes = [
     type: 'DATANODE',
     status: 'UNCONFIGURED' as const,
     cert_valid_until: '2020-02-10T20:40:00.000Z',
+    datanode_version: '6.1',
   },
   {
     hostname: '192.168.0.12',
@@ -54,5 +56,6 @@ export const dataNodes = [
     type: 'DATANODE',
     status: 'UNCONFIGURED' as const,
     cert_valid_until: '2020-02-10T20:40:00.000Z',
+    datanode_version: '6.1',
   },
 ];
