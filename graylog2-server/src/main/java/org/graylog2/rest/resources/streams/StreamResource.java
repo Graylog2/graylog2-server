@@ -49,6 +49,11 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineCompactSource;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventSender;
@@ -94,6 +99,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.PaginatedStreamService;
 import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamGuardException;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
@@ -103,6 +109,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -154,6 +161,8 @@ public class StreamResource extends RestResource {
     private final BulkExecutor<Stream, UserContext> bulkStreamDeleteExecutor;
     private final BulkExecutor<Stream, UserContext> bulkStreamStartExecutor;
     private final BulkExecutor<Stream, UserContext> bulkStreamStopExecutor;
+    private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
+    private final PipelineService pipelineService;
 
     private final DbQueryCreator dbQueryCreator;
 
@@ -165,13 +174,17 @@ public class StreamResource extends RestResource {
                           IndexSetRegistry indexSetRegistry,
                           RecentActivityService recentActivityService,
                           AuditEventSender auditEventSender,
-                          MessageFactory messageFactory) {
+                          MessageFactory messageFactory,
+                          PipelineStreamConnectionsService pipelineStreamConnectionsService,
+                          PipelineService pipelineService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
         this.messageFactory = messageFactory;
+        this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
+        this.pipelineService = pipelineService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
         final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
@@ -183,7 +196,6 @@ public class StreamResource extends RestResource {
         this.bulkStreamDeleteExecutor = new SequentialBulkExecutor<>(this::deleteInner, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
         this.bulkStreamStartExecutor = new SequentialBulkExecutor<>(this::resumeInner, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
         this.bulkStreamStopExecutor = new SequentialBulkExecutor<>(this::pauseInner, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
-
     }
 
     @POST
@@ -380,8 +392,14 @@ public class StreamResource extends RestResource {
         checkNotEditableStream(streamId, "The stream cannot be deleted.");
 
         final Stream stream = streamService.load(streamId);
+
+        try {
+            streamService.destroy(stream);
+        } catch (StreamGuardException e) {
+            throw new BadRequestException(e.getMessage());
+        }
         recentActivityService.delete(streamId, GRNTypes.STREAM, stream.getTitle(), userContext.getUser());
-        streamService.destroy(stream);
+
         return stream;
     }
 
@@ -584,6 +602,21 @@ public class StreamResource extends RestResource {
                 .build(savedStreamId);
 
         return Response.created(streamUri).entity(result).build();
+    }
+
+    @GET
+    @Path("/{streamId}/pipelines")
+    @ApiOperation(value = "Get pipelines associated with a stream")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<PipelineCompactSource> getConnectedPipelines(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
+        PipelineConnections pipelineConnections = pipelineStreamConnectionsService.load(streamId);
+        List<PipelineCompactSource> list = new ArrayList<>();
+
+        for (String id : pipelineConnections.pipelineIds()) {
+            PipelineDao pipelineDao = pipelineService.load(id);
+            list.add(PipelineCompactSource.create(pipelineDao.id(), pipelineDao.title()));
+        }
+        return list;
     }
 
     @PUT
