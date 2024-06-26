@@ -226,18 +226,23 @@ components:
       type: "object"
       required:
         - "id"
-        - "stream_ids"
+        - "stream_id"
+        - "output_target"
         - "title"
         - "rule"
       properties:
         id:
           type: "string"
           description: "The database ID"
-        stream_ids:
-          type: "array"
-          description: "The associated stream IDs"
-          items:
-            type: "string"
+        stream_id:
+          type: "string"
+          description: "The associated stream ID"
+        output_target:
+          type: "string"
+          description: "The output target"
+          enum:
+            - "indexer"
+            - "data-warehouse"
         title:
           type: "string"
           description: "The filter title"
@@ -254,8 +259,8 @@ components:
           $ref: "#/components/schemas/RuleBuilder"
       example:
         id: "6666dadd4dfc4e7c263a7900"
-        stream_ids:
-          - "6666df991ca760793bf0fd56"
+        stream_id: "6666df991ca760793bf0fd56"
+        output_target: "indexer"
         title: "Skip debug messages"
         status: "enabled"
         rule:
