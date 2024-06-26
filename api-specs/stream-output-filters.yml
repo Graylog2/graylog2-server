@@ -276,11 +276,6 @@ components:
               parameters:
                 field: "msg_is_debug"
               negate: false
-          actions:
-            - id: "action-1"
-              function: "remove_indexer_output_target"
-              parameters: {}
-              negate: false
 
     ##########################################################################################################
     ## Existing types
