@@ -2,4 +2,4 @@ type = "fixed"
 message = "Fix processing failures due to lookup failures in the IPInfo geolocation database."
 
 issues = ["Graylog2/graylog-plugin-enterprise#7602"]
-pulls = ["19750"]
+pulls = ["19750","19753"]
