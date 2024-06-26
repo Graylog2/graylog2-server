@@ -47,6 +47,12 @@ export const PipelinesActions = singletonActions(
   }),
 );
 
+type ParseError = {
+    line: number;
+    position_in_line: number;
+    type: string;
+}
+
 export type PipelineType = {
   id: string,
   title: string,
@@ -54,14 +60,14 @@ export type PipelineType = {
   source: string,
   created_at: string,
   modified_at: string,
-  stages: StageType[],
-  errors?: [],
+  stages: Array<StageType>,
+  errors?: Array<ParseError>,
 };
 
 export type StageType = {
   stage: number,
   match: string,
-  rules: [string],
+  rules: Array<string>,
 };
 
 export type PaginatedPipelineResponse = PaginatedListJSON & {

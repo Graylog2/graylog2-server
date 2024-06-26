@@ -54,7 +54,11 @@ class DataNodeCertRenewalPeriodicalTest {
     void testAlreadyExpired() throws Exception {
         final DatanodeKeystore datanodeKeystore = datanodeKeystore(Duration.ofNanos(1));
         final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
-        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(1)), csrRequester);
+        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(
+                datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(1)),
+                csrRequester,
+                () -> false
+        );
         periodical.doRun();
         Mockito.verify(csrRequester, Mockito.times(1)).triggerCertificateSigningRequest();
     }
@@ -64,7 +68,7 @@ class DataNodeCertRenewalPeriodicalTest {
     void testExpiringSoon() throws Exception {
         final DatanodeKeystore datanodeKeystore = datanodeKeystore(Duration.ofMinutes(1));
         final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
-        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(1)), csrRequester);
+        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(1)), csrRequester, () -> false);
         periodical.doRun();
         Mockito.verify(csrRequester, Mockito.times(1)).triggerCertificateSigningRequest();
     }
@@ -74,7 +78,7 @@ class DataNodeCertRenewalPeriodicalTest {
     void testExpiringInFarFuture() throws Exception {
         final DatanodeKeystore datanodeKeystore = datanodeKeystore(Duration.ofDays(30));
         final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
-        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(30)), csrRequester);
+        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(30)), csrRequester, () -> false);
         periodical.doRun();
         Mockito.verify(csrRequester, Mockito.never()).triggerCertificateSigningRequest();
     }

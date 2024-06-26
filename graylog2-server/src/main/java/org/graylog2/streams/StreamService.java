@@ -42,7 +42,7 @@ public interface StreamService extends PersistedService {
 
     Stream load(String id) throws NotFoundException;
 
-    void destroy(Stream stream) throws NotFoundException;
+    void destroy(Stream stream) throws NotFoundException, StreamGuardException;
 
     List<Stream> loadAll();
 
@@ -55,6 +55,8 @@ public interface StreamService extends PersistedService {
     default List<Stream> loadAllByTitle(String title) {
         return loadAll().stream().filter(s -> title.equals(s.getTitle())).toList();
     }
+
+    Map<String, String> loadStreamTitles(Collection<String> streamIds);
 
     /**
      * @return the total number of streams
