@@ -22,12 +22,14 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.util.Types;
 import org.graylog.security.certutil.CertificateAuthorityBindings;
 import org.graylog2.Configuration;
@@ -161,6 +163,17 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
+        preflightCheckModules.add(new AbstractModule() {
+            @Override
+            protected void configure() {
+                // needed for the ObjectMapperModule, to avoid missing MessageInput.Factory
+                MapBinder.newMapBinder(binder(),
+                        TypeLiteral.get(String.class),
+                        new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
+                        });
+            }
+        });
+        preflightCheckModules.add(new ObjectMapperModule(chainingClassLoader));
 
         if (featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_WEB_ENABLED)) {
             runPreflightWeb(preflightCheckModules);
@@ -175,9 +188,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
         modules.add(new DataNodeProvisioningBindings());
         modules.add(new PreflightWebModule(configuration));
-        modules.add(new ObjectMapperModule(chainingClassLoader));
         modules.add(new SchedulerBindings());
-        modules.add((binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
 
         final Injector preflightInjector = getPreflightInjector(modules);
         GuiceInjectorHolder.setInjector(preflightInjector);
@@ -277,6 +288,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new IndexerDiscoveryModule(),
                 new ServerPreflightChecksModule(),
                 new CertificateAuthorityBindings(),
+                (binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader),
                 binder -> preflightCheckModules.forEach(binder::install));
     }
 
