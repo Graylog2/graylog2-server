@@ -161,7 +161,7 @@ class CaPersistenceService {
             final String keystoreDataAsString = Base64.getEncoder().encodeToString(baos.toByteArray());
             clusterConfigService.write(new EncryptedCaKeystore(encryptionService.encrypt(keystoreDataAsString)));
         } catch (CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
-            throw new KeyStoreStorageException("Failed to save keystore to cluster config service", ex);
+            throw new KeyStoreStorageException("Failed to save keystore to cluster config service", e);
         }
     }
 
