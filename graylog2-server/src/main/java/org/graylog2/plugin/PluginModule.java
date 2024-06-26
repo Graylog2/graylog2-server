@@ -72,6 +72,7 @@ import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
+import org.graylog2.streams.StreamDeletionGuard;
 import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 import org.graylog2.web.PluginUISettingsProvider;
 
@@ -456,5 +457,9 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addTelemetryMetricProvider(String eventId, TelemetryMetricSupplier eventSupplier) {
         telemetryMetricSupplierBinder().addBinding(eventId).toInstance(eventSupplier);
+    }
+
+    protected void addStreamDeletionGuard(Class<? extends StreamDeletionGuard> streamDeletionGuard) {
+        streamDeletionGuardBinder().addBinding().to(streamDeletionGuard);
     }
 }

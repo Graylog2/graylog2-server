@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useCallback } from 'react';
 
 import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
-import { ButtonToolbar, MenuItem } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import Routes from 'routing/Routes';
@@ -34,6 +34,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
+import { LinkContainer } from 'components/common/router';
 
 import StreamModal from '../StreamModal';
 
@@ -155,6 +156,9 @@ const StreamActions = ({
 
   return (
     <ButtonToolbar>
+      <LinkContainer to={Routes.stream_view(stream.id)}>
+        <Button disabled={isNotEditable} bsStyle="primary" bsSize="xsmall">View details</Button>
+      </LinkContainer>
       <ShareButton entityId={stream.id}
                    entityType="stream"
                    onClick={toggleEntityShareModal}

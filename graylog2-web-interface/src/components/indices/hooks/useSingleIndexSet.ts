@@ -17,42 +17,38 @@
 import { useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
-import type { Stream } from 'stores/streams/StreamsStore';
 import fetch from 'logic/rest/FetchProvider';
+import type FetchError from 'logic/errors/FetchError';
+import { type IndexSet } from 'stores/indices/IndexSetsStore';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 
-const fetchStream = (streamId: string) => {
-  const { url } = ApiRoutes.StreamsApiController.get(streamId);
+const fetchIndexSet = (indexSetId: string) => fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url));
 
-  return fetch('GET', qualifyUrl(url));
-};
-
-const useStream = (streamId: string, { enabled } = { enabled: true }): {
-  data: Stream
+const useSingleIndexSet = (indexSetId: string) : {
+  data: IndexSet,
   refetch: () => void,
-  isFetching: boolean,
-  isError,
+  isSuccess: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isFetching, isError } = useQuery(
-    ['stream', streamId],
-    () => fetchStream(streamId),
+  const { data, refetch, isInitialLoading, isSuccess } = useQuery<IndexSet, FetchError>(
+    ['indexSet', indexSetId],
+    () => fetchIndexSet(indexSetId),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading stream failed with status: ${errorThrown}`,
-          'Could not load Stream');
+        UserNotification.error(`Loading index set with id: ${indexSetId} failed with status: ${errorThrown}`,
+          'Could not load index set');
       },
       keepPreviousData: true,
-      enabled,
     },
   );
 
   return ({
     data,
     refetch,
-    isFetching,
-    isError,
+    isSuccess,
+    isInitialLoading,
   });
 };
 
-export default useStream;
+export default useSingleIndexSet;

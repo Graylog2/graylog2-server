@@ -21,10 +21,10 @@ export const DEFAULT_LAYOUT = {
   entityTableId: 'streams',
   defaultPageSize: 20,
   defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['title', 'description', 'index_set_title', 'rules', 'throughput', 'disabled'],
+  defaultDisplayedAttributes: ['title', 'index_set_title', 'rules', 'throughput', 'disabled'],
 };
 
-export const COLUMNS_ORDER = ['title', 'description', 'index_set_title', 'rules', 'throughput', 'disabled', 'created_at'];
+export const COLUMNS_ORDER = ['title', 'index_set_title', 'rules', 'throughput', 'disabled', 'created_at'];
 
 export const ADDITIONAL_ATTRIBUTES: Array<Attribute> = [
   { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },

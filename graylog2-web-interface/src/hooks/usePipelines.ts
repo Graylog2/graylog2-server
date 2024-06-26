@@ -16,43 +16,37 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { type PipelineType } from 'stores/pipelines/PipelinesStore';
 import UserNotification from 'util/UserNotification';
-import type { Stream } from 'stores/streams/StreamsStore';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
+import { PipelinesPipelines } from '@graylog/server-api';
+import type FetchError from 'logic/errors/FetchError';
 
-const fetchStream = (streamId: string) => {
-  const { url } = ApiRoutes.StreamsApiController.get(streamId);
+type Options = {
+  enabled: boolean,
+}
 
-  return fetch('GET', qualifyUrl(url));
-};
-
-const useStream = (streamId: string, { enabled } = { enabled: true }): {
-  data: Stream
+const usePipelines = ({ enabled }: Options = { enabled: true }) : {
+  data: Array<PipelineType>,
   refetch: () => void,
-  isFetching: boolean,
-  isError,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isFetching, isError } = useQuery(
-    ['stream', streamId],
-    () => fetchStream(streamId),
+  const { data, refetch, isInitialLoading } = useQuery<Array<PipelineType>, FetchError>(
+    ['pipelines'],
+    () => PipelinesPipelines.getAll(),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading stream failed with status: ${errorThrown}`,
-          'Could not load Stream');
+        UserNotification.error(`Loading pipelines failed with status: ${errorThrown}`,
+          'Could not load pipelines');
       },
-      keepPreviousData: true,
       enabled,
     },
   );
 
   return ({
-    data,
+    data: data ?? [],
     refetch,
-    isFetching,
-    isError,
+    isInitialLoading,
   });
 };
 
-export default useStream;
+export default usePipelines;
