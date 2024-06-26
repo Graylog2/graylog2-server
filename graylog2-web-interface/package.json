@@ -43,7 +43,7 @@
     ]
   },
   "dependencies": {
-    "@graylog/sawmill": "^2.0.18",
+    "@graylog/sawmill": "^2.0.19",
     "@mantine/core": "^7.5.2",
     "@mantine/dropzone": "^7.5.2",
     "@mantine/hooks": "^7.5.2",
