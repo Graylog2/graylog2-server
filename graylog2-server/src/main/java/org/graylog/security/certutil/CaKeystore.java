@@ -86,7 +86,7 @@ public class CaKeystore {
 
     public synchronized Optional<CertificateAuthorityInformation> getInformation() {
         try {
-            return Optional.ofNullable(caPersistenceService.get());
+            return caPersistenceService.get();
         } catch (KeyStoreStorageException e) {
             throw new RuntimeException(e);
         }

@@ -16,6 +16,7 @@
  */
 package org.graylog.security.certutil;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -47,7 +48,9 @@ import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
@@ -85,12 +88,12 @@ class CaPersistenceService {
         this.eventBus = eventBus;
     }
 
-    public CertificateAuthorityInformation get() throws KeyStoreStorageException {
+    public Optional<CertificateAuthorityInformation> get() throws KeyStoreStorageException {
         if (configuration.configuredCaExists()) {
-            return new CertificateAuthorityInformation("local CA", CAType.LOCAL);
+            return Optional.of(new CertificateAuthorityInformation("local CA", CAType.LOCAL));
         } else {
-            var keystore = readFromDatabase();
-            return keystore.map(c -> new CertificateAuthorityInformation(CA_KEYSTORE_ID, CAType.GENERATED)).orElse(null);
+            return readFromDatabase()
+                    .map(c -> new CertificateAuthorityInformation(CA_KEYSTORE_ID, CAType.GENERATED));
         }
     }
 
@@ -100,7 +103,7 @@ class CaPersistenceService {
         writeToDatabase(keyStore);
         LOG.debug("Generated a new CA.");
         triggerCaChangedEvent();
-        return get();
+        return get().orElseThrow(() -> new IllegalStateException("Failed to obtain CA information, but a CA has been just created. Inconsistent state!"));
     }
 
     public void upload(@Nullable String password, List<FormDataBodyPart> parts) throws CACreationException {
@@ -145,7 +148,8 @@ class CaPersistenceService {
 
     public Optional<CaKeystoreWithPassword> loadKeyStore() throws KeyStoreStorageException {
         if (configuration.configuredCaExists()) {
-            return readFromFS(configuration.getCaKeystoreFile(), configuration.getCaPassword().toCharArray());
+            // TODO: we could cache this for better performance
+            return readFromFS();
         } else {
             return readFromDatabase();
         }
@@ -156,30 +160,35 @@ class CaPersistenceService {
             keyStore.store(baos, passwordSecret.toCharArray());
             final String keystoreDataAsString = Base64.getEncoder().encodeToString(baos.toByteArray());
             clusterConfigService.write(new EncryptedCaKeystore(encryptionService.encrypt(keystoreDataAsString)));
-        } catch (Exception ex) {
-            throw new KeyStoreStorageException("Failed to save keystore to Mongo collection", ex);
+        } catch (CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
+            throw new KeyStoreStorageException("Failed to save keystore to cluster config service", ex);
         }
     }
 
     private Optional<CaKeystoreWithPassword> readFromDatabase() {
         return Optional.ofNullable(clusterConfigService.get(EncryptedCaKeystore.class))
-                .map(encryptedCaKeystore -> encryptionService.decrypt(encryptedCaKeystore.keystore()))
-                .map(keystoreAsString -> {
-                    try (ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(keystoreAsString))) {
-                        KeyStore keyStore = KeyStore.getInstance(PKCS12);
-                        keyStore.load(bais, passwordSecret.toCharArray());
-                        return keyStore;
-                    } catch (Exception ex) {
-                        throw new RuntimeException("Failed to load keystore from Mongo collection", ex);
-                    }
-                })
+                .map(EncryptedCaKeystore::keystore)
+                .map(encryptionService::decrypt)
+                .map(Base64.getDecoder()::decode)
+                .map(this::parseKEystoreFromString)
                 .map(ks -> new CaKeystoreWithPassword(ks, passwordSecret));
     }
 
-    private Optional<CaKeystoreWithPassword> readFromFS(final Path location, char[] password) throws KeyStoreStorageException {
-        try (var in = Files.newInputStream(location)) {
+    @Nonnull
+    private KeyStore parseKEystoreFromString(byte[] keystoreAsString) {
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(keystoreAsString)) {
+            KeyStore keyStore = KeyStore.getInstance(PKCS12);
+            keyStore.load(bais, passwordSecret.toCharArray());
+            return keyStore;
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to load keystore from Mongo collection", ex);
+        }
+    }
+
+    private Optional<CaKeystoreWithPassword> readFromFS() throws KeyStoreStorageException {
+        try (var in = Files.newInputStream(configuration.getCaKeystoreFile())) {
             KeyStore caKeystore = KeyStore.getInstance(CertConstants.PKCS12);
-            caKeystore.load(in, password);
+            caKeystore.load(in, configuration.getCaPassword().toCharArray());
             return Optional.of(caKeystore).map(ks -> new CaKeystoreWithPassword(ks, configuration.getCaPassword()));
         } catch (IOException | GeneralSecurityException ex) {
             throw new KeyStoreStorageException("Could not read keystore: " + ex.getMessage(), ex);
