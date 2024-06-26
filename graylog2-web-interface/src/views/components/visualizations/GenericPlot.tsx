@@ -235,6 +235,8 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
   }, [onHoverMarker]);
 
   const _onMarkerClick = useCallback(({ points }: Readonly<Plotly.PlotMouseEvent>) => {
+    console.log('test');
+
     onClickMarker?.({
       x: points[0].x as string,
       y: points[0].y as string,

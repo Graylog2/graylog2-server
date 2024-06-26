@@ -41,6 +41,7 @@ export { default as CountBadge } from './CountBadge';
 export { default as DataTable } from './DataTable';
 export { default as DatePicker } from './DatePicker';
 export { default as DocumentTitle } from './DocumentTitle';
+export { default as Drawer } from './Drawer';
 export { default as DropdownMenu } from './DropdownMenu';
 export { default as DropdownSubmenu } from './DropdownSubmenu';
 export { default as ElementDimensions } from './ElementDimensions';

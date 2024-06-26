@@ -51,7 +51,9 @@ const reexecuteSearchTypes = (
   const handleSearchResult = (searchExecutionResult: SearchExecutionResult): SearchExecutionResult => {
     const { result: searchResult, widgetMapping } = searchExecutionResult;
     const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
+
     const { result } = selectSearchExecutionResult(getState());
+    console.log(result.result);
 
     return { result: result.updateSearchTypes(updatedSearchTypes), widgetMapping };
   };
