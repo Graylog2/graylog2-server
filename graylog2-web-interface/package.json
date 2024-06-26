@@ -43,6 +43,7 @@
     ]
   },
   "dependencies": {
+    "@graylog/sawmill": "^2.0.18",
     "@mantine/core": "^7.5.2",
     "@mantine/dropzone": "^7.5.2",
     "@mantine/hooks": "^7.5.2",
@@ -81,7 +82,7 @@
     "plotly.js": "2.33.0",
     "posthog-js": "^1.52.0",
     "qs": "^6.3.0",
-    "react-ace": "11.0.1",
+    "react-ace": "12.0.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.14.0",
     "react-day-picker": "^7.4.8",
@@ -176,6 +177,7 @@
   },
   "resolutions": {
     "@types/react": "18.0.28",
-    "nth-check": "2.0.1"
+    "nth-check": "2.0.1",
+    "typescript": "5.5.2"
   }
 }
