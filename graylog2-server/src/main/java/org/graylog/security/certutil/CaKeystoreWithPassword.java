@@ -14,7 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage.location;
+package org.graylog.security.certutil;
 
-public interface KeystoreLocation {
-}
+import java.security.KeyStore;
+
+/**
+ * Keystores may originate in the mongodb or filesystem. Both use different passwords, so we need to provide the
+ * password along with the keystore, to be able to access private keys for signing.
+ */
+record CaKeystoreWithPassword(KeyStore keyStore, String password) {}
