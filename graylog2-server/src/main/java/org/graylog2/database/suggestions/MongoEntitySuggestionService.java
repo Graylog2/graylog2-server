@@ -86,7 +86,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
         final long total = userCanReadAllEntities
                 ? mongoCollection.countDocuments(bsonFilter)
-                : MongoUtils.stream(mongoCollection.find(bsonFilter)).filter(checkPermission).count();
+                : MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD))).filter(checkPermission).count();
 
         return new EntitySuggestionResponse(suggestions,
                 PaginatedList.PaginationInfo.create((int) total,

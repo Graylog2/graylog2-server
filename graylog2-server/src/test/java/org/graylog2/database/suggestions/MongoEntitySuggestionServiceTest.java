@@ -127,8 +127,10 @@ class MongoEntitySuggestionServiceTest {
         doReturn(true).when(subject).isPermitted(permission + ":5a82f5974b900a7a97caa1e7");
 
         final var result = toTest.suggest("dashboards", "title", "", 1, 10, subject);
-        final var suggestions = result.suggestions();
 
+        assertThat(result.pagination().count()).isEqualTo(2);
+
+        final var suggestions = result.suggestions();
         assertThat(suggestions).hasSize(2);
         assertThat(suggestions.stream().map(EntitySuggestion::id).toList())
                 .containsExactlyInAnyOrder("5a82f5974b900a7a97caa1e5", "5a82f5974b900a7a97caa1e7");
