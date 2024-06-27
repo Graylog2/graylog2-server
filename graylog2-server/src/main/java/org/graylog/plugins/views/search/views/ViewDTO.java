@@ -50,6 +50,10 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonDeserialize(builder = ViewDTO.Builder.class)
 @WithBeanGetter
+/* We do store both saved searches and dashboards in a single collection. Therefore we cannot use the `@DbEntity`-annotation
+   on this collection if we just want to retrieve one of them. To enable this for dashboards, a view is created, matching
+   only documents which have the corresponding type.
+ */
 @DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ)
 public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, MongoEntity {
     public static final String COLLECTION_NAME = "views";
