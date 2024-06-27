@@ -67,6 +67,7 @@ public class GraylogApis implements GraylogRestApi {
         this.system = new SystemApi(this);
         this.eventNotifications = new EventNotifications(this);
         this.eventDefinitions = new EventDefinitions(this);
+        this.dashboards = new Dashboards(this);
     }
 
     public RequestSpecification requestSpecification() {
@@ -130,6 +131,10 @@ public class GraylogApis implements GraylogRestApi {
 
     public EventDefinitions eventDefinitions() {
         return eventDefinitions;
+    }
+
+    public Dashboards dashboards() {
+        return dashboards;
     }
 
     protected RequestSpecification prefix(final Users.User user) {
