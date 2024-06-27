@@ -1934,10 +1934,10 @@
     chroma-js "^2.1.2"
     lodash "^4.17.21"
 
-"@graylog/sawmill@^2.0.18":
-  version "2.0.18"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.18.tgz#184a82f2fd1b268dbc02a954e64f9416a14cb04e"
-  integrity sha512-U0MbL6qZ/dKHb024iX3DqJrmLVvRgTOOSbMM+TZwFPbabEf+jKO2VMbCOAc2CtL8JsNngadwWIJPwwtYuOfGMQ==
+"@graylog/sawmill@^2.0.19":
+  version "2.0.19"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.19.tgz#2f9135bbd89adcc8619ac6498413c07bb3366cbd"
+  integrity sha512-RxYGJCt+ylTmAyZDlFFX0zKzEz1ygLNrS+00YXAuTfE+ubYes2S5vf+vHSpFnPl4IdHOKwXVTOV4+bvhis6lPw==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
