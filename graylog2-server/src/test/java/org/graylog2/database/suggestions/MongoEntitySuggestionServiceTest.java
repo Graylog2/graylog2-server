@@ -18,7 +18,6 @@ package org.graylog2.database.suggestions;
 
 import org.apache.shiro.subject.Subject;
 import org.graylog2.database.DbEntity;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
 import org.graylog2.streams.StreamImpl;
@@ -36,9 +35,6 @@ import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class MongoEntitySuggestionServiceTest {
-
-    @Mock
-    private MongoConnection mongoConnection;
     @Mock
     private DbEntitiesCatalog catalog;
     @Mock
