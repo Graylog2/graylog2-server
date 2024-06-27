@@ -61,7 +61,7 @@ type Props = {
 const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, filter }: Props) => {
   const isShiftHeld = useIsKeyHeld('Shift');
   const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
-  const { data: { pagination, suggestions }, isInitialLoading } = useFilterValueSuggestions(attribute.id, attribute.related_collection, searchParams);
+  const { data: { pagination, suggestions }, isInitialLoading } = useFilterValueSuggestions(attribute.id, attribute.related_collection, searchParams, attribute.related_property);
   const handleSearchChange = useCallback((newSearchQuery: string) => {
     setSearchParams((cur) => ({ ...cur, page: DEFAULT_SEARCH_PARAMS.page, query: newSearchQuery }));
   }, [setSearchParams]);
