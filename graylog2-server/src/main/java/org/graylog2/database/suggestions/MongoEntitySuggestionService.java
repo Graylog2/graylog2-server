@@ -17,6 +17,7 @@
 package org.graylog2.database.suggestions;
 
 import com.google.common.base.Strings;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
@@ -35,6 +36,7 @@ import org.graylog2.database.utils.MongoUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class MongoEntitySuggestionService implements EntitySuggestionService {
     private static final String ID_FIELD = "_id";
@@ -70,13 +72,8 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         final var skip = (page - 1) * perPage;
         final var checkPermission = createPermissionCheck(subject, collection);
         final var documents = userCanReadAllEntities
-                ? MongoUtils.stream(resultWithoutPagination
-                .limit(perPage)
-                .skip(skip))
-                : MongoUtils.stream(resultWithoutPagination)
-                .filter(checkPermission)
-                .limit(perPage)
-                .skip(skip);
+                ? mongoPaginate(resultWithoutPagination, perPage, skip)
+                : paginateWithPermissionCheck(resultWithoutPagination, perPage, skip, checkPermission);
 
         final List<EntitySuggestion> suggestions = documents
                 .map(doc ->
@@ -89,15 +86,24 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
         final long total = userCanReadAllEntities
                 ? mongoCollection.countDocuments(bsonFilter)
-                : MongoUtils.stream(mongoCollection.find(bsonFilter))
-                .filter(checkPermission)
-                .count();
+                : MongoUtils.stream(mongoCollection.find(bsonFilter)).filter(checkPermission).count();
 
         return new EntitySuggestionResponse(suggestions,
                 PaginatedList.PaginationInfo.create((int) total,
                         suggestions.size(),
                         page,
                         perPage));
+    }
+
+    private Stream<Document> paginateWithPermissionCheck(FindIterable<Document> result, int limit, int skip, Predicate<Document> checkPermission) {
+        return MongoUtils.stream(result)
+                .filter(checkPermission)
+                .limit(limit)
+                .skip(skip);
+    }
+
+    private Stream<Document> mongoPaginate(FindIterable<Document> result, int limit, int skip) {
+        return MongoUtils.stream(result.limit(limit).skip(skip));
     }
 
     private Predicate<Document> createPermissionCheck(final Subject subject, final String collection) {
