@@ -53,6 +53,7 @@ public class GraylogApis implements GraylogRestApi {
     private final SystemApi system;
     private final EventNotifications eventNotifications;
     private final EventDefinitions eventDefinitions;
+    private final Dashboards dashboards;
 
     public GraylogApis(GraylogBackend backend) {
         this.backend = backend;
