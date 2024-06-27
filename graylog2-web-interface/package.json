@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-interface",
-  "version": "6.1.0-alpha.3",
+  "version": "6.1.0-SNAPSHOT",
   "description": "Graylog Web Interface",
   "author": "torch",
   "license": "SSPL-1.0",
@@ -43,7 +43,7 @@
     ]
   },
   "dependencies": {
-    "@graylog/sawmill": "^2.0.18",
+    "@graylog/sawmill": "^2.0.19",
     "@mantine/core": "^7.5.2",
     "@mantine/dropzone": "^7.5.2",
     "@mantine/hooks": "^7.5.2",
