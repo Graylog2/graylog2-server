@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.suggestions;
 
+import com.google.common.base.Strings;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
@@ -33,8 +34,8 @@ import org.graylog2.database.utils.MongoUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
-//TODO: Suggestions won't be provided to users that have permissions to just some of the entities in the collection
 public class MongoEntitySuggestionService implements EntitySuggestionService {
     private static final String ID_FIELD = "_id";
 
@@ -56,7 +57,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
 
-        final var bsonFilter = (query != null && !query.isEmpty())
+        final var bsonFilter = !Strings.isNullOrEmpty(query)
                 ? Filters.regex(valueColumn, query, "i")
                 : Filters.empty();
 
@@ -65,16 +66,17 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 .projection(Projections.include(valueColumn))
                 .sort(Sorts.ascending(valueColumn));
 
-        final var readPermission = readPermissionForCollection(collection);
         final var userCanReadAllEntities = hasAllPermission(subject) || hasReadPermissionForWholeCollection(subject, collection);
+        final var skip = (page - 1) * perPage;
+        final var checkPermission = createPermissionCheck(subject, collection);
         final var documents = userCanReadAllEntities
                 ? MongoUtils.stream(resultWithoutPagination
                 .limit(perPage)
-                .skip((page - 1) * perPage))
+                .skip(skip))
                 : MongoUtils.stream(resultWithoutPagination)
-                .filter(doc -> readPermission.map(permission -> subject.isPermitted(permission + ":" + doc.getObjectId(ID_FIELD).toString())).orElse(false))
+                .filter(checkPermission)
                 .limit(perPage)
-                .skip((long) (page - 1) * perPage);
+                .skip(skip);
 
         final List<EntitySuggestion> suggestions = documents
                 .map(doc ->
@@ -88,7 +90,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         final long total = userCanReadAllEntities
                 ? mongoCollection.countDocuments(bsonFilter)
                 : MongoUtils.stream(mongoCollection.find(bsonFilter))
-                .filter(doc -> readPermission.map(permission -> subject.isPermitted(permission + ":" + doc.getObjectId(ID_FIELD).toString())).orElse(false))
+                .filter(checkPermission)
                 .count();
 
         return new EntitySuggestionResponse(suggestions,
@@ -96,6 +98,13 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                         suggestions.size(),
                         page,
                         perPage));
+    }
+
+    private Predicate<Document> createPermissionCheck(final Subject subject, final String collection) {
+        final var readPermission = readPermissionForCollection(collection);
+        return doc -> readPermission
+                .map(permission -> subject.isPermitted(permission + ":" + doc.getObjectId(ID_FIELD).toString()))
+                .orElse(false);
     }
 
     boolean hasAllPermission(final Subject subject) {
