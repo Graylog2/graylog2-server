@@ -82,6 +82,7 @@ export type Attribute = {
   filterable?: true,
   filter_options?: Array<{ value: string, title: string }>
   related_collection?: string,
+  related_property?: string,
   permissions?: Array<string>,
 }
 
