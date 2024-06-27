@@ -44,11 +44,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.time.Duration;
@@ -61,6 +61,12 @@ import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 @Singleton
 class CaPersistenceService {
+
+    static {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    }
+
+
     private static final Logger LOG = LoggerFactory.getLogger(CaPersistenceService.class);
 
     public static final String CA_KEYSTORE_ID = "GRAYLOG CA";

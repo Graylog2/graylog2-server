@@ -113,7 +113,7 @@ public class PemCaReaderTest {
             -----END PRIVATE KEY-----
             """;
 
-    private static final String PEM_CERT_WITH_ENCRYPTED_KEY = PEM_CERT + "\n" + ENCRYPTED_KEY;
+    public static final String PEM_CERT_WITH_ENCRYPTED_KEY = PEM_CERT + "\n" + ENCRYPTED_KEY;
     private static final String PEM_CERT_WITH_UNENCRYPTED_KEY = PEM_CERT + "\n" + UNENCRYPTED_KEY;
 
     @BeforeAll
