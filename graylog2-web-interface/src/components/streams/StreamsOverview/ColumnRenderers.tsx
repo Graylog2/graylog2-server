@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Output } from 'src/stores/outputs/OutputsStore';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import type { Output } from 'stores/outputs/OutputsStore';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';
