@@ -56,7 +56,7 @@ public class MessageCountRotationStrategyTest {
         when(indices.numberOfMessages("name")).thenReturn(10L);
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
+        when(indexSetConfig.rotationStrategyConfig()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
         final MessageCountRotationStrategy strategy = createStrategy();
 
@@ -70,7 +70,7 @@ public class MessageCountRotationStrategyTest {
         when(indices.numberOfMessages("name")).thenReturn(1L);
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
+        when(indexSetConfig.rotationStrategyConfig()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
         final MessageCountRotationStrategy strategy = createStrategy();
 
@@ -85,7 +85,7 @@ public class MessageCountRotationStrategyTest {
         doThrow(IndexNotFoundException.class).when(indices).numberOfMessages("name");
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
+        when(indexSetConfig.rotationStrategyConfig()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
         final MessageCountRotationStrategy strategy = createStrategy();
 

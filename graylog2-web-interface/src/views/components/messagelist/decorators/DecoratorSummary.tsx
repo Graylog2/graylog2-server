@@ -153,7 +153,7 @@ class DecoratorSummary extends React.Component<Props, State> {
                                                 includeTitleField={false}
                                                 submitAction={this._handleSubmit}
                                                 cancelAction={this._closeEditForm}
-                                                wrapperComponent={wrapperComponent}
+                                                wrapperComponent={wrapperComponent as React.ComponentProps<typeof ConfigurationForm>['wrapperComponent']}
                                                 values={decorator.config} />
       )
       : (

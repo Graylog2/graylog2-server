@@ -16,10 +16,12 @@
  */
 package org.graylog2.indexer.datanode;
 
+import jakarta.annotation.Nullable;
+
 import java.net.URI;
 import java.util.List;
 
-public record RemoteReindexRequest(String allowlist,
+public record RemoteReindexRequest(@Nullable String allowlist,
                                    URI uri,
                                    String username,
                                    String password,

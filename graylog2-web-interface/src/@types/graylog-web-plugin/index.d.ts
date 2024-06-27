@@ -135,10 +135,29 @@ interface LogoutHook {
 
 type DataTiering = {
   type: string,
-  TiersConfigurationFields: React.ComponentType<{}>,
+  TiersConfigurationFields: React.ComponentType<{valuesPrefix?: string}>,
   TiersSummary: React.ComponentType<{
     config: DataTieringConfig
   }>,
+  WarmTierReadinessInfo: React.ComponentType,
+}
+
+interface PluginDataWarehouse {
+  DataWarehouseStatus: React.ComponentType<{
+    stream: {
+      enabled_status: boolean;
+    }
+  }>,
+  StreamDataWarehouse: React.ComponentType<{}>,
+}
+
+interface PluginDataWarehouse {
+  DataWarehouseStatus: React.ComponentType<{
+    stream: {
+      enabled_status: boolean;
+    }
+  }>,
+  StreamDataWarehouse: React.ComponentType<{}>,
 }
 
 type FieldValueProvider = {
@@ -162,12 +181,25 @@ type FieldValueProvider = {
     key_field?: string,
   },
 }
+
+interface PluginDataWarehouse {
+  DataWarehouseStatus: React.ComponentType<{
+    stream: {
+      enabled_status: boolean;
+    }
+  }>,
+  StreamDataWarehouse: React.ComponentType<{}>,
+  DataWarehouseJobs: React.ComponentType<{}>,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
+    dataWarehouse?: Array<PluginDataWarehouse>
     dataTiering?: Array<DataTiering>
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
+    dataWarehouse?: Array<PluginDataWarehouse>
     globalNotifications?: Array<GlobalNotification>;
     fieldValueProviders?:Array<FieldValueProvider>;
     // Global context providers allow to fetch and process data once

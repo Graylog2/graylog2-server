@@ -92,6 +92,12 @@ const Routes = {
     INDICES: {
       LIST: '/system/indices',
       FAILURES: '/system/indices/failures',
+      TEMPLATES: {
+        view: (templateId: string) => `/system/indices/templates/${templateId}`,
+        OVERVIEW: '/system/indices/templates',
+        CREATE: '/system/indices/templates/create',
+        edit: (templateId: string) => `/system/indices/templates/edit/${templateId}`,
+      },
       FIELD_TYPE_PROFILES: {
         OVERVIEW: '/system/indices/field-type-profiles',
         edit: (profileId: string) => `/system/indices/field-type-profiles/${profileId}`,
@@ -262,6 +268,7 @@ const Routes = {
   },
   search: (query: string, timeRange: RoutesTimeRange, resolution?: number) => Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution),
   message_show: (index: string, messageId: string) => `/messages/${index}/${messageId}`,
+  stream_view: (streamId: string) => `/streams/${streamId}/view`,
   stream_edit: (streamId: string) => `/streams/${streamId}/edit`,
   stream_edit_example: (streamId: string, index: string, messageId: string) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
   stream_outputs: (streamId: string) => `/streams/${streamId}/outputs`,

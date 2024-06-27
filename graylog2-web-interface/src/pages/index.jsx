@@ -53,12 +53,15 @@ const ImportExtractorsPage = loadAsync(() => import('./ImportExtractorsPage'));
 const IndexerFailuresPage = loadAsync(() => import('./IndexerFailuresPage'));
 const IndexSetConfigurationPage = loadAsync(() => import('./IndexSetConfigurationPage'));
 const IndexSetCreationPage = loadAsync(() => import('./IndexSetCreationPage'));
-
 const IndexSetFieldTypesPage = loadAsync(() => import('./IndexSetFieldTypesPage'));
 const IndexSetPage = loadAsync(() => import('./IndexSetPage'));
 const IndexSetFieldTypeProfileCreatePage = loadAsync(() => import('./IndexSetFieldTypeProfileCreatePage'));
 const IndexSetFieldTypeProfileEditPage = loadAsync(() => import('./IndexSetFieldTypeProfileEditPage'));
 const IndexSetFieldTypeProfilesPage = loadAsync(() => import('./IndexSetFieldTypeProfilesPage'));
+const IndexSetTemplatePage = loadAsync(() => import('./IndexSetTemplatePage'));
+const IndexSetTemplatesPage = loadAsync(() => import('./IndexSetTemplatesPage'));
+const IndexSetTemplateCreatePage = loadAsync(() => import('./IndexSetTemplateCreatePage'));
+const IndexSetTemplateEditPage = loadAsync(() => import('./IndexSetTemplateEditPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
 const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'));
@@ -97,6 +100,7 @@ const StartPage = loadAsync(() => import('./StartPage'));
 const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
 const StreamOutputsPage = loadAsync(() => import('./StreamOutputsPage'));
 const StreamsPage = loadAsync(() => import('./StreamsPage'));
+const StreamDetailsPage = loadAsync(() => import('./StreamDetailsPage'));
 const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
 const SystemLogsPage = loadAsync(() => import('./SystemLogsPage'));
@@ -152,6 +156,10 @@ export {
   IndexSetFieldTypeProfileCreatePage,
   IndexSetFieldTypeProfileEditPage,
   IndexSetFieldTypeProfilesPage,
+  IndexSetTemplatePage,
+  IndexSetTemplatesPage,
+  IndexSetTemplateCreatePage,
+  IndexSetTemplateEditPage,
   IndicesPage,
   InputsPage,
   KeyboardShortcutsPage,
@@ -189,6 +197,7 @@ export {
   SimulatorPage,
   StartPage,
   StreamEditPage,
+  StreamDetailsPage,
   StreamOutputsPage,
   StreamsPage,
   SystemOutputsPage,

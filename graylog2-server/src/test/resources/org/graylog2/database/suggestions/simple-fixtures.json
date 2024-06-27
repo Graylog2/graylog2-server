@@ -1,0 +1,22 @@
+{
+  "dashboards": [
+    {
+      "_id": {
+        "$oid": "5a82f5974b900a7a97caa1e5"
+      },
+      "title": "Test"
+    },
+    {
+      "_id": {
+        "$oid": "5a82f5974b900a7a97caa1e6"
+      },
+      "title": "Test 2"
+    },
+    {
+      "_id": {
+        "$oid": "5a82f5974b900a7a97caa1e7"
+      },
+      "title": "Test 3"
+    }
+  ]
+}
