@@ -36,7 +36,7 @@ const StreamDataRoutingDestinations = ({ stream }: Props) => {
   return (
     <>
       {isSuccess && <DestinationIndexSetSection indexSet={indexSet} stream={stream} />}
-      <StreamDataWarehouseComponent />
+      {StreamDataWarehouseComponent && <StreamDataWarehouseComponent />}
       <DestinationOutputs stream={stream} />
     </>
   );
