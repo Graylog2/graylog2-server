@@ -63,7 +63,8 @@ const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filt
                        </CenteredButton>
                      )}
                      placement="bottom"
-                     onToggle={_onToggle}>
+                     onToggle={_onToggle}
+                     dropdownZIndex={1050}>
       <FilterConfiguration attribute={attribute}
                            filterValueRenderer={filterValueRenderer}
                            onSubmit={onSubmit}
