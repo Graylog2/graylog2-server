@@ -16,7 +16,6 @@
  */
 package org.graylog2.database.dbcatalog.impl;
 
-import io.github.classgraph.AnnotationInfo;
 import io.github.classgraph.AnnotationParameterValueList;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
@@ -57,14 +56,16 @@ public class ClassGraphDbEntitiesScanningMethod implements DbEntitiesScanningMet
             final String annotationName = DbEntity.class.getCanonicalName();
             ClassInfoList classInfoList = scanResult.getClassesWithAnnotation(annotationName);
             for (ClassInfo classInfo : classInfoList) {
-                AnnotationInfo annotationInfo = classInfo.getAnnotationInfo(annotationName);
-                AnnotationParameterValueList paramVals = annotationInfo.getParameterValues();
-                dbEntities.add(new DbEntityCatalogEntry(
-                        paramVals.get("collection").getValue().toString(),
-                        paramVals.get("titleField").getValue().toString(),
-                        classInfo.loadClass(),
-                        paramVals.get("readPermission").getValue().toString()
-                ));
+                final var annotations = classInfo.getAnnotationInfoRepeatable(annotationName);
+                for (final var annotationInfo : annotations) {
+                    AnnotationParameterValueList paramVals = annotationInfo.getParameterValues();
+                    dbEntities.add(new DbEntityCatalogEntry(
+                            paramVals.get("collection").getValue().toString(),
+                            paramVals.get("titleField").getValue().toString(),
+                            classInfo.loadClass(),
+                            paramVals.get("readPermission").getValue().toString()
+                    ));
+                }
             }
 
             return new DbEntitiesCatalog(dbEntities);

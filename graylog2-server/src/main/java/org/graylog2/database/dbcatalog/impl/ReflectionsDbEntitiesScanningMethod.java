@@ -24,8 +24,8 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Deprecated
@@ -53,18 +53,17 @@ public class ReflectionsDbEntitiesScanningMethod implements DbEntitiesScanningMe
         final Reflections reflections = new Reflections(configuration);
 
         final List<DbEntityCatalogEntry> dbEntities = reflections.getTypesAnnotatedWith(DbEntity.class).stream()
-                .map(
+                .flatMap(
                         type -> {
-                            final DbEntity annotation = type.getAnnotation(DbEntity.class);
-
-                            return new DbEntityCatalogEntry(
+                            final var annotations = type.getAnnotationsByType(DbEntity.class);
+                            return Arrays.stream(annotations).map(annotation -> new DbEntityCatalogEntry(
                                     annotation.collection(),
                                     annotation.titleField(),
                                     type,
-                                    annotation.readPermission());
+                                    annotation.readPermission()));
 
                         }
-                ).collect(Collectors.toList());
+                ).toList();
 
         return new DbEntitiesCatalog(dbEntities);
     }
