@@ -32,7 +32,6 @@ import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -132,7 +131,7 @@ class UntrustedCertificateExtractorTest {
 
     }
 
-    @NotNull
+    @Nonnull
     private String getHttpHost() {
         final int port = httpsServer.getListeners().iterator().next().getPort();
         return "https://localhost:" + port;
