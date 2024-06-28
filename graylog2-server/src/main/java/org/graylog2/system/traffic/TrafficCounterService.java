@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -38,13 +39,11 @@ import org.mongojack.internal.update.SingleUpdateOperationValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-public class TrafficCounterService {
+public class TrafficCounterService implements TrafficUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(TrafficCounterService.class);
     private static final String BUCKET = "bucket";
 
@@ -64,10 +63,11 @@ public class TrafficCounterService {
         return observationTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 
-    private static DateTime getHourBucketStart(DateTime observationTime) {
+    public static DateTime getHourBucketStart(DateTime observationTime) {
         return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 
+    @Override
     public void updateTraffic(DateTime observationTime, NodeId nodeId, long inLastMinute, long outLastMinute, long decodedLastMinute) {
         // we bucket traffic data by the hour and aggregate it to a day bucket for reporting
         final DateTime dayBucket = getHourBucketStart(observationTime);
