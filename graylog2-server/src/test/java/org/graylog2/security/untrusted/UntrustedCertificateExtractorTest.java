@@ -16,34 +16,35 @@
  */
 package org.graylog2.security.untrusted;
 
-import com.sun.net.httpserver.HttpsConfigurator;
-import com.sun.net.httpserver.HttpsParameters;
-import com.sun.net.httpserver.HttpsServer;
 import jakarta.annotation.Nonnull;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.assertj.core.api.Assertions;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
+import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.SSLParameters;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
+import java.net.ServerSocket;
+import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -52,66 +53,61 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 
 class UntrustedCertificateExtractorTest {
 
-    private HttpsServer httpsServer;
+    private HttpServer httpsServer;
+
+    private static HttpServer startServer(KeyStore keyStore, String password) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+        final ResourceConfig rc = new ResourceConfig()
+                .register(HelloResource.class);
+
+        SSLContextConfigurator sslCon = new SSLContextConfigurator();
+        sslCon.setKeyStoreBytes(keystoreToBytes(keyStore, password));
+        sslCon.setKeyStorePass(password);
+        sslCon.setTrustStoreBytes(keystoreToBytes(keyStore, password));
+        sslCon.setTrustStorePass(password);
+
+        GuiceInjectorHolder.createInjector(Collections.emptyList());
+
+        String baseUri = "https://localhost:" + findFreePort();
+
+        return GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUri), rc, true, new SSLEngineConfigurator(sslCon).setClientMode(false).setNeedClientAuth(false));
+    }
+
+    private static int findFreePort() throws IOException {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        }
+    }
+
+
+    private static byte[] keystoreToBytes(KeyStore keyStore, String password) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        keyStore.store(byteArrayOutputStream, password.toCharArray());
+        return byteArrayOutputStream.toByteArray();
+    }
 
     @BeforeEach
     void setUp() throws Exception {
         final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned("junit-extractor-test").validity(Duration.ofDays(1)));
         final char[] password = "my-password".toCharArray();
         final KeyStore keystore = keyPair.toKeystore("ca", password);
+        httpsServer = startServer(keystore, "my-password");
 
-        InetSocketAddress address = new InetSocketAddress(0); // means find any free port
-
-        httpsServer = HttpsServer.create(address, 0);
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(keystore, password);
-
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        tmf.init(keystore);
-
-        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
-        httpsServer.setHttpsConfigurator(new HttpsConfigurator(sslContext) {
-            public void configure(HttpsParameters params) {
-                try {
-                    SSLContext context = getSSLContext();
-                    SSLEngine engine = context.createSSLEngine();
-                    params.setNeedClientAuth(false);
-                    params.setCipherSuites(engine.getEnabledCipherSuites());
-                    params.setProtocols(engine.getEnabledProtocols());
-
-                    SSLParameters sslParameters = context.getSupportedSSLParameters();
-                    params.setSSLParameters(sslParameters);
-
-                } catch (Exception ex) {
-                    System.out.println("Failed to create HTTPS port");
-                }
-            }
-        });
-        httpsServer.createContext("/", exchange -> {
-            String response = "This is the response";
-            exchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes(StandardCharsets.UTF_8));
-            os.close();
-        });
-        httpsServer.setExecutor(null); // creates default executor
-        httpsServer.start();
     }
 
     @AfterEach
     void tearDown() {
-        httpsServer.stop(1);
+        httpsServer.shutdown();
+        GuiceInjectorHolder.resetInjector();
     }
 
     @Test
     void testExtraction() throws NoSuchAlgorithmException, IOException, KeyManagementException, KeyStoreException, CertificateException {
-        final String host = "https://localhost:" + httpsServer.getAddress().getPort();
+        final String host = getHttpHost();
 
         final OkHttpClient client = new OkHttpClient.Builder().build();
         final Request request = new Request.Builder().get().url(host).build();
@@ -125,7 +121,7 @@ class UntrustedCertificateExtractorTest {
         // extract server certificates
         final UntrustedCertificateExtractor extractor = new UntrustedCertificateExtractor(client);
         final List<X509Certificate> certificates = extractor.extractUntrustedCerts(host);
-        // and add them to the truststore configured for this client
+        // and add them to the truststore configured for this client8
         final OkHttpClient clientWithTrust = clientWithTruststore(client, certificates);
 
         // now verify the connection again, should work without errors and deliver response
@@ -134,6 +130,12 @@ class UntrustedCertificateExtractorTest {
             Assertions.assertThat(response.body().string()).isEqualTo("This is the response");
         }
 
+    }
+
+    @NotNull
+    private String getHttpHost() {
+        final int port = httpsServer.getListeners().iterator().next().getPort();
+        return "https://localhost:" + port;
     }
 
     @Nonnull
