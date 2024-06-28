@@ -97,7 +97,11 @@ const DataNodePage = () => {
                 </StatusLabel>
               </dd>
               <dt>Certificate valid until:</dt>
-              <dd><RelativeTime dateTime={datanode.cert_valid_until} /> <CertRenewalButton nodeId={datanode.node_id} status={datanode.status} /></dd>
+              <dd><RelativeTime dateTime={datanode.cert_valid_until} /> <CertRenewalButton nodeId={datanode.node_id}
+                                                                                           status={datanode.status} />
+              </dd>
+              <dt>Datanode version:</dt>
+              <dd>{datanode.datanode_version}</dd>
             </StyledHorizontalDl>
           </Col>
           <ActionsCol xs={3}>

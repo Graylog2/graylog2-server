@@ -67,6 +67,14 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
         return DataNodeStatus.valueOf(fields.get("datanode_status").toString());
     }
 
+
+    public String getDatanodeVersion() {
+        if (!fields.containsKey(DataNodeDto.FIELD_DATANODE_VERSION)) {
+            return null;
+        }
+        return (String) fields.get(DataNodeDto.FIELD_DATANODE_VERSION);
+    }
+
     @Override
     public DataNodeDto toDto() {
         return DataNodeDto.Builder.builder()
@@ -81,6 +89,7 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
                 .setRestApiAddress(this.getRestApiAddress())
                 .setActionQueue(this.getActionQueue())
                 .setCertValidUntil(this.getCertValidTill())
+                .setDatanodeVersion(this.getDatanodeVersion())
                 .build();
     }
 

@@ -29,10 +29,12 @@ import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalDouble;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -60,6 +62,7 @@ public class EventImpl implements Event {
     private Map<String, FieldValue> fields = new HashMap<>();
     private Map<String, FieldValue> groupByFields = new HashMap<>();
     private final Map<String, Double> scores = new HashMap<>();
+    private final Set<String> associatedAssets = new HashSet<>();
     private EventReplayInfo replayInfo;
 
     EventImpl(String eventId,
@@ -256,6 +259,11 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public void addAssociatedAssets(Set<String> associatedAssets) {
+        this.associatedAssets.addAll(associatedAssets);
+    }
+
+    @Override
     public boolean getAlert() {
         return alert;
     }
@@ -334,6 +342,7 @@ public class EventImpl implements Event {
                 .key(String.join("|", getKeyTuple()))
                 .priority(getPriority())
                 .scores(ImmutableMap.copyOf(scores))
+                .associatedAssets(ImmutableSet.copyOf(associatedAssets))
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))
                 .groupByFields(ImmutableMap.copyOf(groupByFields))
@@ -391,6 +400,7 @@ public class EventImpl implements Event {
                 Objects.equals(fields, event.fields) &&
                 Objects.equals(groupByFields, event.groupByFields) &&
                 Objects.equals(scores, event.scores) &&
+                Objects.equals(associatedAssets, event.associatedAssets) &&
                 Objects.equals(replayInfo, event.replayInfo);
     }
 
@@ -423,6 +433,7 @@ public class EventImpl implements Event {
                 .add("groupByFields", groupByFields)
                 .add("replayInfo", replayInfo)
                 .add("scores", scores)
+                .add("associatedAssets", associatedAssets)
                 .toString();
     }
 

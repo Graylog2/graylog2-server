@@ -18,8 +18,13 @@ import { useCallback, useEffect, useState } from 'react';
 
 import useCarouselApi from './useCarouselApi';
 
-// Hook which returns all slide indices which have been in the view at least once.
-const useSlidesInView = (carouselId: string) => {
+/*
+ * Hook which either returns
+ * - all slides which are currently in view
+ * - or all slides which have been in the view at least once.
+ * depending on the `memorizePrevious` state.
+ */
+const useSlidesInView = (carouselId: string, memorizePrevious = false) => {
   const carouselApi = useCarouselApi(carouselId);
   const [slidesInView, setSlidesInView] = useState<Array<number>>([]);
 
@@ -29,20 +34,24 @@ const useSlidesInView = (carouselId: string) => {
         carouselApi.off('slidesInView', updateSlidesInView);
       }
 
-      const inView = carouselApi
-        .slidesInView()
-        .filter((index) => !cur.includes(index));
+      const inView = carouselApi.slidesInView();
 
-      return cur.concat(inView);
+      if (memorizePrevious) {
+        return cur.concat(inView.filter((index) => !cur.includes(index)));
+      }
+
+      return inView;
     });
-  }, [carouselApi]);
+  }, [carouselApi, memorizePrevious]);
 
   useEffect(() => {
     if (!carouselApi) return;
 
     updateSlidesInView();
-    carouselApi.on('slidesInView', updateSlidesInView);
-    carouselApi.on('reInit', updateSlidesInView);
+
+    carouselApi.on('slidesInView', () => {
+      updateSlidesInView();
+    });
   }, [carouselApi, updateSlidesInView]);
 
   return slidesInView;
