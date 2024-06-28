@@ -148,7 +148,7 @@
         <kafka.version>3.7.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.23.1</log4j.version>
-        <lucene.version>9.11.0</lucene.version>
+        <lucene.version>9.11.1</lucene.version>
         <metrics.version>4.2.26</metrics.version>
         <mongodb-driver.version>5.1.1</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
@@ -193,7 +193,7 @@
         <equalsverifier.version>3.16.1</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
-        <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <junit-jupiter.version>5.10.3</junit-jupiter.version>
         <mockito.version>5.12.0</mockito.version>
         <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
@@ -572,7 +572,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.22.0</version>
+                    <version>3.23.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -597,7 +597,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.6.0</version>
+                    <version>4.8.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
