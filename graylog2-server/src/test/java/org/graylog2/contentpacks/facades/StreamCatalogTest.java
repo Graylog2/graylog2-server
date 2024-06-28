@@ -107,7 +107,7 @@ public class StreamCatalogTest {
                 indexSetService,
                 mongoIndexSetFactory,
                 entityOwnershipService,
-                clusterEventBus);
+                clusterEventBus, Set.of());
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );

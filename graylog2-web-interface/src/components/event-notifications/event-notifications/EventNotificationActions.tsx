@@ -31,15 +31,16 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 type Props = {
   isTestLoading: boolean,
   notification: EventNotification,
   onTest: (notification: EventNotification) => void,
-  refetchEventNotification: () => void,
 };
 
-const EventNotificationActions = ({ isTestLoading, notification, refetchEventNotification, onTest }: Props) => {
+const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props) => {
+  const { refetch: refetchEventNotification } = useTableFetchContext();
   const { deselectEntity } = useSelectedEntities();
   const [showDialog, setShowDialog] = useState(false);
   const [showShareNotification, setShowShareNotification] = useState(undefined);

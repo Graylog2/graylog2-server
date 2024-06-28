@@ -21,8 +21,7 @@ import { useState } from 'react';
 
 import { Alert, Button } from 'components/bootstrap';
 import { Icon, ConfirmDialog } from 'components/common';
-import { SideNav, SideNavItem, ContentArea, Container } from 'components/security/page-layout';
-import Routes from 'routing/Routes';
+import { ContentArea, Container } from 'components/security/page-layout';
 
 const StyledAlert = styled(Alert)`
   padding: ${({ theme }) => theme.spacings.lg};
@@ -94,57 +93,13 @@ const RIGHT_COLUMN_ITEM_LIST = [
   'SOAR Integrations',
 ];
 
-const navItems = [
-  {
-    path: Routes.SECURITY.OVERVIEW,
-    iconName: 'ballot',
-    end: true,
-    title: 'Overview',
-  },
-  {
-    path: Routes.SECURITY.USER_ACTIVITY,
-    iconName: 'person',
-    end: false,
-    title: 'User Activity',
-  },
-  {
-    path: Routes.SECURITY.HOST_ACTIVITY,
-    iconName: 'tv',
-    end: false,
-    title: 'Host Activity',
-  },
-  {
-    path: Routes.SECURITY.NETWORK_ACTIVITY,
-    iconName: 'wifi',
-    end: false,
-    title: 'Network Activity',
-  },
-  {
-    path: Routes.SECURITY.ANOMALIES,
-    iconName: 'zoom_in',
-    end: false,
-    title: 'Anomalies',
-  },
-] as const;
-
 const TeaserPageLayout = ({ children }: PropsWithChildren) => {
-  const [showSideBar, setShowSideBar] = useState(true);
   const [showModal, setShowModal] = useState(true);
 
   return (
     <>
       <Container>
-        <SideNav isOpen={showSideBar} toggleIsOpen={() => setShowSideBar((cur) => !cur)}>
-          {navItems.map((route) => (
-            <SideNavItem key={route.title}
-                         iconName={route.iconName}
-                         linkTarget={route.path}
-                         linkEnd={route.end}>
-              {route.title}
-            </SideNavItem>
-          ))}
-        </SideNav>
-        <ContentArea $sideNavIsOpen={showSideBar}>
+        <ContentArea>
           <StyledAlert bsStyle="info" noIcon>
             <Banner>
               <LeftItems>

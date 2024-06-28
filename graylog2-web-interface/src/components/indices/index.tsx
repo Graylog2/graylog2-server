@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as ClosedIndexDetails } from './ClosedIndexDetails';
+export { default as CreateIndexSet } from './CreateIndexSet';
 export { default as IndexDetails } from './IndexDetails';
 export { default as IndexRangeSummary } from './IndexRangeSummary';
 export { default as IndicesConfigurationDropdown } from './IndicesConfigurationDropdown';

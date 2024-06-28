@@ -41,11 +41,7 @@ const testTimeout = applyTimeoutMultiplier(30000);
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
-jest.mock('views/hooks/useAutoRefresh', () => () => ({
-  refreshConfig: null,
-  startAutoRefresh: () => {},
-  stopAutoRefresh: () => {},
-}));
+jest.mock('views/hooks/useAutoRefresh');
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
   ['listStreams', () => ({ then: jest.fn() })],

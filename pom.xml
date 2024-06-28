@@ -99,20 +99,20 @@
         <auto-value.version>1.11.0</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.25.6</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.26.1</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.1.0</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.1.1</aws-msk-iam-auth.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
         <byte-buddy.version>1.14.17</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.173</classgraph.version>
+        <classgraph.version>4.8.174</classgraph.version>
         <commons-codec.version>1.17.0</commons-codec.version>
         <commons-csv.version>1.11.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.4.0</commons-exec.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
-        <commons-net.version>3.11.0</commons-net.version>
+        <commons-net.version>3.11.1</commons-net.version>
         <commons-validator.version>1.9.0</commons-validator.version>
         <commons-io.version>2.16.1</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
@@ -130,7 +130,7 @@
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hk2.version>3.1.0</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.17.1</jackson.version>
-        <jadconfig.version>0.14.0</jadconfig.version>
+        <jadconfig.version>0.15.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
@@ -148,12 +148,12 @@
         <kafka.version>3.7.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.23.1</log4j.version>
-        <lucene.version>9.10.0</lucene.version>
-        <metrics.version>4.2.25</metrics.version>
-        <mongodb-driver.version>5.1.0</mongodb-driver.version>
+        <lucene.version>9.11.1</lucene.version>
+        <metrics.version>4.2.26</metrics.version>
+        <mongodb-driver.version>5.1.1</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.110.Final</netty.version>
+        <netty.version>4.1.111.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.65.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -175,7 +175,7 @@
         <swagger.version>1.6.14</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>7.0.0</unboundid-ldap.version>
+        <unboundid-ldap.version>7.0.1</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.0</validation-api.version>
         <zstd.version>1.5.6-3</zstd.version>
@@ -193,7 +193,7 @@
         <equalsverifier.version>3.16.1</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
-        <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <junit-jupiter.version>5.10.3</junit-jupiter.version>
         <mockito.version>5.12.0</mockito.version>
         <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
@@ -517,7 +517,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.3.2</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -547,7 +547,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.4.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -567,12 +567,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.22.0</version>
+                    <version>3.23.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -582,12 +582,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -597,7 +597,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.5.0</version>
+                    <version>4.8.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -952,6 +952,7 @@
                             -Xep:IncrementInForLoopAndHeader:ERROR
                             -Xep:NonAtomicVolatileUpdate:ERROR
                             -Xep:PrimitiveAtomicReference:ERROR
+                            -Xep:WildcardImport:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>

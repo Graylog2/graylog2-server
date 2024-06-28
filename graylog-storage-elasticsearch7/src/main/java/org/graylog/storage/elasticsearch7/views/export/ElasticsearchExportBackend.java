@@ -30,10 +30,12 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.TermsQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
+import org.graylog2.database.filtering.AttributeFilter;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -137,6 +139,13 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 .filter(queryStringFilter(command.queryString()))
                 .filter(timestampFilter(command))
                 .filter(streamsFilter(command));
+
+        final List<AttributeFilter> attributeFilters = command.attributeFilters();
+        if (attributeFilters != null && !attributeFilters.isEmpty()) {
+            attributeFilters.stream()
+                    .flatMap(attribute -> attribute.toQueryStrings().stream())
+                    .forEach(filterQuery -> boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery)));
+        }
 
         final Collection<UsedSearchFilter> usedSearchFilters = command.usedSearchFilters();
         if (usedSearchFilters != null) {

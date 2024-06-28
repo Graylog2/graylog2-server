@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.configuration;
 
+import com.google.common.base.Suppliers;
 import com.google.common.eventbus.EventBus;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -47,8 +48,10 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
@@ -67,12 +70,16 @@ public class DatanodeKeystore {
     public static String DATANODE_KEY_ALIAS = CertConstants.DATANODE_KEY_ALIAS;
     private final EventBus eventBus;
 
+    // TODO: we could be smarter here, caching the results as long as there is no keystore change event. This requires some
+    // additional code, but would perform better.
+    private final Supplier<Date> certValidUntil = Suppliers.memoizeWithExpiration(this::doGetCertificateExpiration, Duration.ofMinutes(1));
+
     @Inject
     public DatanodeKeystore(DatanodeConfiguration configuration, final @Named("password_secret") String passwordSecret, EventBus eventBus) {
         this(configuration.datanodeDirectories(), passwordSecret, eventBus);
     }
 
-    DatanodeKeystore(DatanodeDirectories datanodeDirectories, String passwordSecret, EventBus eventBus) {
+    public DatanodeKeystore(DatanodeDirectories datanodeDirectories, String passwordSecret, EventBus eventBus) {
         this.datanodeDirectories = datanodeDirectories;
         this.passwordSecret = passwordSecret;
         this.eventBus = eventBus;
@@ -140,7 +147,7 @@ public class DatanodeKeystore {
         }
     }
 
-    private KeyStore persistKeystore(KeyStore keystore) throws DatanodeKeystoreException {
+    private synchronized KeyStore persistKeystore(KeyStore keystore) throws DatanodeKeystoreException {
         try (FileOutputStream fos = new FileOutputStream(keystorePath().toFile())) {
             keystore.store(fos, passwordSecret.toCharArray());
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
@@ -172,10 +179,18 @@ public class DatanodeKeystore {
     }
 
     public Date getCertificateExpiration() {
+        return certValidUntil.get();
+    }
 
+    private Date doGetCertificateExpiration() {
         try {
-            final X509Certificate datanodeCert = (X509Certificate) loadKeystore().getCertificate(DATANODE_KEY_ALIAS);
-            return datanodeCert.getNotAfter();
+            final KeyStore keystore = loadKeystore();
+            if (isSignedCertificateChain(keystore)) {
+                final X509Certificate datanodeCert = (X509Certificate) keystore.getCertificate(DATANODE_KEY_ALIAS);
+                return datanodeCert.getNotAfter();
+            } else {
+                return null;
+            }
         } catch (KeyStoreException | DatanodeKeystoreException e) {
             throw new RuntimeException(e);
         }

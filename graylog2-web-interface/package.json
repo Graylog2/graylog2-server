@@ -43,6 +43,7 @@
     ]
   },
   "dependencies": {
+    "@graylog/sawmill": "^2.0.19",
     "@mantine/core": "^7.5.2",
     "@mantine/dropzone": "^7.5.2",
     "@mantine/hooks": "^7.5.2",
@@ -55,12 +56,13 @@
     "@reduxjs/toolkit": "^2.2.0",
     "@tanstack/query-sync-storage-persister": "^4.33.0",
     "@tanstack/react-query-persist-client": "^4.33.0",
-    "ace-builds": "1.34.2",
+    "ace-builds": "1.35.0",
     "bootstrap": "3.4.1",
     "bson-objectid": "^2.0.3",
     "chroma-js": "^2.0.3",
     "classnames": "^2.2.0",
     "core-js": "3",
+    "cronstrue": "^2.50.0",
     "crossfilter": "1.3.x",
     "dompurify": "^3.0.0",
     "embla-carousel-react": "^8.0.0-rc11",
@@ -70,7 +72,7 @@
     "interactjs": "^1.4.0-rc.13",
     "leaflet": "^1.5.1",
     "lodash": "^4.17.4",
-    "marked": "^12.0.0",
+    "marked": "^13.0.0",
     "material-symbols": "^0.15.0",
     "md5": "^2.2.1",
     "moment-duration-format": "2.3.2",
@@ -81,7 +83,7 @@
     "plotly.js": "2.33.0",
     "posthog-js": "^1.52.0",
     "qs": "^6.3.0",
-    "react-ace": "11.0.1",
+    "react-ace": "12.0.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.14.0",
     "react-day-picker": "^7.4.8",
@@ -109,7 +111,7 @@
     "twix": "^1.1.4",
     "typeahead.js": "^0.11.1",
     "urijs": "^1.19.6",
-    "uuid": "9.0.1",
+    "uuid": "10.0.0",
     "wicg-inert": "^3.1.2"
   },
   "devDependencies": {
@@ -176,6 +178,7 @@
   },
   "resolutions": {
     "@types/react": "18.0.28",
-    "nth-check": "2.0.1"
+    "nth-check": "2.0.1",
+    "typescript": "5.5.2"
   }
 }

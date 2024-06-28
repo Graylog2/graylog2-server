@@ -34,11 +34,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class CertificateExchangeImplTest {
@@ -80,6 +83,58 @@ public class CertificateExchangeImplTest {
         AtomicReference<CertificateChain> secondNodeChainRef = new AtomicReference<>();
         certificateExchange.pollCertificate(SECOND_NODE_ID, secondNodeChainRef::set);
         verifyCertChain(secondNodeChainRef, "my-second-node");
+    }
+
+    @Test
+    public void testRepeatedCSR() throws CSRGenerationException, IOException {
+        certificateExchange.requestCertificate(new CertificateSigningRequest(FIRST_NODE_ID, createCertificateSigningRequest("my-datanode-host")));
+        certificateExchange.requestCertificate(new CertificateSigningRequest(FIRST_NODE_ID, createCertificateSigningRequest("my-datanode-host")));
+        certificateExchange.requestCertificate(new CertificateSigningRequest(FIRST_NODE_ID, createCertificateSigningRequest("my-datanode-host")));
+
+        AtomicInteger counter = new AtomicInteger();
+        certificateExchange.signPendingCertificateRequests(request -> {
+            counter.incrementAndGet(); // remember how many certs are we signing
+            return signCertificate(request);
+        });
+
+        Assertions.assertThat(counter.get()).isEqualTo(1);
+    }
+
+    @Test
+    public void testFailureDuringChainPolling() throws CSRGenerationException, IOException {
+        certificateExchange.requestCertificate(new CertificateSigningRequest(FIRST_NODE_ID, createCertificateSigningRequest("my-datanode-host")));
+        certificateExchange.signPendingCertificateRequests(this::signCertificate);
+
+        Assertions.assertThatThrownBy(() ->
+                certificateExchange.pollCertificate(FIRST_NODE_ID, certificateChain -> {
+            throw new RuntimeException("let's fail, this is expected!");
+        })).isInstanceOf(RuntimeException.class);
+
+        AtomicReference<CertificateChain> chain = new AtomicReference<>();
+        // second try, the chain should still be there!
+        certificateExchange.pollCertificate(FIRST_NODE_ID, chain::set);
+        Assertions.assertThat(chain.get()).isNotNull();
+    }
+
+    @Test
+    public void testFailureDuringSigning() throws CSRGenerationException, IOException {
+
+        certificateExchange.requestCertificate(new CertificateSigningRequest(FIRST_NODE_ID, createCertificateSigningRequest("my-datanode-host")));
+
+        // fail during the initial signing process
+        certificateExchange.signPendingCertificateRequests(request -> {
+            throw new RuntimeException("let's fail, this is expected!");
+        });
+
+        AtomicInteger counter = new AtomicInteger();
+        // now test again and check that there is indeed one CSR to process
+        certificateExchange.signPendingCertificateRequests(request -> {
+            counter.incrementAndGet(); // remember how many certs are we signing
+            return signCertificate(request);
+        });
+
+        Assertions.assertThat(counter.get()).isEqualTo(1);
+
     }
 
     private void verifyCertChain(AtomicReference<CertificateChain> ref, String hostname) {

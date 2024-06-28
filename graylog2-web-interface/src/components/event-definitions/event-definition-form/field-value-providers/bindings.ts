@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { PluginExports } from 'graylog-web-plugin/plugin';
+
 import TemplateFieldValueProviderForm from './TemplateFieldValueProviderForm';
 import TemplateFieldValueProviderSummary from './TemplateFieldValueProviderSummary';
 import LookupTableFieldValueProviderForm from './LookupTableFieldValueProviderForm';
 import LookupTableFieldValueProviderFormContainer from './LookupTableFieldValueProviderFormContainer';
 import LookupTableFieldValueProviderSummary from './LookupTableFieldValueProviderSummary';
 
-export default {
+const bindings: PluginExports = {
   fieldValueProviders: [
     {
       type: TemplateFieldValueProviderForm.type,
@@ -40,3 +42,5 @@ export default {
     },
   ],
 };
+
+export default bindings;

@@ -23,7 +23,6 @@ import com.maxmind.geoip2.exception.AddressNotFoundException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Locale;
 import java.util.Optional;
@@ -50,7 +49,7 @@ public class IpInfoIpAsnResolver extends IpInfoIpResolver<GeoAsnInformation> {
         try (Timer.Context ignored = resolveTime.time()) {
             final IPinfoASN ipInfoASN = adapter.ipInfoASN(address);
             info = GeoAsnInformation.create(ipInfoASN.name(), ipInfoASN.type(), ipInfoASN.asn());
-        } catch (IOException | AddressNotFoundException | UnsupportedOperationException e) {
+        } catch (Exception e) {
             info = null;
             if (!(e instanceof AddressNotFoundException)) {
                 String error = String.format(Locale.US, "Error getting ASN for IP Address '%s'. %s", address, e.getMessage());

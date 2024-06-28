@@ -24,15 +24,15 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
-import org.graylog.security.certutil.CaService;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog.security.certutil.CaKeystore;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.datanode.DataNodeCommandService;
+import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
@@ -63,11 +63,11 @@ public class MigrationActionsImpl implements MigrationActions {
     private final ClusterConfigService clusterConfigService;
     private final ClusterProcessingControlFactory clusterProcessingControlFactory;
     private final NodeService<DataNodeDto> nodeService;
-    private final CaService caService;
+    private final CaKeystore caKeystore;
     private final PreflightConfigService preflightConfigService;
 
     private MigrationStateMachineContext stateMachineContext;
-    private final DataNodeProvisioningService dataNodeProvisioningService;
+    private final DataNodeCommandService dataNodeCommandService;
 
     private final RemoteReindexingMigrationAdapter migrationService;
     private final MetricRegistry metricRegistry;
@@ -79,7 +79,7 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Inject
     public MigrationActionsImpl(final ClusterConfigService clusterConfigService, NodeService<DataNodeDto> nodeService,
-                                final CaService caService, DataNodeProvisioningService dataNodeProvisioningService,
+                                final CaKeystore caKeystore, DataNodeCommandService dataNodeCommandService,
                                 RemoteReindexingMigrationAdapter migrationService,
                                 final ClusterProcessingControlFactory clusterProcessingControlFactory,
                                 final PreflightConfigService preflightConfigService,
@@ -90,8 +90,8 @@ public class MigrationActionsImpl implements MigrationActions {
                                 final ObjectMapper objectMapper) {
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
-        this.caService = caService;
-        this.dataNodeProvisioningService = dataNodeProvisioningService;
+        this.caKeystore = caKeystore;
+        this.dataNodeCommandService = dataNodeCommandService;
         this.clusterProcessingControlFactory = clusterProcessingControlFactory;
         this.migrationService = migrationService;
         this.preflightConfigService = preflightConfigService;
@@ -164,11 +164,7 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean caDoesNotExist() {
-        try {
-            return this.caService.get() == null;
-        } catch (KeyStoreStorageException e) {
-            return true;
-        }
+        return !caKeystore.exists();
     }
 
     @Override
@@ -191,8 +187,15 @@ public class MigrationActionsImpl implements MigrationActions {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().stream()
                 .filter(node -> node.getDataNodeStatus() != DataNodeStatus.AVAILABLE)
-                .filter(node -> dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId()).map(config -> config.state() != DataNodeProvisioningConfig.State.STARTUP_PREPARED).orElse(true))
-                .forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
+                .forEach(nodeDto -> triggerCSR(nodeDto, DatanodeStartType.MANUALLY));
+    }
+
+    private void triggerCSR(DataNodeDto nodeDto, DatanodeStartType startType) {
+            try {
+                dataNodeCommandService.triggerCertificateSigningRequest(nodeDto.getNodeId(), startType);
+            } catch (NodeNotFoundException e) {
+                throw new RuntimeException(e);
+            }
     }
 
     @Override
@@ -200,21 +203,31 @@ public class MigrationActionsImpl implements MigrationActions {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().stream()
                 .filter(node -> node.getDataNodeStatus() != DataNodeStatus.AVAILABLE)
-                .forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
+                .forEach(nodeDto -> triggerCSR(nodeDto, DatanodeStartType.AUTOMATICALLY));
     }
 
     @Override
     public boolean provisioningFinished() {
-        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE ||
-                dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId())
-                .map(dn -> dn.state() == DataNodeProvisioningConfig.State.STARTUP_PREPARED)
-                .orElse(false));
+        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
+    }
+
+    @Override
+    public boolean allDatanodesPrepared() {
+        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.PREPARED);
     }
 
     @Override
     public void startDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_TRIGGER));
+        activeDataNodes.values().forEach(this::startDataNode);
+    }
+
+    private void startDataNode(DataNodeDto node) {
+        try {
+            dataNodeCommandService.startNode(node.getNodeId());
+        } catch (NodeNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -231,7 +244,7 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void startRemoteReindex() {
-        final String allowlist = getStateMachineContext().getActionArgumentOpt("allowlist", String.class).orElseThrow(() -> new NullPointerException("allowlist has to be provided"));
+        final String allowlist = getStateMachineContext().getActionArgumentOpt("allowlist", String.class).orElse(null);
         final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);

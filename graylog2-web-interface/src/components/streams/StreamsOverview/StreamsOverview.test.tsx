@@ -22,7 +22,7 @@ import { QueryParamProvider } from 'use-query-params';
 
 import { indexSets } from 'fixtures/indexSets';
 import { asMock, MockStore } from 'helpers/mocking';
-import useStreams from 'components/streams/hooks/useStreams';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import { stream } from 'fixtures/streams';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
@@ -31,7 +31,7 @@ import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 
 import StreamsOverview from './StreamsOverview';
 
-jest.mock('components/streams/hooks/useStreams');
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/streams/hooks/useStreamRuleTypes');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
@@ -56,6 +56,7 @@ const attributes = [
     id: 'description',
     title: 'Description',
     sortable: true,
+    hidden: true,
   },
 ];
 
@@ -67,7 +68,7 @@ const paginatedStreams = (exampleStream = stream) => ({
       perPage: 5,
       count: 1,
     },
-    elements: [exampleStream],
+    list: [exampleStream],
     attributes,
   },
   refetch: () => {},
@@ -99,21 +100,21 @@ describe('StreamsOverview', () => {
           perPage: 5,
           count: 0,
         },
-        elements: [],
+        list: [],
         attributes,
       },
       refetch: () => {},
       isInitialLoading: false,
     });
-    asMock(useStreams).mockReturnValue(emptyPaginatedStreams);
+    asMock(useFetchEntities).mockReturnValue(emptyPaginatedStreams);
 
     renderSut();
 
-    await screen.findByText('No streams have been found');
+    await screen.findByText('No streams have been found.');
   });
 
   it('should render list', async () => {
-    asMock(useStreams).mockReturnValue(paginatedStreams());
+    asMock(useFetchEntities).mockReturnValue(paginatedStreams());
 
     renderSut();
 
@@ -145,7 +146,7 @@ describe('StreamsOverview', () => {
         },
       ],
     };
-    asMock(useStreams).mockReturnValue(paginatedStreams(streamWithRules));
+    asMock(useFetchEntities).mockReturnValue(paginatedStreams(streamWithRules));
 
     renderSut();
 

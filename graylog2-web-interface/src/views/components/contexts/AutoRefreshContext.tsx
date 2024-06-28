@@ -23,6 +23,8 @@ export type RefreshConfig = {
   enabled: boolean
 }
 
+export type IntervalSetupCallback = () => void;
+
 type AutoRefreshContextType = {
   refreshConfig: RefreshConfig | null,
   startAutoRefresh: (interval: number) => void
