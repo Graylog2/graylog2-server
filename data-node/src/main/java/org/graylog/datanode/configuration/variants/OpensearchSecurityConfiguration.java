@@ -75,7 +75,7 @@ public class OpensearchSecurityConfiguration {
      * initial set of opensearch users, it will create and persist a truststore that will be set as a system-wide
      * truststore.
      */
-    public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
+    public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, List<X509Certificate> trustedCertificates, byte[] signingKey) throws GeneralSecurityException, IOException {
         opensearchHeap = datanodeConfiguration.opensearchHeap();
         if (securityEnabled()) {
 
@@ -90,6 +90,7 @@ public class OpensearchSecurityConfiguration {
             this.truststore = TruststoreCreator.newTruststore()
                     .addRootCert("transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
                     .addRootCert("http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addCertificates(trustedCertificates)
                     .persist(trustStorePath, truststorePassword.toCharArray());
 
             System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
@@ -131,7 +132,9 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.disabled", "true");
             config.put("plugins.security.ssl.http.enabled", "false");
         }
-        return config.build();
+        final ImmutableMap<String, String> configIt = config.build();
+        System.out.println(configIt);
+        return configIt;
     }
 
     private Map<String, Object> filterConfigurationMap(final Map<String, Object> map, final String... keys) {

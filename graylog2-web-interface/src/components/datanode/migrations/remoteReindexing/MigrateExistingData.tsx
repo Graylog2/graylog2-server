@@ -95,6 +95,11 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
     resetConnectionCheck();
   };
 
+  const handleCheckboxChange = async (e: React.ChangeEvent<any>, callback: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<RemoteReindexRequest>>) => {
+    await callback(e.target.name, e.target.checked);
+    resetConnectionCheck();
+  };
+
   const handleSelectIndices = (indexToToggle: string) => {
     if (selectedIndices.includes(indexToToggle)) {
       setSelectedIndices(selectedIndices.filter((index) => index !== indexToToggle));
@@ -114,6 +119,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
     password: '',
     synchronous: false,
     indices: [],
+    trust_unknown_certs: false,
   };
 
   return (
@@ -164,6 +170,15 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  disabled={isLoading}
                  value={values.allowlist}
                  onChange={(e) => handleChange(e, setFieldValue)}
+                 required />
+          <Input id="trust_unknown_certs"
+                 name="trust_unknown_certs"
+                 label="Trust unknown certificates"
+                 help="Trust all certificates of the remote host during the migration process."
+                 type="checkbox"
+                 disabled={isLoading}
+                 value={values.trust_unknown_certs}
+                 onChange={(e) => handleCheckboxChange(e, setFieldValue)}
                  required />
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">

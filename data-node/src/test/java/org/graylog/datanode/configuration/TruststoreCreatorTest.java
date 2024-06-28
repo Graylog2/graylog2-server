@@ -18,6 +18,7 @@ package org.graylog.datanode.configuration;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -43,6 +44,7 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,12 +58,13 @@ public class TruststoreCreatorTest {
     @Test
     void testTrustStoreCreation(@TempDir Path tempDir) throws Exception {
 
-        final FilesystemKeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "root","CN=ROOT", BigInteger.ONE);
-        final FilesystemKeystoreInformation boot = createKeystore(tempDir.resolve("boot.p12"), "boot","CN=BOOT", BigInteger.TWO);
+        final FilesystemKeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "root", "CN=ROOT", BigInteger.ONE);
+        final FilesystemKeystoreInformation boot = createKeystore(tempDir.resolve("boot.p12"), "boot", "CN=BOOT", BigInteger.TWO);
 
         final FilesystemKeystoreInformation truststore = TruststoreCreator.newTruststore()
                 .addRootCert("root", root, "root")
                 .addRootCert("boot", boot, "boot")
+
                 .persist(tempDir.resolve("truststore.sec"), "caramba! caramba!".toCharArray());
 
         assertTrue(truststore.location().toFile().exists());
@@ -79,6 +82,25 @@ public class TruststoreCreatorTest {
         verifyCertificate(rootCert, "CN=ROOT", BigInteger.ONE);
         final Certificate bootCert = keyStore.getCertificate("boot");
         verifyCertificate(bootCert, "CN=BOOT", BigInteger.TWO);
+
+    }
+
+
+    @Test
+    void testAdditionalCertificates(@TempDir Path tempDir) throws GeneralSecurityException, IOException, OperatorCreationException {
+        final FilesystemKeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "something-unknown", "CN=ROOT", BigInteger.ONE);
+        final X509Certificate cert = (X509Certificate) root.loadKeystore().getCertificate("something-unknown");
+
+        final FilesystemKeystoreInformation truststore = TruststoreCreator.newTruststore()
+                .addCertificates(List.of(cert))
+                .persist(tempDir.resolve("truststore.sec"), "caramba! caramba!".toCharArray());
+
+        final KeyStore keystore = truststore.loadKeystore();
+
+        final String alias = keystore.getCertificateAlias(cert);
+        Assertions.assertThat(alias)
+                .isNotNull()
+                .isEqualTo("cn=root");
 
     }
 
