@@ -17,24 +17,12 @@
 package org.graylog2.database;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Repeatable(DbEntities.class)
-public @interface DbEntity {
-    String collection();
-
-    String titleField() default "title";
-
-    String readPermission() default NOBODY_ALLOWED;
-
-    //use for DBEntities that do not have string representations/ titles at all
-    String NO_TITLE = "";
-
-    String ALL_ALLOWED = "";
-    String NOBODY_ALLOWED = "__no_access__";
+public @interface DbEntities {
+    DbEntity[] value();
 }

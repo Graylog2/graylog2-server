@@ -17,7 +17,7 @@
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
@@ -33,10 +33,10 @@ import type { StreamRule as StreamRuleTypeDefinition, Stream, StreamRule } from 
 
 import useCurrentUser from '../../hooks/useCurrentUser';
 
-const ActionButtonsWrap = styled.span`
-  margin-right: 6px;
+const ActionButtonsWrap = styled.span(({ theme }) => css`
+  margin-right: ${theme.spacings.xs};
   float: right;
-`;
+`);
 
 type Props = {
   matchData?: {
@@ -86,16 +86,17 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
     <ActionButtonsWrap className="align-right">
       <Button bsStyle="link"
               bsSize="xsmall"
+              onClick={() => setShowStreamRuleForm(true)}
+              title="Edit stream rule">
+        <Icon name="edit_square" type="regular" />
+      </Button>
+      <Button bsStyle="danger"
+              bsSize="xsmall"
               onClick={() => setShowConfirmDelete(true)}
               title="Delete stream rule">
         <Icon name="delete" type="regular" />
       </Button>
-      <Button bsStyle="link"
-              bsSize="xsmall"
-              onClick={() => setShowStreamRuleForm(true)}
-              title="Edit stream rule">
-        <Icon name="edit_square" />
-      </Button>
+
     </ActionButtonsWrap>
   );
 

@@ -26,7 +26,7 @@ import useFiltersWithTitle from 'components/common/EntityFilters/hooks/useFilter
 
 import { ROW_MIN_HEIGHT } from './Constants';
 
-const SUPPORTED_ATTRIBUTE_TYPES = ['STRING', 'BOOLEAN', 'DATE'];
+const SUPPORTED_ATTRIBUTE_TYPES = ['STRING', 'BOOLEAN', 'DATE', 'OBJECT_ID'];
 
 const FilterCreation = styled.div`
   display: inline-flex;
