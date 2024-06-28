@@ -177,7 +177,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  help="Trust all certificates of the remote host during the migration process."
                  type="checkbox"
                  disabled={isLoading}
-                 value={values.trust_unknown_certs}
+                 checked={values.trust_unknown_certs}
                  onChange={(e) => handleCheckboxChange(e, setFieldValue)}
                  required />
           {(availableIndices.length > 0) && (
