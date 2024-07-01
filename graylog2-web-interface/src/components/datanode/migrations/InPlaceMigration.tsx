@@ -48,7 +48,7 @@ const StyledPanelGroup = styled(PanelGroup)`
     background-color: ${(props) => props.theme.colors.global.contentBackground};
 
     .panel-heading {
-      background-color: ${(props) => props.theme.colors.table.row.backgroundAlt};
+      background-color: ${(props) => props.theme.colors.table.row.backgroundStriped};
     }
 
     &:not(:first-child) {

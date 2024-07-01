@@ -21,6 +21,7 @@ import 'moment-duration-format';
 import get from 'lodash/get';
 import styled, { css } from 'styled-components';
 
+import { describeExpression } from 'util/CronUtils';
 import { Button, Col, Row } from 'components/bootstrap';
 import { Icon, Pluralize, Timestamp } from 'components/common';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
@@ -54,16 +55,27 @@ class EventDefinitionDescription extends React.Component {
     context: {},
   };
 
+  static describeSchedule = (isCron, value) => {
+    if (isCron) {
+      const cronDescription = describeExpression(value);
+
+      // Lower case the A in At or the E in Every
+      return cronDescription.charAt(0).toLowerCase() + cronDescription.slice(1);
+    }
+
+    return `every ${moment.duration(value)
+      .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false })}`;
+  };
+
   static renderSchedulingInformation = (definition) => {
     let schedulingInformation = 'Not scheduled.';
 
-    if (definition.config.search_within_ms && definition.config.execute_every_ms) {
-      const executeEveryFormatted = moment.duration(definition.config.execute_every_ms)
-        .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false });
+    if (definition.config.search_within_ms && (definition.config.use_cron_scheduling || definition.config.execute_every_ms)) {
+      const executeEveryFormatted = EventDefinitionDescription.describeSchedule(definition.config.use_cron_scheduling, definition.config.use_cron_scheduling ? definition.config.cron_expression : definition.config.execute_every_ms);
       const searchWithinFormatted = moment.duration(definition.config.search_within_ms)
         .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
-      schedulingInformation = `Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
+      schedulingInformation = `Runs ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
     }
 
     return schedulingInformation;

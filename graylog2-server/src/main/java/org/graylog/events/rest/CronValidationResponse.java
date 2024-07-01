@@ -14,14 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.dbcatalog.impl;
+package org.graylog.events.rest;
 
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.shared.plugins.ChainingClassLoader;
-
-public interface DbEntitiesScanningMethod {
-
-    DbEntitiesCatalog scan(final String[] packagesToScan,
-                           final String[] packagesToExclude,
-                           final ChainingClassLoader chainingClassLoader);
-}
+public record CronValidationResponse(String error, String description) {}
