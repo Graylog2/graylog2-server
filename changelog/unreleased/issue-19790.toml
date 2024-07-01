@@ -1,0 +1,5 @@
+type="f"
+message="Fix CA upload delete icon XMARK not found"
+
+issues=["19790"]
+pulls=["19791"]
