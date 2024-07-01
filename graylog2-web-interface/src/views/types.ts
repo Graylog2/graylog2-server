@@ -493,7 +493,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
-    'views.widgets.exportAction'?: Array<() => WidgetActionType | null>;
+    'views.widgets.exportAction'?: Array<{ action: WidgetActionType, useCondition: () => boolean }>;
     'views.reducers'?: Array<ViewsReducer>;
     'views.requires.provided'?: Array<string>;
     'views.queryInput.commands'?: Array<CustomCommand>;

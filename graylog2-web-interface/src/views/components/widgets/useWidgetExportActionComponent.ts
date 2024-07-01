@@ -21,9 +21,10 @@ import type Widget from 'views/logic/widgets/Widget';
 const useWidgetExportActionComponent = (widget: Widget) => {
   const exportActions = usePluginEntities('views.widgets.exportAction');
 
-  const widgetExportAction = exportActions
-    .map((fn: () => WidgetActionType) => fn())
-    .filter((action) => action && (typeof action.isHidden !== 'function' || !action.isHidden(widget)));
+  const widgetExportAction = exportActions && exportActions
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    .filter(({ action, useCondition }) => (typeof useCondition === 'function' && useCondition()) && action && (typeof action.isHidden !== 'function' || !action.isHidden(widget)))
+    .map(({ action }: { action: WidgetActionType }) => action);
 
   return widgetExportAction?.[0]?.component;
 };
