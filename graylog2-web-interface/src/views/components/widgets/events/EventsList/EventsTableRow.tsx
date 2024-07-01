@@ -25,7 +25,7 @@ import useEventAttributes from 'views/components/widgets/events/hooks/useEventAt
 
 const Td = styled.td(({ theme }) => css`
   && {
-    border-color: ${theme.colors.table.row.border};
+    border-color: ${theme.colors.table.row.divider};
   }
 `);
 
