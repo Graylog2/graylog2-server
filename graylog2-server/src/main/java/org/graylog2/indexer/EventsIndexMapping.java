@@ -23,6 +23,8 @@ import org.graylog2.indexer.indices.Template;
 
 import java.util.Map;
 
+import static org.graylog.schema.SecurityFields.FIELD_ASSOCIATED_ASSETS;
+
 public abstract class EventsIndexMapping implements IndexMappingTemplate {
     @Override
     public Template toTemplate(IndexSetMappingTemplate indexSetConfig, Long order) {
@@ -197,6 +199,9 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                 .put("scores", map()
                         .put("type", "object")
                         .put("dynamic", true)
+                        .build())
+                .put(FIELD_ASSOCIATED_ASSETS, map()
+                        .put("type", "keyword")
                         .build())
                 /* TODO: Enable the typed fields once we decided if that's the way to go
                 .put("fields_typed", map()
