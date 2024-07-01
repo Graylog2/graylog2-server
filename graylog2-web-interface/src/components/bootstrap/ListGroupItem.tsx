@@ -23,7 +23,7 @@ import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 const RefContainer = styled.span(({ theme }) => css`
   display: block;
   &:not(:last-child) {
-    border-bottom: 1px solid ${theme.colors.table.row.border};
+    border-bottom: 1px solid ${theme.colors.table.row.divider};
   }
 `);
 
