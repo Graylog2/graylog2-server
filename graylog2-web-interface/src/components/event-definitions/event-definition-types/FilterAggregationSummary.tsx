@@ -19,6 +19,7 @@ import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import upperFirst from 'lodash/upperFirst';
 
+import { describeExpression } from 'util/CronUtils';
 import { Link } from 'components/common/router';
 import { Alert } from 'components/bootstrap';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
@@ -133,6 +134,9 @@ const FilterAggregationSummary = ({ config, currentUser }: Props) => {
     streams: configStreams,
     search_within_ms: searchWithinMs,
     execute_every_ms: executeEveryMs,
+    use_cron_scheduling: useCronScheduling,
+    cron_expression: cronExpression,
+    cron_timezone: cronTimezone,
     _is_scheduled: isScheduled,
     event_limit,
     group_by: groupBy,
@@ -150,6 +154,14 @@ const FilterAggregationSummary = ({ config, currentUser }: Props) => {
 
   const validationResults = validateExpression(conditions.expression, series);
 
+  const renderCronExpression = (expression) => {
+    if (expression) {
+      return describeExpression(expression);
+    }
+
+    return 'Error: no cron expression specified!';
+  };
+
   return (
     <dl>
       <dt>Type</dt>
@@ -163,8 +175,25 @@ const FilterAggregationSummary = ({ config, currentUser }: Props) => {
       <dd className={styles.streamList}><Streams streams={streams} streamIds={effectiveStreamIds} streamIdsWithMissingPermission={streamIdsWithMissingPermission} /></dd>
       <dt>Search within</dt>
       <dd>{searchWithin.duration} {searchWithin.unit.toLowerCase()}</dd>
-      <dt>Execute search every</dt>
-      <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
+      <dt>Use Cron Scheduling</dt>
+      <dd>{useCronScheduling ? 'yes' : 'no'}</dd>
+      {useCronScheduling
+        ? (
+          <>
+            <dt>Cron Expression</dt>
+            <dd>{cronExpression}</dd>
+            <dt>Cron Description</dt>
+            <dd>{renderCronExpression(cronExpression)}</dd>
+            <dt>Time Zone</dt>
+            <dd>{cronTimezone}</dd>
+          </>
+        )
+        : (
+          <>
+            <dt>Execute search every</dt>
+            <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
+          </>
+        )}
       <dt>Enable scheduling</dt>
       <dd>{isScheduled ? 'yes' : 'no'}</dd>
       {conditionType === 'filter' && (

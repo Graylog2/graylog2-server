@@ -81,6 +81,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -145,7 +146,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private void doStartMigration(MigrationConfiguration migration, RemoteReindexRequest request) {
         try {
             new Thread(() -> {
-                prepareCluster(request.allowlist(), migration);
+                prepareCluster(request, migration);
                 createIndicesInNewCluster(migration);
                 startAsyncTasks(migration, request);
             }).start();
@@ -165,18 +166,42 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         });
     }
 
-    private void prepareCluster(String allowlistAsString, MigrationConfiguration migration) {
-        Preconditions.checkArgument(allowlistAsString != null, "Allowlist has to be provided in the request.");
-        List<String> allowlist = Arrays.stream(allowlistAsString.split(",")).map(String::trim).toList();
+    private void prepareCluster(RemoteReindexRequest req, MigrationConfiguration migration) {
+        final List<String> allowlist = parseAllowlist(req);
         if (!isRemoteReindexAllowed(allowlist)) {
             // this is expected state for fresh datanode cluster - there is no value configured in the reindex.remote.allowlist
             // we have to add it to the configuration and wait till the whole cluster restarts
-            logInfo(migration, "Preparing cluster for remote reindexing, setting allowlist to: " + allowlistAsString);
+            logInfo(migration, "Preparing cluster for remote reindexing, setting allowlist to: " + req);
             allowReindexingFrom(allowlist);
             waitForClusterRestart(allowlist, migration);
         } else {
             logInfo(migration, "Remote reindex allowlist already configured, skipping cluster configuration and restart.");
         }
+    }
+
+    @Nonnull
+    protected static List<String> parseAllowlist(RemoteReindexRequest req) {
+
+        if (req.allowlist() == null || req.allowlist().isBlank()) {
+            // nothing provided, let's use the host address and parse allowlist from it
+            return Collections.singletonList(fixProtocolPrefix(req.uri().toString(), req.uri()));
+        } else {
+            return Arrays.stream(req.allowlist().split(","))
+                    .map(String::trim)
+                    .map(allowlistItem -> fixProtocolPrefix(allowlistItem, req.uri()))
+                    .toList();
+        }
+    }
+
+    /**
+     * Users often provide the very same value for remote host and allowlist. But allowlist needs to be just
+     * hostname:port, without protocol. A mistake that we can easily automatically fix.
+     */
+    private static String fixProtocolPrefix(String allowlistItem, URI remoteHost) {
+        if (remoteHost.toString().equals(allowlistItem)) {
+            return allowlistItem.replaceAll("https?://", "");
+        }
+        return allowlistItem;
     }
 
     private ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password, MigrationConfiguration migration) {

@@ -18,6 +18,7 @@ import React from 'react';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
+import { describeExpression } from 'util/CronUtils';
 import { OverlayTrigger, Icon, Timestamp } from 'components/common';
 import Button from 'components/bootstrap/Button';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
@@ -60,6 +61,18 @@ const getTimeRange = (scheduler: Scheduler) => {
   );
 };
 
+const describeSchedule = (isCron: boolean, value: number | string) => {
+  if (isCron) {
+    const cronDescription = describeExpression(value as string);
+
+    // Lower case the A in At or the E in Every
+    return cronDescription.charAt(0).toLowerCase() + cronDescription.slice(1);
+  }
+
+  return `every ${moment.duration(value)
+    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false })}`;
+};
+
 const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) => (
   <dl>
     <DetailTitle>Status:</DetailTitle>
@@ -91,23 +104,27 @@ const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) =>
 const SchedulingInfo = ({
   executeEveryMs,
   searchWithinMs,
+  useCronScheduling,
+  cronExpression,
   scheduler,
   title,
   clearNotifications,
 }:{
   executeEveryMs: number,
   searchWithinMs: number,
-  scheduler: Scheduler, title: string,
-  clearNotifications: () => void
+  useCronScheduling: boolean,
+  cronExpression: string,
+  scheduler: Scheduler,
+  title: string,
+  clearNotifications: () => void,
 }) => {
-  const executeEveryFormatted = moment.duration(executeEveryMs)
-    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false });
+  const executeEveryFormatted = describeSchedule(useCronScheduling, useCronScheduling ? cronExpression : executeEveryMs);
   const searchWithinFormatted = moment.duration(searchWithinMs)
     .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
   return (
     <>
-      {`Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}. `}
+      {`Runs ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}. `}
       <OverlayTrigger trigger="click"
                       rootClose
                       placement="left"
@@ -137,6 +154,8 @@ const SchedulingCell = ({ definition } : Props) => {
     config: {
       search_within_ms: searchWithinMs,
       execute_every_ms: executeEveryMs,
+      use_cron_scheduling: useCronScheduling,
+      cron_expression: cronExpression,
     },
     scheduler,
   } = definition;
@@ -144,6 +163,8 @@ const SchedulingCell = ({ definition } : Props) => {
   return (
     <SchedulingInfo executeEveryMs={executeEveryMs}
                     searchWithinMs={searchWithinMs}
+                    useCronScheduling={useCronScheduling}
+                    cronExpression={cronExpression}
                     title={title}
                     scheduler={scheduler}
                     clearNotifications={clearNotifications(definition)} />

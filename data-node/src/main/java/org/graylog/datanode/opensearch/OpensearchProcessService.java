@@ -95,11 +95,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 case START -> stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
                 case REQUEST_CSR -> {
                     this.processAutostart = false;
-                    csrRequester.triggerCsr();
+                    csrRequester.triggerCertificateSigningRequest();
                 }
                 case REQUEST_CSR_WITH_AUTOSTART -> {
                     this.processAutostart = true;
-                    csrRequester.triggerCsr();
+                    csrRequester.triggerCertificateSigningRequest();
                 }
             }
         }

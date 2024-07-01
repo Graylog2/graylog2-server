@@ -20,7 +20,8 @@ import { Button } from 'components/bootstrap';
 
 type Props = {
   children: React.ReactElement,
-  disabled: boolean,
+  // eslint-disable-next-line react/require-default-props
+  disabled?: boolean,
   onCancel: () => void,
   onSubmitForm: (arg: any) => void,
 };

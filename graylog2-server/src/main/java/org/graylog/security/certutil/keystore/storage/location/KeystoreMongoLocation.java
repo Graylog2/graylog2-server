@@ -38,6 +38,7 @@ public class KeystoreMongoLocation implements KeystoreLocation {
         return datanode(nodeId.getNodeId());
     }
 
+    @Deprecated
     public static KeystoreMongoLocation datanode(String nodeId) {
         return new KeystoreMongoLocation(nodeId, KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
     }

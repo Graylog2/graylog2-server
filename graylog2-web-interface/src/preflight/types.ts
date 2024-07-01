@@ -33,6 +33,7 @@ export type DataNode = {
   action_queue?: string,
   cert_valid_until: string | null,
   error_msg?: string,
+  datanode_version: string,
 }
 
 export type DataNodes = Array<DataNode>;

@@ -32,7 +32,6 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
-import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.slf4j.Logger;
@@ -103,8 +102,8 @@ public class MaintenanceStrategiesHelper {
 
     public HotOnlyDataTieringConfig defaultDataTieringConfig() {
         return HotOnlyDataTieringConfig.builder()
-                .indexLifetimeMin(IndexLifetimeConfig.DEFAULT_LIFETIME_MIN)
-                .indexLifetimeMax(IndexLifetimeConfig.DEFAULT_LIFETIME_MAX)
+                .indexLifetimeMin(elasticsearchConfiguration.getTimeSizeOptimizingRetentionMinLifeTime())
+                .indexLifetimeMax(elasticsearchConfiguration.getTimeSizeOptimizingRetentionMaxLifeTime())
                 .build();
     }
 }

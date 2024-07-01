@@ -45,6 +45,7 @@ const initialFilterConfig = {
   execute_every_ms: 5 * 60 * 1000,
   _is_scheduled: true,
   event_limit: 100,
+  use_cron_scheduling: false,
 };
 
 const initialAggregationConfig = {
