@@ -130,6 +130,7 @@ describe('useConfigurationStep', () => {
         type: 'DATANODE',
         status: 'UNCONFIGURED',
         cert_valid_until: '2020-02-10T20:40:00.000Z',
+        datanode_version: '6.1',
       }],
     });
 
@@ -193,6 +194,7 @@ describe('useConfigurationStep', () => {
         type: 'DATANODE',
         status: 'CONNECTED',
         cert_valid_until: '2020-02-10T20:40:00.000Z',
+        datanode_version: '6.1',
       }],
     });
 

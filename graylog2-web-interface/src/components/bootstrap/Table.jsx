@@ -84,14 +84,14 @@ const tableCss = css(({ theme }) => css`
     > tfoot > tr {
       > th,
       > td {
-        border-top-color: ${theme.colors.table.row.backgroundAlt};
+        border-top-color: ${theme.colors.table.row.backgroundStriped};
       }
     }
 
     > thead > tr > th {
       background: ${theme.colors.table.head.background};
       white-space: nowrap;
-      border-bottom-color: ${theme.colors.table.row.border};
+      border-bottom-color: ${theme.colors.table.row.divider};
     }
 
     > tbody > tr {
@@ -100,7 +100,7 @@ const tableCss = css(({ theme }) => css`
     }
 
     > tbody + tbody {
-      border-top-color: ${theme.colors.table.row.backgroundAlt};
+      border-top-color: ${theme.colors.table.row.backgroundStriped};
     }
 
     .table {
@@ -109,20 +109,20 @@ const tableCss = css(({ theme }) => css`
   }
 
   &.table-bordered {
-    border-color: ${theme.colors.table.row.backgroundAlt};
+    border-color: ${theme.colors.table.row.backgroundStriped};
 
     > thead > tr,
     > tfoot > tr,
     > tbody > tr {
       > td,
       > th {
-        border-color: ${theme.colors.table.row.backgroundAlt};
+        border-color: ${theme.colors.table.row.backgroundStriped};
       }
     }
   }
 
   &.table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: ${theme.colors.table.row.backgroundAlt};
+    background-color: ${theme.colors.table.row.backgroundStriped};
   }
 
   &.table-hover > tbody > tr:hover {

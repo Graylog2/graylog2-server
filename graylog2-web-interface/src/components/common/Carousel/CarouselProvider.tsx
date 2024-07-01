@@ -26,6 +26,7 @@ type Props = React.PropsWithChildren<{
     align: 'start',
     slidesToScroll: number,
     inViewThreshold: number,
+    watchDrag: boolean
   }>
 }>
 

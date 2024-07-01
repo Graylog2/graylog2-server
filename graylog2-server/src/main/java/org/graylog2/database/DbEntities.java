@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.dbcatalog.impl;
+package org.graylog2.database;
 
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.shared.plugins.ChainingClassLoader;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface DbEntitiesScanningMethod {
-
-    DbEntitiesCatalog scan(final String[] packagesToScan,
-                           final String[] packagesToExclude,
-                           final ChainingClassLoader chainingClassLoader);
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface DbEntities {
+    DbEntity[] value();
 }
