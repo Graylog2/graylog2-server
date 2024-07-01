@@ -81,6 +81,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final MongoIndexSet.Factory indexSetFactory;
     private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
+    private final Set<StreamDeletionGuard> streamDeletionGuards;
 
     @Inject
     public StreamServiceImpl(MongoConnection mongoConnection,
@@ -89,7 +90,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              IndexSetService indexSetService,
                              MongoIndexSet.Factory indexSetFactory,
                              EntityOwnershipService entityOwnershipService,
-                             ClusterEventBus clusterEventBus) {
+                             ClusterEventBus clusterEventBus,
+                             Set<StreamDeletionGuard> streamDeletionGuards) {
         super(mongoConnection);
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
@@ -97,6 +99,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.indexSetFactory = indexSetFactory;
         this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
+        this.streamDeletionGuards = streamDeletionGuards;
     }
 
     @Nullable
@@ -173,6 +176,23 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     @Override
     public List<Stream> loadAllByTitle(String title) {
         return loadAll(QueryBuilder.start(StreamImpl.FIELD_TITLE).is(title).get());
+    }
+
+    @Override
+    public Map<String, String> loadStreamTitles(Collection<String> streamIds) {
+        if (streamIds.isEmpty()) {
+            return Map.of();
+        }
+
+        final var streamObjectIds = streamIds.stream().map(ObjectId::new).toList();
+        final var cursor = collection(StreamImpl.class).find(
+                new BasicDBObject("_id", new BasicDBObject("$in", streamObjectIds)),
+                new BasicDBObject("_id", 1).append("title", 1)
+        );
+        try (cursor) {
+            return cursorToList(cursor).stream()
+                    .collect(Collectors.toMap(i -> i.get("_id").toString(), i -> i.get("title").toString()));
+        }
     }
 
     @Override
@@ -304,7 +324,9 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public void destroy(Stream stream) throws NotFoundException {
+    public void destroy(Stream stream) throws NotFoundException, StreamGuardException {
+        checkDeletionguards(stream.getId());
+
         for (StreamRule streamRule : streamRuleService.loadForStream(stream)) {
             super.destroy(streamRule);
         }
@@ -317,6 +339,12 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
         clusterEventBus.post(StreamDeletedEvent.create(streamId));
         entityOwnershipService.unregisterStream(streamId);
+    }
+
+    private void checkDeletionguards(String streamId) throws StreamGuardException {
+        for (StreamDeletionGuard guard : streamDeletionGuards) {
+            guard.checkGuard(streamId);
+        }
     }
 
     public void update(Stream stream, @Nullable String title, @Nullable String description) throws ValidationException {

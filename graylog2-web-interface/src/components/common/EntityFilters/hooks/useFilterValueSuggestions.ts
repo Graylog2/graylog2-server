@@ -39,10 +39,10 @@ type PaginatedSuggestions = {
   suggestions: Array<{ id: string, value: string }>,
 }
 
-const fetchFilterValueSuggestions = async (collection: string, { query, page, pageSize }: SearchParams): Promise<PaginatedSuggestions | undefined> => {
+const fetchFilterValueSuggestions = async (collection: string, { query, page, pageSize }: SearchParams, collectionProperty: string = 'title'): Promise<PaginatedSuggestions | undefined> => {
   const additional = {
     collection,
-    column: 'title',
+    column: collectionProperty,
   };
   const url = PaginationURL('entity_suggestions', page, pageSize, query, additional);
 
@@ -53,6 +53,7 @@ const useFilterValueSuggestions = (
   attributeId: string,
   collection: string,
   searchParams: SearchParams,
+  collectionProperty: string,
 ): {
   data: PaginatedSuggestions | undefined
   isInitialLoading: boolean
@@ -61,7 +62,7 @@ const useFilterValueSuggestions = (
     throw Error(`Attribute meta data for attribute "${attributeId}" is missing related collection.`);
   }
 
-  const { data, isInitialLoading } = useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(collection, searchParams), {
+  const { data, isInitialLoading } = useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(collection, searchParams, collectionProperty), {
     onError: (errorThrown) => {
       UserNotification.error(`Loading suggestions for filter failed with status: ${errorThrown}`,
         'Could not load filter suggestions');

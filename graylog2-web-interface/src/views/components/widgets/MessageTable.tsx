@@ -45,7 +45,7 @@ const Table = styled.table(({ theme }) => css`
   word-break: break-all;
 
   > tbody > tr > td {
-    border-color: ${theme.colors.table.row.border};
+    border-color: ${theme.colors.table.row.divider};
   }
 
   @media print {

@@ -1,0 +1,5 @@
+type="a"
+message="Display datanode version in datanodes overview under System / Data Nodes"
+
+issues=["19680", "18783"]
+pulls=["19691"]
