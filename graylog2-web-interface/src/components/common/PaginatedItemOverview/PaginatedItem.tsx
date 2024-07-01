@@ -33,7 +33,7 @@ const Container = styled.span(({ theme }) => css`
   background-color: ${theme.colors.table.row.background};
 
   &:nth-of-type(even) {
-    background-color: ${theme.colors.table.row.backgroundAlt};
+    background-color: ${theme.colors.table.row.backgroundStriped};
   }
 `);
 
