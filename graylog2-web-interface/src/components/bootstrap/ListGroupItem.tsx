@@ -14,30 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { forwardRef } from 'react';
+import * as React from 'react';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 
-const RefContainer = styled.span(({ theme }) => `
+const RefContainer = styled.span(({ theme }) => css`
   display: block;
-  border: 1px solid ${theme.colors.variant.lighter.default};
-  margin-bottom: -1px;
-
-  &:first-child {
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-    border-bottom-right-radius: 4px;
-    border-bottom-left-radius: 4px;
+  &:not(:last-child) {
+    border-bottom: 1px solid ${theme.colors.table.row.border};
   }
 `);
 
-const variantStyles = css(({ bsStyle, theme }) => {
+const variantStyles = css<{ bsStyle: string }>(({ bsStyle, theme }) => {
   if (!bsStyle) {
     return undefined;
   }
@@ -151,18 +141,32 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   ${variantStyles}
 `);
 
-const ListGroupItem = forwardRef(({ containerProps, ...rest }, ref) => (
+type Props = React.PropsWithChildren<{
+  active?: boolean
+  bsStyle?: string,
+  className?: string,
+  containerProps?: object,
+  disabled?: boolean,
+  header?: React.ReactNode,
+  href?: string,
+  onClick?:() => void
+}>
+
+const ListGroupItem = forwardRef<HTMLElement, Props>(({ containerProps, ...rest }, ref) => (
   <RefContainer ref={ref} {...containerProps}>
     <StyledListGroupItem {...rest} />
   </RefContainer>
 ));
 
-ListGroupItem.propTypes = {
-  containerProps: PropTypes.object,
-};
-
 ListGroupItem.defaultProps = {
+  active: undefined,
+  bsStyle: undefined,
+  className: undefined,
   containerProps: {},
+  disabled: undefined,
+  header: undefined,
+  href: undefined,
+  onClick: undefined,
 };
 
 export default ListGroupItem;
