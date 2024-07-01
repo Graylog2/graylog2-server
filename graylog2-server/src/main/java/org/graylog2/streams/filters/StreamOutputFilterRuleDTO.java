@@ -12,6 +12,8 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.shared.security.RestPermissions;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
 import java.util.Optional;
 
@@ -28,6 +30,7 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
         DISABLED;
     }
 
+    private static final String FIELD_ID = "id";
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_STREAM_ID = "stream_id";
@@ -54,7 +57,7 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
     @NotBlank
     public abstract Status status();
 
-    @JsonProperty(FIELD_STATUS)
+    @JsonProperty(FIELD_RULE)
     public abstract RuleBuilder rule();
 
     public static Builder builder() {
@@ -69,10 +72,15 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
                     .status(Status.DISABLED);
         }
 
+        @Id
+        @ObjectId
+        @JsonProperty(FIELD_ID)
+        public abstract Builder id(String id);
+
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);
 
-        @JsonProperty(FIELD_STREAM_ID)
+        @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(@Nullable String description);
 
         @JsonProperty(FIELD_STREAM_ID)

@@ -11,6 +11,7 @@ import org.graylog2.database.utils.MongoUtils;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedId;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -46,9 +47,11 @@ public class StreamOutputFilterService {
     }
 
     public StreamOutputFilterRuleDTO create(StreamOutputFilterRuleDTO dto) {
-        final var result = collection.insertOne(dto);
+        if (!isBlank(dto.id())) {
+            throw new IllegalArgumentException("id must be blank");
+        }
 
-        return utils.getById(insertedId(result))
+        return utils.getById(insertedId(collection.insertOne(dto)))
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't insert document: %s", dto)));
     }
 
