@@ -40,8 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 public class TrafficCounterService implements TrafficUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(TrafficCounterService.class);
@@ -59,18 +57,10 @@ public class TrafficCounterService implements TrafficUpdater {
         db.createIndex(new BasicDBObject(BUCKET, 1), new BasicDBObject("unique", true));
     }
 
-    private static DateTime getDayBucketStart(DateTime observationTime) {
-        return observationTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-    }
-
-    public static DateTime getHourBucketStart(DateTime observationTime) {
-        return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-    }
-
     @Override
     public void updateTraffic(DateTime observationTime, NodeId nodeId, long inLastMinute, long outLastMinute, long decodedLastMinute) {
         // we bucket traffic data by the hour and aggregate it to a day bucket for reporting
-        final DateTime dayBucket = getHourBucketStart(observationTime);
+        final DateTime dayBucket = TrafficUpdater.getHourBucketStart(observationTime);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Updating traffic for node {} at {}:  in/decoded/out {}/{}/{} bytes",
@@ -120,9 +110,9 @@ public class TrafficCounterService implements TrafficUpdater {
 
         // Include traffic up until the current timestamp if includeToday is true.
         // Otherwise, default to the end of the previous day.
-        final DateTime to = includeToday ? now : getDayBucketStart(now).minusMillis(1);
+        final DateTime to = includeToday ? now : TrafficUpdater.getDayBucketStart(now).minusMillis(1);
         // Make sure to include the full first day
-        final DateTime from = getDayBucketStart(now).minus(daysToIncludeDuration);
+        final DateTime from = TrafficUpdater.getDayBucketStart(now).minus(daysToIncludeDuration);
 
         final DBQuery.Query query = DBQuery.and(
                 DBQuery.lessThanEquals(BUCKET, to),
@@ -141,23 +131,12 @@ public class TrafficCounterService implements TrafficUpdater {
 
             // we might need to aggregate the hourly database values to their UTC daily buckets
             if (interval == Interval.DAILY) {
-                inputHistogram = aggregateToDaily(inputHistogram);
-                outputHistogram = aggregateToDaily(outputHistogram);
-                decodedHistogram = aggregateToDaily(decodedHistogram);
+                inputHistogram = TrafficUpdater.aggregateToDaily(inputHistogram);
+                outputHistogram = TrafficUpdater.aggregateToDaily(outputHistogram);
+                decodedHistogram = TrafficUpdater.aggregateToDaily(decodedHistogram);
             }
             return TrafficHistogram.create(from, to, inputHistogram, outputHistogram, decodedHistogram);
-        } catch (Exception e) {
-            // TODO: remove this diagnostic logging after fixing https://github.com/Graylog2/graylog2-server/issues/9559
-            LOG.error("Unable to load traffic data range {} to {}", from, to);
-            throw e;
         }
-    }
-
-    private TreeMap<DateTime, Long> aggregateToDaily(Map<DateTime, Long> histogram) {
-        return histogram.entrySet().stream()
-                .collect(Collectors.groupingBy(entry -> entry.getKey().withTimeAtStartOfDay(),
-                        TreeMap::new,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.summingLong(Long::valueOf))));
     }
 
     public enum Interval {

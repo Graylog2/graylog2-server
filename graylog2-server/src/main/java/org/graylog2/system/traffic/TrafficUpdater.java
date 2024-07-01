@@ -19,6 +19,25 @@ package org.graylog2.system.traffic;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
 public interface TrafficUpdater {
     void updateTraffic(DateTime observationTime, NodeId nodeId, long inLastMinute, long outLastMinute, long decodedLastMinute);
+
+    static DateTime getDayBucketStart(DateTime observationTime) {
+        return observationTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+    }
+
+    static DateTime getHourBucketStart(DateTime observationTime) {
+        return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+    }
+
+    static TreeMap<DateTime, Long> aggregateToDaily(Map<DateTime, Long> histogram) {
+        return histogram.entrySet().stream()
+                .collect(Collectors.groupingBy(entry -> entry.getKey().withTimeAtStartOfDay(),
+                        TreeMap::new,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.summingLong(Long::valueOf))));
+    }
 }
