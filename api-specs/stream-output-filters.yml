@@ -268,12 +268,12 @@ components:
           conditions:
             - id: "condition-1"
               function: "has_field"
-              parameters:
+              params:
                 field: "is_debug"
               negate: false
             - id: "condition-2"
               function: "has_field"
-              parameters:
+              params:
                 field: "msg_is_debug"
               negate: false
 
@@ -401,7 +401,7 @@ components:
         function:
           type: "string"
           description: "The function name"
-        parameters:
+        params:
           type: "object"
           description: "The named function parameters"
         negate:
@@ -423,7 +423,7 @@ components:
       example:
         id: "condition-1"
         function: "has_field"
-        parameters:
+        params:
           field: "source"
         negate: false
         operator: "AND"
