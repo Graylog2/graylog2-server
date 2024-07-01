@@ -36,7 +36,7 @@ const EventsNumber = ({ data } : WidgetComponentProps<EventsWidgetConfig, Events
 
   useEffect(() => {
     onRenderComplete();
-  }, []);
+  }, [onRenderComplete]);
 
   return (
     <NumberBox resizeDelay={20}>
