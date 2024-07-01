@@ -22,7 +22,6 @@ import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.process.Environment;
-import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
 import java.util.LinkedHashMap;
@@ -99,10 +98,11 @@ public record OpensearchConfiguration(
         javaOpts.add("-Xms%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
         javaOpts.add("-Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
 
-        final FilesystemKeystoreInformation truststore = opensearchSecurityConfiguration.getTruststore();
-        javaOpts.add("-Djavax.net.ssl.trustStore=" + truststore.location().toAbsolutePath());
-        javaOpts.add("-Djavax.net.ssl.trustStorePassword=" + truststore.passwordAsString());
-        javaOpts.add("-Djavax.net.ssl.trustStoreType=pkcs12");
+        opensearchSecurityConfiguration.getTruststore().ifPresent(truststore -> {
+            javaOpts.add("-Djavax.net.ssl.trustStore=" + truststore.location().toAbsolutePath());
+            javaOpts.add("-Djavax.net.ssl.trustStorePassword=" + truststore.passwordAsString());
+            javaOpts.add("-Djavax.net.ssl.trustStoreType=pkcs12");
+        });
 
         env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
         env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());

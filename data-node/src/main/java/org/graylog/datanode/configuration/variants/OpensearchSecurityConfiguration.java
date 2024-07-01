@@ -44,6 +44,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class OpensearchSecurityConfiguration {
@@ -132,9 +133,7 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.disabled", "true");
             config.put("plugins.security.ssl.http.enabled", "false");
         }
-        final ImmutableMap<String, String> configIt = config.build();
-        System.out.println(configIt);
-        return configIt;
+        return config.build();
     }
 
     private Map<String, Object> filterConfigurationMap(final Map<String, Object> map, final String... keys) {
@@ -168,8 +167,8 @@ public class OpensearchSecurityConfiguration {
         return httpCertificate;
     }
 
-    public FilesystemKeystoreInformation getTruststore() {
-        return truststore;
+    public Optional<FilesystemKeystoreInformation> getTruststore() {
+        return Optional.ofNullable(truststore);
     }
 
     protected ImmutableMap<String, String> commonSecureConfig() {
