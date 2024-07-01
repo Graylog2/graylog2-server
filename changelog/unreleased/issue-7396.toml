@@ -1,0 +1,5 @@
+type="c"
+message="Always display input for widget title in widget edit mode."
+
+issues=["7396"]
+pulls=["19737"]
