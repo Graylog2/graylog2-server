@@ -63,6 +63,7 @@ import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog.events.processor.EventResolver;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -467,6 +468,21 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         ValidationResult validationResult = toValidate.config().validate();
         validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
         return validationResult;
+    }
+
+    @POST
+    @Path("/validate/cron_expression")
+    @NoAuditEvent("Validation only")
+    @ApiOperation(value = "Validate a cron expression")
+    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
+    public CronValidationResponse validate(@ApiParam(name = "JSON body", required = true)
+                                           @Valid @NotNull CronValidationRequest toValidate) {
+        try {
+            CronUtils.validateExpression(toValidate.expression());
+            return new CronValidationResponse(null, CronUtils.describeExpression(toValidate.expression()));
+        } catch (IllegalArgumentException e) {
+            return new CronValidationResponse(e.getMessage(), null);
+        }
     }
 
     private void checkEventDefinitionPermissions(EventDefinitionDto dto, String action) {
