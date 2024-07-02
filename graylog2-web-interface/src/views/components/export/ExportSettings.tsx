@@ -84,7 +84,10 @@ const ExportSettings = ({
                                    }
                                  selectSize="normal"
                                  displaySortableListOverlayInPortal
-                                 selectedFields={value.map(({ field }) => field)} />
+                                 selectedFields={value.map(({ field }) => field)}
+                                 showSelectAllRest
+                                 showDeSelectAll
+                                 showListCollapseButton />
           </>
         )}
       </Field>
