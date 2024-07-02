@@ -36,6 +36,8 @@ import org.mockito.junit.MockitoRule;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import static org.graylog2.plugin.lookup.LookupResult.DEFAULT_ERROR_LOOKUP_RESULT;
+import static org.graylog2.plugin.lookup.LookupResult.EMPTY_LOOKUP_RESULT;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -113,6 +115,27 @@ public class CaffeineLookupCacheTest {
         ticker.advance(10, TimeUnit.SECONDS);
         LookupResult value3 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
         Assertions.assertThat(value3.singleValue()).isEqualTo("x");
+    }
+
+    @Test
+    public void ttlError() throws Exception {
+        LookupCache cache = buildCache(false);
+        LookupResult lr1 = LookupResult.empty();
+        LookupResult lr2 = LookupResult.withError();
+        LookupResult lr3 = LookupResult.withError(999);
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2).thenReturn(lr3);
+
+        LookupResult value1 = cache.get(LookupCacheKey.createFromJSON("x1", "y"), loader);
+        Assertions.assertThat(value1.singleValue()).isNull();
+        Assertions.assertThat(value1.cacheTTL()).isEqualTo(EMPTY_LOOKUP_RESULT.cacheTTL());
+
+        LookupResult value2 = cache.get(LookupCacheKey.createFromJSON("x2", "y"), loader);
+        Assertions.assertThat(value2.singleValue()).isNull();
+        Assertions.assertThat(value2.cacheTTL()).isEqualTo(DEFAULT_ERROR_LOOKUP_RESULT.cacheTTL());
+
+        LookupResult value3 = cache.get(LookupCacheKey.createFromJSON("x3", "y"), loader);
+        Assertions.assertThat(value3.singleValue()).isNull();
+        Assertions.assertThat(value3.cacheTTL()).isEqualTo(999);
     }
 
     private LookupCache buildCache(boolean ignoreNull) {
