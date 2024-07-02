@@ -27,6 +27,8 @@ import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigration
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
+const DEFAULT_THREADS_COUNT = 4;
+
 const IndicesContainer = styled.div`
   max-height: 300px;
   overflow-y: scroll;
@@ -91,7 +93,15 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
   };
 
   const handleChange = async (e: React.ChangeEvent<any>, callback: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<RemoteReindexRequest>>) => {
-    await callback(e.target.name, e.target.value);
+    let value;
+    value = e.target.value;
+
+    if (e.target.name === 'threads') {
+      value = Number(e.target.value) < 1 ? DEFAULT_THREADS_COUNT : Number(e.target.value);
+    }
+
+    await callback(e.target.name, value);
+
     resetConnectionCheck();
   };
 
@@ -114,6 +124,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
     password: '',
     synchronous: false,
     indices: [],
+    threads: DEFAULT_THREADS_COUNT,
   };
 
   return (
@@ -163,6 +174,17 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  type="text"
                  disabled={isLoading}
                  value={values.allowlist}
+                 onChange={(e) => handleChange(e, setFieldValue)}
+                 required />
+          <Input id="threads"
+                 name="threads"
+                 label="Threads count"
+                 help="Threads count defines how many indices will be migrated parallelly (minimum 1, default 4)"
+                 type="number"
+                 min={1}
+                 step={1}
+                 disabled={isLoading}
+                 value={values.threads}
                  onChange={(e) => handleChange(e, setFieldValue)}
                  required />
           {(availableIndices.length > 0) && (

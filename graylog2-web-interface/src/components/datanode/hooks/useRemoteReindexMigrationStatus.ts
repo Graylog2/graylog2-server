@@ -53,6 +53,7 @@ export type RemoteReindexRequest = {
   indices: string[],
   synchronous: boolean,
   user: string,
+  threads: number,
 }
 
 export const RemoteReindexFinishedStatusActions: MigrationActions[] = ['RETRY_MIGRATE_EXISTING_DATA', 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER'];
