@@ -52,6 +52,7 @@ type Props = {
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
+
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
   useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries(KEY_PREFIX));
 
