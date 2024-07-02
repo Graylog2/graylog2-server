@@ -57,6 +57,30 @@
           }
         ]
       }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "stream_id": "54e3deadbeefdeadbeef1000",
+      "output_target": "something-else",
+      "title": "Test Filter 3",
+      "status": "enabled",
+      "rule": {
+        "operator": "AND",
+        "conditions": [
+          {
+            "id": {
+              "$oid": "54e3deadbeefdeadbeef0001"
+            },
+            "function": "has_field",
+            "params": {
+              "field": "is_debug",
+              "negate": false
+            }
+          }
+        ]
+      }
     }
   ]
 }

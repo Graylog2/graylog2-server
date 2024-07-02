@@ -45,8 +45,16 @@ class StreamOutputFilterServiceTest {
 
     @Test
     @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
-    void findPaginated() {
-        final var result = service.findPaginated(Filters.empty(), Sorts.ascending("title"), 10, 1, id -> true);
+    void findPaginatedForStream() {
+        final var result = service.findPaginatedForStream("54e3deadbeefdeadbeef1000", Sorts.ascending("title"), 10, 1, id -> true);
+
+        assertThat(result.delegate()).hasSize(3);
+    }
+
+    @Test
+    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    void findPaginatedForStreamAndTarget() {
+        final var result = service.findPaginatedForStreamAndTarget("54e3deadbeefdeadbeef1000", "indexer", Sorts.ascending("title"), 10, 1, id -> true);
 
         assertThat(result.delegate()).hasSize(2);
     }

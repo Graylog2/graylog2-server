@@ -49,8 +49,8 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
     private static final String FIELD_ID = "id";
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_DESCRIPTION = "description";
-    private static final String FIELD_STREAM_ID = "stream_id";
-    private static final String FIELD_OUTPUT_TARGET = "output_target";
+    static final String FIELD_STREAM_ID = "stream_id";
+    static final String FIELD_OUTPUT_TARGET = "output_target";
     private static final String FIELD_STATUS = "status";
     private static final String FIELD_RULE = "rule";
 

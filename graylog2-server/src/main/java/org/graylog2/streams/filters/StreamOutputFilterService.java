@@ -27,11 +27,15 @@ import org.graylog2.database.utils.MongoUtils;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedId;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
+import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_OUTPUT_TARGET;
+import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_STREAM_ID;
 
 public class StreamOutputFilterService {
     static final String COLLECTION = "stream_output_filters";
@@ -47,12 +51,28 @@ public class StreamOutputFilterService {
         this.utils = mongoCollections.utils(collection);
     }
 
-    public PaginatedList<StreamOutputFilterRuleDTO> findPaginated(Bson query,
-                                                                  Bson sort,
-                                                                  int perPage,
-                                                                  int page,
-                                                                  Predicate<String> permissionSelector) {
-        return paginationHelper.filter(query)
+    public PaginatedList<StreamOutputFilterRuleDTO> findPaginatedForStream(
+            String streamId,
+            Bson sort,
+            int perPage,
+            int page,
+            Predicate<String> permissionSelector
+    ) {
+        return paginationHelper.filter(eq(FIELD_STREAM_ID, streamId))
+                .sort(sort)
+                .perPage(perPage)
+                .page(page, dto -> permissionSelector.test(dto.id()));
+    }
+
+    public PaginatedList<StreamOutputFilterRuleDTO> findPaginatedForStreamAndTarget(
+            String streamId,
+            String targetId,
+            Bson sort,
+            int perPage,
+            int page,
+            Predicate<String> permissionSelector
+    ) {
+        return paginationHelper.filter(and(eq(FIELD_STREAM_ID, streamId), eq(FIELD_OUTPUT_TARGET, targetId)))
                 .sort(sort)
                 .perPage(perPage)
                 .page(page, dto -> permissionSelector.test(dto.id()));
