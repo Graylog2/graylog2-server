@@ -269,8 +269,6 @@ public abstract class CmdLineTool implements CliCommand {
 
         coreConfigInjector = setupCoreConfigInjector();
 
-        processConfiguration(jadConfig);
-
         if (isDumpConfig()) {
             dumpCurrentConfigAndExit();
         }
@@ -421,7 +419,7 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected void processConfiguration(JadConfig jadConfig) {
         try {
-            jadConfig.process();
+            jadConfig.processFailingLazily();
         } catch (RepositoryException e) {
             LOG.error("Couldn't load configuration: {}", e.getMessage());
             System.exit(1);

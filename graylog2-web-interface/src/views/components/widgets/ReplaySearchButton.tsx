@@ -35,6 +35,10 @@ const NeutralLink = styled.a`
   align-items: center;
   color: inherit;
   text-decoration: none;
+  
+  &:hover {
+    text-decoration: none;
+  }
 
   &:visited {
     color: inherit;

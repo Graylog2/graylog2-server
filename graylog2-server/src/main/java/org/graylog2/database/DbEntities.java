@@ -14,20 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { css } from 'styled-components';
+package org.graylog2.database;
 
-const TableHeaderCell = styled.th<{ $isNumeric?: boolean, $borderedHeader?: boolean }>(({ $isNumeric, $borderedHeader, theme }) => css`
-  && {
-    background-color: ${theme.colors.table.head.background};
-    min-width: 50px;
-    border: ${$borderedHeader ? `1px solid ${theme.colors.table.row.backgroundStriped}` : '0'};
-    padding: 0 5px;
-    vertical-align: middle;
-    white-space: nowrap;
-    font-weight: normal;
-    font-size: ${theme.fonts.size.small};
-    ${$isNumeric ? 'text-align: right' : ''}
-  }
-`);
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-export default TableHeaderCell;
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface DbEntities {
+    DbEntity[] value();
+}
