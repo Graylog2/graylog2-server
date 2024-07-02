@@ -16,17 +16,22 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.bson.Document;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
-import org.graylog2.cluster.certificates.CertificatesService;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +46,7 @@ import java.security.UnrecoverableKeyException;
 import java.util.Base64;
 import java.util.Optional;
 
+import static com.mongodb.client.model.Filters.eq;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 /**
@@ -51,19 +57,27 @@ import static org.graylog.security.certutil.CertConstants.PKCS12;
 public class LegacyDatanodeKeystoreProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(LegacyDatanodeKeystoreProvider.class);
+    public static final String LEGACY_COLLECTION_NAME = "data_node_certificates";
 
-    private final CertificatesService certificatesService;
     private final NodeId nodeId;
     private final String passwordSecret;
 
     private final DatanodeDirectories datanodeDirectories;
 
+
+    private static final String ENCRYPTED_VALUE_SUBFIELD = "encrypted_value";
+    private static final String SALT_SUBFIELD = "salt";
+
+    private final MongoDatabase mongoDatabase;
+    private final EncryptedValueService encryptionService;
+
     @Inject
-    public LegacyDatanodeKeystoreProvider(CertificatesService certificatesService, NodeId nodeId, final @Named("password_secret") String passwordSecret, DatanodeConfiguration datanodeConfiguration) {
-        this.certificatesService = certificatesService;
+    public LegacyDatanodeKeystoreProvider(NodeId nodeId, final @Named("password_secret") String passwordSecret, DatanodeConfiguration datanodeConfiguration, final MongoConnection mongoConnection, EncryptedValueService encryptionService) {
         this.nodeId = nodeId;
         this.passwordSecret = passwordSecret;
         this.datanodeDirectories = datanodeConfiguration.datanodeDirectories();
+        this.mongoDatabase = mongoConnection.getMongoDatabase();
+        this.encryptionService = encryptionService;
     }
 
     public Optional<KeyStore> get() throws KeyStoreStorageException {
@@ -99,8 +113,29 @@ public class LegacyDatanodeKeystoreProvider {
     }
 
     private Optional<String> readEncodedCertFromDatabase() {
-        KeystoreMongoLocation location = KeystoreMongoLocation.datanode(nodeId);
-        return certificatesService.readCert(location);
+        MongoCollection<Document> dbCollection = mongoDatabase.getCollection(LEGACY_COLLECTION_NAME);
+        final FindIterable<Document> objects = dbCollection.find(
+                eq(
+                        "node_id",
+                        nodeId.getNodeId()
+                )
+        );
+        final Document nodeCertificate = objects.first();
+
+        if (nodeCertificate != null) {
+            final Document encryptedCertificateDocument = nodeCertificate.get("encrypted_certificate_keystore", Document.class);
+            if (encryptedCertificateDocument != null) {
+                final EncryptedValue encryptedCertificate = EncryptedValue.builder()
+                        .value(encryptedCertificateDocument.getString(ENCRYPTED_VALUE_SUBFIELD))
+                        .salt(encryptedCertificateDocument.getString(SALT_SUBFIELD))
+                        .isDeleteValue(false)
+                        .isKeepValue(false)
+                        .build();
+
+                return Optional.ofNullable(encryptionService.decrypt(encryptedCertificate));
+            }
+        }
+        return Optional.empty();
     }
 
     public void deleteLocalPrivateKey() {

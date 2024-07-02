@@ -14,14 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.dbcatalog.impl;
+import * as React from 'react';
+import { RingProgress as MantineRingProgress } from '@mantine/core';
+import styled from 'styled-components';
 
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.shared.plugins.ChainingClassLoader;
+const LabelContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
-public interface DbEntitiesScanningMethod {
+type Props = Pick<React.ComponentProps<typeof MantineRingProgress>, 'label' | 'size' | 'thickness' | 'sections'>;
 
-    DbEntitiesCatalog scan(final String[] packagesToScan,
-                           final String[] packagesToExclude,
-                           final ChainingClassLoader chainingClassLoader);
-}
+const RingProgress = ({ label, ...props }: Props) => (
+  <MantineRingProgress roundCaps label={<LabelContainer>{label}</LabelContainer>} {...props} />
+);
+
+export default RingProgress;
