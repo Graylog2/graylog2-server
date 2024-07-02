@@ -122,6 +122,24 @@ class StreamOutputFilterServiceTest {
     }
 
     @Test
+    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
     void update() {
+        final var optionalDto = service.findById("54e3deadbeefdeadbeef0000");
+
+        assertThat(optionalDto).isPresent().get().satisfies(d -> {
+            assertThat(d.title()).isEqualTo("Test Filter 1");
+        });
+
+        final var dto = optionalDto.get();
+
+        final var updatedDto = service.update(dto.toBuilder().title("Changed title").build());
+        final var reloadedUpdatedDto =  service.findById("54e3deadbeefdeadbeef0000");
+
+        assertThat(updatedDto).satisfies(d -> {
+            assertThat(d.title()).isEqualTo("Changed title");
+        });
+        assertThat(reloadedUpdatedDto).get().satisfies(d -> {
+            assertThat(d.title()).isEqualTo("Changed title");
+        });
     }
 }

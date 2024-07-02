@@ -76,6 +76,8 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
     @JsonProperty(FIELD_RULE)
     public abstract RuleBuilder rule();
 
+    public abstract Builder toBuilder();
+
     public static Builder builder() {
         return Builder.create();
     }
