@@ -19,6 +19,7 @@ package org.graylog.testing.mongodb;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog2.database.MongoCollections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,11 @@ class MongoDBExtensionTest {
         @Test
         void withoutFixtures(MongoDBTestService mongodb) {
             assertThat(mongodb.mongoDatabase().listCollections()).isEmpty();
+        }
+
+        @Test
+        void withMongoCollectionsInjection(MongoCollections collections) {
+            assertThat(collections).isInstanceOf(MongoCollections.class);
         }
     }
 
@@ -72,6 +78,11 @@ class MongoDBExtensionTest {
         @Test
         void withoutFixtures(MongoDBTestService mongodb) {
             assertThat(mongodb.mongoDatabase().listCollections()).isEmpty();
+        }
+
+        @Test
+        void withMongoCollectionsInjection(MongoCollections collections) {
+            assertThat(collections).isInstanceOf(MongoCollections.class);
         }
     }
 
