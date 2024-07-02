@@ -62,7 +62,7 @@ public class Periodicals {
                 t.start();
             }
         } else {
-            LOG.info(
+            LOG.debug(
                     "Starting [{}] periodical in [{}s], polling every [{}s].",
                     periodical.getClass().getCanonicalName(),
                     periodical.getInitialDelaySeconds(),
