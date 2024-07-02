@@ -16,12 +16,14 @@
  */
 package org.graylog2.rest.resources.streams.outputs.filters;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.mongodb.client.model.Sorts;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -35,9 +37,14 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.rest.PaginationParameters;
+import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.filters.StreamOutputFilterRuleDTO;
 import org.graylog2.streams.filters.StreamOutputFilterService;
+
+import java.util.Map;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -57,12 +64,22 @@ public class StreamOutputFiltersResource extends RestResource {
     @GET
     @Path("/filters")
     @ApiOperation(value = "Get available filter rules for stream")
-    public Response getPaginatedFilters(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId) {
+    public PaginatedResponse<StreamOutputFilterRuleDTO> getPaginatedFilters(
+            @ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
+            @ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParams
+    ) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        // TODO: Check for each filter instance!
-        checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_READ, streamId);
 
-        return Response.ok().build();
+        final var paginatedList = filterService.findPaginatedForStream(
+                streamId,
+                paginationParams.getQuery(),
+                Sorts.ascending(StreamOutputFilterRuleDTO.FIELD_TITLE),
+                paginationParams.getPerPage(),
+                paginationParams.getPage(),
+                dtoId -> isPermitted(RestPermissions.STREAM_OUTPUT_FILTERS_READ, dtoId)
+        );
+
+        return PaginatedResponse.create("elements", paginatedList, paginationParams.getQuery());
     }
 
     @GET
@@ -93,11 +110,11 @@ public class StreamOutputFiltersResource extends RestResource {
     @ApiOperation(value = "Create new filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_FILTER_CREATE)
     public Response createFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-                                 @ApiParam(name = "JSON body", required = true) JsonNode body) {
+                                 @ApiParam(name = "JSON body", required = true) @Valid StreamOutputFilterRuleDTO dto) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_CREATE);
 
-        return Response.ok().build();
+        return Response.ok(wrapDto(filterService.create(dto))).build();
     }
 
     @PUT
@@ -121,6 +138,10 @@ public class StreamOutputFiltersResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_DELETE, filterId);
 
-        return Response.ok().build();
+        return Response.ok(wrapDto(filterService.delete(filterId))).build();
+    }
+
+    private Map<String, StreamOutputFilterRuleDTO> wrapDto(StreamOutputFilterRuleDTO dto) {
+        return Map.of("filter", dto);
     }
 }
