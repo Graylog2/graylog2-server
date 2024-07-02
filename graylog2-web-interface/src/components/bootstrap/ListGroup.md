@@ -1,6 +1,6 @@
 ### Normal List
 ```js
-import { ListGroup } from 'components/bootstrap';
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 <ListGroup>
   <ListGroupItem>Item 1</ListGroupItem>
@@ -11,7 +11,7 @@ import { ListGroup } from 'components/bootstrap';
 
 ### Linked Items
 ```js
-import { ListGroup } from 'components/bootstrap';
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 <ListGroup>
   <ListGroupItem href="#">Link 1</ListGroupItem>
@@ -22,7 +22,7 @@ import { ListGroup } from 'components/bootstrap';
 
 ### Stateful Items
 ```js
-import { ListGroup } from 'components/bootstrap';
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 <ListGroup>
   <ListGroupItem href="#" active>Link 1</ListGroupItem>
@@ -33,7 +33,7 @@ import { ListGroup } from 'components/bootstrap';
 
 ### Variant Items
 ```js
-import { ListGroup } from 'components/bootstrap';
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
 const styles = ['Danger', 'Warning', 'Success', 'Info'];
 
 <ListGroup componentClass="ol">
@@ -45,7 +45,7 @@ const styles = ['Danger', 'Warning', 'Success', 'Info'];
 
 ### w/ Headers
 ```js
-import { ListGroup } from 'components/bootstrap';
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 <ListGroup>
   <ListGroupItem header="Heading 1">Some body text</ListGroupItem>

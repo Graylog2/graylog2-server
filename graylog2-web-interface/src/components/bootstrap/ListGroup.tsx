@@ -15,18 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroup as BootstrapListGroup } from 'react-bootstrap';
 
-const ListGroup = ({ className, ...props }) => <BootstrapListGroup bsClass={className} {...props} />;
+type Props = React.PropsWithChildren<{
+  className?: string,
+  componentClass?: React.ElementType | undefined
+}>
 
-ListGroup.propTypes = {
-  className: PropTypes.string,
-};
+const ListGroup = ({ className, children, ...props }: Props) => <BootstrapListGroup bsClass={className} {...props}>{children}</BootstrapListGroup>;
 
 ListGroup.defaultProps = {
   className: undefined,
+  componentClass: undefined,
 };
 
 /** @component */
