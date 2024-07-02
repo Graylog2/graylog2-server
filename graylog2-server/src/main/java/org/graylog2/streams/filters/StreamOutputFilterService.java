@@ -121,4 +121,13 @@ public class StreamOutputFilterService {
         return utils.getById(dto.id())
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't find updated document: %s", dto)));
     }
+
+    public StreamOutputFilterRuleDTO delete(String id) {
+        final var dto = utils.getById(id)
+                .orElseThrow(() -> new IllegalArgumentException(f("Couldn't find document with ID <%s> for deletion", id)));
+
+        collection.deleteOne(idEq(id));
+
+        return dto;
+    }
 }

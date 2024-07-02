@@ -167,4 +167,25 @@ class StreamOutputFilterServiceTest {
             assertThat(d.title()).isEqualTo("Changed title");
         });
     }
+
+    @Test
+    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    void delete() {
+        final var optionalDto = service.findById("54e3deadbeefdeadbeef0000");
+
+        assertThat(optionalDto).isPresent();
+
+        final var deletedDto = service.delete("54e3deadbeefdeadbeef0000");
+
+        assertThat(deletedDto.id()).isEqualTo("54e3deadbeefdeadbeef0000");
+
+        assertThat(service.findById("54e3deadbeefdeadbeef0000")).isNotPresent();
+    }
+
+    @Test
+    void deleteWithInvalidID() {
+        assertThatThrownBy(() -> service.delete("54e3deadbeefdeadbeef9999"))
+                .hasMessageContaining("54e3deadbeefdeadbeef9999")
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
