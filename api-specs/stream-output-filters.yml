@@ -54,6 +54,42 @@ paths:
                   filter:
                     $ref: "#/components/schemas/StreamOutputFilterRule"
 
+  /streams/{streamId}/outputs/target/{targetId}/filters:
+    parameters:
+      - in: "path"
+        name: "streamId"
+        description: "The stream ID"
+        schema:
+          type: "string"
+        required: true
+      - in: "path"
+        name: "targetId"
+        description: "The target ID"
+        schema:
+          type: "string"
+        required: true
+
+    get:
+      summary: "Get available filters for stream and target"
+      parameters:
+        - $ref: "#/components/parameters/query"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+      responses:
+        200:
+          description: "Available filters"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginationInfo"
+                  - type: "object"
+                    properties:
+                      elements:
+                        $ref: "#/components/schemas/StreamOutputFilterRule"
+
   /streams/{streamId}/outputs/filters/{filterId}:
     parameters:
       - in: "path"

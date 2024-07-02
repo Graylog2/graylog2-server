@@ -37,20 +37,25 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.filters.StreamOutputFilterService;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Api(value = "Stream/Outputs/Filters", description = "Manage stream output filter rules", tags = {CLOUD_VISIBLE})
-@Path("/streams/{streamId}/outputs/filters")
+@Path("/streams/{streamId}/outputs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class StreamOutputFiltersResource extends RestResource {
+    private final StreamOutputFilterService filterService;
+
     @Inject
-    public StreamOutputFiltersResource() {
+    public StreamOutputFiltersResource(StreamOutputFilterService filterService) {
+        this.filterService = filterService;
     }
 
     @GET
+    @Path("/filters")
     @ApiOperation(value = "Get available filter rules for stream")
     public Response getPaginatedFilters(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
@@ -61,7 +66,19 @@ public class StreamOutputFiltersResource extends RestResource {
     }
 
     @GET
-    @Path("/{filterId}")
+    @Path("/target/{targetId}/filters")
+    @ApiOperation(value = "Get available filter rules for stream")
+    public Response getPaginatedFiltersForTarget(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
+                                                 @ApiParam(name = "targetId", required = true) @PathParam("targetId") @NotBlank String targetId) {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+        // TODO: Check for each filter instance!
+        checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_READ, streamId);
+
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/filters/{filterId}")
     @ApiOperation(value = "Get filter rule for given ID")
     public Response getFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
                               @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
@@ -72,6 +89,7 @@ public class StreamOutputFiltersResource extends RestResource {
     }
 
     @POST
+    @Path("/filters")
     @ApiOperation(value = "Create new filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_FILTER_CREATE)
     public Response createFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
@@ -83,7 +101,7 @@ public class StreamOutputFiltersResource extends RestResource {
     }
 
     @PUT
-    @Path("/{filterId}")
+    @Path("/filters/{filterId}")
     @ApiOperation(value = "Update filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_FILTER_UPDATE)
     public Response updateFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
@@ -95,7 +113,7 @@ public class StreamOutputFiltersResource extends RestResource {
     }
 
     @DELETE
-    @Path("/{filterId}")
+    @Path("/filters/{filterId}")
     @ApiOperation(value = "Delete filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_FILTER_DELETE)
     public Response deleteFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
