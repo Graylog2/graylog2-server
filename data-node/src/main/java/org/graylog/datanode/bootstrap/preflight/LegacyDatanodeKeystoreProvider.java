@@ -58,6 +58,7 @@ public class LegacyDatanodeKeystoreProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(LegacyDatanodeKeystoreProvider.class);
     public static final String LEGACY_COLLECTION_NAME = "data_node_certificates";
+    public static final String ENCRYPTED_CERTIFICATE_FIELD = "encrypted_certificate_keystore";
 
     private final NodeId nodeId;
     private final String passwordSecret;
@@ -123,7 +124,7 @@ public class LegacyDatanodeKeystoreProvider {
         final Document nodeCertificate = objects.first();
 
         if (nodeCertificate != null) {
-            final Document encryptedCertificateDocument = nodeCertificate.get("encrypted_certificate_keystore", Document.class);
+            final Document encryptedCertificateDocument = nodeCertificate.get(ENCRYPTED_CERTIFICATE_FIELD, Document.class);
             if (encryptedCertificateDocument != null) {
                 final EncryptedValue encryptedCertificate = EncryptedValue.builder()
                         .value(encryptedCertificateDocument.getString(ENCRYPTED_VALUE_SUBFIELD))

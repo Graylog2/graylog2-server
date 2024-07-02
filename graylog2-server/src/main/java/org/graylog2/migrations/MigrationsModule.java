@@ -70,5 +70,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20230904073300_MigrateThemePreferences.class);
         addMigration(V20240312140000_RemoveFieldTypeMappingsManagerRole.class);
         addMigration(V202404170856_UpdateIndexSetTemplates.class);
+        addMigration(V202406260800_MigrateCertificateAuthority.class);
     }
 }

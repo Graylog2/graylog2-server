@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class PemCaReader {
-    private List<Object> readPemObjects(PEMParser pemParser) throws IOException {
+    private static List<Object> readPemObjects(PEMParser pemParser) throws IOException {
         final var results = new ArrayList<>();
         while (true) {
             final var pemObject = pemParser.readObject();
@@ -53,7 +53,7 @@ public class PemCaReader {
     public record CA(List<Certificate> certificates, PrivateKey privateKey) {}
 
     // TODO: secure against errors, tests
-    public CA readCA(final String pemFileContent, final String keyPassword) throws CACreationException {
+    public static CA readCA(final String pemFileContent, final String keyPassword) throws CACreationException {
         try (var bundleReader = new StringReader(pemFileContent)) {
             PEMParser pemParser = new PEMParser(bundleReader);
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");

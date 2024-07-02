@@ -42,17 +42,19 @@ public class CaTruststoreImpl implements CaTruststore {
      * This service should be replaced by cluster config service!
      * @deprecated
      */
-    private final CaService caService;
+    private final CaPersistenceService caPersistenceService;
 
     @Inject
-    public CaTruststoreImpl(CaService caService) {
+    public CaTruststoreImpl(CaPersistenceService caPersistenceService) {
 
-        this.caService = caService;
+        this.caPersistenceService = caPersistenceService;
     }
 
     public Optional<KeyStore> getTrustStore() throws CaTruststoreException {
         try {
-            return caService.loadKeyStore().map(CaTruststoreImpl::filterOutPrivateKey);
+            return caPersistenceService.loadKeyStore()
+                    .map(CaKeystoreWithPassword::keyStore)
+                    .map(CaTruststoreImpl::filterOutPrivateKey);
         } catch (KeyStoreStorageException e) {
             throw new CaTruststoreException(e);
         }

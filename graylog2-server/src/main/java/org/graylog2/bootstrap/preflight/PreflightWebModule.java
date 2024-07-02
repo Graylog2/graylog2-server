@@ -74,7 +74,6 @@ public class PreflightWebModule extends Graylog2Module {
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(new TypeLiteral<NodeService<ServerNodeDto>>() {}).to(ServerNodeClusterService.class);
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
-        bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class);
 
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(PreflightBoot.class).asEagerSingleton();
@@ -101,14 +100,6 @@ public class PreflightWebModule extends Graylog2Module {
         bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
 
         migrationsBinder().addBinding().to(V20230929142900_CreateInitialPreflightPassword.class);
-
-        // needed for the ObjectMapperModule
-        MapBinder.newMapBinder(binder(),
-                TypeLiteral.get(String.class),
-                new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
-                });
-
-
     }
 
     protected void addPreflightRestResource(Class<?> restResourceClass) {

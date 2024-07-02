@@ -33,8 +33,6 @@ import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollection;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -104,16 +102,14 @@ class LegacyDatanodeKeystoreProviderTest {
     }
 
     private static void writeCertToMongo(MongoDatabase mongoDatabase, SimpleNodeId nodeId, String keystoreStringRepresentation, EncryptedValueService encryptionService) {
-        final KeystoreMongoLocation keystoreMongoLocation = KeystoreMongoLocation.datanode(nodeId);
-        final KeystoreMongoCollection collection = keystoreMongoLocation.collection();
-        MongoCollection<Document> dbCollection = mongoDatabase.getCollection(collection.collectionName());
+        MongoCollection<Document> dbCollection = mongoDatabase.getCollection(LegacyDatanodeKeystoreProvider.LEGACY_COLLECTION_NAME);
         final EncryptedValue encrypted = encryptionService.encrypt(keystoreStringRepresentation);
         dbCollection.updateOne(
-                eq(collection.identifierField(), keystoreMongoLocation.nodeId()),
+                eq("node_id", nodeId.getNodeId()),
                 combine(
-                        set(collection.identifierField(), keystoreMongoLocation.nodeId()),
-                        set(collection.encryptedCertificateField() + ".encrypted_value", encrypted.value()),
-                        set(collection.encryptedCertificateField() + ".salt", encrypted.salt())
+                        set("node_id", nodeId.getNodeId()),
+                        set(LegacyDatanodeKeystoreProvider.ENCRYPTED_CERTIFICATE_FIELD + ".encrypted_value", encrypted.value()),
+                        set(LegacyDatanodeKeystoreProvider.ENCRYPTED_CERTIFICATE_FIELD + ".salt", encrypted.salt())
                 ),
                 new UpdateOptions().upsert(true)
         );
