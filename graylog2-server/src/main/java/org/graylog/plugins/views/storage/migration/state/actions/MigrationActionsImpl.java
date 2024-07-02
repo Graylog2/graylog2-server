@@ -249,8 +249,9 @@ public class MigrationActionsImpl implements MigrationActions {
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
         final List<String> indices = getStateMachineContext().getActionArgumentOpt("indices", List.class).orElse(Collections.emptyList()); // todo: generics!
+        final boolean trustUnknownCerts = getStateMachineContext().getActionArgumentOpt("trust_unknown_certs", Boolean.class).orElse(false);
         final int threadsCount = getStateMachineContext().getActionArgumentOpt("threads", Integer.class).orElse(4);
-        final String migrationID = migrationService.start(new RemoteReindexRequest(allowlist, hostname, user, password, indices, threadsCount));
+        final String migrationID = migrationService.start(new RemoteReindexRequest(allowlist, hostname, user, password, indices, threadsCount, trustUnknownCerts));
         getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, migrationID);
     }
 
@@ -276,7 +277,8 @@ public class MigrationActionsImpl implements MigrationActions {
         final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
-        getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password));
+        final boolean trustUnknownCerts = getStateMachineContext().getActionArgumentOpt("trust_unknown_certs", Boolean.class).orElse(false);
+        getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password, trustUnknownCerts));
     }
 
     @Override

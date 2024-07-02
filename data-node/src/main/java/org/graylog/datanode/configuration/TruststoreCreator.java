@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.configuration;
 
+import jakarta.annotation.Nonnull;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.slf4j.Logger;
@@ -28,10 +29,13 @@ import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TruststoreCreator {
@@ -51,7 +55,22 @@ public class TruststoreCreator {
         return this;
     }
 
+    public TruststoreCreator addCertificates(List<X509Certificate> trustedCertificates) {
+        trustedCertificates.forEach(cert -> rootCertificates.put(cert.getSubjectX500Principal().getName(), cert));
+        return this;
+    }
+
     public FilesystemKeystoreInformation persist(final Path truststorePath, final char[] truststorePassword) throws IOException, GeneralSecurityException {
+        final KeyStore trustStore = createTruststore();
+
+        try (final FileOutputStream fileOutputStream = new FileOutputStream(truststorePath.toFile())) {
+            trustStore.store(fileOutputStream, truststorePassword);
+        }
+        return new FilesystemKeystoreInformation(truststorePath, truststorePassword);
+    }
+
+    @Nonnull
+    public KeyStore createTruststore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore trustStore = KeyStore.getInstance(CertConstants.PKCS12);
         trustStore.load(null, null);
 
@@ -59,11 +78,7 @@ public class TruststoreCreator {
             LOG.info("Adding certificate {} to the truststore", cert.getKey());
             trustStore.setCertificateEntry(cert.getKey(), cert.getValue());
         }
-
-        try (final FileOutputStream fileOutputStream = new FileOutputStream(truststorePath.toFile())) {
-            trustStore.store(fileOutputStream, truststorePassword);
-        }
-        return new FilesystemKeystoreInformation(truststorePath, truststorePassword);
+        return trustStore;
     }
 
 

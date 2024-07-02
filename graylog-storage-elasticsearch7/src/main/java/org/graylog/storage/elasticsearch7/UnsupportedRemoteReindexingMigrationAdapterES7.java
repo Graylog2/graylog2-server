@@ -38,7 +38,7 @@ public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteRei
     }
 
     @Override
-    public IndexerConnectionCheckResult checkConnection(URI uri, String username, String password) {
+    public IndexerConnectionCheckResult checkConnection(URI uri, String username, String password, boolean trustUnknownCerts) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 }

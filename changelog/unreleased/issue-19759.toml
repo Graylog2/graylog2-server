@@ -1,0 +1,5 @@
+type="f"
+message="Add support for unknown certificate authorities during the remote reindex migration to the datanode"
+
+issues=["19759"]
+pulls=["19775"]

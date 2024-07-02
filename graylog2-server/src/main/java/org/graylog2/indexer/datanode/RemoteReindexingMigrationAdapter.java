@@ -34,5 +34,5 @@ public interface RemoteReindexingMigrationAdapter {
 
     RemoteReindexMigration status(@NotNull String migrationID);
 
-    IndexerConnectionCheckResult checkConnection(final URI uri, final String username, final String password);
+    IndexerConnectionCheckResult checkConnection(final URI uri, final String username, final String password, boolean trustUnknownCerts);
 }

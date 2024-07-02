@@ -23,7 +23,6 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -67,6 +66,8 @@ import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.indexer.migration.TaskStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.security.TrustAllX509TrustManager;
+import org.graylog2.security.untrusted.UntrustedCertificateExtractor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -74,12 +75,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -137,7 +144,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private List<String> collectIndices(RemoteReindexRequest request) {
         try {
-            return isAllIndices(request.indices()) ? getAllIndicesFrom(request.uri(), request.username(), request.password()) : request.indices();
+            return isAllIndices(request.indices()) ? getAllIndicesFrom(request.uri(), request.username(), request.password(), request.trustUnknownCerts()) : request.indices();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -171,8 +178,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         if (!isRemoteReindexAllowed(allowlist)) {
             // this is expected state for fresh datanode cluster - there is no value configured in the reindex.remote.allowlist
             // we have to add it to the configuration and wait till the whole cluster restarts
-            logInfo(migration, "Preparing cluster for remote reindexing, setting allowlist to: " + req);
-            allowReindexingFrom(allowlist);
+            logInfo(migration, "Preparing cluster for remote reindexing, setting allowlist to: " + req.allowlist());
+            allowReindexing(allowlist, req, migration);
             waitForClusterRestart(allowlist, migration);
         } else {
             logInfo(migration, "Remote reindex allowlist already configured, skipping cluster configuration and restart.");
@@ -259,9 +266,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     @Override
-    public IndexerConnectionCheckResult checkConnection(URI uri, String username, String password) {
+    public IndexerConnectionCheckResult checkConnection(URI uri, String username, String password, boolean trustUnknownCerts) {
         try {
-            final List<String> discoveredIndices = getAllIndicesFrom(uri, username, password);
+            final List<String> discoveredIndices = getAllIndicesFrom(uri, username, password, trustUnknownCerts);
             return IndexerConnectionCheckResult.success(discoveredIndices);
         } catch (Exception e) {
             return IndexerConnectionCheckResult.failure(e);
@@ -326,14 +333,33 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    void allowReindexingFrom(final List<String> allowlist) {
-        eventBus.post(new RemoteReindexAllowlistEvent(allowlist, RemoteReindexAllowlistEvent.ACTION.ADD));
+    void allowReindexing(List<String> allowlist, final RemoteReindexRequest request, MigrationConfiguration migration) {
+        if (request.trustUnknownCerts()) {
+            try {
+                final String host = request.uri().toURL().toString();
+                final List<X509Certificate> untrustedCerts = extractHostCertificates(host, migration);
+                eventBus.post(RemoteReindexAllowlistEvent.add(allowlist, untrustedCerts));
+            } catch (NoSuchAlgorithmException | IOException | KeyManagementException e) {
+                throw new RuntimeException("Failed to extract trusted certificates", e);
+            }
+        } else {
+            eventBus.post(RemoteReindexAllowlistEvent.add(allowlist));
+        }
     }
 
-    List<String> getAllIndicesFrom(final URI uri, final String username, final String password) throws MalformedURLException {
+    @Nonnull
+    private List<X509Certificate> extractHostCertificates(String host, MigrationConfiguration migration) throws NoSuchAlgorithmException, IOException, KeyManagementException {
+        logInfo(migration, "Extracting certificates of host " + host);
+        final UntrustedCertificateExtractor extractor = new UntrustedCertificateExtractor(httpClient);
+        final List<X509Certificate> untrustedCerts = extractor.extractUntrustedCerts(host);
+        logInfo(migration, "Found following certificates that will be added to truststore " + untrustedCerts.stream().map(c -> c.getSubjectX500Principal().getName()).toList());
+        return untrustedCerts;
+    }
+
+    List<String> getAllIndicesFrom(final URI uri, final String username, final String password, boolean trustUnknownCerts) throws MalformedURLException {
         final var host = uri.toURL().toString();
         var url = (host.endsWith("/") ? host : host + "/") + "_cat/indices?h=index";
-        try (var response = httpClient.newCall(new Request.Builder().url(url).header("Authorization", Credentials.basic(username, password)).build()).execute()) {
+        try (var response = getClient(trustUnknownCerts).newCall(new Request.Builder().url(url).header("Authorization", Credentials.basic(username, password)).build()).execute()) {
             if (response.isSuccessful() && response.body() != null) {
                 // filtering all indices that start with "." as they indicate a system index - we don't want to reindex those
                 return new BufferedReader(new StringReader(response.body().string())).lines().filter(i -> !i.startsWith(".")).sorted().toList();
@@ -342,6 +368,21 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not read list of indices from " + host + ", " + e.getMessage(), e);
+        }
+    }
+
+    private OkHttpClient getClient(boolean trustUnknownCerts) {
+        if (trustUnknownCerts) {
+            try {
+                final SSLContext ctx = SSLContext.getInstance("TLS");
+                final TrustAllX509TrustManager trustManager = new TrustAllX509TrustManager();
+                ctx.init(null, new TrustManager[]{trustManager}, new SecureRandom());
+                return httpClient.newBuilder().sslSocketFactory(ctx.getSocketFactory(), trustManager).build();
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return httpClient;
         }
     }
 

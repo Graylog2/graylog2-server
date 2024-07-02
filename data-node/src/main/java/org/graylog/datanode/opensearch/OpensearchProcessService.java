@@ -78,9 +78,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
         switch (event.action()) {
-            case ADD ->
-                    this.configurationProvider.setTransientConfiguration("reindex.remote.allowlist", event.allowlist());
-            case REMOVE -> this.configurationProvider.removeTransientConfiguration("reindex.remote.allowlist");
+            case ADD -> this.configurationProvider.setAllowlist(event.allowlist(), event.trustedCertificates());
+            case REMOVE -> this.configurationProvider.removeAllowlist();
         }
     }
 
