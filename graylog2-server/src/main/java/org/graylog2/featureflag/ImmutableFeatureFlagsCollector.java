@@ -32,8 +32,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-import static org.graylog2.bootstrap.CmdLineTool.GRAYLOG_ENVIRONMENT_VAR_PREFIX;
-import static org.graylog2.bootstrap.CmdLineTool.GRAYLOG_SYSTEM_PROP_PREFIX;
+import static org.graylog2.bootstrap.AbstractNodeBootstrap.GRAYLOG_ENVIRONMENT_VAR_PREFIX;
+import static org.graylog2.bootstrap.AbstractNodeBootstrap.GRAYLOG_SYSTEM_PROP_PREFIX;
 import static org.graylog2.featureflag.FeatureFlagStringUtil.startsWithIgnoreCase;
 import static org.graylog2.featureflag.FeatureFlagStringUtil.stringFormat;
 import static org.graylog2.featureflag.FeatureFlagStringUtil.toUpperCase;

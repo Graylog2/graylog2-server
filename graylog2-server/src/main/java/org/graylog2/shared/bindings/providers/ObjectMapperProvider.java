@@ -17,6 +17,7 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -79,14 +80,14 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                                 @JacksonSubTypes final Set<NamedType> subtypes,
                                 final EncryptedValueService encryptedValueService,
                                 final GRNRegistry grnRegistry,
-                                final InputConfigurationBeanDeserializerModifier inputConfigurationBeanDeserializerModifier) {
+                                BeanDeserializerModifier beanDeserializerModifier) {
         final ObjectMapper mapper = new ObjectMapper();
         this.objectMapper = ObjectMapperConfiguration.configureMapper(mapper,
                 classLoader,
                 subtypes,
                 encryptedValueService,
                 grnRegistry,
-                inputConfigurationBeanDeserializerModifier);
+                beanDeserializerModifier);
     }
 
     @Override

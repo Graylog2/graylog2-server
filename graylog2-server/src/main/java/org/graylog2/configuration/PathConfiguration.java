@@ -17,6 +17,7 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import org.graylog2.MinimalNodeConfiguration;
 import org.graylog2.configuration.converters.SortedPathSetConverter;
 
 import java.nio.file.Path;
@@ -25,7 +26,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
 
-public class PathConfiguration {
+public class PathConfiguration extends MinimalNodeConfiguration {
     public static final String ALLOWED_AUXILIARY_PATHS = "allowed_auxiliary_paths";
 
     protected static final Path DEFAULT_BIN_DIR = Paths.get("bin");

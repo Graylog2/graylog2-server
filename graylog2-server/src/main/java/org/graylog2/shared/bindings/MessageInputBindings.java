@@ -16,7 +16,10 @@
  */
 package org.graylog2.shared.bindings;
 
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
+import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.plugins.beats.BeatsInputPluginModule;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.inputs.gelf.amqp.GELFAMQPInput;
@@ -35,14 +38,23 @@ import org.graylog2.inputs.syslog.kafka.SyslogKafkaInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.inputs.transports.TransportsModule;
+import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.inputs.MessageInputFactory;
 
 public class MessageInputBindings extends Graylog2Module {
     @Override
     protected void configure() {
         install(new TransportsModule());
         install(new CodecsModule());
+        bind(MessageInputFactory.class).in(Scopes.SINGLETON);
+        bind(InputConfigurationBeanDeserializerModifier.class).in(Scopes.SINGLETON);
+
+        // Our inputs require a bean deserializer modifier to handle EncryptedValue config settings.
+        OptionalBinder.newOptionalBinder(binder(), BeanDeserializerModifier.class)
+                .setBinding()
+                .to(InputConfigurationBeanDeserializerModifier.class);
 
         final MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder = inputsMapBinder();
         // new style inputs, using transports and codecs

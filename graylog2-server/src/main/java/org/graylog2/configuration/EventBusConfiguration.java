@@ -14,17 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
+package org.graylog2.configuration;
 
-import jakarta.inject.Inject;
-import org.graylog2.Configuration;
-import org.graylog2.database.MongoConnection;
+import com.github.joschi.jadconfig.Parameter;
 
-public class ServerNodeClusterService extends AbstractNodeService<ServerNodeEntity, ServerNodeDto> {
+public class EventBusConfiguration {
+    
+    @Parameter(value = "async_eventbus_processors")
+    private final int asyncEventbusProcessors = 2;
 
-    @Inject
-    public ServerNodeClusterService(MongoConnection mongoConnection, Configuration configuration) {
-        super(mongoConnection, configuration, ServerNodeEntity.class);
+    public int getAsyncEventbusProcessors() {
+        return asyncEventbusProcessors;
     }
 
 }

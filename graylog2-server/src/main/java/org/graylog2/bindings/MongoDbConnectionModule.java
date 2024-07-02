@@ -14,17 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
+package org.graylog2.bindings;
 
-import jakarta.inject.Inject;
-import org.graylog2.Configuration;
+import com.google.inject.AbstractModule;
+import org.graylog2.bindings.providers.MongoConnectionProvider;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 
-public class ServerNodeClusterService extends AbstractNodeService<ServerNodeEntity, ServerNodeDto> {
-
-    @Inject
-    public ServerNodeClusterService(MongoConnection mongoConnection, Configuration configuration) {
-        super(mongoConnection, configuration, ServerNodeEntity.class);
+/**
+ * Provides a basic MongoDB connection ready to be used with mongojack
+ */
+public class MongoDbConnectionModule extends AbstractModule {
+    @Override
+    protected void configure() {
+        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
+        bind(MongoCollections.class).asEagerSingleton();
+        bind(MongoJackObjectMapperProvider.class);
     }
-
 }

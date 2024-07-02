@@ -17,9 +17,11 @@
 package org.graylog2.shared.bindings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.grn.GRNModule;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -51,5 +53,9 @@ public class ObjectMapperModule extends Graylog2Module {
         bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class).asEagerSingleton();
         bind(YAMLMapper.class).toProvider(YamlMapperProvider.class).asEagerSingleton();
         bind(XmlMapper.class).toProvider(XmlMapperProvider.class).asEagerSingleton();
+        OptionalBinder.newOptionalBinder(binder(), BeanDeserializerModifier.class)
+                .setDefault()
+                .toInstance(new BeanDeserializerModifier() {
+                });
     }
 }

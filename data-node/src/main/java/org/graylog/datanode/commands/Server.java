@@ -87,7 +87,7 @@ public class Server extends ServerBootstrap {
         modules.add(
                 new ConfigurationModule(configuration),
                 new MongoDBModule(),
-                new ServerBindings(configuration, isMigrationCommand()),
+                new ServerBindings(configuration, false),
                 new RestBindings(),
                 new DataNodeProvisioningBindings(),
                 new PeriodicalBindings(),

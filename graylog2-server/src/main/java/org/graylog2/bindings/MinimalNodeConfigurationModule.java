@@ -14,17 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
+package org.graylog2.bindings;
 
-import jakarta.inject.Inject;
-import org.graylog2.Configuration;
-import org.graylog2.database.MongoConnection;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import org.graylog2.MinimalNodeConfiguration;
 
-public class ServerNodeClusterService extends AbstractNodeService<ServerNodeEntity, ServerNodeDto> {
+import static java.util.Objects.requireNonNull;
 
-    @Inject
-    public ServerNodeClusterService(MongoConnection mongoConnection, Configuration configuration) {
-        super(mongoConnection, configuration, ServerNodeEntity.class);
+public class MinimalNodeConfigurationModule implements Module {
+    private final MinimalNodeConfiguration configuration;
+
+    public MinimalNodeConfigurationModule(MinimalNodeConfiguration configuration) {
+        this.configuration = requireNonNull(configuration);
     }
 
+    @Override
+    public void configure(Binder binder) {
+        binder.bind(MinimalNodeConfiguration.class).toInstance(configuration);
+    }
 }
