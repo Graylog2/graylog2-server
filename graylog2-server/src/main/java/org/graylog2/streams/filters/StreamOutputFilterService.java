@@ -16,6 +16,7 @@
  */
 package org.graylog2.streams.filters;
 
+import com.google.common.collect.ImmutableMap;
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
@@ -23,6 +24,8 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -34,11 +37,21 @@ import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedId;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
+import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_DESCRIPTION;
 import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_OUTPUT_TARGET;
+import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_STATUS;
 import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_STREAM_ID;
+import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_TITLE;
 
 public class StreamOutputFilterService {
     static final String COLLECTION = "stream_output_filters";
+
+    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(FIELD_TITLE, SearchQueryField.create(FIELD_TITLE))
+            .put(FIELD_DESCRIPTION, SearchQueryField.create(FIELD_DESCRIPTION))
+            .put(FIELD_OUTPUT_TARGET, SearchQueryField.create(FIELD_OUTPUT_TARGET))
+            .put(FIELD_STATUS, SearchQueryField.create(FIELD_STATUS))
+            .build();
 
     private final MongoCollection<StreamOutputFilterRuleDTO> collection;
     private final MongoPaginationHelper<StreamOutputFilterRuleDTO> paginationHelper;
@@ -51,14 +64,22 @@ public class StreamOutputFilterService {
         this.utils = mongoCollections.utils(collection);
     }
 
+    private Bson parseQuery(String queryString) {
+        final var queryParser = new SearchQueryParser(FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        return queryParser.parse(queryString).toBson();
+    }
+
     public PaginatedList<StreamOutputFilterRuleDTO> findPaginatedForStream(
             String streamId,
+            String queryString,
             Bson sort,
             int perPage,
             int page,
             Predicate<String> permissionSelector
     ) {
-        return paginationHelper.filter(eq(FIELD_STREAM_ID, streamId))
+        final var query = parseQuery(queryString);
+
+        return paginationHelper.filter(and(eq(FIELD_STREAM_ID, streamId), query))
                 .sort(sort)
                 .perPage(perPage)
                 .page(page, dto -> permissionSelector.test(dto.id()));
@@ -67,12 +88,15 @@ public class StreamOutputFilterService {
     public PaginatedList<StreamOutputFilterRuleDTO> findPaginatedForStreamAndTarget(
             String streamId,
             String targetId,
+            String queryString,
             Bson sort,
             int perPage,
             int page,
             Predicate<String> permissionSelector
     ) {
-        return paginationHelper.filter(and(eq(FIELD_STREAM_ID, streamId), eq(FIELD_OUTPUT_TARGET, targetId)))
+        final var query = parseQuery(queryString);
+
+        return paginationHelper.filter(and(eq(FIELD_STREAM_ID, streamId), eq(FIELD_OUTPUT_TARGET, targetId), query))
                 .sort(sort)
                 .perPage(perPage)
                 .page(page, dto -> permissionSelector.test(dto.id()));

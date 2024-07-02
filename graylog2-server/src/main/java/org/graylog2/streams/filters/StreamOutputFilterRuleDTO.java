@@ -47,11 +47,11 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
     }
 
     private static final String FIELD_ID = "id";
-    private static final String FIELD_TITLE = "title";
-    private static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_TITLE = "title";
+    static final String FIELD_DESCRIPTION = "description";
     static final String FIELD_STREAM_ID = "stream_id";
     static final String FIELD_OUTPUT_TARGET = "output_target";
-    private static final String FIELD_STATUS = "status";
+    static final String FIELD_STATUS = "status";
     private static final String FIELD_RULE = "rule";
 
     @JsonProperty(FIELD_TITLE)
@@ -70,7 +70,6 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
     public abstract String outputTarget();
 
     @JsonProperty(FIELD_STATUS)
-    @NotBlank
     public abstract Status status();
 
     @JsonProperty(FIELD_RULE)

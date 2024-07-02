@@ -16,7 +16,6 @@
  */
 package org.graylog2.streams.filters;
 
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
@@ -46,17 +45,35 @@ class StreamOutputFilterServiceTest {
     @Test
     @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
     void findPaginatedForStream() {
-        final var result = service.findPaginatedForStream("54e3deadbeefdeadbeef1000", Sorts.ascending("title"), 10, 1, id -> true);
+        final var result = service.findPaginatedForStream("54e3deadbeefdeadbeef1000", "", Sorts.ascending("title"), 10, 1, id -> true);
 
         assertThat(result.delegate()).hasSize(3);
     }
 
     @Test
     @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    void findPaginatedForStreamWithQuery() {
+        final var result = service.findPaginatedForStream("54e3deadbeefdeadbeef1000", "title:\"Test Filter 2\"", Sorts.ascending("title"), 10, 1, id -> true);
+
+        assertThat(result.delegate()).hasSize(1);
+        assertThat(result.delegate().get(0).title()).isEqualTo("Test Filter 2");
+    }
+
+    @Test
+    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
     void findPaginatedForStreamAndTarget() {
-        final var result = service.findPaginatedForStreamAndTarget("54e3deadbeefdeadbeef1000", "indexer", Sorts.ascending("title"), 10, 1, id -> true);
+        final var result = service.findPaginatedForStreamAndTarget("54e3deadbeefdeadbeef1000", "indexer", "", Sorts.ascending("title"), 10, 1, id -> true);
 
         assertThat(result.delegate()).hasSize(2);
+    }
+
+    @Test
+    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    void findPaginatedForStreamAndTargetWithQuery() {
+        final var result = service.findPaginatedForStreamAndTarget("54e3deadbeefdeadbeef1000", "indexer", "status:disabled", Sorts.ascending("title"), 10, 1, id -> true);
+
+        assertThat(result.delegate()).hasSize(1);
+        assertThat(result.delegate().get(0).status()).isEqualTo(StreamOutputFilterRuleDTO.Status.DISABLED);
     }
 
     @Test
@@ -141,7 +158,7 @@ class StreamOutputFilterServiceTest {
         final var dto = optionalDto.get();
 
         final var updatedDto = service.update(dto.toBuilder().title("Changed title").build());
-        final var reloadedUpdatedDto =  service.findById("54e3deadbeefdeadbeef0000");
+        final var reloadedUpdatedDto = service.findById("54e3deadbeefdeadbeef0000");
 
         assertThat(updatedDto).satisfies(d -> {
             assertThat(d.title()).isEqualTo("Changed title");
