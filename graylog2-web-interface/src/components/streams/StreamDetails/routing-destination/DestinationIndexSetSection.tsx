@@ -59,7 +59,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
                 {archivingEnabled ? 'enabled' : 'disabled'}
               </Badge>
             </td>
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+            {}
             <td>
               <ActionButtonsWrap className="align-right">
                 <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>

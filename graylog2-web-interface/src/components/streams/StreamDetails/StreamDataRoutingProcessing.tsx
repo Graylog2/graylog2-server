@@ -65,7 +65,7 @@ const StreamDataRoutingProcessing = () => {
                 <td>
                   {pipeline.title}
                 </td>
-                {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                {}
                 <td>
                   <ActionButtonsWrap className="align-right">
                     <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
