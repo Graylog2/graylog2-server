@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.Locale;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
@@ -95,6 +96,6 @@ public class CertutilTruststore implements CliCommand {
     }
 
     private static String certificateInfo(X509Certificate cert) {
-        return String.format("Subject: %s, issuer: %s, not before: %s, not after: %s", cert.getSubjectX500Principal(), cert.getIssuerX500Principal(), cert.getNotBefore(), cert.getNotAfter());
+        return String.format(Locale.ROOT, "Subject: %s, issuer: %s, not before: %s, not after: %s", cert.getSubjectX500Principal(), cert.getIssuerX500Principal(), cert.getNotBefore(), cert.getNotAfter());
     }
 }
