@@ -23,7 +23,6 @@ import asMock from 'helpers/mocking/AsMock';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
 import generateId from 'logic/generateId';
 
-const mockedOpen = jest.fn();
 jest.mock('views/logic/valueactions/createEventDefinition/hooks/useModalReducer', () => jest.fn());
 jest.mock('logic/generateId');
 
@@ -56,17 +55,6 @@ const renderWithAllChecked = () => renderCreateDefinitionModal({
 const mockedDispatch = jest.fn();
 
 describe('CreateEventDefinitionModal', () => {
-  let originalWindowOpen;
-
-  beforeAll(() => {
-    originalWindowOpen = window.open;
-    window.open = mockedOpen;
-  });
-
-  afterAll(() => {
-    window.open = originalWindowOpen;
-  });
-
   it('shows strategies and show details button', async () => {
     asMock(useModalReducer).mockReturnValue([
       {
@@ -273,11 +261,12 @@ describe('CreateEventDefinitionModal', () => {
 
     renderWithAllChecked();
 
-    const linkButton = await screen.findByText('Continue configuration');
+    const linkButton = await screen.findByRole<HTMLAnchorElement>('link', {
+      name: /continue configuration/i,
+      hidden: true,
+    });
 
-    fireEvent.click(linkButton);
-
-    expect(mockedOpen).toHaveBeenCalledWith('/alerts/definitions/new?step=condition&session-id=cedfv-session-id', '_blank');
+    expect(linkButton.href).toContain('/alerts/definitions/new?step=condition&session-id=cedfv-session-id');
   });
 
   it('takes strategy from hook', () => {
