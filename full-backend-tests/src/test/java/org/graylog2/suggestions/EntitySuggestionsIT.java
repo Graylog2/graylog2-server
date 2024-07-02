@@ -17,8 +17,8 @@
 package org.graylog2.suggestions;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -31,7 +31,7 @@ public class EntitySuggestionsIT {
         this.api = api;
     }
 
-    @Test
+    @ContainerMatrixTest
     void returnsTitlesForDashboards() {
         final var dashboard1 = api.dashboards().createDashboard("Test");
         final var dashboard2 = api.dashboards().createDashboard("Test 2");
@@ -39,7 +39,7 @@ public class EntitySuggestionsIT {
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
-                .get("/entity_suggestions?page=1&per_page=100&collection=dashboards&column=title")
+                .get("/entity_suggestions?page=1&per_page=100&collection=dashboards&column=title&query=Test")
                 .then()
                 .log().ifValidationFails()
                 .assertThat()

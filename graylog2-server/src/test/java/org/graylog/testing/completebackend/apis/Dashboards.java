@@ -46,7 +46,7 @@ public class Dashboards implements GraylogRestApi {
                 .post("/views")
                 .then()
                 .log().ifError()
-                .statusCode(201)
+                .statusCode(200)
                 .assertThat().body("id", notNullValue())
                 .extract().body().jsonPath().getString("id");
     }
