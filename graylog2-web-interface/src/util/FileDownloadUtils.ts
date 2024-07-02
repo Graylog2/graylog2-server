@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import UserNotification from 'util/UserNotification';
 import { fetchBlobFile, fetchFile } from 'logic/rest/FetchProvider';
-import UserNotification from 'preflight/util/UserNotification';
 
 export const createLinkAndDownload = (href: string, fileName: string) => {
   const a = document.createElement('a');

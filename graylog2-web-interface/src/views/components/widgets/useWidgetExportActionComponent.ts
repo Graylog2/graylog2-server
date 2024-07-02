@@ -15,11 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import usePluginEntities from 'hooks/usePluginEntities';
+import { type WidgetActionType } from 'views/components/widgets/Types';
+import type Widget from 'views/logic/widgets/Widget';
 
-const useWidgetExportActionComponent = () => {
-  const exportAction = usePluginEntities('views.components.widgets.exportAction')?.[0];
+const useWidgetExportActionComponent = (widget: Widget) => {
+  const exportActions = usePluginEntities('views.widgets.exportAction');
 
-  return exportAction && exportAction();
+  const widgetExportAction = exportActions && exportActions
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    .filter(({ action, useCondition }) => (typeof useCondition === 'function' && useCondition()) && action && (typeof action.isHidden !== 'function' || !action.isHidden(widget)))
+    .map(({ action }: { action: WidgetActionType }) => action);
+
+  return widgetExportAction?.[0]?.component;
 };
 
 export default useWidgetExportActionComponent;
