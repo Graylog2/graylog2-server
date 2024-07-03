@@ -54,7 +54,7 @@ const PanelToggle = styled(Panel.Toggle)<{ clickable: boolean }>(({ clickable = 
 const PanelBody = styled(Panel.Body)<{ editable: boolean }>(({ editable = false }) => css`
   cursor: ${editable ? 'inherit' : 'none'};
   pointer-events: ${editable ? 'inherit' : 'none'};
-  background-color: ${editable ? 'inherit' : (props) => props.theme.colors.gray[90]};
+  background-color: ${editable ? 'inherit' : (props) => props.theme.colors.global.navigationBoxShadow};
 `);
 
 type Props = {
