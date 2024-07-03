@@ -102,4 +102,5 @@ export type OnTriggerStepFunction = (step: MigrationActions, args?: StepArgs) =>
 export type MigrationStepComponentProps = {
   currentStep: MigrationState,
   onTriggerStep: OnTriggerStepFunction,
+  hideActions?: boolean,
 };
