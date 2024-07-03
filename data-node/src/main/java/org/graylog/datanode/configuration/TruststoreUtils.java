@@ -17,7 +17,6 @@
 package org.graylog.datanode.configuration;
 
 import jakarta.annotation.Nonnull;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,7 +72,7 @@ public class TruststoreUtils {
                 .findFirst();
     }
 
-    @NotNull
+    @Nonnull
     private static Optional<Path> libSecurityFile(String javaHome, String filename) {
         return Optional.ofNullable(javaHome).map(home -> Paths.get(home, "lib", "security", filename));
     }
