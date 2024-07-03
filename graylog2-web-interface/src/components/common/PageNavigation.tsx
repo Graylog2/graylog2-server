@@ -33,7 +33,6 @@ const StyledButton = styled(Button)(({ theme }) => css`
   font-family: ${theme.fonts.family.navigation};
   font-size: ${theme.fonts.size.navigation};
   color: ${theme.colors.variant.darker.default};
-  background-color: transparent;
   
   &:hover,
   &:focus {
@@ -86,7 +85,7 @@ const PageNavigation = ({ items }: Props) => (
       return (
         <IfPermitted permissions={permissions ?? []} key={path}>
           <LinkContainer to={path} relativeActive={!exactPathMatch}>
-            <StyledButton>
+            <StyledButton bsStyle="transparent">
               <NavItemStateIndicator>
                 {title}
               </NavItemStateIndicator>

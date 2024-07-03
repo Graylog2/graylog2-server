@@ -1,6 +1,6 @@
 #### Variants
 ```tsx
-const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Link', 'Default'];
+const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Link', 'Default', 'Transparent'];
 
 styles.map((style, i) => {
   return (
