@@ -47,6 +47,11 @@ public class V202406260800_MigrateCertificateAuthority extends Migration {
     }
 
     @Override
+    public MigrationType migrationType() {
+        return MigrationType.PREFLIGHT;
+    }
+
+    @Override
     public ZonedDateTime createdAt() {
         return ZonedDateTime.parse("2024-06-26T08:00:00Z");
     }

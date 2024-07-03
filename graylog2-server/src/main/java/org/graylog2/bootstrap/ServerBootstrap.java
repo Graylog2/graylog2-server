@@ -200,6 +200,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     private void doRunWithPreflightInjector(Injector preflightInjector) {
+
+        // always run preflight migrations, even if we skip the preflight web later
+        runPreflightMigrations(preflightInjector);
+
         final PreflightBoot preflightBoot = preflightInjector.getInstance(PreflightBoot.class);
 
         if (!preflightBoot.shouldRunPreflightWeb()) {
@@ -207,16 +211,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
 
         LOG.info("Fresh installation detected, starting configuration webserver");
-
-
-        try {
-            if (configuration.isLeader() && configuration.runMigrations()) {
-                runMigrations(preflightInjector, MigrationType.PREFLIGHT);
-            }
-        } catch (Exception e) {
-            LOG.error("Exception while running migrations", e);
-            System.exit(1);
-        }
 
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
         final LeaderElectionService leaderElectionService = preflightInjector.getInstance(LeaderElectionService.class);
@@ -250,6 +244,17 @@ public abstract class ServerBootstrap extends CmdLineTool {
             } catch (InterruptedException e) {
                 LOG.warn("Tried to wait for a bit before resuming but got interrupted. Resuming anyway now. Error was: {}", e.getMessage());
             }
+        }
+    }
+
+    private void runPreflightMigrations(Injector preflightInjector) {
+        try {
+            if (configuration.isLeader() && configuration.runMigrations()) {
+                runMigrations(preflightInjector, MigrationType.PREFLIGHT);
+            }
+        } catch (Exception e) {
+            LOG.error("Exception while running migrations", e);
+            System.exit(1);
         }
     }
 
