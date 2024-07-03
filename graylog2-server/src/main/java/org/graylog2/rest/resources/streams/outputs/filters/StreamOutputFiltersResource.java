@@ -27,6 +27,7 @@ import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -41,12 +42,14 @@ import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamService;
 import org.graylog2.streams.filters.StreamOutputFilterRuleDTO;
 import org.graylog2.streams.filters.StreamOutputFilterService;
 
 import java.util.Map;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Api(value = "Stream/Outputs/Filters", description = "Manage stream output filter rules", tags = {CLOUD_VISIBLE})
 @Path("/streams/{streamId}/outputs")
@@ -55,20 +58,23 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @RequiresAuthentication
 public class StreamOutputFiltersResource extends RestResource {
     private final StreamOutputFilterService filterService;
+    private final StreamService streamService;
 
     @Inject
-    public StreamOutputFiltersResource(StreamOutputFilterService filterService) {
+    public StreamOutputFiltersResource(StreamOutputFilterService filterService, StreamService streamService) {
         this.filterService = filterService;
+        this.streamService = streamService;
     }
 
     @GET
     @Path("/filters")
-    @ApiOperation(value = "Get available filter rules for stream")
-    public PaginatedResponse<StreamOutputFilterRuleDTO> getPaginatedFilters(
+    @ApiOperation("Get available filter rules for stream")
+    public PaginatedResponse<StreamOutputFilterRuleDTO> getPaginatedFiltersForStream(
             @ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
             @ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParams
     ) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+        checkStream(streamId);
 
         final var paginatedList = filterService.findPaginatedForStream(
                 streamId,
@@ -84,36 +90,54 @@ public class StreamOutputFiltersResource extends RestResource {
 
     @GET
     @Path("/target/{targetId}/filters")
-    @ApiOperation(value = "Get available filter rules for stream")
-    public Response getPaginatedFiltersForTarget(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-                                                 @ApiParam(name = "targetId", required = true) @PathParam("targetId") @NotBlank String targetId) {
+    @ApiOperation("Get available filter rules for stream and target")
+    public PaginatedResponse<StreamOutputFilterRuleDTO> getPaginatedFiltersForStreamAndTarget(
+            @ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
+            @ApiParam(name = "targetId", required = true) @PathParam("targetId") @NotBlank String targetId,
+            @ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParams
+    ) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        // TODO: Check for each filter instance!
-        checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_READ, streamId);
+        checkStream(streamId);
 
-        return Response.ok().build();
+        final var paginatedList = filterService.findPaginatedForStreamAndTarget(
+                streamId,
+                targetId,
+                paginationParams.getQuery(),
+                Sorts.ascending(StreamOutputFilterRuleDTO.FIELD_TITLE),
+                paginationParams.getPerPage(),
+                paginationParams.getPage(),
+                dtoId -> isPermitted(RestPermissions.STREAM_OUTPUT_FILTERS_READ, dtoId)
+        );
+
+        return PaginatedResponse.create("elements", paginatedList, paginationParams.getQuery());
     }
 
     @GET
     @Path("/filters/{filterId}")
-    @ApiOperation(value = "Get filter rule for given ID")
+    @ApiOperation("Get filter rule for given ID")
     public Response getFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
                               @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_READ, filterId);
+        checkStream(streamId);
 
-        return Response.ok().build();
+        final var dto = filterService.findById(filterId)
+                .orElseThrow(() -> new NotFoundException("Filter not found"));
+
+        return Response.ok(wrapDto(dto)).build();
     }
 
     @POST
     @Path("/filters")
-    @ApiOperation(value = "Create new filter rule")
+    @ApiOperation("Create new filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_FILTER_CREATE)
     public Response createFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-                                 @ApiParam(name = "JSON body", required = true) @Valid StreamOutputFilterRuleDTO dto) {
+                                 @ApiParam(name = "JSON Body", required = true) @Valid StreamOutputFilterRuleDTO dto) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_CREATE);
+        checkStream(streamId);
 
+        // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
         return Response.ok(wrapDto(filterService.create(dto))).build();
     }
 
@@ -122,26 +146,39 @@ public class StreamOutputFiltersResource extends RestResource {
     @ApiOperation(value = "Update filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_FILTER_UPDATE)
     public Response updateFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-                                 @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
+                                 @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId,
+                                 @ApiParam(name = "JSON Body", required = true) @Valid StreamOutputFilterRuleDTO dto) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_EDIT, filterId);
+        checkStream(streamId);
 
-        return Response.ok().build();
+        // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
+        return Response.ok(wrapDto(filterService.update(dto))).build();
     }
 
     @DELETE
     @Path("/filters/{filterId}")
-    @ApiOperation(value = "Delete filter rule")
+    @ApiOperation("Delete filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_FILTER_DELETE)
     public Response deleteFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
                                  @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_DELETE, filterId);
+        checkStream(streamId);
 
         return Response.ok(wrapDto(filterService.delete(filterId))).build();
     }
 
     private Map<String, StreamOutputFilterRuleDTO> wrapDto(StreamOutputFilterRuleDTO dto) {
         return Map.of("filter", dto);
+    }
+
+    // We want to ensure that the given stream exists to avoid creating filter rules for non-existent streams.
+    private void checkStream(String streamId) {
+        try {
+            streamService.load(streamId);
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new NotFoundException(f("Stream not found: %s", streamId));
+        }
     }
 }
