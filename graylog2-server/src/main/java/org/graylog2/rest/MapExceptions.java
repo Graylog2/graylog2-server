@@ -23,14 +23,29 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Defines exception to response status mappings for the annotated resource class.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface MapExceptions {
+    /**
+     * The exception to response status mapping definitions.
+     */
     Type[] value();
 
+    /**
+     * Exception to response mapping definition.
+     */
     @interface Type {
-        Class<?> value();
+        /**
+         * The {@link Throwable} that should be mapped to a response status.
+         */
+        Class<? extends Throwable> value();
 
+        /**
+         * The {@link Response.Status} that should be used for the throwable.
+         */
         Response.Status status() default Response.Status.INTERNAL_SERVER_ERROR;
     }
 }
