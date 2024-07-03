@@ -18,16 +18,19 @@ package org.graylog.plugins.views.search.rest.export.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
+import org.bson.Document;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.export.ExportTabularResultResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.graylog.plugins.views.search.searchtypes.export.ExportTabularResultResponse.DataRow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ExportTabularResultResponseTest {
 
@@ -49,6 +52,27 @@ class ExportTabularResultResponseTest {
         );
 
         assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    void testCreationFromDocumentList() {
+        List<Document> documents = List.of(
+                new Document(Map.of("name", "Juan", "age", 42)),
+                new Document(Map.of("name", "Enrique", "age", 13))
+        );
+
+        final ExportTabularResultResponse response = ExportTabularResultResponse.fromDocumentList(documents, List.of("name", "age", "non-existing"));
+
+        final ExportTabularResultResponse expectedResponse = new ExportTabularResultResponse(
+                List.of("name", "age", "non-existing"),
+                List.of(
+                        new DataRow(Arrays.asList("Juan", 42, null)),
+                        new DataRow(Arrays.asList("Enrique", 13, null))
+                )
+        );
+
+        assertEquals(expectedResponse, response);
+
     }
 
     @Test
