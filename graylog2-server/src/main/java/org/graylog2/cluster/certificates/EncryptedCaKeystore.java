@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage.location;
+package org.graylog2.cluster.certificates;
 
-public record KeystoreMongoCollection(String collectionName,
-                                      String identifierField,
-                                      String encryptedCertificateField) {
+import org.graylog2.security.encryption.EncryptedValue;
+
+public record EncryptedCaKeystore(EncryptedValue keystore) {
 }
