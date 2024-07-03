@@ -32,6 +32,7 @@ import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsT
 import org.graylog.plugins.views.migrations.V20200409083200_RemoveRootQueriesFromMigratedDashboards;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.migrations.V20240605120000_RemoveUnitFieldFromSearchDocuments;
+import org.graylog.plugins.views.migrations.V20240626143000_CreateDashboardsView;
 import org.graylog.plugins.views.providers.ExportBackendProvider;
 import org.graylog.plugins.views.providers.QuerySuggestionsProvider;
 import org.graylog.plugins.views.search.SearchRequirements;
@@ -239,6 +240,7 @@ public class ViewsBindings extends ViewsModule {
         addMigration(V20200409083200_RemoveRootQueriesFromMigratedDashboards.class);
         addMigration(V20200730000000_AddGl2MessageIdFieldAliasForEvents.class);
         addMigration(V20240605120000_RemoveUnitFieldFromSearchDocuments.class);
+        addMigration(V20240626143000_CreateDashboardsView.class);
 
         addAuditEventTypes(ViewsAuditEventTypes.class);
 
