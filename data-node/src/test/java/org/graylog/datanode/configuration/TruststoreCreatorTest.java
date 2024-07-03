@@ -17,6 +17,7 @@
 package org.graylog.datanode.configuration;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -39,10 +40,12 @@ import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +64,7 @@ public class TruststoreCreatorTest {
         final FilesystemKeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "root", "CN=ROOT", BigInteger.ONE);
         final FilesystemKeystoreInformation boot = createKeystore(tempDir.resolve("boot.p12"), "boot", "CN=BOOT", BigInteger.TWO);
 
-        final FilesystemKeystoreInformation truststore = TruststoreCreator.newTruststore()
+        final FilesystemKeystoreInformation truststore = TruststoreCreator.newEmpty()
                 .addRootCert("root", root, "root")
                 .addRootCert("boot", boot, "boot")
 
@@ -82,16 +85,23 @@ public class TruststoreCreatorTest {
         verifyCertificate(rootCert, "CN=ROOT", BigInteger.ONE);
         final Certificate bootCert = keyStore.getCertificate("boot");
         verifyCertificate(bootCert, "CN=BOOT", BigInteger.TWO);
-
     }
 
+    @Test
+    void testDefaultJvm() throws KeyStoreException {
+        final TruststoreCreator truststoreCreator = TruststoreCreator.newDefaultJvm();
+        final KeyStore truststore = truststoreCreator.getTruststore();
+        final ArrayList<String> aliases = Lists.newArrayList(truststore.aliases().asIterator());
+        Assertions.assertThat(aliases)
+                .hasSizeGreaterThan(10); // reasonable assumption that there are more than 10 trusted CAs in JVM truststore?
+    }
 
     @Test
     void testAdditionalCertificates(@TempDir Path tempDir) throws GeneralSecurityException, IOException, OperatorCreationException {
         final FilesystemKeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "something-unknown", "CN=ROOT", BigInteger.ONE);
         final X509Certificate cert = (X509Certificate) root.loadKeystore().getCertificate("something-unknown");
 
-        final FilesystemKeystoreInformation truststore = TruststoreCreator.newTruststore()
+        final FilesystemKeystoreInformation truststore = TruststoreCreator.newEmpty()
                 .addCertificates(List.of(cert))
                 .persist(tempDir.resolve("truststore.sec"), "caramba! caramba!".toCharArray());
 

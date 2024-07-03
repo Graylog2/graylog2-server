@@ -88,9 +88,9 @@ public class OpensearchSecurityConfiguration {
             final Path trustStorePath = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TRUSTSTORE_FILE);
             final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
-            this.truststore = TruststoreCreator.newTruststore()
-                    .addRootCert("transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
-                    .addRootCert("http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
+            this.truststore = TruststoreCreator.newDefaultJvm()
+                    .addRootCert("datanode-transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addRootCert("datanode-http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
                     .addCertificates(trustedCertificates)
                     .persist(trustStorePath, truststorePassword.toCharArray());
 

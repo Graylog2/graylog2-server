@@ -34,51 +34,61 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TruststoreCreator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TruststoreCreator.class);
+    private final KeyStore truststore;
 
-    private final Map<String, X509Certificate> rootCertificates = new LinkedHashMap<>();
+    public TruststoreCreator(KeyStore truststore) {
+        this.truststore = truststore;
+    }
 
-    public static TruststoreCreator newTruststore() {
-        return new TruststoreCreator();
+    public static TruststoreCreator newDefaultJvm() {
+        return TruststoreUtils.loadJvmTruststore()
+                .map(TruststoreCreator::new)
+                .orElseGet(TruststoreCreator::newEmpty);
+    }
+
+    public static TruststoreCreator newEmpty() {
+        try {
+            KeyStore trustStore = KeyStore.getInstance(CertConstants.PKCS12);
+            trustStore.load(null, null);
+            return new TruststoreCreator(trustStore);
+        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public TruststoreCreator addRootCert(final String name, FilesystemKeystoreInformation keystoreInformation,
                                          final String alias) throws IOException, GeneralSecurityException {
         final X509Certificate rootCert = findRootCert(keystoreInformation.location(), keystoreInformation.password(), alias);
-        rootCertificates.put(name, rootCert);
+        this.truststore.setCertificateEntry(name, rootCert);
         return this;
     }
 
     public TruststoreCreator addCertificates(List<X509Certificate> trustedCertificates) {
-        trustedCertificates.forEach(cert -> rootCertificates.put(cert.getSubjectX500Principal().getName(), cert));
+        trustedCertificates.forEach(cert -> {
+            try {
+                this.truststore.setCertificateEntry(cert.getSubjectX500Principal().getName(), cert);
+            } catch (KeyStoreException e) {
+                throw new RuntimeException(e);
+            }
+        });
         return this;
     }
 
     public FilesystemKeystoreInformation persist(final Path truststorePath, final char[] truststorePassword) throws IOException, GeneralSecurityException {
-        final KeyStore trustStore = createTruststore();
 
         try (final FileOutputStream fileOutputStream = new FileOutputStream(truststorePath.toFile())) {
-            trustStore.store(fileOutputStream, truststorePassword);
+            this.truststore.store(fileOutputStream, truststorePassword);
         }
         return new FilesystemKeystoreInformation(truststorePath, truststorePassword);
     }
 
     @Nonnull
-    public KeyStore createTruststore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        KeyStore trustStore = KeyStore.getInstance(CertConstants.PKCS12);
-        trustStore.load(null, null);
-
-        for (Map.Entry<String, X509Certificate> cert : rootCertificates.entrySet()) {
-            LOG.info("Adding certificate {} to the truststore", cert.getKey());
-            trustStore.setCertificateEntry(cert.getKey(), cert.getValue());
-        }
-        return trustStore;
+    public KeyStore getTruststore() {
+        return this.truststore;
     }
 
 
@@ -91,7 +101,7 @@ public class TruststoreCreator {
         return Arrays.stream(certs)
                 .filter(cert -> cert instanceof X509Certificate)
                 .map(cert -> (X509Certificate) cert)
-                .filter(cert -> isRootCaCertificate(cert) || certs.length == 1)//TODO: certs.length == 1 may be temporary, our merged does not create a proper cert chain, it seems
+                .filter(cert -> isRootCaCertificate(cert) || certs.length == 1)
                 .findFirst()
                 .orElseThrow(() -> new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!"));
     }
