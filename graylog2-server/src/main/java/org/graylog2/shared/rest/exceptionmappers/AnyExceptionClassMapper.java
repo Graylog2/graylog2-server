@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
 import static java.util.Objects.nonNull;
@@ -50,12 +49,10 @@ public class AnyExceptionClassMapper implements ExtendedExceptionMapper<Exceptio
 
     @Override
     public Response toResponse(Exception exception) {
-        final Optional<MapExceptions.Type> annotationMapper = getAnnotation()
-                .filter(type -> type.value().isAssignableFrom(exception.getClass()))
-                .findFirst();
+        final Optional<Response.Status> status = getStatus(exception);
 
-        if (annotationMapper.isPresent()) {
-            return toResponse(exception, annotationMapper.get().status());
+        if (status.isPresent()) {
+            return toResponse(exception, status.get());
         }
 
         LOG.error("Unhandled exception in REST resource", exception);
@@ -72,11 +69,15 @@ public class AnyExceptionClassMapper implements ExtendedExceptionMapper<Exceptio
                 .build();
     }
 
-    private Stream<MapExceptions.Type> getAnnotation() {
+    private Optional<Response.Status> getStatus(Exception exception) {
         final var annotation = resourceInfo.getResourceClass().getAnnotation(MapExceptions.class);
         if (annotation != null && annotation.value().length > 0) {
-            return Arrays.stream(annotation.value()).filter(v -> nonNull(v.value()));
+            return Arrays.stream(annotation.value())
+                    .filter(type -> nonNull(type.value()))
+                    .filter(type -> type.value().isAssignableFrom(exception.getClass()))
+                    .map(MapExceptions.Type::status)
+                    .findFirst();
         }
-        return Stream.of();
+        return Optional.empty();
     }
 }
