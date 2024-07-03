@@ -147,21 +147,6 @@ paths:
                   filter:
                     $ref: "#/components/schemas/StreamOutputFilterRule"
 
-  /streams/outputs/filters/builder/actions:
-    get:
-      summary: "Return available actions"
-      responses:
-        200:
-          description: "Actions"
-          content:
-            application/json:
-              schema:
-                properties:
-                  conditions:
-                    type: "array"
-                    items:
-                      $ref: "#/components/schemas/RuleBuilderFunction"
-
   /streams/outputs/filters/builder/conditions:
     get:
       summary: "Return available conditions"
@@ -416,11 +401,6 @@ components:
         conditions:
           type: "array"
           description: "The conditions array"
-          items:
-            $ref: "#/components/schemas/RuleBuilderStep"
-        actions:
-          type: "array"
-          description: "The actions array"
           items:
             $ref: "#/components/schemas/RuleBuilderStep"
 
