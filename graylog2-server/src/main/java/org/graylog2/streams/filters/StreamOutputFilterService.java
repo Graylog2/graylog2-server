@@ -111,17 +111,19 @@ public class StreamOutputFilterService {
         return utils.getById(id);
     }
 
-    public StreamOutputFilterRuleDTO create(StreamOutputFilterRuleDTO dto) {
+    public StreamOutputFilterRuleDTO create(String streamId, StreamOutputFilterRuleDTO dto) {
         if (!isBlank(dto.id())) {
             throw new IllegalArgumentException("id must be blank");
         }
 
-        return utils.getById(insertedId(collection.insertOne(dto)))
+        // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
+        return utils.getById(insertedId(collection.insertOne(dto.withStream(streamId))))
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't insert document: %s", dto)));
     }
 
-    public StreamOutputFilterRuleDTO update(StreamOutputFilterRuleDTO dto) {
-        collection.replaceOne(idEq(requireNonBlank(dto.id(), "id can't be blank")), dto);
+    public StreamOutputFilterRuleDTO update(String streamId, StreamOutputFilterRuleDTO dto) {
+        // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
+        collection.replaceOne(idEq(requireNonBlank(dto.id(), "id can't be blank")), dto.withStream(streamId));
 
         return utils.getById(dto.id())
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't find updated document: %s", dto)));

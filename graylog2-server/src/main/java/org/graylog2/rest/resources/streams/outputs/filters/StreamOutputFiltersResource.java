@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -137,8 +138,7 @@ public class StreamOutputFiltersResource extends RestResource {
         checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_CREATE);
         checkStream(streamId);
 
-        // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
-        return Response.ok(wrapDto(filterService.create(dto))).build();
+        return Response.ok(wrapDto(filterService.create(streamId, dto))).build();
     }
 
     @PUT
@@ -152,8 +152,11 @@ public class StreamOutputFiltersResource extends RestResource {
         checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_EDIT, filterId);
         checkStream(streamId);
 
-        // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
-        return Response.ok(wrapDto(filterService.update(dto))).build();
+        if (!filterId.equals(dto.id())) {
+            throw new BadRequestException("The filter ID in the URL doesn't match the one in the payload");
+        }
+
+        return Response.ok(wrapDto(filterService.update(streamId, dto))).build();
     }
 
     @DELETE

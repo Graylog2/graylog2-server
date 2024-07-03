@@ -33,6 +33,8 @@ import org.mongojack.ObjectId;
 
 import java.util.Optional;
 
+import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
+
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
@@ -76,6 +78,12 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
     public abstract RuleBuilder rule();
 
     public abstract Builder toBuilder();
+
+    public StreamOutputFilterRuleDTO withStream(String streamId) {
+        return toBuilder()
+                .streamId(requireNonBlank(streamId, "streamId can't be blank"))
+                .build();
+    }
 
     public static Builder builder() {
         return Builder.create();

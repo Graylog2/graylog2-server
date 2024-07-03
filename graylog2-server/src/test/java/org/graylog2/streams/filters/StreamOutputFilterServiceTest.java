@@ -94,7 +94,7 @@ class StreamOutputFilterServiceTest {
 
     @Test
     void create() {
-        final var result = service.create(StreamOutputFilterRuleDTO.builder()
+        final var result = service.create("stream-1", StreamOutputFilterRuleDTO.builder()
                 .title("Test")
                 .description("A Test")
                 .streamId("stream-1")
@@ -143,7 +143,29 @@ class StreamOutputFilterServiceTest {
                         .build())
                 .build();
 
-        assertThatThrownBy(() -> service.create(dto)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.create("stream-1", dto)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void createEnforcesGivenStreamID() {
+        final var result = service.create("stream-1", StreamOutputFilterRuleDTO.builder()
+                .title("Test")
+                .description("A Test")
+                .streamId("stream-no-no")
+                .outputTarget("indexer")
+                .status(StreamOutputFilterRuleDTO.Status.DISABLED)
+                .rule(RuleBuilder.builder()
+                        .operator(RuleBuilderStep.Operator.AND)
+                        .conditions(List.of(
+                                RuleBuilderStep.builder()
+                                        .function("has_field")
+                                        .parameters(Map.of("field", "is_debug"))
+                                        .build()
+                        ))
+                        .build())
+                .build());
+
+        assertThat(result.streamId()).isEqualTo("stream-1");
     }
 
     @Test
@@ -157,13 +179,38 @@ class StreamOutputFilterServiceTest {
 
         final var dto = optionalDto.get();
 
-        final var updatedDto = service.update(dto.toBuilder().title("Changed title").build());
+        final var updatedDto = service.update(dto.streamId(), dto.toBuilder().title("Changed title").build());
         final var reloadedUpdatedDto = service.findById("54e3deadbeefdeadbeef0000");
 
         assertThat(updatedDto).satisfies(d -> {
             assertThat(d.title()).isEqualTo("Changed title");
         });
         assertThat(reloadedUpdatedDto).get().satisfies(d -> {
+            assertThat(d.title()).isEqualTo("Changed title");
+        });
+    }
+
+    @Test
+
+    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    void updateEnforcesGivenStreamID() {
+        final var optionalDto = service.findById("54e3deadbeefdeadbeef0000");
+
+        assertThat(optionalDto).isPresent().get().satisfies(d -> {
+            assertThat(d.title()).isEqualTo("Test Filter 1");
+        });
+
+        final var dto = optionalDto.get();
+
+        final var updatedDto = service.update("stream-custom", dto.toBuilder().title("Changed title").build());
+        final var reloadedUpdatedDto = service.findById("54e3deadbeefdeadbeef0000");
+
+        assertThat(updatedDto).satisfies(d -> {
+            assertThat(d.streamId()).isEqualTo("stream-custom");
+            assertThat(d.title()).isEqualTo("Changed title");
+        });
+        assertThat(reloadedUpdatedDto).get().satisfies(d -> {
+            assertThat(d.streamId()).isEqualTo("stream-custom");
             assertThat(d.title()).isEqualTo("Changed title");
         });
     }
