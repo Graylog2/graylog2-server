@@ -68,8 +68,8 @@ public class MongoCollectionExportService {
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collectionName);
         final var checkPermission = permissionsUtils.createPermissionCheck(subject, collectionName);
         final var documents = userCanReadAllEntities
-                ? mongoPaginate(resultsWithoutLimit, limit)
-                : paginateWithPermissionCheck(resultsWithoutLimit, limit, checkPermission);
+                ? getFromMongo(resultsWithoutLimit, limit)
+                : getWithInMemoryPermissionCheck(resultsWithoutLimit, limit, checkPermission);
 
         return documents.collect(Collectors.toList());
 
@@ -82,13 +82,13 @@ public class MongoCollectionExportService {
                 .toList());
     }
 
-    private Stream<Document> paginateWithPermissionCheck(FindIterable<Document> result, int limit, Predicate<Document> checkPermission) {
+    private Stream<Document> getWithInMemoryPermissionCheck(FindIterable<Document> result, int limit, Predicate<Document> checkPermission) {
         return MongoUtils.stream(result)
                 .filter(checkPermission)
                 .limit(limit);
     }
 
-    private Stream<Document> mongoPaginate(FindIterable<Document> result, int limit) {
+    private Stream<Document> getFromMongo(FindIterable<Document> result, int limit) {
         return MongoUtils.stream(result.limit(limit));
     }
 }
