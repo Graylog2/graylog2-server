@@ -97,7 +97,7 @@ const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) 
       pointer-events: all;
       color: ${colors.color};
       background-color: ${colors.background};
-      opacity: ${isLinkStyle(style) ? 1 : 0.45};
+      opacity: 0.45;
 
       &:hover {
         color: ${colors.color};
