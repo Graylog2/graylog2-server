@@ -19,11 +19,12 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import type Widget from 'views/logic/widgets/Widget';
 import type { WidgetActionType } from 'views/components/widgets/Types';
 import ExportWidgetActionDelegate from 'views/components/widgets/ExportWidgetAction/ExportWidgetActionDelegate';
+import EventsWidget from 'views/logic/widgets/events/EventsWidget';
 
 const ExportWidgetAction: WidgetActionType = {
   type: 'export-widget-action',
   position: 'menu',
-  isHidden: (w: Widget) => (w.type !== AggregationWidget.type),
+  isHidden: (w: Widget) => ![AggregationWidget.type, EventsWidget.type].includes(w.type),
   component: ExportWidgetActionDelegate,
 };
 
