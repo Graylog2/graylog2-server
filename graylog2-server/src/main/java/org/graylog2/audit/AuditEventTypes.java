@@ -140,9 +140,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String SESSION_DELETE = PREFIX + "session:delete";
     public static final String STATIC_FIELD_CREATE = PREFIX + "static_field:create";
     public static final String STATIC_FIELD_DELETE = PREFIX + "static_field:delete";
-    public static final String STREAM_OUTPUT_FILTER_CREATE = PREFIX + "stream_output_filter:create";
-    public static final String STREAM_OUTPUT_FILTER_DELETE = PREFIX + "stream_output_filter:delete";
-    public static final String STREAM_OUTPUT_FILTER_UPDATE = PREFIX + "stream_output_filter:update";
+    public static final String STREAM_DESTINATION_FILTER_CREATE = PREFIX + "stream_destination_filter:create";
+    public static final String STREAM_DESTINATION_FILTER_DELETE = PREFIX + "stream_destination_filter:delete";
+    public static final String STREAM_DESTINATION_FILTER_UPDATE = PREFIX + "stream_destination_filter:update";
     public static final String STREAM_CREATE = PREFIX + "stream:create";
     public static final String STREAM_DELETE = PREFIX + "stream:delete";
     public static final String STREAM_OUTPUT_ASSIGNMENT_CREATE = PREFIX + "stream_output_assignment:create";
@@ -295,9 +295,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(STREAM_DELETE)
             .add(STREAM_OUTPUT_ASSIGNMENT_CREATE)
             .add(STREAM_OUTPUT_ASSIGNMENT_DELETE)
-            .add(STREAM_OUTPUT_FILTER_CREATE)
-            .add(STREAM_OUTPUT_FILTER_DELETE)
-            .add(STREAM_OUTPUT_FILTER_UPDATE)
+            .add(STREAM_DESTINATION_FILTER_CREATE)
+            .add(STREAM_DESTINATION_FILTER_DELETE)
+            .add(STREAM_DESTINATION_FILTER_UPDATE)
             .add(STREAM_RULE_CREATE)
             .add(STREAM_RULE_DELETE)
             .add(STREAM_RULE_UPDATE)

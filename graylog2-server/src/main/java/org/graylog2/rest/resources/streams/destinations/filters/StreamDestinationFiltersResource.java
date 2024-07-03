@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.streams.outputs.filters;
+package org.graylog2.rest.resources.streams.destinations.filters;
 
 import com.mongodb.client.model.Sorts;
 import io.swagger.annotations.Api;
@@ -44,25 +44,25 @@ import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.filters.StreamOutputFilterRuleDTO;
-import org.graylog2.streams.filters.StreamOutputFilterService;
+import org.graylog2.streams.filters.StreamDestinationFilterRuleDTO;
+import org.graylog2.streams.filters.StreamDestinationFilterService;
 
 import java.util.Map;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-@Api(value = "Stream/Outputs/Filters", description = "Manage stream output filter rules", tags = {CLOUD_VISIBLE})
-@Path("/streams/{streamId}/outputs")
+@Api(value = "Stream/Destinations/Filters", description = "Manage stream destination filter rules", tags = {CLOUD_VISIBLE})
+@Path("/streams/{streamId}/destinations")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-public class StreamOutputFiltersResource extends RestResource {
-    private final StreamOutputFilterService filterService;
+public class StreamDestinationFiltersResource extends RestResource {
+    private final StreamDestinationFilterService filterService;
     private final StreamService streamService;
 
     @Inject
-    public StreamOutputFiltersResource(StreamOutputFilterService filterService, StreamService streamService) {
+    public StreamDestinationFiltersResource(StreamDestinationFilterService filterService, StreamService streamService) {
         this.filterService = filterService;
         this.streamService = streamService;
     }
@@ -70,7 +70,7 @@ public class StreamOutputFiltersResource extends RestResource {
     @GET
     @Path("/filters")
     @ApiOperation("Get available filter rules for stream")
-    public PaginatedResponse<StreamOutputFilterRuleDTO> getPaginatedFiltersForStream(
+    public PaginatedResponse<StreamDestinationFilterRuleDTO> getPaginatedFiltersForStream(
             @ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
             @ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParams
     ) {
@@ -80,10 +80,10 @@ public class StreamOutputFiltersResource extends RestResource {
         final var paginatedList = filterService.findPaginatedForStream(
                 streamId,
                 paginationParams.getQuery(),
-                Sorts.ascending(StreamOutputFilterRuleDTO.FIELD_TITLE),
+                Sorts.ascending(StreamDestinationFilterRuleDTO.FIELD_TITLE),
                 paginationParams.getPerPage(),
                 paginationParams.getPage(),
-                dtoId -> isPermitted(RestPermissions.STREAM_OUTPUT_FILTERS_READ, dtoId)
+                dtoId -> isPermitted(RestPermissions.STREAM_DESTINATION_FILTERS_READ, dtoId)
         );
 
         return PaginatedResponse.create("elements", paginatedList, paginationParams.getQuery());
@@ -92,7 +92,7 @@ public class StreamOutputFiltersResource extends RestResource {
     @GET
     @Path("/target/{targetId}/filters")
     @ApiOperation("Get available filter rules for stream and target")
-    public PaginatedResponse<StreamOutputFilterRuleDTO> getPaginatedFiltersForStreamAndTarget(
+    public PaginatedResponse<StreamDestinationFilterRuleDTO> getPaginatedFiltersForStreamAndTarget(
             @ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
             @ApiParam(name = "targetId", required = true) @PathParam("targetId") @NotBlank String targetId,
             @ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParams
@@ -104,10 +104,10 @@ public class StreamOutputFiltersResource extends RestResource {
                 streamId,
                 targetId,
                 paginationParams.getQuery(),
-                Sorts.ascending(StreamOutputFilterRuleDTO.FIELD_TITLE),
+                Sorts.ascending(StreamDestinationFilterRuleDTO.FIELD_TITLE),
                 paginationParams.getPerPage(),
                 paginationParams.getPage(),
-                dtoId -> isPermitted(RestPermissions.STREAM_OUTPUT_FILTERS_READ, dtoId)
+                dtoId -> isPermitted(RestPermissions.STREAM_DESTINATION_FILTERS_READ, dtoId)
         );
 
         return PaginatedResponse.create("elements", paginatedList, paginationParams.getQuery());
@@ -119,7 +119,7 @@ public class StreamOutputFiltersResource extends RestResource {
     public Response getFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
                               @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_READ, filterId);
+        checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_READ, filterId);
         checkStream(streamId);
 
         final var dto = filterService.findById(filterId)
@@ -131,11 +131,11 @@ public class StreamOutputFiltersResource extends RestResource {
     @POST
     @Path("/filters")
     @ApiOperation("Create new filter rule")
-    @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_FILTER_CREATE)
+    @AuditEvent(type = AuditEventTypes.STREAM_DESTINATION_FILTER_CREATE)
     public Response createFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-                                 @ApiParam(name = "JSON Body", required = true) @Valid StreamOutputFilterRuleDTO dto) {
+                                 @ApiParam(name = "JSON Body", required = true) @Valid StreamDestinationFilterRuleDTO dto) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_CREATE);
+        checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_CREATE);
         checkStream(streamId);
 
         return Response.ok(wrapDto(filterService.create(streamId, dto))).build();
@@ -144,12 +144,12 @@ public class StreamOutputFiltersResource extends RestResource {
     @PUT
     @Path("/filters/{filterId}")
     @ApiOperation(value = "Update filter rule")
-    @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_FILTER_UPDATE)
+    @AuditEvent(type = AuditEventTypes.STREAM_DESTINATION_FILTER_UPDATE)
     public Response updateFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
                                  @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId,
-                                 @ApiParam(name = "JSON Body", required = true) @Valid StreamOutputFilterRuleDTO dto) {
+                                 @ApiParam(name = "JSON Body", required = true) @Valid StreamDestinationFilterRuleDTO dto) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_EDIT, filterId);
+        checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_EDIT, filterId);
         checkStream(streamId);
 
         if (!filterId.equals(dto.id())) {
@@ -162,17 +162,17 @@ public class StreamOutputFiltersResource extends RestResource {
     @DELETE
     @Path("/filters/{filterId}")
     @ApiOperation("Delete filter rule")
-    @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_FILTER_DELETE)
+    @AuditEvent(type = AuditEventTypes.STREAM_DESTINATION_FILTER_DELETE)
     public Response deleteFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
                                  @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkPermission(RestPermissions.STREAM_OUTPUT_FILTERS_DELETE, filterId);
+        checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_DELETE, filterId);
         checkStream(streamId);
 
         return Response.ok(wrapDto(filterService.delete(filterId))).build();
     }
 
-    private Map<String, StreamOutputFilterRuleDTO> wrapDto(StreamOutputFilterRuleDTO dto) {
+    private Map<String, StreamDestinationFilterRuleDTO> wrapDto(StreamDestinationFilterRuleDTO dto) {
         return Map.of("filter", dto);
     }
 

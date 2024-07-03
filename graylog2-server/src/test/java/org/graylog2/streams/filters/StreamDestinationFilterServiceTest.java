@@ -33,13 +33,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MongoDBExtension.class)
-class StreamOutputFilterServiceTest {
+class StreamDestinationFilterServiceTest {
 
-    private StreamOutputFilterService service;
+    private StreamDestinationFilterService service;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        this.service = new StreamOutputFilterService(mongoCollections);
+        this.service = new StreamDestinationFilterService(mongoCollections);
     }
 
     @Test
@@ -73,7 +73,7 @@ class StreamOutputFilterServiceTest {
         final var result = service.findPaginatedForStreamAndTarget("54e3deadbeefdeadbeef1000", "indexer", "status:disabled", Sorts.ascending("title"), 10, 1, id -> true);
 
         assertThat(result.delegate()).hasSize(1);
-        assertThat(result.delegate().get(0).status()).isEqualTo(StreamOutputFilterRuleDTO.Status.DISABLED);
+        assertThat(result.delegate().get(0).status()).isEqualTo(StreamDestinationFilterRuleDTO.Status.DISABLED);
     }
 
     @Test
@@ -82,8 +82,8 @@ class StreamOutputFilterServiceTest {
         assertThat(service.findById("54e3deadbeefdeadbeef0000")).get().satisfies(dto -> {
             assertThat(dto.title()).isEqualTo("Test Filter 1");
             assertThat(dto.streamId()).isEqualTo("54e3deadbeefdeadbeef1000");
-            assertThat(dto.outputTarget()).isEqualTo("indexer");
-            assertThat(dto.status()).isEqualTo(StreamOutputFilterRuleDTO.Status.ENABLED);
+            assertThat(dto.destinationType()).isEqualTo("indexer");
+            assertThat(dto.status()).isEqualTo(StreamDestinationFilterRuleDTO.Status.ENABLED);
             assertThat(dto.rule()).satisfies(rule -> {
                 assertThat(rule.operator()).isEqualTo(RuleBuilderStep.Operator.OR);
                 assertThat(rule.conditions()).hasSize(2);
@@ -94,12 +94,12 @@ class StreamOutputFilterServiceTest {
 
     @Test
     void create() {
-        final var result = service.create("stream-1", StreamOutputFilterRuleDTO.builder()
+        final var result = service.create("stream-1", StreamDestinationFilterRuleDTO.builder()
                 .title("Test")
                 .description("A Test")
                 .streamId("stream-1")
-                .outputTarget("indexer")
-                .status(StreamOutputFilterRuleDTO.Status.DISABLED)
+                .destinationType("indexer")
+                .status(StreamDestinationFilterRuleDTO.Status.DISABLED)
                 .rule(RuleBuilder.builder()
                         .operator(RuleBuilderStep.Operator.AND)
                         .conditions(List.of(
@@ -115,8 +115,8 @@ class StreamOutputFilterServiceTest {
         assertThat(result.title()).isEqualTo("Test");
         assertThat(result.description()).get().isEqualTo("A Test");
         assertThat(result.streamId()).isEqualTo("stream-1");
-        assertThat(result.outputTarget()).isEqualTo("indexer");
-        assertThat(result.status()).isEqualTo(StreamOutputFilterRuleDTO.Status.DISABLED);
+        assertThat(result.destinationType()).isEqualTo("indexer");
+        assertThat(result.status()).isEqualTo(StreamDestinationFilterRuleDTO.Status.DISABLED);
         assertThat(result.rule()).satisfies(rule -> {
             assertThat(rule.operator()).isEqualTo(RuleBuilderStep.Operator.AND);
             assertThat(rule.conditions()).hasSize(1);
@@ -125,13 +125,13 @@ class StreamOutputFilterServiceTest {
 
     @Test
     void createWithExistingID() {
-        final StreamOutputFilterRuleDTO dto = StreamOutputFilterRuleDTO.builder()
+        final StreamDestinationFilterRuleDTO dto = StreamDestinationFilterRuleDTO.builder()
                 .id("54e3deadbeefdeadbeef0000")
                 .title("Test")
                 .description("A Test")
                 .streamId("stream-1")
-                .outputTarget("indexer")
-                .status(StreamOutputFilterRuleDTO.Status.DISABLED)
+                .destinationType("indexer")
+                .status(StreamDestinationFilterRuleDTO.Status.DISABLED)
                 .rule(RuleBuilder.builder()
                         .operator(RuleBuilderStep.Operator.AND)
                         .conditions(List.of(
@@ -148,12 +148,12 @@ class StreamOutputFilterServiceTest {
 
     @Test
     void createEnforcesGivenStreamID() {
-        final var result = service.create("stream-1", StreamOutputFilterRuleDTO.builder()
+        final var result = service.create("stream-1", StreamDestinationFilterRuleDTO.builder()
                 .title("Test")
                 .description("A Test")
                 .streamId("stream-no-no")
-                .outputTarget("indexer")
-                .status(StreamOutputFilterRuleDTO.Status.DISABLED)
+                .destinationType("indexer")
+                .status(StreamDestinationFilterRuleDTO.Status.DISABLED)
                 .rule(RuleBuilder.builder()
                         .operator(RuleBuilderStep.Operator.AND)
                         .conditions(List.of(

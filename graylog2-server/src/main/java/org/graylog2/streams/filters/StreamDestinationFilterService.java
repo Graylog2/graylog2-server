@@ -38,34 +38,34 @@ import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedId;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
-import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_DESCRIPTION;
-import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_OUTPUT_TARGET;
-import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_STATUS;
-import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_STREAM_ID;
-import static org.graylog2.streams.filters.StreamOutputFilterRuleDTO.FIELD_TITLE;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_DESCRIPTION;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_DESTINATION_TYPE;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_STATUS;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_STREAM_ID;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_TITLE;
 
-public class StreamOutputFilterService {
-    static final String COLLECTION = "stream_output_filters";
+public class StreamDestinationFilterService {
+    static final String COLLECTION = "stream_destination_filters";
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(FIELD_TITLE, SearchQueryField.create(FIELD_TITLE))
             .put(FIELD_DESCRIPTION, SearchQueryField.create(FIELD_DESCRIPTION))
-            .put(FIELD_OUTPUT_TARGET, SearchQueryField.create(FIELD_OUTPUT_TARGET))
+            .put(FIELD_DESTINATION_TYPE, SearchQueryField.create(FIELD_DESTINATION_TYPE))
             .put(FIELD_STATUS, SearchQueryField.create(FIELD_STATUS))
             .build();
 
-    private final MongoCollection<StreamOutputFilterRuleDTO> collection;
-    private final MongoPaginationHelper<StreamOutputFilterRuleDTO> paginationHelper;
-    private final MongoUtils<StreamOutputFilterRuleDTO> utils;
+    private final MongoCollection<StreamDestinationFilterRuleDTO> collection;
+    private final MongoPaginationHelper<StreamDestinationFilterRuleDTO> paginationHelper;
+    private final MongoUtils<StreamDestinationFilterRuleDTO> utils;
 
     @Inject
-    public StreamOutputFilterService(MongoCollections mongoCollections) {
-        this.collection = mongoCollections.collection(COLLECTION, StreamOutputFilterRuleDTO.class);
+    public StreamDestinationFilterService(MongoCollections mongoCollections) {
+        this.collection = mongoCollections.collection(COLLECTION, StreamDestinationFilterRuleDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.utils = mongoCollections.utils(collection);
 
         collection.createIndex(Indexes.ascending(FIELD_STREAM_ID));
-        collection.createIndex(Indexes.ascending(FIELD_OUTPUT_TARGET));
+        collection.createIndex(Indexes.ascending(FIELD_DESTINATION_TYPE));
         collection.createIndex(Indexes.ascending(FIELD_STATUS));
     }
 
@@ -74,7 +74,7 @@ public class StreamOutputFilterService {
         return queryParser.parse(queryString).toBson();
     }
 
-    public PaginatedList<StreamOutputFilterRuleDTO> findPaginatedForStream(
+    public PaginatedList<StreamDestinationFilterRuleDTO> findPaginatedForStream(
             String streamId,
             String queryString,
             Bson sort,
@@ -90,7 +90,7 @@ public class StreamOutputFilterService {
                 .page(page, dto -> permissionSelector.test(dto.id()));
     }
 
-    public PaginatedList<StreamOutputFilterRuleDTO> findPaginatedForStreamAndTarget(
+    public PaginatedList<StreamDestinationFilterRuleDTO> findPaginatedForStreamAndTarget(
             String streamId,
             String targetId,
             String queryString,
@@ -101,17 +101,17 @@ public class StreamOutputFilterService {
     ) {
         final var query = parseQuery(queryString);
 
-        return paginationHelper.filter(and(eq(FIELD_STREAM_ID, streamId), eq(FIELD_OUTPUT_TARGET, targetId), query))
+        return paginationHelper.filter(and(eq(FIELD_STREAM_ID, streamId), eq(FIELD_DESTINATION_TYPE, targetId), query))
                 .sort(sort)
                 .perPage(perPage)
                 .page(page, dto -> permissionSelector.test(dto.id()));
     }
 
-    public Optional<StreamOutputFilterRuleDTO> findById(String id) {
+    public Optional<StreamDestinationFilterRuleDTO> findById(String id) {
         return utils.getById(id);
     }
 
-    public StreamOutputFilterRuleDTO create(String streamId, StreamOutputFilterRuleDTO dto) {
+    public StreamDestinationFilterRuleDTO create(String streamId, StreamDestinationFilterRuleDTO dto) {
         if (!isBlank(dto.id())) {
             throw new IllegalArgumentException("id must be blank");
         }
@@ -121,7 +121,7 @@ public class StreamOutputFilterService {
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't insert document: %s", dto)));
     }
 
-    public StreamOutputFilterRuleDTO update(String streamId, StreamOutputFilterRuleDTO dto) {
+    public StreamDestinationFilterRuleDTO update(String streamId, StreamDestinationFilterRuleDTO dto) {
         // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
         collection.replaceOne(idEq(requireNonBlank(dto.id(), "id can't be blank")), dto.withStream(streamId));
 
@@ -129,7 +129,7 @@ public class StreamOutputFilterService {
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't find updated document: %s", dto)));
     }
 
-    public StreamOutputFilterRuleDTO delete(String id) {
+    public StreamDestinationFilterRuleDTO delete(String id) {
         final var dto = utils.getById(id)
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't find document with ID <%s> for deletion", id)));
 

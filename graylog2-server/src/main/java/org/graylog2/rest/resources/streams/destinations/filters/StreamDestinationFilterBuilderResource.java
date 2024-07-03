@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.streams.outputs.filters;
+package org.graylog2.rest.resources.streams.destinations.filters;
 
 import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
@@ -43,14 +43,14 @@ import java.util.Set;
 import static java.util.Objects.requireNonNullElse;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Stream/Outputs/Filters/Builder", description = "Stream output filter builder", tags = {CLOUD_VISIBLE})
-@Path("/streams/outputs/filters/builder")
+@Api(value = "Stream/Destinations/Filters/Builder", description = "Stream destination filter builder", tags = {CLOUD_VISIBLE})
+@Path("/streams/destinations/filters/builder")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-public class StreamOutputFilterBuilderResource extends RestResource {
-    // We want to control the available conditions for the stream output filters to avoid exposing functions
-    // that don't make sense in the output filter context.
+public class StreamDestinationFilterBuilderResource extends RestResource {
+    // We want to control the available conditions for the stream destination filters to avoid exposing functions
+    // that don't make sense in the destination filter context.
     // Check "/api/system/pipelines/rulebuilder/conditions" for all available conditions.
     private static final Set<String> INCLUDED_CONDITIONS = ImmutableSet.<String>builder()
             .add("array_contains")
@@ -76,14 +76,14 @@ public class StreamOutputFilterBuilderResource extends RestResource {
     private final RuleBuilderRegistry ruleBuilderRegistry;
 
     @Inject
-    public StreamOutputFilterBuilderResource(RuleBuilderRegistry ruleBuilderRegistry) {
+    public StreamDestinationFilterBuilderResource(RuleBuilderRegistry ruleBuilderRegistry) {
         this.ruleBuilderRegistry = ruleBuilderRegistry;
     }
 
     @GET
     @Path("/conditions")
     @ApiOperation(value = "Get available filter rule conditions")
-    @RequiresPermissions(RestPermissions.STREAM_OUTPUT_FILTERS_READ)
+    @RequiresPermissions(RestPermissions.STREAM_DESTINATION_FILTERS_READ)
     public Response getConditions() {
         final var conditions = ruleBuilderRegistry.conditions()
                 .values()
@@ -100,7 +100,7 @@ public class StreamOutputFilterBuilderResource extends RestResource {
     @Path("/simulate")
     @ApiOperation(value = "Run the simulator for the given rule and message")
     @NoAuditEvent("No data changes. Only used to simulate a filter rule.")
-    @RequiresPermissions(RestPermissions.STREAM_OUTPUT_FILTERS_READ)
+    @RequiresPermissions(RestPermissions.STREAM_DESTINATION_FILTERS_READ)
     public Response simulateRule() {
         throw new ServerErrorException("Simulator not implemented yet", Response.Status.NOT_IMPLEMENTED);
     }

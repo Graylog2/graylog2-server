@@ -38,9 +38,9 @@ import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-@JsonDeserialize(builder = StreamOutputFilterRuleDTO.Builder.class)
-@DbEntity(collection = StreamOutputFilterService.COLLECTION, readPermission = RestPermissions.STREAM_OUTPUT_FILTERS_READ)
-public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
+@JsonDeserialize(builder = StreamDestinationFilterRuleDTO.Builder.class)
+@DbEntity(collection = StreamDestinationFilterService.COLLECTION, readPermission = RestPermissions.STREAM_DESTINATION_FILTERS_READ)
+public abstract class StreamDestinationFilterRuleDTO implements MongoEntity {
     public enum Status {
         @JsonProperty("enabled")
         ENABLED,
@@ -52,7 +52,7 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
     public static final String FIELD_TITLE = "title";
     static final String FIELD_DESCRIPTION = "description";
     static final String FIELD_STREAM_ID = "stream_id";
-    static final String FIELD_OUTPUT_TARGET = "output_target";
+    static final String FIELD_DESTINATION_TYPE = "destination_type";
     static final String FIELD_STATUS = "status";
     private static final String FIELD_RULE = "rule";
 
@@ -67,9 +67,9 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
     @NotBlank
     public abstract String streamId();
 
-    @JsonProperty(FIELD_OUTPUT_TARGET)
+    @JsonProperty(FIELD_DESTINATION_TYPE)
     @NotBlank
-    public abstract String outputTarget();
+    public abstract String destinationType();
 
     @JsonProperty(FIELD_STATUS)
     public abstract Status status();
@@ -79,7 +79,7 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
 
     public abstract Builder toBuilder();
 
-    public StreamOutputFilterRuleDTO withStream(String streamId) {
+    public StreamDestinationFilterRuleDTO withStream(String streamId) {
         return toBuilder()
                 .streamId(requireNonBlank(streamId, "streamId can't be blank"))
                 .build();
@@ -93,7 +93,7 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_StreamOutputFilterRuleDTO.Builder()
+            return new AutoValue_StreamDestinationFilterRuleDTO.Builder()
                     .status(Status.DISABLED);
         }
 
@@ -111,8 +111,8 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
         @JsonProperty(FIELD_STREAM_ID)
         public abstract Builder streamId(String streamId);
 
-        @JsonProperty(FIELD_OUTPUT_TARGET)
-        public abstract Builder outputTarget(String outputTarget);
+        @JsonProperty(FIELD_DESTINATION_TYPE)
+        public abstract Builder destinationType(String destinationType);
 
         @JsonProperty(FIELD_STATUS)
         public abstract Builder status(Status status);
@@ -120,6 +120,6 @@ public abstract class StreamOutputFilterRuleDTO implements MongoEntity {
         @JsonProperty(FIELD_RULE)
         public abstract Builder rule(RuleBuilder rule);
 
-        public abstract StreamOutputFilterRuleDTO build();
+        public abstract StreamDestinationFilterRuleDTO build();
     }
 }

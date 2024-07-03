@@ -1,12 +1,12 @@
 openapi: "3.1.0"
 info:
-  title: "Stream Output Filters"
+  title: "Stream Destination Filters"
   version: "1.0.0"
 servers:
   - url: "http://localhost:8080/api"
 
 paths:
-  /streams/{streamId}/outputs/filters:
+  /streams/{streamId}/destinations/filters:
     parameters:
       - in: "path"
         name: "streamId"
@@ -34,7 +34,7 @@ paths:
                   - type: "object"
                     properties:
                       elements:
-                        $ref: "#/components/schemas/StreamOutputFilterRule"
+                        $ref: "#/components/schemas/StreamDestinationFilterRule"
 
     post:
       summary: "Create new filter rule for stream"
@@ -43,7 +43,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StreamOutputFilterRule"
+              $ref: "#/components/schemas/StreamDestinationFilterRule"
       responses:
         200:
           description: "Newly created filter rule"
@@ -52,9 +52,9 @@ paths:
               schema:
                 properties:
                   filter:
-                    $ref: "#/components/schemas/StreamOutputFilterRule"
+                    $ref: "#/components/schemas/StreamDestinationFilterRule"
 
-  /streams/{streamId}/outputs/target/{targetId}/filters:
+  /streams/{streamId}/destinations/target/{targetId}/filters:
     parameters:
       - in: "path"
         name: "streamId"
@@ -88,9 +88,9 @@ paths:
                   - type: "object"
                     properties:
                       elements:
-                        $ref: "#/components/schemas/StreamOutputFilterRule"
+                        $ref: "#/components/schemas/StreamDestinationFilterRule"
 
-  /streams/{streamId}/outputs/filters/{filterId}:
+  /streams/{streamId}/destinations/filters/{filterId}:
     parameters:
       - in: "path"
         name: "streamId"
@@ -100,54 +100,54 @@ paths:
         required: true
       - in: "path"
         name: "filterId"
-        description: "The stream output filter ID"
+        description: "The stream destination filter ID"
         schema:
           type: "string"
         required: true
 
     get:
-      summary: "Get stream output filter"
+      summary: "Get stream destination filter"
       responses:
         200:
-          description: "The stream output filter"
+          description: "The stream destination filter"
           content:
             application/json:
               schema:
                 properties:
                   filter:
-                    $ref: "#/components/schemas/StreamOutputFilterRule"
+                    $ref: "#/components/schemas/StreamDestinationFilterRule"
 
     put:
-      summary: "Update stream output filter"
+      summary: "Update stream destination filter"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StreamOutputFilterRule"
+              $ref: "#/components/schemas/StreamDestinationFilterRule"
       responses:
         200:
-          description: "The updated stream output filter"
+          description: "The updated stream destination filter"
           content:
             application/json:
               schema:
                 properties:
                   filter:
-                    $ref: "#/components/schemas/StreamOutputFilterRule"
+                    $ref: "#/components/schemas/StreamDestinationFilterRule"
 
     delete:
-      summary: "Delete stream output filter"
+      summary: "Delete stream destination filter"
       responses:
         200:
-          description: "The deleted stream output filter"
+          description: "The deleted stream destination filter"
           content:
             application/json:
               schema:
                 properties:
                   filter:
-                    $ref: "#/components/schemas/StreamOutputFilterRule"
+                    $ref: "#/components/schemas/StreamDestinationFilterRule"
 
-  /streams/outputs/filters/builder/conditions:
+  /streams/destinations/filters/builder/conditions:
     get:
       summary: "Return available conditions"
       responses:
@@ -162,7 +162,7 @@ paths:
                     conditions:
                       $ref: "#/components/schemas/RuleBuilderFunction"
 
-  /streams/outputs/filters/builder/simulate:
+  /streams/destinations/filters/builder/simulate:
     post:
       summary: "Run the simulator for the given rule and message"
       requestBody:
@@ -243,12 +243,12 @@ components:
     ##########################################################################################################
     ## New types
     ##########################################################################################################
-    StreamOutputFilterRule:
+    StreamDestinationFilterRule:
       type: "object"
       required:
         - "id"
         - "stream_id"
-        - "output_target"
+        - "destination_type"
         - "title"
         - "rule"
       properties:
@@ -258,9 +258,9 @@ components:
         stream_id:
           type: "string"
           description: "The associated stream ID"
-        output_target:
+        destination_type:
           type: "string"
-          description: "The output target"
+          description: "The destination type"
           enum:
             - "indexer"
             - "data-warehouse"
@@ -281,7 +281,7 @@ components:
       example:
         id: "6666dadd4dfc4e7c263a7900"
         stream_id: "6666df991ca760793bf0fd56"
-        output_target: "indexer"
+        destination_type: "indexer"
         title: "Skip debug messages"
         status: "enabled"
         rule:
