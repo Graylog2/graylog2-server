@@ -23,6 +23,7 @@ import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.MapExceptions;
 import org.graylog2.rest.models.HelloWorldResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -37,6 +38,9 @@ import static java.util.Objects.requireNonNull;
 
 @Api(value = "Hello World", description = "A friendly hello world message")
 @Path("/")
+@MapExceptions({
+        @MapExceptions.Type(value = IllegalArgumentException.class, status = Response.Status.BAD_REQUEST)
+})
 public class HelloWorldResource extends RestResource {
     private final NodeId nodeId;
     private final ClusterConfigService clusterConfigService;
