@@ -162,6 +162,25 @@ paths:
                     conditions:
                       $ref: "#/components/schemas/RuleBuilderFunction"
 
+  /streams/destinations/filters/builder/validate:
+    post:
+      summary: "Validates the given rule builder"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RuleBuilderDTO"
+      responses:
+        200:
+          description: "Validated rule builder"
+          content:
+            application/json:
+              schema:
+                properties:
+                  rule_builder:
+                    $ref: "#/components/schemas/RuleBuilderDTO"
+
   /streams/destinations/filters/builder/simulate:
     post:
       summary: "Run the simulator for the given rule and message"

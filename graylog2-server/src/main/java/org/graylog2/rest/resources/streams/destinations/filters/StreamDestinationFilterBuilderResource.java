@@ -19,7 +19,9 @@ package org.graylog2.rest.resources.streams.destinations.filters;
 import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -32,6 +34,9 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderDto;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -74,10 +79,16 @@ public class StreamDestinationFilterBuilderResource extends RestResource {
             .build();
 
     private final RuleBuilderRegistry ruleBuilderRegistry;
+    private final ValidatorService validatorService;
+    private final RuleBuilderService ruleBuilderService;
 
     @Inject
-    public StreamDestinationFilterBuilderResource(RuleBuilderRegistry ruleBuilderRegistry) {
+    public StreamDestinationFilterBuilderResource(RuleBuilderRegistry ruleBuilderRegistry,
+                                                  ValidatorService validatorService,
+                                                  RuleBuilderService ruleBuilderService) {
         this.ruleBuilderRegistry = ruleBuilderRegistry;
+        this.validatorService = validatorService;
+        this.ruleBuilderService = ruleBuilderService;
     }
 
     @GET
@@ -94,6 +105,19 @@ public class StreamDestinationFilterBuilderResource extends RestResource {
                 .toList();
 
         return Response.ok(Map.of("conditions", conditions)).build();
+    }
+
+    @POST
+    @Path("/validate")
+    @ApiOperation("Validate rule builder")
+    @NoAuditEvent("No data changes. Only used to validate a rule builder.")
+    public Response validateRule(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
+        final var validatedDto = validatorService.validate(ruleBuilderDto);
+        final var dtoWithTitles = validatedDto.toBuilder()
+                .ruleBuilder(ruleBuilderService.generateTitles(validatedDto.ruleBuilder()))
+                .build();
+
+        return Response.ok(Map.of("rule_builder", dtoWithTitles)).build();
     }
 
     @POST
