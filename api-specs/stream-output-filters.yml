@@ -159,7 +159,7 @@ paths:
                 properties:
                   conditions:
                     type: "array"
-                    items:
+                    conditions:
                       $ref: "#/components/schemas/RuleBuilderFunction"
 
   /streams/outputs/filters/builder/simulate:
