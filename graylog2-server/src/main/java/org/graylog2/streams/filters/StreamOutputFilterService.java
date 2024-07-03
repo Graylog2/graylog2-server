@@ -18,6 +18,7 @@ package org.graylog2.streams.filters;
 
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollections;
@@ -62,6 +63,10 @@ public class StreamOutputFilterService {
         this.collection = mongoCollections.collection(COLLECTION, StreamOutputFilterRuleDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.utils = mongoCollections.utils(collection);
+
+        collection.createIndex(Indexes.ascending(FIELD_STREAM_ID));
+        collection.createIndex(Indexes.ascending(FIELD_OUTPUT_TARGET));
+        collection.createIndex(Indexes.ascending(FIELD_STATUS));
     }
 
     private Bson parseQuery(String queryString) {
