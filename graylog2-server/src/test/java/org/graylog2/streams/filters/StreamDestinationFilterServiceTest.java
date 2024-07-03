@@ -43,7 +43,7 @@ class StreamDestinationFilterServiceTest {
     }
 
     @Test
-    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
     void findPaginatedForStream() {
         final var result = service.findPaginatedForStream("54e3deadbeefdeadbeef1000", "", Sorts.ascending("title"), 10, 1, id -> true);
 
@@ -51,7 +51,7 @@ class StreamDestinationFilterServiceTest {
     }
 
     @Test
-    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
     void findPaginatedForStreamWithQuery() {
         final var result = service.findPaginatedForStream("54e3deadbeefdeadbeef1000", "title:\"Test Filter 2\"", Sorts.ascending("title"), 10, 1, id -> true);
 
@@ -60,7 +60,7 @@ class StreamDestinationFilterServiceTest {
     }
 
     @Test
-    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
     void findPaginatedForStreamAndTarget() {
         final var result = service.findPaginatedForStreamAndTarget("54e3deadbeefdeadbeef1000", "indexer", "", Sorts.ascending("title"), 10, 1, id -> true);
 
@@ -68,7 +68,7 @@ class StreamDestinationFilterServiceTest {
     }
 
     @Test
-    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
     void findPaginatedForStreamAndTargetWithQuery() {
         final var result = service.findPaginatedForStreamAndTarget("54e3deadbeefdeadbeef1000", "indexer", "status:disabled", Sorts.ascending("title"), 10, 1, id -> true);
 
@@ -77,7 +77,7 @@ class StreamDestinationFilterServiceTest {
     }
 
     @Test
-    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
     void findById() {
         assertThat(service.findById("54e3deadbeefdeadbeef0000")).get().satisfies(dto -> {
             assertThat(dto.title()).isEqualTo("Test Filter 1");
@@ -169,7 +169,7 @@ class StreamDestinationFilterServiceTest {
     }
 
     @Test
-    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
     void update() {
         final var optionalDto = service.findById("54e3deadbeefdeadbeef0000");
 
@@ -192,7 +192,7 @@ class StreamDestinationFilterServiceTest {
 
     @Test
 
-    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
     void updateEnforcesGivenStreamID() {
         final var optionalDto = service.findById("54e3deadbeefdeadbeef0000");
 
@@ -216,7 +216,7 @@ class StreamDestinationFilterServiceTest {
     }
 
     @Test
-    @MongoDBFixtures("StreamOutputFilterServiceTest-2024-07-01-1.json")
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
     void delete() {
         final var optionalDto = service.findById("54e3deadbeefdeadbeef0000");
 

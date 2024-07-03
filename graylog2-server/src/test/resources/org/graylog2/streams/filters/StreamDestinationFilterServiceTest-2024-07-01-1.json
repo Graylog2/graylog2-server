@@ -1,11 +1,11 @@
 {
-  "stream_output_filters": [
+  "stream_destination_filters": [
     {
       "_id": {
         "$oid": "54e3deadbeefdeadbeef0000"
       },
       "stream_id": "54e3deadbeefdeadbeef1000",
-      "output_target": "indexer",
+      "destination_type": "indexer",
       "title": "Test Filter 1",
       "status": "enabled",
       "rule": {
@@ -39,7 +39,7 @@
         "$oid": "54e3deadbeefdeadbeef0001"
       },
       "stream_id": "54e3deadbeefdeadbeef1000",
-      "output_target": "indexer",
+      "destination_type": "indexer",
       "title": "Test Filter 2",
       "status": "disabled",
       "rule": {
@@ -63,7 +63,7 @@
         "$oid": "54e3deadbeefdeadbeef0002"
       },
       "stream_id": "54e3deadbeefdeadbeef1000",
-      "output_target": "something-else",
+      "destination_type": "something-else",
       "title": "Test Filter 3",
       "status": "enabled",
       "rule": {
