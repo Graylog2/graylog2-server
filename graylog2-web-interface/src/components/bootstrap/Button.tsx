@@ -46,7 +46,14 @@ const stylesProps = (style: StyleProps) => {
   }
 };
 
-const stylesForSize = (size: BsSize) => {
+const stylesForSize = (size: BsSize, bsStyle: StyleProps) => {
+  if (bsStyle === 'link') {
+    return css`
+      padding: 0;
+      height: auto;
+    `;
+  }
+
   switch (size) {
     case 'xs':
     case 'xsmall':
@@ -76,11 +83,9 @@ const stylesForSize = (size: BsSize) => {
 };
 
 const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) => {
-  if (style === 'link') {
-    return '';
-  }
+  const isLink = style === 'link';
 
-  const colors = themeColors.disabled[style];
+  const colors = isLink ? { color: themeColors.global.textDefault, background: 'transparent' } : themeColors.disabled[style];
 
   return css`
     &:disabled,
@@ -88,10 +93,11 @@ const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) 
       pointer-events: all;
       color: ${colors.color};
       background-color: ${colors.background};
-      opacity: 0.45;
+      opacity: ${isLink ? 1 : 0.45};
 
       &:hover {
         color: ${colors.color};
+        text-decoration: none;
       }
     }
   `;
@@ -105,19 +111,29 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
     case 'primary':
     case 'warning':
       return css`
-        color: ${themeColors.global.textDefault};
+          color: ${themeColors.global.textDefault};
 
         &:hover {
-        color: ${themeColors.global.textDefault};
+          color: ${themeColors.global.textDefault};
         }
 
         &:focus {
-        color: ${themeColors.global.textDefault};
+          color: ${themeColors.global.textDefault};
         }
     `;
     default: return '';
   }
 };
+
+// Other link styles are defined in e.g. the size specific function
+const linkStyles = css`
+  vertical-align: baseline;
+
+  &:hover {
+    background: transparent;
+    text-decoration: underline;
+  }
+`;
 
 const StyledButton = styled(MantineButton)<{
   $bsStyle: StyleProps,
@@ -129,7 +145,8 @@ const StyledButton = styled(MantineButton)<{
   $bsSize,
   $active,
 }) => {
-  const textColor = $bsStyle === 'link' ? theme.colors.global.link : theme.colors.button[$bsStyle].color;
+  const isLink = $bsStyle === 'link';
+  const textColor = isLink ? theme.colors.global.link : theme.colors.button[$bsStyle].color;
 
   return css`
     color: ${textColor};
@@ -137,10 +154,10 @@ const StyledButton = styled(MantineButton)<{
     overflow: visible;
 
     ${disabledStyles(theme.colors, $bsStyle)}
-    ${stylesForSize($bsSize)}
+    ${stylesForSize($bsSize, $bsStyle)}
 
     &:hover {
-      color: ${textColor};
+      color: ${isLink ? theme.colors.global.linkHover : textColor};
       text-decoration: none;
     }
 
@@ -150,6 +167,7 @@ const StyledButton = styled(MantineButton)<{
     }
 
     ${$active && activeStyles(theme.colors, $bsStyle)}
+    ${isLink && linkStyles}
 
     .mantine-Button-label {
       gap: 0.25em;

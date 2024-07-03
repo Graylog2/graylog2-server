@@ -13,6 +13,19 @@ styles.map((style, i) => {
 })
 ```
 
+#### Sizes
+```tsx
+const sizes = ['xs' , 'sm' , 'md' , 'lg'];
+
+sizes.map((size, i) => {
+  return (
+    <p key={`button-example-${size}-${i}`}>
+      <Button bsStyle="info" bsSize={size}>{size}</Button>{' '}
+    </p>
+  )
+})
+```
+
 #### Button with a link
 ```tsx
 <Button href="https://www.graylog.org"
