@@ -25,6 +25,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog2.security.TrustManagerAggregator;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.cli.OpensearchCommandLineProcess;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
@@ -35,6 +36,7 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.periodicals.ClusterStateResponse;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -58,12 +60,18 @@ import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -125,7 +133,27 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
+
+        final TrustManager trustManager = configuration.opensearchSecurityConfiguration().getTruststore()
+                .map(this::createAggregatedTrustManager)
+                .orElse(this.trustManager);
+
         return OpensearchRestClient.build(configuration, datanodeConfiguration, trustManager);
+    }
+
+    /**
+     * We have to combine the system-wide trust manager with a manager that trusts certificates used to secure
+     * the datanode's opensearch process.
+     * @param truststore truststore containing certificates used to secure datanode's opensearch
+     * @return combined trust manager
+     */
+    @Nonnull
+    private X509TrustManager createAggregatedTrustManager(FilesystemKeystoreInformation truststore) {
+        try {
+            return new TrustManagerAggregator(List.of(this.trustManager, TrustManagerAggregator.trustManagerFromKeystore(truststore.loadKeystore())));
+        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

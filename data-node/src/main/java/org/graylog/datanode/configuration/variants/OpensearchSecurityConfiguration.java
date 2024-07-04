@@ -73,8 +73,7 @@ public class OpensearchSecurityConfiguration {
      * Caution: side effects!
      *
      * This method will take the current security setup and apply it to the managed opensearch. It will change the
-     * initial set of opensearch users, it will create and persist a truststore that will be set as a system-wide
-     * truststore.
+     * initial set of opensearch users, it will create and persist a truststore
      */
     public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, List<X509Certificate> trustedCertificates, byte[] signingKey) throws GeneralSecurityException, IOException {
         opensearchHeap = datanodeConfiguration.opensearchHeap();
