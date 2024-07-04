@@ -17,6 +17,8 @@
 package org.graylog.datanode.configuration;
 
 import jakarta.annotation.Nonnull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,10 +33,17 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class TruststoreUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TruststoreUtils.class);
+
     public static Optional<KeyStore> loadJvmTruststore() {
         return jvmTruststoreLocation().map(location -> {
+
             String password = jvmTruststorePassword();
             String type = jvmTruststoreType();
+
+            LOG.info("Detected existing JVM truststore: " + location.toAbsolutePath() + " of type " + type);
+
             try {
                 KeyStore trustStore = KeyStore.getInstance(type);
                 try (InputStream is = Files.newInputStream(location)) {

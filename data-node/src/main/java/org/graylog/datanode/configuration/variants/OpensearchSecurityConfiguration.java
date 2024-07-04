@@ -94,9 +94,6 @@ public class OpensearchSecurityConfiguration {
                     .addCertificates(trustedCertificates)
                     .persist(trustStorePath, truststorePassword.toCharArray());
 
-            System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
-            System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
-
             enableJwtAuthenticationInConfig(opensearchConfigDir, signingKey);
         }
         return this;
