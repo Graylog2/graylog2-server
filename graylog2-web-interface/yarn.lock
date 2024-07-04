@@ -1923,18 +1923,7 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.1.tgz#16308cea045f0fc777b6ff20a9f25474dd8293d2"
   integrity sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q==
 
-"@graylog/sawmill@2.0.19":
-  version "2.0.19"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.19.tgz#2f9135bbd89adcc8619ac6498413c07bb3366cbd"
-  integrity sha512-RxYGJCt+ylTmAyZDlFFX0zKzEz1ygLNrS+00YXAuTfE+ubYes2S5vf+vHSpFnPl4IdHOKwXVTOV4+bvhis6lPw==
-  dependencies:
-    "@openfonts/dm-sans_latin" "^1.0.2"
-    "@openfonts/source-sans-pro_latin" "^1.44.2"
-    "@openfonts/ubuntu-mono_latin" "^1.44.1"
-    chroma-js "^2.1.2"
-    lodash "^4.17.21"
-
-"@graylog/sawmill@^2.0.21":
+"@graylog/sawmill@2.0.21":
   version "2.0.21"
   resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.21.tgz#6d13d0ae7eae5b274afe0939421f56793208073e"
   integrity sha512-yWGmDT+uEIDhDIneZCJ5jtvSsEZQ2uf75Bybv0WMJ3cGffrHWmJX/tF/fBVCX6VqQ2HT7Fc0iLKkSVxkxo3J+A==
