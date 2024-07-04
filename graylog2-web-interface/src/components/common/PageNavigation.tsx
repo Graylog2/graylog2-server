@@ -85,7 +85,7 @@ const PageNavigation = ({ items }: Props) => (
       return (
         <IfPermitted permissions={permissions ?? []} key={path}>
           <LinkContainer to={path} relativeActive={!exactPathMatch}>
-            <StyledButton bsStyle="link">
+            <StyledButton bsStyle="transparent">
               <NavItemStateIndicator>
                 {title}
               </NavItemStateIndicator>
