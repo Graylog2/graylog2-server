@@ -78,8 +78,8 @@ class StreamDestinationFilterServiceTest {
 
     @Test
     @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
-    void findById() {
-        assertThat(service.findById("54e3deadbeefdeadbeef0000")).get().satisfies(dto -> {
+    void findByIdForStream() {
+        assertThat(service.findByIdForStream("foo", "54e3deadbeefdeadbeef0000")).get().satisfies(dto -> {
             assertThat(dto.title()).isEqualTo("Test Filter 1");
             assertThat(dto.streamId()).isEqualTo("54e3deadbeefdeadbeef1000");
             assertThat(dto.destinationType()).isEqualTo("indexer");
@@ -93,8 +93,8 @@ class StreamDestinationFilterServiceTest {
     }
 
     @Test
-    void create() {
-        final var result = service.create("stream-1", StreamDestinationFilterRuleDTO.builder()
+    void createForStream() {
+        final var result = service.createForStream("stream-1", StreamDestinationFilterRuleDTO.builder()
                 .title("Test")
                 .description("A Test")
                 .streamId("stream-1")
@@ -124,7 +124,7 @@ class StreamDestinationFilterServiceTest {
     }
 
     @Test
-    void createWithExistingID() {
+    void createForStreamWithExistingID() {
         final StreamDestinationFilterRuleDTO dto = StreamDestinationFilterRuleDTO.builder()
                 .id("54e3deadbeefdeadbeef0000")
                 .title("Test")
@@ -143,12 +143,12 @@ class StreamDestinationFilterServiceTest {
                         .build())
                 .build();
 
-        assertThatThrownBy(() -> service.create("stream-1", dto)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.createForStream("stream-1", dto)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void createEnforcesGivenStreamID() {
-        final var result = service.create("stream-1", StreamDestinationFilterRuleDTO.builder()
+    void createForStreamEnforcesGivenStreamID() {
+        final var result = service.createForStream("stream-1", StreamDestinationFilterRuleDTO.builder()
                 .title("Test")
                 .description("A Test")
                 .streamId("stream-no-no")
@@ -170,8 +170,8 @@ class StreamDestinationFilterServiceTest {
 
     @Test
     @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
-    void update() {
-        final var optionalDto = service.findById("54e3deadbeefdeadbeef0000");
+    void updateForStream() {
+        final var optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
 
         assertThat(optionalDto).isPresent().get().satisfies(d -> {
             assertThat(d.title()).isEqualTo("Test Filter 1");
@@ -179,8 +179,8 @@ class StreamDestinationFilterServiceTest {
 
         final var dto = optionalDto.get();
 
-        final var updatedDto = service.update(dto.streamId(), dto.toBuilder().title("Changed title").build());
-        final var reloadedUpdatedDto = service.findById("54e3deadbeefdeadbeef0000");
+        final var updatedDto = service.updateForStream(dto.streamId(), dto.toBuilder().title("Changed title").build());
+        final var reloadedUpdatedDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
 
         assertThat(updatedDto).satisfies(d -> {
             assertThat(d.title()).isEqualTo("Changed title");
@@ -193,8 +193,8 @@ class StreamDestinationFilterServiceTest {
     @Test
 
     @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
-    void updateEnforcesGivenStreamID() {
-        final var optionalDto = service.findById("54e3deadbeefdeadbeef0000");
+    void updateForStreamEnforcesGivenStreamID() {
+        final var optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
 
         assertThat(optionalDto).isPresent().get().satisfies(d -> {
             assertThat(d.title()).isEqualTo("Test Filter 1");
@@ -202,36 +202,39 @@ class StreamDestinationFilterServiceTest {
 
         final var dto = optionalDto.get();
 
-        final var updatedDto = service.update("stream-custom", dto.toBuilder().title("Changed title").build());
-        final var reloadedUpdatedDto = service.findById("54e3deadbeefdeadbeef0000");
+        final var updatedDto = service.updateForStream("54e3deadbeefdeadbeef1000", dto.toBuilder()
+                .title("Changed title")
+                .streamId("custom-stream")
+                .build());
+        final var reloadedUpdatedDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
 
         assertThat(updatedDto).satisfies(d -> {
-            assertThat(d.streamId()).isEqualTo("stream-custom");
+            assertThat(d.streamId()).isEqualTo("54e3deadbeefdeadbeef1000");
             assertThat(d.title()).isEqualTo("Changed title");
         });
         assertThat(reloadedUpdatedDto).get().satisfies(d -> {
-            assertThat(d.streamId()).isEqualTo("stream-custom");
+            assertThat(d.streamId()).isEqualTo("54e3deadbeefdeadbeef1000");
             assertThat(d.title()).isEqualTo("Changed title");
         });
     }
 
     @Test
     @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
-    void delete() {
-        final var optionalDto = service.findById("54e3deadbeefdeadbeef0000");
+    void deleteFromStream() {
+        final var optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
 
         assertThat(optionalDto).isPresent();
 
-        final var deletedDto = service.delete("54e3deadbeefdeadbeef0000");
+        final var deletedDto = service.deleteFromStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
 
         assertThat(deletedDto.id()).isEqualTo("54e3deadbeefdeadbeef0000");
 
-        assertThat(service.findById("54e3deadbeefdeadbeef0000")).isNotPresent();
+        assertThat(service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000")).isNotPresent();
     }
 
     @Test
-    void deleteWithInvalidID() {
-        assertThatThrownBy(() -> service.delete("54e3deadbeefdeadbeef9999"))
+    void deleteFromStreamWithInvalidID() {
+        assertThatThrownBy(() -> service.deleteFromStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef9999"))
                 .hasMessageContaining("54e3deadbeefdeadbeef9999")
                 .isInstanceOf(IllegalArgumentException.class);
     }

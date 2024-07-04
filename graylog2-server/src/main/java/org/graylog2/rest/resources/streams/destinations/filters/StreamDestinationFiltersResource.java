@@ -122,7 +122,7 @@ public class StreamDestinationFiltersResource extends RestResource {
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_READ, filterId);
         checkStream(streamId);
 
-        final var dto = filterService.findById(filterId)
+        final var dto = filterService.findByIdForStream(streamId, filterId)
                 .orElseThrow(() -> new NotFoundException("Filter not found"));
 
         return Response.ok(wrapDto(dto)).build();
@@ -138,7 +138,7 @@ public class StreamDestinationFiltersResource extends RestResource {
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_CREATE);
         checkStream(streamId);
 
-        return Response.ok(wrapDto(filterService.create(streamId, dto))).build();
+        return Response.ok(wrapDto(filterService.createForStream(streamId, dto))).build();
     }
 
     @PUT
@@ -156,7 +156,7 @@ public class StreamDestinationFiltersResource extends RestResource {
             throw new BadRequestException("The filter ID in the URL doesn't match the one in the payload");
         }
 
-        return Response.ok(wrapDto(filterService.update(streamId, dto))).build();
+        return Response.ok(wrapDto(filterService.updateForStream(streamId, dto))).build();
     }
 
     @DELETE
@@ -169,7 +169,7 @@ public class StreamDestinationFiltersResource extends RestResource {
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_DELETE, filterId);
         checkStream(streamId);
 
-        return Response.ok(wrapDto(filterService.delete(filterId))).build();
+        return Response.ok(wrapDto(filterService.deleteFromStream(streamId, filterId))).build();
     }
 
     private Map<String, StreamDestinationFilterRuleDTO> wrapDto(StreamDestinationFilterRuleDTO dto) {

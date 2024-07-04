@@ -107,11 +107,12 @@ public class StreamDestinationFilterService {
                 .page(page, dto -> permissionSelector.test(dto.id()));
     }
 
-    public Optional<StreamDestinationFilterRuleDTO> findById(String id) {
+    public Optional<StreamDestinationFilterRuleDTO> findByIdForStream(String streamId, String id) {
+        collection.find(and(eq(FIELD_STREAM_ID, streamId), idEq(id)));
         return utils.getById(id);
     }
 
-    public StreamDestinationFilterRuleDTO create(String streamId, StreamDestinationFilterRuleDTO dto) {
+    public StreamDestinationFilterRuleDTO createForStream(String streamId, StreamDestinationFilterRuleDTO dto) {
         if (!isBlank(dto.id())) {
             throw new IllegalArgumentException("id must be blank");
         }
@@ -121,19 +122,22 @@ public class StreamDestinationFilterService {
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't insert document: %s", dto)));
     }
 
-    public StreamDestinationFilterRuleDTO update(String streamId, StreamDestinationFilterRuleDTO dto) {
+    public StreamDestinationFilterRuleDTO updateForStream(String streamId, StreamDestinationFilterRuleDTO dto) {
         // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
-        collection.replaceOne(idEq(requireNonBlank(dto.id(), "id can't be blank")), dto.withStream(streamId));
+        collection.replaceOne(
+                and(eq(FIELD_STREAM_ID, streamId), idEq(requireNonBlank(dto.id(), "id can't be blank"))),
+                dto.withStream(streamId)
+        );
 
         return utils.getById(dto.id())
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't find updated document: %s", dto)));
     }
 
-    public StreamDestinationFilterRuleDTO delete(String id) {
+    public StreamDestinationFilterRuleDTO deleteFromStream(String streamId, String id) {
         final var dto = utils.getById(id)
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't find document with ID <%s> for deletion", id)));
 
-        collection.deleteOne(idEq(id));
+        collection.deleteOne(and(eq(FIELD_STREAM_ID, streamId), idEq(id)));
 
         return dto;
     }
