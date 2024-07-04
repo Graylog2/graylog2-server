@@ -37,16 +37,20 @@ import org.slf4j.LoggerFactory;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class V20240704100700_DashboardAddLastUpdated extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190127111728_MigrateWidgetFormatSettings.class);
     private final ClusterConfigService clusterConfigService;
     private final MongoCollection<ViewDTO> viewsCollection;
+    private final MongoCollection<Search> searchesCollection;
 
     @Inject
     public V20240704100700_DashboardAddLastUpdated(final ClusterConfigService clusterConfigService, final MongoCollections mongoCollections) {
         this.clusterConfigService = clusterConfigService;
         this.viewsCollection = mongoCollections.collection("views", ViewDTO.class);
+        this.searchesCollection = mongoCollections.collection("searches", Search.class);
     }
 
     @Override
@@ -61,9 +65,12 @@ public class V20240704100700_DashboardAddLastUpdated extends Migration {
             return;
         }
 
-        viewsCollection.find(Filters.and(Filters.eq(ViewDTO.FIELD_LAST_UPDATED_AT, null), Filters.eq(ViewDTO.FIELD_TYPE, ViewDTO.Type.DASHBOARD)))
-                .forEach(v -> {
-                    final var n = v.toBuilder().lastUpdatedAt(DateTime.now(DateTimeZone.UTC)).build();
+        final var views = viewsCollection.find(Filters.and(Filters.eq(ViewDTO.FIELD_LAST_UPDATED_AT, null), Filters.eq(ViewDTO.FIELD_TYPE, ViewDTO.Type.DASHBOARD))).into(new ArrayList<>());
+        final var searchIds = views.stream().map(ViewDTO::searchId).toList();
+        final var searches = searchesCollection.find(Filters.in("id", searchIds)).into(new ArrayList<>()).stream().collect(Collectors.toMap(Search::id, Function.identity()));;
+        views.forEach(v -> {
+                    final var search = searches.get(v.searchId());
+                    final var n = v.toBuilder().lastUpdatedAt(search != null ? search.createdAt() : v.createdAt()).build();
                     viewsCollection.replaceOne(MongoUtils.idEq(n.id()), n);
                 });
 
