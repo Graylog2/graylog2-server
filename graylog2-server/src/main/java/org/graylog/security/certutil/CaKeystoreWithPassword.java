@@ -14,16 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.migrations;
+package org.graylog.security.certutil;
 
-public enum MigrationType {
-    /**
-     * Will run _before_ preflight checks and before the preflight interface starts
-     */
-    PREFLIGHT,
-    /**
-     * Will run during a regular startup, after the preflight is either skipped or finished. This is the default
-     * behaviour for most of our migrations.
-     */
-    STANDARD
-}
+import java.security.KeyStore;
+
+/**
+ * Keystores may originate in the mongodb or filesystem. Both use different passwords, so we need to provide the
+ * password along with the keystore, to be able to access private keys for signing.
+ */
+record CaKeystoreWithPassword(KeyStore keyStore, String password) {}

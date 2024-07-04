@@ -22,7 +22,7 @@ import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import type { VisualizationComponent } from 'views/components/aggregationbuilder/AggregationBuilder';
-import type { WidgetActionType, WidgetMenuActionComponentProps } from 'views/components/widgets/Types';
+import type { WidgetActionType } from 'views/components/widgets/Types';
 import type { Creator } from 'views/components/sidebar/create/AddWidgetButton';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
@@ -58,6 +58,7 @@ import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
+import type { ExportPayload } from 'util/MessagesExportUtils';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -182,12 +183,13 @@ interface SearchType<T, R> {
   defaults: {};
 }
 
-interface ExportFormat {
+export interface ExportFormat {
   type: string;
   displayName: () => string;
   disabled?: () => boolean;
   mimeType: string;
   fileExtension: string;
+  formatSpecificFileDownloader?: (format: string, widget: Widget, view: View, executionState: SearchExecutionState, currentUser: User, currentQuery: Query, exportPayload: ExportPayload,) => Promise<void>
 }
 
 export interface SystemConfigurationComponentProps {
@@ -474,7 +476,6 @@ declare module 'graylog-web-plugin/plugin' {
       key: string,
     }>;
     'views.components.widgets.events.actions'?: Array<EventWidgetAction>;
-    'views.components.widgets.exportAction'?: Array<() => React.ComponentType<WidgetMenuActionComponentProps> | null>;
     'views.components.searchActions'?: Array<SearchAction>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
@@ -492,6 +493,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
+    'views.widgets.exportAction'?: Array<{ action: WidgetActionType, useCondition: () => boolean }>;
     'views.reducers'?: Array<ViewsReducer>;
     'views.requires.provided'?: Array<string>;
     'views.queryInput.commands'?: Array<CustomCommand>;

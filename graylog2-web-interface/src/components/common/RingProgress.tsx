@@ -14,7 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage.location;
+import * as React from 'react';
+import { RingProgress as MantineRingProgress } from '@mantine/core';
+import styled from 'styled-components';
 
-public interface KeystoreLocation {
-}
+const LabelContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+type Props = Pick<React.ComponentProps<typeof MantineRingProgress>, 'label' | 'size' | 'thickness' | 'sections'>;
+
+const RingProgress = ({ label, ...props }: Props) => (
+  <MantineRingProgress roundCaps label={<LabelContainer>{label}</LabelContainer>} {...props} />
+);
+
+export default RingProgress;
