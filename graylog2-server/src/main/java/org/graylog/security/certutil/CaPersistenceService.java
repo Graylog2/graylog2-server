@@ -26,7 +26,6 @@ import org.graylog.security.certutil.ca.CAKeyPair;
 import org.graylog.security.certutil.ca.PemCaReader;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog.security.certutil.keystore.storage.KeystoreUtils;
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertificateAuthorityInformation;
@@ -45,6 +44,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -52,7 +52,9 @@ import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -113,7 +115,7 @@ class CaPersistenceService {
     }
 
     public void upload(@Nullable String password, List<FormDataBodyPart> parts) throws CACreationException {
-        final var passwordCharArray = password == null ? null : password.toCharArray();
+        final var providedPassword = password == null ? null : password.toCharArray();
         // TODO: if the upload consists of more than one file, handle accordingly
         // or: decide that it's always only one file containing all certificates
         try {
@@ -126,21 +128,46 @@ class CaPersistenceService {
                 // Test, if upload is PEM file, must contain at least a certificate
                 if (pem.contains("-----BEGIN CERTIFICATE")) {
                     var ca = PemCaReader.readCA(pem, password);
-                    keyStore.setKeyEntry(CA_KEY_ALIAS, ca.privateKey(), passwordCharArray, ca.certificates().toArray(new Certificate[0]));
+                    keyStore.setKeyEntry(CA_KEY_ALIAS, ca.privateKey(), providedPassword, ca.certificates().toArray(new Certificate[0]));
                 } else {
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-                    keyStore.load(bais, passwordCharArray);
+                    keyStore.load(bais, providedPassword);
                 }
             }
-            // we want to get rid of the provided uploaded password and replace it with our general password secret, to standardize
-            // all usages - for both uploaded and generated self-signed keystores.
-            final KeyStore keystoreReplacedPassword = KeystoreUtils.newStoreCopyContent(keyStore, passwordCharArray, passwordSecret.toCharArray());
-            writeToDatabase(keystoreReplacedPassword);
+            writeToDatabase(adaptUploadedKeystore(keyStore, providedPassword));
             triggerCaChangedEvent();
         } catch (IOException | KeyStoreStorageException | GeneralSecurityException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);
             throw new CACreationException("Could not write CA: " + ex.getMessage(), ex);
         }
+    }
+
+    /**
+     * we want to get rid of the provided uploaded password and replace it with our general password secret, to standardize
+     * all usages - for both uploaded and generated self-signed keystores. Additionally we want to unify aliases
+     */
+    @Nonnull
+    private KeyStore adaptUploadedKeystore(KeyStore existingKeystore, char[] existingPassword) throws GeneralSecurityException, IOException {
+        KeyStore adaptedKeystore = KeyStore.getInstance(PKCS12);
+        adaptedKeystore.load(null, passwordSecret.toCharArray());
+        final ArrayList<String> aliases = Collections.list(existingKeystore.aliases());
+        if(aliases.isEmpty()) {
+            throw new IllegalStateException("Provided keystore is empty!");
+        } else if (aliases.size() == 1) {
+            final String alias = aliases.iterator().next();
+            if (existingKeystore.isKeyEntry(alias)) {
+                LOG.info("Found one alias " + alias + ", extracting and persisting key and certificate chain.");
+                final Key key = existingKeystore.getKey(alias, existingPassword);
+                final Certificate[] certChain = existingKeystore.getCertificateChain(alias);
+                adaptedKeystore.setKeyEntry(CA_KEY_ALIAS, key, passwordSecret.toCharArray(), certChain);
+            } else {
+                throw new IllegalStateException("Only one alias " + alias + " found in the keystore and it doesn't have a key assigned");
+            }
+        } else {
+            // TODO: handle situations with multiple aliases
+            throw new IllegalStateException("Keystores with multiple keys not supported yet!");
+        }
+        return adaptedKeystore;
     }
 
     public void startOver() {
