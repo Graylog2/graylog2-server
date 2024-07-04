@@ -37,6 +37,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderDto;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.rest.PaginationParameters;
@@ -47,6 +49,7 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.streams.filters.StreamDestinationFilterRuleDTO;
 import org.graylog2.streams.filters.StreamDestinationFilterService;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -60,11 +63,15 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class StreamDestinationFiltersResource extends RestResource {
     private final StreamDestinationFilterService filterService;
     private final StreamService streamService;
+    private final ValidatorService validatorService;
 
     @Inject
-    public StreamDestinationFiltersResource(StreamDestinationFilterService filterService, StreamService streamService) {
+    public StreamDestinationFiltersResource(StreamDestinationFilterService filterService,
+                                            StreamService streamService,
+                                            ValidatorService validatorService) {
         this.filterService = filterService;
         this.streamService = streamService;
+        this.validatorService = validatorService;
     }
 
     @GET
@@ -137,8 +144,13 @@ public class StreamDestinationFiltersResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_CREATE);
         checkStream(streamId);
+        validateDto(dto);
 
-        return Response.ok(wrapDto(filterService.createForStream(streamId, dto))).build();
+        try {
+            return Response.ok(wrapDto(filterService.createForStream(streamId, dto))).build();
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @PUT
@@ -156,7 +168,13 @@ public class StreamDestinationFiltersResource extends RestResource {
             throw new BadRequestException("The filter ID in the URL doesn't match the one in the payload");
         }
 
-        return Response.ok(wrapDto(filterService.updateForStream(streamId, dto))).build();
+        validateDto(dto);
+
+        try {
+            return Response.ok(wrapDto(filterService.updateForStream(streamId, dto))).build();
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @DELETE
@@ -169,7 +187,11 @@ public class StreamDestinationFiltersResource extends RestResource {
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_DELETE, filterId);
         checkStream(streamId);
 
-        return Response.ok(wrapDto(filterService.deleteFromStream(streamId, filterId))).build();
+        try {
+            return Response.ok(wrapDto(filterService.deleteFromStream(streamId, filterId))).build();
+        } catch (IllegalArgumentException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     private Map<String, StreamDestinationFilterRuleDTO> wrapDto(StreamDestinationFilterRuleDTO dto) {
@@ -182,6 +204,18 @@ public class StreamDestinationFiltersResource extends RestResource {
             streamService.load(streamId);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new NotFoundException(f("Stream not found: %s", streamId));
+        }
+    }
+
+    private void validateDto(@Valid StreamDestinationFilterRuleDTO dto) {
+        final var ruleBuilderDto = RuleBuilderDto.builder()
+                .title(dto.title())
+                .ruleBuilder(dto.rule().toBuilder().actions(List.of()).build())
+                .build();
+        try {
+            validatorService.validateAndFailFast(ruleBuilderDto);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
         }
     }
 }
