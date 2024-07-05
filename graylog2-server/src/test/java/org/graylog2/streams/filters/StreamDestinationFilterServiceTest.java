@@ -16,6 +16,7 @@
  */
 package org.graylog2.streams.filters;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.mongodb.client.model.Sorts;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
@@ -237,5 +238,19 @@ class StreamDestinationFilterServiceTest {
         assertThatThrownBy(() -> service.deleteFromStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef9999"))
                 .hasMessageContaining("54e3deadbeefdeadbeef9999")
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
+    void forEachEnabled() {
+        final var resultBuilder = ImmutableMultimap.<String, String>builder();
+
+        service.forEachEnabledFilterGroupedByStream(filter -> filter.filters().forEach(f -> resultBuilder.put(filter.streamId(), f.title())));
+
+        final var result = resultBuilder.build();
+
+        assertThat(result.keySet()).containsExactlyInAnyOrder("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef2000");
+        assertThat(result.get("54e3deadbeefdeadbeef1000")).containsExactlyInAnyOrder("Test Filter 1", "Test Filter 3");
+        assertThat(result.get("54e3deadbeefdeadbeef2000")).containsExactlyInAnyOrder("Test Filter 4");
     }
 }

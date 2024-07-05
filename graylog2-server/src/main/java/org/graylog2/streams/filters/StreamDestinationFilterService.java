@@ -16,8 +16,11 @@
  */
 package org.graylog2.streams.filters;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
@@ -27,8 +30,12 @@ import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.mongojack.Id;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static com.mongodb.client.model.Filters.and;
@@ -140,5 +147,18 @@ public class StreamDestinationFilterService {
         collection.deleteOne(and(eq(FIELD_STREAM_ID, streamId), idEq(id)));
 
         return dto;
+    }
+
+    public record GroupByStreamResult(@JsonProperty("id") @Id String streamId,
+                                      @JsonProperty("filters") Set<StreamDestinationFilterRuleDTO> filters) {}
+
+    public void forEachEnabledFilterGroupedByStream(Consumer<GroupByStreamResult> consumer) {
+        // Group all enabled filters by stream ID
+        collection.aggregate(List.of(
+                Aggregates.match(eq(FIELD_STATUS, StreamDestinationFilterRuleDTO.Status.ENABLED)),
+                Aggregates.group("$" + FIELD_STREAM_ID, List.of(
+                        Accumulators.push("filters", "$$ROOT")
+                ))
+        ), GroupByStreamResult.class).forEach(consumer);
     }
 }
