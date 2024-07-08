@@ -19,6 +19,8 @@ package org.graylog2.system.traffic;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -34,10 +36,21 @@ public interface TrafficUpdater {
         return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 
-    static TreeMap<DateTime, Long> aggregateToDaily(Map<DateTime, Long> histogram) {
+    static Map<DateTime, Long> aggregateToDaily(Map<DateTime, Long> histogram) {
         return histogram.entrySet().stream()
                 .collect(Collectors.groupingBy(entry -> entry.getKey().withTimeAtStartOfDay(),
                         TreeMap::new,
                         Collectors.mapping(Map.Entry::getValue, Collectors.summingLong(Long::valueOf))));
+    }
+
+    static Map<ZonedDateTime, Long> aggregateToDailyZDT(Map<ZonedDateTime, Long> histogram) {
+        return histogram.entrySet().stream()
+                .collect(Collectors.groupingBy(entry -> timeAtStartOfDay(entry.getKey()),
+                        TreeMap::new,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.summingLong(Long::valueOf))));
+    }
+
+    static private ZonedDateTime timeAtStartOfDay(ZonedDateTime dateTime) {
+        return dateTime.truncatedTo(ChronoUnit.DAYS);
     }
 }
