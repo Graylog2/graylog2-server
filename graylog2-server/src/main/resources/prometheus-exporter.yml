@@ -1295,10 +1295,10 @@ metric_mappings:
     wildcard_extract_labels:
       - "write"
 
-  - metric_name: "data_warehouse_iceberg_file_io_hadoop_write"
-    match_pattern: "org.graylog.iceberg.file.io.hadoop.write"
+  - metric_name: "data_warehouse_iceberg_file_io_local_write"
+    match_pattern: "org.graylog.iceberg.file.io.local.write"
 
 
-  - metric_name: "data_warehouse_iceberg_file_io_hadoop_read"
-    match_pattern: "org.graylog.iceberg.file.io.hadoop.read"
+  - metric_name: "data_warehouse_iceberg_file_io_local_read"
+    match_pattern: "org.graylog.iceberg.file.io.local.read"
 
