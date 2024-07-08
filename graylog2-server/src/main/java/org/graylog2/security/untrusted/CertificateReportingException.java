@@ -14,9 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage.location;
+package org.graylog2.security.untrusted;
 
-public record KeystoreMongoCollection(String collectionName,
-                                      String identifierField,
-                                      String encryptedCertificateField) {
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+/**
+ * Wrapper around CertificateException which additionally makes the actual certificate chain accessible to the caller/
+ * catcher of the exception.
+ */
+public class CertificateReportingException extends CertificateException {
+    private final X509Certificate[] chain;
+
+    public CertificateReportingException(CertificateException cause, X509Certificate[] chain) {
+        super(cause);
+        this.chain = chain;
+    }
+
+    public X509Certificate[] getChain() {
+        return chain;
+    }
 }

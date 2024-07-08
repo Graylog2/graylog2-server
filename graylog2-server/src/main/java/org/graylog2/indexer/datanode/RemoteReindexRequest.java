@@ -26,5 +26,6 @@ public record RemoteReindexRequest(@Nullable String allowlist,
                                    String username,
                                    String password,
                                    List<String> indices,
-                                   int threadsCount) {
+                                   int threadsCount,
+                                   boolean trustUnknownCerts) {
 }
