@@ -1,0 +1,5 @@
+type = "a"
+message = "Add filters for filterable stream destinations."
+
+issues = ["graylog-plugin-enterprise#7210"]
+pulls = ["19739"]

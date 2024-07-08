@@ -14,17 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration;
+package org.graylog2.security.untrusted;
 
-import java.net.URI;
-import java.util.List;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
-public record RemoteReindexParams(String allowlist,
-                                  URI hostname,
-                                  String user,
-                                  String password,
-                                  List<String> indices,
-                                  boolean synchronous,
-                                  int threadsCount,
-                                  boolean trustUnknownCerts) {
+/**
+ * Wrapper around CertificateException which additionally makes the actual certificate chain accessible to the caller/
+ * catcher of the exception.
+ */
+public class CertificateReportingException extends CertificateException {
+    private final X509Certificate[] chain;
+
+    public CertificateReportingException(CertificateException cause, X509Certificate[] chain) {
+        super(cause);
+        this.chain = chain;
+    }
+
+    public X509Certificate[] getChain() {
+        return chain;
+    }
 }

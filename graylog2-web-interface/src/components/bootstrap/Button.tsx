@@ -35,8 +35,10 @@ const sizeForMantine = (size: BsSize) => {
   }
 };
 
-export type StyleProps = ColorVariant | 'link';
+export type StyleProps = ColorVariant | 'link' | 'transparent';
 
+const isLinkStyle = (style: StyleProps) => style === 'link';
+const isTransparentStyle = (style: StyleProps) => style === 'transparent';
 const mapStyle = (style: StyleProps) => (style === 'default' ? 'gray' : style);
 
 const stylesProps = (style: StyleProps) => {
@@ -47,7 +49,7 @@ const stylesProps = (style: StyleProps) => {
 };
 
 const stylesForSize = (size: BsSize, bsStyle: StyleProps) => {
-  if (bsStyle === 'link') {
+  if (isLinkStyle(bsStyle)) {
     return css`
       padding: 0;
       height: auto;
@@ -83,9 +85,11 @@ const stylesForSize = (size: BsSize, bsStyle: StyleProps) => {
 };
 
 const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) => {
-  const isLink = style === 'link';
+  const isSpecialStyle = isLinkStyle(style) || isTransparentStyle(style);
 
-  const colors = isLink ? { color: themeColors.global.textDefault, background: 'transparent' } : themeColors.disabled[style];
+  const colors = isSpecialStyle
+    ? { color: themeColors.global.textDefault, background: 'transparent' }
+    : themeColors.disabled[style];
 
   return css`
     &:disabled,
@@ -93,7 +97,7 @@ const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) 
       pointer-events: all;
       color: ${colors.color};
       background-color: ${colors.background};
-      opacity: ${isLink ? 1 : 0.45};
+      opacity: 0.45;
 
       &:hover {
         color: ${colors.color};
@@ -110,6 +114,7 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
     case 'success':
     case 'primary':
     case 'warning':
+    case 'transparent':
       return css`
           color: ${themeColors.global.textDefault};
 
@@ -135,6 +140,24 @@ const linkStyles = css`
   }
 `;
 
+// Other transparent styles are defined in e.g. the size specific function
+const transparentStyles = css`
+  &:hover {
+    background: transparent;
+  }
+`;
+
+const textColor = (style: StyleProps, colors: DefaultTheme['colors']) => {
+  switch (style) {
+    case 'link':
+      return colors.global.link;
+    case 'transparent':
+      return colors.global.textDefault;
+    default:
+      return colors.button[style].color;
+  }
+};
+
 const StyledButton = styled(MantineButton)<{
   $bsStyle: StyleProps,
   $bsSize: BsSize,
@@ -145,11 +168,12 @@ const StyledButton = styled(MantineButton)<{
   $bsSize,
   $active,
 }) => {
-  const isLink = $bsStyle === 'link';
-  const textColor = isLink ? theme.colors.global.link : theme.colors.button[$bsStyle].color;
+  const isLink = isLinkStyle($bsStyle);
+  const isTransparent = isTransparentStyle($bsStyle);
+  const color = textColor($bsStyle, theme.colors);
 
   return css`
-    color: ${textColor};
+    color: ${color};
     font-weight: 400;
     overflow: visible;
 
@@ -157,17 +181,18 @@ const StyledButton = styled(MantineButton)<{
     ${stylesForSize($bsSize, $bsStyle)}
 
     &:hover {
-      color: ${isLink ? theme.colors.global.linkHover : textColor};
+      color: ${isLink ? theme.colors.global.linkHover : color};
       text-decoration: none;
     }
 
     &:focus {
-      color: ${textColor};
+      color: ${color};
       text-decoration: none;
     }
 
     ${$active && activeStyles(theme.colors, $bsStyle)}
     ${isLink && linkStyles}
+    ${isTransparent && transparentStyles}
 
     .mantine-Button-label {
       gap: 0.25em;
@@ -208,7 +233,10 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
   }, ref) => {
     const theme = useTheme();
     const style = mapStyle(bsStyle);
-    const color = style === 'link' ? 'transparent' : theme.colors.button[style].background;
+    const color = (isLinkStyle(style) || isTransparentStyle(style))
+      ? 'transparent'
+      : theme.colors.button[style].background;
+
     const sharedProps = {
       id,
       'aria-label': ariaLabel,

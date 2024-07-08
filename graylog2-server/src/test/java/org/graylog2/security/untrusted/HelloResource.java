@@ -14,17 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration;
+package org.graylog2.security.untrusted;
 
-import java.net.URI;
-import java.util.List;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 
-public record RemoteReindexParams(String allowlist,
-                                  URI hostname,
-                                  String user,
-                                  String password,
-                                  List<String> indices,
-                                  boolean synchronous,
-                                  int threadsCount,
-                                  boolean trustUnknownCerts) {
+@Path("/")
+public class HelloResource {
+    @GET
+    public String getHello() {
+        return "This is the response";
+    }
 }
