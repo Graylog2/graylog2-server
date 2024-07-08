@@ -22,6 +22,7 @@ import styled from 'styled-components';
 
 import { Alert, Input, Row, Col } from 'components/bootstrap';
 import { SearchForm, Spinner } from 'components/common';
+import { getValueFromInput } from 'util/FormsUtils';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
@@ -94,10 +95,10 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
 
   const handleChange = async (e: React.ChangeEvent<any>, callback: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<RemoteReindexRequest>>) => {
     let value;
-    value = e.target.value;
+    value = getValueFromInput(e.target);
 
     if (e.target.name === 'threads') {
-      value = Number(e.target.value) < 1 ? DEFAULT_THREADS_COUNT : Number(e.target.value);
+      value = (value || 0) < 1 ? DEFAULT_THREADS_COUNT : value;
     }
 
     await callback(e.target.name, value);
