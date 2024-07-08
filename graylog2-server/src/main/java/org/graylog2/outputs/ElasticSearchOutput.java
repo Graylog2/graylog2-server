@@ -19,11 +19,13 @@ package org.graylog2.outputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.collect.ImmutableMultimap;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
+import org.graylog2.outputs.filter.DefaultFilteredMessage;
 import org.graylog2.outputs.filter.FilteredMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
@@ -74,8 +76,7 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
     @Override
     public void writeFiltered(List<FilteredMessage> filteredMessages) throws Exception {
         final var messages = filteredMessages.stream()
-                .filter(message -> message.outputs().contains(FILTER_KEY))
-                .map(FilteredMessage::message)
+                .filter(message -> !message.destinations().get(FILTER_KEY).isEmpty())
                 .toList();
 
         writes.mark(messages.size());
@@ -89,7 +90,12 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
         if (LOG.isTraceEnabled()) {
             LOG.trace("Writing message id to [{}]: <{}>", NAME, message.getId());
         }
-        writeMessageEntries(List.of(message));
+        writeMessageEntries(List.of(new DefaultFilteredMessage(
+                message,
+                ImmutableMultimap.<String, Stream>builder()
+                        .putAll(FILTER_KEY, message.getStreams())
+                        .build()
+        )));
     }
 
     @Override
@@ -97,15 +103,23 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
         if (LOG.isTraceEnabled()) {
             LOG.trace("Writing {} messages to [{}]", messageList.size(), NAME);
         }
-        writeMessageEntries(messageList);
+        writeMessageEntries(messageList.stream()
+                .map(message -> new DefaultFilteredMessage(
+                        message,
+                        ImmutableMultimap.<String, Stream>builder()
+                                .putAll(FILTER_KEY, message.getStreams())
+                                .build()
+                ))
+                .collect(Collectors.toList()));
     }
 
-    private void writeMessageEntries(List<Message> messageList) {
-        // We need to create one message per index set
+    private void writeMessageEntries(List<FilteredMessage> messageList) {
+        // We need to create one message per index set. Use the streams from the filtered targets.
         final var messagesWithIndex = messageList.stream()
-                .flatMap(message -> message.getStreams()
+                .flatMap(message -> message.destinations()
+                        .get(FILTER_KEY)
                         .stream()
-                        .map(stream -> new MessageWithIndex(message, stream.getIndexSet())))
+                        .map(stream -> new MessageWithIndex(message.message(), stream.getIndexSet())))
                 .toList();
 
         if (LOG.isTraceEnabled()) {
