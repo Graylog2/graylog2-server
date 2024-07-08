@@ -33,13 +33,13 @@ class CaTruststoreImplTest {
     void testAbsenceOfPrivateKey() throws Exception {
         final KeyPair caKeys = generateCaKeys();
 
-        final char[] password = "my-pass".toCharArray();
-        final KeyStore keystore = caKeys.toKeystore(CertConstants.CA_KEY_ALIAS, password);
+        final String password = "my-pass";
+        final KeyStore keystore = caKeys.toKeystore(CertConstants.CA_KEY_ALIAS, password.toCharArray());
 
         // verify that the keystore contains a private key. It should be there, together with a cert
         Assertions.assertThat(keystore.isKeyEntry(CertConstants.CA_KEY_ALIAS)).isTrue();
 
-        final CaTruststore truststore = new CaTruststoreImpl(mockCaService(keystore));
+        final CaTruststore truststore = new CaTruststoreImpl(mockCaService(keystore, password));
         Assertions.assertThat(truststore.getTrustStore())
                 .isPresent()
                 .hasValueSatisfying(ts -> {
@@ -54,10 +54,10 @@ class CaTruststoreImplTest {
     }
 
     @Nonnull
-    private static CaService mockCaService(KeyStore keystore) throws KeyStoreStorageException {
-        final CaService caService = Mockito.mock(CaService.class);
-        Mockito.when(caService.loadKeyStore()).thenReturn(Optional.of(keystore));
-        return caService;
+    private static CaPersistenceService mockCaService(KeyStore keystore, String password) throws KeyStoreStorageException {
+        final CaPersistenceService caPersistenceService = Mockito.mock(CaPersistenceService.class);
+        Mockito.when(caPersistenceService.loadKeyStore()).thenReturn(Optional.of(new CaKeystoreWithPassword(keystore, password)));
+        return caPersistenceService;
     }
 
     @Nonnull

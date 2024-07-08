@@ -25,5 +25,6 @@ public record RemoteReindexParams(String allowlist,
                                   String password,
                                   List<String> indices,
                                   boolean synchronous,
-                                  int threadsCount) {
+                                  int threadsCount,
+                                  boolean trustUnknownCerts) {
 }
