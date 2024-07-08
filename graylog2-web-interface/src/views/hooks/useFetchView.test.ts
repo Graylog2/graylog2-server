@@ -27,7 +27,7 @@ import View from 'views/logic/views/View';
 
 import useFetchView from './useFetchView';
 
-const viewJson = {
+const viewJson: ViewJson = {
   id: 'foo',
   type: 'DASHBOARD',
   title: 'Foo',
@@ -36,12 +36,12 @@ const viewJson = {
   search_id: 'foosearch',
   properties: List<any>(),
   state: {},
-  dashboard_state: { widgets: [], positions: [] },
   created_at: '2022-01-01 00:00:00',
+  last_updated_at: '2022-01-01 00:00:00',
   owner: 'admin',
   requires: {},
   favorite: false,
-} as ViewJson;
+};
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {

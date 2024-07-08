@@ -20,6 +20,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.CsrRequester;
+import org.graylog2.bootstrap.preflight.PreflightConfigResult;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -43,20 +45,33 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private final CsrRequester csrRequester;
 
+    private final Supplier<Boolean> isServerInPreflightMode;
+
     @Inject
-    public DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, ClusterConfigService clusterConfigService, CsrRequester csrRequester) {
-        this(datanodeKeystore, () -> clusterConfigService.get(RenewalPolicy.class), csrRequester);
+    public DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, ClusterConfigService clusterConfigService, CsrRequester csrRequester, PreflightConfigService preflightConfigService) {
+        this(datanodeKeystore, () -> clusterConfigService.get(RenewalPolicy.class), csrRequester, () -> isInPreflight(preflightConfigService));
     }
 
-    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester) {
+    private static boolean isInPreflight(PreflightConfigService preflightConfigService) {
+        return preflightConfigService.getPreflightConfigResult() != PreflightConfigResult.FINISHED;
+    }
+
+    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode) {
         this.datanodeKeystore = datanodeKeystore;
         this.renewalPolicySupplier = renewalPolicySupplier;
         this.csrRequester = csrRequester;
+        this.isServerInPreflightMode = isServerInPreflightMode;
     }
 
 
     @Override
     public void doRun() {
+        if (isServerInPreflightMode.get()) {
+            // we don't want to automatically trigger CSRs during preflight, don't run it if the preflight is still not finished or skipped
+            LOG.debug("Datanode still in preflight mode, skipping cert renewal task");
+            return;
+        }
+
         // always check if there are any certificates that we can accept
         getRenewalPolicy()
                 .filter(this::needsNewCertificate)

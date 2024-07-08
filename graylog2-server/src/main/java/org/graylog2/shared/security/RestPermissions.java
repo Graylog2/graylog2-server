@@ -138,6 +138,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String SEARCHES_KEYWORD = "searches:keyword";
     public static final String SEARCHES_RELATIVE = "searches:relative";
     public static final String SOURCES_READ = "sources:read";
+    public static final String STREAM_DESTINATION_FILTERS_CREATE = "stream_destination_filters:create";
+    public static final String STREAM_DESTINATION_FILTERS_DELETE = "stream_destination_filters:delete";
+    public static final String STREAM_DESTINATION_FILTERS_EDIT = "stream_destination_filters:edit";
+    public static final String STREAM_DESTINATION_FILTERS_READ = "stream_destination_filters:read";
     public static final String STREAM_OUTPUTS_CREATE = "stream_outputs:create";
     public static final String STREAM_OUTPUTS_DELETE = "stream_outputs:delete";
     public static final String STREAM_OUTPUTS_READ = "stream_outputs:read";

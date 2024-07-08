@@ -35,7 +35,7 @@ const useStream = (streamId: string, { enabled } = { enabled: true }): {
   isError,
 } => {
   const { data, refetch, isFetching, isError } = useQuery(
-    ['streams', streamId],
+    ['stream', streamId],
     () => fetchStream(streamId),
     {
       onError: (errorThrown) => {

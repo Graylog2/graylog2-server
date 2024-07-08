@@ -48,6 +48,8 @@ import org.graylog2.rest.resources.search.DecoratorResource;
 import org.graylog2.rest.resources.search.KeywordSearchResource;
 import org.graylog2.rest.resources.search.RelativeSearchResource;
 import org.graylog2.rest.resources.streams.StreamResource;
+import org.graylog2.rest.resources.streams.destinations.filters.StreamDestinationFilterBuilderResource;
+import org.graylog2.rest.resources.streams.destinations.filters.StreamDestinationFiltersResource;
 import org.graylog2.rest.resources.streams.outputs.StreamOutputResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleInputsResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleResource;
@@ -258,6 +260,8 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StreamRuleResource.class);
         addSystemRestResource(StreamResource.class);
         addSystemRestResource(StreamRuleInputsResource.class);
+        addSystemRestResource(StreamDestinationFiltersResource.class);
+        addSystemRestResource(StreamDestinationFilterBuilderResource.class);
     }
 
     private void addMonitoringResources() {
