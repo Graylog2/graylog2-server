@@ -17,12 +17,14 @@
 package org.graylog2.streams.filters;
 
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.mongodb.client.model.Sorts;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.events.ClusterEventBus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +42,7 @@ class StreamDestinationFilterServiceTest {
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        this.service = new StreamDestinationFilterService(mongoCollections);
+        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()));
     }
 
     @Test
