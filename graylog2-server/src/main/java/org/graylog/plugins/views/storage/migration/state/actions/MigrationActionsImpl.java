@@ -184,7 +184,8 @@ public class MigrationActionsImpl implements MigrationActions {
     public boolean compatibleDatanodesRunning() {
         Map<String, DataNodeDto> nodes = nodeService.allActive();
         return !nodes.isEmpty() && nodes.values().stream()
-                .allMatch(node -> Objects.equals(node.getDatanodeVersion(), graylogVersion.toString()));
+                .allMatch(node -> node.getDatanodeVersion() != null &&
+                        graylogVersion.compareTo(new Version(com.github.zafarkhaja.semver.Version.valueOf(node.getDatanodeVersion()))) == 0);
     }
 
     @Override
