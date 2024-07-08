@@ -24,7 +24,6 @@ const AuthenticationOverviewPage = loadAsync(() => import('./AuthenticationOverv
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const AuthenticatorsPage = loadAsync(() => import('./AuthenticatorsPage'));
 const AuthenticatorsEditPage = loadAsync(() => import('./AuthenticatorsEditPage'));
-const CategoriesPage = loadAsync(() => import('pages/CategoriesPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
@@ -42,6 +41,7 @@ const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificatio
 const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
 const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
 const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
+const EntityGroupsPage = loadAsync(() => import('pages/EntityGroupsPage'));
 const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
 const EventNotificationsPage = loadAsync(() => import('./EventNotificationsPage'));
 const EventsPage = loadAsync(() => import('./EventsPage'));
@@ -122,7 +122,6 @@ export {
   AuthenticationOverviewPage,
   AuthenticatorsPage,
   AuthenticatorsEditPage,
-  CategoriesPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
@@ -140,6 +139,7 @@ export {
   EditContentPackPage,
   EditExtractorsPage,
   EnterprisePage,
+  EntityGroupsPage,
   EventDefinitionsPage,
   EventNotificationsPage,
   EventsPage,
