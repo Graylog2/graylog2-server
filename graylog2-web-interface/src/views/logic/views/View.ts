@@ -55,6 +55,7 @@ type InternalState = {
   owner: string,
   requires: Requirements,
   favorite: boolean,
+  lastUpdatedAt: Date,
 };
 
 export type ViewJson = {
@@ -70,6 +71,7 @@ export type ViewJson = {
   owner: string,
   requires: Requirements,
   favorite: boolean,
+  last_updated_at: string,
 };
 
 export default class View {
@@ -92,6 +94,7 @@ export default class View {
     owner: string,
     requires: Requirements,
     favorite: boolean,
+    lastUpdatedAt: Date,
   ) {
     this._value = {
       id,
@@ -106,6 +109,7 @@ export default class View {
       owner,
       requires,
       favorite,
+      lastUpdatedAt,
     };
   }
 
@@ -166,6 +170,10 @@ export default class View {
     return this._value.favorite || false;
   }
 
+  get lastUpdatedAt(): Date {
+    return this._value.lastUpdatedAt;
+  }
+
   getSearchTypeByWidgetId(widgetId: string): QuerySearchType | undefined | null {
     const widgetMapping = this.state.map((state) => state.widgetMapping).flatten(true);
     const searchTypeId = widgetMapping.get(widgetId).first();
@@ -224,9 +232,10 @@ export default class View {
   }
 
   static fromJSON(value: ViewJson): View {
-    const { id, type, title, summary, description, properties, state, created_at, owner, requires, favorite } = value;
+    const { id, type, title, summary, description, properties, state, created_at, owner, requires, favorite, last_updated_at } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
     const createdAtDate = new Date(created_at);
+    const lastUpdatedAtDate = new Date(last_updated_at);
 
     return View.create()
       .toBuilder()
@@ -241,6 +250,7 @@ export default class View {
       .owner(owner)
       .requires(requires)
       .favorite(favorite)
+      .lastUpdatedAt(lastUpdatedAtDate)
       .build();
   }
 
@@ -303,6 +313,10 @@ class Builder {
     return new Builder(this.value.set('createdAt', value));
   }
 
+  lastUpdatedAt(value: Date): Builder {
+    return new Builder(this.value.set('lastUpdatedAt', value));
+  }
+
   owner(value: string): Builder {
     return new Builder(this.value.set('owner', value));
   }
@@ -316,8 +330,8 @@ class Builder {
   }
 
   build(): View {
-    const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite } = this.value.toObject();
+    const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite, lastUpdatedAt } = this.value.toObject();
 
-    return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite);
+    return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite, lastUpdatedAt);
   }
 }

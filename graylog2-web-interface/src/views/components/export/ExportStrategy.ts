@@ -48,7 +48,7 @@ const _initialSearchWidget = (widgets, directExportWidgetId) => {
   return null;
 };
 
-const formatDefinition = (format: string) => {
+export const formatDefinition = (format: string) => {
   const formats = PluginStore.exports('views.export.formats');
 
   const definition = formats.find(({ type }) => (type === format));
