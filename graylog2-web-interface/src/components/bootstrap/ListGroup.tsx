@@ -14,7 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage.location;
+import React from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { ListGroup as BootstrapListGroup } from 'react-bootstrap';
 
-public interface KeystoreLocation {
-}
+type Props = React.PropsWithChildren<{
+  className?: string,
+  componentClass?: React.ElementType | undefined
+}>
+
+const ListGroup = ({ className, children, ...props }: Props) => <BootstrapListGroup bsClass={className} {...props}>{children}</BootstrapListGroup>;
+
+ListGroup.defaultProps = {
+  className: undefined,
+  componentClass: undefined,
+};
+
+/** @component */
+export default ListGroup;
