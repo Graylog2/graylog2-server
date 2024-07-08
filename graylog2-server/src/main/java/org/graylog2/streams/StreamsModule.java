@@ -16,10 +16,8 @@
  */
 package org.graylog2.streams;
 
-import com.google.inject.Scopes;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.inject.Graylog2Module;
-import org.graylog2.streams.filters.StreamDestinationFilterService;
 import org.graylog2.streams.input.StreamRuleInputsProvider;
 import org.graylog2.streams.input.StreamRuleServerInputsProvider;
 
@@ -29,8 +27,6 @@ public class StreamsModule extends Graylog2Module {
     protected void configure() {
         bind(StreamRuleService.class).to(StreamRuleServiceImpl.class);
         bind(StreamService.class).to(StreamServiceImpl.class);
-
-        bind(StreamDestinationFilterService.class).in(Scopes.SINGLETON);
 
         Multibinder<StreamRuleInputsProvider> uriBinder = Multibinder.newSetBinder(binder(), StreamRuleInputsProvider.class);
         uriBinder.addBinding().to(StreamRuleServerInputsProvider.class);
