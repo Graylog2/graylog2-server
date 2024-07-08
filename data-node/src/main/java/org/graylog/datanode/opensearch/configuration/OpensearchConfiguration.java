@@ -25,6 +25,7 @@ import org.graylog.datanode.process.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -92,7 +93,18 @@ public record OpensearchConfiguration(
 
     public Environment getEnv() {
         final Environment env = new Environment(System.getenv());
-        env.put("OPENSEARCH_JAVA_OPTS", "-Xms%s -Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap(), opensearchSecurityConfiguration.getOpensearchHeap()));
+
+        List<String> javaOpts = new LinkedList<>();
+        javaOpts.add("-Xms%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
+        javaOpts.add("-Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
+
+        opensearchSecurityConfiguration.getTruststore().ifPresent(truststore -> {
+            javaOpts.add("-Djavax.net.ssl.trustStore=" + truststore.location().toAbsolutePath());
+            javaOpts.add("-Djavax.net.ssl.trustStorePassword=" + truststore.passwordAsString());
+            javaOpts.add("-Djavax.net.ssl.trustStoreType=pkcs12");
+        });
+
+        env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
         env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
         return env;
     }

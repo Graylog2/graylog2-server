@@ -35,8 +35,10 @@ const sizeForMantine = (size: BsSize) => {
   }
 };
 
-export type StyleProps = ColorVariant | 'link';
+export type StyleProps = ColorVariant | 'link' | 'transparent';
 
+const isLinkStyle = (style: StyleProps) => style === 'link';
+const isTransparentStyle = (style: StyleProps) => style === 'transparent';
 const mapStyle = (style: StyleProps) => (style === 'default' ? 'gray' : style);
 
 const stylesProps = (style: StyleProps) => {
@@ -46,7 +48,14 @@ const stylesProps = (style: StyleProps) => {
   }
 };
 
-const stylesForSize = (size: BsSize) => {
+const stylesForSize = (size: BsSize, bsStyle: StyleProps) => {
+  if (isLinkStyle(bsStyle)) {
+    return css`
+      padding: 0;
+      height: auto;
+    `;
+  }
+
   switch (size) {
     case 'xs':
     case 'xsmall':
@@ -76,11 +85,11 @@ const stylesForSize = (size: BsSize) => {
 };
 
 const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) => {
-  if (style === 'link') {
-    return '';
-  }
+  const isSpecialStyle = isLinkStyle(style) || isTransparentStyle(style);
 
-  const colors = themeColors.disabled[style];
+  const colors = isSpecialStyle
+    ? { color: themeColors.global.textDefault, background: 'transparent' }
+    : themeColors.disabled[style];
 
   return css`
     &:disabled,
@@ -92,6 +101,7 @@ const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) 
 
       &:hover {
         color: ${colors.color};
+        text-decoration: none;
       }
     }
   `;
@@ -104,18 +114,47 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
     case 'success':
     case 'primary':
     case 'warning':
+    case 'transparent':
       return css`
-        color: ${themeColors.global.textDefault};
+          color: ${themeColors.global.textDefault};
 
         &:hover {
-        color: ${themeColors.global.textDefault};
+          color: ${themeColors.global.textDefault};
         }
 
         &:focus {
-        color: ${themeColors.global.textDefault};
+          color: ${themeColors.global.textDefault};
         }
     `;
     default: return '';
+  }
+};
+
+// Other link styles are defined in e.g. the size specific function
+const linkStyles = css`
+  vertical-align: baseline;
+
+  &:hover {
+    background: transparent;
+    text-decoration: underline;
+  }
+`;
+
+// Other transparent styles are defined in e.g. the size specific function
+const transparentStyles = css`
+  &:hover {
+    background: transparent;
+  }
+`;
+
+const textColor = (style: StyleProps, colors: DefaultTheme['colors']) => {
+  switch (style) {
+    case 'link':
+      return colors.global.link;
+    case 'transparent':
+      return colors.global.textDefault;
+    default:
+      return colors.button[style].color;
   }
 };
 
@@ -129,27 +168,31 @@ const StyledButton = styled(MantineButton)<{
   $bsSize,
   $active,
 }) => {
-  const textColor = $bsStyle === 'link' ? theme.colors.global.link : theme.colors.button[$bsStyle].color;
+  const isLink = isLinkStyle($bsStyle);
+  const isTransparent = isTransparentStyle($bsStyle);
+  const color = textColor($bsStyle, theme.colors);
 
   return css`
-    color: ${textColor};
+    color: ${color};
     font-weight: 400;
     overflow: visible;
 
     ${disabledStyles(theme.colors, $bsStyle)}
-    ${stylesForSize($bsSize)}
+    ${stylesForSize($bsSize, $bsStyle)}
 
     &:hover {
-      color: ${textColor};
+      color: ${isLink ? theme.colors.global.linkHover : color};
       text-decoration: none;
     }
 
     &:focus {
-      color: ${textColor};
+      color: ${color};
       text-decoration: none;
     }
 
     ${$active && activeStyles(theme.colors, $bsStyle)}
+    ${isLink && linkStyles}
+    ${isTransparent && transparentStyles}
 
     .mantine-Button-label {
       gap: 0.25em;
@@ -190,7 +233,10 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
   }, ref) => {
     const theme = useTheme();
     const style = mapStyle(bsStyle);
-    const color = style === 'link' ? 'transparent' : theme.colors.button[style].background;
+    const color = (isLinkStyle(style) || isTransparentStyle(style))
+      ? 'transparent'
+      : theme.colors.button[style].background;
+
     const sharedProps = {
       id,
       'aria-label': ariaLabel,
