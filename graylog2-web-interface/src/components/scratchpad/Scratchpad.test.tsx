@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import ClipboardJS from 'clipboard';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
@@ -85,24 +84,21 @@ describe('<Scratchpad />', () => {
     await screen.findByText(/auto saved\./i);
   });
 
-  it('shows copied status', () => {
+  it('shows copied status', async () => {
     render(<SUT />);
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = await screen.findByRole('textbox');
     textarea.focus();
     fireEvent.change(textarea, { target: { value: 'foo' } });
 
-    const btnCopy = screen.getByRole('button', { name: /copy/i });
+    const btnCopy = await screen.findByRole('button', { name: /copy/i });
 
-    const clipboard = new ClipboardJS(btnCopy);
-
+    document.execCommand = jest.fn();
     fireEvent.click(btnCopy);
 
-    clipboard.on('success', () => {
-      expect(screen.getByText(/copied!/i)).toBeInTheDocument();
-    });
+    expect(document.execCommand).toHaveBeenCalledWith('copy');
 
-    expect(clipboard.on).toHaveBeenCalled();
+    await screen.findByText(/copied!/i);
   });
 
   it('confirms before clearing data', async () => {

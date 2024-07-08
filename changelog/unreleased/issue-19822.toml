@@ -1,0 +1,5 @@
+type="f"
+message="Fixing copy button in scratchpad modal."
+
+issues=["19822"]
+pulls=["19823"]
