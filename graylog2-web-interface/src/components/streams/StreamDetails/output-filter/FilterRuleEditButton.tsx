@@ -20,11 +20,9 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
-
-import FilterRuleForm from './FilterRuleForm';
-import type { StreamOutputFilterRule } from './Types';
-
-import useStreamOutputRuleMutation from '../../hooks/useStreamOutputRuleMutation';
+import FilterRuleForm from 'components/streams/StreamDetails/output-filter/FilterRuleForm';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
+import useStreamOutputRuleMutation from 'components/streams/hooks/useStreamOutputRuleMutation';
 
 type Props ={
   filterRule: Partial<StreamOutputFilterRule>,

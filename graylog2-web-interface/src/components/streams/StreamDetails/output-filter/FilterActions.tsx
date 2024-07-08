@@ -16,9 +16,9 @@
  */
 import React from 'react';
 
-import type { StreamOutputFilterRule } from './Types';
-import FilterRuleEditButton from './FilterRuleEditButton';
-import FilterDeleteButton from './FilterDeleteButton';
+import FilterRuleEditButton from 'components/streams/StreamDetails/output-filter/FilterRuleEditButton';
+import FilterDeleteButton from 'components/streams/StreamDetails/output-filter/FilterDeleteButton';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
 type Props = {
   filterRule: StreamOutputFilterRule,

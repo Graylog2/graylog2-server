@@ -26,8 +26,7 @@ import { ConfigurationForm } from 'components/configurationforms';
 import type { Output } from 'stores/outputs/OutputsStore';
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
-
-import type { AvailableOutputRequestedConfiguration } from '../../useAvailableOutputTypes';
+import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
 
 type Props = {
   output: Output,

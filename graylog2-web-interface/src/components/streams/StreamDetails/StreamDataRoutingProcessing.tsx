@@ -25,8 +25,7 @@ import Routes from 'routing/Routes';
 import { IfPermitted, Section, Icon } from 'components/common';
 import usePipelines from 'hooks/usePipelines';
 import { LinkContainer } from 'components/common/router';
-
-import StreamPipelinesConnectionForm from './StreamPipelinesConnectionForm';
+import StreamPipelinesConnectionForm from 'components/streams/StreamDetails/StreamPipelinesConnectionForm';
 
 const ActionButtonsWrap = styled.span`
   margin-right: 6px;

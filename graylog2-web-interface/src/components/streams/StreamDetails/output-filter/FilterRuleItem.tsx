@@ -14,19 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import * as React from 'react';
 
-import FilterActions from '../FilterActions';
-import type { StreamOutputFilterRule } from '../Types';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
-const useTableElements = (destinationType: string) => {
-  const entityActions = useCallback((listItem: StreamOutputFilterRule) => (
-    <FilterActions filterRule={listItem} destinationType={destinationType} />
-  ), [destinationType]);
-
-  return {
-    entityActions,
-  };
+type Props = {
+  rule: StreamOutputFilterRule,
 };
 
-export default useTableElements;
+const FilterRuleItem = ({ rule }: Props) => (
+  <tr>
+    <td>{rule.title}</td>
+    <td>enabled</td>
+    <td>throughput</td>
+    <td>errors</td>
+  </tr>
+);
+
+export default FilterRuleItem;

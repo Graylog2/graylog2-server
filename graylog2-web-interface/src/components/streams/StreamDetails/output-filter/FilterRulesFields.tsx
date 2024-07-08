@@ -24,10 +24,8 @@ import { ConfirmDialog } from 'components/common';
 import type { BlockType, RuleBlock } from 'components/rules/rule-builder/types';
 import RuleBuilderBlock from 'components/rules/rule-builder/RuleBuilderBlock';
 import { Panel, Radio } from 'components/bootstrap';
-
-import type { StreamOutputFilterRule } from './Types';
-
-import useStreamOutputRuleBuilder, { fetchValidateRule } from '../../hooks/useStreamOutputRuleBuilder';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
+import useStreamOutputRuleBuilder, { fetchValidateRule } from 'components/streams/hooks/useStreamOutputRuleBuilder';
 
 type Props = {
   type: BlockType,

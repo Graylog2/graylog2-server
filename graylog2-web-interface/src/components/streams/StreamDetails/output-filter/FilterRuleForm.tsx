@@ -19,9 +19,8 @@ import { Formik } from 'formik';
 
 import { BootstrapModalWrapper, Modal } from 'components/bootstrap';
 import { FormikInput, ModalSubmit } from 'components/common';
-
-import type { StreamOutputFilterRule } from './Types';
-import FilterRulesFields from './FilterRulesFields';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
+import FilterRulesFields from 'components/streams/StreamDetails/output-filter/FilterRulesFields';
 
 type StreamOutputFilterRuleValues = Partial<StreamOutputFilterRule>;
 type Props = {

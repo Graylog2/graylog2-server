@@ -266,6 +266,11 @@ const ApiRoutes = {
     update: (streamId: string, streamRuleId: string) => ({ url: `/streams/${streamId}/rules/${streamRuleId}` }),
     create: (streamId: string) => ({ url: `/streams/${streamId}/rules` }),
   },
+  StreamOutputFilterRuleApiController: {
+    delete: (streamId: string, filterId: string) => ({ url: `/streams/${streamId}/destinations/filters/${filterId}` }),
+    update: (streamId: string, filterId: string) => ({ url: `/streams/${streamId}/destinations/filters/${filterId}` }),
+    create: (streamId: string) => ({ url: `/streams/${streamId}/destinations/filters` }),
+  },
   SystemApiController: {
     info: () => ({ url: '/system' }),
     jvm: () => ({ url: '/system/jvm' }),

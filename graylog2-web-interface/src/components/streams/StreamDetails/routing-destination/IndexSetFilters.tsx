@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import FilterRulesList from '../common/FilterRuleList';
+import FilterRulesList from 'components/streams/StreamDetails/output-filter/FilterRuleList';
 
 type Props = {
   streamId: string,

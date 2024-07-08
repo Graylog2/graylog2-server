@@ -23,10 +23,9 @@ import { OutputsStore, type Output } from 'stores/outputs/OutputsStore';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type { ConfigurationFormData } from 'components/configurationforms';
+import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
 
 import OutputItem from './OutputItem';
-
-import type { AvailableOutputRequestedConfiguration } from '../../useAvailableOutputTypes';
 
 type Props = {
   outputs: Array<Output>,

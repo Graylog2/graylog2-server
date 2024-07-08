@@ -16,15 +16,17 @@
  */
 import { useMutation } from '@tanstack/react-query';
 
-import { StreamDestinationsFilters } from '@graylog/server-api';
 import UserNotification from 'util/UserNotification';
-
-import type { StreamOutputFilterRule } from '../StreamDetails/common/Types';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
 type StreamOutputParam = {streamId: string, filterOutputRule: Partial<StreamOutputFilterRule>};
-const createStreamOutputRule = async ({ streamId, filterOutputRule }: StreamOutputParam) => StreamDestinationsFilters.createFilter(streamId, filterOutputRule);
-const updateStreamOutputRule = async ({ streamId, filterOutputRule }: StreamOutputParam) => StreamDestinationsFilters.updateFilter(streamId, filterOutputRule.id, filterOutputRule);
-const removeStreamOutputRule = async ({ streamId, filterId }: {streamId: string, filterId: string}) => StreamDestinationsFilters.deleteFilter(streamId, filterId);
+
+const createStreamOutputRule = async ({ streamId, filterOutputRule }: StreamOutputParam) => fetch('POST', qualifyUrl(ApiRoutes.StreamOutputFilterRuleApiController.create(streamId).url), filterOutputRule);
+const updateStreamOutputRule = async ({ streamId, filterOutputRule }: StreamOutputParam) => fetch('PUT', qualifyUrl(ApiRoutes.StreamOutputFilterRuleApiController.update(streamId, filterOutputRule.id).url), filterOutputRule);
+const removeStreamOutputRule = async ({ streamId, filterId }: {streamId: string, filterId: string}) => fetch('DELETE', qualifyUrl(ApiRoutes.StreamOutputFilterRuleApiController.delete(streamId, filterId).url));
 
 const useStreamOutputRuleMutation = () => {
   const createMutation = useMutation(createStreamOutputRule, {

@@ -21,13 +21,11 @@ import type { SearchParams } from 'src/stores/PaginationTypes';
 
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { IfPermitted, PaginatedEntityTable, QueryHelper } from 'components/common';
-
-import { ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER, DEFAULT_LAYOUT } from './Constants';
-import useTableElements from './hooks/useTableComponents';
-import type { StreamOutputFilterRule } from './Types';
-import FilterRuleEditButton from './FilterRuleEditButton';
-
-import { keyFn, fetchStreamOutputFilters } from '../../hooks/useStreamOutputFilters';
+import { ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER, DEFAULT_LAYOUT } from 'components/streams/StreamDetails/output-filter/Constants';
+import useTableElements from 'components/streams/StreamDetails/output-filter/hooks/useTableComponents';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
+import FilterRuleEditButton from 'components/streams/StreamDetails/output-filter/FilterRuleEditButton';
+import { keyFn, fetchStreamOutputFilters } from 'components/streams/hooks/useStreamOutputFilters';
 
 export const StyledSectionComponent = styled(SectionComponent)`
   &.content {

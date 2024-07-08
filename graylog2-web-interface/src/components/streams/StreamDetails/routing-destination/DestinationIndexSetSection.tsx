@@ -25,9 +25,8 @@ import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
 import type { Stream } from 'stores/streams/StreamsStore';
-
-import IndexSetUpdateForm from './IndexSetUpdateForm';
-import IndexSetFilters from './IndexSetFilters';
+import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
+import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
 
 type Props = {
   indexSet: IndexSet,

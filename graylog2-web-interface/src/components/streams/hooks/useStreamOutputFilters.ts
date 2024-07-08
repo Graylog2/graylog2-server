@@ -18,8 +18,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-
-import type { StreamOutputFilterRule } from '../StreamDetails/common/Types';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
 type PaginatedResponse = {
   total: number,

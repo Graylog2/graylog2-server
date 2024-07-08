@@ -20,8 +20,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { BlockDict, RuleBuilderRule } from 'components/rules/rule-builder/types';
 import { StreamDestinationsFiltersBuilder } from '@graylog/server-api';
 import UserNotification from 'util/UserNotification';
-
-import type { StreamOutputFilterRule } from '../StreamDetails/common/Types';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
 type ConditionsResponse ={conditions: Array<BlockDict>}
 const fetchRuleConditions = async () => StreamDestinationsFiltersBuilder.getConditions().then((resp: ConditionsResponse) => resp.conditions);
