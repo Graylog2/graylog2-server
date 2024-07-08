@@ -26,7 +26,7 @@ import org.apache.shiro.subject.Subject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 
@@ -44,13 +44,13 @@ import java.util.stream.Stream;
  */
 public class MongoCollectionExportService {
 
-    private final MongoCollections mongoCollections;
+    private final MongoConnection mongoConnection;
     private final EntityPermissionsUtils permissionsUtils;
 
     @Inject
-    public MongoCollectionExportService(final MongoCollections mongoCollections,
+    public MongoCollectionExportService(final MongoConnection mongoConnection,
                                         final EntityPermissionsUtils permissionsUtils) {
-        this.mongoCollections = mongoCollections;
+        this.mongoConnection = mongoConnection;
         this.permissionsUtils = permissionsUtils;
     }
 
@@ -60,7 +60,7 @@ public class MongoCollectionExportService {
                                  final Bson dbFilter,
                                  final List<Sort> sorts,
                                  final Subject subject) {
-        final MongoCollection<Document> collection = mongoCollections.rawCollection(collectionName);
+        final MongoCollection<Document> collection = mongoConnection.getMongoDatabase().getCollection(collectionName);
         final FindIterable<Document> resultsWithoutLimit = collection.find(Objects.requireNonNullElse(dbFilter, Filters.empty()))
                 .projection(Projections.fields(Projections.include(exportedFieldNames)))
                 .sort(toMongoDbSort(sorts));

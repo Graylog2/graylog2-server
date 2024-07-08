@@ -24,8 +24,7 @@ import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,18 +46,19 @@ import static org.mockito.Mockito.doReturn;
 class MongoCollectionExportServiceTest {
 
     private static final String TEST_COLLECTION_NAME = "people";
-    private MongoCollections collections;
     @Mock
     private EntityPermissionsUtils permissionsUtils;
     @Mock
     private Subject subject;
+    private MongoCollection<Document> collection;
     private MongoCollectionExportService toTest;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
-        collections = new MongoCollections(mongoJackObjectMapperProvider, mongoDBTestService.mongoConnection());
-        toTest = new MongoCollectionExportService(collections, permissionsUtils);
-        collections.rawCollection(TEST_COLLECTION_NAME).deleteMany(Filters.empty());
+    void setUp(MongoDBTestService mongoDBTestService) {
+        final MongoConnection mongoConnection = mongoDBTestService.mongoConnection();
+        toTest = new MongoCollectionExportService(mongoConnection, permissionsUtils);
+        collection = mongoConnection.getMongoDatabase().getCollection(TEST_COLLECTION_NAME);
+        collection.deleteMany(Filters.empty());
     }
 
     @Test
@@ -145,7 +145,6 @@ class MongoCollectionExportServiceTest {
     }
 
     private void insertTestData() {
-        final MongoCollection<Document> collection = collections.rawCollection(TEST_COLLECTION_NAME);
         collection.insertOne(new Document(Map.of("_id", "0000000000000000000000a5", "name", "John", "age", 42)));
         collection.insertOne(new Document(Map.of("_id", "0000000000000000000000b6", "name", "Jerry", "age", 32)));
         collection.insertOne(new Document(Map.of("_id", "0000000000000000000000c7", "name", "Judith", "age", 22)));

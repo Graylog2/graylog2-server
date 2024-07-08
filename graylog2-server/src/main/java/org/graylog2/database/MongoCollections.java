@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bson.Document;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;
@@ -77,16 +76,6 @@ public class MongoCollections {
      */
     public <T extends MongoEntity> MongoCollection<T> collection(String collectionName, Class<T> valueType) {
         return getCollection(collectionName, valueType);
-    }
-
-    /**
-     * Get a MongoCollection instance in a raw form, without mapping to {@link MongoEntity} objects.
-     *
-     * @param collectionName Name of the collection
-     * @return A MongoCollection of {@link Document} objects
-     */
-    public MongoCollection<Document> rawCollection(final String collectionName) {
-        return mongoConnection.getMongoDatabase().getCollection(collectionName);
     }
 
     /**
