@@ -259,6 +259,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
             <WidgetHeader title={title}
                           hideDragHandle={!interactive || isFocused}
                           loading={loading}
+                          editing={editing}
                           onRename={onRenameWidget}>
               {!editing ? (
                 <WidgetActionsMenu isFocused={isFocused}
