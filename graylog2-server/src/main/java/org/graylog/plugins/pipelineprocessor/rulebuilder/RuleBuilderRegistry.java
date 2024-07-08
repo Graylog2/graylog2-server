@@ -17,11 +17,10 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder;
 
 import com.google.common.collect.Streams;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,7 +39,7 @@ public class RuleBuilderRegistry {
     }
 
     public Map<String, RuleFragment> conditions() {
-        final Stream<RuleFragment> functionConditions = functionRegistry.all()
+        final Stream<RuleFragment> functionConditions = functionRegistry.allWithInternal()
                 .stream()
                 .filter(f -> f.descriptor().ruleBuilderEnabled()
                         && f.descriptor().returnType().equals(Boolean.class))
@@ -55,7 +54,7 @@ public class RuleBuilderRegistry {
     }
 
     public Map<String, RuleFragment> actions() {
-        final Stream<RuleFragment> functions = functionRegistry.all()
+        final Stream<RuleFragment> functions = functionRegistry.allWithInternal()
                 .stream()
                 .filter(f -> f.descriptor().ruleBuilderEnabled()
                         && !f.descriptor().returnType().equals(Boolean.class))
