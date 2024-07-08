@@ -191,7 +191,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  step={1}
                  disabled={isLoading}
                  value={values.threads}
-                 onChange={(e) => handleChange(e, setFieldValue)}
+                 onChange={(e) => handleChange(e, setFieldValue)} />
           <Input id="trust_unknown_certs"
                  name="trust_unknown_certs"
                  label="Trust unknown certificates"
