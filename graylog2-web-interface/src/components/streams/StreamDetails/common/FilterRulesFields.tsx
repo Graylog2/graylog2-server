@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { useFormikContext } from 'formik';
 import ObjectID from 'bson-objectid';
 
+import { ConfirmDialog } from 'components/common';
 import type { BlockType, RuleBlock } from 'components/rules/rule-builder/types';
 import RuleBuilderBlock from 'components/rules/rule-builder/RuleBuilderBlock';
 import { Panel, Radio } from 'components/bootstrap';
@@ -61,6 +62,10 @@ const StyledPanelBody = styled(Panel.Body)`
 
 const FilterRulesFields = ({ type }: Props) => {
   const { values, setFieldValue, setValues } = useFormikContext<StreamOutputFilterRule>();
+  const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
+  const newConditionBlockIndex = values.rule?.conditions.length;
+  const { conditions } = useStreamOutputRuleBuilder();
+
   const validateAndUpdateFormValues = (ruleToValidate: StreamOutputFilterRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
     setValues({ ...values, rule: ruleValidated.rule });
   }).catch(() => setValues(ruleToValidate));
@@ -72,10 +77,23 @@ const FilterRulesFields = ({ type }: Props) => {
     }
   };
 
-  const updateBlock = async (/* orderIndex: number, type: string, block: RuleBlock */) => {};
-  const [, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
-  const newConditionBlockIndex = values.rule?.conditions.length;
-  const { conditions } = useStreamOutputRuleBuilder();
+  const updateBlock = async (orderIndex: number, blockType: string, block: RuleBlock) => {
+    if (blockType === 'condition') {
+      const currentConditions = [...values.rule.conditions];
+      currentConditions[orderIndex] = block;
+      const ruleToValidate = { ...values, rule: { ...values.rule, conditions: currentConditions } };
+      validateAndUpdateFormValues(ruleToValidate);
+    }
+  };
+
+  const deleteBlock = (orderIndex: number, blockType: BlockType) => {
+    if (blockType === 'condition') {
+      const currentConditions = [...values.rule.conditions];
+      currentConditions.splice(orderIndex, 1);
+      const ruleToValidate = { ...values, rule: { ...values.rule, conditions: currentConditions } };
+      validateAndUpdateFormValues(ruleToValidate);
+    }
+  };
 
   return (
     <StyledPanel expanded>
@@ -87,12 +105,12 @@ const FilterRulesFields = ({ type }: Props) => {
         <WhenOperator>
           <Radio name="operator"
                  checked={values.rule?.operator === 'AND'}
-                 onChange={() => setFieldValue('operator', 'AND')}>
+                 onChange={() => setFieldValue('rule.operator', 'AND')}>
             and
           </Radio>
           <Radio name="operator"
                  checked={values.rule?.operator === 'OR'}
-                 onChange={() => setFieldValue('operator', 'OR')}>
+                 onChange={() => setFieldValue('rule.operator', 'OR')}>
             or
           </Radio>
         </WhenOperator>
@@ -122,6 +140,17 @@ const FilterRulesFields = ({ type }: Props) => {
                             })} />
         </StyledPanelBody>
       </Panel.Collapse>
+      {blockToDelete && (
+      <ConfirmDialog title={`Delete ${blockToDelete.type}`}
+                     show
+                     onConfirm={() => {
+                       deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
+                       setBlockToDelete(null);
+                     }}
+                     onCancel={() => setBlockToDelete(null)}>
+        <>Are you sure you want to delete <strong>{blockToDelete.type} N° {blockToDelete.orderIndex + 1}</strong>?</>
+      </ConfirmDialog>
+      )}
     </StyledPanel>
 
   );

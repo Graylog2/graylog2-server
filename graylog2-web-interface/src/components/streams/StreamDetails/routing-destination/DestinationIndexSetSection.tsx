@@ -27,6 +27,7 @@ import { useStore } from 'stores/connect';
 import type { Stream } from 'stores/streams/StreamsStore';
 
 import IndexSetUpdateForm from './IndexSetUpdateForm';
+import IndexSetFilters from './IndexSetFilters';
 
 type Props = {
   indexSet: IndexSet,
@@ -78,6 +79,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
           </tr>
         </tbody>
       </Table>
+      <IndexSetFilters streamId={stream.id} />
     </Section>
   );
 };

@@ -18,28 +18,30 @@ import * as React from 'react';
 import { Formik } from 'formik';
 
 import { BootstrapModalWrapper, Modal } from 'components/bootstrap';
-import { FormikInput } from 'components/common';
+import { FormikInput, ModalSubmit } from 'components/common';
 
 import type { StreamOutputFilterRule } from './Types';
 import FilterRulesFields from './FilterRulesFields';
 
 type StreamOutputFilterRuleValues = Partial<StreamOutputFilterRule>;
-type Props ={
+type Props = {
   title: string,
-  filterRule: StreamOutputFilterRule,
+  filterRule: Partial<StreamOutputFilterRule>,
   onCancel: () => void,
+  handleSubmit: (values: Partial<StreamOutputFilterRule>) => void,
+  destinationType: string,
 };
 
-const FilterRuleForm = ({ title, filterRule, onCancel }: Props) => (
+const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destinationType }: Props) => (
   <BootstrapModalWrapper showModal
                          bsSize="lg"
                          role="alertdialog"
                          onHide={onCancel}>
-    <Formik<StreamOutputFilterRuleValues> initialValues={filterRule}
+    <Formik<StreamOutputFilterRuleValues> initialValues={{ ...filterRule, destination_type: destinationType }}
                                           onSubmit={() => {}}
                                           validateOnBlur={false}
                                           validateOnMount>
-      {() => (
+      {({ isSubmitting, values }) => (
         <>
           <Modal.Header closeButton>
             <Modal.Title>{title}</Modal.Title>
@@ -50,12 +52,25 @@ const FilterRuleForm = ({ title, filterRule, onCancel }: Props) => (
                          label="Title"
                          help="Rule title"
                          required />
+            <FormikInput id="description"
+                         name="description"
+                         label="Description"
+                         help="Rule description"
+                         required />
             <FormikInput id="enabled"
                          name="enabled"
                          type="checkbox"
                          label="Enable rule" />
             <label htmlFor="rule_builder">Rule Builder</label>
             <FilterRulesFields type="condition" />
+            <Modal.Footer>
+              <ModalSubmit isSubmitting={isSubmitting}
+                           isAsyncSubmit
+                           onSubmit={() => { handleSubmit(values); }}
+                           onCancel={onCancel}
+                           submitButtonText={values?.id ? 'Update' : 'Create'}
+                           submitLoadingText={values?.id ? 'Updating filter' : 'Saving filter'} />
+            </Modal.Footer>
           </Modal.Body>
         </>
       )}

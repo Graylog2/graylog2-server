@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -23,26 +24,50 @@ import { Icon } from 'components/common';
 import FilterRuleForm from './FilterRuleForm';
 import type { StreamOutputFilterRule } from './Types';
 
+import useStreamOutputRuleMutation from '../../hooks/useStreamOutputRuleMutation';
+
 type Props ={
-  filterRule: StreamOutputFilterRule,
+  filterRule: Partial<StreamOutputFilterRule>,
+  streamId: string,
+  destinationType: string,
 };
 
-const FilterRuleEditButton = ({ filterRule }: Props) => {
+const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) => {
   const [showForm, setShowForm] = useState(false);
+  const { createStreamOutputRule, updateStreamOutputRule } = useStreamOutputRuleMutation();
+
+  const queryClient = useQueryClient();
 
   const onClick = () => {
     setShowForm(true);
   };
 
+  const handleSubmit = (filterOutputRule: Partial<StreamOutputFilterRule>) => {
+    const submitFilterHandler = filterOutputRule?.id ? updateStreamOutputRule : createStreamOutputRule;
+
+    submitFilterHandler({ streamId, filterOutputRule }).then(() => {
+      queryClient.invalidateQueries(['streams']);
+      setShowForm(false);
+    });
+  };
+
+  const isNew = !filterRule?.id;
+
   return (
     <>
-      <Button bsStyle="link"
-              bsSize="xsmall"
+      <Button bsStyle={isNew ? 'success' : 'link'}
+              bsSize={isNew ? 'md' : 'xsmall'}
               onClick={onClick}
-              title="View">
-        <Icon name="edit_square" />
+              title="Edit">
+        {isNew ? (<>Create rule</>) : (<Icon name="edit_square" />)}
       </Button>
-      {showForm && <FilterRuleForm title="Edit Filter Rule" filterRule={filterRule} onCancel={() => setShowForm(false)}/>}
+      {showForm && (
+      <FilterRuleForm title="Edit Filter Rule"
+                      filterRule={filterRule}
+                      destinationType={destinationType}
+                      onCancel={() => setShowForm(false)}
+                      handleSubmit={handleSubmit} />
+      )}
     </>
   );
 };

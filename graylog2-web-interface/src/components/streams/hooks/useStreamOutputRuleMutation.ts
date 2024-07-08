@@ -21,9 +21,10 @@ import UserNotification from 'util/UserNotification';
 
 import type { StreamOutputFilterRule } from '../StreamDetails/common/Types';
 
-const createStreamOutputRule = async ({ streamId, filterOutputRule }: {streamId: string, filterOutputRule: StreamOutputFilterRule}) => StreamDestinationsFilters.createFilter(streamId, filterOutputRule);
-const updateStreamOutputRule = async ({ streamId, outputs }) => {};
-const removeStreamOutputRule = async ({ streamId, outputId }) => {};
+type StreamOutputParam = {streamId: string, filterOutputRule: Partial<StreamOutputFilterRule>};
+const createStreamOutputRule = async ({ streamId, filterOutputRule }: StreamOutputParam) => StreamDestinationsFilters.createFilter(streamId, filterOutputRule);
+const updateStreamOutputRule = async ({ streamId, filterOutputRule }: StreamOutputParam) => StreamDestinationsFilters.updateFilter(streamId, filterOutputRule.id, filterOutputRule);
+const removeStreamOutputRule = async ({ streamId, filterId }: {streamId: string, filterId: string}) => StreamDestinationsFilters.deleteFilter(streamId, filterId);
 
 const useStreamOutputRuleMutation = () => {
   const createMutation = useMutation(createStreamOutputRule, {
@@ -41,7 +42,7 @@ const useStreamOutputRuleMutation = () => {
         'Could not update stream output filter rule');
     },
     onSuccess: () => {
-      UserNotification.success('Stream Output filter rule has been successfully added.', 'Success!');
+      UserNotification.success('Stream Output filter rule has been successfully updated.', 'Success!');
     },
 
   });
@@ -58,7 +59,7 @@ const useStreamOutputRuleMutation = () => {
   return {
     createStreamOutputRule: createMutation.mutateAsync,
     updateStreamOutputRule: updateMutation.mutateAsync,
-    removeStreamOutput: removeMutation.mutateAsync,
+    removeStreamOutputRule: removeMutation.mutateAsync,
   };
 };
 

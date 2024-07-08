@@ -14,24 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
-import type { StreamOutputFilterRule } from './Types';
-import FilterRuleEditButton from './FilterRuleEditButton';
-import FilterDeleteButton from './FilterDeleteButton';
+import FilterRulesList from '../common/FilterRuleList';
 
 type Props = {
-  filterRule: StreamOutputFilterRule,
-  destinationType: string,
-}
+  streamId: string,
+};
 
-const FilterActions = ({ filterRule, destinationType }: Props) => (
-  <>
-    <FilterRuleEditButton filterRule={filterRule}
-                          destinationType={destinationType}
-                          streamId={filterRule.stream_id} />
-    <FilterDeleteButton streamId={filterRule.stream_id} filterOutputRule={filterRule} />
-  </>
+const IndexSetFilters = ({ streamId }: Props) => (
+  <FilterRulesList streamId={streamId} destinationType="indexer" />
 );
 
-export default FilterActions;
+export default IndexSetFilters;

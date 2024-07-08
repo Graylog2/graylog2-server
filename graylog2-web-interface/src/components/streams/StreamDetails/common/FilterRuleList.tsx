@@ -15,13 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
+import type { SearchParams } from 'src/stores/PaginationTypes';
 
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { PaginatedEntityTable, QueryHelper } from 'components/common';
+import { IfPermitted, PaginatedEntityTable, QueryHelper } from 'components/common';
 
 import { ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER, DEFAULT_LAYOUT } from './Constants';
 import useTableElements from './hooks/useTableComponents';
+import type { StreamOutputFilterRule } from './Types';
+import FilterRuleEditButton from './FilterRuleEditButton';
 
 import { keyFn, fetchStreamOutputFilters } from '../../hooks/useStreamOutputFilters';
 
@@ -33,23 +37,33 @@ export const StyledSectionComponent = styled(SectionComponent)`
 
 type Props = {
   streamId: string,
+  destinationType: string,
 };
 
-const FilterRulesList = ({ streamId }: Props) => {
-  const { entityActions } = useTableElements();
+const FilterRulesList = ({ streamId, destinationType }: Props) => {
+  const { entityActions } = useTableElements(destinationType);
+  const _keyFn = useCallback((searchParams: SearchParams) => keyFn(streamId, destinationType, searchParams), [streamId, destinationType]);
+  const _fetchStreamOutputFilters = useCallback((searchParams: SearchParams) => fetchStreamOutputFilters(streamId, { ...searchParams, query: `destination_type:${destinationType}` }), [streamId, destinationType]);
 
   return (
-    <StyledSectionComponent title="Filter Rule">
-      <PaginatedEntityTable<any> humanName="filter"
-                                 columnsOrder={COLUMNS_ORDER}
-                                 additionalAttributes={ADDITIONAL_ATTRIBUTES}
-                                 queryHelpComponent={<QueryHelper entityName="streamOutputFilters" />}
-                                 entityActions={entityActions}
-                                 tableLayout={DEFAULT_LAYOUT}
-                                 fetchEntities={(searchParams) => fetchStreamOutputFilters(streamId, searchParams)}
-                                 columnRenderers={{}}
-                                 keyFn={keyFn}
-                                 entityAttributesAreCamelCase={false} />
+    <StyledSectionComponent title="Filter Rule"
+                            headerActions={(
+                              <IfPermitted permissions="">
+                                <FilterRuleEditButton filterRule={{ stream_id: streamId }}
+                                                      destinationType={destinationType}
+                                                      streamId={streamId} />
+                              </IfPermitted>
+             )}>
+      <PaginatedEntityTable<StreamOutputFilterRule> humanName="filter"
+                                                    columnsOrder={COLUMNS_ORDER}
+                                                    additionalAttributes={ADDITIONAL_ATTRIBUTES}
+                                                    queryHelpComponent={<QueryHelper entityName="streamOutputFilters" />}
+                                                    entityActions={entityActions}
+                                                    tableLayout={DEFAULT_LAYOUT}
+                                                    fetchEntities={_fetchStreamOutputFilters}
+                                                    columnRenderers={{}}
+                                                    keyFn={_keyFn}
+                                                    entityAttributesAreCamelCase={false} />
 
     </StyledSectionComponent>
   );

@@ -14,8 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { StreamDestinationsFilters } from '@graylog/server-api';
 import type { SearchParams } from 'stores/PaginationTypes';
+import PaginationURL from 'util/PaginationURL';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 
 import type { StreamOutputFilterRule } from '../StreamDetails/common/Types';
 
@@ -27,19 +29,18 @@ type PaginatedResponse = {
   elements: Array<StreamOutputFilterRule>,
   query: string
 }
-export const KEY_PREFIX = ['streams', 'overview'];
-export const keyFn = (searchParams: SearchParams) => [...KEY_PREFIX, searchParams];
+export const KEY_PREFIX = ['streams', 'output', 'filters'];
+export const keyFn = (streamId: string, destinationType: string, searchParams?: SearchParams) => [...KEY_PREFIX, streamId, destinationType, searchParams];
 
-export const fetchStreamOutputFilters = (streamId: string, _searchParams: SearchParams) => {
-  // const paginationParam = {
-  //   per_page: searchParams?.pageSize,
-  //   query: searchParams?.query,
-  //   page: searchParams?.page,
-  //   sort_by: searchParams?.sort.attributeId,
-  //   order: searchParams?.sort.direction,
-  // };
+export const fetchStreamOutputFilters = async (streamId: string, searchParams: SearchParams) => {
+  const url = PaginationURL(
+    `/streams/${streamId}/destinations/filters`,
+    searchParams.page,
+    searchParams.pageSize,
+    searchParams.query,
+    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
 
-  return StreamDestinationsFilters.getPaginatedFiltersForStream(streamId).then((response: PaginatedResponse) => {
+  return fetch('GET', qualifyUrl(url)).then((response: PaginatedResponse) => {
     const {
       elements,
       query,
@@ -50,6 +51,7 @@ export const fetchStreamOutputFilters = (streamId: string, _searchParams: Search
 
     return {
       list: elements,
+      attributes: [],
       pagination: {
         total,
         page,
