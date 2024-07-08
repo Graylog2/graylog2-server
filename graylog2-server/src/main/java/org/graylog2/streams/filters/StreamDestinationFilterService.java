@@ -23,7 +23,6 @@ import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -53,7 +52,6 @@ import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_
 import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_STREAM_ID;
 import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_TITLE;
 
-@Singleton
 public class StreamDestinationFilterService {
     static final String COLLECTION = "stream_destination_filters";
 
