@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import type { SearchParams } from 'src/stores/PaginationTypes';
 
+import type { SearchParams } from 'stores/PaginationTypes';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { IfPermitted, PaginatedEntityTable, QueryHelper } from 'components/common';
 import { ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER, DEFAULT_LAYOUT } from 'components/streams/StreamDetails/output-filter/Constants';
