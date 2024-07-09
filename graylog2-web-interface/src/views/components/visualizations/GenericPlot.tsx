@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useContext, useMemo, useCallback } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
-import type * as Plotly from 'plotly.js';
 import type { Layout } from 'plotly.js';
 
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
@@ -117,7 +116,7 @@ const style = { height: '100%', width: '100%' };
 
 const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
 
-const usePlotLayout = (layout: {}) => {
+const usePlotLayout = (layout: Partial<Layout>) => {
   const theme = useTheme();
   const interactive = useContext(InteractiveContext);
   const { colors } = useContext(ChartColorContext);
@@ -260,8 +259,8 @@ GenericPlot.defaultProps = {
   layout: {},
   onZoom: () => {},
   setChartColor: undefined,
-  onClickMarker: (_event) => {},
-  onHoverMarker: (_event) => {},
+  onClickMarker: () => {},
+  onHoverMarker: () => {},
   onUnhoverMarker: () => {},
 };
 
