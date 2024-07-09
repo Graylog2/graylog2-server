@@ -1,0 +1,4 @@
+type = "f"
+message = "Disabling interactive functionality in widgets when in non-interactive context."
+
+pulls = ["19857"]
