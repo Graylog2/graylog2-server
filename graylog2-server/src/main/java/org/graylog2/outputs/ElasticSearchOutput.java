@@ -19,7 +19,6 @@ package org.graylog2.outputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.collect.ImmutableMultimap;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.indexer.messages.IndexingResults;
@@ -38,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -90,12 +90,7 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
         if (LOG.isTraceEnabled()) {
             LOG.trace("Writing message id to [{}]: <{}>", NAME, message.getId());
         }
-        writeMessageEntries(List.of(new DefaultFilteredMessage(
-                message,
-                ImmutableMultimap.<String, Stream>builder()
-                        .putAll(FILTER_KEY, message.getStreams())
-                        .build()
-        )));
+        writeMessageEntries(List.of(DefaultFilteredMessage.forDestinationKeys(message, Set.of(FILTER_KEY))));
     }
 
     @Override
@@ -104,12 +99,7 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
             LOG.trace("Writing {} messages to [{}]", messageList.size(), NAME);
         }
         writeMessageEntries(messageList.stream()
-                .map(message -> new DefaultFilteredMessage(
-                        message,
-                        ImmutableMultimap.<String, Stream>builder()
-                                .putAll(FILTER_KEY, message.getStreams())
-                                .build()
-                ))
+                .map(message -> DefaultFilteredMessage.forDestinationKeys(message, Set.of(FILTER_KEY)))
                 .collect(Collectors.toList()));
     }
 
