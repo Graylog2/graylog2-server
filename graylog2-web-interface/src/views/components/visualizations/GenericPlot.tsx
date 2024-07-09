@@ -176,7 +176,7 @@ const usePlotLayout = (layout: {}) => {
       line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
     }));
 
-    return interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout);
+    return interactive ? plotLayout : merge({}, plotLayout, nonInteractiveLayout);
   }, [colors, interactive, layout, theme.colors.global.textDefault, theme.colors.variant.lightest.default, theme.fonts.family.body, theme.fonts.size.small]);
 };
 
