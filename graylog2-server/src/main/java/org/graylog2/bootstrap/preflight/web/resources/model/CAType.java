@@ -19,5 +19,5 @@ package org.graylog2.bootstrap.preflight.web.resources.model;
 public enum CAType {
     GENERATED,
     LOCAL,
-    UPLOADED
+    UPLOADED // TODO: not used anywhere
 }

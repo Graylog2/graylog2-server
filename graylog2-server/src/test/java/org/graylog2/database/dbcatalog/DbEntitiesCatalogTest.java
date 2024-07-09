@@ -32,7 +32,6 @@ class DbEntitiesCatalogTest {
         DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of());
 
         assertThat(catalog.getByCollectionName("Guadalajara")).isEmpty();
-        assertThat(catalog.getByModelClass(Object.class)).isEmpty();
     }
 
     @Test
@@ -40,7 +39,6 @@ class DbEntitiesCatalogTest {
         DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")));
 
         assertThat(catalog.getByCollectionName("Guadalajara")).isEmpty();
-        assertThat(catalog.getByModelClass(Object.class)).isEmpty();
     }
 
     @Test
@@ -48,11 +46,6 @@ class DbEntitiesCatalogTest {
         DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")));
 
         assertThat(catalog.getByCollectionName("streams"))
-                .isEqualTo(Optional.of(
-                        new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")
-                        )
-                );
-        assertThat(catalog.getByModelClass(StreamImpl.class))
                 .isEqualTo(Optional.of(
                         new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")
                         )
