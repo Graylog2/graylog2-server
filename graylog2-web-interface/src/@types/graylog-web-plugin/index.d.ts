@@ -21,6 +21,8 @@ import type { DataTieringConfig } from 'components/indices/data-tiering';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import type { Stream } from 'logic/streams/types';
 
 interface PluginRoute {
   path: string;
@@ -142,24 +144,6 @@ type DataTiering = {
   WarmTierReadinessInfo: React.ComponentType,
 }
 
-interface PluginDataWarehouse {
-  DataWarehouseStatus: React.ComponentType<{
-    stream: {
-      enabled_status: boolean;
-    }
-  }>,
-  StreamDataWarehouse: React.ComponentType<{}>,
-}
-
-interface PluginDataWarehouse {
-  DataWarehouseStatus: React.ComponentType<{
-    stream: {
-      enabled_status: boolean;
-    }
-  }>,
-  StreamDataWarehouse: React.ComponentType<{}>,
-}
-
 type FieldValueProvider = {
   type: string,
   displayName: string,
@@ -192,8 +176,8 @@ interface PluginDataWarehouse {
   DataWarehouseJobs: React.ComponentType<{}>,
   streamDataWarehouseTableElements: {
     attributeName: string,
-    attributes: any,
-    columnRenderer: any,
+    attributes: Array<{ id: string, title: string }>,
+    columnRenderer: ColumnRenderers<Stream>,
   }
 }
 
