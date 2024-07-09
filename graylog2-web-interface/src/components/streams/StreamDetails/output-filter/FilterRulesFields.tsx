@@ -45,13 +45,13 @@ const StyledPanelHeading = styled(Panel.Heading)(({ theme }) => css`
   border: 0;
 `);
 
-const WhenOperator = styled.div`
+const WhenOperator = styled.div(({ theme }) => css`
   display: flex;
 
   .radio {
-    margin: 0 8px;
+    margin: 0 ${theme.spacings.xs};
   }
-`;
+`);
 
 const StyledPanelBody = styled(Panel.Body)`
   border: 0;

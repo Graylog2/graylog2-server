@@ -33,8 +33,7 @@ type Props = {
   stream: Stream,
 };
 
-const ActionButtonsWrap = styled.span(({ theme }) => css`
-  margin-right: ${theme.spacings.sm};
+const ActionButtonsWrap = styled.span(() => css`
   float: right;
 `);
 
@@ -61,7 +60,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
             </td>
             {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <td>
-              <ActionButtonsWrap className="align-right">
+              <ActionButtonsWrap>
                 <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
                   <Button bsStyle="link"
                           bsSize="xsmall"
