@@ -151,7 +151,7 @@ public class StreamDestinationFilterService {
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't find document with ID <%s> for deletion", id)));
 
         if (collection.deleteOne(and(eq(FIELD_STREAM_ID, streamId), idEq(id))).getDeletedCount() > 0) {
-            clusterEventBus.post(StreamDestinationFilterUpdatedEvent.of(id));
+            clusterEventBus.post(StreamDestinationFilterDeletedEvent.of(id));
         }
 
         return dto;
