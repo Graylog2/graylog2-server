@@ -21,6 +21,8 @@ import type { DataTieringConfig } from 'components/indices/data-tiering';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import type { Stream } from 'logic/streams/types';
 
 interface PluginRoute {
   path: string;
@@ -142,24 +144,6 @@ type DataTiering = {
   WarmTierReadinessInfo: React.ComponentType,
 }
 
-interface PluginDataWarehouse {
-  DataWarehouseStatus: React.ComponentType<{
-    stream: {
-      enabled_status: boolean;
-    }
-  }>,
-  StreamDataWarehouse: React.ComponentType<{}>,
-}
-
-interface PluginDataWarehouse {
-  DataWarehouseStatus: React.ComponentType<{
-    stream: {
-      enabled_status: boolean;
-    }
-  }>,
-  StreamDataWarehouse: React.ComponentType<{}>,
-}
-
 type FieldValueProvider = {
   type: string,
   displayName: string,
@@ -190,6 +174,11 @@ interface PluginDataWarehouse {
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
   DataWarehouseJobs: React.ComponentType<{}>,
+  streamDataWarehouseTableElements: {
+    attributeName: string,
+    attributes: Array<{ id: string, title: string }>,
+    columnRenderer: ColumnRenderers<Stream>,
+  }
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -199,7 +188,6 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
-    dataWarehouse?: Array<PluginDataWarehouse>
     globalNotifications?: Array<GlobalNotification>;
     fieldValueProviders?:Array<FieldValueProvider>;
     // Global context providers allow to fetch and process data once
