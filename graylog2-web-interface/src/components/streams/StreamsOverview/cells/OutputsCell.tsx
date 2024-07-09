@@ -14,7 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage.location;
 
-public interface KeystoreLocation {
+import { useRef } from 'react';
+import * as React from 'react';
+import styled from 'styled-components';
+
+import type { Stream } from 'stores/streams/StreamsStore';
+import { CountBadge } from 'components/common';
+
+const StyledCountBadge = styled(CountBadge)`
+  cursor: pointer;
+`;
+
+type Props = {
+  stream: Stream
 }
+
+const OutputsCell = ({ stream }: Props) => {
+  const buttonRef = useRef();
+
+  if (stream.is_default || !stream.is_editable) {
+    return null;
+  }
+
+  return (
+    <StyledCountBadge ref={buttonRef} title="Stream Outputs">
+      {stream.outputs?.length || 0}
+    </StyledCountBadge>
+  );
+};
+
+export default OutputsCell;
