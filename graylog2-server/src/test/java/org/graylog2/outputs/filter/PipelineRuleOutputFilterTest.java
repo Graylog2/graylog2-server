@@ -36,6 +36,7 @@ import org.graylog2.outputs.filter.functions.RemoveFromStreamDestination;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.SuppressForbidden;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -143,6 +144,7 @@ class PipelineRuleOutputFilterTest {
         assertThat(filteredMessage.destinations().get("other")).containsExactlyInAnyOrder(defaultStream);
     }
 
+    @SuppressForbidden("Executors.newSingleThreadScheduledExecutor is okay in tests")
     private PipelineRuleOutputFilter createFilter(Map<String, Pipeline> pipelines, Set<String> destinations) {
         doAnswer((Answer<Void>) invocation -> {
             final AtomicReference<PipelineRuleOutputFilterState> state = invocation.getArgument(0);
