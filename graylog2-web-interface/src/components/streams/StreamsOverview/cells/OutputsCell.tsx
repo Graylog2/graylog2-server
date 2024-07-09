@@ -14,25 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+
+import { useRef } from 'react';
+import * as React from 'react';
 import styled from 'styled-components';
 
-import { Alert } from 'components/bootstrap';
-import type FetchError from 'logic/errors/FetchError';
+import type { Stream } from 'stores/streams/StreamsStore';
+import { CountBadge } from 'components/common';
 
-const ESClusterError = styled(Alert)`
-  margin-top: 10px;
-  margin-bottom: 5px;
+const StyledCountBadge = styled(CountBadge)`
+  cursor: pointer;
 `;
 
-const IndexerClusterHealthError = ({ error, name }: { error: FetchError, name?: { name: string, distribution: string } }) => (
-  <ESClusterError bsStyle="danger">
-    Could not retrieve {name?.distribution || 'Elasticsearch'} cluster health. Fetching {name?.distribution || 'Elasticsearch'} cluster health failed: {error.message}
-  </ESClusterError>
-);
+type Props = {
+  stream: Stream
+}
 
-IndexerClusterHealthError.defaultProps = {
-  name: undefined,
+const OutputsCell = ({ stream }: Props) => {
+  const buttonRef = useRef();
+
+  if (stream.is_default || !stream.is_editable) {
+    return null;
+  }
+
+  return (
+    <StyledCountBadge ref={buttonRef} title="Stream Outputs">
+      {stream.outputs?.length || 0}
+    </StyledCountBadge>
+  );
 };
 
-export default IndexerClusterHealthError;
+export default OutputsCell;
