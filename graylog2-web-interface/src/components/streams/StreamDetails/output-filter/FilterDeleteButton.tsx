@@ -20,40 +20,45 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from 'components/bootstrap';
 import { ConfirmDialog, Icon } from 'components/common';
-import type { Output } from 'stores/outputs/OutputsStore';
-import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
-import { keyFn } from 'hooks/useStreamOutputs';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
+import useStreamOutputRuleMutation from 'components/streams/hooks/useStreamOutputRuleMutation';
 
-type Props = {
-  output: Output,
+type Props ={
   streamId: string,
-}
+  filterOutputRule: StreamOutputFilterRule,
+};
 
-const RemoveOutputButton = ({ output, streamId }: Props) => {
-  const [showConfirmRemove, setShowConfirmRemove] = useState(false);
-  const { removeStreamOutput } = useStreamOutputMutation();
+const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
+  const [showDialog, setShowDialog] = useState(false);
+  const { removeStreamOutputRule } = useStreamOutputRuleMutation();
   const queryClient = useQueryClient();
 
-  const onConfirmRemoveOutput = () => {
-    removeStreamOutput({ streamId, outputId: output.id }).then(() => queryClient.invalidateQueries(keyFn(streamId)));
+  const onConfirmDelete = async () => {
+    await removeStreamOutputRule({ streamId, filterId: filterOutputRule.id }).then(() => {
+      queryClient.invalidateQueries(['streams']);
+    });
+
+    setShowDialog(false);
   };
 
   return (
     <>
       <Button bsStyle="link"
               bsSize="xsmall"
-              onClick={() => setShowConfirmRemove(true)}
-              title="Edit Output">
+              onClick={() => setShowDialog(true)}
+              title="View">
         <Icon name="delete" type="regular" />
       </Button>
-      <ConfirmDialog show={showConfirmRemove}
-                     onConfirm={onConfirmRemoveOutput}
-                     onCancel={() => setShowConfirmRemove(false)}
-                     title="Remove Output">
-        <p>Do you really want to remove this output from the stream?</p>
+      {showDialog && (
+      <ConfirmDialog title="Delete Rule"
+                     show
+                     onConfirm={onConfirmDelete}
+                     onCancel={() => setShowDialog(false)}>
+        {`Are you sure you want to delete  ${filterOutputRule.title} rule ?`}
       </ConfirmDialog>
+      )}
     </>
   );
 };
 
-export default RemoveOutputButton;
+export default FilterDeleteButton;

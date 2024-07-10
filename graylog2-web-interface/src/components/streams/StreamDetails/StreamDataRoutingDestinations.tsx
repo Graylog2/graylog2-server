@@ -20,9 +20,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { Stream } from 'stores/streams/StreamsStore';
 import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
-
-import DestinationIndexSetSection from './routing-destination/DestinationIndexSetSection';
-import DestinationOutputs from './routing-destination/DestinationOutputs';
+import DestinationOutputs from 'components/streams/StreamDetails/routing-destination/DestinationOutputs';
+import DestinationIndexSetSection from 'components/streams/StreamDetails/routing-destination/DestinationIndexSetSection';
 
 type Props = {
   stream: Stream;
