@@ -14,20 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-// eslint-disable-next-line no-restricted-imports
-import { ListGroup as BootstrapListGroup } from 'react-bootstrap';
 
-const ListGroup = ({ className, ...props }) => <BootstrapListGroup bsClass={className} {...props} />;
+import { useRef } from 'react';
+import * as React from 'react';
+import styled from 'styled-components';
 
-ListGroup.propTypes = {
-  className: PropTypes.string,
+import type { Stream } from 'stores/streams/StreamsStore';
+import { CountBadge } from 'components/common';
+
+const StyledCountBadge = styled(CountBadge)`
+  cursor: pointer;
+`;
+
+type Props = {
+  stream: Stream
+}
+
+const OutputsCell = ({ stream }: Props) => {
+  const buttonRef = useRef();
+
+  if (stream.is_default || !stream.is_editable) {
+    return null;
+  }
+
+  return (
+    <StyledCountBadge ref={buttonRef} title="Stream Outputs">
+      {stream.outputs?.length || 0}
+    </StyledCountBadge>
+  );
 };
 
-ListGroup.defaultProps = {
-  className: undefined,
-};
-
-/** @component */
-export default ListGroup;
+export default OutputsCell;

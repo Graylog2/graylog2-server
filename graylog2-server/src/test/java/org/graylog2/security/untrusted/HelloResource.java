@@ -14,7 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage.location;
+package org.graylog2.security.untrusted;
 
-public interface KeystoreLocation {
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("/")
+public class HelloResource {
+    @GET
+    public String getHello() {
+        return "This is the response";
+    }
 }

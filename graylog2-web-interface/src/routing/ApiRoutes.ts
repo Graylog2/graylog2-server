@@ -147,6 +147,7 @@ const ApiRoutes = {
   IndexerClusterApiController: {
     health: () => ({ url: '/system/indexer/cluster/health' }),
     name: () => ({ url: '/system/indexer/cluster/name' }),
+    info: () => ({ url: '/system/indexer/cluster/info' }),
   },
   IndexerFailuresApiController: {
     count: (since: number) => ({ url: `/system/indexer/failures/count?since=${since}` }),
