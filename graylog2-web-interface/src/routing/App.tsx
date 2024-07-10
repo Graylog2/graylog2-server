@@ -33,6 +33,7 @@ import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
+import InvestigationsProviders from 'components/investigations/contexts/InvestigationsProvider';
 
 const AppLayout = styled.div`
   display: flex;
@@ -86,9 +87,11 @@ const App = () => (
                     <Scratchpad />
                     <ReportedErrorBoundary>
                       <RuntimeErrorBoundary>
-                        <PageContent>
-                          <Outlet />
-                        </PageContent>
+                        <InvestigationsProviders>
+                          <PageContent>
+                            <Outlet />
+                          </PageContent>
+                        </InvestigationsProviders>
                       </RuntimeErrorBoundary>
                     </ReportedErrorBoundary>
                   </AppLayout>
