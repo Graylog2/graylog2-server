@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { Formik } from 'formik';
 
-import { BootstrapModalWrapper, FormGroup, Modal } from 'components/bootstrap';
+import { BootstrapModalWrapper, Modal } from 'components/bootstrap';
 import { FormikInput, ModalSubmit } from 'components/common';
 import { formHasErrors } from 'util/FormsUtils';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
@@ -68,45 +68,47 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
                                             validateOnBlur
                                             validateOnChange
                                             onSubmit={() => {}}>
-        {({ isSubmitting, values, isValid, errors, validateForm }) => (
-          <>
-            <Modal.Header closeButton>
-              <Modal.Title>{title}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <FormikInput id="title"
-                           name="title"
-                           label="Title"
-                           help="Rule title"
-                           error={errors.title}
-                           required />
-              <FormikInput id="description"
-                           name="description"
-                           label="Description"
-                           help="Rule description" />
-              <FormGroup validationState={errors.rule ? 'danger' : null}>
+        {({ isSubmitting, values, isValid, errors, validateForm }) => {
+          const onSubmit = () => {
+            validateForm().then((errorsList) => {
+              if (!formHasErrors(errorsList)) {
+                handleSubmit(values);
+              }
+            });
+          };
+
+          return (
+            <>
+              <Modal.Header closeButton>
+                <Modal.Title>{title}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <FormikInput id="title"
+                             name="title"
+                             label="Title"
+                             help="Rule title"
+                             error={errors.title}
+                             required />
+                <FormikInput id="description"
+                             name="description"
+                             label="Description"
+                             help="Rule description" />
                 <label htmlFor="rule_builder">Rule Builder</label>
                 {errors?.rule && (<p className="text-danger">{errors.rule as React.ReactNode}</p>)}
                 <FilterRulesFields type="condition" />
-              </FormGroup>
-              <Modal.Footer>
-                <ModalSubmit isSubmitting={isSubmitting}
-                             isAsyncSubmit
-                             onSubmit={() => {
-                               validateForm().then((errorsList) => {
-                                 if (!formHasErrors(errorsList)) {
-                                   handleSubmit(values);
-                                 }
-                               });
-                             }}
-                             onCancel={onCancel}
-                             disabledSubmit={!isValid}
-                             submitButtonText={values?.id ? 'Update' : 'Create'}
-                             submitLoadingText={values?.id ? 'Updating filter' : 'Saving filter'} />
-              </Modal.Footer>
-            </Modal.Body>
-          </>
-        )}
+                <Modal.Footer>
+                  <ModalSubmit isSubmitting={isSubmitting}
+                               isAsyncSubmit
+                               onSubmit={onSubmit}
+                               onCancel={onCancel}
+                               disabledSubmit={!isValid || values?.rule?.errors?.length > 0}
+                               submitButtonText={values?.id ? 'Update' : 'Create'}
+                               submitLoadingText={values?.id ? 'Updating filter' : 'Saving filter'} />
+                </Modal.Footer>
+              </Modal.Body>
+            </>
+          );
+        }}
       </Formik>
     </BootstrapModalWrapper>
   );

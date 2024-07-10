@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { useFormikContext } from 'formik';
 import ObjectID from 'bson-objectid';
 
+import Errors from 'components/rules/rule-builder/Errors';
 import { ConfirmDialog } from 'components/common';
 import type { BlockType, RuleBlock } from 'components/rules/rule-builder/types';
 import RuleBuilderBlock from 'components/rules/rule-builder/RuleBuilderBlock';
@@ -149,6 +150,7 @@ const FilterRulesFields = ({ type }: Props) => {
         <>Are you sure you want to delete <strong>{blockToDelete.type} N° {blockToDelete.orderIndex + 1}</strong>?</>
       </ConfirmDialog>
       )}
+      <Errors objectWithErrors={values.rule} />
     </StyledPanel>
 
   );

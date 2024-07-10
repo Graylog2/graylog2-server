@@ -28,5 +28,5 @@ export const COLUMNS_ORDER = ['title', 'description'];
 
 export const ADDITIONAL_ATTRIBUTES: Array<Attribute> = [
   { id: 'title', title: 'Rule' },
-  { id: 'description', title: 'description' },
+  { id: 'description', title: 'Description' },
 ];
