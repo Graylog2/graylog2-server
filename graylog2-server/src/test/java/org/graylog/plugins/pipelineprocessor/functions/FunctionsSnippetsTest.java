@@ -1593,6 +1593,16 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("test99_k2")).isEqualTo("v,2");
         assertThat(message.getField("test99_k3")).isEqualTo("v3");
 
+        // When too many fieldNames specified, fields should not be parsed.
+        assertThat(message.getField("should_not_exist_k1")).isNull();
+        assertThat(message.getField("should_not_exist_k2")).isNull();
+        assertThat(message.getField("should_not_exist_k3")).isNull();
+
+        // When extra field names are ignored, values should be parsed.
+        assertThat(message.getField("ignore_extra_field_names_k1")).isEqualTo("v1");
+        assertThat(message.getField("ignore_extra_field_names_k2")).isEqualTo("v2");
+        assertThat(message.getField("ignore_extra_field_names_k3")).isEqualTo("v3");
+        assertThat(message.getField("ignore_extra_field_names_k4")).isNull();
     }
 
     @Test
