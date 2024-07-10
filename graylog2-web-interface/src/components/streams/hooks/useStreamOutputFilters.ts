@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import ApiRoutes from 'routing/ApiRoutes';
 import type { SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
@@ -33,7 +34,7 @@ export const keyFn = (streamId: string, destinationType: string, searchParams?: 
 
 export const fetchStreamOutputFilters = async (streamId: string, searchParams: SearchParams) => {
   const url = PaginationURL(
-    `/streams/${streamId}/destinations/filters`,
+    ApiRoutes.StreamOutputFilterRuleApiController.get(streamId).url,
     searchParams.page,
     searchParams.pageSize,
     searchParams.query,

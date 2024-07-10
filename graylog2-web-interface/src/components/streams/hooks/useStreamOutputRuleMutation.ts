@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
-import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
@@ -29,22 +29,27 @@ const updateStreamOutputRule = async ({ streamId, filterOutputRule }: StreamOutp
 const removeStreamOutputRule = async ({ streamId, filterId }: {streamId: string, filterId: string}) => fetch('DELETE', qualifyUrl(ApiRoutes.StreamOutputFilterRuleApiController.delete(streamId, filterId).url));
 
 const useStreamOutputRuleMutation = () => {
+  const queryClient = useQueryClient();
+  const invalidateStreamQueries = () => queryClient.invalidateQueries(['streams']);
+
   const createMutation = useMutation(createStreamOutputRule, {
     onError: (errorThrown) => {
-      UserNotification.error(`Create stream output filter rule failed with status: ${errorThrown}`,
+      UserNotification.error(`Creating stream output filter rule failed with status: ${errorThrown}`,
         'Could not create stream output filter rule');
     },
     onSuccess: () => {
       UserNotification.success('Stream Output filter rule has been successfully created.', 'Success!');
+      invalidateStreamQueries();
     },
   });
   const updateMutation = useMutation(updateStreamOutputRule, {
     onError: (errorThrown) => {
-      UserNotification.error(`Updating strean output filter rule failed with status: ${errorThrown}`,
+      UserNotification.error(`Updating stream output filter rule failed with status: ${errorThrown}`,
         'Could not update stream output filter rule');
     },
     onSuccess: () => {
       UserNotification.success('Stream Output filter rule has been successfully updated.', 'Success!');
+      invalidateStreamQueries();
     },
 
   });
@@ -54,7 +59,8 @@ const useStreamOutputRuleMutation = () => {
         'Could not delete stream output filter rule');
     },
     onSuccess: () => {
-      UserNotification.success(' Stream Output filter rule has been successfully removed.', 'Success!');
+      UserNotification.success('Stream Output filter rule has been successfully removed.', 'Success!');
+      invalidateStreamQueries();
     },
   });
 

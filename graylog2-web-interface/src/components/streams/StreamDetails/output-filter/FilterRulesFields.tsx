@@ -61,7 +61,7 @@ const StyledPanelBody = styled(Panel.Body)`
 const FilterRulesFields = ({ type }: Props) => {
   const { values, setFieldValue, setValues } = useFormikContext<StreamOutputFilterRule>();
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
-  const newConditionBlockIndex = values.rule?.conditions.length;
+  const newConditionBlockIndex = values.rule?.conditions?.length;
   const { conditions } = useStreamOutputRuleBuilder();
 
   const validateAndUpdateFormValues = (ruleToValidate: StreamOutputFilterRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {

@@ -57,7 +57,7 @@ const EditOutputButton = ({ output, disabled, onUpdate, getTypeDefinition }: Pro
               bsSize="xsmall"
               onClick={onClick}
               title="Edit Output">
-        <Icon name="edit_square" type="regular" />
+        <Icon name="edit_square" />
       </Button>
       <ConfigurationForm<Output['configuration']> ref={configFormRef}
                                                   key={`configuration-form-output-${output.id}`}

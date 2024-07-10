@@ -21,11 +21,12 @@ export const DEFAULT_LAYOUT = {
   entityTableId: 'streamOuputFilter',
   defaultPageSize: 20,
   defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['title'],
+  defaultDisplayedAttributes: ['title', 'description'],
 };
 
-export const COLUMNS_ORDER = ['title'];
+export const COLUMNS_ORDER = ['title', 'description'];
 
 export const ADDITIONAL_ATTRIBUTES: Array<Attribute> = [
   { id: 'title', title: 'Rule' },
+  { id: 'description', title: 'description' },
 ];

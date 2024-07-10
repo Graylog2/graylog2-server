@@ -50,6 +50,7 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
   };
 
   const isNew = !filterRule?.id;
+  const title = isNew ? 'Create Filter Rule' : 'Edit Filter Rule';
 
   return (
     <>
@@ -60,11 +61,11 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
         {isNew ? (<>Create rule</>) : (<Icon name="edit_square" />)}
       </Button>
       {showForm && (
-      <FilterRuleForm title="Edit Filter Rule"
-                      filterRule={filterRule}
-                      destinationType={destinationType}
-                      onCancel={() => setShowForm(false)}
-                      handleSubmit={handleSubmit} />
+        <FilterRuleForm title={title}
+                        filterRule={filterRule}
+                        destinationType={destinationType}
+                        onCancel={() => setShowForm(false)}
+                        handleSubmit={handleSubmit} />
       )}
     </>
   );

@@ -29,9 +29,17 @@ type Props ={
 };
 
 const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
-  const [showDialog, setShowDialog] = useState(null);
+  const [showDialog, setShowDialog] = useState(false);
   const { removeStreamOutputRule } = useStreamOutputRuleMutation();
   const queryClient = useQueryClient();
+
+  const onConfirmDelete = async () => {
+    await removeStreamOutputRule({ streamId, filterId: filterOutputRule.id }).then(() => {
+      queryClient.invalidateQueries(['streams']);
+    });
+
+    setShowDialog(false);
+  };
 
   return (
     <>
@@ -44,13 +52,7 @@ const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
       {showDialog && (
       <ConfirmDialog title="Delete Rule"
                      show
-                     onConfirm={async () => {
-                       await removeStreamOutputRule({ streamId, filterId: filterOutputRule.id }).then(() => {
-                         queryClient.invalidateQueries(['streams']);
-                       });
-
-                       setShowDialog(false);
-                     }}
+                     onConfirm={onConfirmDelete}
                      onCancel={() => setShowDialog(false)}>
         {`Are you sure you want to delete  ${filterOutputRule.title} rule ?`}
       </ConfirmDialog>
