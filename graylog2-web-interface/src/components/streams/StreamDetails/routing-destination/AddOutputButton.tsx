@@ -27,8 +27,7 @@ import { OutputsStore, type Output } from 'stores/outputs/OutputsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
-
-import type { AvailableOutputRequestedConfiguration, AvailableOutputTypes } from '../../useAvailableOutputTypes';
+import type { AvailableOutputRequestedConfiguration, AvailableOutputTypes } from 'components/streams/useAvailableOutputTypes';
 
 type Props = {
   stream: Stream
