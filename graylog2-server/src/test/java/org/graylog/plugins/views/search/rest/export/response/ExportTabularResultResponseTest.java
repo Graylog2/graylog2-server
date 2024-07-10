@@ -54,6 +54,7 @@ class ExportTabularResultResponseTest {
         assertEquals(expectedResponse, response);
     }
 
+
     @Test
     void testCreationFromDocumentList() {
         List<Document> documents = List.of(
