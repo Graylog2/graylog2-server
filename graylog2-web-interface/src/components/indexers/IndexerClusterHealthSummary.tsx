@@ -38,7 +38,8 @@ const IndexerClusterHealthSummary = ({ health, name }: {
     }
   },
   name?: {
-    name: string
+    name: string,
+    distribution: string,
   }
 }) => {
   const formattedHealthStatus = health.status.toLowerCase();
@@ -53,7 +54,7 @@ const IndexerClusterHealthSummary = ({ health, name }: {
   };
 
   const formattedTextForHealth = useMemo(() => {
-    const text = `Elasticsearch cluster ${name?.name || ''} is ${formattedHealthStatus}.`;
+    const text = `${name?.distribution || 'Elasticsearch'} cluster ${name?.name || ''} is ${formattedHealthStatus}.`;
 
     switch (formattedHealthStatus) {
       case 'green': return text;

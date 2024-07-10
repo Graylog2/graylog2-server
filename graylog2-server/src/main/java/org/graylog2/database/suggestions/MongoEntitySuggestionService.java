@@ -23,31 +23,29 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
-import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.subject.Subject;
 import org.bson.Document;
-import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.shared.security.EntityPermissionsUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+
 public class MongoEntitySuggestionService implements EntitySuggestionService {
-    private static final String ID_FIELD = "_id";
 
     private final MongoConnection mongoConnection;
-    private final DbEntitiesCatalog catalog;
+    private final EntityPermissionsUtils permissionsUtils;
 
     @Inject
-    public MongoEntitySuggestionService(final MongoConnection mongoConnection, final DbEntitiesCatalog catalog) {
+    public MongoEntitySuggestionService(final MongoConnection mongoConnection,
+                                        final EntityPermissionsUtils permissionsUtils) {
         this.mongoConnection = mongoConnection;
-        this.catalog = catalog;
+        this.permissionsUtils = permissionsUtils;
     }
 
     @Override
@@ -68,9 +66,9 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 .projection(Projections.include(valueColumn))
                 .sort(Sorts.ascending(valueColumn));
 
-        final var userCanReadAllEntities = hasAllPermission(subject) || hasReadPermissionForWholeCollection(subject, collection);
+        final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
         final var skip = (page - 1) * perPage;
-        final var checkPermission = createPermissionCheck(subject, collection);
+        final var checkPermission = permissionsUtils.createPermissionCheck(subject, collection);
         final var documents = userCanReadAllEntities
                 ? mongoPaginate(resultWithoutPagination, perPage, skip)
                 : paginateWithPermissionCheck(resultWithoutPagination, perPage, skip, checkPermission);
@@ -106,26 +104,4 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         return MongoUtils.stream(result.limit(limit).skip(skip));
     }
 
-    private Predicate<Document> createPermissionCheck(final Subject subject, final String collection) {
-        final var readPermission = readPermissionForCollection(collection);
-        return doc -> readPermission
-                .map(permission -> subject.isPermitted(permission + ":" + doc.getObjectId(ID_FIELD).toString()))
-                .orElse(false);
-    }
-
-    boolean hasAllPermission(final Subject subject) {
-        return subject.isPermitted(new AllPermission());
-    }
-
-    boolean hasReadPermissionForWholeCollection(final Subject subject,
-                                                final String collection) {
-        return readPermissionForCollection(collection)
-                .map(rp -> rp.equals(DbEntity.ALL_ALLOWED) || subject.isPermitted(rp + ":*"))
-                .orElse(false);
-    }
-
-    private Optional<String> readPermissionForCollection(String collection) {
-        return catalog.getByCollectionName(collection)
-                .map(DbEntityCatalogEntry::readPermission);
-    }
 }
