@@ -17,20 +17,16 @@
 package org.graylog2.datanode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.annotation.Nonnull;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public record RemoteReindexAllowlistEvent(List<String> allowlist, ACTION action,
@@ -44,35 +40,22 @@ public record RemoteReindexAllowlistEvent(List<String> allowlist, ACTION action,
         return add(allowlist, Collections.emptyList());
     }
 
-    public static RemoteReindexAllowlistEvent add(List<String> allowlist, List<X509Certificate> trustedCertificates) {
-        return new RemoteReindexAllowlistEvent(allowlist, ACTION.ADD, encodeCerts(trustedCertificates));
+    /**
+     * @param allowlist
+     * @param trustedCertificates PEM encoded certificates that the datanodes should trust
+     * @return
+     */
+    public static RemoteReindexAllowlistEvent add(List<String> allowlist, List<String> trustedCertificates) {
+        return new RemoteReindexAllowlistEvent(allowlist, ACTION.ADD, trustedCertificates);
     }
 
     public static RemoteReindexAllowlistEvent remove() {
         return new RemoteReindexAllowlistEvent(Collections.emptyList(), ACTION.REMOVE, Collections.emptyList());
     }
 
-    @Nonnull
-    private static List<String> encodeCerts(List<X509Certificate> trustedCertificates) {
-        return Optional.ofNullable(trustedCertificates)
-                .map(certs -> certs.stream().map(RemoteReindexAllowlistEvent::encode).collect(Collectors.toList()))
-                .orElse(Collections.emptyList());
-    }
-
-
     @JsonIgnore
     public List<X509Certificate> trustedCertificates() {
         return pemEncodedTrustedCertificates.stream().map(RemoteReindexAllowlistEvent::decode).collect(Collectors.toList());
-    }
-
-    private static String encode(X509Certificate certificate) {
-        var writer = new StringWriter();
-        try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
-            jcaPEMWriter.writeObject(certificate);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return writer.toString();
     }
 
     private static X509Certificate decode(String pemEncodedCert) {

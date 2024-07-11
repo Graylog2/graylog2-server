@@ -28,4 +28,8 @@ public record IndexerConnectionCheckResult(List<String> indices, String error) {
     public static IndexerConnectionCheckResult failure(Exception e) {
         return new IndexerConnectionCheckResult(Collections.emptyList(), e.getMessage());
     }
+
+    public static IndexerConnectionCheckResult failure(String errorMessage) {
+        return new IndexerConnectionCheckResult(Collections.emptyList(), errorMessage);
+    }
 }

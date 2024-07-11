@@ -17,11 +17,14 @@
 package org.graylog2.datanode;
 
 import org.assertj.core.api.Assertions;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.List;
@@ -32,12 +35,22 @@ class RemoteReindexAllowlistEventTest {
     void testEncodeDecodeCertificate() throws Exception {
         final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned("my-server").validity(Duration.ofDays(31)));
         final X509Certificate certificate = keyPair.certificate();
-        final RemoteReindexAllowlistEvent event = RemoteReindexAllowlistEvent.add(List.of("localhost:9200"), List.of(certificate));
+        final RemoteReindexAllowlistEvent event = RemoteReindexAllowlistEvent.add(List.of("localhost:9200"), List.of(encodeAsPem(certificate)));
 
         final List<X509Certificate> certificates = event.trustedCertificates();
         Assertions.assertThat(certificates)
                 .hasSize(1)
                 .contains(certificate);
 
+    }
+
+    private String encodeAsPem(X509Certificate certificate) {
+        var writer = new StringWriter();
+        try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
+            jcaPEMWriter.writeObject(certificate);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return writer.toString();
     }
 }

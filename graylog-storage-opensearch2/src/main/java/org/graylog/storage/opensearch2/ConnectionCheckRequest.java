@@ -14,17 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.storage.opensearch2;
 
-import org.graylog2.plugin.inject.Graylog2Module;
+import java.net.URI;
 
-public class RestBindings extends Graylog2Module {
-    @Override
-    protected void configure() {
-        addSystemRestResource(StatusController.class);
-        addSystemRestResource(LogsController.class);
-        addSystemRestResource(ManagementController.class);
-        addSystemRestResource(IndicesDirectoryController.class);
-        addSystemRestResource(OpensearchConnectionCheckController.class);
-    }
+public record ConnectionCheckRequest(String host, String username, String password, boolean trustUnknownCerts) {
 }
