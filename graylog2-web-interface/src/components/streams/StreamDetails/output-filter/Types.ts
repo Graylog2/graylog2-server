@@ -22,6 +22,6 @@ export type StreamOutputFilterRule = {
   destination_type: string
   title: string
   description: string
-  status: string
+  status: 'enabled'| 'disabled'
   rule: RuleBuilderType,
 }

@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Formik } from 'formik';
+import { Formik, Field } from 'formik';
 
-import { BootstrapModalWrapper, Modal } from 'components/bootstrap';
+import { BootstrapModalWrapper, Input, Modal } from 'components/bootstrap';
 import { FormikInput, ModalSubmit } from 'components/common';
-import { formHasErrors } from 'util/FormsUtils';
+import { formHasErrors, getValueFromInput } from 'util/FormsUtils';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import FilterRulesFields from 'components/streams/StreamDetails/output-filter/FilterRulesFields';
 
@@ -57,6 +57,7 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
         ...filterRule,
         destination_type: destinationType,
         ...(!filterRule?.id && {
+          status: 'enabled',
           rule: {
             operator: 'AND',
             conditions: [],
@@ -68,13 +69,18 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
                                             validateOnBlur
                                             validateOnChange
                                             onSubmit={() => {}}>
-        {({ isSubmitting, values, isValid, errors, validateForm }) => {
+        {({ isSubmitting, values, isValid, errors, validateForm, setFieldValue }) => {
           const onSubmit = () => {
             validateForm().then((errorsList) => {
               if (!formHasErrors(errorsList)) {
                 handleSubmit(values);
               }
             });
+          };
+
+          const onStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+            const isChecked = getValueFromInput(event.target);
+            setFieldValue('status', isChecked ? 'enabled' : 'disabled');
           };
 
           return (
@@ -93,6 +99,17 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
                              name="description"
                              label="Description"
                              help="Rule description" />
+                <Field name="status">
+                  {({ field: { name, value }, meta }) => (
+                    <Input id={name}
+                           error={meta?.error}
+                           label="Enabled"
+                           type="checkbox"
+                           onChange={onStatusChange}
+                           checked={value === 'enabled'}
+                           value={value === 'enabled'} />
+                  )}
+                </Field>
                 <label htmlFor="rule_builder">Rule Builder</label>
                 {errors?.rule && (<p className="text-danger">{errors.rule as React.ReactNode}</p>)}
                 <FilterRulesFields type="condition" />
