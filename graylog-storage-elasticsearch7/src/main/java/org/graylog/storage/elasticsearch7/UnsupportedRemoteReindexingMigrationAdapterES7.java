@@ -22,7 +22,6 @@ import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 
@@ -36,7 +35,7 @@ public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteRei
     }
 
     @Override
-    public RemoteReindexMigration status(@NotNull String migrationID) {
+    public RemoteReindexMigration status(@Nonnull String migrationID) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
