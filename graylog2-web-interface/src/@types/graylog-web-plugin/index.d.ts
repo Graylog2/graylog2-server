@@ -193,6 +193,7 @@ declare module 'graylog-web-plugin/plugin' {
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
+    pageContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
     routes?: Array<PluginRoute>;
     entityRoutes?: Array<(id: string, type: string) => string>
     pages?: PluginPages;

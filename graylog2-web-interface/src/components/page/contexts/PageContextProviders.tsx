@@ -22,8 +22,8 @@ type Props = {
   children: React.ReactElement,
 };
 
-const InvestigationsProviders = ({ children }: Props) => {
-  const contextProviders = usePluginEntities('investigationsProviders');
+const PageContextProviders = ({ children }: Props) => {
+  const contextProviders = usePluginEntities('pageContextProviders');
 
   if (!contextProviders || contextProviders?.length === 0) {
     return children;
@@ -36,4 +36,4 @@ const InvestigationsProviders = ({ children }: Props) => {
   ), children);
 };
 
-export default InvestigationsProviders;
+export default PageContextProviders;
