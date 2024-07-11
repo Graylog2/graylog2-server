@@ -16,8 +16,11 @@
  */
 package org.graylog2.streams.filters;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
@@ -25,10 +28,15 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.mongojack.Id;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static com.mongodb.client.model.Filters.and;
@@ -57,12 +65,14 @@ public class StreamDestinationFilterService {
     private final MongoCollection<StreamDestinationFilterRuleDTO> collection;
     private final MongoPaginationHelper<StreamDestinationFilterRuleDTO> paginationHelper;
     private final MongoUtils<StreamDestinationFilterRuleDTO> utils;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public StreamDestinationFilterService(MongoCollections mongoCollections) {
+    public StreamDestinationFilterService(MongoCollections mongoCollections, ClusterEventBus clusterEventBus) {
         this.collection = mongoCollections.collection(COLLECTION, StreamDestinationFilterRuleDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.utils = mongoCollections.utils(collection);
+        this.clusterEventBus = clusterEventBus;
 
         collection.createIndex(Indexes.ascending(FIELD_STREAM_ID));
         collection.createIndex(Indexes.ascending(FIELD_DESTINATION_TYPE));
@@ -118,7 +128,9 @@ public class StreamDestinationFilterService {
         }
 
         // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
-        return utils.getById(insertedId(collection.insertOne(dto.withStream(streamId))))
+        final var dtoId = insertedId(collection.insertOne(dto.withStream(streamId)));
+        clusterEventBus.post(StreamDestinationFilterUpdatedEvent.of(dtoId.toHexString()));
+        return utils.getById(dtoId)
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't insert document: %s", dto)));
     }
 
@@ -128,6 +140,7 @@ public class StreamDestinationFilterService {
                 and(eq(FIELD_STREAM_ID, streamId), idEq(requireNonBlank(dto.id(), "id can't be blank"))),
                 dto.withStream(streamId)
         );
+        clusterEventBus.post(StreamDestinationFilterUpdatedEvent.of(requireNonBlank(dto.id())));
 
         return utils.getById(dto.id())
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't find updated document: %s", dto)));
@@ -137,8 +150,23 @@ public class StreamDestinationFilterService {
         final var dto = utils.getById(id)
                 .orElseThrow(() -> new IllegalArgumentException(f("Couldn't find document with ID <%s> for deletion", id)));
 
-        collection.deleteOne(and(eq(FIELD_STREAM_ID, streamId), idEq(id)));
+        if (collection.deleteOne(and(eq(FIELD_STREAM_ID, streamId), idEq(id))).getDeletedCount() > 0) {
+            clusterEventBus.post(StreamDestinationFilterDeletedEvent.of(id));
+        }
 
         return dto;
+    }
+
+    public record GroupByStreamResult(@JsonProperty("id") @Id String streamId,
+                                      @JsonProperty("filters") Set<StreamDestinationFilterRuleDTO> filters) {}
+
+    public void forEachEnabledFilterGroupedByStream(Consumer<GroupByStreamResult> consumer) {
+        // Group all enabled filters by stream ID
+        collection.aggregate(List.of(
+                Aggregates.match(eq(FIELD_STATUS, StreamDestinationFilterRuleDTO.Status.ENABLED)),
+                Aggregates.group("$" + FIELD_STREAM_ID, List.of(
+                        Accumulators.push("filters", "$$ROOT")
+                ))
+        ), GroupByStreamResult.class).forEach(consumer);
     }
 }

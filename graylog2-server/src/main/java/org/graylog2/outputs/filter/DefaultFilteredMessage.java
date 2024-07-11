@@ -16,22 +16,42 @@
  */
 package org.graylog2.outputs.filter;
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.streams.Stream;
 
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-public record DefaultFilteredMessage(Message message, Set<String> outputs) implements FilteredMessage {
+public record DefaultFilteredMessage(Message message,
+                                     Multimap<String, Stream> destinations) implements FilteredMessage {
     public DefaultFilteredMessage {
         requireNonNull(message, "message cannot be null");
-        requireNonNull(outputs, "outputs cannot be null");
+        requireNonNull(destinations, "destinations cannot be null");
+    }
+
+    /**
+     * Creates a filtered message for the given destination keys. The streams of the given message are added to all
+     * destination keys.
+     *
+     * @param message         the message
+     * @param destinationKeys the set of destination keys
+     * @return the new filtered message
+     */
+    public static DefaultFilteredMessage forDestinationKeys(Message message, Set<String> destinationKeys) {
+        final var builder = ImmutableMultimap.<String, Stream>builder();
+
+        destinationKeys.forEach(key -> builder.putAll(key, message.getStreams()));
+
+        return new DefaultFilteredMessage(message, builder.build());
     }
 
     @Override
     public boolean isIndexed() {
         // We consider a message indexed if it is written to the indexer output.
-        return outputs.contains(ElasticSearchOutput.FILTER_KEY);
+        return !destinations.get(ElasticSearchOutput.FILTER_KEY).isEmpty();
     }
 }
