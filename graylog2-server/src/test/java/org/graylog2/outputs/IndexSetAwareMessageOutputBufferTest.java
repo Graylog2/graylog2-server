@@ -115,6 +115,6 @@ class IndexSetAwareMessageOutputBufferTest {
     }
 
     private FilteredMessage createMessage(String message, Set<String> outputs) {
-        return new DefaultFilteredMessage(messageFactory.createMessage(message, "source", Tools.nowUTC()), outputs);
+        return DefaultFilteredMessage.forDestinationKeys(messageFactory.createMessage(message, "source", Tools.nowUTC()), outputs);
     }
 }

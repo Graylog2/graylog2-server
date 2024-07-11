@@ -14,33 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.plugins.pipelineprocessor.parser;
 
-export type EventReplayInfo = {
-  timerange_start: string,
-  timerange_end: string,
-  query: string,
-  streams: string[],
-};
+import jakarta.inject.Qualifier;
 
-export type Event = {
-  id: string,
-  event_definition_id: string,
-  event_definition_type: string,
-  priority: number,
-  timestamp: string,
-  timerange_start: string,
-  timerange_end: string,
-  key: string,
-  fields: Record<string, string>,
-  group_by_fields: { [key: string]: string },
-  source_streams: string[],
-  replay_info: EventReplayInfo | undefined,
-  alert: boolean | undefined,
-};
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-export type EventDefinitionContext = {
-  id: string,
-  title: string,
-  remediation_steps?: string,
-  description?: string,
-};
+/**
+ * Annotation for internal pipeline rule functions.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+@Qualifier
+public @interface InternalPipelineFunctions {
+}

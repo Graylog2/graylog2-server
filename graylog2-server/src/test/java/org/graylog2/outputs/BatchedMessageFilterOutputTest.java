@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -194,8 +195,8 @@ class BatchedMessageFilterOutputTest {
 
     private List<FilteredMessage> messagesWithOutput(List<Message> messages) {
         return messages.stream()
-                .map(message -> (FilteredMessage) new DefaultFilteredMessage(message, Set.of(ElasticSearchOutput.FILTER_KEY)))
-                .toList();
+                .map(message -> DefaultFilteredMessage.forDestinationKeys(message, Set.of(ElasticSearchOutput.FILTER_KEY)))
+                .collect(Collectors.toList());
     }
 
     private List<Message> buildMessages(final int count) {

@@ -17,14 +17,13 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
 import freemarker.template.Configuration;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,7 @@ public class ActionParser {
 
     @Inject
     public ActionParser(RuleBuilderRegistry ruleBuilderRegistry, SecureFreemarkerConfigProvider secureFreemarkerConfigProvider) {
-        this.actions = ruleBuilderRegistry.actions();
+        this.actions = ruleBuilderRegistry.actionsWithInternal();
         this.freemarkerConfiguration = ParserUtil.initializeFragmentTemplates(secureFreemarkerConfigProvider, actions);
     }
 
