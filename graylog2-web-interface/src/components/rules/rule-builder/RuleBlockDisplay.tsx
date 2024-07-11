@@ -181,7 +181,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
                                    buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                                    bsSize="xsmall"
                                    onToggle={handleDropdownToggle}
-                                   dropdownZIndex={1000}>
+                                   dropdownZIndex={1500}>
               <MenuItem onClick={onEdit}>Edit</MenuItem>
               <MenuItem onClick={() => {
                 onDuplicate();

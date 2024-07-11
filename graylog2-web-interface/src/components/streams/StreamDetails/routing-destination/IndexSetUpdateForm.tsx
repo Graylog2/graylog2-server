@@ -26,8 +26,7 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { Icon, ModalSubmit } from 'components/common';
 import UserNotification from 'util/UserNotification';
 import { isPermitted } from 'util/PermissionsMixin';
-
-import IndexSetSelect from '../../IndexSetSelect';
+import IndexSetSelect from 'components/streams/IndexSetSelect';
 
 type FormValues = Partial<Pick<Stream, 'index_set_id'>>
 type Props = {

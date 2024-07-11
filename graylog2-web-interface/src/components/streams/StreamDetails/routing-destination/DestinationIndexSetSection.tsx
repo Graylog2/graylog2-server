@@ -25,16 +25,15 @@ import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
 import type { Stream } from 'stores/streams/StreamsStore';
-
-import IndexSetUpdateForm from './IndexSetUpdateForm';
+import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
+import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
 
 type Props = {
   indexSet: IndexSet,
   stream: Stream,
 };
 
-const ActionButtonsWrap = styled.span(({ theme }) => css`
-  margin-right: ${theme.spacings.sm};
+const ActionButtonsWrap = styled.span(() => css`
   float: right;
 `);
 
@@ -61,7 +60,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
             </td>
             {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <td>
-              <ActionButtonsWrap className="align-right">
+              <ActionButtonsWrap>
                 <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
                   <Button bsStyle="link"
                           bsSize="xsmall"
@@ -78,6 +77,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
           </tr>
         </tbody>
       </Table>
+      <IndexSetFilters streamId={stream.id} />
     </Section>
   );
 };

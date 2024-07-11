@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+CMD=$1
+NOHUP=${NOHUP:=$(which nohup)}
+PS=${PS:=$(which ps)}
+
+# default java
+JAVA_CMD=${JAVA_CMD:=$(which java)}
+
+
+if [ -n "$JAVA_HOME" ]
+then
+    # try to use $JAVA_HOME
+    if [ -x "$JAVA_HOME"/bin/java ]
+    then
+        JAVA_CMD="$JAVA_HOME"/bin/java
+    else
+        die "$JAVA_HOME"/bin/java is not executable
+    fi
+fi
+
+# resolve links - $0 may be a softlink
+GRAYLOGCTL="$0"
+
+while [ -h "$GRAYLOGCTL" ]; do
+    ls=$(ls -ld "$GRAYLOGCTL")
+    link=$(expr "$ls" : '.*-> \(.*\)$')
+    if expr "$link" : '/.*' > /dev/null; then
+        GRAYLOGCTL="$link"
+    else
+        GRAYLOGCTL=$(dirname "$GRAYLOGCTL")/"$link"
+    fi
+done
+
+# take variables from environment if set
+GRAYLOGCTL_DIR=${GRAYLOGCTL_DIR:=$(dirname "$GRAYLOGCTL")}
+GRAYLOG_JVM_DIR="$(dirname "$GRAYLOGCTL_DIR")/jvm"
+GRAYLOG_SERVER_JAR=${GRAYLOG_SERVER_JAR:=graylog.jar}
+DEFAULT_JAVA_OPTS="-Dlog4j2.formatMsgNoLookups=true -Djdk.tls.acknowledgeCloseNotify=true -Xms1g -Xmx1g -XX:+UseG1GC -server -XX:-OmitStackTraceInFastThrow"
+
+if [ -z "$JAVA_HOME" ] && [ -d "$GRAYLOG_JVM_DIR" ]; then
+	echo "Using bundled JVM in $GRAYLOG_JVM_DIR"
+	export JAVA_HOME="$GRAYLOG_JVM_DIR"
+	JAVA_CMD="$GRAYLOG_JVM_DIR/bin/java"
+fi
+
+JAVA_OPTS="${JAVA_OPTS:="$DEFAULT_JAVA_OPTS"}"
+
+certutil() {
+    echo "Running certutil $1..."
+    cd "$GRAYLOGCTL_DIR/.."
+    "${JAVA_CMD}" ${JAVA_OPTS} ${LOG4J} -jar "${GRAYLOG_SERVER_JAR}" certutil $1
+}
+
+case "$CMD" in
+    ca)
+        certutil "ca"
+        ;;
+    cert)
+        certutil "cert"
+        ;;
+    http)
+        certutil "http"
+        ;;
+    truststore)
+        certutil "truststore"
+        ;;
+    *)
+        echo "Usage $0 {ca|cert|http|truststore}"
+esac

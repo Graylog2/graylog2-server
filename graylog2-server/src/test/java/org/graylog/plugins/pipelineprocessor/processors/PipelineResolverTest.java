@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.ImmutableSortedSet;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -104,6 +105,59 @@ class PipelineResolverTest {
         );
 
         assertThat(resolver.config()).isEqualTo(config);
+    }
+
+    @Test
+    void resolveFunctions() {
+        final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
+        final var resolver = new PipelineResolver(
+                new PipelineRuleParser(new FunctionRegistry(Map.of())),
+                PipelineResolverConfig.of(() -> Stream.of(rule1), Stream::of, Stream::of)
+        );
+
+        final var pipelineObj = Pipeline.builder()
+                .id("pipeline-999")
+                .name("test-pipeline-999")
+                .stages(ImmutableSortedSet.of(
+                        Stage.builder()
+                                .stage(0)
+                                .match(Stage.Match.EITHER)
+                                .ruleReferences(List.of(rule1.title()))
+                                .build()
+                ))
+                .build();
+
+        final var pipelines = resolver.resolveFunctions(Set.of(pipelineObj), registry);
+
+        assertThat(pipelines).hasSize(1);
+        assertThat(pipelines.get("pipeline-999")).satisfies(pipeline -> {
+            assertThat(pipeline.id()).isEqualTo("pipeline-999");
+            assertThat(pipeline.name()).isEqualTo("test-pipeline-999");
+            assertThat(pipeline.stages()).hasSize(1);
+            assertThat(pipeline.stages().first()).satisfies(stage -> {
+                assertThat(stage.stage()).isEqualTo(0);
+                assertThat(stage.match()).isEqualTo(Stage.Match.EITHER);
+                assertThat(stage.ruleReferences()).isEqualTo(List.of("test-rule-1"));
+                assertThat(stage.getRules()).hasSize(1);
+                assertThat(stage.getRules().get(0)).satisfies(rule -> {
+                    assertThat(rule.id()).isEqualTo("rule-1");
+                    assertThat(rule.name()).isEqualTo("test-rule-1");
+                });
+            });
+        });
+
+        assertThat(metricRegistry.getMetrics().keySet()).containsExactlyInAnyOrder(
+                "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-999.0.not-matched",
+                "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-999.0.matched",
+                "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-999.0.failed",
+                "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-999.0.executed",
+                "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.matched",
+                "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.not-matched",
+                "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.failed",
+                "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.executed",
+                "org.graylog.plugins.pipelineprocessor.ast.Pipeline.pipeline-999.executed",
+                "org.graylog.plugins.pipelineprocessor.ast.Pipeline.pipeline-999.stage.0.executed"
+        );
     }
 
     @Test
