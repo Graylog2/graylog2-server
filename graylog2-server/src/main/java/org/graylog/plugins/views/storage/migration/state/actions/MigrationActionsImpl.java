@@ -278,7 +278,8 @@ public class MigrationActionsImpl implements MigrationActions {
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
         final boolean trustUnknownCerts = getStateMachineContext().getActionArgumentOpt("trust_unknown_certs", Boolean.class).orElse(false);
-        getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password, trustUnknownCerts));
+        final String allowlist = getStateMachineContext().getActionArgumentOpt("allowlist", String.class).orElse(null);
+        getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password, allowlist, trustUnknownCerts));
     }
 
     @Override

@@ -25,9 +25,9 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.validation.constraints.NotNull;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -74,7 +74,6 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.BufferedReader;
@@ -87,8 +86,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -174,8 +171,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private void prepareCluster(RemoteReindexRequest req, MigrationConfiguration migration) {
-        final List<String> allowlist = parseAllowlist(req);
-        if (!isRemoteReindexAllowed(allowlist)) {
+        final RemoteReindexAllowlist allowlist = new RemoteReindexAllowlist(req.uri(), req.allowlist());
+        if (!allowlist.isClusterSettingMatching(clusterAllowlistSetting())) {
             // this is expected state for fresh datanode cluster - there is no value configured in the reindex.remote.allowlist
             // we have to add it to the configuration and wait till the whole cluster restarts
             logInfo(migration, "Preparing cluster for remote reindexing, setting allowlist to: " + req.allowlist());
@@ -184,31 +181,6 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         } else {
             logInfo(migration, "Remote reindex allowlist already configured, skipping cluster configuration and restart.");
         }
-    }
-
-    @Nonnull
-    protected static List<String> parseAllowlist(RemoteReindexRequest req) {
-
-        if (req.allowlist() == null || req.allowlist().isBlank()) {
-            // nothing provided, let's use the host address and parse allowlist from it
-            return Collections.singletonList(fixProtocolPrefix(req.uri().toString(), req.uri()));
-        } else {
-            return Arrays.stream(req.allowlist().split(","))
-                    .map(String::trim)
-                    .map(allowlistItem -> fixProtocolPrefix(allowlistItem, req.uri()))
-                    .toList();
-        }
-    }
-
-    /**
-     * Users often provide the very same value for remote host and allowlist. But allowlist needs to be just
-     * hostname:port, without protocol. A mistake that we can easily automatically fix.
-     */
-    private static String fixProtocolPrefix(String allowlistItem, URI remoteHost) {
-        if (remoteHost.toString().equals(allowlistItem)) {
-            return allowlistItem.replaceAll("https?://", "");
-        }
-        return allowlistItem;
     }
 
     private ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password, MigrationConfiguration migration) {
@@ -220,7 +192,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     @Override
-    public RemoteReindexMigration status(@NotNull String migrationID) {
+    public RemoteReindexMigration status(@Nonnull String migrationID) {
         return reindexMigrationService.getMigration(migrationID)
                 .map(migrationConfiguration -> {
                     final List<RemoteReindexIndex> indices = migrationConfiguration.indices()
@@ -266,28 +238,35 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     @Override
-    public IndexerConnectionCheckResult checkConnection(URI uri, String username, String password, boolean trustUnknownCerts) {
+    public IndexerConnectionCheckResult checkConnection(@Nonnull URI remoteHost, @Nullable String username, @Nullable String password, @Nullable String allowlist, boolean trustUnknownCerts) {
+
+
         try {
-            final List<String> discoveredIndices = getAllIndicesFrom(uri, username, password, trustUnknownCerts);
+            final RemoteReindexAllowlist reindexAllowlist = new RemoteReindexAllowlist(remoteHost, allowlist);
+            reindexAllowlist.validate();
+            final List<String> discoveredIndices = getAllIndicesFrom(remoteHost, username, password, trustUnknownCerts);
             return IndexerConnectionCheckResult.success(discoveredIndices);
         } catch (Exception e) {
             return IndexerConnectionCheckResult.failure(e);
         }
     }
 
-    private boolean isRemoteReindexAllowed(List<String> allowlistEntries) {
-        final String allowlistSettingValue = client.execute((restHighLevelClient, requestOptions) -> {
+    private boolean isRemoteReindexAllowed(List<String> allowlistEntries, String clusterAllowlistSetting) {
+        // the value is not proper json, just something like [localhost:9201]. It should be safe to simply use String.contains,
+        // but there is maybe a chance for mismatches and then we'd have to parse the value
+        return allowlistEntries.stream().allMatch(clusterAllowlistSetting::contains);
+    }
+
+    private String clusterAllowlistSetting() {
+        return client.execute((restHighLevelClient, requestOptions) -> {
             final ClusterGetSettingsRequest request = new ClusterGetSettingsRequest();
             request.includeDefaults(true);
             final ClusterGetSettingsResponse settings = restHighLevelClient.cluster().getSettings(request, requestOptions);
             return settings.getSetting("reindex.remote.allowlist");
         });
-        // the value is not proper json, just something like [localhost:9201]. It should be safe to simply use String.contains,
-        // but there is maybe a chance for mismatches and then we'd have to parse the value
-        return allowlistEntries.stream().allMatch(allowlistSettingValue::contains);
     }
 
-    private void waitForClusterRestart(List<String> allowlist, MigrationConfiguration migration) {
+    private void waitForClusterRestart(RemoteReindexAllowlist allowlist, MigrationConfiguration migration) {
         final var retryer = RetryerBuilder.<RemoteReindexConfigurationStatus>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(WAIT_BETWEEN_CONNECTION_ATTEMPTS, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(CONNECTION_ATTEMPTS))
@@ -312,7 +291,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             public <V> void onRetry(Attempt<V> attempt) {
                 if (attempt.hasResult()) {
                     final RemoteReindexConfigurationStatus status = (RemoteReindexConfigurationStatus) attempt.getResult();
-                    final String message = String.format(Locale.ROOT, "Waiting for datanode cluster to reconfigure and restart, attempt %d. Cluster health: %s, allowlist configured: %b.", attempt.getAttemptNumber(), status.status(), status.allowlistConfigured());
+                    final String message = String.format(Locale.ROOT, "Waiting for datanode cluster to reconfigure and restart, attempt %d. Cluster health: %s, allowlist configured: %b (cluster setting value: %s).", attempt.getAttemptNumber(), status.status(), status.allowlistConfigured(), status.clusterAllowlistSetting());
                     logInfo(migration, message);
                 } else {
                     logInfo(migration, "Waiting for datanode cluster to reconfigure and restart, attempt #" + attempt.getAttemptNumber());
@@ -321,29 +300,31 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         };
     }
 
-    private RemoteReindexConfigurationStatus remoteReindexClusterState(List<String> allowlist) {
+    private RemoteReindexConfigurationStatus remoteReindexClusterState(RemoteReindexAllowlist allowlist) {
         final ClusterHealthResponse clusterHealth = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.cluster().health(new ClusterHealthRequest(), RequestOptions.DEFAULT));
-        final boolean remoteReindexAllowed = isRemoteReindexAllowed(allowlist);
-        return new RemoteReindexConfigurationStatus(remoteReindexAllowed, clusterHealth.getStatus());
+        final String clusterAllowlistSetting = clusterAllowlistSetting();
+        final boolean remoteReindexAllowed = allowlist.isClusterSettingMatching(clusterAllowlistSetting);
+        return new RemoteReindexConfigurationStatus(remoteReindexAllowed, clusterAllowlistSetting, clusterHealth.getStatus());
     }
 
-    private record RemoteReindexConfigurationStatus(boolean allowlistConfigured, ClusterHealthStatus status) {
+    private record RemoteReindexConfigurationStatus(boolean allowlistConfigured, String clusterAllowlistSetting,
+                                                    ClusterHealthStatus status) {
         private boolean isClusterReady() {
             return allowlistConfigured && status.equals(ClusterHealthStatus.GREEN);
         }
     }
 
-    void allowReindexing(List<String> allowlist, final RemoteReindexRequest request, MigrationConfiguration migration) {
+    void allowReindexing(RemoteReindexAllowlist allowlist, final RemoteReindexRequest request, MigrationConfiguration migration) {
         if (request.trustUnknownCerts()) {
             try {
                 final String host = request.uri().toURL().toString();
                 final List<X509Certificate> untrustedCerts = extractHostCertificates(host, migration);
-                eventBus.post(RemoteReindexAllowlistEvent.add(allowlist, untrustedCerts));
+                eventBus.post(RemoteReindexAllowlistEvent.add(allowlist.value(), untrustedCerts));
             } catch (NoSuchAlgorithmException | IOException | KeyManagementException e) {
                 throw new RuntimeException("Failed to extract trusted certificates", e);
             }
         } else {
-            eventBus.post(RemoteReindexAllowlistEvent.add(allowlist));
+            eventBus.post(RemoteReindexAllowlistEvent.add(allowlist.value()));
         }
     }
 
