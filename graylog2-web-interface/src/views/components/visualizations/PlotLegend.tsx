@@ -36,6 +36,7 @@ import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 const ColorHint = styled.div(({ color }) => css`
   cursor: pointer;
@@ -121,6 +122,7 @@ type TableCellProps = {
 }
 
 const TableCell = ({ value, fieldTypes, colors, activeQuery, labelFields, mapKeys, setColor }:TableCellProps) => {
+  const interactive = useContext(InteractiveContext);
   const [showPopover, setShowPopover] = useState(false);
   const labelsWithField = value.split(keySeparator).map((label, idx) => {
     const field = labelFields[idx];
@@ -137,10 +139,12 @@ const TableCell = ({ value, fieldTypes, colors, activeQuery, labelFields, mapKey
     field,
   }) => mapKeys(label, field)).join(humanSeparator);
 
-  const _onColorSelect = useCallback((field: string, color: string) => {
-    setColor(field, color);
+  const _onColorSelect = useCallback((color: string) => {
+    setColor(value, color);
     setShowPopover(false);
-  }, [setColor]);
+  }, [setColor, value]);
+
+  const togglePopover = useMemo(() => (interactive ? () => setShowPopover((show) => !show) : () => {}), [interactive]);
 
   return (
     <LegendCell key={value}>
@@ -148,13 +152,13 @@ const TableCell = ({ value, fieldTypes, colors, activeQuery, labelFields, mapKey
         <Popover position="top" withArrow opened={showPopover}>
           <Popover.Target>
             <ColorHint aria-label="Color Hint"
-                       onClick={() => setShowPopover((show) => !show)}
+                       onClick={togglePopover}
                        color={colors.get(value, defaultColor)} />
           </Popover.Target>
           <Popover.Dropdown title={`Configuration for ${humanLabel}`}>
             <ColorPicker color={colors.get(value, defaultColor)}
                          colors={defaultColors}
-                         onChange={(newColor) => _onColorSelect(value, newColor)} />
+                         onChange={_onColorSelect} />
           </Popover.Dropdown>
         </Popover>
         <ValueContainer>

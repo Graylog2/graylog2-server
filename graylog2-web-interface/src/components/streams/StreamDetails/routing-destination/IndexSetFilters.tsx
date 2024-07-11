@@ -14,9 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage.location;
+import * as React from 'react';
 
-public record KeystoreMongoCollection(String collectionName,
-                                      String identifierField,
-                                      String encryptedCertificateField) {
-}
+import FilterRulesList from 'components/streams/StreamDetails/output-filter/FilterRuleList';
+
+type Props = {
+  streamId: string,
+};
+
+const IndexSetFilters = ({ streamId }: Props) => (
+  <FilterRulesList streamId={streamId} destinationType="indexer" />
+);
+
+export default IndexSetFilters;

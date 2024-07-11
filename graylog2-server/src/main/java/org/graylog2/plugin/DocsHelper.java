@@ -16,13 +16,16 @@
  */
 package org.graylog2.plugin;
 
-public enum DocsHelper {
-    PAGE_SENDING_JSONPATH("json"),
-    PAGE_SENDING_IPFIXPATH("ipfix-input"),
-    PAGE_ES_CONFIGURATION("elasticsearch"),
-    PAGE_ES_VERSIONS("elasticsearch#elasticsearch-versions");
+import org.graylog2.shared.ServerVersion;
 
-    private static final String DOCS_URL = "https://docs.graylog.org/docs/";
+public enum DocsHelper {
+    PAGE_SENDING_JSONPATH("getting_in_log_data/json_path_from_http_api_input.html"),
+    PAGE_SENDING_IPFIXPATH("getting_in_log_data/ipfix_input.html"),
+    PAGE_ES_CONFIGURATION("https://go2docs.graylog.org/current/setting_up_graylog/server.conf.html#OpenSearch"),
+    PAGE_ES_VERSIONS("downloading_and_installing_graylog/installing_graylog.html#CompatibilityMatrix"),
+    REPORTING_HELP("interacting_with_your_log_data/reporting.html");
+
+    private static final String SERVER = "https://go2docs.graylog.org";
 
     private final String path;
 
@@ -32,10 +35,19 @@ public enum DocsHelper {
 
     @Override
     public String toString() {
-        return DOCS_URL + path;
+        return SERVER + "/" + version() + "/" + path;
+    }
+
+    private String version() {
+        final var version = ServerVersion.VERSION.getVersion();
+        if(version.toString().contains("SNAPSHOT")) {
+            return "current";
+        } else {
+            return version.getMajorVersion() + "-" + version.getMinorVersion();
+        }
     }
 
     public String toLink(String title) {
-        return "<a href=\"" + toString() + "\" target=\"_blank\">" + title + "</a>";
+        return "<a href=\"" + this + "\" target=\"_blank\">" + title + "</a>";
     }
 }
