@@ -14,26 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useContext } from 'react';
 import type { Optional } from 'utility-types';
 import { UNSAFE_DataRouterContext as DataRouterContext, matchRoutes } from 'react-router-dom';
 
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
-import AppConfig from 'util/AppConfig';
+import { currentPathnameWithoutPrefix } from 'util/URLUtils';
 
 const useSendTelemetry = () => {
   const { sendTelemetry } = useContext(TelemetryContext);
   const dataRouterContext = useContext(DataRouterContext);
-  const pathPrefixLength = useMemo(() => {
-    const pathPrefix = AppConfig.gl2AppPathPrefix();
-
-    return (!pathPrefix || pathPrefix === '' || pathPrefix === '/') ? 0 : pathPrefix.length;
-  }, []);
 
   return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
     const { router: { routes } } = dataRouterContext;
-    const pathname = window.location.pathname.slice(pathPrefixLength);
+    const pathname = window.location.pathname.slice(currentPathnameWithoutPrefix());
     const matches = matchRoutes(routes, pathname);
     const route = matches.at(-1).route.path;
 
@@ -41,7 +36,7 @@ const useSendTelemetry = () => {
       eventType,
       { app_path_pattern: route, ...event },
     );
-  }, [dataRouterContext, pathPrefixLength, sendTelemetry]);
+  }, [dataRouterContext, sendTelemetry]);
 };
 
 export default useSendTelemetry;
