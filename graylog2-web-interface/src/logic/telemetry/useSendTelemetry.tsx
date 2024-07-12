@@ -41,7 +41,7 @@ const useSendTelemetry = () => {
       eventType,
       { app_path_pattern: route, ...event },
     );
-  }, [sendTelemetry, dataRouterContext]);
+  }, [dataRouterContext, pathPrefixLength, sendTelemetry]);
 };
 
 export default useSendTelemetry;
