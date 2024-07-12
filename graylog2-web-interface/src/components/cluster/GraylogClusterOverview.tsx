@@ -93,7 +93,7 @@ const ClusterInfo = () => {
   );
 };
 
-const GraylogClusterTrafficGraph = () => {
+export const GraylogClusterTrafficGraph = () => {
   const { traffic } = useStore(ClusterTrafficStore);
   const [graphDays, setGraphDays] = useState(DAYS[0]);
   const [graphWidth, setGraphWidth] = useState(600);
