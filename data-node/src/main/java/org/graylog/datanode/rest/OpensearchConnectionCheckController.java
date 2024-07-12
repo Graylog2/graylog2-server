@@ -25,14 +25,15 @@ import jakarta.ws.rs.core.MediaType;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
 import org.graylog.storage.opensearch2.ConnectionCheckRequest;
 import org.graylog.storage.opensearch2.ConnectionCheckResponse;
-import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.untrusted.UntrustedCertificateExtractor;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -40,6 +41,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -47,21 +50,30 @@ import java.util.Locale;
 @Produces(MediaType.APPLICATION_JSON)
 public class OpensearchConnectionCheckController {
 
-    private final CustomCAX509TrustManager trustManager;
+    public static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
+    public static final Duration WRITE_TIMEOUT = Duration.ofSeconds(10);
+    public static final Duration READ_TIMEOUT = Duration.ofSeconds(10);
+    private final DatanodeTrustManagerProvider datanodeTrustManagerProvider;
 
     private final OkHttpClient httpClient;
 
     @Inject
-    public OpensearchConnectionCheckController(CustomCAX509TrustManager trustManager, OkHttpClient httpClient) {
-        this.trustManager = trustManager;
-        this.httpClient = httpClient;
+    public OpensearchConnectionCheckController(DatanodeTrustManagerProvider datanodeTrustManagerProvider) {
+        this.datanodeTrustManagerProvider = datanodeTrustManagerProvider;
+        this.httpClient = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
+                .connectTimeout(CONNECT_TIMEOUT)
+                .writeTimeout(WRITE_TIMEOUT)
+                .readTimeout(READ_TIMEOUT)
+                .build();
     }
 
     @POST
     @Path("opensearch")
     public ConnectionCheckResponse status(ConnectionCheckRequest request) {
-        final List<X509Certificate> unknownCertificates = extractUnknownCertificates(request.host());
+        final List<X509Certificate> unknownCertificates = new LinkedList<>();
         try {
+            unknownCertificates.addAll(extractUnknownCertificates(request.host()));
             final List<String> indices = getAllIndicesFrom(request.host(), request.username(), request.password(), request.trustUnknownCerts());
             return ConnectionCheckResponse.success(indices, unknownCertificates);
         } catch (Exception e) {
@@ -86,22 +98,28 @@ public class OpensearchConnectionCheckController {
 
 
     private OkHttpClient getClient(boolean trustUnknownCerts) {
-        if (trustUnknownCerts) {
-            try {
-                final SSLContext ctx = SSLContext.getInstance("TLS");
-                final TrustAllX509TrustManager trustManager = new TrustAllX509TrustManager();
-                ctx.init(null, new TrustManager[]{trustManager}, new SecureRandom());
-                return httpClient.newBuilder().sslSocketFactory(ctx.getSocketFactory(), trustManager).build();
-            } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return httpClient;
+        try {
+            final SSLContext ctx = SSLContext.getInstance("TLS");
+            final X509TrustManager trustManager = getTrustManager(trustUnknownCerts);
+            ctx.init(null, new TrustManager[]{trustManager}, new SecureRandom());
+            return httpClient.newBuilder().sslSocketFactory(ctx.getSocketFactory(), trustManager).build();
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            throw new RuntimeException(e);
+
         }
     }
 
     @Nonnull
-    private List<X509Certificate> extractUnknownCertificates(String host)  {
+    private X509TrustManager getTrustManager(boolean trustUnknownCerts) {
+        if (trustUnknownCerts) {
+            return new TrustAllX509TrustManager();
+        } else {
+            return datanodeTrustManagerProvider.get();
+        }
+    }
+
+    @Nonnull
+    private List<X509Certificate> extractUnknownCertificates(String host) {
         final UntrustedCertificateExtractor extractor = new UntrustedCertificateExtractor(httpClient);
         try {
             return extractor.extractUntrustedCerts(host);
