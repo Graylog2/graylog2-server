@@ -16,12 +16,19 @@
  */
 package org.graylog2.outputs.filter;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
+import org.graylog2.outputs.filter.functions.RemoveFromStreamDestination;
 
-public class OutputFilterModule extends AbstractModule {
+public class OutputFilterModule extends ProcessorFunctionsModule {
     @Override
     protected void configure() {
-        bind(OutputFilter.class).to(AllOutputsFilter.class).in(Scopes.SINGLETON);
+        bind(OutputFilter.class).to(PipelineRuleOutputFilter.class).in(Scopes.SINGLETON);
+
+        bind(PipelineRuleOutputFilterStateUpdater.class).in(Scopes.SINGLETON);
+        install(new FactoryModuleBuilder().build(PipelineRuleOutputFilterState.Factory.class));
+
+        addInternalMessageProcessorFunction(RemoveFromStreamDestination.NAME, RemoveFromStreamDestination.class);
     }
 }

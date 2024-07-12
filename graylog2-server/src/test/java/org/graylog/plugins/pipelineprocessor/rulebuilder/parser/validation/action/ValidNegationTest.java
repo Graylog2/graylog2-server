@@ -67,7 +67,7 @@ class ValidNegationTest {
                 .descriptor(fragmentFunction.descriptor())
                 .build());
 
-        when(ruleBuilderRegistry.actions()).thenReturn(actions);
+        when(ruleBuilderRegistry.actionsWithInternal()).thenReturn(actions);
 
         classUnderTest = new ValidNegation(ruleBuilderRegistry);
     }
