@@ -30,6 +30,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -102,7 +103,7 @@ public record AggregatedConnectionResponse(Map<String, ConnectionCheckResponse> 
             md.update(der);
             byte[] digest = md.digest();
             String digestHex = DatatypeConverter.printHexBinary(digest);
-            return digestHex.toLowerCase();
+            return digestHex.toLowerCase(Locale.ROOT);
         } catch (CertificateEncodingException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
