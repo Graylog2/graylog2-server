@@ -18,7 +18,7 @@ package org.graylog.datanode.configuration;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
