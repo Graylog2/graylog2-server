@@ -256,7 +256,11 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public void startRemoteReindex() {
         final String allowlist = getStateMachineContext().getActionArgumentOpt("allowlist", String.class).orElse(null);
-        final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
+        String host = getStateMachineContext().getActionArgument("hostname", String.class);
+        if (host.endsWith("/")) {
+            host = host.substring(0, host.length() - 1);
+        }
+        final URI hostname = Objects.requireNonNull(URI.create(host), "hostname has to be provided");
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
         final List<String> indices = getStateMachineContext().getActionArgumentOpt("indices", List.class).orElse(Collections.emptyList()); // todo: generics!
