@@ -251,12 +251,6 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    private boolean isRemoteReindexAllowed(List<String> allowlistEntries, String clusterAllowlistSetting) {
-        // the value is not proper json, just something like [localhost:9201]. It should be safe to simply use String.contains,
-        // but there is maybe a chance for mismatches and then we'd have to parse the value
-        return allowlistEntries.stream().allMatch(clusterAllowlistSetting::contains);
-    }
-
     private String clusterAllowlistSetting() {
         return client.execute((restHighLevelClient, requestOptions) -> {
             final ClusterGetSettingsRequest request = new ClusterGetSettingsRequest();

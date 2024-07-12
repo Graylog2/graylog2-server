@@ -33,11 +33,25 @@ import java.util.Set;
 public class RemoteReindexAllowlist {
 
     private final URI remoteHost;
-    private final String allowlist;
+    private final String rawValue;
+    private final List<String> parsedValue;
 
     public RemoteReindexAllowlist(URI remoteHost, String requestedAllowlist) {
         this.remoteHost = remoteHost;
-        this.allowlist = requestedAllowlist;
+        this.rawValue = requestedAllowlist;
+        this.parsedValue = parse(remoteHost, requestedAllowlist);
+    }
+
+    private static List<String> parse(URI remoteHost, String rawValue) {
+        if (rawValue == null || rawValue.isBlank()) {
+            // nothing provided, let's use the host address and parse allowlist from it
+            return Collections.singletonList(fixProtocolPrefix(remoteHost.toString(), remoteHost));
+        } else {
+            return Arrays.stream(rawValue.split(","))
+                    .map(String::trim)
+                    .map(allowlistItem -> fixProtocolPrefix(allowlistItem, remoteHost))
+                    .toList();
+        }
     }
 
     public void validate() {
@@ -46,21 +60,13 @@ public class RemoteReindexAllowlist {
         final CharacterRunAutomaton characterRunAutomaton = new CharacterRunAutomaton(automaton);
         final boolean isHostMatching = characterRunAutomaton.run(remoteHost.getHost() + ":" + remoteHost.getPort());
         if (!isHostMatching) {
-            throw new IllegalArgumentException("Provided allowlist[" + allowlist + "] doesn't match remote host address[" + remoteHost + "]");
+            throw new IllegalArgumentException("Provided allowlist[" + rawValue + "] doesn't match remote host address[" + remoteHost + "]");
         }
     }
 
     @Nonnull
     public List<String> value() {
-        if (this.allowlist == null || this.allowlist.isBlank()) {
-            // nothing provided, let's use the host address and parse allowlist from it
-            return Collections.singletonList(fixProtocolPrefix(remoteHost.toString(), remoteHost));
-        } else {
-            return Arrays.stream(this.allowlist.split(","))
-                    .map(String::trim)
-                    .map(allowlistItem -> fixProtocolPrefix(allowlistItem, remoteHost))
-                    .toList();
-        }
+        return parsedValue;
     }
 
 
