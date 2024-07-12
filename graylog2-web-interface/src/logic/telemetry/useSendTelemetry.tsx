@@ -28,7 +28,7 @@ const useSendTelemetry = () => {
 
   return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
     const { router: { routes } } = dataRouterContext;
-    const pathname = window.location.pathname.slice(currentPathnameWithoutPrefix());
+    const pathname = currentPathnameWithoutPrefix();
     const matches = matchRoutes(routes, pathname);
     const route = matches.at(-1).route.path;
 
