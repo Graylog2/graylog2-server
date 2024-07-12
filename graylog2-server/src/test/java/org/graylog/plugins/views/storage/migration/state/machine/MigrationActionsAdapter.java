@@ -125,6 +125,11 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public boolean compatibleDatanodesRunning() {
+        return false;
+    }
+
+    @Override
     public void provisionDataNodes() {
     }
 
@@ -140,5 +145,10 @@ public class MigrationActionsAdapter implements MigrationActions {
     @Override
     public void startDataNodes() {
 
+    }
+
+    @Override
+    public boolean allDatanodesPrepared() {
+        return false;
     }
 }

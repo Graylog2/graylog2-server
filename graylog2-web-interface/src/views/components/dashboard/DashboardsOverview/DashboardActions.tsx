@@ -32,7 +32,8 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import type FetchError from 'logic/errors/FetchError';
 import { isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import MoreActions from 'components/common/EntityDataTable/MoreActions';
+import { MoreActions } from 'components/common/EntityDataTable';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
@@ -44,7 +45,6 @@ const _extractErrorMessage = (error: FetchError) => ((error
 
 type Props = {
   dashboard: View,
-  refetchDashboards: () => void,
   isEvidenceModal?: boolean,
 }
 
@@ -107,16 +107,17 @@ DashboardDeleteAction.defaultProps = {
   isEvidenceModal: false,
 };
 
-const DashboardActions = ({ dashboard, refetchDashboards, isEvidenceModal }: Props) => {
+const DashboardActions = ({ dashboard, isEvidenceModal }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(dashboard);
   const currentUser = useCurrentUser();
+  const { refetch } = useTableFetchContext();
 
   const moreActions = [
     pluggableActions.length ? pluggableActions : null,
     pluggableActions.length && !isEvidenceModal ? <MenuItem divider key="divider" /> : null,
     isAnyPermitted(currentUser.permissions, [`view:edit:${dashboard.id}`, 'view:edit'])
-      ? <DashboardDeleteAction dashboard={dashboard} refetchDashboards={refetchDashboards} key="delete-action" isEvidenceModal={isEvidenceModal} />
+      ? <DashboardDeleteAction dashboard={dashboard} refetchDashboards={refetch} key="delete-action" isEvidenceModal={isEvidenceModal} />
       : null,
   ].filter(Boolean);
 

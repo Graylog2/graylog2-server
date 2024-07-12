@@ -18,12 +18,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { Button, ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { MoreActions } from 'components/common/EntityDataTable';
 
 import CopyConfigurationModal from './CopyConfigurationModal';
 import styles from './ConfigurationRow.css';
@@ -66,7 +67,6 @@ class ConfigurationRow extends React.Component {
     return (
       <tr>
         <td className={styles.name}>{configuration.name}</td>
-        {/* eslint-disable jsx-a11y/control-has-associated-label */}
         <td className={styles.color}><ColorLabel color={configuration.color} size="small" /></td>
         <td>
           <CollectorIndicator collector={collector.name || 'Unknown collector'}
@@ -77,15 +77,12 @@ class ConfigurationRow extends React.Component {
             <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}>
               <Button onClick={this.openModal} bsStyle="info" bsSize="xsmall">Edit</Button>
             </LinkContainer>
-            <DropdownButton id={`more-actions-${configuration.id}`}
-                            title="More actions"
-                            bsSize="xsmall"
-                            pullRight>
+            <MoreActions>
               <MenuItem onSelect={() => this.openModal()}>Clone</MenuItem>
 
               <MenuItem divider />
               <MenuItem onSelect={this._handleDelete} variant="danger">Delete</MenuItem>
-            </DropdownButton>
+            </MoreActions>
             {showModal && (
             <CopyConfigurationModal configuration={configuration}
                                     onClose={this.closeModal}

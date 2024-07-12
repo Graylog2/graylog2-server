@@ -35,7 +35,6 @@ import org.graylog.events.processor.modifier.EventModifier;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
-import org.graylog.plugins.views.search.db.StaticReferencedSearch;
 import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
@@ -63,6 +62,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
+import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -72,6 +72,7 @@ import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
+import org.graylog2.streams.StreamDeletionGuard;
 import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 import org.graylog2.web.PluginUISettingsProvider;
 
@@ -124,6 +125,10 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addInitializer(Class<? extends Service> initializerClass) {
         Multibinder<Service> serviceBinder = serviceBinder();
         serviceBinder.addBinding().to(initializerClass);
+    }
+
+    protected void addFilteredMessageOutput(String name, Class<? extends FilteredMessageOutput> filteredMessageOutputClass) {
+        filteredOutputsMapBinder().addBinding(name).to(filteredMessageOutputClass);
     }
 
     // This should only be used by plugins that have been built before Graylog 3.0.1.
@@ -452,5 +457,9 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addTelemetryMetricProvider(String eventId, TelemetryMetricSupplier eventSupplier) {
         telemetryMetricSupplierBinder().addBinding(eventId).toInstance(eventSupplier);
+    }
+
+    protected void addStreamDeletionGuard(Class<? extends StreamDeletionGuard> streamDeletionGuard) {
+        streamDeletionGuardBinder().addBinding().to(streamDeletionGuard);
     }
 }

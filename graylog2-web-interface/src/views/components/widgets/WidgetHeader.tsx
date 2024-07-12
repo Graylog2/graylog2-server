@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Spinner, Icon } from 'components/common';
 import EditableTitle from 'views/components/common/EditableTitle';
+import { Input } from 'components/bootstrap';
 
 import CustomPropTypes from '../CustomPropTypes';
 
@@ -34,6 +35,11 @@ const Container = styled.div(({ theme }) => css`
   display: grid;
   grid-template-columns: minmax(35px, 1fr) max-content;
   align-items: center;
+
+  .widget-title {
+    width: 100%;
+    max-width: 400px;
+  }
 `);
 
 const Col = styled.div`
@@ -57,19 +63,48 @@ const WidgetActionDropdown = styled.span`
   position: relative;
 `;
 
+const TitleInputWrapper = styled.div`
+  max-width: 400px;
+  width: 100%;
+
+  .form-group {
+    margin-bottom: 5px;
+    width: 100%;
+  }
+`;
+
+const TitleInput = styled(Input)(({ theme }) => css`
+  font-size: ${theme.fonts.size.large};
+  width: 100%;
+`);
+
 type Props = {
   children: React.ReactNode,
   onRename: (newTitle: string) => unknown,
   hideDragHandle: boolean,
   title: string,
   loading: boolean,
+  editing: boolean,
 };
 
-const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }: Props) => (
+const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading, editing }: Props) => (
   <Container>
     <Col>
       {hideDragHandle || <DragHandleContainer className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="drag_indicator" /></DragHandleContainer>}
-      <EditableTitle key={title} disabled={!onRename} value={title} onChange={onRename} />
+      {editing ? (
+        <TitleInputWrapper>
+          <TitleInput type="text"
+                      id="widget-title"
+                      onChange={(e) => onRename(e.target.value)}
+                      value={title}
+                      required />
+        </TitleInputWrapper>
+      ) : (
+        <EditableTitle key={title}
+                       disabled={!onRename}
+                       value={title}
+                       onChange={onRename} />
+      )}
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>
     <WidgetActionDropdown>

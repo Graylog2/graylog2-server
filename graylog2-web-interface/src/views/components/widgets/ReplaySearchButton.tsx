@@ -35,6 +35,10 @@ const NeutralLink = styled.a`
   align-items: center;
   color: inherit;
   text-decoration: none;
+  
+  &:hover {
+    text-decoration: none;
+  }
 
   &:visited {
     color: inherit;
@@ -66,13 +70,17 @@ const buildSearchLink = (
   return searchLink;
 };
 
-export const ReplaySearchButtonComponent = ({ searchLink, children, onClick }: { children?: React.ReactNode, searchLink: string, onClick?: () => void }) => (
-  <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search" onClick={onClick}>
-    {children
-      ? <>{children} <StyledIcon name="play_arrow" /></>
-      : <IconButton name="play_arrow" focusable={false} />}
-  </NeutralLink>
-);
+export const ReplaySearchButtonComponent = ({ searchLink, children, onClick }: { children?: React.ReactNode, searchLink: string, onClick?: () => void }) => {
+  const title = 'Replay search';
+
+  return (
+    <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title={title} onClick={onClick}>
+      {children
+        ? <>{children} <StyledIcon name="play_arrow" /></>
+        : <IconButton name="play_arrow" focusable={false} title={title} />}
+    </NeutralLink>
+  );
+};
 
 type Props = {
   queryString?: string | undefined,
@@ -93,7 +101,11 @@ const ReplaySearchButton = ({ queryString, timerange, streams, parameters, child
     }
   }, [sessionId, parameters, parameterBindings]);
 
-  return <ReplaySearchButtonComponent searchLink={searchLink} onClick={onReplaySearch}>{children}</ReplaySearchButtonComponent>;
+  return (
+    <ReplaySearchButtonComponent searchLink={searchLink} onClick={onReplaySearch}>
+      {children}
+    </ReplaySearchButtonComponent>
+  );
 };
 
 ReplaySearchButton.defaultProps = {

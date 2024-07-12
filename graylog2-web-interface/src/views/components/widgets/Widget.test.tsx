@@ -67,11 +67,7 @@ const searchExplainContext = (searchedIndexRanges = [
 
 jest.mock('views/components/useWidgetResults');
 
-jest.mock('views/hooks/useAutoRefresh', () => () => ({
-  refreshConfig: null,
-  startAutoRefresh: () => {},
-  stopAutoRefresh: () => {},
-}));
+jest.mock('views/hooks/useAutoRefresh');
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
@@ -161,6 +157,10 @@ describe('<Widget />', () => {
   );
 
   const getWidgetUpdateButton = () => screen.getByRole('button', { name: /update widget/i });
+
+  beforeEach(() => {
+    asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
+  });
 
   it('should render with empty props', async () => {
     asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
@@ -287,10 +287,10 @@ describe('<Widget />', () => {
   it('copies title when duplicating widget', async () => {
     render(<DummyWidget title="Dummy Widget" />);
 
-    const actionToggle = screen.getByTestId('widgetActionDropDown');
+    const actionToggle = await screen.findByRole('button', { name: /open actions dropdown/i });
 
     fireEvent.click(actionToggle);
-    const duplicateBtn = screen.getByText('Duplicate');
+    const duplicateBtn = await screen.findByRole('menuitem', { name: /duplicate/i });
 
     fireEvent.click(duplicateBtn);
 

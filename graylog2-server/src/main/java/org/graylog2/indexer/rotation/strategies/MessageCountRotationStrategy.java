@@ -67,11 +67,11 @@ public class MessageCountRotationStrategy implements RotationStrategy {
 
     @Nullable
     private Result shouldRotate(String index, IndexSet indexSet) {
-        if (!(indexSet.getConfig().rotationStrategy() instanceof MessageCountRotationStrategyConfig)) {
-            throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
+        if (!(indexSet.getConfig().rotationStrategyConfig() instanceof MessageCountRotationStrategyConfig)) {
+            throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategyConfig().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
         }
 
-        final MessageCountRotationStrategyConfig config = (MessageCountRotationStrategyConfig) indexSet.getConfig().rotationStrategy();
+        final MessageCountRotationStrategyConfig config = (MessageCountRotationStrategyConfig) indexSet.getConfig().rotationStrategyConfig();
 
         try {
             final long numberOfMessages = indices.numberOfMessages(index);

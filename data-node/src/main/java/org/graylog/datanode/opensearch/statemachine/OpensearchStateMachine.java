@@ -88,7 +88,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_REMOVE, OpensearchState.REMOVING)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED, process::stop) //restart if reconfigured
-                .ignore(OpensearchEvent.PROCESS_STARTED);
+                .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING); // allow restarts
 
         // if the REST api is not responding, we'll jump to this state and count how many times the failure
         // occurs. If it fails ttoo many times, we'll mark the process as FAILED
@@ -108,7 +108,8 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED) //restart if reconfigured
-                .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED);
+                .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
+                .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING);
 
         // final state, the process is not alive anymore, terminated on the operating system level
         config.configure(OpensearchState.TERMINATED)

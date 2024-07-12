@@ -810,7 +810,7 @@
         <dependency>
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
-            <version>1.5.1</version>
+            <version>1.5.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -873,13 +873,6 @@
                 <filtering>true</filtering>
                 <includes>
                     <include>**/*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>../graylog-shared-resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>units/**/*</include>
                 </includes>
             </resource>
         </resources>

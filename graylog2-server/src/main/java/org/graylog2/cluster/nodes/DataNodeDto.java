@@ -23,18 +23,27 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import org.graylog.security.certutil.CertRenewalService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
 
-import javax.annotation.Nullable;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @AutoValue
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonSerialize(as = DataNodeDto.class)
 @JsonDeserialize(builder = DataNodeDto.Builder.class)
 public abstract class DataNodeDto extends NodeDto {
+
+    public static final String FIELD_CERT_VALID_UNTIL = "cert_valid_until";
+    public static final String FIELD_DATANODE_VERSION = "datanode_version";
 
     @Nullable
     @JsonProperty("cluster_address")
@@ -51,9 +60,33 @@ public abstract class DataNodeDto extends NodeDto {
     @JsonProperty("action_queue")
     public abstract DataNodeLifecycleTrigger getActionQueue();
 
+    @jakarta.annotation.Nullable
+    @JsonProperty(FIELD_CERT_VALID_UNTIL)
+    public abstract Date getCertValidUntil();
+
+    @jakarta.annotation.Nullable
+    @JsonProperty(FIELD_DATANODE_VERSION)
+    public abstract String getDatanodeVersion();
+
+
     @Nullable
     @JsonUnwrapped
-    public abstract CertRenewalService.ProvisioningInformation getProvisioningInformation();
+    public CertRenewalService.ProvisioningInformation getProvisioningInformation() {
+        DataNodeProvisioningConfig.State state = switch (getDataNodeStatus()) {
+            case AVAILABLE -> DataNodeProvisioningConfig.State.CONNECTED;
+            case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
+            case PREPARED -> DataNodeProvisioningConfig.State.STARTUP_PREPARED;
+            default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
+        };
+
+        final LocalDateTime certValidTill = Optional.ofNullable(getCertValidUntil())
+                .map(date -> Instant.ofEpochMilli(date.getTime())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime())
+                .orElse(null);
+
+        return new CertRenewalService.ProvisioningInformation(state, null, certValidTill);
+    }
 
     @Override
     public Map<String, Object> toEntityParameters() {
@@ -74,6 +107,15 @@ public abstract class DataNodeDto extends NodeDto {
                 params.put("action_queue", getActionQueue());
             }
         }
+
+        if (Objects.nonNull(getCertValidUntil())) {
+            params.put(FIELD_CERT_VALID_UNTIL, getCertValidUntil());
+        }
+
+        if(Objects.nonNull(getDatanodeVersion())) {
+            params.put(FIELD_DATANODE_VERSION, getDatanodeVersion());
+        }
+
         return params;
     }
 
@@ -101,11 +143,12 @@ public abstract class DataNodeDto extends NodeDto {
         @JsonProperty("action_queue")
         public abstract Builder setActionQueue(DataNodeLifecycleTrigger trigger);
 
-        public abstract Builder setProvisioningInformation(CertRenewalService.ProvisioningInformation provisioningInformation);
+        @JsonProperty(FIELD_CERT_VALID_UNTIL)
+        public abstract Builder setCertValidUntil(Date certValidUntil);
 
+        @JsonProperty(FIELD_DATANODE_VERSION)
+        public abstract Builder setDatanodeVersion(String datanodeVersion);
 
         public abstract DataNodeDto build();
-
-
     }
 }

@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class SearchQuery {
     private final Multimap<String, SearchQueryParser.FieldValue> queryMap;
@@ -80,8 +79,7 @@ public class SearchQuery {
     private DBQuery.Query[] toQuery(String field, List<SearchQueryParser.FieldValue> values) {
         return values.stream()
                 .map(value -> value.getOperator().buildQuery(field, value.getValue()))
-                .collect(Collectors.toList())
-                .toArray(new DBQuery.Query[0]);
+                .toArray(DBQuery.Query[]::new);
     }
 
     public Bson toBson() {

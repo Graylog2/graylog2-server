@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import PropTypes from 'prop-types';
+
 export const DATA_TIERING_TYPE = {
   HOT_ONLY: 'hot_only',
   HOT_WARM: 'hot_warm',
@@ -40,3 +42,13 @@ export type DataTieringFormValues = {
   archive_before_deletion: boolean,
   warm_tier_repository_name?: string | null,
 }
+
+export const dataTieringPropType = PropTypes.shape({
+  type: PropTypes.oneOf(['hot_only', 'hot_warm']).isRequired,
+  index_lifetime_min: PropTypes.string.isRequired,
+  index_lifetime_max: PropTypes.string.isRequired,
+  index_hot_lifetime_min: PropTypes.string,
+  warm_tier_enabled: PropTypes.bool,
+  archive_before_deletion: PropTypes.bool,
+  warm_tier_repository_name: PropTypes.string,
+});

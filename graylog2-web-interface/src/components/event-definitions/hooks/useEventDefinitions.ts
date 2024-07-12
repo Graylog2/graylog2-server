@@ -25,9 +25,22 @@ type Options = {
   enabled: boolean,
 }
 
+export const fetchEventDefinitions = (searchParams: SearchParams) => EventDefinitionsStore.searchPaginated(
+  searchParams.page,
+  searchParams.pageSize,
+  searchParams.query,
+  { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
+).then(({ elements, pagination, attributes }) => ({
+  list: elements,
+  pagination,
+  attributes,
+}));
+
+export const keyFn = (searchParams: SearchParams) => ['eventDefinition', 'overview', searchParams];
+
 const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
-    elements: Array<EventDefinition>,
+    list: Array<EventDefinition>,
     pagination: { total: number }
     attributes: Array<{ id: string, title: string, sortable: boolean }>
   } | undefined,
@@ -35,13 +48,8 @@ const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = 
   isInitialLoading: boolean,
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
-    ['eventDefinition', 'overview', searchParams],
-    () => EventDefinitionsStore.searchPaginated(
-      searchParams.page,
-      searchParams.pageSize,
-      searchParams.query,
-      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
-    ),
+    keyFn(searchParams),
+    () => fetchEventDefinitions(searchParams),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading Event Definitions failed with status: ${errorThrown}`,

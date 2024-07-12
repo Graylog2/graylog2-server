@@ -44,7 +44,7 @@ const Welcome = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) =>
           <JwtAuthenticationInfo />
         </Col>
       </Row>
-      <MigrationStepTriggerButtonToolbar disabled={dataNodes?.elements?.length <= 0} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar disabled={dataNodes?.list?.length <= 0} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

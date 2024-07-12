@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { fetchFile } from 'logic/rest/FetchProvider';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
+import { fetchBlobFile, fetchFile } from 'logic/rest/FetchProvider';
 
 export const createLinkAndDownload = (href: string, fileName: string) => {
   const a = document.createElement('a');
@@ -40,8 +40,14 @@ export const downloadBLOB = (contents: BlobPart, metadata: { fileName: string, c
   createLinkAndDownload(href, metadata.fileName);
 };
 
-export const fetchFileWithBlob = async <Body>(method: string, url: string, body: Body | undefined, mimeType: string, fileName: string) => fetchFile(method, url, body, mimeType)
-  .then((result) => downloadBLOB(result, { fileName, contentType: mimeType }))
-  .catch((errorThrown) => {
-    UserNotification.error(`Downloading failed with status: ${errorThrown}`, 'Unable to download');
-  });
+const errorHandler = (errorThrown: Error) => {
+  UserNotification.error(`Downloading failed with status: ${errorThrown}`, 'Unable to download');
+};
+
+export const fetchTextFile = async <Body>(method: string, url: string, body: Body | undefined, mimeType: string, fileName: string) => fetchFile(method, url, body, mimeType)
+  .then((result: string) => downloadBLOB(result, { fileName, contentType: mimeType }))
+  .catch(errorHandler);
+
+export const fetchBinaryFile = async <Body>(method: string, url: string, body: Body | undefined, mimeType: string, fileName: string) => fetchBlobFile(method, url, body, mimeType)
+  .then((result: Blob) => downloadBLOB(result, { fileName, contentType: mimeType }))
+  .catch(errorHandler);

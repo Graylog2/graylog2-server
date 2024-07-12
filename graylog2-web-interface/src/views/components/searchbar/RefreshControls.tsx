@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
-import { Icon, Spinner, HoverForHelp } from 'components/common';
+import { Icon, Spinner, HoverForHelp, ProgressAnimation } from 'components/common';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -30,10 +30,13 @@ import useLocation from 'routing/useLocation';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import ReadableDuration from 'components/common/ReadableDuration';
+import useAppSelector from 'stores/useAppSelector';
+import { selectJobIds } from 'views/logic/slices/searchExecutionSelectors';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
   justify-content: flex-end;
+  position: relative;
 
   > .btn-group {
     .btn:first-child {
@@ -49,7 +52,11 @@ const ButtonLabel = () => {
     return <>Not updating</>;
   }
 
-  return <>Every <ReadableDuration duration={refreshConfig.interval} /></>;
+  return (
+    <>
+      Every <ReadableDuration duration={refreshConfig.interval} />
+    </>
+  );
 };
 
 const useDisableOnFormChange = () => {
@@ -83,7 +90,11 @@ const useDefaultInterval = () => {
   return defaultAutoRefreshInterval;
 };
 
-const RefreshControls = () => {
+type Props = {
+  disable: boolean
+}
+
+const RefreshControls = ({ disable }: Props) => {
   const { dirty, submitForm } = useFormikContext();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -92,6 +103,7 @@ const RefreshControls = () => {
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions);
   const { refreshConfig, startAutoRefresh, stopAutoRefresh } = useAutoRefresh();
   const defaultInterval = useDefaultInterval();
+  const jobIds = useAppSelector(selectJobIds);
 
   useDisableOnFormChange();
 
@@ -135,11 +147,18 @@ const RefreshControls = () => {
 
   return (
     <FlexibleButtonGroup aria-label="Refresh Search Controls">
-      <Button onClick={toggleEnable} title={refreshConfig?.enabled ? 'Pause Refresh' : 'Start Refresh'} disabled={isLoadingMinimumInterval || !defaultInterval}>
-        <Icon name={refreshConfig?.enabled ? 'pause' : 'play_arrow'} />
+      {(refreshConfig?.enabled && !jobIds) && (
+        <ProgressAnimation key={`${refreshConfig.interval}`}
+                           $animationDuration={refreshConfig.interval}
+                           $increase={false} />
+      )}
+
+      <Button onClick={toggleEnable} title={refreshConfig?.enabled ? 'Pause Refresh' : 'Start Refresh'} disabled={disable || isLoadingMinimumInterval || !defaultInterval}>
+        <Icon name={refreshConfig?.enabled ? 'pause' : 'update'} />
       </Button>
 
       <DropdownButton title={<ButtonLabel />}
+                      disabled={disable}
                       id="refresh-options-dropdown">
         {isLoadingMinimumInterval && <Spinner />}
         {!isLoadingMinimumInterval && intervalOptions.map(([interval, label]) => {

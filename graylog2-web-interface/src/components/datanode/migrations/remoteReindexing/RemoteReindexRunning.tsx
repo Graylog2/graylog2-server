@@ -15,17 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
+import { useQueryParam, StringParam } from 'use-query-params';
 
-import { ConfirmDialog, ProgressBar } from 'components/common';
+import { ConfirmDialog } from 'components/common';
 import { Alert, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
 import { MIGRATION_ACTIONS } from '../../Constants';
+import RemoteReindexTasksProgress from '../common/RemoteReindexProgressBar';
 
 const IndicesContainer = styled.div`
   max-height: 100px;
@@ -67,6 +69,18 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
   const indicesWithErrors = migrationStatus?.indices.filter((index) => index.status === 'ERROR') || [];
   const [showLogView, setShowLogView] = useState<boolean>(false);
   const [showRetryMigrationConfirmDialog, setShowRetryMigrationConfirmDialog] = useState<boolean>(false);
+  const [showLogsQuery, setShowLogsQuery] = useQueryParam('show_logs', StringParam);
+
+  useEffect(() => {
+    if (showLogsQuery === 'true' && !showLogView) {
+      setShowLogView(true);
+    }
+  }, [showLogsQuery, showLogView]);
+
+  const handleCloseLogView = () => {
+    setShowLogView(false);
+    setShowLogsQuery(undefined);
+  };
 
   const hasMigrationFailed = migrationStatus?.progress === 100 && migrationStatus?.status === 'ERROR';
 
@@ -76,13 +90,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
       once the data migration is finished you will be automatically transitioned to the next step.
       <br />
       <br />
-      <ProgressBar bars={[{
-        animated: true,
-        striped: true,
-        value: migrationStatus?.progress || 0,
-        bsStyle: 'info',
-        label: `${migrationStatus?.status || ''} ${migrationStatus?.progress || 0}%`,
-      }]} />
+      <RemoteReindexTasksProgress migrationStatus={migrationStatus} />
       {(indicesWithErrors.length > 0) && (
         <Alert title="Migration failed" bsStyle="danger">
           <IndicesContainer>
@@ -97,14 +105,14 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
       )}
       <MigrationStepTriggerButtonToolbar nextSteps={(nextSteps || currentStep.next_steps).filter((step) => step !== RetryMigrateExistingData)} onTriggerStep={handleTriggerStep}>
         <Button bsStyle="default" bsSize="small" onClick={() => setShowLogView(true)}>Log View</Button>
-        <Button bsStyle="default" bsSize="small" onClick={() => (hasMigrationFailed ? onTriggerStep(RetryMigrateExistingData) : setShowRetryMigrationConfirmDialog(true))}>{MIGRATION_ACTIONS[RetryMigrateExistingData]?.label}</Button>
+        <Button bsStyle="default" bsSize="small" onClick={() => (hasMigrationFailed ? handleTriggerStep(RetryMigrateExistingData) : setShowRetryMigrationConfirmDialog(true))}>{MIGRATION_ACTIONS[RetryMigrateExistingData]?.label}</Button>
       </MigrationStepTriggerButtonToolbar>
       {showRetryMigrationConfirmDialog && (
         <ConfirmDialog show={showRetryMigrationConfirmDialog}
                        title="Retry migrating existing data"
                        onCancel={() => setShowRetryMigrationConfirmDialog(false)}
                        onConfirm={() => {
-                         onTriggerStep(RetryMigrateExistingData);
+                         handleTriggerStep(RetryMigrateExistingData);
                          setShowRetryMigrationConfirmDialog(false);
                        }}>
           Are you sure you want to stop the current running remote reindexing migration and retry migrating existing data?
@@ -112,7 +120,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
       )}
       {showLogView && (
         <BootstrapModalWrapper showModal={showLogView}
-                               onHide={() => setShowLogView(false)}
+                               onHide={handleCloseLogView}
                                bsSize="large"
                                backdrop>
           <Modal.Header closeButton>

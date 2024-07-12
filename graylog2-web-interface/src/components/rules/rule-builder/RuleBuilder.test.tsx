@@ -43,10 +43,13 @@ describe('RuleBuilder', () => {
     };
   });
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   afterEach(() => {
     // eslint-disable-next-line no-console
     console.error = originalConsoleError;
-    jest.restoreAllMocks();
   });
 
   it('should save Title and Description', async () => {

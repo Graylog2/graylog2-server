@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nullable;
 import org.graylog.events.event.EventDto;
+import org.graylog.events.processor.EventDefinitionDto;
 
 import java.util.List;
 import java.util.Map;
@@ -109,8 +111,16 @@ public abstract class EventsSearchResult {
         @JsonProperty("description")
         public abstract String description();
 
+        @Nullable
+        @JsonProperty(EventDefinitionDto.FIELD_REMEDIATION_STEPS)
+        public abstract String remediationSteps();
+
         public static ContextEntity create(String id, String title, String description) {
-            return new AutoValue_EventsSearchResult_ContextEntity(id, title, description);
+            return new AutoValue_EventsSearchResult_ContextEntity(id, title, description, null);
+        }
+
+        public static ContextEntity create(String id, String title, String description, String remediationSteps) {
+            return new AutoValue_EventsSearchResult_ContextEntity(id, title, description, remediationSteps);
         }
     }
 }

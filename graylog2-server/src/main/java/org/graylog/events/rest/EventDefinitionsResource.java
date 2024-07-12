@@ -63,6 +63,7 @@ import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog.events.processor.EventResolver;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -77,6 +78,7 @@ import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
@@ -175,7 +177,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                                   allowableValues = "title,description,priority,status")
                                                         @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                        @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+                                                        @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
         try {
@@ -186,9 +188,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if ("status".equals(sort)) {
             sort = "alert";
         }
-        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
-            return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-        }, sort, order, page, perPage);
+        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
+                searchQuery,
+                event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
+                order.toBsonSort(sort),
+                page,
+                perPage);
         PaginatedList<EventDefinitionDto> definitionDtos = new PaginatedList<>(
                 result.delegate(), result.pagination().total(), result.pagination().page(), result.pagination().perPage()
         );
@@ -219,9 +224,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
-            return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-        }, "title", "asc", page, perPage);
+        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
+                searchQuery,
+                event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
+                SortOrder.ASCENDING.toBsonSort("title"),
+                page,
+                perPage);
         final ImmutableMap<String, Object> context = contextService.contextFor(result.delegate());
         return PaginatedResponse.create("event_definitions", result, query, context);
     }
@@ -460,6 +468,21 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         ValidationResult validationResult = toValidate.config().validate();
         validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
         return validationResult;
+    }
+
+    @POST
+    @Path("/validate/cron_expression")
+    @NoAuditEvent("Validation only")
+    @ApiOperation(value = "Validate a cron expression")
+    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
+    public CronValidationResponse validate(@ApiParam(name = "JSON body", required = true)
+                                           @Valid @NotNull CronValidationRequest toValidate) {
+        try {
+            CronUtils.validateExpression(toValidate.expression());
+            return new CronValidationResponse(null, CronUtils.describeExpression(toValidate.expression()));
+        } catch (IllegalArgumentException e) {
+            return new CronValidationResponse(e.getMessage(), null);
+        }
     }
 
     private void checkEventDefinitionPermissions(EventDefinitionDto dto, String action) {

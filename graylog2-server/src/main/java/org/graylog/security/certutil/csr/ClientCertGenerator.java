@@ -17,10 +17,15 @@
 package org.graylog.security.certutil.csr;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CaKeystore;
+import org.graylog.security.certutil.CertConstants;
+import org.graylog.security.certutil.CertRequest;
+import org.graylog.security.certutil.CertificateGenerator;
+import org.graylog.security.certutil.KeyPair;
+import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
+import org.graylog2.cluster.certificates.CertificateSigningRequest;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -28,31 +33,19 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.List;
 
-import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
-
 public class ClientCertGenerator {
-    private final CaService caService;
-    private final String passwordSecret;
-    private final CsrGenerator csrGenerator;
-    private final CsrSigner csrSigner;
+    private final CaKeystore caKeystore;
     private final ClusterConfigService clusterConfigService;
     private final SecurityAdapter securityAdapter;
 
     @Inject
-    public ClientCertGenerator(final CaService caService,
-                               @Named("password_secret") final String passwordSecret,
-                               final CsrGenerator csrGenerator,
-                               final CsrSigner csrSigner,
+    public ClientCertGenerator(CaKeystore caKeystore,
                                final ClusterConfigService clusterConfigService,
                                final SecurityAdapter securityAdapter) {
-        this.caService = caService;
-        this.passwordSecret = passwordSecret;
-        this.csrGenerator = csrGenerator;
-        this.csrSigner = csrSigner;
+        this.caKeystore = caKeystore;
         this.clusterConfigService = clusterConfigService;
         this.securityAdapter = securityAdapter;
     }
@@ -62,20 +55,13 @@ public class ClientCertGenerator {
                                          final char[] privateKeyPassword) throws ClientCertGenerationException {
         try {
             var renewalPolicy = this.clusterConfigService.get(RenewalPolicy.class);
-
-            final KeyStore caKeystore = caService.loadKeyStore().orElseThrow(()-> new IllegalStateException("No CA configured"));
-
-            var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, passwordSecret.toCharArray());
-            var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
-
-            var privateKeyEncryptedStorage = new InMemoryPrivateKeyStorage();
-            var csr = csrGenerator.generateCSR(privateKeyPassword, principal, List.of(principal), privateKeyEncryptedStorage);
-            var pk = privateKeyEncryptedStorage.readEncryptedKey(privateKeyPassword);
-            var cert = csrSigner.sign(caPrivateKey, caCertificate, csr, renewalPolicy);
-
+            final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(principal).isCA(false).validity(Duration.ofDays(10 * 365)));
+            final KeyStore keystore = keyPair.toKeystore(CertConstants.DATANODE_KEY_ALIAS, privateKeyPassword);
+            final InMemoryKeystoreInformation keystoreInformation = new InMemoryKeystoreInformation(keystore, privateKeyPassword);
+            var csr = CsrGenerator.generateCSR(keystoreInformation, CertConstants.DATANODE_KEY_ALIAS, principal, List.of(principal));
+            final CertificateChain certChain = caKeystore.signCertificateRequest(new CertificateSigningRequest(principal, csr), renewalPolicy);
             securityAdapter.addUserToRoleMapping(role, principal);
-
-            return new ClientCert(principal, role, serializeAsPEM(caCertificate), serializeAsPEM(pk), serializeAsPEM(cert));
+            return new ClientCert(principal, role, serializeAsPEM(certChain.caCertificates().iterator().next()), serializeAsPEM(keyPair.privateKey()), serializeAsPEM(certChain.signedCertificate()));
         } catch (Exception e) {
             throw new ClientCertGenerationException("Failed to generate client certificate: " + e.getMessage(), e);
         }

@@ -21,7 +21,7 @@ import { Messages } from '@graylog/server-api';
 import MessageFormatter from 'logic/message/MessageFormatter';
 import UserNotification from 'preflight/util/UserNotification';
 
-const fetchMessage = async (index: string, id: string) => {
+export const fetchMessage = async (index: string, id: string) => {
   const message = await Messages.search(index, id);
 
   return MessageFormatter.formatResultMessage(message);

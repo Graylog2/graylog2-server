@@ -24,6 +24,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertConstants;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class OpensearchSecurityConfiguration {
@@ -53,12 +55,12 @@ public class OpensearchSecurityConfiguration {
     private static final String TRUSTSTORE_FORMAT = "PKCS12";
     private static final Path TRUSTSTORE_FILE = Path.of("datanode-truststore.p12");
 
-    private final KeystoreInformation transportCertificate;
-    private final KeystoreInformation httpCertificate;
-    private KeystoreInformation truststore;
+    private final FilesystemKeystoreInformation transportCertificate;
+    private final FilesystemKeystoreInformation httpCertificate;
+    private FilesystemKeystoreInformation truststore;
     private String opensearchHeap;
 
-    public OpensearchSecurityConfiguration(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
+    public OpensearchSecurityConfiguration(FilesystemKeystoreInformation transportCertificate, FilesystemKeystoreInformation httpCertificate) {
         this.transportCertificate = transportCertificate;
         this.httpCertificate = httpCertificate;
     }
@@ -71,10 +73,9 @@ public class OpensearchSecurityConfiguration {
      * Caution: side effects!
      *
      * This method will take the current security setup and apply it to the managed opensearch. It will change the
-     * initial set of opensearch users, it will create and persist a truststore that will be set as a system-wide
-     * truststore.
+     * initial set of opensearch users, it will create and persist a truststore
      */
-    public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
+    public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, List<X509Certificate> trustedCertificates, byte[] signingKey) throws GeneralSecurityException, IOException {
         opensearchHeap = datanodeConfiguration.opensearchHeap();
         if (securityEnabled()) {
 
@@ -86,13 +87,11 @@ public class OpensearchSecurityConfiguration {
             final Path trustStorePath = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TRUSTSTORE_FILE);
             final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
-            this.truststore = TruststoreCreator.newTruststore()
-                    .addRootCert("transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
-                    .addRootCert("http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
+            this.truststore = TruststoreCreator.newDefaultJvm()
+                    .addRootCert("datanode-transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addRootCert("datanode-http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addCertificates(trustedCertificates)
                     .persist(trustStorePath, truststorePassword.toCharArray());
-
-            System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
-            System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
             enableJwtAuthenticationInConfig(opensearchConfigDir, signingKey);
         }
@@ -156,16 +155,16 @@ public class OpensearchSecurityConfiguration {
         return !Objects.isNull(httpCertificate) && !Objects.isNull(transportCertificate);
     }
 
-    public KeystoreInformation getTransportCertificate() {
+    public FilesystemKeystoreInformation getTransportCertificate() {
         return transportCertificate;
     }
 
-    public KeystoreInformation getHttpCertificate() {
+    public FilesystemKeystoreInformation getHttpCertificate() {
         return httpCertificate;
     }
 
-    public KeystoreInformation getTruststore() {
-        return truststore;
+    public Optional<FilesystemKeystoreInformation> getTruststore() {
+        return Optional.ofNullable(truststore);
     }
 
     protected ImmutableMap<String, String> commonSecureConfig() {
@@ -188,7 +187,7 @@ public class OpensearchSecurityConfiguration {
         return config.build();
     }
 
-    private void logCertificateInformation(String certificateType, KeystoreInformation keystore) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
+    private void logCertificateInformation(String certificateType, FilesystemKeystoreInformation keystore) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
         final KeyStore instance = KeyStore.getInstance(KEYSTORE_FORMAT);
         try (final FileInputStream is = new FileInputStream(keystore.location().toFile())) {
             instance.load(is, keystore.password());
@@ -202,6 +201,8 @@ public class OpensearchSecurityConfiguration {
                             .map(Object::toString)
                             .collect(Collectors.joining(", "));
                     LOG.info("Opensearch {} has following alternative names: {}", certificateType, alternativeNames);
+                    LOG.info("Opensearch {} has following serial number: {}", certificateType, ((X509Certificate) cert).getSerialNumber());
+                    LOG.info("Opensearch {} has following validity: {} - {}", certificateType, ((X509Certificate) cert).getNotBefore(), ((X509Certificate) cert).getNotAfter());
                 }
             }
         }

@@ -24,19 +24,15 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
-import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
+import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-import org.graylog2.cluster.preflight.DataNodeProvisioningService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
-import org.graylog2.events.ClusterEventBus;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,39 +42,34 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessService.class);
 
-    private static final int WATCHDOG_RESTART_ATTEMPTS = 3;
     private final OpensearchProcess process;
-    private final OpensearchConfigurationProvider configurationProvider;
-    private final EventBus eventBus;
+    private final OpensearchConfigurationService configurationProvider;
     private final NodeId nodeId;
-    private final DataNodeProvisioningService dataNodeProvisioningService;
     private final DatanodeDirectoriesLockfileCheck lockfileCheck;
     private final PreflightConfigService preflightConfigService;
     private final Configuration configuration;
 
     private final OpensearchStateMachine stateMachine;
+    private final CsrRequester csrRequester;
+    private boolean processAutostart = true;
 
 
     @Inject
     public OpensearchProcessService(
-            final OpensearchConfigurationProvider configurationProvider,
+            final OpensearchConfigurationService configurationProvider,
             final EventBus eventBus,
             final Configuration configuration,
-            final DataNodeProvisioningService dataNodeProvisioningService,
             final NodeId nodeId,
-            final IndexFieldTypesService indexFieldTypesService,
-            final ClusterEventBus clusterEventBus,
             final DatanodeDirectoriesLockfileCheck lockfileCheck,
             final PreflightConfigService preflightConfigService,
-            final OpensearchProcess process, OpensearchStateMachine stateMachine) {
+            final OpensearchProcess process, CsrRequester csrRequester, OpensearchStateMachine stateMachine) {
         this.configurationProvider = configurationProvider;
         this.configuration = configuration;
-        this.eventBus = eventBus;
         this.nodeId = nodeId;
-        this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.lockfileCheck = lockfileCheck;
         this.preflightConfigService = preflightConfigService;
         this.process = process;
+        this.csrRequester = csrRequester;
         this.stateMachine = stateMachine;
         eventBus.register(this);
     }
@@ -87,34 +78,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
         switch (event.action()) {
-            case ADD -> {
-                stateMachine.fire(OpensearchEvent.PROCESS_STOPPED);
-                this.configurationProvider.setTransientConfiguration("reindex.remote.allowlist", event.allowlist());
-                configure(); // , "action.auto_create_index", "false"));
-                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
-            }
-            case REMOVE -> {
-                stateMachine.fire(OpensearchEvent.PROCESS_STOPPED);
-                configure();
-                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
-            }
-        }
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
-        switch (event.state()) {
-            case STARTUP_REQUESTED -> {
-                LOG.info("Startup requested by Graylog server");
-                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
-            }
-            case STORED -> {
-                LOG.info("Provisioning ready, configuring and starting OpenSearch");
-                configure();
-                dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_PREPARED);
-                stateMachine.fire(OpensearchEvent.PROCESS_PREPARED);
-            }
+            case ADD -> this.configurationProvider.setAllowlist(event.allowlist(), event.trustedCertificates());
+            case REMOVE -> this.configurationProvider.removeAllowlist();
         }
     }
 
@@ -127,12 +92,20 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 case RESET -> stateMachine.fire(OpensearchEvent.RESET);
                 case STOP -> this.shutDown();
                 case START -> stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+                case REQUEST_CSR -> {
+                    this.processAutostart = false;
+                    csrRequester.triggerCertificateSigningRequest();
+                }
+                case REQUEST_CSR_WITH_AUTOSTART -> {
+                    this.processAutostart = true;
+                    csrRequester.triggerCertificateSigningRequest();
+                }
             }
         }
     }
 
     private void checkWritePreflightFinishedOnInsecureStartup() {
-        if(configuration.isInsecureStartup()) {
+        if (configuration.isInsecureStartup()) {
             var preflight = preflightConfigService.getPreflightConfigResult();
             if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
                 preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
@@ -145,23 +118,34 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
      */
     @Override
     protected void startUp() {
-        final OpensearchConfiguration config = configurationProvider.get();
-        configure();
+
+    }
+
+    @Subscribe
+    public void onConfigurationChangeEvent(OpensearchConfigurationChangeEvent event) {
+        onConfigurationChange(event.config());
+    }
+
+    private void onConfigurationChange(OpensearchConfiguration config) {
+        configure(config);
         if (config.securityConfigured()) {
             LOG.info("OpenSearch starting up");
             checkWritePreflightFinishedOnInsecureStartup();
             try {
                 lockfileCheck.checkDatanodeLock(config.datanodeDirectories().getDataTargetDir());
-                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+                if (stateMachine.isInState(OpensearchState.WAITING_FOR_CONFIGURATION) && !this.processAutostart) {
+                    stateMachine.fire(OpensearchEvent.PROCESS_PREPARED);
+                    this.processAutostart = true; // reset to default
+                } else {
+                    stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+                }
             } catch (Exception e) {
                 LOG.error("Could not start up data node", e);
             }
-
         }
     }
 
-    private void configure() {
-        final OpensearchConfiguration config = configurationProvider.get();
+    private void configure(OpensearchConfiguration config) {
         if (config.securityConfigured()) {
             this.process.configure(config);
         } else {
@@ -175,7 +159,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                     """;
             LOG.info(noConfigMessage);
         }
-        eventBus.post(new OpensearchConfigurationChangeEvent(config)); //refresh jersey
     }
 
 

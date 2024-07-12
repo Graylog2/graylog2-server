@@ -41,11 +41,15 @@ public interface MigrationActions {
     boolean renewalPolicyDoesNotExist();
     boolean caAndRenewalPolicyExist();
 
+    boolean compatibleDatanodesRunning();
+
     void provisionDataNodes();
 
     void provisionAndStartDataNodes();
 
     boolean provisioningFinished();
+
+    boolean allDatanodesPrepared();
 
     void startDataNodes();
 

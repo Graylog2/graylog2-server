@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
 import styled, { css } from 'styled-components';
 
-import { Col, Label, Tooltip } from 'components/bootstrap';
+import { Col, Label } from 'components/bootstrap';
 import { OverlayTrigger } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ContentHeadRow from 'components/common/ContentHeadRow';
@@ -87,11 +87,10 @@ const LifecycleIndicator = ({
 
   const label = upperFirst(lifecycle);
   const defaultMessage = lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
-  const tooltip = <Tooltip id={lifecycle}>{lifecycleMessage || defaultMessage}</Tooltip>;
 
   return (
     <LifecycleIndicatorContainer>
-      <OverlayTrigger placement="bottom" overlay={tooltip}>
+      <OverlayTrigger placement="bottom" overlay={lifecycleMessage || defaultMessage}>
         <Label bsStyle="primary">{label}</Label>
       </OverlayTrigger>
     </LifecycleIndicatorContainer>
