@@ -33,6 +33,7 @@ import { InputsStore } from 'stores/inputs/InputsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TableDataCell } from 'views/components/datatable';
+import { getPathnameWithoutId, currentPathnameWithoutPrefix } from 'util/URLUtils';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -141,6 +142,7 @@ const MessageTableEntry = ({
 
     if (!isSelectingText) {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_DETAILS_TOGGLED, {
+        app_pathname: getPathnameWithoutId(currentPathnameWithoutPrefix()),
         app_section: 'widget',
         app_action_value: 'widget-message-table-toggle-details',
       });
