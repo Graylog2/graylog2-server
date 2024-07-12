@@ -37,8 +37,10 @@ const FieldName = styled.span`
 `;
 
 const ButtonRow = styled.div`
+  margin-top: 5px;
   display: inline-flex;
   gap: 5px;
+  margin-bottom: 10px;  
 `;
 
 type Props = {
@@ -158,7 +160,7 @@ const FieldSelect = ({
               onChange={onChange} />
       {(_showSelectAllRest || _showDeSelectAll) && (
       <ButtonRow>
-        {_showSelectAllRest && <Button bsSize="xs" onClick={_onSelectAllRest}>Select all rest fields</Button>}
+        {_showSelectAllRest && <Button bsSize="xs" onClick={_onSelectAllRest}>Select all fields</Button>}
         {_showDeSelectAll && <Button bsSize="xs" onClick={onDeSelectAll}>Deselect all fields</Button>}
       </ButtonRow>
       )}
