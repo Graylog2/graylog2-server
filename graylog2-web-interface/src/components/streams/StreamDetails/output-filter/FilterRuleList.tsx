@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 
+import type { ColumnRenderers } from 'components/common/EntityDataTable/types';
 import type { SearchParams } from 'stores/PaginationTypes';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { IfPermitted, PaginatedEntityTable, QueryHelper } from 'components/common';
@@ -26,6 +27,8 @@ import useTableElements from 'components/streams/StreamDetails/output-filter/hoo
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import FilterRuleEditButton from 'components/streams/StreamDetails/output-filter/FilterRuleEditButton';
 import { keyFn, fetchStreamOutputFilters } from 'components/streams/hooks/useStreamOutputFilters';
+
+import FilterStatusCell from './FilterStatusCell';
 
 export const StyledSectionComponent = styled(SectionComponent)`
   &.content {
@@ -43,6 +46,14 @@ const FilterRulesList = ({ streamId, destinationType }: Props) => {
   const _keyFn = useCallback((searchParams: SearchParams) => keyFn(streamId, destinationType, searchParams), [streamId, destinationType]);
   const _fetchStreamOutputFilters = useCallback((searchParams: SearchParams) => fetchStreamOutputFilters(streamId, { ...searchParams, query: `destination_type:${destinationType}` }), [streamId, destinationType]);
 
+  const customColumnRenderers = (): ColumnRenderers<StreamOutputFilterRule> => ({
+    attributes: {
+      status: {
+        renderCell: (_title: string, filterOutputRule) => <FilterStatusCell filterOutputRule={filterOutputRule} />,
+      },
+    },
+  });
+
   return (
     <StyledSectionComponent title="Filter Rule"
                             headerActions={(
@@ -59,7 +70,7 @@ const FilterRulesList = ({ streamId, destinationType }: Props) => {
                                                     entityActions={entityActions}
                                                     tableLayout={DEFAULT_LAYOUT}
                                                     fetchEntities={_fetchStreamOutputFilters}
-                                                    columnRenderers={{}}
+                                                    columnRenderers={customColumnRenderers()}
                                                     keyFn={_keyFn}
                                                     entityAttributesAreCamelCase={false} />
 
