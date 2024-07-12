@@ -16,6 +16,8 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
@@ -33,12 +35,12 @@ public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteRei
     }
 
     @Override
-    public RemoteReindexMigration status(String migrationID) {
+    public RemoteReindexMigration status(@Nonnull String migrationID) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
     @Override
-    public IndexerConnectionCheckResult checkConnection(URI uri, String username, String password, boolean trustUnknownCerts) {
+    public IndexerConnectionCheckResult checkConnection(@Nonnull URI uri, @Nullable String username, @Nullable String password, @Nullable String allowlist, boolean trustUnknownCerts) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 }

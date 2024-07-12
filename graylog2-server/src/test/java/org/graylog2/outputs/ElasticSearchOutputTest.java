@@ -163,8 +163,8 @@ public class ElasticSearchOutputTest {
 
         output.writeFiltered(List.of(
                 // The first message should not be written to the output because the output's filter key is not included.
-                new DefaultFilteredMessage(messageList.get(0), Set.of("foo")),
-                new DefaultFilteredMessage(messageList.get(1), Set.of("foo", ElasticSearchOutput.FILTER_KEY))
+                DefaultFilteredMessage.forDestinationKeys(messageList.get(0), Set.of("foo")),
+                DefaultFilteredMessage.forDestinationKeys(messageList.get(1), Set.of("foo", ElasticSearchOutput.FILTER_KEY))
         ));
 
         verify(messages, times(1)).bulkIndex(eq(List.of(
@@ -182,8 +182,8 @@ public class ElasticSearchOutputTest {
 
         output.writeFiltered(List.of(
                 // The first message should not be written to the output because the output's filter key is not included.
-                new DefaultFilteredMessage(messageList.get(0), Set.of("foo")),
-                new DefaultFilteredMessage(messageList.get(1), Set.of("foo", ElasticSearchOutput.FILTER_KEY))
+                DefaultFilteredMessage.forDestinationKeys(messageList.get(0), Set.of("foo")),
+                DefaultFilteredMessage.forDestinationKeys(messageList.get(1), Set.of("foo", ElasticSearchOutput.FILTER_KEY))
         ));
 
         verify(messages, times(1)).bulkIndex(argThat(argument -> {

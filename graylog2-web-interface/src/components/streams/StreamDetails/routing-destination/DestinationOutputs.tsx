@@ -20,12 +20,11 @@ import useOutputs from 'hooks/useOutputs';
 import { Section, Spinner } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import useStreamOutputs from 'hooks/useStreamOutputs';
+import type { AvailableOutputSummary } from 'components/streams/useAvailableOutputTypes';
+import useAvailableOutputTypes from 'components/streams/useAvailableOutputTypes';
 
 import OutputsList from './OutputsList';
 import AddOutputButton from './AddOutputButton';
-
-import type { AvailableOutputSummary } from '../../useAvailableOutputTypes';
-import useAvailableOutputTypes from '../../useAvailableOutputTypes';
 
 type Props = {
   stream: Stream

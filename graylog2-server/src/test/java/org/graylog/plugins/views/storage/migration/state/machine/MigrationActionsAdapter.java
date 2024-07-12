@@ -125,6 +125,11 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public boolean compatibleDatanodesRunning() {
+        return false;
+    }
+
+    @Override
     public void provisionDataNodes() {
     }
 

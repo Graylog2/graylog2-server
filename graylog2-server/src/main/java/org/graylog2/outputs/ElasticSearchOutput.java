@@ -24,6 +24,7 @@ import jakarta.inject.Singleton;
 import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
+import org.graylog2.outputs.filter.DefaultFilteredMessage;
 import org.graylog2.outputs.filter.FilteredMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -74,8 +76,7 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
     @Override
     public void writeFiltered(List<FilteredMessage> filteredMessages) throws Exception {
         final var messages = filteredMessages.stream()
-                .filter(message -> message.outputs().contains(FILTER_KEY))
-                .map(FilteredMessage::message)
+                .filter(message -> !message.destinations().get(FILTER_KEY).isEmpty())
                 .toList();
 
         writes.mark(messages.size());
@@ -89,7 +90,7 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
         if (LOG.isTraceEnabled()) {
             LOG.trace("Writing message id to [{}]: <{}>", NAME, message.getId());
         }
-        writeMessageEntries(List.of(message));
+        writeMessageEntries(List.of(DefaultFilteredMessage.forDestinationKeys(message, Set.of(FILTER_KEY))));
     }
 
     @Override
@@ -97,15 +98,18 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
         if (LOG.isTraceEnabled()) {
             LOG.trace("Writing {} messages to [{}]", messageList.size(), NAME);
         }
-        writeMessageEntries(messageList);
+        writeMessageEntries(messageList.stream()
+                .map(message -> DefaultFilteredMessage.forDestinationKeys(message, Set.of(FILTER_KEY)))
+                .collect(Collectors.toList()));
     }
 
-    private void writeMessageEntries(List<Message> messageList) {
-        // We need to create one message per index set
+    private void writeMessageEntries(List<FilteredMessage> messageList) {
+        // We need to create one message per index set. Use the streams from the filtered targets.
         final var messagesWithIndex = messageList.stream()
-                .flatMap(message -> message.getStreams()
+                .flatMap(message -> message.destinations()
+                        .get(FILTER_KEY)
                         .stream()
-                        .map(stream -> new MessageWithIndex(message, stream.getIndexSet())))
+                        .map(stream -> new MessageWithIndex(message.message(), stream.getIndexSet())))
                 .toList();
 
         if (LOG.isTraceEnabled()) {

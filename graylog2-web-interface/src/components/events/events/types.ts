@@ -32,7 +32,7 @@ export type Event = {
   timerange_end: string,
   key: string,
   fields: Record<string, string>,
-  group_by_fields: {[key: string]: string},
+  group_by_fields: { [key: string]: string },
   source_streams: string[],
   replay_info: EventReplayInfo | undefined,
   alert: boolean | undefined,
@@ -41,4 +41,6 @@ export type Event = {
 export type EventDefinitionContext = {
   id: string,
   title: string,
+  remediation_steps?: string,
+  description?: string,
 };
