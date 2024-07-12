@@ -252,7 +252,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private IndexMigrationProgress toProgress(TaskStatus status) {
-        return new IndexMigrationProgress(status.total(), status.created(), status.updated(), status.deleted());
+        return new IndexMigrationProgress(status.total(), status.created(), status.updated(), status.deleted(), status.versionConflicts(), status.noops());
     }
 
     @Nullable
@@ -506,7 +506,10 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private void onTaskSuccess(MigrationConfiguration migration, String index, TaskStatus taskStatus, Duration duration) {
-        final String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index, humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
+        String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index, humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
+        if (taskStatus.noops() > 0 || taskStatus.versionConflicts() > 0) {
+            message += String.format(Locale.ROOT, " %d documents were not migrated (%d version conflicts, %d ignored)", taskStatus.versionConflicts() + taskStatus.noops(), taskStatus.versionConflicts(), taskStatus.noops());
+        }
         logInfo(migration, message);
     }
 
