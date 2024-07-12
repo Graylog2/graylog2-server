@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { asMock } from 'helpers/mocking';
-import { qualifyUrl } from 'util/URLUtils';
+import { qualifyUrl, currentPathnameWithoutPrefix } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 
 jest.mock('util/AppConfig');
@@ -49,5 +49,46 @@ describe('qualifyUrl', () => {
     const qualifiedUrl = qualifyUrl('/foo');
 
     expect(qualifyUrl(qualifiedUrl)).toEqual('http://something.graylog.cloud/api/foo');
+  });
+
+  describe('currentPathnameWithoutPrefix', () => {
+    const setLocation = (pathname: string) => Object.defineProperty(window, 'location', {
+      value: {
+        pathname,
+      },
+      writable: true,
+    });
+
+    const mockPathPrefix = (pathPrefix: string | undefined | null) => asMock(AppConfig.gl2AppPathPrefix).mockReturnValue(pathPrefix);
+
+    it('returns current path when prefix is undefined/null/empty/single slash', () => {
+      const pathname = '/welcome';
+      setLocation(pathname);
+
+      mockPathPrefix(null);
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+
+      mockPathPrefix(undefined);
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+
+      mockPathPrefix('');
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+
+      mockPathPrefix('/');
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+    });
+
+    it('returns current path when prefix is defined', () => {
+      const pathname = '/welcome';
+      setLocation(`/foo${pathname}`);
+
+      mockPathPrefix('/foo');
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+    });
   });
 });
