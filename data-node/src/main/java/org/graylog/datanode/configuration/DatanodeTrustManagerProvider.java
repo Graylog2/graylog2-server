@@ -19,7 +19,7 @@ package org.graylog.datanode.configuration;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
+import jakarta.inject.Provider;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog2.security.CustomCAX509TrustManager;
