@@ -37,6 +37,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.StreamReferenceEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.entitygroups.EntityGroupService;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.users.UserService;
@@ -62,8 +63,14 @@ public class StreamReferenceFacade extends StreamFacade {
     private final StreamService streamService;
 
     @Inject
-    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService, V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration, IndexSetService indexSetService, UserService userService) {
-        super(objectMapper, streamService, streamRuleService, legacyAlertsMigration, indexSetService, userService);
+    public StreamReferenceFacade(ObjectMapper objectMapper,
+                                 StreamService streamService,
+                                 StreamRuleService streamRuleService,
+                                 V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration,
+                                 IndexSetService indexSetService,
+                                 UserService userService,
+                                 EntityGroupService entityGroupService) {
+        super(objectMapper, streamService, streamRuleService, legacyAlertsMigration, indexSetService, userService, entityGroupService);
         this.objectMapper = objectMapper;
         this.streamService = streamService;
     }
