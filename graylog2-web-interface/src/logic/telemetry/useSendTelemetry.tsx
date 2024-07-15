@@ -27,6 +27,10 @@ const useSendTelemetry = () => {
   const dataRouterContext = useContext(DataRouterContext);
 
   return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
+    if (!dataRouterContext?.router?.routes) {
+      throw new Error('Data router context is missing!');
+    }
+
     const { router: { routes } } = dataRouterContext;
     const pathname = currentPathnameWithoutPrefix();
     const matches = matchRoutes(routes, pathname);
