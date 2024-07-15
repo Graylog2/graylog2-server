@@ -32,6 +32,7 @@ import moment from 'moment';
 import { OrderedMap } from 'immutable';
 import type { $PropertyType } from 'utility-types';
 
+import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import * as FormsUtils from 'util/FormsUtils';
@@ -39,7 +40,7 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
-import { MultiSelect, TimeUnitInput, SearchFiltersFormControls } from 'components/common';
+import { MultiSelect, TimeUnitInput, SearchFiltersFormControls, TimezoneSelect } from 'components/common';
 import Query from 'views/logic/queries/Query';
 import type { RelativeTimeRangeWithEnd, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
@@ -58,7 +59,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type User from 'logic/users/User';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'views/stores/StreamsStore';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
 import type { FiltersType } from 'views/types';
@@ -128,6 +129,8 @@ const FilterForm = ({
     () => isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS),
     [currentUser.permissions],
   );
+
+  const [cronDescription, setCronDescription] = useState<string>(currentConfig.cron_expression ? describeExpression(currentConfig.cron_expression) : '');
 
   const validateQueryString = useCallback(
     (queryString: ElasticsearchQueryString | string,
@@ -290,6 +293,18 @@ const FilterForm = ({
     debouncedParseQuery(value, newConfig);
   };
 
+  const handleCronExpressionChange = (event) => {
+    const { name } = event.target;
+    const value = FormsUtils.getValueFromInput(event.target);
+    const newConfig = getUpdatedConfig(name, value);
+    handleConfigChange(name, newConfig);
+  };
+
+  const handleCronTimezoneChange = (tz) => {
+    const newConfig = getUpdatedConfig('cron_timezone', tz);
+    handleConfigChange('cron_timezone', newConfig);
+  };
+
   const handleSearchFiltersChange = (searchFilters) => {
     const { query } = eventDefinition.config;
 
@@ -304,6 +319,24 @@ const FilterForm = ({
     const value = FormsUtils.getValueFromInput(event.target);
     const newConfig = getUpdatedConfig(name, value);
     handleConfigChange(name, newConfig);
+  };
+
+  const handleUseCronSchedulingChange = (event) => {
+    const { name } = event.target;
+    const value = FormsUtils.getValueFromInput(event.target);
+    const newConfig = cloneDeep(eventDefinition.config);
+    newConfig[name] = value;
+
+    if (value) {
+      newConfig.cron_expression = '';
+      newConfig.cron_timezone = userTimezone;
+    } else {
+      newConfig.cron_expression = null;
+      newConfig.cron_timezone = null;
+    }
+
+    setCurrentConfig(newConfig);
+    propagateChange(newConfig);
   };
 
   const hideFiltersPreview = (value) => {
@@ -480,19 +513,58 @@ const FilterForm = ({
           <HelpBlock>{get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
           )}
         </FormGroup>
+        <Input id="is-cron-checkbox"
+               type="checkbox"
+               name="use_cron_scheduling"
+               label="Use Cron Scheduling"
+               help="Schedule this event with a Quartz cron expression"
+               checked={defaultTo(eventDefinition.config.use_cron_scheduling, false)}
+               onChange={handleUseCronSchedulingChange} />
+        {currentConfig.use_cron_scheduling
+          ? (
+            <>
+              <FormGroup controlId="cron-expression" validationState={validation.errors.cron_expression ? 'error' : null}>
+                <Input id="cron-expression"
+                       name="cron_expression"
+                       label="Cron Expression"
+                       type="text"
+                       help={(
+                         <span>
+                           {cronDescription || 'A Quartz cron expression to determine when the event should be run.'}
+                         </span>
+                   )}
+                       value={defaultTo(currentConfig.cron_expression, '')}
+                       onBlur={() => setCronDescription(describeExpression(currentConfig.cron_expression))}
+                       onChange={handleCronExpressionChange} />
+                {validation.errors.cron_expression && (
+                <HelpBlock>{get(validation, 'errors.cron_expression[0]')}</HelpBlock>
+                )}
+              </FormGroup>
+              <FormGroup>
+                <ControlLabel>Cron Time Zone</ControlLabel>
+                <TimezoneSelect value={defaultTo(currentConfig.cron_timezone, userTimezone)}
+                                name="cron_timezone"
+                                clearable={false}
+                                onChange={handleCronTimezoneChange} />
 
-        <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
-          <TimeUnitInput label="Execute search every"
-                         update={handleTimeRangeChange('execute_every_ms')}
-                         value={executeEveryMsDuration}
-                         unit={executeEveryMsUnit}
-                         units={TIME_UNITS}
-                         clearable
-                         required />
-          {validation.errors.execute_every_ms && (
-          <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
+              </FormGroup>
+            </>
+          )
+          : (
+            <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
+              <TimeUnitInput label="Execute search every"
+                             update={handleTimeRangeChange('execute_every_ms')}
+                             value={executeEveryMsDuration}
+                             unit={executeEveryMsUnit}
+                             units={TIME_UNITS}
+                             clearable
+                             required />
+              {validation.errors.execute_every_ms && (
+              <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
+              )}
+            </FormGroup>
           )}
-        </FormGroup>
+
         <Input id="schedule-checkbox"
                type="checkbox"
                name="_is_scheduled"

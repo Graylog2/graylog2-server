@@ -35,7 +35,7 @@ import {
   labels,
 } from 'views/logic/valueactions/createEventDefinition/Constants';
 import RadioSection from 'views/logic/valueactions/createEventDefinition/RadioSection';
-import { ExpandableList, ExpandableListItem, Icon, LinkButton } from 'components/common';
+import { ExpandableList, ExpandableListItem, Icon } from 'components/common';
 import useLocalStorageConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useLocalStorageConfigData';
 import Routes from 'routing/Routes';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
@@ -137,7 +137,9 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
         }
       </Modal.Body>
       <Modal.Footer>
-        <LinkButton bsStyle="primary" onClick={onContinueConfigurationClick} to={eventDefinitionCreationUrl} target="_blank">Continue configuration</LinkButton>
+        <Button bsStyle="primary" onClick={onContinueConfigurationClick} href={eventDefinitionCreationUrl} target="_blank">
+          Continue configuration
+        </Button>
       </Modal.Footer>
     </Modal>
   );

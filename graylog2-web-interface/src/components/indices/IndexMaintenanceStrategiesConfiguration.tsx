@@ -24,6 +24,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import type {
   RetentionStrategyConfig,
   RotationStrategy,
+  RetentionStrategy,
   TimeBasedRotationStrategyConfig,
   JsonSchema,
   StrategyConfig,
@@ -47,6 +48,7 @@ type IndexMaintenanceStrategiesFormValues = {
   rotation_strategy?: RotationStrategy,
   rotation_strategy_class?: string,
   retention_strategy_class?: string,
+  retention_strategy?: RetentionStrategy,
 }
 
 interface ConfigComponentProps extends SystemConfigurationComponentProps {
@@ -64,18 +66,19 @@ type Props = {
   name: string,
   description?: string,
   selectPlaceholder: string,
+  label: string,
   pluginExports: Array<{
     type: string,
     displayName: string,
     configComponent: React.ComponentType<ConfigComponentProps>
   }>,
   strategies: Strategies,
-  retentionStrategiesContext: {
+  retentionStrategiesContext?: {
     max_index_retention_period?: string,
   },
   activeConfig: {
-    strategy: string,
-    config: StrategyConfig,
+    strategy?: string,
+    config?: StrategyConfig,
   },
   getState: (strategy: string, data: StrategyConfig) => {
     rotation_strategy_config?: StrategyConfig,
@@ -95,8 +98,6 @@ const StyledSelect = styled(Select)`
 `;
 const StyledAlert = styled(Alert)`
   overflow: auto;
-  margin-right: 15px;
-  margin-left: 15px;
 `;
 
 const getStrategyJsonSchema = (selectedStrategy: string, strategies: Strategies) : JsonSchema | undefined => {
@@ -157,7 +158,7 @@ const getConfigurationComponent = (
     return null;
   }
 
-  const strategyType = typeof strategy === 'string' ? strategy : strategy.type;
+  const strategyType = typeof strategy === 'string' ? strategy : strategy?.type;
 
   const strategyConfig = getStrategyConfig(configTypeName, selectedStrategy, strategyType, config, strategies);
 
@@ -181,6 +182,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
   name,
   description,
   selectPlaceholder,
+  label,
   pluginExports,
   strategies,
   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
@@ -196,6 +198,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
       rotation_strategy_class: rotationStrategyClass,
       retention_strategy_class: retentionStrategyClass,
     },
+    errors,
   } = useFormikContext<IndexMaintenanceStrategiesFormValues>();
 
   const [maxNumberOfIndices, setMaxNumberOfIndices] = useIndexRetention().useMaxNumberOfIndices;
@@ -261,7 +264,13 @@ const IndexMaintenanceStrategiesConfiguration = ({
     const isSelectedItemInList = availableStrategies.filter((availableStrategy) => availableStrategy.type === newStrategy).length > 0;
 
     if (!isSelectedItemInList) {
-      return [...availableStrategies, pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy)].map((pluginOptions) => ({ value: pluginOptions.type, label: pluginOptions.displayName }));
+      const selectedItemStrategy = pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy);
+
+      if (selectedItemStrategy) {
+        return [...availableStrategies, selectedItemStrategy].map((pluginOptions) => ({ value: pluginOptions.type, label: pluginOptions.displayName }));
+      }
+
+      return availableStrategies.map((pluginOptions) => ({ value: pluginOptions.type, label: pluginOptions.displayName }));
     }
 
     return availableStrategies
@@ -273,7 +282,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
   const getActiveSelection = () => newStrategy;
 
   const shouldShowInvalidRetentionWarning = () => (
-    name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies)
+    !!newStrategy && name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies)
   );
 
   return (
@@ -305,9 +314,9 @@ const IndexMaintenanceStrategiesConfiguration = ({
       <Row>
         <Col md={12}>
           <Input id="strategy-select"
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9"
-                 label={selectPlaceholder}>
+                 error={errors[`${name}_strategy_class`]}
+                 name={`${name}_strategy_class`}
+                 label={label}>
             <StyledSelect placeholder={selectPlaceholder}
                           options={getAvailableSelectOptions()}
                           matchProp="label"
@@ -350,6 +359,7 @@ IndexMaintenanceStrategiesConfiguration.propTypes = {
   name: PropTypes.string.isRequired,
   description: PropTypes.string,
   selectPlaceholder: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   pluginExports: PropTypes.array.isRequired,
   strategies: PropTypes.array.isRequired,
   retentionStrategiesContext: PropTypes.shape({

@@ -82,7 +82,7 @@ public class IndexRetentionThread extends Periodical {
                 continue;
             }
             final IndexSetConfig config = indexSet.getConfig();
-            if (config.dataTiering() != null) {
+            if (config.dataTieringConfig() != null) {
                 dataTieringOrchestrator.retain(indexSet);
             } else {
                 final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategyClass());

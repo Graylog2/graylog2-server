@@ -39,6 +39,8 @@ import org.graylog2.cluster.nodes.NodeService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,6 +62,8 @@ public class OpensearchConfigurationService extends AbstractIdleService {
      * This configuration won't survive datanode restart. But it can be repeatedly provided to the managed opensearch
      */
     private final Map<String, Object> transientConfiguration = new ConcurrentHashMap<>();
+
+    private final List<X509Certificate> trustedCertificates = new ArrayList<>();
     private final EventBus eventBus;
 
     @Inject
@@ -101,6 +105,16 @@ public class OpensearchConfigurationService extends AbstractIdleService {
         triggerConfigurationChangedEvent();
     }
 
+
+    public void setAllowlist(List<String> allowlist, List<X509Certificate> trustedCertificates) {
+        this.trustedCertificates.addAll(trustedCertificates);
+        setTransientConfiguration("reindex.remote.allowlist", allowlist);
+    }
+
+    public void removeAllowlist() {
+        removeTransientConfiguration("reindex.remote.allowlist");
+    }
+
     public void setTransientConfiguration(String key, Object value) {
         this.transientConfiguration.put(key, value);
         triggerConfigurationChangedEvent();
@@ -140,7 +154,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
             if (chosenSecurityConfigurationVariant.isPresent()) {
                 securityConfiguration = chosenSecurityConfigurationVariant.get()
                         .build()
-                        .configure(datanodeConfiguration, signingKey);
+                        .configure(datanodeConfiguration, trustedCertificates, signingKey);
                 opensearchProperties.putAll(securityConfiguration.getProperties());
             }
 

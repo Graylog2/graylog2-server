@@ -78,9 +78,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
         switch (event.action()) {
-            case ADD ->
-                    this.configurationProvider.setTransientConfiguration("reindex.remote.allowlist", event.allowlist());
-            case REMOVE -> this.configurationProvider.removeTransientConfiguration("reindex.remote.allowlist");
+            case ADD -> this.configurationProvider.setAllowlist(event.allowlist(), event.trustedCertificates());
+            case REMOVE -> this.configurationProvider.removeAllowlist();
         }
     }
 
@@ -95,11 +94,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 case START -> stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
                 case REQUEST_CSR -> {
                     this.processAutostart = false;
-                    csrRequester.triggerCsr();
+                    csrRequester.triggerCertificateSigningRequest();
                 }
                 case REQUEST_CSR_WITH_AUTOSTART -> {
                     this.processAutostart = true;
-                    csrRequester.triggerCsr();
+                    csrRequester.triggerCertificateSigningRequest();
                 }
             }
         }

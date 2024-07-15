@@ -48,6 +48,8 @@ import org.graylog2.rest.resources.search.DecoratorResource;
 import org.graylog2.rest.resources.search.KeywordSearchResource;
 import org.graylog2.rest.resources.search.RelativeSearchResource;
 import org.graylog2.rest.resources.streams.StreamResource;
+import org.graylog2.rest.resources.streams.destinations.filters.StreamDestinationFilterBuilderResource;
+import org.graylog2.rest.resources.streams.destinations.filters.StreamDestinationFiltersResource;
 import org.graylog2.rest.resources.streams.outputs.StreamOutputResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleInputsResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleResource;
@@ -81,6 +83,7 @@ import org.graylog2.rest.resources.system.debug.bundle.SupportBundleResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
 import org.graylog2.rest.resources.system.indexer.IndexFieldTypeProfileResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
+import org.graylog2.rest.resources.system.indexer.IndexSetTemplateResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsMappingResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsResource;
 import org.graylog2.rest.resources.system.indexer.IndexTemplatesResource;
@@ -206,6 +209,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(IndexerClusterResource.class);
         addSystemRestResource(IndexerOverviewResource.class);
         addSystemRestResource(IndexFieldTypeProfileResource.class);
+        addSystemRestResource(IndexSetTemplateResource.class);
         addSystemRestResource(IndexSetsResource.class);
         addSystemRestResource(IndexSetsMappingResource.class);
         addSystemRestResource(IndexSetDefaultsResource.class);
@@ -256,6 +260,8 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StreamRuleResource.class);
         addSystemRestResource(StreamResource.class);
         addSystemRestResource(StreamRuleInputsResource.class);
+        addSystemRestResource(StreamDestinationFiltersResource.class);
+        addSystemRestResource(StreamDestinationFilterBuilderResource.class);
     }
 
     private void addMonitoringResources() {

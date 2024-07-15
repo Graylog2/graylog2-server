@@ -147,6 +147,7 @@ const ApiRoutes = {
   IndexerClusterApiController: {
     health: () => ({ url: '/system/indexer/cluster/health' }),
     name: () => ({ url: '/system/indexer/cluster/name' }),
+    info: () => ({ url: '/system/indexer/cluster/info' }),
   },
   IndexerFailuresApiController: {
     count: (since: number) => ({ url: `/system/indexer/failures/count?since=${since}` }),
@@ -253,6 +254,7 @@ const ApiRoutes = {
     delete: (streamId: string) => ({ url: `/streams/${streamId}` }),
     pause: (streamId: string) => ({ url: `/streams/${streamId}/pause` }),
     resume: (streamId: string) => ({ url: `/streams/${streamId}/resume` }),
+    stream_connected_pipelines: (streamId: string) => ({ url: `/streams/${streamId}/pipelines` }),
     testMatch: (streamId: string) => ({ url: `/streams/${streamId}/testMatch` }),
   },
   StreamOutputsApiController: {
@@ -264,6 +266,12 @@ const ApiRoutes = {
     delete: (streamId: string, streamRuleId: string) => ({ url: `/streams/${streamId}/rules/${streamRuleId}` }),
     update: (streamId: string, streamRuleId: string) => ({ url: `/streams/${streamId}/rules/${streamRuleId}` }),
     create: (streamId: string) => ({ url: `/streams/${streamId}/rules` }),
+  },
+  StreamOutputFilterRuleApiController: {
+    get: (streamId: string) => ({ url: `/streams/${streamId}/destinations/filters` }),
+    delete: (streamId: string, filterId: string) => ({ url: `/streams/${streamId}/destinations/filters/${filterId}` }),
+    update: (streamId: string, filterId: string) => ({ url: `/streams/${streamId}/destinations/filters/${filterId}` }),
+    create: (streamId: string) => ({ url: `/streams/${streamId}/destinations/filters` }),
   },
   SystemApiController: {
     info: () => ({ url: '/system' }),
