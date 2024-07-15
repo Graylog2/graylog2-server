@@ -17,24 +17,30 @@
 import { useCallback, useContext } from 'react';
 import type { Optional } from 'utility-types';
 import { UNSAFE_DataRouterContext as DataRouterContext, matchRoutes } from 'react-router-dom';
+import type { DataRouterContextObject } from 'react-router/dist/lib/context';
 
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import { currentPathnameWithoutPrefix } from 'util/URLUtils';
+
+const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
+  if (!dataRouterContext?.router?.routes) {
+    return undefined;
+  }
+
+  const { router: { routes } } = dataRouterContext;
+  const pathname = currentPathnameWithoutPrefix();
+  const matches = matchRoutes(routes, pathname);
+
+  return matches.at(-1).route.path;
+};
 
 const useSendTelemetry = () => {
   const { sendTelemetry } = useContext(TelemetryContext);
   const dataRouterContext = useContext(DataRouterContext);
 
   return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
-    if (!dataRouterContext?.router?.routes) {
-      return () => {};
-    }
-
-    const { router: { routes } } = dataRouterContext;
-    const pathname = currentPathnameWithoutPrefix();
-    const matches = matchRoutes(routes, pathname);
-    const route = matches.at(-1).route.path;
+    const route = retrieveCurrentRoute(dataRouterContext);
 
     return sendTelemetry(
       eventType,
