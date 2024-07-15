@@ -22,6 +22,7 @@ jest.mock('util/AppConfig');
 
 const oldLocation = window.location;
 
+// eslint-disable-next-line compat/compat
 const mockLocation = (url: string): Location => new URL(url) as unknown as Location;
 
 describe('qualifyUrl', () => {
