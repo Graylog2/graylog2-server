@@ -29,10 +29,10 @@ const PageContextProviders = ({ children }: Props) => {
     return children;
   }
 
-  return contextProviders.reduce((nestedChildren, InvestigationContextProvider) => (
-    <InvestigationContextProvider>
+  return contextProviders.reduce((nestedChildren, PageContextProvider) => (
+    <PageContextProvider>
       {nestedChildren}
-    </InvestigationContextProvider>
+    </PageContextProvider>
   ), children);
 };
 
