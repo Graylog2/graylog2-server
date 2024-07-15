@@ -101,11 +101,7 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
     setProfile(currentProfile);
   }, [currentProfile]);
 
-  const onChangeProfile = (newProfile: string) => {
-    console.log('Changing profile to: ', newProfile);
-
-    return setProfile(newProfile);
-  };
+  const onChangeProfile = (newProfile: string) => setProfile(newProfile);
 
   return (
     <Modal onHide={onCancel}
