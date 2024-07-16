@@ -16,15 +16,11 @@
  */
 import React from 'react';
 
-class GreyNoiseAdapterSummary extends React.Component {
-  render() {
-    return (
-      <dl>
-        <dt>API Token</dt>
-        <dd>******</dd>
-      </dl>
-    );
-  }
-}
+const GreyNoiseAdapterSummary = () => (
+  <dl>
+    <dt>API Token</dt>
+    <dd>******</dd>
+  </dl>
+);
 
 export default GreyNoiseAdapterSummary;
