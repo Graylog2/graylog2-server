@@ -18,8 +18,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Alert } from 'components/bootstrap';
-
 class GreyNoiseAdapterSummary extends React.Component {
   static propTypes = {
     dataAdapter: PropTypes.shape({
@@ -34,15 +32,10 @@ class GreyNoiseAdapterSummary extends React.Component {
 
   render() {
     return (
-      <div>
-        <dl>
-          <dt>API Token</dt>
-          <dd>******</dd>
-        </dl>
-        <Alert style={{ marginBottom: 10 }} bsStyle="danger" title="Deprecation Warning">
-          <p>The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.</p>
-        </Alert>
-      </div>
+      <dl>
+        <dt>API Token</dt>
+        <dd>******</dd>
+      </dl>
     );
   }
 }
