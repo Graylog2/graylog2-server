@@ -29,6 +29,7 @@ import jakarta.validation.constraints.Pattern;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
 import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -255,7 +256,11 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, Simp
     @JsonIgnore
     public boolean canHaveCustomFieldMappings() {
         final String indexTemplateType = this.indexTemplateType().orElse(null);
-        if (EVENT_TEMPLATE_TYPE.equals(indexTemplateType) || "failures".equals(indexTemplateType)) {
+        if (EVENT_TEMPLATE_TYPE.equals(indexTemplateType) ||
+                IndexTemplateProvider.FAILURE_TEMPLATE_TYPE.equals(indexTemplateType) ||
+                IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE.equals(indexTemplateType)
+
+        ) {
             return false;
         }
         return true;
@@ -264,7 +269,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, Simp
     @JsonIgnore
     public boolean canHaveProfile() {
         final String indexTemplateType = this.indexTemplateType().orElse(null);
-        if (EVENT_TEMPLATE_TYPE.equals(indexTemplateType) || "failures".equals(indexTemplateType)) {
+        if (EVENT_TEMPLATE_TYPE.equals(indexTemplateType) ||
+                IndexTemplateProvider.FAILURE_TEMPLATE_TYPE.equals(indexTemplateType) ||
+                IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE.equals(indexTemplateType)) {
             return false;
         }
         return true;
