@@ -55,10 +55,6 @@ public interface MigrationActions {
 
     boolean dataNodeStartupFinished();
 
-    void setStateMachineContext(MigrationStateMachineContext context);
-
-    MigrationStateMachineContext getStateMachineContext();
-
     void startRemoteReindex();
 
     void requestMigrationStatus();
