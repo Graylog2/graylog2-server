@@ -31,6 +31,8 @@ class GreyNoiseAdapterSummary extends React.Component {
   };
 
   render() {
+    const { config } = this.props.dataAdapter;
+
     return (
       <dl>
         <dt>API Token</dt>
