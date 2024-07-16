@@ -72,10 +72,11 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     public static final String FIELD_REQUIRES = "requires";
     public static final String FIELD_STATE = "state";
     public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_LAST_UPDATED_AT = "last_updated_at";
     public static final String FIELD_OWNER = "owner";
     public static final String FIELD_FAVORITE = "favorite";
 
-    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
+    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT, FIELD_LAST_UPDATED_AT, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
     public static final ImmutableSet<String> STRING_SORT_FIELDS = ImmutableSet.of(FIELD_TITLE, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
     public static final String SECONDARY_SORT = FIELD_TITLE;
 
@@ -119,6 +120,9 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
+
+    @JsonProperty(FIELD_LAST_UPDATED_AT)
+    public abstract DateTime lastUpdatedAt();
 
     @JsonProperty(FIELD_FAVORITE)
     @MongoIgnore
@@ -207,6 +211,9 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);
 
+        @JsonProperty(FIELD_LAST_UPDATED_AT)
+        public abstract Builder lastUpdatedAt(DateTime lastUpdatedAt);
+
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(Map<String, ViewStateDTO> state);
 
@@ -223,6 +230,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
                     .properties(ImmutableSet.of())
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC))
+                    .lastUpdatedAt(DateTime.now(DateTimeZone.UTC))
                     .favorite(false);
         }
 

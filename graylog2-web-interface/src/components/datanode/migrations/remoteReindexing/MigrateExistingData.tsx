@@ -22,10 +22,13 @@ import styled from 'styled-components';
 
 import { Alert, Input, Row, Col } from 'components/bootstrap';
 import { SearchForm, Spinner } from 'components/common';
+import { getValueFromInput } from 'util/FormsUtils';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
+
+const DEFAULT_THREADS_COUNT = 4;
 
 const IndicesContainer = styled.div`
   max-height: 300px;
@@ -91,7 +94,20 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   };
 
   const handleChange = async (e: React.ChangeEvent<any>, callback: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<RemoteReindexRequest>>) => {
-    await callback(e.target.name, e.target.value);
+    let value;
+    value = getValueFromInput(e.target);
+
+    if (e.target.name === 'threads') {
+      value = (value || 0) < 1 ? DEFAULT_THREADS_COUNT : value;
+    }
+
+    await callback(e.target.name, value);
+
+    resetConnectionCheck();
+  };
+
+  const handleCheckboxChange = async (e: React.ChangeEvent<any>, callback: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<RemoteReindexRequest>>) => {
+    await callback(e.target.name, e.target.checked);
     resetConnectionCheck();
   };
 
@@ -114,6 +130,8 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
     password: '',
     synchronous: false,
     indices: [],
+    threads: DEFAULT_THREADS_COUNT,
+    trust_unknown_certs: false,
   };
 
   return (
@@ -164,6 +182,25 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
                  disabled={isLoading}
                  value={values.allowlist}
                  onChange={(e) => handleChange(e, setFieldValue)}
+                 required />
+          <Input id="threads"
+                 name="threads"
+                 label="Threads count"
+                 help="Threads count defines how many indices will be migrated in parallel (minimum 1, default 4)"
+                 type="number"
+                 min={1}
+                 step={1}
+                 disabled={isLoading}
+                 value={values.threads}
+                 onChange={(e) => handleChange(e, setFieldValue)} />
+          <Input id="trust_unknown_certs"
+                 name="trust_unknown_certs"
+                 label="Trust unknown certificates"
+                 help="Trust all certificates of the remote host during the migration process."
+                 type="checkbox"
+                 disabled={isLoading}
+                 checked={values.trust_unknown_certs}
+                 onChange={(e) => handleCheckboxChange(e, setFieldValue)}
                  required />
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">

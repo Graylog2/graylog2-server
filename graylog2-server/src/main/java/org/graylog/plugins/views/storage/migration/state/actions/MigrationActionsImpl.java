@@ -37,6 +37,7 @@ import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.plugin.GlobalMetricNames;
+import org.graylog2.plugin.Version;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
@@ -76,6 +77,8 @@ public class MigrationActionsImpl implements MigrationActions {
     private final ElasticsearchVersionProvider searchVersionProvider;
     private final List<URI> elasticsearchHosts;
     private final ObjectMapper objectMapper;
+
+    private final Version graylogVersion = Version.CURRENT_CLASSPATH;
 
     @Inject
     public MigrationActionsImpl(final ClusterConfigService clusterConfigService, NodeService<DataNodeDto> nodeService,
@@ -178,6 +181,14 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
+    public boolean compatibleDatanodesRunning() {
+        Map<String, DataNodeDto> nodes = nodeService.allActive();
+        return !nodes.isEmpty() && nodes.values().stream()
+                .allMatch(node -> node.getDatanodeVersion() != null &&
+                        graylogVersion.compareTo(new Version(com.github.zafarkhaja.semver.Version.valueOf(node.getDatanodeVersion()))) == 0);
+    }
+
+    @Override
     public void provisionDataNodes() {
         // if we start provisioning DataNodes via the migration, Preflight is definitely done/no option anymore
         var preflight = preflightConfigService.getPreflightConfigResult();
@@ -249,8 +260,9 @@ public class MigrationActionsImpl implements MigrationActions {
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
         final List<String> indices = getStateMachineContext().getActionArgumentOpt("indices", List.class).orElse(Collections.emptyList()); // todo: generics!
+        final boolean trustUnknownCerts = getStateMachineContext().getActionArgumentOpt("trust_unknown_certs", Boolean.class).orElse(false);
         final int threadsCount = getStateMachineContext().getActionArgumentOpt("threads", Integer.class).orElse(4);
-        final String migrationID = migrationService.start(new RemoteReindexRequest(allowlist, hostname, user, password, indices, threadsCount));
+        final String migrationID = migrationService.start(new RemoteReindexRequest(allowlist, hostname, user, password, indices, threadsCount, trustUnknownCerts));
         getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, migrationID);
     }
 
@@ -276,7 +288,9 @@ public class MigrationActionsImpl implements MigrationActions {
         final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
-        getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password));
+        final boolean trustUnknownCerts = getStateMachineContext().getActionArgumentOpt("trust_unknown_certs", Boolean.class).orElse(false);
+        final String allowlist = getStateMachineContext().getActionArgumentOpt("allowlist", String.class).orElse(null);
+        getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password, allowlist, trustUnknownCerts));
     }
 
     @Override

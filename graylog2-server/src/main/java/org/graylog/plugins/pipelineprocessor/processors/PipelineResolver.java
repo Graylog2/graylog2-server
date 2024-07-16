@@ -33,12 +33,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Resolves pipelines, pipeline rules, and pipeline stream connections from database objects to pipeline AST objects.
@@ -83,13 +86,30 @@ public class PipelineResolver {
     }
 
     /**
-     * Resolves the rule and pipeline DAO objects into AST objects.
+     * Resolve functions for the given set of {@link Pipeline} AST objects. Should only be used when programmatically
+     * generating pipeline AST objects.
      *
+     * @param pipelines              the pipeline AST objects
+     * @param pipelineMetricRegistry the metric registry
      * @return a map of pipeline ID to pipeline instances
      */
-    public ImmutableMap<String, Pipeline> resolvePipelines(PipelineMetricRegistry pipelineMetricRegistry) {
+    public ImmutableMap<String, Pipeline> resolveFunctions(Collection<Pipeline> pipelines,
+                                                           PipelineMetricRegistry pipelineMetricRegistry) {
+        final Map<String, Rule> ruleNameMap = resolveRules();
+        final ImmutableMap.Builder<String, Pipeline> pipelineIdMap = ImmutableMap.builder();
+
+        for (final var pipeline : pipelines) {
+            final var id = requireNonNull(pipeline.id(), "pipeline ID can't be null");
+            pipelineIdMap.put(id, resolvePipeline(pipelineMetricRegistry, pipeline, ruleNameMap));
+        }
+
+        return pipelineIdMap.build();
+    }
+
+    private Map<String, Rule> resolveRules() {
         // Read all rules and parse them
         final Map<String, Rule> ruleNameMap = Maps.newHashMap();
+
         try (final var ruleStream = ruleDaoSupplier.get()) {
             ruleStream.forEach(ruleDao -> {
                 Rule rule;
@@ -102,6 +122,17 @@ public class PipelineResolver {
                 ruleNameMap.put(rule.name(), rule);
             });
         }
+
+        return ruleNameMap;
+    }
+
+    /**
+     * Resolves the rule and pipeline DAO objects into AST objects.
+     *
+     * @return a map of pipeline ID to pipeline instances
+     */
+    public ImmutableMap<String, Pipeline> resolvePipelines(PipelineMetricRegistry pipelineMetricRegistry) {
+        final Map<String, Rule> ruleNameMap = resolveRules();
 
         // Read all pipelines and parse them
         final ImmutableMap.Builder<String, Pipeline> pipelineIdMap = ImmutableMap.builder();

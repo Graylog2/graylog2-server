@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import type { Output } from 'stores/outputs/OutputsStore';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';
@@ -25,15 +27,21 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 import StatusCell from './cells/StatusCell';
 import StreamRulesCell from './cells/StreamRulesCell';
+import PipelinesCell from './cells/PipelinesCell';
+import OutputsCell from './cells/OutputsCell';
+import ArchivingsCell from './cells/ArchivingsCell';
+
+const streamDataWarehouseColumnRenderer = PluginStore.exports('dataWarehouse')?.[0]?.streamDataWarehouseTableElements.columnRenderer;
 
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   attributes: {
     title: {
       renderCell: (_title: string, stream) => <TitleCell stream={stream} />,
+      width: 0.5,
     },
     index_set_title: {
       renderCell: (_index_set_title: string, stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
-      width: 0.7,
+      width: 0.3,
     },
     throughput: {
       renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,
@@ -45,8 +53,21 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
     },
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
-      staticWidth: 130,
+      staticWidth: 100,
     },
+    pipelines: {
+      renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
+      staticWidth: 100,
+    },
+    outputs: {
+      renderCell: (_outputs: Output[], stream) => <OutputsCell stream={stream} />,
+      staticWidth: 100,
+    },
+    archiving: {
+      renderCell: (_archiving:boolean, stream) => <ArchivingsCell stream={stream} indexSets={indexSets} />,
+      staticWidth: 100,
+    },
+    ...(streamDataWarehouseColumnRenderer || {}),
   },
 });
 

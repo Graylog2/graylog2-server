@@ -16,36 +16,31 @@
  */
 package org.graylog2.database.suggestions;
 
-import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.subject.Subject;
+import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog2.database.DbEntity;
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.shared.security.EntityPermissionsUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
 @MongoDBFixtures("simple-fixtures.json")
 class MongoEntitySuggestionServiceTest {
     @Mock
-    private DbEntitiesCatalog catalog;
+    private EntityPermissionsUtils entityPermissionsUtils;
     @Mock
     private Subject subject;
 
@@ -53,78 +48,18 @@ class MongoEntitySuggestionServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
-        this.toTest = new MongoEntitySuggestionService(mongodb.mongoConnection(), catalog);
+        this.toTest = new MongoEntitySuggestionService(mongodb.mongoConnection(), entityPermissionsUtils);
     }
-
-    @Test
-    void hasReadPermissionForWholeCollectionReturnsFalseOnNoEntryInCatalog() {
-        doReturn(Optional.empty()).when(catalog).getByCollectionName("streams");
-
-        final boolean hasReadPermissions = toTest.hasReadPermissionForWholeCollection(subject, "streams");
-        assertFalse(hasReadPermissions);
-    }
-
-    @Test
-    void hasReadPermissionForWholeCollectionReturnsFalseWhenCatalogHasNullPermission() {
-        doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, null))
-        ).when(catalog)
-                .getByCollectionName("streams");
-
-        final boolean hasReadPermissions = toTest.hasReadPermissionForWholeCollection(subject, "streams");
-        assertFalse(hasReadPermissions);
-    }
-
-    @Test
-    void hasReadPermissionForWholeCollectionReturnsTrueWhenCatalogHasAllAllowedPermission() {
-        doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, DbEntity.ALL_ALLOWED))
-        ).when(catalog)
-                .getByCollectionName("streams");
-
-        final boolean hasReadPermissions = toTest.hasReadPermissionForWholeCollection(subject, "streams");
-        assertTrue(hasReadPermissions);
-    }
-
-    @Test
-    void hasReadPermissionForWholeCollectionReturnsFalseWhenSubjectMissesPermission() {
-        doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"))
-        ).when(catalog)
-                .getByCollectionName("streams");
-
-        doReturn(false).when(subject).isPermitted("streams:read:*");
-        final boolean hasReadPermissions = toTest.hasReadPermissionForWholeCollection(subject, "streams");
-        assertFalse(hasReadPermissions);
-    }
-
-    @Test
-    void hasReadPermissionForWholeCollectionReturnsTrueWhenSubjectHasPermission() {
-        doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"))
-        ).when(catalog)
-                .getByCollectionName("streams");
-
-        doReturn(true).when(subject).isPermitted("streams:read:*");
-        final boolean hasReadPermissions = toTest.hasReadPermissionForWholeCollection(subject, "streams");
-        assertTrue(hasReadPermissions);
-    }
-
-    private record Dashboard(String id, String title) {}
 
     @Test
     void checksPermissionsForEachDocumentWhenUserDoesNotHavePermissionForWholeCollection() {
-        final var permission = "dashboard:read";
-        doReturn(Optional.of(
-                new DbEntityCatalogEntry("dashboards", "title", Dashboard.class, permission))
-        ).when(catalog)
-                .getByCollectionName("dashboards");
+        doReturn(false).when(entityPermissionsUtils).hasAllPermission(subject);
+        doReturn(false).when(entityPermissionsUtils).hasReadPermissionForWholeCollection(subject, "dashboards");
 
-        doReturn(false).when(subject).isPermitted(permission + ":*");
-        when(subject.isPermitted(any(AllPermission.class))).thenReturn(false);
-        doReturn(true).when(subject).isPermitted(permission + ":5a82f5974b900a7a97caa1e5");
-        doReturn(false).when(subject).isPermitted(permission + ":5a82f5974b900a7a97caa1e6");
-        doReturn(true).when(subject).isPermitted(permission + ":5a82f5974b900a7a97caa1e7");
+        final Collection<String> permittedIds = List.of("5a82f5974b900a7a97caa1e5", "5a82f5974b900a7a97caa1e7");
+        doReturn((Predicate<Document>) document -> permittedIds.contains(document.getObjectId(EntityPermissionsUtils.ID_FIELD).toString()))
+                .when(entityPermissionsUtils)
+                .createPermissionCheck(subject, "dashboards");
 
         final var result = toTest.suggest("dashboards", "title", "", 1, 10, subject);
 

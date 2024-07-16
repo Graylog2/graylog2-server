@@ -52,6 +52,7 @@ type Props = {
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
+
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
   useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries(KEY_PREFIX));
 
@@ -66,6 +67,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                   tableLayout={DEFAULT_LAYOUT}
                                   fetchEntities={fetchStreams}
                                   keyFn={keyFn}
+                                  actionsCellWidth={180}
                                   expandedSectionsRenderer={expandedSections}
                                   bulkSelection={{ actions: bulkActions }}
                                   entityAttributesAreCamelCase={false}

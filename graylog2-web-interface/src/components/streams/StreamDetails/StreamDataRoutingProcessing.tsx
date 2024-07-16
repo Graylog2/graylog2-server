@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePipelinesConnectedStream, { type StreamConnectedPipelines } from 'hooks/usePipelinesConnectedStream';
@@ -25,13 +25,12 @@ import Routes from 'routing/Routes';
 import { IfPermitted, Section, Icon } from 'components/common';
 import usePipelines from 'hooks/usePipelines';
 import { LinkContainer } from 'components/common/router';
+import StreamPipelinesConnectionForm from 'components/streams/StreamDetails/StreamPipelinesConnectionForm';
 
-import StreamPipelinesConnectionForm from './StreamPipelinesConnectionForm';
-
-const ActionButtonsWrap = styled.span`
-  margin-right: 6px;
+const ActionButtonsWrap = styled.span(({ theme }) => css`
+  margin-right: ${theme.spacings.xxs};
   float: right;
-`;
+`);
 
 const StreamDataRoutingProcessing = () => {
   const { streamId } = useParams<{streamId: string}>();
