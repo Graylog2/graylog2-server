@@ -29,18 +29,24 @@ export type PaginatedResponse<T> = {
   attributes: Array<Attribute>,
 }
 
+export type FetchOptions = {
+  refetchInterval?: number,
+};
+
 const useFetchEntities = <T>({
   fetchKey,
   searchParams,
   fetchEntities,
   enabled,
   humanName,
+  fetchOptions = {},
 }: {
   fetchKey: Array<unknown>,
   searchParams: SearchParams,
   fetchEntities: (searchParams: SearchParams) => Promise<PaginatedResponse<T>>
   enabled: boolean,
   humanName: string
+  fetchOptions?: FetchOptions,
 }): {
   isInitialLoading: boolean,
   data: PaginatedResponse<T>,
@@ -55,6 +61,7 @@ const useFetchEntities = <T>({
         UserNotification.error(`Fetching ${humanName} failed with status: ${error}`, `Could not retrieve ${humanName}`);
       },
       keepPreviousData: true,
+      ...fetchOptions,
     },
   );
 
