@@ -29,7 +29,7 @@ const DownsizeWarning = styled(Alert)`
   margin-bottom: 5px;
 `;
 
-const JournalDowntimeWarning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
+const JournalDowntimeWarning = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const { data, error, isError } = useJournalDowntimeSize();
 
   return (
@@ -45,7 +45,7 @@ const JournalDowntimeWarning = ({ currentStep, onTriggerStep }: MigrationStepCom
       <DownsizeWarning bsStyle="warning">
         Please make sure your journal volume size is sufficient before proceeding.
       </DownsizeWarning>
-      <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

@@ -27,7 +27,7 @@ const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
 
-const StopMessageProcessing = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
+const StopMessageProcessing = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => (
   <>
     <p>Graylog processing is stopped.</p>
     <StyledHelpPanel bsStyle="warning">
@@ -43,7 +43,7 @@ const StopMessageProcessing = ({ currentStep, onTriggerStep }: MigrationStepComp
       </Panel.Body>
     </StyledHelpPanel>
     <p />
-    <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+    <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
 
   </>
 );

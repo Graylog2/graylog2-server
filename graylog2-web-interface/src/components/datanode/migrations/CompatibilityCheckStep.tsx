@@ -29,7 +29,7 @@ const CompatibilityAlert = styled(Alert)`
   margin-bottom: 5px;
 `;
 
-const CompatibilityCheckStep = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
+const CompatibilityCheckStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const { error: requestError, data, isInitialLoading, isError } = useCompatibilityCheck();
 
   if (isInitialLoading) {
@@ -63,7 +63,7 @@ const CompatibilityCheckStep = ({ currentStep, onTriggerStep }: MigrationStepCom
       {isCompatible && data && Object.keys(data).map((hostname) => (
         <CompatibilityStatus key={hostname} hostname={hostname} opensearchVersion={data[hostname].opensearch_version} nodeInfo={data[hostname].info} />
       ))}
-      <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>
   );
 };
