@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { useStore } from 'stores/connect';
 import type { Stream } from 'views/stores/StreamsStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/useCurrentStream';
 import type { IndexSet, IndexSetsStoreState } from 'stores/indices/IndexSetsStore';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 const streamsMapper = ({ streams }) => streams.map((stream: Stream) => ({ indexSet: stream.index_set_id, id: stream.id }));
