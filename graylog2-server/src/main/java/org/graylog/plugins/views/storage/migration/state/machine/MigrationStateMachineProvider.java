@@ -31,9 +31,9 @@ public class MigrationStateMachineProvider implements Provider<MigrationStateMac
     private final MigrationActionsFactory migrationActionsFactory;
 
     @Inject
-    public MigrationStateMachineProvider(DatanodeMigrationPersistence persistenceService, MigrationActionsFactory migrationActions) {
+    public MigrationStateMachineProvider(DatanodeMigrationPersistence persistenceService, MigrationActionsFactory migrationActionsFactory) {
        this.persistenceService = persistenceService;
-       this.migrationActionsFactory = migrationActions;
+       this.migrationActionsFactory = migrationActionsFactory;
     }
 
     @Override

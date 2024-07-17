@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
-import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
-
 /**
  * Set of callbacks used during the migration in different states.
  */
