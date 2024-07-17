@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -32,6 +32,11 @@ import type { FieldTypeUsage, FieldTypes } from 'views/logic/fieldactions/Change
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/useCurrentStream';
+import { useStore } from 'stores/connect';
+import type { IndexSet, IndexSetsStoreState } from 'stores/indices/IndexSetsStore';
+import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 const Container = styled.div`
   margin-top: 20px;
@@ -44,8 +49,15 @@ type Props = {
   initialSelection: Array<string>
 }
 
+const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string, IndexSet> => {
+  if (!indexSets) return null;
+
+  return Object.fromEntries(indexSets.map((indexSet) => ([indexSet.id, indexSet])));
+};
+
 const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelection }: Props) => {
   const [activePage, setActivePage] = useState(1);
+  const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
 
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
@@ -96,6 +108,16 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
     setIndexSetSelection(newSelection);
   }, [setIndexSetSelection]);
 
+  const isEntitySelectable = useCallback((entity) => {
+    const indexSetId = entity.id;
+
+    return isIndexFieldTypeChangeAllowed(indexSets[indexSetId]);
+  }, [indexSets]);
+
+  useEffect(() => {
+    IndexSetsActions.list(false);
+  }, []);
+
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
@@ -119,6 +141,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
                                              onChangeSelection,
                                              initialSelection,
                                              actions: <BulkActionsDropdown />,
+                                             isEntitySelectable,
                                            }}
                                            columnDefinitions={attributes}
                                            columnRenderers={columnRenderers}
