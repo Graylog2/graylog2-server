@@ -53,13 +53,10 @@ const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
 };
 
 EntityList.defaultProps = {
-  bsNoItemsStyle: 'info',
   noItemsText: 'No items available',
 };
 
 EntityList.propTypes = {
-  /** bsStyle to use when there are no items in the list. */
-  bsNoItemsStyle: PropTypes.oneOf(['info', 'success', 'warning']),
   /** Text to show when there are no items in the list. */
   noItemsText: PropTypes.oneOfType([
     PropTypes.string,
