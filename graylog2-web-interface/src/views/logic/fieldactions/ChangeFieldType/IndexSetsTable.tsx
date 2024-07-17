@@ -35,7 +35,6 @@ import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/use
 import { useStore } from 'stores/connect';
 import type { IndexSet, IndexSetsStoreState } from 'stores/indices/IndexSetsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 const Container = styled.div`
