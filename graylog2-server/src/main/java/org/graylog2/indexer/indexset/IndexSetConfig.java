@@ -42,6 +42,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
@@ -60,6 +61,12 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, Simp
     public static final String FIELD_INDEX_WILDCARD = "index_wildcard";
     public static final String FIELD_INDEX_TEMPLATE_NAME = "index_template_name";
     public static final String FIELD_CUSTOM_FIELD_MAPPINGS = "custom_field_mappings";
+
+    private static final Set<String> TEMPLATE_TYPES_FOR_INDEX_SETS_WITH_IMMUTABLE_FIELD_TYPES = Set.of(
+            EVENT_TEMPLATE_TYPE,
+            IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
+            IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE
+    );
 
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
@@ -255,26 +262,12 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, Simp
 
     @JsonIgnore
     public boolean canHaveCustomFieldMappings() {
-        final String indexTemplateType = this.indexTemplateType().orElse(null);
-        if (EVENT_TEMPLATE_TYPE.equals(indexTemplateType) ||
-                IndexTemplateProvider.FAILURE_TEMPLATE_TYPE.equals(indexTemplateType) ||
-                IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE.equals(indexTemplateType)
-
-        ) {
-            return false;
-        }
-        return true;
+        return !this.indexTemplateType().map(TEMPLATE_TYPES_FOR_INDEX_SETS_WITH_IMMUTABLE_FIELD_TYPES::contains).orElse(false);
     }
 
     @JsonIgnore
     public boolean canHaveProfile() {
-        final String indexTemplateType = this.indexTemplateType().orElse(null);
-        if (EVENT_TEMPLATE_TYPE.equals(indexTemplateType) ||
-                IndexTemplateProvider.FAILURE_TEMPLATE_TYPE.equals(indexTemplateType) ||
-                IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE.equals(indexTemplateType)) {
-            return false;
-        }
-        return true;
+        return !this.indexTemplateType().map(TEMPLATE_TYPES_FOR_INDEX_SETS_WITH_IMMUTABLE_FIELD_TYPES::contains).orElse(false);
     }
 
     @Override
