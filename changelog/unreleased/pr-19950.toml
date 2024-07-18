@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Unify table header border style for search widgets, fix scrolling behaviour."
+
+pulls = ["19950"]
