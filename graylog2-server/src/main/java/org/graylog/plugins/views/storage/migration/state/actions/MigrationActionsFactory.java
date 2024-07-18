@@ -14,19 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog.plugins.views.storage.migration.state.actions;
 
-import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.storage.SearchVersion;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 
-import javax.annotation.Nonnull;
-
-public interface IndexTemplateProvider<T extends IndexMappingTemplate> {
-
-    String FAILURE_TEMPLATE_TYPE = "failures";
-    String ILLUMINATE_INDEX_TEMPLATE_TYPE = "illuminate_content";
-
-    @Nonnull
-    T create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig)
-            throws IgnoreIndexTemplate;
+public interface MigrationActionsFactory {
+    MigrationActions create(MigrationStateMachineContext context);
 }

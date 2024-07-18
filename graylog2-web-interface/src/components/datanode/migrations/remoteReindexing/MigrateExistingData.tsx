@@ -46,7 +46,7 @@ export type RemoteReindexCheckConnection = {
   error: any,
 }
 
-const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
+const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['CHECK_REMOTE_INDEXER_CONNECTION']);
   const [errorMessage, setErrrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -243,7 +243,8 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
           {isLoading ? (
             <Spinner />
           ) : (
-            <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps}
+            <MigrationStepTriggerButtonToolbar hidden={hideActions}
+                                               nextSteps={nextSteps || currentStep.next_steps}
                                                onTriggerStep={handleTriggerNextStep}
                                                args={{ ...values, indices: filteredSelectedIndices } as RemoteReindexRequest} />
           )}

@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indexset;
 
+import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -299,14 +300,28 @@ public class IndexSetConfigTest {
 
     @Test
     public void testFailureIndexWithProfileSetIsIllegal() {
-        assertFalse(testIndexSetConfig("failures",
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
                 null,
                 "profile").canHaveProfile());
     }
 
     @Test
     public void testFailureIndexWithChangedFieldMappingsIsIllegal() {
-        assertFalse(testIndexSetConfig("failures",
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
+                new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
+                null).canHaveCustomFieldMappings());
+    }
+
+    @Test
+    public void testIlluminateIndexWithProfileSetIsIllegal() {
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE,
+                null,
+                "profile").canHaveProfile());
+    }
+
+    @Test
+    public void testIlluminateIndexWithChangedFieldMappingsIsIllegal() {
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE,
                 new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
                 null).canHaveCustomFieldMappings());
     }

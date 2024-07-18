@@ -20,24 +20,15 @@ import org.graylog.plugins.views.storage.migration.state.actions.MigrationAction
 
 public class MigrationActionsAdapter implements MigrationActions {
 
-    MigrationStateMachineContext context;
+    protected final MigrationStateMachineContext context;
 
-    public MigrationActionsAdapter() {
-        this.context = new MigrationStateMachineContext();
+    public MigrationActionsAdapter(MigrationStateMachineContext context) {
+        this.context = context;
     }
 
     @Override
     public boolean dataNodeStartupFinished() {
         return false;
-    }
-
-    public void setStateMachineContext(MigrationStateMachineContext context) {
-        this.context = context;
-    }
-
-    @Override
-    public MigrationStateMachineContext getStateMachineContext() {
-        return context;
     }
 
     @Override

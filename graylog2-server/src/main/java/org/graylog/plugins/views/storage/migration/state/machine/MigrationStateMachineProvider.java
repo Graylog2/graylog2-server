@@ -21,23 +21,26 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
+import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionsFactory;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationPersistence;
 
 @Singleton
 public class MigrationStateMachineProvider implements Provider<MigrationStateMachine> {
 
     private final DatanodeMigrationPersistence persistenceService;
-    private final MigrationActions migrationActions;
+    private final MigrationActionsFactory migrationActionsFactory;
 
     @Inject
-    public MigrationStateMachineProvider(DatanodeMigrationPersistence persistenceService, MigrationActions migrationActions) {
+    public MigrationStateMachineProvider(DatanodeMigrationPersistence persistenceService, MigrationActionsFactory migrationActionsFactory) {
        this.persistenceService = persistenceService;
-       this.migrationActions = migrationActions;
+       this.migrationActionsFactory = migrationActionsFactory;
     }
 
     @Override
     public MigrationStateMachine get() {
+        final MigrationStateMachineContext context = persistenceService.getStateMachineContext().orElseGet(MigrationStateMachineContext::new);
+        final MigrationActions migrationActions = migrationActionsFactory.create(context);
         final StateMachine<MigrationState, MigrationStep> stateMachine = MigrationStateMachineBuilder.buildFromPersistedState(persistenceService, migrationActions);
-        return new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        return new MigrationStateMachineImpl(stateMachine, persistenceService, context);
     }
 }
