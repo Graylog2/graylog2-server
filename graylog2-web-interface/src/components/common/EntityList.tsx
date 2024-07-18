@@ -53,6 +53,7 @@ const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
 };
 
 EntityList.defaultProps = {
+  bsNoItemsStyle: undefined,
   noItemsText: 'No items available',
 };
 
