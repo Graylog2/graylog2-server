@@ -21,7 +21,7 @@ import { Space } from 'preflight/components/common';
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
-const ExistingDataMigrationQuestion = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
+const ExistingDataMigrationQuestion = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => (
   <>
     <p>Do you want to migrate your existing data?</p>
     <Space h="md" />
@@ -30,7 +30,7 @@ const ExistingDataMigrationQuestion = ({ currentStep, onTriggerStep }: Migration
     <Space h="md" />
     <p>Once that is done please restart Graylog to finish the migration.</p>
     <Space h="md" />
-    <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+    <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
   </>
 );
 
