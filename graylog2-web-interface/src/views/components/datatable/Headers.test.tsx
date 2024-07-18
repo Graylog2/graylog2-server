@@ -66,7 +66,6 @@ describe('Headers', () => {
         <Headers columnPivots={columnPivots}
                  rowPivots={rowPivots}
                  series={series}
-                 borderedHeader={false}
                  rollup={rollup}
                  actualColumnPivotFields={actualColumnPivotFields}
                  fields={Immutable.List(fields)}

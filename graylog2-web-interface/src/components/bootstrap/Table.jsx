@@ -84,7 +84,7 @@ const tableCss = css(({ theme }) => css`
     > tfoot > tr {
       > th,
       > td {
-        border-top-color: ${theme.colors.table.row.backgroundStriped};
+        border-top-color: ${theme.colors.table.row.divider};
       }
     }
 
@@ -100,7 +100,7 @@ const tableCss = css(({ theme }) => css`
     }
 
     > tbody + tbody {
-      border-top-color: ${theme.colors.table.row.backgroundStriped};
+      border-top-color: ${theme.colors.table.row.divider};
     }
 
     .table {

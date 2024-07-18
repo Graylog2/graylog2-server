@@ -30,6 +30,10 @@ import type Direction from 'views/logic/aggregationbuilder/Direction';
 
 import AttributeSortIcon from '../../overview-configuration/AttributeSortIcon';
 
+const Table = styled.table`
+  border-collapse: separate;
+`;
+
 const TableWrapper = styled.div`
   overflow: auto;
 `;
@@ -56,7 +60,7 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
 
   return (
     <TableWrapper>
-      <table className="table table-condensed">
+      <Table className="table table-condensed">
         <TableHead>
           <tr>
             {config.fields.toArray().map((field) => {
@@ -88,7 +92,7 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
                             fields={config.fields} />
           ))}
         </tbody>
-      </table>
+      </Table>
     </TableWrapper>
   );
 };

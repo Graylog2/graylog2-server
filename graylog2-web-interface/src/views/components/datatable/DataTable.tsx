@@ -47,7 +47,6 @@ import { makeVisualization, retrieveChartData } from '../aggregationbuilder/Aggr
 
 type Props = VisualizationComponentProps & {
   bordered?: boolean,
-  borderedHeader?: boolean,
   condensed?: boolean,
   data: { [key: string]: Rows } & { events?: Events },
   setLoadingState: (loading: boolean) => void
@@ -124,7 +123,6 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
 
 const DataTable = ({
   bordered,
-  borderedHeader,
   condensed,
   config,
   data,
@@ -269,7 +267,6 @@ const DataTable = ({
                        condensed={condensed}>
           <THead $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
             <Headers actualColumnPivotFields={actualColumnPivotFields}
-                     borderedHeader={borderedHeader}
                      columnPivots={columnPivots}
                      fields={fields}
                      rollup={rollup}
@@ -296,7 +293,6 @@ DataTable.defaultProps = {
   striped: true,
   bordered: false,
   stickyHeader: true,
-  borderedHeader: true,
 };
 
 const ConnectedDataTable = makeVisualization(DataTable, 'table');

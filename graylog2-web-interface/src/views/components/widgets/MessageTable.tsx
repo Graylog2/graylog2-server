@@ -39,7 +39,7 @@ const Table = styled.table(({ theme }) => css`
   position: relative;
   font-size: ${theme.fonts.size.small};
   margin: 0;
-  border-collapse: collapse;
+  border-collapse: separate;
   width: 100%;
   word-break: break-all;
 

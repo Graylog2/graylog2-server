@@ -28,7 +28,7 @@ const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme, $stickyH
   position: relative;
   font-size: ${theme.fonts.size.small};
   margin: 0;
-  border-collapse: collapse;
+  border-collapse: separate; // without this the th border are not sticky
   width: 100%;
   word-break: break-all;
   
