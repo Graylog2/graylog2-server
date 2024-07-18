@@ -64,7 +64,7 @@ const getColorVariantFromLogLevel = (logLovel: string): ColorVariant|undefined =
 
 const RetryMigrateExistingData = 'RETRY_MIGRATE_EXISTING_DATA';
 
-const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
+const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const { nextSteps, migrationStatus, handleTriggerStep } = useRemoteReindexMigrationStatus(currentStep, onTriggerStep);
   const indicesWithErrors = migrationStatus?.indices.filter((index) => index.status === 'ERROR') || [];
   const [showLogView, setShowLogView] = useState<boolean>(false);
@@ -103,7 +103,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
           </IndicesContainer>
         </Alert>
       )}
-      <MigrationStepTriggerButtonToolbar nextSteps={(nextSteps || currentStep.next_steps).filter((step) => step !== RetryMigrateExistingData)} onTriggerStep={handleTriggerStep}>
+      <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={(nextSteps || currentStep.next_steps).filter((step) => step !== RetryMigrateExistingData)} onTriggerStep={handleTriggerStep}>
         <Button bsStyle="default" bsSize="small" onClick={() => setShowLogView(true)}>Log View</Button>
         <Button bsStyle="default" bsSize="small" onClick={() => (hasMigrationFailed ? handleTriggerStep(RetryMigrateExistingData) : setShowRetryMigrationConfirmDialog(true))}>{MIGRATION_ACTIONS[RetryMigrateExistingData]?.label}</Button>
       </MigrationStepTriggerButtonToolbar>
