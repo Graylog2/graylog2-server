@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
+import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
@@ -115,6 +116,18 @@ jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappin
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
+
+jest.mock('stores/indices/IndexSetsStore', () => ({
+  IndexSetsActions: {
+    list: jest.fn(),
+  },
+  IndexSetsStore: MockStore(['getInitialState', () => ({
+    indexSets: [
+      { id: 'id-1', title: 'Index Title 1' },
+      { id: 'id-2', title: 'Index Title 2' },
+    ],
+  })]),
+}));
 
 describe('ChangeFieldTypeModal', () => {
   const putFieldTypeMutationMock = jest.fn(() => Promise.resolve());
