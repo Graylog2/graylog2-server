@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -48,13 +49,12 @@ import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -225,7 +225,15 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
                         })
                         .collect(Collectors.joining("&"));
             } else {
-                body = templateEngine.transform(bodyTemplate, modelMap);
+                Map<String, Object> escapedModelMap = new HashMap<>();
+                modelMap.forEach((k, v) -> {
+                    if (v instanceof String str) {
+                        escapedModelMap.put(k, str.replace("\"", "\\\""));
+                    } else {
+                        escapedModelMap.put(k, v);
+                    }
+                });
+                body = templateEngine.transform(bodyTemplate, escapedModelMap);
             }
         } else {
             if (config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
