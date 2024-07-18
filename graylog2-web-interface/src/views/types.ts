@@ -184,6 +184,7 @@ interface SearchType<T, R> {
 }
 
 export interface ExportFormat {
+  order?: number;
   type: string;
   displayName: () => string;
   disabled?: () => boolean;
