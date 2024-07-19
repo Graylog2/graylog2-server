@@ -89,5 +89,14 @@ class IndexSetFieldTypeTest {
                 new IndexSetFieldType("buhaha", "text", INDEX, false),
                 new IndexSetFieldType("arizona", "string", INDEX, false)
         ));
+
+        assertTrue(0 > fieldTypeComparator.compare(
+                new IndexSetFieldType("buhaha", "long", INDEX, false),
+                new IndexSetFieldType("buhaha", null, INDEX, false)
+        ));
+        assertTrue(0 < reversedFieldTypeComparator.compare(
+                new IndexSetFieldType("buhaha", "long", INDEX, false),
+                new IndexSetFieldType("buhaha", null, INDEX, false)
+        ));
     }
 }
