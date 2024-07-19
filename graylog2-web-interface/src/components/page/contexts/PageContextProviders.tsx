@@ -14,19 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+import * as React from 'react';
 
-import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.storage.SearchVersion;
+import usePluginEntities from 'hooks/usePluginEntities';
 
-import javax.annotation.Nonnull;
+type Props = {
+  children: React.ReactElement,
+};
 
-public interface IndexTemplateProvider<T extends IndexMappingTemplate> {
+const PageContextProviders = ({ children }: Props) => {
+  const contextProviders = usePluginEntities('pageContextProviders');
 
-    String FAILURE_TEMPLATE_TYPE = "failures";
-    String ILLUMINATE_INDEX_TEMPLATE_TYPE = "illuminate_content";
+  if (!contextProviders || contextProviders?.length === 0) {
+    return children;
+  }
 
-    @Nonnull
-    T create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig)
-            throws IgnoreIndexTemplate;
-}
+  return contextProviders.reduce((nestedChildren, PageContextProvider) => (
+    <PageContextProvider>
+      {nestedChildren}
+    </PageContextProvider>
+  ), children);
+};
+
+export default PageContextProviders;

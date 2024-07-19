@@ -14,19 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
 
-import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.storage.SearchVersion;
+import * as React from 'react';
+import { Timeline as MantineTimeline } from '@mantine/core';
 
-import javax.annotation.Nonnull;
+type Props = React.PropsWithChildren<{
+  active: number,
+  bulletSize: number,
+  className?: string,
+  color: string,
+}>
 
-public interface IndexTemplateProvider<T extends IndexMappingTemplate> {
+const Timeline = ({ children, bulletSize, color, active, className }: Props) => (
+  <MantineTimeline bulletSize={bulletSize}
+                   color={color}
+                   className={className}
+                   active={active}>{children}
+  </MantineTimeline>
+);
 
-    String FAILURE_TEMPLATE_TYPE = "failures";
-    String ILLUMINATE_INDEX_TEMPLATE_TYPE = "illuminate_content";
+Timeline.Item = MantineTimeline.Item;
 
-    @Nonnull
-    T create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig)
-            throws IgnoreIndexTemplate;
-}
+Timeline.defaultProps = {
+  className: undefined,
+};
+
+export default Timeline;
