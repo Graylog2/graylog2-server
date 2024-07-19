@@ -93,7 +93,7 @@ const FieldsConfiguration = ({
                     onClick={() => {
                       setShowSelectedList((cur) => !cur);
                     }}>
-        {showSelectedList ? `Hide ${selectedFields.length} selected fields` : `Show ${selectedFields.length} selected fields`}<ToggleIcon name={showSelectedList ? 'expand_less' : 'expand_more'} />
+        {showSelectedList ? `Hide ${selectedFields.length} selected fields` : `Show ${selectedFields.length} selected fields`}<ToggleIcon name={showSelectedList ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
       </ToggleButton>
       )}
       {showSelectedList && (
