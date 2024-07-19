@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.Collections;
 import java.util.List;
 
 @ExtendWith(MongoDBExtension.class)
@@ -46,7 +47,7 @@ class RemoteReindexMigrationServiceImplTest {
 
     @Test
     void testCreateReadUpdate() {
-        MigrationConfiguration migration = migrationService.saveMigration(MigrationConfiguration.forIndices(List.of("index_1", "index_2", "errors_1")));
+        MigrationConfiguration migration = migrationService.saveMigration(MigrationConfiguration.forIndices(List.of("index_1", "index_2", "errors_1"), Collections.emptyList()));
         final String migrationID = migration.id();
         Assertions.assertThat(migration)
                 .satisfies(m -> Assertions.assertThat(m.id()).isNotEmpty())
@@ -75,7 +76,7 @@ class RemoteReindexMigrationServiceImplTest {
 
     @Test
     void testLogs() {
-        MigrationConfiguration migration = migrationService.saveMigration(MigrationConfiguration.forIndices(List.of("index_1", "index_2", "errors_1")));
+        MigrationConfiguration migration = migrationService.saveMigration(MigrationConfiguration.forIndices(List.of("index_1", "index_2", "errors_1"), Collections.emptyList()));
         migrationService.appendLogEntry(migration.id(), new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.INFO, "info entry"));
         migrationService.appendLogEntry(migration.id(), new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.ERROR, "error entry"));
         Assertions.assertThat(migrationService.getMigration(migration.id()))

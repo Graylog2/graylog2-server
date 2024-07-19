@@ -1,0 +1,5 @@
+type = "a"
+message = "Add pipeline connections management to stream details page."
+
+issues = [""]
+pulls = ["19587"]

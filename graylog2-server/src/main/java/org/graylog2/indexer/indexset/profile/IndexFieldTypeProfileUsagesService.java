@@ -23,13 +23,14 @@ import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_PROFILE_ID;
 
 /**
  * Service returning usages of profiles - documents in Mongo that reference profiles.
@@ -51,7 +52,7 @@ public class IndexFieldTypeProfileUsagesService {
         }
         Set<String> usagesInIndexSet = new HashSet<>();
         indexSetsCollection
-                .find(Filters.eq(IndexSetConfig.FIELD_PROFILE_ID, profileId))
+                .find(Filters.eq(FIELD_PROFILE_ID, profileId))
                 .projection(Projections.include(INDEX_SET_ID))
                 .map(document -> document.getObjectId(INDEX_SET_ID).toString())
                 .into(usagesInIndexSet);
@@ -62,14 +63,14 @@ public class IndexFieldTypeProfileUsagesService {
         Map<String, Set<String>> usagesInIndexSet = new HashMap<>();
         profilesIds.forEach(profId -> usagesInIndexSet.put(profId, new HashSet<>()));
         indexSetsCollection
-                .find(Filters.in(IndexSetConfig.FIELD_PROFILE_ID,
+                .find(Filters.in(FIELD_PROFILE_ID,
                         profilesIds.stream()
                                 .filter(ObjectId::isValid)
                                 .toList()))
-                .projection(Projections.include(INDEX_SET_ID, IndexSetConfig.FIELD_PROFILE_ID))
+                .projection(Projections.include(INDEX_SET_ID, FIELD_PROFILE_ID))
                 .forEach(document -> {
                     final String indexSetId = document.getObjectId(INDEX_SET_ID).toString();
-                    final String profileId = document.getString(IndexSetConfig.FIELD_PROFILE_ID);
+                    final String profileId = document.getString(FIELD_PROFILE_ID);
                     usagesInIndexSet.get(profileId).add(indexSetId);
                 });
 

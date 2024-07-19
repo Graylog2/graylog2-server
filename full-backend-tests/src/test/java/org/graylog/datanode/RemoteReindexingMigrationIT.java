@@ -23,7 +23,6 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
-import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
@@ -89,7 +88,7 @@ public class RemoteReindexingMigrationIT {
                     "indices": ["%s", "%s"],
                     "synchronous": false
                 }
-                """.formatted(allowlistValue(openSearchInstance.internalUri()), openSearchInstance.internalUri(), indexName, indexName2);
+                """.formatted(openSearchInstance.internalUri(), openSearchInstance.internalUri(), indexName, indexName2);
 
 
         final ValidatableResponse migrationResponse = apis.post("/remote-reindex-migration/remoteReindex", request, 200);
@@ -102,12 +101,6 @@ public class RemoteReindexingMigrationIT {
 
         Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
         Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
-
-    }
-
-    @NotNull
-    private String allowlistValue(String indexerUri) {
-        return indexerUri.replace("http://", "");
 
     }
 

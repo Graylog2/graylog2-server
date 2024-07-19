@@ -27,7 +27,7 @@ import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
+import type { ChartConfig, PlotLayout } from 'views/components/visualizations/GenericPlot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import {
@@ -88,9 +88,10 @@ const BarVisualization = makeVisualization(({
 }: VisualizationComponentProps) => {
   const { convertValueToUnit } = useFieldUnitTypes();
   const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
+
   const { layouts, yAxisMapper, mapperAxisNumber } = useMemo(() => generateYAxis(config), [config]);
   const barmode = useMemo(() => (visualizationConfig && visualizationConfig.barmode ? visualizationConfig.barmode : undefined), [visualizationConfig]);
-  const _layout = useMemo(() => ({
+  const _layout = useMemo<Partial<PlotLayout>>(() => ({
     ...layouts,
     hovermode: 'x',
     xaxis: { domain: generateDomain(Object.keys(layouts)?.length) },

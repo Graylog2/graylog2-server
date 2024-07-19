@@ -138,6 +138,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String SEARCHES_KEYWORD = "searches:keyword";
     public static final String SEARCHES_RELATIVE = "searches:relative";
     public static final String SOURCES_READ = "sources:read";
+    public static final String STREAM_DESTINATION_FILTERS_CREATE = "stream_destination_filters:create";
+    public static final String STREAM_DESTINATION_FILTERS_DELETE = "stream_destination_filters:delete";
+    public static final String STREAM_DESTINATION_FILTERS_EDIT = "stream_destination_filters:edit";
+    public static final String STREAM_DESTINATION_FILTERS_READ = "stream_destination_filters:read";
     public static final String STREAM_OUTPUTS_CREATE = "stream_outputs:create";
     public static final String STREAM_OUTPUTS_DELETE = "stream_outputs:delete";
     public static final String STREAM_OUTPUTS_READ = "stream_outputs:read";
@@ -166,6 +170,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String MAPPING_PROFILES_DELETE = "mappingprofiles:delete";
     public static final String MAPPING_PROFILES_EDIT = "mappingprofiles:edit";
     public static final String MAPPING_PROFILES_READ = "mappingprofiles:read";
+    public static final String INDEX_SET_TEMPLATES_CREATE = "indexset_templates:create";
+    public static final String INDEX_SET_TEMPLATES_DELETE = "indexset_templates:delete";
+    public static final String INDEX_SET_TEMPLATES_EDIT = "indexset_templates:edit";
+    public static final String INDEX_SET_TEMPLATES_READ = "indexset_templates:read";
     public static final String URL_WHITELIST_READ = "urlwhitelist:read";
     public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";
@@ -242,6 +250,10 @@ public class RestPermissions implements PluginPermissions {
             .add(create(INDEXSETS_DELETE, ""))
             .add(create(INDEXSETS_EDIT, ""))
             .add(create(INDEXSETS_READ, ""))
+            .add(create(INDEX_SET_TEMPLATES_CREATE, ""))
+            .add(create(INDEX_SET_TEMPLATES_DELETE, ""))
+            .add(create(INDEX_SET_TEMPLATES_EDIT, ""))
+            .add(create(INDEX_SET_TEMPLATES_READ, ""))
             .add(create(INDICES_CHANGESTATE, ""))
             .add(create(INDICES_DELETE, ""))
             .add(create(INDICES_FAILURES, ""))

@@ -15,22 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import keyBy from 'lodash/keyBy';
 
 import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
 import ExpandedRowToggleWrapper from 'components/indices/IndexSetFieldTypes/originBadges/ExpandedRowToggleWrapper';
 import { Icon } from 'components/common';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
-import type { Attribute } from 'stores/PaginationTypes';
-import OriginBadge from 'components/indices/IndexSetFieldTypes/originBadges/OriginBadge';
+import OriginCell from 'components/indices/IndexSetFieldTypes/originBadges/OriginCell';
 
-const useCustomColumnRenderers = (attributes: Array<Attribute>) => {
+const useCustomColumnRenderers = () => {
   const { data: { fieldTypes } } = useFieldTypesForMappings();
-  const normalizedOrigin = useMemo(() => {
-    const originOptions = attributes?.find(({ id }) => id === 'origin')?.filter_options;
-
-    return keyBy(originOptions, 'value');
-  }, [attributes]);
 
   return useMemo(() => ({
     attributes: {
@@ -40,7 +33,7 @@ const useCustomColumnRenderers = (attributes: Array<Attribute>) => {
       origin: {
         renderCell: (origin: FieldTypeOrigin, { id }) => (
           <ExpandedRowToggleWrapper id={id}>
-            <OriginBadge origin={origin} title={normalizedOrigin?.[origin]?.title} />
+            <OriginCell origin={origin} />
           </ExpandedRowToggleWrapper>
         ),
         staticWidth: 200,
@@ -51,7 +44,7 @@ const useCustomColumnRenderers = (attributes: Array<Attribute>) => {
         staticWidth: 120,
       },
     },
-  }), [fieldTypes, normalizedOrigin]);
+  }), [fieldTypes]);
 };
 
 export default useCustomColumnRenderers;

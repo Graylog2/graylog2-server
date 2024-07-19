@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { Field } from 'formik';
+import sortBy from 'lodash/sortBy';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import Select from 'components/common/Select';
@@ -24,7 +25,7 @@ import { defaultCompare } from 'logic/DefaultCompare';
 const ExportFormatSelection = () => {
   const exportFormats = usePluginEntities('views.export.formats');
 
-  const exportFormatOptions = exportFormats.sort((type1, type2) => defaultCompare(type1?.displayName, type2?.displayName))
+  const exportFormatOptions = sortBy(exportFormats.sort((type1, type2) => defaultCompare(type1?.displayName, type2?.displayName)), ['order'])
     .map(({ type, displayName, disabled = () => false }) => {
       const isDisabled = disabled();
       const title = displayName();

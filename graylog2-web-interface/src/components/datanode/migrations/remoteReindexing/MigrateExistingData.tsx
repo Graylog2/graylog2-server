@@ -22,10 +22,13 @@ import styled from 'styled-components';
 
 import { Alert, Input, Row, Col } from 'components/bootstrap';
 import { SearchForm, Spinner } from 'components/common';
+import { getValueFromInput } from 'util/FormsUtils';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
+
+const DEFAULT_THREADS_COUNT = 4;
 
 const IndicesContainer = styled.div`
   max-height: 300px;
@@ -43,7 +46,7 @@ export type RemoteReindexCheckConnection = {
   error: any,
 }
 
-const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
+const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['CHECK_REMOTE_INDEXER_CONNECTION']);
   const [errorMessage, setErrrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -91,7 +94,20 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
   };
 
   const handleChange = async (e: React.ChangeEvent<any>, callback: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<RemoteReindexRequest>>) => {
-    await callback(e.target.name, e.target.value);
+    let value;
+    value = getValueFromInput(e.target);
+
+    if (e.target.name === 'threads') {
+      value = (value || 0) < 1 ? DEFAULT_THREADS_COUNT : value;
+    }
+
+    await callback(e.target.name, value);
+
+    resetConnectionCheck();
+  };
+
+  const handleCheckboxChange = async (e: React.ChangeEvent<any>, callback: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<RemoteReindexRequest>>) => {
+    await callback(e.target.name, e.target.checked);
     resetConnectionCheck();
   };
 
@@ -114,6 +130,8 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
     password: '',
     synchronous: false,
     indices: [],
+    threads: DEFAULT_THREADS_COUNT,
+    trust_unknown_certs: false,
   };
 
   return (
@@ -165,6 +183,25 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  value={values.allowlist}
                  onChange={(e) => handleChange(e, setFieldValue)}
                  required />
+          <Input id="threads"
+                 name="threads"
+                 label="Threads count"
+                 help="Threads count defines how many indices will be migrated in parallel (minimum 1, default 4)"
+                 type="number"
+                 min={1}
+                 step={1}
+                 disabled={isLoading}
+                 value={values.threads}
+                 onChange={(e) => handleChange(e, setFieldValue)} />
+          <Input id="trust_unknown_certs"
+                 name="trust_unknown_certs"
+                 label="Trust unknown certificates"
+                 help="Trust all certificates of the remote host during the migration process."
+                 type="checkbox"
+                 disabled={isLoading}
+                 checked={values.trust_unknown_certs}
+                 onChange={(e) => handleCheckboxChange(e, setFieldValue)}
+                 required />
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">
               Below are the available indices for the remote reindex migration, <b>{filteredSelectedIndices.length}/{availableIndices.length}</b> are selected.
@@ -206,7 +243,8 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
           {isLoading ? (
             <Spinner />
           ) : (
-            <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps}
+            <MigrationStepTriggerButtonToolbar hidden={hideActions}
+                                               nextSteps={nextSteps || currentStep.next_steps}
                                                onTriggerStep={handleTriggerNextStep}
                                                args={{ ...values, indices: filteredSelectedIndices } as RemoteReindexRequest} />
           )}

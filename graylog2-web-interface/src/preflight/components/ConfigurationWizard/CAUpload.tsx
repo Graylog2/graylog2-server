@@ -58,7 +58,7 @@ const File = styled.div`
   align-items: center;
 `;
 
-const DeleteIcon: React.ComponentType<{ name: 'xmark', onClick: () => void }> = styled(Icon)`
+const DeleteIcon = styled(Icon)`
   cursor: pointer;
 `;
 
@@ -145,7 +145,7 @@ const CAUpload = () => {
                 <Files>
                   {value?.filter((file) => !!file).map(({ name: fileName }, index) => (
                     <File key={fileName}>
-                      <Icon name="draft" /> {fileName} <DeleteIcon name="xmark"
+                      <Icon name="draft" /> {fileName} <DeleteIcon name="cancel"
                                                                    onClick={() => {
                                                                      const newValue = value.filter((_ignored, idx) => idx !== index);
                                                                      onChange({ target: { name, value: newValue } });

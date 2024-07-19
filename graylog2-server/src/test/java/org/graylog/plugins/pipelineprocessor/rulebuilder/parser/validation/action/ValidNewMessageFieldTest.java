@@ -65,7 +65,7 @@ class ValidNewMessageFieldTest {
                 .descriptor(setFieldFunction.descriptor())
                 .build());
 
-        when(ruleBuilderRegistry.actions()).thenReturn(actions);
+        when(ruleBuilderRegistry.actionsWithInternal()).thenReturn(actions);
 
         classUnderTest = new ValidNewMessageField(ruleBuilderRegistry);
     }

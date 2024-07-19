@@ -18,14 +18,16 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indices.Template;
 
 import java.util.Map;
 
+import static org.graylog.schema.SecurityFields.FIELD_ASSOCIATED_ASSETS;
+
 public abstract class EventsIndexMapping implements IndexMappingTemplate {
     @Override
-    public Template toTemplate(TemplateIndexSetConfig indexSetConfig, Long order) {
+    public Template toTemplate(IndexSetMappingTemplate indexSetConfig, Long order) {
         final String indexRefreshInterval = "1s"; // TODO: Index refresh interval must be configurable
 
         var mappings = new Template.Mappings(buildMappings());
@@ -197,6 +199,9 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                 .put("scores", map()
                         .put("type", "object")
                         .put("dynamic", true)
+                        .build())
+                .put(FIELD_ASSOCIATED_ASSETS, map()
+                        .put("type", "keyword")
                         .build())
                 /* TODO: Enable the typed fields once we decided if that's the way to go
                 .put("fields_typed", map()

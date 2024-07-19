@@ -19,12 +19,12 @@ package org.graylog.datanode.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
+import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
+import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.OpensearchProcessImpl;
 import org.graylog.datanode.opensearch.OpensearchProcessService;
-import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachineProvider;
 import org.graylog.datanode.opensearch.statemachine.tracer.ClusterNodeStateTracer;
@@ -37,13 +37,16 @@ public class OpensearchProcessBindings extends AbstractModule {
     @Override
     protected void configure() {
 
-        bind(OpensearchConfiguration.class).toProvider(OpensearchConfigurationProvider.class);
+
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
 
         bind(OpensearchProcess.class).to(OpensearchProcessImpl.class).asEagerSingleton();
         bind(OpensearchStateMachine.class).toProvider(OpensearchStateMachineProvider.class).asEagerSingleton();
         // this service both starts and provides the opensearch process
+        serviceBinder.addBinding().to(OpensearchConfigurationService.class).asEagerSingleton();
         serviceBinder.addBinding().to(OpensearchProcessService.class).asEagerSingleton();
+
+        bind(DatanodeTrustManagerProvider.class);
 
         // tracer
         Multibinder<StateMachineTracer> tracerBinder = Multibinder.newSetBinder(binder(), StateMachineTracer.class);

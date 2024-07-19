@@ -52,7 +52,7 @@ class ValidConditionTest {
         RuleFragment ruleFragment = FunctionUtil.testCondition(TEST_CONDITION, "fragment", optional);
         conditions.put(TEST_CONDITION, ruleFragment);
 
-        when(ruleBuilderRegistry.conditions()).thenReturn(conditions);
+        when(ruleBuilderRegistry.conditionsWithInternal()).thenReturn(conditions);
 
         classUnderTest = new ValidCondition(ruleBuilderRegistry);
     }

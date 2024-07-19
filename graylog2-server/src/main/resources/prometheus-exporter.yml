@@ -1264,3 +1264,39 @@ metric_mappings:
     match_pattern: "org.graylog2.shared.bindings.providers.ProxiedRequestsExecutorService.http-proxied-requests-executor.*"
     wildcard_extract_labels:
       - "type"
+
+  - metric_name: "data_warehouse_s3_client_head_object"
+    match_pattern: "org.graylog.plugins.datawarehouse.s3client.*.HeadObject"
+    wildcard_extract_labels:
+      - "head_object"
+
+  - metric_name: "data_warehouse_s3_client_get_object"
+    match_pattern: "org.graylog.plugins.datawarehouse.s3client.*.GetObject"
+    wildcard_extract_labels:
+      - "get_object"
+
+  - metric_name: "data_warehouse_s3_client_put_object"
+    match_pattern: "org.graylog.plugins.datawarehouse.s3client.*.PutObject"
+    wildcard_extract_labels:
+      - "put_object"
+
+  - metric_name: "data_warehouse_s3_client_delete_object"
+    match_pattern: "org.graylog.plugins.datawarehouse.s3client.*.DeleteObject"
+    wildcard_extract_labels:
+      - "delete_object"
+
+  - metric_name: "data_warehouse_iceberg_file_io_s3_read"
+    match_pattern: "org.graylog.iceberg.file.io.s3.read.*"
+    wildcard_extract_labels:
+      - "read"
+
+  - metric_name: "data_warehouse_iceberg_file_io_s3_write"
+    match_pattern: "org.graylog.iceberg.file.io.s3.write.*"
+    wildcard_extract_labels:
+      - "write"
+
+  - metric_name: "data_warehouse_iceberg_file_io_local_write"
+    match_pattern: "org.graylog.iceberg.file.io.local.write"
+
+  - metric_name: "data_warehouse_iceberg_file_io_local_read"
+    match_pattern: "org.graylog.iceberg.file.io.local.read"

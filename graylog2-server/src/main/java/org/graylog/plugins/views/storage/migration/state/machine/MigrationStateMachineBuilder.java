@@ -67,7 +67,7 @@ public class MigrationStateMachineBuilder {
         // remote reindexing branch of the migration
         config.configure(MigrationState.REMOTE_REINDEX_WELCOME_PAGE)
                 .onEntry(migrationActions::reindexUpgradeSelected)
-                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.dataNodeStartupFinished(), migrationActions::provisionAndStartDataNodes)
+                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.dataNodeStartupFinished() && migrationActions.compatibleDatanodesRunning(), migrationActions::provisionAndStartDataNodes)
                 .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
 
         // This page should contain the "Please restart Graylog to continue with data migration"
@@ -98,7 +98,7 @@ public class MigrationStateMachineBuilder {
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
                 .onEntry(migrationActions::rollingUpgradeSelected)
-                .permit(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE, migrationActions::runDirectoryCompatibilityCheck);
+                .permitIf(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE, migrationActions::compatibleDatanodesRunning, migrationActions::runDirectoryCompatibilityCheck);
 
         config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE)
                 .permitReentryIf(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK, () -> !migrationActions.directoryCompatibilityCheckOk(), migrationActions::runDirectoryCompatibilityCheck)
@@ -106,7 +106,7 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, () -> migrationActions.directoryCompatibilityCheckOk() && migrationActions.provisioningFinished());
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING)
-                .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
+                .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::allDatanodesPrepared);
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
                 .onEntry(migrationActions::calculateTrafficEstimate)

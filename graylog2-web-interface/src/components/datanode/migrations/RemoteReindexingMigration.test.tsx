@@ -16,12 +16,21 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { useQueryParam } from 'use-query-params';
 
 import type { MigrationState, MigrationStateItem } from 'components/datanode/Types';
+import { asMock } from 'helpers/mocking';
 
 import RemoteReindexingMigration from './RemoteReindexingMigration';
 
 import { MIGRATION_STATE } from '../Constants';
+
+jest.mock('use-query-params', () => ({
+  ...jest.requireActual('use-query-params'),
+  useQueryParam: jest.fn(),
+}));
+
+jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '' })));
 
 jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() => ({
   data: {
@@ -48,7 +57,7 @@ jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() =>
 jest.mock('components/datanode/hooks/useDataNodes', () => jest.fn(() => ({
   data: {
     attributes: [],
-    elements: [{
+    list: [{
       cert_valid_until: '2053-11-02T13:20:58',
       error_msg: null,
       hostname: 'datanode1',
@@ -89,6 +98,10 @@ const renderStep = (_state: MigrationStateItem) => {
 };
 
 describe('RemoteReindexingMigration', () => {
+  beforeEach(() => {
+    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
+  });
+
   it('should render Welcome step', async () => {
     renderStep(MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key);
 
@@ -149,5 +162,17 @@ describe('RemoteReindexingMigration', () => {
     });
 
     await screen.findByText(/To finish please shut down your/);
+  });
+
+  it('should render RemoteReindexRunning step and show Logs', async () => {
+    asMock(useQueryParam).mockImplementation((field: string) => {
+      const value = field === 'show_logs' ? 'true' : undefined;
+
+      return [value, () => {}];
+    });
+
+    renderStep(MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key);
+
+    await screen.findByText(/Remote Reindex Migration Logs/);
   });
 });

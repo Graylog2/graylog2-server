@@ -16,6 +16,8 @@
  */
 package org.graylog2.shared.utilities;
 
+import jakarta.annotation.Nonnull;
+
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -101,5 +103,33 @@ public final class StringUtils {
                 .filter(Objects::nonNull)
                 .flatMap(v -> Arrays.stream(v.split(",")))
                 .filter(s -> !s.trim().isEmpty());
+    }
+
+    /**
+     * Returns the given string if it's not null and not only whitespace. Otherwise, throws an exception.
+     *
+     * @param value the string value to check
+     * @return the value if not null or blank
+     * @throws IllegalArgumentException when given string is null or whitespace
+     */
+    @Nonnull
+    public static String requireNonBlank(String value) {
+        return requireNonBlank(value, "string cannot be blank");
+    }
+
+    /**
+     * Returns the given string if it's not null and not only whitespace. Otherwise, throws an exception.
+     *
+     * @param value   the string value to check
+     * @param message the exception message
+     * @return the value if not null or blank
+     * @throws IllegalArgumentException when given string is null or whitespace
+     */
+    @Nonnull
+    public static String requireNonBlank(String value, String message) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(value)) {
+            throw new IllegalArgumentException(message);
+        }
+        return value;
     }
 }

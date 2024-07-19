@@ -57,6 +57,7 @@ export type DataNode = {
   data_node_status?: string,
   cert_valid_until: string | null,
   error_msg?: string,
+  datanode_version: string,
 }
 
 export type DataNodes = Array<DataNode>;
@@ -101,4 +102,5 @@ export type OnTriggerStepFunction = (step: MigrationActions, args?: StepArgs) =>
 export type MigrationStepComponentProps = {
   currentStep: MigrationState,
   onTriggerStep: OnTriggerStepFunction,
+  hideActions?: boolean,
 };

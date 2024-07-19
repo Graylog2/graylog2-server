@@ -25,13 +25,15 @@ type Props<OptionValue> = {
   disabled?: boolean,
   onChange?: (value: OptionValue) => void,
   value?: OptionValue,
+  className?: string
 }
 
-const SegmentedControl = <OptionValue extends string>({ data, defaultValue, disabled, onChange, value }: Props<OptionValue>) => {
+const SegmentedControl = <OptionValue extends string>({ className, data, defaultValue, disabled, onChange, value }: Props<OptionValue>) => {
   const theme = useTheme();
 
   return (
     <MantineSegmentedControl color={theme.colors.variant.info}
+                             className={className}
                              data={data}
                              defaultValue={defaultValue}
                              disabled={disabled}
@@ -42,6 +44,7 @@ const SegmentedControl = <OptionValue extends string>({ data, defaultValue, disa
 };
 
 SegmentedControl.defaultProps = {
+  className: undefined,
   defaultValue: undefined,
   disabled: false,
   onChange: undefined,

@@ -29,7 +29,9 @@ import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import StreamsContext from 'contexts/StreamsContext';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { defaultPerspective as mockDefaultPerspective } from 'fixtures/perspectives';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
+import type { Stream } from 'logic/streams/types';
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
@@ -45,7 +47,7 @@ jest.mock('stores/users/CurrentUserStore', () => ({
   ),
 }));
 
-jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => () => ({
   data: {
     list: [],
     pagination: { total: 0 },
@@ -99,6 +101,13 @@ jest.mock('hooks/useSearchConfiguration', () => () => ({
   refresh: jest.fn(),
 }));
 
+jest.mock('components/perspectives/hooks/useActivePerspective', () => ({
+  __esModule: true,
+  default: () => ({
+    activePerspective: mockDefaultPerspective,
+  }),
+}));
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   createBrowserRouter: jest.fn(),
@@ -120,7 +129,7 @@ describe('Create a new dashboard', () => {
     <DefaultProviders>
       <DefaultQueryClientProvider>
         <CurrentUserProvider>
-          <StreamsContext.Provider value={[{ id: 'stream-1', title: 'Stream 1' }]}>
+          <StreamsContext.Provider value={[{ id: 'stream-1', title: 'Stream 1' } as Stream]}>
             <AppRouter />
           </StreamsContext.Provider>
         </CurrentUserProvider>
