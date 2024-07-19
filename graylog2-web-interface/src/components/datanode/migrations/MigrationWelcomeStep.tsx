@@ -44,7 +44,7 @@ const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
 
-const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
+const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => (
   <Row>
     <Col md={6}>
       <MigrationError errorMessage={currentStep.error_message} />
@@ -60,7 +60,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: MigrationStepCompo
       <p>You can get more information on the Data Node migration <DocumentationLink page="graylog-data-node" text="documentation" />.</p>
       <br />
       <MigrationDatanodeList />
-      <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </Col>
     <Col md={6}>
       <StyledHelpPanel bsStyle="info">

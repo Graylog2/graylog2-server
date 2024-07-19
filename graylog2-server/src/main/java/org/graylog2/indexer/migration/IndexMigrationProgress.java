@@ -16,13 +16,15 @@
  */
 package org.graylog2.indexer.migration;
 
-public record IndexMigrationProgress(long total, long created, long updated, long deleted) {
+public record IndexMigrationProgress(long total, long created, long updated, long deleted, long versionConflicts,
+                                     long noops) {
+
     public int progressPercent() {
 
         if(total == 0) { // avoid division by zero
             return 100;
         }
 
-        return (int) Math.min((100.0 / total) * (created + updated + deleted), 100);
+        return (int) Math.min((100.0 / total) * (created + updated + deleted + versionConflicts + noops), 100);
     }
 }

@@ -29,10 +29,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class V20240626143000_CreateDashboardsView extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190127111728_MigrateWidgetFormatSettings.class);
+    private static final String DASHBOARDS_COLLECTION = "dashboards";
     private final ClusterConfigService clusterConfigService;
     private final MongoConnection mongoConnection;
 
@@ -53,8 +55,16 @@ public class V20240626143000_CreateDashboardsView extends Migration {
             LOG.debug("Migration already completed.");
             return;
         }
+        final var database = mongoConnection.getMongoDatabase();
 
-        mongoConnection.getMongoDatabase().createView("dashboards", ViewDTO.COLLECTION_NAME, List.of(
+        // On setups which were running Graylog before Views were introduced, a `dashboards` collection might exist
+        final var collectionExists = database.listCollectionNames().into(new ArrayList<>()).contains(DASHBOARDS_COLLECTION);
+
+        if (collectionExists) {
+            database.getCollection(DASHBOARDS_COLLECTION).drop();
+        }
+
+        database.createView(DASHBOARDS_COLLECTION, ViewDTO.COLLECTION_NAME, List.of(
                 Aggregates.match(Filters.eq(ViewDTO.FIELD_TYPE, ViewDTO.Type.DASHBOARD))
         ));
 

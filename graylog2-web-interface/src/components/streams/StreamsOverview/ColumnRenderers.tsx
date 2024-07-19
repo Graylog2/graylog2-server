@@ -37,10 +37,11 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
   attributes: {
     title: {
       renderCell: (_title: string, stream) => <TitleCell stream={stream} />,
+      width: 0.5,
     },
     index_set_title: {
       renderCell: (_index_set_title: string, stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
-      width: 0.7,
+      width: 0.3,
     },
     throughput: {
       renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,
@@ -52,19 +53,19 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
     },
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
-      staticWidth: 130,
+      staticWidth: 100,
     },
     pipelines: {
       renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
-      staticWidth: 130,
+      staticWidth: 100,
     },
     outputs: {
       renderCell: (_outputs: Output[], stream) => <OutputsCell stream={stream} />,
-      staticWidth: 130,
+      staticWidth: 100,
     },
     archiving: {
       renderCell: (_archiving:boolean, stream) => <ArchivingsCell stream={stream} indexSets={indexSets} />,
-      staticWidth: 130,
+      staticWidth: 100,
     },
     ...(streamDataWarehouseColumnRenderer || {}),
   },
