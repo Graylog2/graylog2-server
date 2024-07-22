@@ -111,11 +111,12 @@ public class TeamsEventNotificationV2 implements EventNotification {
     /**
      * Fills out the AdaptiveCard template with the event context and backlog (if configured).
      *
-     * @param ctx event notification context
+     * @param ctx    event notification context
      * @param config notification configuration
      * @return the filled out template for the Teams Adaptive Card
      * @throws PermanentEventNotificationException - throws this exception when the custom message template is invalid
      */
+    @VisibleForTesting
     String generateBody(EventNotificationContext ctx, TeamsEventNotificationConfigV2 config) throws PermanentEventNotificationException {
         final List<MessageSummary> backlog = getMessageBacklog(ctx, config);
         Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog, config.timeZone());
@@ -136,7 +137,6 @@ public class TeamsEventNotificationV2 implements EventNotification {
         }
         return backlog;
     }
-
 
     @VisibleForTesting
     Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, String type, List<MessageSummary> backlog, DateTimeZone timeZone) {
@@ -163,5 +163,4 @@ public class TeamsEventNotificationV2 implements EventNotification {
         @Override
         TeamsEventNotificationV2 create();
     }
-
 }
