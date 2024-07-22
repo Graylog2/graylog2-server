@@ -31,8 +31,6 @@ import TeamsNotificationSummary from './event-notifications/event-notification-t
 import GreyNoiseAdapterFieldSet from './dataadapters/GreyNoiseAdapterFieldSet';
 import GreyNoiseAdapterSummary from './dataadapters/GreyNoiseAdapterSummary';
 import GreyNoiseAdapterDocumentation from './dataadapters/GreyNoiseAdapterDocumentation';
-import GreyNoiseCommunityIpLookupAdapterDocumentation
-  from './dataadapters/GreyNoiseCommunityIpLookupAdapterDocumentation';
 import TeamsNotificationV2Form from './event-notifications/event-notification-types/TeamsNotificationV2Form';
 import TeamsNotificationV2Summary from './event-notifications/event-notification-types/TeamsNotificationV2Summary';
 import TeamsNotificationV2Details from './event-notifications/event-notification-details/TeamsNotificationV2Details';
@@ -89,13 +87,6 @@ const bindings = {
       formComponent: GreyNoiseAdapterFieldSet,
       summaryComponent: GreyNoiseAdapterSummary,
       documentationComponent: GreyNoiseAdapterDocumentation,
-    },
-    {
-      type: 'GreyNoise Community IP Lookup',
-      displayName: '[Deprecated] GreyNoise Community IP Lookup',
-      formComponent: GreyNoiseAdapterFieldSet,
-      summaryComponent: GreyNoiseAdapterSummary,
-      documentationComponent: GreyNoiseCommunityIpLookupAdapterDocumentation,
     },
   ],
 };
