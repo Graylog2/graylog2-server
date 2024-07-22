@@ -81,7 +81,6 @@ class BatchedMessageFilterOutputTest {
     private final int outputFlushInterval = 1;
 
     @BeforeEach
-    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     void setUp(MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
         lenient().when(defaultStream.getIndexSet()).thenReturn(indexSet);
@@ -111,6 +110,7 @@ class BatchedMessageFilterOutputTest {
         }
     }
 
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     private @Nonnull BatchedMessageFilterOutput createOutput(BatchSizeConfig maxBatchSize) {
         return new BatchedMessageFilterOutput(
                 Map.of("targetOutput1", targetOutput1),
