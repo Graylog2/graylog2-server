@@ -18,6 +18,7 @@ package org.graylog2.outputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
+import jakarta.annotation.Nonnull;
 import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
@@ -34,6 +35,7 @@ import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,9 +73,10 @@ class BatchedMessageFilterOutputTest {
     @Mock(extraInterfaces = MessageOutput.class)
     private FilteredMessageOutput targetOutput1;
 
+    private static final int MESSAGES_PER_BATCH = 3;
+
     private MessageFactory messageFactory;
     private BatchedMessageFilterOutput output;
-    private int outputBatchSize;
     private final int shutdownTimeoutMs = "true".equals(System.getenv("CI")) ? 500 : 100; // be more graceful when running on ci infrastructure
     private final int outputFlushInterval = 1;
 
@@ -81,19 +84,6 @@ class BatchedMessageFilterOutputTest {
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     void setUp(MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
-        this.outputBatchSize = 3;
-        this.output = new BatchedMessageFilterOutput(
-                Map.of("targetOutput1", targetOutput1),
-                new AllOutputsFilter(Map.of(ElasticSearchOutput.FILTER_KEY, mock(FilteredMessageOutput.class))),
-                new MetricRegistry(),
-                cluster,
-                acknowledger,
-                new BatchSizeConfig(String.valueOf(outputBatchSize)),
-                outputFlushInterval,
-                shutdownTimeoutMs,
-                Executors.newSingleThreadScheduledExecutor()
-        );
-
         lenient().when(defaultStream.getIndexSet()).thenReturn(indexSet);
     }
 
@@ -104,93 +94,35 @@ class BatchedMessageFilterOutputTest {
         }
     }
 
-    @Test
-    public void writeMessages() throws Exception {
-        final var messageList = sendMessages(output, outputBatchSize);
-
-        verify(targetOutput1, times(1)).writeFiltered(messagesWithOutput(messageList));
+    @Nested
+    class CountBased extends BaseTest {
+        @BeforeEach
+        void setUp() {
+            output = createOutput(new BatchSizeConfig(String.valueOf(MESSAGES_PER_BATCH)));
+        }
     }
 
-    @Test
-    public void writeMoreMessages() throws Exception {
-        sendMessages(output, outputBatchSize * 3);
-
-        verify(targetOutput1, times(3)).writeFiltered(anyList());
+    @Nested
+    class SizeBased extends BaseTest {
+        @BeforeEach
+        void setUp() {
+            final var batchSizeBytes = buildMessages(MESSAGES_PER_BATCH).stream().mapToLong(Message::getSize).sum();
+            output = createOutput(new BatchSizeConfig(batchSizeBytes + " bytes"));
+        }
     }
 
-    @Test
-    public void forceFlush() throws Exception {
-        final var messageList = sendMessages(output, outputBatchSize - 1);
-
-        // No interactions yet because we flush on 3 messages but only sent 2.
-        verifyNoInteractions(targetOutput1);
-
-        output.forceFlush();
-
-        verify(targetOutput1, times(1)).writeFiltered(messagesWithOutput(messageList));
-    }
-
-    @Test
-    public void waitForScheduledFlush() throws Exception {
-        // Call initialize to start the scheduled flush job.
-        output.initialize();
-
-        final var messageList = sendMessages(output, outputBatchSize - 1);
-
-        Thread.sleep(outputFlushInterval * 1000L + 100); // Let the scheduled flush job run
-
-        verify(targetOutput1, times(1)).writeFiltered(eq(messagesWithOutput(messageList)));
-    }
-
-    @Test
-    public void stopWithHealthyCluster() throws Exception {
-        when(cluster.isConnected()).thenReturn(true);
-        when(cluster.isDeflectorHealthy()).thenReturn(true);
-
-        final var messageList = sendMessages(output, outputBatchSize - 1);
-
-        output.stop();
-
-        verify(targetOutput1, times(1)).writeFiltered(messagesWithOutput(messageList));
-    }
-
-    @Test
-    @Timeout(1)
-    public void stopWithDisconnectedCluster() throws Exception {
-        when(cluster.isConnected()).thenReturn(false);
-
-        sendMessages(output, outputBatchSize - 1);
-        output.stop();
-
-        verifyNoInteractions(targetOutput1);
-    }
-
-    /**
-     * Test that shutdown can proceed even if the index request ends up being blocked.
-     */
-    @Test
-    @Timeout(1)
-    public void stopWithIndexingBlocked() throws Exception {
-        when(cluster.isConnected()).thenReturn(true);
-        when(cluster.isDeflectorHealthy()).thenReturn(true);
-
-        doAnswer(invocation -> {
-            // this will block until interrupted
-            try {
-                new CountDownLatch(1).await();
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-            return null;
-        }).when(targetOutput1).writeFiltered(anyList());
-
-        final var messageList = sendMessages(output, outputBatchSize - 1);
-
-        // The shutdownTimeoutMs is < than this test's @Timeout(1), so the stop method should return before the
-        // test timeout triggers.
-        output.stop();
-
-        verify(targetOutput1, times(1)).writeFiltered(messagesWithOutput(messageList));
+    private @Nonnull BatchedMessageFilterOutput createOutput(BatchSizeConfig maxBatchSize) {
+        return new BatchedMessageFilterOutput(
+                Map.of("targetOutput1", targetOutput1),
+                new AllOutputsFilter(Map.of(ElasticSearchOutput.FILTER_KEY, mock(FilteredMessageOutput.class))),
+                new MetricRegistry(),
+                cluster,
+                acknowledger,
+                maxBatchSize,
+                outputFlushInterval,
+                shutdownTimeoutMs,
+                Executors.newSingleThreadScheduledExecutor()
+        );
     }
 
     private List<FilteredMessage> messagesWithOutput(List<Message> messages) {
@@ -218,5 +150,96 @@ class BatchedMessageFilterOutputTest {
         }
 
         return messageList;
+    }
+
+    abstract class BaseTest {
+        @Test
+        public void writeMessages() throws Exception {
+            final var messageList = sendMessages(output, MESSAGES_PER_BATCH);
+
+            verify(targetOutput1, times(1)).writeFiltered(messagesWithOutput(messageList));
+        }
+
+        @Test
+        public void writeMoreMessages() throws Exception {
+            sendMessages(output, MESSAGES_PER_BATCH * 3);
+
+            verify(targetOutput1, times(3)).writeFiltered(anyList());
+        }
+
+        @Test
+        public void forceFlush() throws Exception {
+            final var messageList = sendMessages(output, MESSAGES_PER_BATCH - 1);
+
+            // No interactions yet because we flush on 3 messages but only sent 2.
+            verifyNoInteractions(targetOutput1);
+
+            output.forceFlush();
+
+            verify(targetOutput1, times(1)).writeFiltered(messagesWithOutput(messageList));
+        }
+
+        @Test
+        public void waitForScheduledFlush() throws Exception {
+            // Call initialize to start the scheduled flush job.
+            output.initialize();
+
+            final var messageList = sendMessages(output, MESSAGES_PER_BATCH - 1);
+
+            Thread.sleep(outputFlushInterval * 1000L + 100); // Let the scheduled flush job run
+
+            verify(targetOutput1, times(1)).writeFiltered(eq(messagesWithOutput(messageList)));
+        }
+
+        @Test
+        public void stopWithHealthyCluster() throws Exception {
+            when(cluster.isConnected()).thenReturn(true);
+            when(cluster.isDeflectorHealthy()).thenReturn(true);
+
+            final var messageList = sendMessages(output, MESSAGES_PER_BATCH - 1);
+
+            output.stop();
+
+            verify(targetOutput1, times(1)).writeFiltered(messagesWithOutput(messageList));
+        }
+
+        @Test
+        @Timeout(1)
+        public void stopWithDisconnectedCluster() throws Exception {
+            when(cluster.isConnected()).thenReturn(false);
+
+            sendMessages(output, MESSAGES_PER_BATCH - 1);
+            output.stop();
+
+            verifyNoInteractions(targetOutput1);
+        }
+
+        /**
+         * Test that shutdown can proceed even if the index request ends up being blocked.
+         */
+        @Test
+        @Timeout(1)
+        public void stopWithIndexingBlocked() throws Exception {
+            when(cluster.isConnected()).thenReturn(true);
+            when(cluster.isDeflectorHealthy()).thenReturn(true);
+
+            doAnswer(invocation -> {
+                // this will block until interrupted
+                try {
+                    new CountDownLatch(1).await();
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+                return null;
+            }).when(targetOutput1).writeFiltered(anyList());
+
+            final var messageList = sendMessages(output, MESSAGES_PER_BATCH - 1);
+
+            // The shutdownTimeoutMs is < than this test's @Timeout(1), so the stop method should return before the
+            // test timeout triggers.
+            output.stop();
+
+            verify(targetOutput1, times(1)).writeFiltered(messagesWithOutput(messageList));
+        }
     }
 }
