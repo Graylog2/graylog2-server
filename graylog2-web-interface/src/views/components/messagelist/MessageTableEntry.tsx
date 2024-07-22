@@ -157,7 +157,7 @@ const MessageTableEntry = ({
     const type = fieldType(selectedFieldName, message, fields);
 
     return (
-      <TableDataCell $isNumeric={type.isNumeric()} key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
+      <TableDataCell className="table-data-cell" $isNumeric={type.isNumeric()} key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
         <Strong strong={idx === 0}>
           <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
             <TypeSpecificValue value={message.fields[selectedFieldName]}
@@ -175,7 +175,7 @@ const MessageTableEntry = ({
   return (
     <AdditionalContext.Provider value={additionalContextValue}>
       <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
-        <FieldsRow onClick={_toggleDetail}>
+        <FieldsRow onClick={_toggleDetail} className="table-data-row">
           {selectedFieldsList}
         </FieldsRow>
 
