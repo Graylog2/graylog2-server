@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { SyntheticEvent } from 'react';
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
@@ -21,18 +22,18 @@ import camelCase from 'lodash/camelCase';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
-import { TimezoneSelect } from 'components/common';
+import { TimezoneSelect, URLWhiteListInput, SourceCodeEditor } from 'components/common';
 import type { SelectCallback } from 'components/bootstrap/types';
 
 import type { ValidationType, ConfigV2Type } from '../types';
 
-type TeamsNotificationFormType = {
+type TeamsNotificationFormV2Type = {
   config: ConfigV2Type,
   validation: ValidationType
   onChange: any
 }
 
-class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, any> {
+class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Type, any> {
   static defaultConfig = {
     webhook_url: '',
     /* eslint-disable no-template-curly-in-string */
@@ -146,7 +147,7 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
     time_zone: 'UTC',
   };
 
-  constructor(props: TeamsNotificationFormType | Readonly<TeamsNotificationFormType>) {
+  constructor(props: TeamsNotificationFormV2Type | Readonly<TeamsNotificationFormV2Type>) {
     super(props);
 
     const defaultBacklogSize = props.config.backlog_size;
@@ -183,9 +184,12 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
     this.propagateChange('time_zone', nextValue);
   };
 
-  handleChange = (event: { target: { name: any; }; }) => {
-    const { name } = event.target;
-    this.propagateChange(name, getValueFromInput(event.target));
+  handleWebhookUrlChange = (event: SyntheticEvent<EventTarget>) => {
+    this.propagateChange('webhook_url', getValueFromInput(event.target));
+  };
+
+  handleAdaptiveCardChange = (nextValue: string) => {
+    this.propagateChange('adaptive_card', nextValue);
   };
 
   render() {
@@ -196,24 +200,24 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
 
     return (
       <>
-        <Input id="notification-webhookUrl"
-               name="webhook_url"
-               label="Webhook URL"
-               type="text"
-               bsStyle={validation.errors.webhook_url ? 'error' : null}
-               help={get(validation, 'errors.webhook_url[0]', 'Teams "Incoming Webhook" URL')}
-               value={config.webhook_url || ''}
-               onChange={this.handleChange}
-               required />
-        <Input id="notification-adaptiveCard"
-               name="adaptive_card"
-               label="Adaptive Card Template"
-               type="textarea"
-               bsStyle={validation.errors.adaptive_card ? 'error' : null}
-               help={get(validation, 'errors.adaptive_card[0]', element)}
-               value={config.adaptive_card || ''}
-               onChange={this.handleChange} />
-
+        <URLWhiteListInput label="Webhook URL"
+                           onChange={this.handleWebhookUrlChange}
+                           validationState={validation.errors.webhook_url ? 'error' : null}
+                           validationMessage={get(validation, 'errors.webhook_url[0]', 'Teams "Incoming Webhook" URL')}
+                           url={config.webhook_url || ''}
+                           autofocus={false} />
+        <FormGroup>
+          <ControlLabel>Adaptive Card Template</ControlLabel>
+          <SourceCodeEditor id="notification-adaptiveCard"
+                            mode="text"
+                            theme="light"
+                            value={config.adaptive_card || ''}
+                            wrapEnabled
+                            onChange={this.handleAdaptiveCardChange} />
+          <HelpBlock>
+            {get(validation, 'errors.adaptive_card[0]', element)}
+          </HelpBlock>
+        </FormGroup>
         <FormGroup>
           <Input id="notification-time-zone"
                  help="Time zone used for timestamps in the notification body."
@@ -247,4 +251,4 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
   }
 }
 
-export default TeamsNotificationForm;
+export default TeamsNotificationV2Form;

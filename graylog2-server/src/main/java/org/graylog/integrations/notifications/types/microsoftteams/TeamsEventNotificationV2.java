@@ -34,6 +34,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -89,10 +89,10 @@ public class TeamsEventNotificationV2 implements EventNotification {
             final String requestBody = generateBody(ctx, config);
             requestClient.send(requestBody, config.webhookUrl());
         } catch (TemporaryEventNotificationException exp) {
-            //scheduler needs to retry a TemporaryEventNotificationException
+            // Scheduler needs to retry a TemporaryEventNotificationException
             throw exp;
         } catch (PermanentEventNotificationException exp) {
-            String errorMessage = String.format(Locale.ROOT, "Error sending the TeamsEventNotificationV2 :: %s", exp.getMessage());
+            String errorMessage = StringUtils.f("Error sending Teams Notification ID: %s. %s", ctx.notificationId(), exp.getMessage());
             final Notification systemNotification = notificationService.buildNow()
                     .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
