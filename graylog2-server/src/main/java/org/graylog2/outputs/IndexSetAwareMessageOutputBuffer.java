@@ -16,12 +16,12 @@
  */
 package org.graylog2.outputs;
 
+import com.github.joschi.jadconfig.util.Size;
 import org.graylog2.outputs.filter.FilteredMessage;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -37,9 +37,12 @@ import java.util.function.Consumer;
  * The trade-off is that outputs which don't create one message per index set will write smaller batches.
  */
 public class IndexSetAwareMessageOutputBuffer {
-    private final int maxBufferSize;
+    private final int maxBufferSizeCount;
+    private final long maxBufferSizeBytes;
+
     private volatile List<FilteredMessage> buffer;
-    private final AtomicInteger bufferLength = new AtomicInteger();
+    private volatile int bufferLength = 0;
+    private volatile long bufferSizeBytes = 0L;
     private final AtomicLong lastFlushTime = new AtomicLong();
 
     /**
@@ -47,9 +50,10 @@ public class IndexSetAwareMessageOutputBuffer {
      *
      * @param maxBufferSize the maximum buffer size
      */
-    public IndexSetAwareMessageOutputBuffer(int maxBufferSize) {
-        this.maxBufferSize = maxBufferSize;
-        this.buffer = new ArrayList<>(this.maxBufferSize);
+    public IndexSetAwareMessageOutputBuffer(BatchSizeConfig maxBufferSize) {
+        this.maxBufferSizeCount = maxBufferSize.getAsCount().orElse(0);
+        this.maxBufferSizeBytes = maxBufferSize.getAsBytes().map(Size::toBytes).orElse(0L);
+        this.buffer = new ArrayList<>(maxBufferSize.getAsCount().orElse(500));
     }
 
     /**
@@ -81,12 +85,16 @@ public class IndexSetAwareMessageOutputBuffer {
         synchronized (this) {
             // See class the class documentation for the reasoning behind the bufferLength calculation.
             buffer.add(filteredMessage);
-            bufferLength.addAndGet(Math.max(filteredMessage.message().getIndexSets().size(), 1));
+            final int requiredSlots = Math.max(filteredMessage.message().getIndexSets().size(), 1);
+            bufferLength += requiredSlots;
+            bufferSizeBytes += requiredSlots * filteredMessage.message().getSize();
 
-            if (bufferLength.get() >= maxBufferSize) {
+            if ((maxBufferSizeBytes != 0L && bufferSizeBytes >= maxBufferSizeBytes) ||
+                    maxBufferSizeCount != 0 && bufferLength >= maxBufferSizeCount) {
                 flushBatch = buffer;
-                buffer = new ArrayList<>(maxBufferSize);
-                bufferLength.set(0);
+                buffer = new ArrayList<>(bufferLength);
+                bufferLength = 0;
+                bufferSizeBytes = 0L;
             }
         }
         // if the current thread found it had to flush any messages, it does so but blocks.
@@ -110,7 +118,7 @@ public class IndexSetAwareMessageOutputBuffer {
         final List<FilteredMessage> flushBatch;
         synchronized (this) {
             flushBatch = buffer;
-            buffer = new ArrayList<>(maxBufferSize);
+            buffer = new ArrayList<>(bufferLength);
         }
         if (flushBatch != null) {
             lastFlushTime.set(System.nanoTime());

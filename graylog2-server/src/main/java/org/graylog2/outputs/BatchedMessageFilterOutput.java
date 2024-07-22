@@ -81,7 +81,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
                                       MetricRegistry metricRegistry,
                                       Cluster cluster,
                                       MessageQueueAcknowledger acknowledger,
-                                      @Named("output_batch_size") int outputBatchSize,
+                                      @Named("output_batch_size") BatchSizeConfig outputBatchSize,
                                       @Named("output_flush_interval") int outputFlushInterval,
                                       @Named("shutdown_timeout") int shutdownTimeoutMs,
                                       @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {

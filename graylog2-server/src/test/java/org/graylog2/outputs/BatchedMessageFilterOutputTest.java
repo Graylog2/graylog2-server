@@ -88,7 +88,7 @@ class BatchedMessageFilterOutputTest {
                 new MetricRegistry(),
                 cluster,
                 acknowledger,
-                outputBatchSize,
+                new BatchSizeConfig(String.valueOf(outputBatchSize)),
                 outputFlushInterval,
                 shutdownTimeoutMs,
                 Executors.newSingleThreadScheduledExecutor()
