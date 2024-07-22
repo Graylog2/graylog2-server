@@ -57,12 +57,14 @@ public class DatanodeResource extends RestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("hostname", SearchQueryField.create("hostname"))
+            .put("datanode_status", SearchQueryField.create("datanode_status"))
             .build();
 
     private static final String DEFAULT_SORT_FIELD = "title";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("hostname").title("Name").build()
+            EntityAttribute.builder().id("hostname").title("Name").build(),
+            EntityAttribute.builder().id("datanode_status").title("Status").build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
