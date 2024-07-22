@@ -29,6 +29,7 @@ import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
 import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
+import com.github.luben.zstd.util.Native;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.base.Joiner;
@@ -82,10 +83,8 @@ import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
-import java.nio.file.Path;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
@@ -272,11 +271,23 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     public void doRun(Level logLevel) {
+        final PluginLoaderConfig pluginLoaderConfig = getPluginLoaderConfig(configFile);
+
+        // Move the zstd temp folder from /tmp to our native lib dir to avoid issues with noexec-mounted /tmp directories.
+        // See: https://github.com/Graylog2/graylog2-server/issues/17837
+        // WARNING: This needs to be set before the first use of the zstd library. Our in-memory logger is using
+        //          zstd library, so we need to set it before the first usage of the Logger instance.
+        //          Setting it after the first library usage wouldn't have any effect.
+        if (Native.isLoaded()) {
+            LOG.warn("The zstd library is already loaded. Setting the ZstdTempFolder property doesn't have any effect!");
+        }
+        System.setProperty("ZstdTempFolder", pluginLoaderConfig.getNativeLibDir().toAbsolutePath().toString());
+
         // This is holding all our metrics.
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
         featureFlags = getFeatureFlags(metricRegistry);
 
-        pluginLoader = getPluginLoader(getPluginPath(configFile).toFile(), chainingClassLoader);
+        pluginLoader = getPluginLoader(pluginLoaderConfig, chainingClassLoader);
 
         installCommandConfig();
         installPluginBootstrapConfig(pluginLoader);
@@ -335,8 +346,8 @@ public abstract class CmdLineTool implements CliCommand {
         startCommand();
     }
 
-    protected PluginLoader getPluginLoader(File pluginDir, ChainingClassLoader classLoader) {
-        return new PluginLoader(pluginDir, classLoader);
+    protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader) {
+        return new PluginLoader(pluginLoaderConfig.getPluginDir().toFile(), classLoader);
     }
 
     private void installPluginBootstrapConfig(PluginLoader pluginLoader) {
@@ -428,11 +439,11 @@ public abstract class CmdLineTool implements CliCommand {
         dumpCurrentConfigAndExit();
     }
 
-    private Path getPluginPath(String configFile) {
+    private PluginLoaderConfig getPluginLoaderConfig(String configFile) {
         final PluginLoaderConfig pluginLoaderConfig = new PluginLoaderConfig();
         processConfiguration(new JadConfig(getConfigRepositories(configFile), pluginLoaderConfig));
 
-        return pluginLoaderConfig.getPluginDir();
+        return pluginLoaderConfig;
     }
 
     private FeatureFlags getFeatureFlags(MetricRegistry metricRegistry) {
