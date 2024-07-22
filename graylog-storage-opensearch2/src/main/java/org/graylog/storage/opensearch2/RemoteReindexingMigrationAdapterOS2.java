@@ -59,6 +59,7 @@ import org.graylog2.indexer.migration.IndexMigrationProgress;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.LogEntry;
 import org.graylog2.indexer.migration.LogLevel;
+import org.graylog2.indexer.migration.RemoteIndex;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.indexer.migration.TaskStatus;
@@ -229,10 +230,13 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             final RemoteReindexAllowlist reindexAllowlist = new RemoteReindexAllowlist(remoteHost, allowlist);
             reindexAllowlist.validate();
             final AggregatedConnectionResponse results = getAllIndicesFrom(remoteHost, username, password, trustUnknownCerts);
+            final List<RemoteIndex> indices = results.indices().stream()
+                    .map(i -> new RemoteIndex(i, indexSetRegistry.isManagedIndex(i)))
+                    .toList();
             if (results.error() != null && !results.error().isEmpty()) {
                 return IndexerConnectionCheckResult.failure(results.error());
             } else {
-                return IndexerConnectionCheckResult.success(results.indices());
+                return IndexerConnectionCheckResult.success(indices);
             }
         } catch (Exception e) {
             return IndexerConnectionCheckResult.failure(e);
