@@ -57,7 +57,8 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
         }
 
         final boolean correctPath = "/gelf".equals(request.uri());
-        if (correctPath && request instanceof FullHttpRequest) {
+        final boolean correctPathBatch = "/gelfbatch".equals(request.uri());
+        if ((correctPath || correctPathBatch) && request instanceof FullHttpRequest) {
             final FullHttpRequest fullHttpRequest = (FullHttpRequest) request;
             final ByteBuf buffer = fullHttpRequest.content();
 

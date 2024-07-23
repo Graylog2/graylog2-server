@@ -40,5 +40,6 @@ public class CodecsModule extends Graylog2Module {
         installCodec(mapBinder, RandomHttpMessageCodec.class);
         installCodec(mapBinder, GelfCodec.class);
         installCodec(mapBinder, JsonPathCodec.class);
+        installCodec(mapBinder, GelfBatchCodec.class);
     }
 }
