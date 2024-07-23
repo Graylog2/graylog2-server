@@ -36,12 +36,18 @@ import java.util.stream.Collectors;
 
 public record AggregatedConnectionResponse(Map<String, ConnectionCheckResponse> responses) {
     public List<String> indices() {
-        return responses.values().stream().flatMap(v -> v.indices().stream()).sorted(Comparator.naturalOrder()).collect(Collectors.toList());
+        return responses.values().stream()
+                .flatMap(v -> v.indices().stream())
+                .sorted(Comparator.naturalOrder())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public String error() {
-
-        final String errorMessage = responses.entrySet().stream().filter(e -> e.getValue().error() != null).map(e -> e.getKey() + ": " + e.getValue().error()).collect(Collectors.joining(";"));
+        final String errorMessage = responses.entrySet().stream()
+                .filter(e -> e.getValue().error() != null)
+                .map(e -> e.getKey() + ": " + e.getValue().error())
+                .collect(Collectors.joining(";"));
 
         if (errorMessage.isEmpty()) {
             return null;
@@ -79,7 +85,9 @@ public record AggregatedConnectionResponse(Map<String, ConnectionCheckResponse> 
     public List<String> certificates() {
         return responses.values().stream()
                 .filter(v -> v.certificates() != null)
-                .flatMap(v -> v.certificates().stream()).distinct().collect(Collectors.toList());
+                .flatMap(v -> v.certificates().stream())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private static X509Certificate decode(String pemEncodedCert) {
