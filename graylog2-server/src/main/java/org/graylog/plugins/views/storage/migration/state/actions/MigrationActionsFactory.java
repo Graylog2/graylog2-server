@@ -14,21 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.plugins.views.storage.migration.state.actions;
 
-import React from 'react';
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 
-import { Alert } from 'components/bootstrap';
-
-class GreyNoiseCommunityIpLookupAdapterDocumentation extends React.Component {
-  render() {
-    return (
-      <div>
-        <Alert style={{ marginBottom: 10 }} bsStyle="warning" title="Deprecation Warning">
-          <p>The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.</p>
-        </Alert>
-      </div>
-    );
-  }
+public interface MigrationActionsFactory {
+    MigrationActions create(MigrationStateMachineContext context);
 }
-
-export default GreyNoiseCommunityIpLookupAdapterDocumentation;

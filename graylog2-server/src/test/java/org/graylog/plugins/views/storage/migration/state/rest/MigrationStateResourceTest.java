@@ -121,11 +121,11 @@ public class MigrationStateResourceTest {
 
     private MigrationStateMachine createStateMachine() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
-        final MigrationActionsAdapter actions = new MigrationActionsAdapter();
+        final MigrationStateMachineContext context = new MigrationStateMachineContext();
+        final MigrationActionsAdapter actions = new MigrationActionsAdapter(context);
         return new MigrationStateMachineImpl(
                 MigrationStateMachineBuilder.buildFromPersistedState(persistence, actions),
-                actions,
-                persistence
-        );
+                persistence,
+                context);
     }
 }

@@ -111,12 +111,12 @@
         <commons-csv.version>1.11.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.4.0</commons-exec.version>
-        <commons-lang3.version>3.14.0</commons-lang3.version>
+        <commons-lang3.version>3.15.0</commons-lang3.version>
         <commons-net.version>3.11.1</commons-net.version>
         <commons-validator.version>1.9.0</commons-validator.version>
         <commons-io.version>2.16.1</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.28.0</error-prone.version>
+        <error-prone.version>2.29.2</error-prone.version>
         <freemarker.version>2.3.33</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.0</geoip2.version>
@@ -153,7 +153,7 @@
         <mongodb-driver.version>5.1.2</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.111.Final</netty.version>
+        <netty.version>4.1.112.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.65.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -168,7 +168,7 @@
         <shiro.version>2.0.1</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <snappy-java.version>1.1.10.5</snappy-java.version>
-        <oshi.version>6.6.1</oshi.version>
+        <oshi.version>6.6.2</oshi.version>
         <siv-mode.version>1.5.2</siv-mode.version>
         <slf4j.version>2.0.13</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
@@ -178,7 +178,7 @@
         <unboundid-ldap.version>7.0.1</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.0</validation-api.version>
-        <zstd.version>1.5.6-3</zstd.version>
+        <zstd.version>1.5.6-4</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.6</jjwt.version>
@@ -198,7 +198,7 @@
         <restassured.version>5.5.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.20.0</testcontainers.version>
-        <testcontainers.opensearch.version>2.0.2</testcontainers.opensearch.version>
+        <testcontainers.opensearch.version>2.1.0</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v18.18.0</nodejs.version>
@@ -542,7 +542,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.7.0</version>
+                    <version>3.8.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

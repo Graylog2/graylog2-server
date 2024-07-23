@@ -4,6 +4,7 @@ Upgrading to Graylog 6.1.x
 ## Breaking Changes
 
 - API errors which are related to invalid requests (e.g. JSON parsing failures, invalid types, etc.) are now responded to with a type of `RequestError` instead of `APIError`.
+- Removed GreyNoise Community Data Adapter deprecated in 5.2.
 
 ## Default Configuration Changes
 
@@ -16,9 +17,10 @@ refactoring. Regular users should not change the setting.
 
 The following Java Code API changes have been made.
 
-| File/method               | Description                                     |
-|---------------------------|-------------------------------------------------|
-| `BlockingBatchedESOutput` | The class got removed.                          |
+| File/method                         | Description            |
+|-------------------------------------|------------------------|
+| `BlockingBatchedESOutput`           | The class got removed. |
+| `GreyNoiseCommunityIpLookupAdapter` | The class got removed. |
 
 ## REST API Endpoint Changes
 

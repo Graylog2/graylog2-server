@@ -19,6 +19,8 @@ package org.graylog2.rest.resources.datanodes;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.net.HttpHeaders;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -36,17 +38,21 @@ import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import jakarta.annotation.Nonnull;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -140,6 +146,45 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
 
         final Response response = httpClient.newCall(builder.build()).execute();
         return new ProxyResponse(response.code(), response.body().byteStream(), getContentType(response));
+    }
+
+    public <RemoteInterfaceType, RemoteResponseType> Map<String, RemoteResponseType> remoteInterface(String nodeSelector, Class<RemoteInterfaceType> interfaceClass, Function<RemoteInterfaceType, Call<RemoteResponseType>> function) {
+        final Collection<DataNodeDto> hosts = resolveHosts(nodeSelector);
+        return hosts.stream()
+                .filter(n -> Objects.nonNull(n.getRestApiAddress()))
+                .parallel()
+                .collect(Collectors.toMap(NodeDto::getHostname, n -> {
+                    final Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl(StringUtils.removeEnd(n.getRestApiAddress(), "/"))
+                            .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+                            .client(httpClient.newBuilder().addInterceptor(chain -> {
+                                final Request req = chain.request().newBuilder()
+                                        .header(HttpHeaders.AUTHORIZATION, authTokenProvider.get())
+                                        .build();
+                                return chain.proceed(req);
+                            }).build())
+                            .build();
+                    try {
+                        final retrofit2.Response<RemoteResponseType> response = function.apply(retrofit.create(interfaceClass)).execute();
+                        if (response.isSuccessful() && response.body() != null) {
+                            return response.body();
+                        } else {
+                            throw new IllegalStateException("Failed to trigger datanode request. Code: " + response.code() + ", message: " + response.message());
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
+    }
+
+    private Collection<DataNodeDto> resolveHosts(String nodeSelector) {
+        if (Objects.equals(DatanodeResolver.ALL_NODES_KEYWORD, nodeSelector)) {
+            return nodeService.allActive().values();
+        } else {
+            return datanodeResolver.findByHostname(nodeSelector)
+                    .map(Collections::singleton)
+                    .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + nodeSelector));
+        }
     }
 
     private String getContentType(Response response) {

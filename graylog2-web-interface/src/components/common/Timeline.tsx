@@ -14,19 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
+import { Timeline as MantineTimeline } from '@mantine/core';
 
-import ActionDropdown from 'views/components/common/ActionDropdown';
-import { IconButton } from 'components/common';
+type Props = React.PropsWithChildren<{
+  active: number,
+  bulletSize: number,
+  className?: string,
+  color: string,
+}>
 
-const WidgetActionDropdown = ({ children }: React.PropsWithChildren) => {
-  const widgetActionDropdownCaret = <IconButton name="keyboard_arrow_down" title="Open actions dropdown" />;
+const Timeline = ({ children, bulletSize, color, active, className }: Props) => (
+  <MantineTimeline bulletSize={bulletSize}
+                   color={color}
+                   className={className}
+                   active={active}>{children}
+  </MantineTimeline>
+);
 
-  return (
-    <ActionDropdown element={widgetActionDropdownCaret}>
-      {children}
-    </ActionDropdown>
-  );
+Timeline.Item = MantineTimeline.Item;
+
+Timeline.defaultProps = {
+  className: undefined,
 };
 
-export default WidgetActionDropdown;
+export default Timeline;
