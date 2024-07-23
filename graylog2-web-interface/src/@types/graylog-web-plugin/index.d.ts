@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
+import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
@@ -174,11 +175,11 @@ interface PluginDataWarehouse {
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
   DataWarehouseJobs: React.ComponentType<{}>,
-  streamDataWarehouseTableElements: {
+  getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
     columnRenderer: ColumnRenderers<Stream>,
-  }
+  } | undefined,
 }
 
 declare module 'graylog-web-plugin/plugin' {
