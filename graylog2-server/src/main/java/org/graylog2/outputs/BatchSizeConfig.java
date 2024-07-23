@@ -69,7 +69,7 @@ public class BatchSizeConfig {
                     throw new ValidationException(
                             "Parameter <%s> should not be greater than 90MB. (Found <%s>)".formatted(name, size));
                 }
-            } catch (Exception ignored) {
+            } catch (IllegalArgumentException ignored) {
                 final Integer intValue = new IntegerConverter().convertFrom(config.value);
                 new PositiveIntegerValidator().validate(name, intValue);
             }
