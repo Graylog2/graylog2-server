@@ -64,7 +64,10 @@ public class DatanodeResource extends RestResource {
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("hostname").title("Name").build(),
-            EntityAttribute.builder().id("datanode_status").title("Status").build()
+            EntityAttribute.builder().id("data_node_status").title("Status").build(),
+            EntityAttribute.builder().id("transport_address").title("Transport address").build(),
+            EntityAttribute.builder().id("cert_valid_until").title("Certificate valid until").build(),
+            EntityAttribute.builder().id("datanode_version").title("Datanode version").build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
