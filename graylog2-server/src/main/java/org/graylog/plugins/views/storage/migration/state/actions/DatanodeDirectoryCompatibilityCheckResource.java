@@ -14,19 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.plugins.views.storage.migration.state.actions;
 
-import ActionDropdown from 'views/components/common/ActionDropdown';
-import { IconButton } from 'components/common';
+import retrofit2.Call;
+import retrofit2.http.GET;
 
-const WidgetActionDropdown = ({ children }: React.PropsWithChildren) => {
-  const widgetActionDropdownCaret = <IconButton name="keyboard_arrow_down" title="Open actions dropdown" />;
+public interface DatanodeDirectoryCompatibilityCheckResource {
 
-  return (
-    <ActionDropdown element={widgetActionDropdownCaret}>
-      {children}
-    </ActionDropdown>
-  );
-};
+    @GET("indices-directory/compatibility")
+    Call<CompatibilityResult> compatibility();
 
-export default WidgetActionDropdown;
+}
