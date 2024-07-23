@@ -232,6 +232,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             final AggregatedConnectionResponse results = getAllIndicesFrom(remoteHost, username, password, trustUnknownCerts);
             final List<RemoteIndex> indices = results.indices().stream()
                     .map(i -> new RemoteIndex(i, indexSetRegistry.isManagedIndex(i)))
+                    .distinct()
                     .toList();
             if (results.error() != null && !results.error().isEmpty()) {
                 return IndexerConnectionCheckResult.failure(results.error());
