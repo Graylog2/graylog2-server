@@ -83,8 +83,12 @@ import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
@@ -281,7 +285,15 @@ public abstract class CmdLineTool implements CliCommand {
         if (Native.isLoaded()) {
             LOG.warn("The zstd library is already loaded. Setting the ZstdTempFolder property doesn't have any effect!");
         }
-        System.setProperty("ZstdTempFolder", pluginLoaderConfig.getNativeLibDir().toAbsolutePath().toString());
+        final Path nativeLibPath = pluginLoaderConfig.getNativeLibDir().toAbsolutePath();
+        try {
+            // We are very early in the startup process and the data_dir and native lib dir don't exist yet. Since the
+            // zstd library doesn't create its own temp directory, we have to do it to avoid errors on startup.
+            Files.createDirectories(nativeLibPath);
+            System.setProperty("ZstdTempFolder", nativeLibPath.toString());
+        } catch (IOException e) {
+            LOG.warn("Couldn't create native lib dir <{}>. Unable to set ZstdTempFolder system property.", nativeLibPath, e);
+        }
 
         // This is holding all our metrics.
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
@@ -344,6 +356,10 @@ public abstract class CmdLineTool implements CliCommand {
         reporter.start();
 
         startCommand();
+    }
+
+    protected PluginLoader getPluginLoader(File pluginDir, ChainingClassLoader classLoader) {
+        return new PluginLoader(pluginDir, classLoader);
     }
 
     protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader) {
