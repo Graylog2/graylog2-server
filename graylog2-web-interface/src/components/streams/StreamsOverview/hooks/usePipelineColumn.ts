@@ -14,19 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
-import ActionDropdown from 'views/components/common/ActionDropdown';
-import { IconButton } from 'components/common';
+const usePipelineColumn = () => {
+  const currentUser = useCurrentUser();
+  const isPipelineColumnPermitted = isPermitted(currentUser.permissions, ['pipeline:edit']);
 
-const WidgetActionDropdown = ({ children }: React.PropsWithChildren) => {
-  const widgetActionDropdownCaret = <IconButton name="keyboard_arrow_down" title="Open actions dropdown" />;
-
-  return (
-    <ActionDropdown element={widgetActionDropdownCaret}>
-      {children}
-    </ActionDropdown>
-  );
+  return {
+    isPipelineColumnPermitted,
+  };
 };
 
-export default WidgetActionDropdown;
+export default usePipelineColumn;

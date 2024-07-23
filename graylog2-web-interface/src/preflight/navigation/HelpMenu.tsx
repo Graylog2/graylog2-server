@@ -33,7 +33,7 @@ const HelpMenu = () => (
     <Menu.Target>
       <StyledButton variant="default">
         <Text fw={500} size="sm" mr={3}>Get Help</Text>
-        <Icon name="expand_more" />
+        <Icon name="keyboard_arrow_down" />
       </StyledButton>
     </Menu.Target>
     <Menu.Dropdown>
