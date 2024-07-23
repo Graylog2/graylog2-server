@@ -21,11 +21,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.rest.resources.system.indexer.responses.FieldTypeOrigin.INDEX;
 import static org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType.FIELD_NAME;
 import static org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType.TYPE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class IndexSetFieldTypeTest {
 
@@ -34,30 +33,30 @@ class IndexSetFieldTypeTest {
 
         final Comparator<IndexSetFieldType> fieldNameComparator = IndexSetFieldType.getComparator(FIELD_NAME, Sorting.Direction.ASC);
         final Comparator<IndexSetFieldType> reversedFieldNameComparator = IndexSetFieldType.getComparator(FIELD_NAME, Sorting.Direction.DESC);
-        assertEquals(0, fieldNameComparator.compare(
+        assertThat(fieldNameComparator.compare(
                 new IndexSetFieldType("buhaha", "long", INDEX, false),
                 new IndexSetFieldType("buhaha", "string", INDEX, false)
-        ));
-        assertEquals(0, reversedFieldNameComparator.compare(
+        )).isZero();
+        assertThat(reversedFieldNameComparator.compare(
                 new IndexSetFieldType("buhaha", "long", INDEX, false),
                 new IndexSetFieldType("buhaha", "string", INDEX, false)
-        ));
-        assertTrue(0 > fieldNameComparator.compare(
+        )).isZero();
+        assertThat(fieldNameComparator.compare(
                 new IndexSetFieldType("buhaha", "long", INDEX, false),
                 new IndexSetFieldType("chiquita", "string", INDEX, false)
-        ));
-        assertTrue(0 < reversedFieldNameComparator.compare(
+        )).isNegative();
+        assertThat(reversedFieldNameComparator.compare(
                 new IndexSetFieldType("buhaha", "long", INDEX, false),
                 new IndexSetFieldType("chiquita", "string", INDEX, false)
-        ));
-        assertTrue(0 < fieldNameComparator.compare(
+        )).isPositive();
+        assertThat(fieldNameComparator.compare(
                 new IndexSetFieldType("buhaha", "long", INDEX, false),
                 new IndexSetFieldType("arizona", "string", INDEX, false)
-        ));
-        assertTrue(0 > reversedFieldNameComparator.compare(
+        )).isPositive();
+        assertThat(reversedFieldNameComparator.compare(
                 new IndexSetFieldType("buhaha", "long", INDEX, false),
                 new IndexSetFieldType("arizona", "string", INDEX, false)
-        ));
+        )).isNegative();
     }
 
     @Test
@@ -65,29 +64,38 @@ class IndexSetFieldTypeTest {
 
         final Comparator<IndexSetFieldType> fieldTypeComparator = IndexSetFieldType.getComparator(TYPE, Sorting.Direction.ASC);
         final Comparator<IndexSetFieldType> reversedFieldTypeComparator = IndexSetFieldType.getComparator(TYPE, Sorting.Direction.DESC);
-        assertEquals(0, fieldTypeComparator.compare(
+        assertThat(fieldTypeComparator.compare(
                 new IndexSetFieldType("buhaha", "long", INDEX, false),
                 new IndexSetFieldType("buhaha", "long", INDEX, false)
-        ));
-        assertEquals(0, reversedFieldTypeComparator.compare(
+        )).isZero();
+        assertThat(reversedFieldTypeComparator.compare(
                 new IndexSetFieldType("buhaha", "long", INDEX, false),
                 new IndexSetFieldType("buhaha", "long", INDEX, false)
-        ));
-        assertTrue(0 > fieldTypeComparator.compare(
+        )).isZero();
+        assertThat(fieldTypeComparator.compare(
                 new IndexSetFieldType("buhaha", "long", INDEX, false),
                 new IndexSetFieldType("chiquita", "string", INDEX, false)
-        ));
-        assertTrue(0 < reversedFieldTypeComparator.compare(
+        )).isNegative();
+        assertThat(reversedFieldTypeComparator.compare(
                 new IndexSetFieldType("buhaha", "long", INDEX, false),
                 new IndexSetFieldType("chiquita", "string", INDEX, false)
-        ));
-        assertTrue(0 < fieldTypeComparator.compare(
+        )).isPositive();
+        assertThat(fieldTypeComparator.compare(
                 new IndexSetFieldType("buhaha", "text", INDEX, false),
                 new IndexSetFieldType("arizona", "string", INDEX, false)
-        ));
-        assertTrue(0 > reversedFieldTypeComparator.compare(
+        )).isPositive();
+        assertThat(reversedFieldTypeComparator.compare(
                 new IndexSetFieldType("buhaha", "text", INDEX, false),
                 new IndexSetFieldType("arizona", "string", INDEX, false)
-        ));
+        )).isNegative();
+
+        assertThat(fieldTypeComparator.compare(
+                new IndexSetFieldType("buhaha", "long", INDEX, false),
+                new IndexSetFieldType("buhaha", null, INDEX, false)
+        )).isNegative();
+        assertThat(reversedFieldTypeComparator.compare(
+                new IndexSetFieldType("buhaha", "long", INDEX, false),
+                new IndexSetFieldType("buhaha", null, INDEX, false)
+        )).isPositive();
     }
 }
