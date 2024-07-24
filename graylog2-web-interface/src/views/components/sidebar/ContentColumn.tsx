@@ -154,7 +154,7 @@ const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout,
               <OverlayToggle $sidebarIsPinned={sidebarIsPinned}>
                 <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
                             title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
-                            name="push_pin" />
+                            name="keep" />
               </OverlayToggle>
             </CenterVertical>
             )}

@@ -14,21 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.storage.opensearch2;
 
-import React from 'react';
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.POST;
 
-import { Alert } from 'components/bootstrap';
+public interface DatanodeRemoteConnectionCheckResource {
 
-class GreyNoiseCommunityIpLookupAdapterDocumentation extends React.Component {
-  render() {
-    return (
-      <div>
-        <Alert style={{ marginBottom: 10 }} bsStyle="warning" title="Deprecation Warning">
-          <p>The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.</p>
-        </Alert>
-      </div>
-    );
-  }
+    @POST("connection-check/opensearch")
+    Call<ConnectionCheckResponse> opensearch(@Body @Valid @NotNull ConnectionCheckRequest request);
+
 }
-
-export default GreyNoiseCommunityIpLookupAdapterDocumentation;
