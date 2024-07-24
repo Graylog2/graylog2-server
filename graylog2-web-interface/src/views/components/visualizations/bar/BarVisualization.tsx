@@ -38,6 +38,7 @@ import {
 import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
 import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
 import dataConvertor from 'views/components/visualizations/utils/dataConvertor';
+import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -87,9 +88,10 @@ const BarVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const { convertValueToUnit } = useFieldUnitTypes();
+  const widgetUnits = useWidgetUnits(config);
   const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
 
-  const { layouts, yAxisMapper, mapperAxisNumber } = useMemo(() => generateYAxis(config), [config]);
+  const { layouts, yAxisMapper, mapperAxisNumber } = useMemo(() => generateYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const barmode = useMemo(() => (visualizationConfig && visualizationConfig.barmode ? visualizationConfig.barmode : undefined), [visualizationConfig]);
   const _layout = useMemo<Partial<PlotLayout>>(() => ({
     ...layouts,
@@ -113,7 +115,7 @@ const BarVisualization = makeVisualization(({
     const totalAxis = Object.keys(layouts).length;
 
     const offsetSettings = getBarChartTraceOffsetSettings(barmode, { yaxis, totalAxis, axisNumber, traceIndex: idx, totalTraces: total });
-    const curUnit = getSeriesUnit(config.series, name || originalName, config.units);
+    const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
 
     const getData = () => ({
       type,
@@ -128,7 +130,7 @@ const BarVisualization = makeVisualization(({
 
     return getData();
   },
-  [convertValueToUnit, _mapKeys, barmode, layouts, mapperAxisNumber, visualizationConfig?.opacity, yAxisMapper]);
+  [yAxisMapper, visualizationConfig?.opacity, mapperAxisNumber, layouts, barmode, config.series, widgetUnits, _mapKeys, convertValueToUnit]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const _chartDataResult = useChartData(rows, { widgetConfig: config, chartType: 'bar', generator: _seriesGenerator });

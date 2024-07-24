@@ -27,9 +27,13 @@ import useEvents from 'views/components/visualizations/useEvents';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { generateDomain, generateYAxis } from 'views/components/visualizations/utils/chartLayoytGenerators';
+import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
+import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
+import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
+import dataConvertor from 'views/components/visualizations/utils/dataConvertor';
 
-import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
+import type { Generator } from '../ChartData';
 
 const AreaVisualization = makeVisualization(({
   config,
@@ -37,8 +41,10 @@ const AreaVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
+  const { convertValueToUnit } = useFieldUnitTypes();
+  const widgetUnits = useWidgetUnits(config);
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
-  const { layouts, yAxisMapper } = useMemo(() => generateYAxis(config), [config]);
+  const { layouts, yAxisMapper } = useMemo(() => generateYAxis({ series: config.series, units: widgetUnits }), [config]);
   const _layout = useMemo(() => ({
     ...layouts,
     hovermode: 'x',
@@ -54,13 +60,14 @@ const AreaVisualization = makeVisualization(({
     ), [mapKeys, rowPivotFields]);
   const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => {
     const yaxis = yAxisMapper[name];
+    const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
 
     return ({
       type,
       name,
       yaxis,
       x: _mapKeys(labels),
-      y: values,
+      y: dataConvertor(values, convertValueToUnit, curUnit),
       fill: 'tozeroy',
       line: { shape: toPlotly(interpolation) },
       originalName,

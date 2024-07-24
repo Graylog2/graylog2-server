@@ -62,7 +62,7 @@ export const getFormatSettings = (unitTypeKey: FieldUnitType | DefaulAxisKey) =>
   switch (unitTypeKey) {
     case 'percent':
       return ({
-        tickformat: '%',
+        tickformat: '.1%',
       });
     case 'size':
       return ({
@@ -102,7 +102,7 @@ export const getUnitLayout = (unitTypeKey: FieldUnitType | DefaulAxisKey, axisCo
 type SeriesName = string;
 type AxisName = string;
 
-export const generateYAxis = ({ series, units }: AggregationWidgetConfig): { mapperAxisNumber: Record<string, number>, layouts: Record<string, unknown>, yAxisMapper: Record<SeriesName, AxisName>} => {
+export const generateYAxis = ({ series, units }: { series: AggregationWidgetConfig['series'], units: AggregationWidgetConfig['units'] }): { mapperAxisNumber: Record<string, number>, layouts: Record<string, unknown>, yAxisMapper: Record<SeriesName, AxisName>} => {
   let axisCount = 1;
   const unitLayout: {} | Record<FieldUnitType, { layout: Record<string, unknown>, axisKeyName: string}> = {};
   const mapper = {};

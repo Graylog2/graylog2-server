@@ -28,9 +28,13 @@ import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import { generateDomain, generateYAxis } from 'views/components/visualizations/utils/chartLayoytGenerators';
+import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
+import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
+import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
+import dataConvertor from 'views/components/visualizations/utils/dataConvertor';
 
-import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
+import type { Generator } from '../ChartData';
 
 const LineVisualization = makeVisualization(({
   config,
@@ -38,7 +42,9 @@ const LineVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
-  const { layouts, yAxisMapper } = useMemo(() => generateYAxis(config), [config]);
+  const { convertValueToUnit } = useFieldUnitTypes();
+  const widgetUnits = useWidgetUnits(config);
+  const { layouts, yAxisMapper } = useMemo(() => generateYAxis({ series: config.series, units: widgetUnits }), [config]);
   const _layout = useMemo(() => ({
     ...layouts,
     hovermode: 'x',
@@ -55,13 +61,14 @@ const LineVisualization = makeVisualization(({
     ), [mapKeys, rowPivotFields]);
   const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => {
     const yaxis = yAxisMapper[name];
+    const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
 
     return ({
       type,
       name,
       yaxis,
       x: _mapKeys(labels),
-      y: values,
+      y: dataConvertor(values, convertValueToUnit, curUnit),
       originalName,
       line: { shape: toPlotly(interpolation) },
     });

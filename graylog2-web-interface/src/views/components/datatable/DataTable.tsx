@@ -33,6 +33,7 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import useAppDispatch from 'stores/useAppDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
+import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 
 import TableHead from './TableHead';
 import DataTableEntry from './DataTableEntry';
@@ -199,7 +200,8 @@ const DataTable = ({
     return Promise.reject();
   }, [formContext?.dirty, editing, widget?.config, widget?.id, dispatch]);
 
-  const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup, units } = config;
+  const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup } = config;
+  const widgetUnits = useWidgetUnits(config);
 
   const rows = retrieveChartData(data) ?? [];
 
@@ -254,7 +256,7 @@ const DataTable = ({
                         columnPivotValues={actualColumnPivotFields}
                         types={fields}
                         series={series}
-                        units={units} />
+                        units={widgetUnits} />
       )
     );
   });

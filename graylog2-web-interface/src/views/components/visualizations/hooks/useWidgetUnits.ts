@@ -32,8 +32,9 @@ const useWidgetUnits = (config: AggregationWidgetConfig) => {
     return field;
   }), [config.series]);
   const usedFieldsInRowPivots = useMemo(() => flatten(config.rowPivots.map((p) => p.fields)), [config.rowPivots]);
+  const usedFieldsInColumnPivots = useMemo(() => flatten(config.columnPivots.map((p) => p.fields)), [config.columnPivots]);
 
-  const allFields: Array<string> = useMemo(() => uniq(compact([...usedFieldsInSeries, ...usedFieldsInRowPivots])), [usedFieldsInRowPivots, usedFieldsInSeries]);
+  const allFields: Array<string> = useMemo(() => uniq(compact([...usedFieldsInSeries, ...usedFieldsInRowPivots, ...usedFieldsInColumnPivots])), [usedFieldsInColumnPivots, usedFieldsInRowPivots, usedFieldsInSeries]);
 
   return useMemo(() => {
     let configUnits = config.units;
