@@ -24,7 +24,7 @@ jobs:
 
       - name: Dispatch e2e trigger to graylog-project-internal
         run: >
-          gh workflow run -R Graylog2/graylog-project-internal trigger-e2e-tests.yml --ref master
+          gh workflow run -R Graylog2/graylog-project-internal trigger-build-for-e2e-test.yml --ref master
           -f caller_repo=${{ github.repository }}
           -f caller_pr_nr=${{ github.event.number }}
           -f caller_base_branch=${{ github.base_ref || github.ref_name }}
