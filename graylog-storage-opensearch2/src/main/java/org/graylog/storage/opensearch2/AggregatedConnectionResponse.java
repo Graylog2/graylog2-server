@@ -16,6 +16,8 @@
  */
 package org.graylog.storage.opensearch2;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
@@ -32,20 +34,24 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public record AggregatedConnectionResponse(Map<String, ConnectionCheckResponse> responses) {
+    @Nonnull
     public List<String> indices() {
         return responses.values().stream()
+                .filter(v -> Objects.nonNull(v.indices()))
                 .flatMap(v -> v.indices().stream())
                 .sorted(Comparator.naturalOrder())
                 .distinct()
                 .collect(Collectors.toList());
     }
 
+    @Nullable
     public String error() {
         final String errorMessage = responses.entrySet().stream()
-                .filter(e -> e.getValue().error() != null)
+                .filter(e -> Objects.nonNull(e.getValue().error()))
                 .map(e -> e.getKey() + ": " + e.getValue().error())
                 .collect(Collectors.joining(";"));
 
@@ -82,9 +88,10 @@ public record AggregatedConnectionResponse(Map<String, ConnectionCheckResponse> 
         );
     }
 
+    @Nonnull
     public List<String> certificates() {
         return responses.values().stream()
-                .filter(v -> v.certificates() != null)
+                .filter(v -> Objects.nonNull(v.certificates()))
                 .flatMap(v -> v.certificates().stream())
                 .distinct()
                 .collect(Collectors.toList());

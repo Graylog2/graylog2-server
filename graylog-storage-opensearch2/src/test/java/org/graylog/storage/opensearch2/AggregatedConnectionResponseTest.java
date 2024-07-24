@@ -48,14 +48,23 @@ class AggregatedConnectionResponseTest {
     @Test
     void testAggregateErrors() {
         final AggregatedConnectionResponse aggregatedResponse = new AggregatedConnectionResponse(Map.of(
-                "node-one", new ConnectionCheckResponse(Collections.emptyList(), Collections.emptyList(), "Failed to connect"),
-                "node-two", new ConnectionCheckResponse(Collections.emptyList(), Collections.emptyList(), "Failed to connect"),
-                "node-three", new ConnectionCheckResponse(Collections.emptyList(), Collections.emptyList(), "Failed to connect")
+                "node-one", new ConnectionCheckResponse(null, null, "Failed to connect"),
+                "node-two", new ConnectionCheckResponse(null, null, "Failed to connect"),
+                "node-three", new ConnectionCheckResponse(null, null, "Failed to connect")
         ));
         Assertions.assertThat(aggregatedResponse.error())
                 .contains("node-one: Failed to connect")
                 .contains("node-two: Failed to connect")
                 .contains("node-three: Failed to connect");
+
+        Assertions.assertThat(aggregatedResponse.certificates())
+                .isNotNull()
+                .hasSize(0);
+
+        Assertions.assertThat(aggregatedResponse.indices())
+                .isNotNull()
+                .hasSize(0);
+
     }
 
     @Test
