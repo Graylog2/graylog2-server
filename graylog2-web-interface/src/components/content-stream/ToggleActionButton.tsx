@@ -36,7 +36,7 @@ const ToggleActionButton = ({ onClick, isOpen }: Props) => (
   <StyledButton bsStyle="link"
                 onClick={() => onClick()}
                 type="button">{isOpen ? 'Close' : 'Open'}
-    <Icon name={isOpen ? 'expand_more' : 'chevron_right'} />
+    <Icon name={isOpen ? 'keyboard_arrow_down' : 'chevron_right'} />
   </StyledButton>
 );
 
