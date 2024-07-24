@@ -62,11 +62,11 @@ const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit
   const { getPrettifiedValue } = useFieldUnitTypes();
   const prettified = getPrettifiedValue(value, { abbrev: unit.abbrev, unitType: unit.unitType });
 
-  return <span title={value.toString()}>{`${prettified.value.toFixed(VALUE_WITH_UNIT_DIGITS)} ${prettified.unit.abbrev}`}</span>;
+  return <span title={value.toString()}>{`${Number(prettified?.value).toFixed(VALUE_WITH_UNIT_DIGITS)} ${prettified.unit.abbrev}`}</span>;
 };
 
 const FormattedValue = ({ field, value, truncate, render, unit }: FormattedValueProps) => {
-  if (unit?.isDefined) return <ValueWithUnitRenderer value={value} unit={unit} />;
+  if (unit?.isDefined && value) return <ValueWithUnitRenderer value={value} unit={unit} />;
 
   return _formatValue(field, value, truncate, render);
 };

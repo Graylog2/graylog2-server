@@ -26,6 +26,7 @@ import type { UnitJson } from 'hooks/useFieldUnitTypes';
 import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
 import type { FieldUnitsFormValues } from 'views/types';
 import UnitContainer from 'views/components/aggregationwizard/units/UnitContainer';
+import { UnitLabel } from 'views/components/aggregationwizard/units/FieldUnitComponent';
 
 const Container = styled.div`
   display: flex;
@@ -53,19 +54,17 @@ const FieldUnitPopover = ({ field }: { field: string }) => {
   const badgeLabel = useMemo(() => {
     const curUnit = values?.units?.[field]?.abbrev;
 
-    return curUnit || '-';
+    return curUnit || '...';
   }, [field, values?.units]);
 
   return (
     <Popover position="right" opened={show} withArrow>
       <Popover.Target>
-        <UnitContainer>
-          <Label onClick={toggleShow}
-                 title="Unit settings"
-                 role="button">
-            {badgeLabel}
-          </Label>
-        </UnitContainer>
+        <UnitLabel onClick={toggleShow}
+                   title="Unit settings"
+                   role="button">
+          {badgeLabel}
+        </UnitLabel>
       </Popover.Target>
       <Popover.Dropdown title="Metrics Unit Settings">
         <Container>

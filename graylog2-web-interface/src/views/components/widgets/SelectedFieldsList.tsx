@@ -22,6 +22,7 @@ import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
+import FieldUnitComponent from 'views/components/aggregationwizard/units/FieldUnitComponent';
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -57,6 +58,10 @@ type ListItemProps = {
   selectSize: 'normal' | 'small',
   testIdPrefix: string,
 }
+
+const Actions = styled.div`
+  display: flex;
+`;
 
 const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   selectSize,
@@ -99,10 +104,11 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
             <Icon name="drag_indicator" />
           </DragHandle>
           <FieldTitle>{item.title}</FieldTitle>
-          <div>
+          <Actions>
+            <FieldUnitComponent field={item.title} />
             <IconButton name="edit_square" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
             <IconButton name="delete" title={`Remove ${item.title} field`} onClick={onRemove} />
-          </div>
+          </Actions>
         </>
       )}
     </ListItemContainer>
