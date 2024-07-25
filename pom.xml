@@ -730,6 +730,7 @@
                     <!-- if the used Java version is too new, don't fail, just do nothing: -->
                     <failOnUnsupportedJava>false</failOnUnsupportedJava>
                     <failOnViolation>true</failOnViolation>
+                    <ignoreSignaturesOfMissingClasses>true</ignoreSignaturesOfMissingClasses>
                     <bundledSignatures>
                         <!-- We want to allow String#formatted without charset. -->
                         <bundledSignature>jdk-unsafe-14</bundledSignature>
