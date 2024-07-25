@@ -55,7 +55,7 @@ const StyledTable = styled(Table)<{ $stickyHeader: boolean, $borderedHeader: boo
     background-color: ${theme.colors.gray[90]};
     color: ${theme.utils.readableColor(theme.colors.gray[90])};
     white-space: nowrap;
-    ${$borderedHeader ? `border: 1px solid ${theme.colors.table.backgroundAlt}` : ''}
+    ${$borderedHeader ? `border: 1px solid ${theme.colors.gray[80]}` : ''}
   }
 
   > tbody td {
