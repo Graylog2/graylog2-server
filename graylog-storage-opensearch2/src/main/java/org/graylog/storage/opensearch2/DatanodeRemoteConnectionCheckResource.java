@@ -14,19 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.storage.opensearch2;
 
-import ActionDropdown from 'views/components/common/ActionDropdown';
-import { IconButton } from 'components/common';
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.POST;
 
-const WidgetActionDropdown = ({ children }: React.PropsWithChildren) => {
-  const widgetActionDropdownCaret = <IconButton name="keyboard_arrow_down" title="Open actions dropdown" />;
+public interface DatanodeRemoteConnectionCheckResource {
 
-  return (
-    <ActionDropdown element={widgetActionDropdownCaret}>
-      {children}
-    </ActionDropdown>
-  );
-};
+    @POST("connection-check/opensearch")
+    Call<ConnectionCheckResponse> opensearch(@Body @Valid @NotNull ConnectionCheckRequest request);
 
-export default WidgetActionDropdown;
+}

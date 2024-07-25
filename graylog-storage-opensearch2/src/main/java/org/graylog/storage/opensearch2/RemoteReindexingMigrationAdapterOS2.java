@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
@@ -29,7 +28,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -53,7 +51,6 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.datanode.IndexMigrationConfiguration;
 import org.graylog2.indexer.datanode.MigrationConfiguration;
-import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.indexer.datanode.RemoteReindexMigrationService;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
@@ -62,10 +59,12 @@ import org.graylog2.indexer.migration.IndexMigrationProgress;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.LogEntry;
 import org.graylog2.indexer.migration.LogLevel;
+import org.graylog2.indexer.migration.RemoteIndex;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.indexer.migration.TaskStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -73,12 +72,10 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -233,10 +230,14 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             final RemoteReindexAllowlist reindexAllowlist = new RemoteReindexAllowlist(remoteHost, allowlist);
             reindexAllowlist.validate();
             final AggregatedConnectionResponse results = getAllIndicesFrom(remoteHost, username, password, trustUnknownCerts);
+            final List<RemoteIndex> indices = results.indices().stream()
+                    .map(i -> new RemoteIndex(i, indexSetRegistry.isManagedIndex(i)))
+                    .distinct()
+                    .toList();
             if (results.error() != null && !results.error().isEmpty()) {
                 return IndexerConnectionCheckResult.failure(results.error());
             } else {
-                return IndexerConnectionCheckResult.success(results.indices());
+                return IndexerConnectionCheckResult.success(indices);
             }
         } catch (Exception e) {
             return IndexerConnectionCheckResult.failure(e);
@@ -314,22 +315,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
      * will be used to display better error message or transported back to the datanodes as trusted, if user decides so.
      */
     private AggregatedConnectionResponse getAllIndicesFrom(final URI uri, final String username, final String password, boolean trustUnknownCerts) {
-        final ByteArrayInputStream body = new ByteArrayInputStream("""
-                {
-                    "host": "%s",
-                    "username": "%s",
-                    "password": "%s",
-                    "trust_unknown_certs": %b
-                }
-                """.formatted(uriToString(uri), username, password, trustUnknownCerts).getBytes(StandardCharsets.UTF_8));
-        try {
-            final ProxyRequestAdapter.ProxyResponse response = datanodeRestApiProxy.request(new ProxyRequestAdapter.ProxyRequest("POST", "/connection-check/opensearch", body, "all", new MultivaluedHashMap<>()));
-            // datanode_hostname -> ConnectionCheckResponse
-            TypeReference<Map<String, ConnectionCheckResponse>> typeRef = new TypeReference<>() {};
-            return new AggregatedConnectionResponse(objectMapper.readValue(response.response(), typeRef));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final ConnectionCheckRequest req = new ConnectionCheckRequest(uriToString(uri), username, password, trustUnknownCerts);
+        final Map<String, ConnectionCheckResponse> responses = datanodeRestApiProxy.remoteInterface(DatanodeResolver.ALL_NODES_KEYWORD, DatanodeRemoteConnectionCheckResource.class, resource -> resource.opensearch(req));
+        return new AggregatedConnectionResponse(responses);
     }
 
     private static String uriToString(URI uri){
