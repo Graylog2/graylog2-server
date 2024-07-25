@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Formik, Form } from 'formik';
 import type { FormikErrors } from 'formik';
+import { Formik, Form } from 'formik';
 import styled from 'styled-components';
 
 import { Alert, Input, Row, Col } from 'components/bootstrap';
-import { SearchForm, Spinner } from 'components/common';
+import { SearchForm, Spinner, Icon } from 'components/common';
 import { getValueFromInput } from 'util/FormsUtils';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
@@ -41,8 +41,13 @@ const SearchContainer = styled.div`
   margin-top: 12px;
 `;
 
+type RemoteIndex = {
+  name: string,
+  managed: boolean,
+}
+
 type RemoteReindexCheckConnection = {
-  indices: string[],
+  indices: RemoteIndex[],
   error: any,
 }
 
@@ -71,8 +76,8 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['CHECK_REMOTE_INDEXER_CONNECTION']);
   const [errorMessage, setErrrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [availableIndices, setAvailableIndices] = useState<string[]>([]);
-  const [selectedIndices, setSelectedIndices] = useState<string[]>([]);
+  const [availableIndices, setAvailableIndices] = useState<RemoteIndex[]>([]);
+  const [selectedIndices, setSelectedIndices] = useState<RemoteIndex[]>([]);
   const [queryIndex, setQueryIndex] = useState<string>('');
   const [initialValues, setInitialValues] = useState<RemoteReindexRequest>(DEFAULT_INITIAL_VALUES);
 
@@ -86,7 +91,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
 
       if (checkConnectionResult?.indices?.length) {
         setAvailableIndices(checkConnectionResult.indices);
-        setSelectedIndices(checkConnectionResult.indices);
+        setSelectedIndices(checkConnectionResult.indices.filter((i) => i.managed));
         setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
         //saveMigrateExistingDataForm(step, data, args);
       } else if (checkConnectionResult?.error) {
@@ -138,7 +143,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
     resetConnectionCheck();
   };
 
-  const handleSelectIndices = (indexToToggle: string) => {
+  const handleSelectIndices = (indexToToggle: RemoteIndex) => {
     if (selectedIndices.includes(indexToToggle)) {
       setSelectedIndices(selectedIndices.filter((index) => index !== indexToToggle));
     } else {
@@ -146,7 +151,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
     }
   };
 
-  const filteredIndices = queryIndex ? availableIndices.filter((index) => index.includes(queryIndex)) : availableIndices;
+  const filteredIndices = queryIndex ? availableIndices.filter((index) => index.name.includes(queryIndex)) : availableIndices;
   const filteredSelectedIndices = selectedIndices.filter((index) => filteredIndices.includes(index));
   const areAllIndicesSelected = filteredSelectedIndices.length === filteredIndices.length;
 
@@ -163,7 +168,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
                  name="hostname"
                  label="Hostname"
                  help="URI of the host to call the remote reindexing command against (http://example:9200)"
-                 placeholder="http://example:9200/"
+                 placeholder="http://example:9200"
                  type="text"
                  disabled={isLoading}
                  value={values.hostname}
@@ -242,10 +247,18 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
               <IndicesContainer>
                 {filteredIndices.map((index) => (
                   <Input type="checkbox"
-                         key={index}
-                         name={index}
-                         id={index}
-                         label={index}
+                         key={index.name}
+                         name={index.name}
+                         id={index.name}
+                         label={(
+                           <>
+                             <span>{index.name} </span>
+                             {!index.managed && (
+                               <Icon name="warning"
+                                     title="This is an index not managed by Graylog. If you import it, you will not be able to query it in Graylog." />
+                             )}
+                           </>
+                         )}
                          disabled={isLoading}
                          checked={filteredSelectedIndices.includes(index)}
                          onChange={() => handleSelectIndices(index)} />
@@ -262,7 +275,10 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
             <MigrationStepTriggerButtonToolbar hidden={hideActions}
                                                nextSteps={nextSteps || currentStep.next_steps}
                                                onTriggerStep={handleTriggerNextStep}
-                                               args={{ ...values, indices: filteredSelectedIndices } as RemoteReindexRequest} />
+                                               args={{
+                                                 ...values,
+                                                 indices: filteredSelectedIndices.map((i) => i.name),
+                                               } as RemoteReindexRequest} />
           )}
         </Form>
       )}
