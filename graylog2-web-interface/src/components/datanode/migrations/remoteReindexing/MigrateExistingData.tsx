@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { FormikErrors } from 'formik';
 import { Formik, Form } from 'formik';
 import styled from 'styled-components';
@@ -27,8 +27,7 @@ import { getValueFromInput } from 'util/FormsUtils';
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
-
-const DEFAULT_THREADS_COUNT = 4;
+import useSaveRemoteReindexMigrationFormValues, { DEFAULT_THREADS_COUNT } from '../../hooks/useSaveRemoteReindexMigrationFormValues';
 
 const IndicesContainer = styled.div`
   max-height: 300px;
@@ -51,27 +50,6 @@ type RemoteReindexCheckConnection = {
   error: any,
 }
 
-const saveFormValues = (values: RemoteReindexRequest) => {
-  sessionStorage.setItem('migrateExistingDataForm', JSON.stringify(values));
-};
-
-const getSavedFormValues = () => JSON.parse(sessionStorage.getItem('migrateExistingDataForm') || '{}');
-
-const removeSavedFormValues = () => {
-  sessionStorage.removeItem('migrateExistingDataForm');
-};
-
-const DEFAULT_INITIAL_VALUES: RemoteReindexRequest = {
-  allowlist: '',
-  hostname: '',
-  user: '',
-  password: '',
-  synchronous: false,
-  indices: [],
-  threads: DEFAULT_THREADS_COUNT,
-  trust_unknown_certs: false,
-};
-
 const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['CHECK_REMOTE_INDEXER_CONNECTION']);
   const [errorMessage, setErrrorMessage] = useState<string | null>(null);
@@ -79,11 +57,8 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   const [availableIndices, setAvailableIndices] = useState<RemoteIndex[]>([]);
   const [selectedIndices, setSelectedIndices] = useState<RemoteIndex[]>([]);
   const [queryIndex, setQueryIndex] = useState<string>('');
-  const [initialValues, setInitialValues] = useState<RemoteReindexRequest>(DEFAULT_INITIAL_VALUES);
 
-  useEffect(() => {
-    setInitialValues((previousValues) => ({ ...previousValues }));
-  }, []);
+  const { initialValues, saveFormValues } = useSaveRemoteReindexMigrationFormValues(!hideActions);
 
   const handleConnectionCheck = (step: MigrationActions, data: MigrationState, args?: StepArgs) => {
     if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
@@ -93,7 +68,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
         setAvailableIndices(checkConnectionResult.indices);
         setSelectedIndices(checkConnectionResult.indices.filter((i) => i.managed));
         setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
-        //saveMigrateExistingDataForm(step, data, args);
+        saveFormValues(args as RemoteReindexRequest);
       } else if (checkConnectionResult?.error) {
         setErrrorMessage(checkConnectionResult.error);
       } else {
@@ -156,9 +131,9 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   const areAllIndicesSelected = filteredSelectedIndices.length === filteredIndices.length;
 
   return (
-    <Formik initialValues={initialValues}
-            onSubmit={() => {
-            }}>
+    <Formik enableReinitialize
+            initialValues={initialValues}
+            onSubmit={() => {}}>
       {({
         values,
         setFieldValue,
