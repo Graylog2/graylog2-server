@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.converters.SizeConverter;
 import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class BatchSizeConfig {
@@ -30,6 +31,10 @@ public class BatchSizeConfig {
 
     public BatchSizeConfig(String value) {
         this.value = value;
+    }
+
+    public BatchSizeConfig(int value) {
+        this.value = String.valueOf(value);
     }
 
     public Optional<Size> getAsBytes() {
@@ -86,5 +91,17 @@ public class BatchSizeConfig {
         public String convertTo(BatchSizeConfig value) {
             return value.value;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof final BatchSizeConfig that)) return false;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value);
     }
 }
