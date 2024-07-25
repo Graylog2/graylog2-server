@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix zstd library loading issue on noexec-mounted /tmp directories."
+
+issues = ["17837"]
+pulls = ["19971"]
