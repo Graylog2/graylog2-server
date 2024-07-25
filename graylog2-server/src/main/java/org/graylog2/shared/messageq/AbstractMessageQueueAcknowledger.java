@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.messageq;
 
-import org.graylog2.plugin.Message;
+import org.graylog2.indexer.messages.Acknowledgeable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,12 +43,12 @@ public abstract class AbstractMessageQueueAcknowledger<T> implements MessageQueu
     }
 
     @Override
-    public void acknowledge(Message message) {
+    public void acknowledge(Acknowledgeable message) {
         acknowledge(message.getMessageQueueId());
     }
 
     @Override
-    public void acknowledge(List<Message> messages) {
+    public void acknowledge(List<? extends Acknowledgeable> messages) {
         messages.forEach(message -> acknowledge(message.getMessageQueueId()));
     }
 

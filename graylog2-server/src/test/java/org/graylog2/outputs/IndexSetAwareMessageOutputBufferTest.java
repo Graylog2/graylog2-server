@@ -16,11 +16,13 @@
  */
 package org.graylog2.outputs;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.outputs.filter.DefaultFilteredMessage;
 import org.graylog2.outputs.filter.FilteredMessage;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,7 +54,8 @@ class IndexSetAwareMessageOutputBufferTest {
     @BeforeEach
     void setUp(MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
-        this.buffer = new IndexSetAwareMessageOutputBuffer(new BatchSizeConfig("5"));
+        this.buffer = new IndexSetAwareMessageOutputBuffer(new BatchSizeConfig("5"), new MetricRegistry(),
+                new ObjectMapperProvider().get());
     }
 
     @Test

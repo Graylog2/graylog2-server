@@ -16,7 +16,16 @@
  */
 package org.graylog2.outputs;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Size;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.ImmutableMessage;
+import org.graylog2.indexer.messages.Messages;
 import org.graylog2.outputs.filter.FilteredMessage;
 
 import java.time.Duration;
@@ -24,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * A thread-safe and index set aware output buffer implementation.
@@ -39,6 +50,8 @@ import java.util.function.Consumer;
 public class IndexSetAwareMessageOutputBuffer {
     private final int maxBufferSizeCount;
     private final long maxBufferSizeBytes;
+    private final Meter invalidTimestampsMeter;
+    private final ObjectMapper objectMapper;
 
     private volatile List<FilteredMessage> buffer;
     private volatile int bufferLength = 0;
@@ -50,10 +63,17 @@ public class IndexSetAwareMessageOutputBuffer {
      *
      * @param maxBufferSize the maximum buffer size
      */
-    public IndexSetAwareMessageOutputBuffer(BatchSizeConfig maxBufferSize) {
+    @Inject
+    public IndexSetAwareMessageOutputBuffer(@Named("output_batch_size") BatchSizeConfig maxBufferSize,
+                                            MetricRegistry metricRegistry,
+                                            ObjectMapper objectMapper) {
+
         this.maxBufferSizeCount = maxBufferSize.getAsCount().orElse(0);
         this.maxBufferSizeBytes = maxBufferSize.getAsBytes().map(Size::toBytes).orElse(0L);
         this.buffer = new ArrayList<>(maxBufferSize.getAsCount().orElse(500));
+
+        this.objectMapper = objectMapper;
+        this.invalidTimestampsMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
     }
 
     /**
@@ -85,9 +105,8 @@ public class IndexSetAwareMessageOutputBuffer {
         synchronized (this) {
             // See class the class documentation for the reasoning behind the bufferLength calculation.
             buffer.add(filteredMessage);
-            final int requiredSlots = Math.max(filteredMessage.message().getIndexSets().size(), 1);
-            bufferLength += requiredSlots;
-            bufferSizeBytes += requiredSlots * filteredMessage.message().getSize();
+            bufferLength += Math.max(filteredMessage.message().getIndexSets().size(), 1);
+            bufferSizeBytes += estimateOsBulkRequestSize(filteredMessage.message());
 
             if ((maxBufferSizeBytes != 0L && bufferSizeBytes >= maxBufferSizeBytes) ||
                     maxBufferSizeCount != 0 && bufferLength >= maxBufferSizeCount) {
@@ -124,5 +143,30 @@ public class IndexSetAwareMessageOutputBuffer {
             lastFlushTime.set(System.nanoTime());
             flusher.accept(flushBatch);
         }
+    }
+
+    /**
+     * Get a ballpark figure for the size in bytes that the OpenSarch bulk request for a message will require.
+     */
+    private long estimateOsBulkRequestSize(ImmutableMessage message) {
+        // Get size of the message by preemptively serializing it. The implementation of ImmutableMessage is expected
+        // to cache the result so that serialization won't be performed twice.
+        long msgSize;
+        try {
+            msgSize = message.serialize(objectMapper, invalidTimestampsMeter).length + 1; // msg size plus newline
+        } catch (JsonProcessingException e) {
+            msgSize = 0;
+        }
+
+        // An OpenSearch bulk index request will include an "index" instruction for each message and each index set.
+        // An instruction will look like this:
+        // {"index":{"_index":"graylog_deflector","_id":"70db7111-48fd-11ef-b7e8-5ae4251f926d"}}
+        // Take that into account as well.
+        final long indexInstructionsSize = message.getIndexSets().stream()
+                .map(IndexSet::getWriteIndexAlias)
+                .mapToLong(index -> 32L + index.length() + 36L + 1) // instruction size plus newline
+                .sum();
+
+        return indexInstructionsSize + msgSize * Math.max(message.getIndexSets().size(), 1);
     }
 }

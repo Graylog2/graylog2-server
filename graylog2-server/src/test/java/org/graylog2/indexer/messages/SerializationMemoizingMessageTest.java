@@ -16,7 +16,8 @@
  */
 package org.graylog2.indexer.messages;
 
-import org.graylog2.indexer.IndexSet;
+class SerializationMemoizingMessageTest {
 
-public record MessageWithIndex(ImmutableMessage message, IndexSet indexSet) {
+    // TODO
+
 }

@@ -17,6 +17,7 @@
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
 
@@ -38,10 +39,18 @@ public interface Indexable {
      * The message id is represented as a {@link de.huxhorn.sulky.ulid.ULID}
      */
     String getMessageId();
+
     long getSize();
+
     DateTime getReceiveTime();
-    Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,@Nonnull final Meter invalidTimestampMeter);
+
+    Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper, @Nonnull final Meter invalidTimestampMeter);
+
     DateTime getTimestamp();
+
+    default byte[] serialize(ObjectMapper objectMapper, @Nonnull final Meter invalidTimestampMeter) throws JsonProcessingException {
+        return objectMapper.writeValueAsBytes(toElasticSearchObject(objectMapper, invalidTimestampMeter));
+    }
 
     /**
      * Guides the failure handling framework when deciding whether this particular

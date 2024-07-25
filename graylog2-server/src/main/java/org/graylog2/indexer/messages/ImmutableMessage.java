@@ -17,6 +17,26 @@
 package org.graylog2.indexer.messages;
 
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.plugin.Message;
 
-public record MessageWithIndex(ImmutableMessage message, IndexSet indexSet) {
+import java.util.Map;
+import java.util.Set;
+
+public interface ImmutableMessage extends Indexable, Acknowledgeable {
+
+    static ImmutableMessage wrap(Message message) {
+        return new SerializationMemoizingMessage(message);
+    }
+
+    Set<IndexSet> getIndexSets();
+
+    Map<String, Object> getFields();
+
+    String getMessage();
+
+    Object getField(String fieldFullMessage);
+
+    String getSource();
+
+    Set<String> getStreamIds();
 }

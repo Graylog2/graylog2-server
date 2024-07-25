@@ -16,7 +16,9 @@
  */
 package org.graylog2.indexer.messages;
 
-import org.graylog2.indexer.IndexSet;
+import javax.annotation.Nullable;
 
-public record MessageWithIndex(ImmutableMessage message, IndexSet indexSet) {
+public interface Acknowledgeable {
+    @Nullable
+    Object getMessageQueueId();
 }

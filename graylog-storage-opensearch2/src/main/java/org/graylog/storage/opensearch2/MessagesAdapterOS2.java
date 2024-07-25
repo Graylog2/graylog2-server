@@ -253,7 +253,7 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
     private IndexRequest indexRequestFrom(IndexingRequest request) {
         final byte[] body;
         try {
-            body = this.objectMapper.writeValueAsBytes(request.message().toElasticSearchObject(objectMapper, this.invalidTimestampMeter));
+            body = request.message().serialize(objectMapper, invalidTimestampMeter);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

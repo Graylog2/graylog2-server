@@ -32,6 +32,7 @@ import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -112,13 +113,15 @@ class BatchedMessageFilterOutputTest {
 
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     private @Nonnull BatchedMessageFilterOutput createOutput(BatchSizeConfig maxBatchSize) {
+        final var buffer = new IndexSetAwareMessageOutputBuffer(maxBatchSize, new MetricRegistry(),
+                new ObjectMapperProvider().get());
         return new BatchedMessageFilterOutput(
                 Map.of("targetOutput1", targetOutput1),
                 new AllOutputsFilter(Map.of(ElasticSearchOutput.FILTER_KEY, mock(FilteredMessageOutput.class))),
                 new MetricRegistry(),
                 cluster,
                 acknowledger,
-                maxBatchSize,
+                buffer,
                 outputFlushInterval,
                 shutdownTimeoutMs,
                 Executors.newSingleThreadScheduledExecutor()
