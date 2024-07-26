@@ -18,6 +18,7 @@ package org.graylog2.cluster.nodes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.cluster.Node;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -25,7 +26,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public abstract class NodeDto implements Node {
+public abstract class NodeDto implements Node, MongoEntity {
+
+    @Override
+    public String id() {
+        return getId();
+    }
 
     @JsonProperty("object_id")
     @Nullable
