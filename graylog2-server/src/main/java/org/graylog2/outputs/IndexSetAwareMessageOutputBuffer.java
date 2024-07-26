@@ -21,6 +21,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Size;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog2.indexer.IndexSet;
@@ -106,7 +108,7 @@ public class IndexSetAwareMessageOutputBuffer {
             // See class the class documentation for the reasoning behind the bufferLength calculation.
             buffer.add(filteredMessage);
             bufferLength += Math.max(filteredMessage.message().getIndexSets().size(), 1);
-            bufferSizeBytes += estimateOsBulkRequestSize(filteredMessage.message());
+            bufferSizeBytes += estimateOsBulkRequestSize(filteredMessage.message(), objectMapper, invalidTimestampsMeter);
 
             if ((maxBufferSizeBytes != 0L && bufferSizeBytes >= maxBufferSizeBytes) ||
                     maxBufferSizeCount != 0 && bufferLength >= maxBufferSizeCount) {
@@ -148,7 +150,8 @@ public class IndexSetAwareMessageOutputBuffer {
     /**
      * Get a ballpark figure for the size in bytes that the OpenSarch bulk request for a message will require.
      */
-    private long estimateOsBulkRequestSize(ImmutableMessage message) {
+    @VisibleForTesting
+    static long estimateOsBulkRequestSize(ImmutableMessage message, ObjectMapper objectMapper, Meter invalidTimestampsMeter) {
         // Get size of the message by preemptively serializing it. The implementation of ImmutableMessage is expected
         // to cache the result so that serialization won't be performed twice.
         long msgSize;
@@ -164,7 +167,7 @@ public class IndexSetAwareMessageOutputBuffer {
         // Take that into account as well.
         final long indexInstructionsSize = message.getIndexSets().stream()
                 .map(IndexSet::getWriteIndexAlias)
-                .mapToLong(index -> 32L + index.length() + 36L + 1) // instruction size plus newline
+                .mapToLong(index -> 32L + MoreObjects.firstNonNull(index, "").length() + 36L + 1) // instruction size plus newline
                 .sum();
 
         return indexInstructionsSize + msgSize * Math.max(message.getIndexSets().size(), 1);

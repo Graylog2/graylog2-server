@@ -16,12 +16,15 @@
  */
 package org.graylog2.outputs;
 
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nonnull;
 import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.outputs.filter.AllOutputsFilter;
 import org.graylog2.outputs.filter.DefaultFilteredMessage;
 import org.graylog2.outputs.filter.FilteredMessage;
@@ -76,6 +79,7 @@ class BatchedMessageFilterOutputTest {
 
     private static final int MESSAGES_PER_BATCH = 3;
 
+    private ObjectMapper objectMapper;
     private MessageFactory messageFactory;
     private BatchedMessageFilterOutput output;
     private final int shutdownTimeoutMs = "true".equals(System.getenv("CI")) ? 500 : 100; // be more graceful when running on ci infrastructure
@@ -84,6 +88,8 @@ class BatchedMessageFilterOutputTest {
     @BeforeEach
     void setUp(MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
+        this.objectMapper = new ObjectMapperProvider().get();
+        when(indexSet.getWriteIndexAlias()).thenReturn("graylog_deflector");
         lenient().when(defaultStream.getIndexSet()).thenReturn(indexSet);
     }
 
@@ -106,7 +112,11 @@ class BatchedMessageFilterOutputTest {
     class SizeBased extends BaseTest {
         @BeforeEach
         void setUp() {
-            final var batchSizeBytes = buildMessages(MESSAGES_PER_BATCH).stream().mapToLong(Message::getSize).sum();
+            final long batchSizeBytes = buildMessages(MESSAGES_PER_BATCH).stream()
+                    .map(ImmutableMessage::wrap)
+                    .mapToLong(m -> IndexSetAwareMessageOutputBuffer.estimateOsBulkRequestSize(m, objectMapper,
+                            new Meter()))
+                    .sum();
             output = createOutput(new BatchSizeConfig(batchSizeBytes + " bytes"));
         }
     }
@@ -114,7 +124,7 @@ class BatchedMessageFilterOutputTest {
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     private @Nonnull BatchedMessageFilterOutput createOutput(BatchSizeConfig maxBatchSize) {
         final var buffer = new IndexSetAwareMessageOutputBuffer(maxBatchSize, new MetricRegistry(),
-                new ObjectMapperProvider().get());
+                objectMapper);
         return new BatchedMessageFilterOutput(
                 Map.of("targetOutput1", targetOutput1),
                 new AllOutputsFilter(Map.of(ElasticSearchOutput.FILTER_KEY, mock(FilteredMessageOutput.class))),
