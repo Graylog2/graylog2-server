@@ -27,8 +27,7 @@ import { getValueFromInput } from 'util/FormsUtils';
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
-
-const DEFAULT_THREADS_COUNT = 4;
+import useSaveRemoteReindexMigrationFormValues, { DEFAULT_THREADS_COUNT } from '../../hooks/useSaveRemoteReindexMigrationFormValues';
 
 const IndicesContainer = styled.div`
   max-height: 300px;
@@ -41,12 +40,12 @@ const SearchContainer = styled.div`
   margin-top: 12px;
 `;
 
-export type RemoteIndex = {
+type RemoteIndex = {
   name: string,
   managed: boolean,
 }
 
-export type RemoteReindexCheckConnection = {
+type RemoteReindexCheckConnection = {
   indices: RemoteIndex[],
   error: any,
 }
@@ -59,7 +58,9 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   const [selectedIndices, setSelectedIndices] = useState<RemoteIndex[]>([]);
   const [queryIndex, setQueryIndex] = useState<string>('');
 
-  const handleConnectionCheck = (step: MigrationActions, data: MigrationState) => {
+  const { initialValues, saveFormValues } = useSaveRemoteReindexMigrationFormValues(!hideActions);
+
+  const handleConnectionCheck = (step: MigrationActions, data: MigrationState, args?: StepArgs) => {
     if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
       const checkConnectionResult = data?.response as RemoteReindexCheckConnection;
 
@@ -67,6 +68,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
         setAvailableIndices(checkConnectionResult.indices);
         setSelectedIndices(checkConnectionResult.indices.filter((i) => i.managed));
         setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
+        saveFormValues(args as RemoteReindexRequest);
       } else if (checkConnectionResult?.error) {
         setErrrorMessage(checkConnectionResult.error);
       } else {
@@ -80,7 +82,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
     setErrrorMessage(null);
 
     return onTriggerStep(step, args).then((data) => {
-      handleConnectionCheck(step, data);
+      handleConnectionCheck(step, data, args);
 
       return data;
     }).catch((error) => {
@@ -128,21 +130,10 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   const filteredSelectedIndices = selectedIndices.filter((index) => filteredIndices.includes(index));
   const areAllIndicesSelected = filteredSelectedIndices.length === filteredIndices.length;
 
-  const initialValues: RemoteReindexRequest = {
-    allowlist: '',
-    hostname: '',
-    user: '',
-    password: '',
-    synchronous: false,
-    indices: [],
-    threads: DEFAULT_THREADS_COUNT,
-    trust_unknown_certs: false,
-  };
-
   return (
-    <Formik initialValues={initialValues}
-            onSubmit={() => {
-            }}>
+    <Formik enableReinitialize
+            initialValues={initialValues}
+            onSubmit={() => {}}>
       {({
         values,
         setFieldValue,
