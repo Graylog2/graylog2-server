@@ -27,7 +27,7 @@ import { Input, FormikInput, Button, Space } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
-import { Dropzone } from 'components/common';
+import Dropzone from 'components/common/Dropzone';
 
 type FormValues = {
   files?: Array<File>,
