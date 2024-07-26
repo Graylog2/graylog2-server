@@ -172,6 +172,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
                 throw new PermanentEventNotificationException(errorMessage);
             }
         } catch (IOException e) {
+            createSystemErrorNotification("Error: " + e.getMessage() + " for notification [" + ctx.notificationId() + "]");
             throw new PermanentEventNotificationException(e.getMessage());
         }
     }
