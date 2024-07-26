@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.preflight;
+package org.graylog.datanode.configuration;
 
 import com.google.inject.AbstractModule;
+import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioner;
+import org.graylog2.bootstrap.preflight.GraylogCertificateProvisionerImpl;
 import org.graylog2.cluster.certificates.CertificateExchange;
 import org.graylog2.cluster.certificates.CertificateExchangeImpl;
 
-public class DataNodeProvisioningBindings extends AbstractModule {
+public class DatanodeProvisioningBindings extends AbstractModule {
 
     @Override
     protected void configure() {

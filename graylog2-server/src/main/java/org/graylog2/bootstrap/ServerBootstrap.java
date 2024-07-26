@@ -31,23 +31,20 @@ import com.google.inject.ProvisionException;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.util.Types;
-import org.graylog.security.certutil.CaKeystore;
 import org.graylog.security.certutil.CertificateAuthorityBindings;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
-import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioningPeriodical;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
-import org.graylog2.cluster.certificates.CertificateExchange;
 import org.graylog2.cluster.leader.LeaderElectionService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
+import org.graylog2.cluster.preflight.GraylogServerProvisioningBindings;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -57,7 +54,6 @@ import org.graylog2.plugin.MessageBindings;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.FreshInstallDetectionModule;
@@ -179,8 +175,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         });
         preflightCheckModules.add(new ObjectMapperModule(chainingClassLoader));
 
-        runInitialCertificateProvisioning(preflightCheckModules);
-
         if (featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_WEB_ENABLED)) {
             runPreflightWeb(preflightCheckModules);
         }
@@ -190,23 +184,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
         preflightCheckService.runChecks();
     }
 
-    /**
-     * The injections and constructors of the follow-up preflight checks need initialized datanodes, otherwise
-     * they'll end up in an infinite loop, waiting for one. But this blocks any progress and periodicals, that
-     * come later. Without periodicals, we are unable to renew certificates for datanodes. So we need to be able
-     * to do this at least once before we start with preflight checks. Give datanodes chance to obtain signed certificates
-     * and start correctly, so they can be recognized and connected to from the graylog server.
-     */
-    private void runInitialCertificateProvisioning(List<Module> preflightCheckModules) {
-        preflightCheckModules.add(new DataNodeProvisioningBindings());
-        final Injector injector = getPreflightInjector(preflightCheckModules);
-        final GraylogCertificateProvisioningPeriodical periodical = new GraylogCertificateProvisioningPeriodical(injector.getInstance(CaKeystore.class), injector.getInstance(ClusterConfigService.class), injector.getInstance(CertificateExchange.class));
-        periodical.run();
-    }
-
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
-        modules.add(new DataNodeProvisioningBindings());
+        modules.add(new GraylogServerProvisioningBindings());
         modules.add(new PreflightWebModule(configuration));
         modules.add(new SchedulerBindings());
 
@@ -310,6 +290,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
+                new GraylogServerProvisioningBindings(),
                 new IndexerDiscoveryModule(),
                 new ServerPreflightChecksModule(),
                 new CertificateAuthorityBindings(),
@@ -472,7 +453,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
         result.add(new IndexerDiscoveryModule());
         result.add(new CertificateRenewalBindings());
-        result.add(new DataNodeProvisioningBindings());
+        result.add(new GraylogServerProvisioningBindings());
         result.add(new CertificateAuthorityBindings());
         return result;
     }
