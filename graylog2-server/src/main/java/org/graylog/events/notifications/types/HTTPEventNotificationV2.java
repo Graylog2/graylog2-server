@@ -166,8 +166,8 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         final OkHttpClient httpClient = selectClient(config);
         try (final Response r = httpClient.newCall(builder.build()).execute()) {
             if (!r.isSuccessful()) {
-                final String errMsg = r.body() == null ? " URL: " + config.url() : " " + r.body().string();
-                errorMessage = "Expected successful HTTP response [2xx] but got [" + r.code() + "]." + errMsg;
+                final String errorDetail = r.body() == null ? " URL: " + config.url() : " " + r.body().string();
+                errorMessage = "Expected successful HTTP response [2xx] but got [" + r.code() + "]." + errorDetail;
                 createSystemErrorNotification(errorMessage + " for notification [" + ctx.notificationId() + "]");
                 throw new PermanentEventNotificationException(errorMessage);
             }
