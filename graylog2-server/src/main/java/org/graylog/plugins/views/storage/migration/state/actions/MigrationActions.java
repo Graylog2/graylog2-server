@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
-import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
-
 /**
  * Set of callbacks used during the migration in different states.
  */
@@ -54,10 +52,6 @@ public interface MigrationActions {
     void startDataNodes();
 
     boolean dataNodeStartupFinished();
-
-    void setStateMachineContext(MigrationStateMachineContext context);
-
-    MigrationStateMachineContext getStateMachineContext();
 
     void startRemoteReindex();
 

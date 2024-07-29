@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix parsing of opensearch allowlist during remote reindex migration"
+
+pulls = ["19947"]

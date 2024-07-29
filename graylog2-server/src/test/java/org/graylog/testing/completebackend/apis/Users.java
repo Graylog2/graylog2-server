@@ -47,6 +47,8 @@ public class Users implements GraylogRestApi {
 
     public static final User LOCAL_ADMIN = new User("admin", "admin", "Admin", "Admin", "admin@graylog", false, 30_0000, "UTC", List.of(), List.of());
     public static final User JOHN_DOE = new User("john.doe", "asdfgh", "John", "Doe", "john@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
+    public static final User DON_GLOW = new User("don.glow", "hrblfrsch", "Don", "Glow", "don@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
+    public static final User POW_POE = new User("pow.poe", "grbldrbl", "Pow", "poe", "pow@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
 
     public JsonPath createUser(User user) {
         given()
@@ -57,6 +59,18 @@ public class Users implements GraylogRestApi {
                 .then()
                 .log().ifError()
                 .statusCode(201);
+
+        return getUserInfo(user.username);
+    }
+
+    public JsonPath addUserToRole(User user, String role) {
+        given()
+                .spec(api.requestSpecification())
+                .when()
+                .put("/roles/" + role + "/members/" + user.username)
+                .then()
+                .log().ifError()
+                .statusCode(204);
 
         return getUserInfo(user.username);
     }

@@ -16,7 +16,9 @@
  */
 package org.graylog.plugins.views.storage.migration;
 
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
+import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionsFactory;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionsImpl;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineProvider;
@@ -29,8 +31,9 @@ public class DatanodeMigrationBindings extends Graylog2Module {
     @Override
     protected void configure() {
         addSystemRestResource(MigrationStateResource.class);
-        bind(MigrationStateMachine.class).toProvider(MigrationStateMachineProvider.class);
         bind(DatanodeMigrationPersistence.class).to(DatanodeMigrationConfigurationImpl.class);
-        bind(MigrationActions.class).to(MigrationActionsImpl.class);
+        install(new FactoryModuleBuilder().implement(MigrationActions.class, MigrationActionsImpl.class).build(
+                MigrationActionsFactory.class));
+        bind(MigrationStateMachine.class).toProvider(MigrationStateMachineProvider.class);
     }
 }
