@@ -22,9 +22,8 @@ import { Formik, Form, Field } from 'formik';
 
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import { FormikInput, Icon } from 'components/common';
+import { FormikInput, Icon, Dropzone } from 'components/common';
 import { Button, Label, Alert } from 'components/bootstrap';
-import { Dropzone } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
