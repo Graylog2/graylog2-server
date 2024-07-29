@@ -25,13 +25,21 @@ import com.google.common.cache.CacheStats;
 import jakarta.annotation.Nonnull;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 public class SerializationMemoizingMessage implements ImmutableMessage {
+    private static final Logger LOG = LoggerFactory.getLogger(SerializationMemoizingMessage.class);
+    private static final Logger RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(
+            LOG, 1, Duration.ofSeconds(20));
+
     private final Message delegate;
 
     private final Cache<ObjectMapper, CacheEntry> serializedBytesCache;
@@ -39,7 +47,7 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     private record CacheEntry(byte[] serializedBytes, Meter invalidTimeStampMeter) {}
 
     public SerializationMemoizingMessage(Message delegate) {
-        this(delegate, false);
+        this(delegate, LOG.isDebugEnabled());
     }
 
     public SerializationMemoizingMessage(Message delegate, boolean enableCacheStats) {
@@ -64,6 +72,11 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
                     }
             );
             invalidTimestampMeter.mark(cacheEntry.invalidTimeStampMeter().getCount());
+            if (RATE_LIMITED_LOG.isDebugEnabled()) {
+                if (cacheStats().evictionCount() > 0) {
+                    RATE_LIMITED_LOG.debug("The JVM cleared a cached serialized message because of memory pressure.");
+                }
+            }
             return cacheEntry.serializedBytes();
         } catch (ExecutionException e) {
             if (e.getCause() instanceof JsonProcessingException jsonProcessingException) {
