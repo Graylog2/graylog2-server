@@ -23,7 +23,6 @@ import camelCase from 'lodash/camelCase';
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
 import { TimezoneSelect, URLWhiteListInput, SourceCodeEditor } from 'components/common';
-import type { SelectCallback } from 'components/bootstrap/types';
 
 import type { ValidationType, ConfigV2Type } from '../types';
 
@@ -158,7 +157,7 @@ class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Typ
     };
   }
 
-  handleBacklogSizeChange: SelectCallback = (event: { target: { name: string; }; }) => {
+  handleBacklogSizeChange = (event: { target: { name: string; }; }) => {
     const { name } = event.target;
     const value = getValueFromInput(event.target);
 
