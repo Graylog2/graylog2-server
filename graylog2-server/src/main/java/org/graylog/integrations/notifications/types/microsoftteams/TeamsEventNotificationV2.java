@@ -18,7 +18,7 @@ package org.graylog.integrations.notifications.types.microsoftteams;
 
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.inject.Inject;
+import javax.inject.Inject;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationException;

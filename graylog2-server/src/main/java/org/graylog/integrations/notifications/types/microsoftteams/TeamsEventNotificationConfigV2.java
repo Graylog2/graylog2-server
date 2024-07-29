@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import jakarta.validation.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
