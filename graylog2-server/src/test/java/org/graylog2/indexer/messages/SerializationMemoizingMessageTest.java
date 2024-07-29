@@ -25,6 +25,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -38,7 +39,7 @@ class SerializationMemoizingMessageTest {
     @Test
     void serializeTwice(MessageFactory messageFactory) throws JsonProcessingException {
         final Message wrappedMsg = messageFactory.createMessage("test message", "test source",
-                DateTime.now());
+                DateTime.now(DateTimeZone.UTC));
         wrappedMsg.addProcessingError(
                 new Message.ProcessingError(ProcessingFailureCause.InvalidTimestampException, "", ""));
 
@@ -66,7 +67,7 @@ class SerializationMemoizingMessageTest {
     @Test
     void differentObjectMappers(MessageFactory messageFactory) throws JsonProcessingException {
         final var msg = new SerializationMemoizingMessage(
-                messageFactory.createMessage("test message", "test source", DateTime.now()),
+                messageFactory.createMessage("test message", "test source", DateTime.now(DateTimeZone.UTC)),
                 true);
 
         msg.serialize(new ObjectMapperProvider().get(), new Meter());
