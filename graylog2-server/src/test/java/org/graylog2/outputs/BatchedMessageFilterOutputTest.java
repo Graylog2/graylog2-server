@@ -16,7 +16,6 @@
  */
 package org.graylog2.outputs;
 
-import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
@@ -114,8 +113,7 @@ class BatchedMessageFilterOutputTest {
         void setUp() {
             final long batchSizeBytes = buildMessages(MESSAGES_PER_BATCH).stream()
                     .map(ImmutableMessage::wrap)
-                    .mapToLong(m -> IndexSetAwareMessageOutputBuffer.estimateOsBulkRequestSize(m, objectMapper,
-                            new Meter()))
+                    .mapToLong(m -> IndexSetAwareMessageOutputBuffer.estimateOsBulkRequestSize(m, objectMapper))
                     .sum();
             output = createOutput(new BatchSizeConfig(batchSizeBytes + " bytes"));
         }

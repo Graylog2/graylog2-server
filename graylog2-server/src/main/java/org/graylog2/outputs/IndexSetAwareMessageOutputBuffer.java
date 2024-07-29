@@ -27,7 +27,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.ImmutableMessage;
-import org.graylog2.indexer.messages.Messages;
 import org.graylog2.outputs.filter.FilteredMessage;
 
 import java.time.Duration;
@@ -35,8 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-
-import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * A thread-safe and index set aware output buffer implementation.
@@ -52,7 +49,6 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class IndexSetAwareMessageOutputBuffer {
     private final int maxBufferSizeCount;
     private final long maxBufferSizeBytes;
-    private final Meter invalidTimestampsMeter;
     private final ObjectMapper objectMapper;
 
     private volatile List<FilteredMessage> buffer;
@@ -75,7 +71,6 @@ public class IndexSetAwareMessageOutputBuffer {
         this.buffer = new ArrayList<>(maxBufferSize.getAsCount().orElse(500));
 
         this.objectMapper = objectMapper;
-        this.invalidTimestampsMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
     }
 
     /**
@@ -108,7 +103,7 @@ public class IndexSetAwareMessageOutputBuffer {
             // See class the class documentation for the reasoning behind the bufferLength calculation.
             buffer.add(filteredMessage);
             bufferLength += Math.max(filteredMessage.message().getIndexSets().size(), 1);
-            bufferSizeBytes += estimateOsBulkRequestSize(filteredMessage.message(), objectMapper, invalidTimestampsMeter);
+            bufferSizeBytes += estimateOsBulkRequestSize(filteredMessage.message(), objectMapper);
 
             if ((maxBufferSizeBytes != 0L && bufferSizeBytes >= maxBufferSizeBytes) ||
                     maxBufferSizeCount != 0 && bufferLength >= maxBufferSizeCount) {
@@ -151,12 +146,12 @@ public class IndexSetAwareMessageOutputBuffer {
      * Get a ballpark figure for the size in bytes that the OpenSarch bulk request for a message will require.
      */
     @VisibleForTesting
-    static long estimateOsBulkRequestSize(ImmutableMessage message, ObjectMapper objectMapper, Meter invalidTimestampsMeter) {
+    static long estimateOsBulkRequestSize(ImmutableMessage message, ObjectMapper objectMapper) {
         // Get size of the message by preemptively serializing it. The implementation of ImmutableMessage is expected
         // to cache the result so that serialization won't be performed twice.
         long msgSize;
         try {
-            msgSize = message.serialize(objectMapper, invalidTimestampsMeter).length + 1; // msg size plus newline
+            msgSize = message.serialize(objectMapper, new Meter()).length + 1; // msg size plus newline
         } catch (JsonProcessingException e) {
             msgSize = 0;
         }

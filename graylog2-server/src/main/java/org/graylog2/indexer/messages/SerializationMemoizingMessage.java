@@ -17,48 +17,67 @@
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.Meter;
-import com.cronutils.utils.VisibleForTesting;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheStats;
 import jakarta.annotation.Nonnull;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 public class SerializationMemoizingMessage implements ImmutableMessage {
     private final Message delegate;
 
-    private volatile WeakReference<byte[]> memoizedBytes = new WeakReference<>(null);
+    private final Cache<ObjectMapper, CacheEntry> serializedBytesCache;
 
-    @VisibleForTesting
-    volatile int serializationCounter = 0;
+    private record CacheEntry(byte[] serializedBytes, Meter invalidTimeStampMeter) {}
 
     public SerializationMemoizingMessage(Message delegate) {
+        this(delegate, false);
+    }
+
+    public SerializationMemoizingMessage(Message delegate, boolean enableCacheStats) {
         this.delegate = delegate;
+
+        final var cacheBuilder = CacheBuilder.newBuilder().weakKeys().softValues();
+        if (enableCacheStats) {
+            this.serializedBytesCache = cacheBuilder.recordStats().build();
+        } else {
+            this.serializedBytesCache = cacheBuilder.build();
+        }
     }
 
     @Override
     public synchronized byte[] serialize(ObjectMapper objectMapper, @Nonnull Meter invalidTimestampMeter)
             throws JsonProcessingException {
-        final var bytes = memoizedBytes.get();
-        if (bytes != null) {
-            return bytes;
-        }
 
-        final Meter tsMeter;
-        if (serializationCounter++ == 0) {
-            tsMeter = invalidTimestampMeter;
-        } else {
-            // dummy meter we because we don't want to count invalid timestamps multiple times
-            tsMeter = new Meter();
+        try {
+            final var cacheEntry = serializedBytesCache.get(objectMapper, () -> {
+                        final var tsMeter = new Meter();
+                        return new CacheEntry(delegate.serialize(objectMapper, tsMeter), tsMeter);
+                    }
+            );
+            invalidTimestampMeter.mark(cacheEntry.invalidTimeStampMeter().getCount());
+            return cacheEntry.serializedBytes();
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof JsonProcessingException jsonProcessingException) {
+                throw jsonProcessingException;
+            }
+            throw new RuntimeException(e);
         }
-        final var serializedBytes = delegate.serialize(objectMapper, tsMeter);
-        memoizedBytes = new WeakReference<>(serializedBytes);
-        return serializedBytes;
+    }
+
+    /**
+     * See {@link Cache#stats()}
+     */
+    CacheStats cacheStats() {
+        return serializedBytesCache.stats();
     }
 
     // only straight-forward delegations below this line
