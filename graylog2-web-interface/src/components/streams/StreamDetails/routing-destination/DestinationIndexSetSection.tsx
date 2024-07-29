@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
 import { Icon, Section } from 'components/common';
 import { IndexSetsStore, type IndexSet } from 'stores/indices/IndexSetsStore';
-import { Table, Badge, Button } from 'components/bootstrap';
+import { Table, Badge, Button, Alert } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
@@ -43,6 +43,11 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
 
   return (
     <Section title="Index Set">
+      <Alert bsStyle="info">
+        Messages routed to the <b>Search Cluster</b>will be searchable in Graylog and count towards Graylog License usage.<br />
+        These messages will be stored in the defined Index Set until the retention policy criteria is met.<br />
+        Note: Messages not routed to the <b>Search Cluster</b> will not be searchable in Graylog.
+      </Alert>
       <Table>
         <thead>
           <tr>

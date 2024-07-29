@@ -27,6 +27,7 @@ import useTableElements from 'components/streams/StreamDetails/output-filter/hoo
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import FilterRuleEditButton from 'components/streams/StreamDetails/output-filter/FilterRuleEditButton';
 import { keyFn, fetchStreamOutputFilters } from 'components/streams/hooks/useStreamOutputFilters';
+import { Alert } from 'components/bootstrap';
 
 import FilterStatusCell from './FilterStatusCell';
 
@@ -63,6 +64,9 @@ const FilterRulesList = ({ streamId, destinationType }: Props) => {
                                                       streamId={streamId} />
                               </IfPermitted>
              )}>
+      <Alert bsStyle="info">
+        Messages which meet the criteria of the following filter rule(s) will not be routed to the  {destinationType === 'indexer' ? 'Index Set' : 'Data Warehouse'}.
+      </Alert>
       <PaginatedEntityTable<StreamOutputFilterRule> humanName="filter"
                                                     columnsOrder={COLUMNS_ORDER}
                                                     additionalAttributes={ADDITIONAL_ATTRIBUTES}
