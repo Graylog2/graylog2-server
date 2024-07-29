@@ -133,7 +133,8 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
                   <table>
                     <tbody>
                       {migrationStatus.logs.map((log) => (
-                        <tr title={new Date(log.timestamp).toLocaleString()}>
+                        <tr>
+                          <td width={160}>{new Date(log.timestamp).toLocaleString()}</td>
                           <td width={80}>[<StyledLog $colorVariant={getColorVariantFromLogLevel(log.log_level)}>{log.log_level}</StyledLog>]</td>
                           <td><StyledLog $colorVariant={getColorVariantFromLogLevel(log.log_level)}>{log.message}</StyledLog></td>
                         </tr>
