@@ -29,3 +29,12 @@ The following REST API changes have been made.
 | Endpoint                 | Description                                      |
 |--------------------------|--------------------------------------------------|
 | `tbd`                    | tbd                                              |
+
+## Deprecated Inputs
+
+The following enterprise Google inputs have been deprecated. Also, a new enterprise Google Workspace has been introduced, 
+which supports retrieving many types of Workspace logs, including the logs from the deprecated inputs. Log parsing for 
+the new Workspace input is expected to be delivered in a future Graylog Illuminate version.
+
+- Gmail Log Events
+- Google Workspace Log Events
