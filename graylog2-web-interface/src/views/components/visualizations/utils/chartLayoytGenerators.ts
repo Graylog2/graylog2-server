@@ -16,16 +16,27 @@
  */
 
 import transform from 'lodash/transform';
+import zipWith from 'lodash/zipWith';
+import sum from 'lodash/sum';
+import flattenDeep from 'lodash/flattenDeep';
 
 import type { FieldUnitType } from 'views/types';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import {
+  getBaseUnit,
+  getPrettifiedValue,
+} from 'hooks/useFieldUnitTypes';
+import { VALUE_WITH_UNIT_DIGITS } from 'views/components/TypeSpecificValue';
+import type { ChartDefinition } from 'views/components/visualizations/ChartData';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 const Y_POSITION_AXIS_STEP = 0.08;
 type DefaulAxisKey = 'withoutUnit';
 const DEFAULT_AXIS_KEY = 'withoutUnit';
+const TIME_AXIS_LABELS_QUANTITY = 4;
 
 const getYAxisPosition = (axisCount: number) => {
   const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
@@ -58,7 +69,24 @@ const defaultSettings = {
   rangemode: 'tozero',
 };
 
-export const getFormatSettings = (unitTypeKey: FieldUnitType | DefaulAxisKey) => {
+const getFormatSettingsForTime = (values: Array<any>) => {
+  const min = Math.min(0, ...values);
+  const max = Math.max(...values);
+  const step = (max - min) / TIME_AXIS_LABELS_QUANTITY;
+
+  const tickvals = Array(TIME_AXIS_LABELS_QUANTITY).fill(null).map((_, index) => (index + 1) * step);
+  const timeBaseUnit = getBaseUnit('time');
+  const prettyValues = tickvals.map((value) => getPrettifiedValue(value, { abbrev: timeBaseUnit.abbrev, unitType: timeBaseUnit.unitType }));
+
+  const ticktext = prettyValues.map((prettified) => `${Number(prettified?.value).toFixed(VALUE_WITH_UNIT_DIGITS)} ${prettified.unit.abbrev}`);
+
+  return ({
+    tickvals,
+    ticktext,
+  });
+};
+
+const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaulAxisKey, values: Array<any>) => {
   switch (unitTypeKey) {
     case 'percent':
       return ({
@@ -70,22 +98,7 @@ export const getFormatSettings = (unitTypeKey: FieldUnitType | DefaulAxisKey) =>
         ticksuffix: 'B',
       });
     case 'time':
-      return ({
-        type: 'date',
-        // tickformat: '.3f',
-        // tick0: 0,
-        // dtick: 8640000, // milliseconds
-
-        tickformatstops: [
-          { dtickrange: [0, 1000], value: '%L ms', name: 'milliseconds' }, //
-          { dtickrange: [1000, 60000], value: '%S s', name: 'seconds' }, //
-          { dtickrange: [60000, 3600000], value: '%-M min', name: 'minutes' }, //
-          { dtickrange: [3600000, 86400000], value: '%-H hr', name: 'hours' },
-          { dtickrange: [86400000, 2629746000], value: '%-d d', name: 'days' },
-          { dtickrange: [2629746000, 31556952000], value: '%-m mon', name: 'months' },
-          { dtickrange: [31556952000, Infinity], value: '%-y y', name: 'years' },
-        ],
-      });
+      return getFormatSettingsForTime(values);
     default:
       return ({
         tickformat: ',~r',
@@ -93,51 +106,14 @@ export const getFormatSettings = (unitTypeKey: FieldUnitType | DefaulAxisKey) =>
   }
 };
 
-export const getUnitLayout = (unitTypeKey: FieldUnitType | DefaulAxisKey, axisCount: number) => ({
-  ...getFormatSettings(unitTypeKey),
+export const getUnitLayoutWithData = (unitTypeKey: FieldUnitType | DefaulAxisKey, axisCount: number, values: Array<any>) => ({
+  ...getFormatSettingsByData(unitTypeKey, values),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
 });
 
 type SeriesName = string;
 type AxisName = string;
-
-export const generateYAxis = ({ series, units }: { series: AggregationWidgetConfig['series'], units: AggregationWidgetConfig['units'] }): { mapperAxisNumber: Record<string, number>, layouts: Record<string, unknown>, yAxisMapper: Record<SeriesName, AxisName>} => {
-  let axisCount = 1;
-  const unitLayout: {} | Record<FieldUnitType, { layout: Record<string, unknown>, axisKeyName: string}> = {};
-  const mapper = {};
-  const mapperAxisNumber = {};
-
-  series.forEach((s: Series) => {
-    const seriesName = s.config.name || s.function;
-    const { field } = parseSeries(s.function) ?? {};
-    const unitType = units?.getFieldUnit(field)?.unitType;
-    const unitTypeKey = unitType || DEFAULT_AXIS_KEY;
-
-    if (!unitLayout[unitTypeKey]) {
-      const axisNameNumberPart = axisCount > 1 ? axisCount : '';
-      const axisKeyName = `yaxis${axisNameNumberPart}`;
-      unitLayout[unitTypeKey] = { layout: getUnitLayout(unitTypeKey, axisCount), axisCount, axisKeyName };
-
-      mapper[seriesName] = `y${axisNameNumberPart}`;
-      mapperAxisNumber[seriesName] = axisCount;
-      axisCount += 1;
-    } else {
-      const currentAxisCount = unitLayout[unitTypeKey].axisCount;
-      const axisNameNumberPart = currentAxisCount > 1 ? currentAxisCount : '';
-      mapper[seriesName] = `y${axisNameNumberPart}`;
-      mapperAxisNumber[seriesName] = currentAxisCount;
-    }
-  });
-
-  return ({
-    layouts: transform(unitLayout, (res, { layout, axisKeyName }) => {
-      res[axisKeyName] = layout;
-    }),
-    yAxisMapper: mapper,
-    mapperAxisNumber,
-  });
-};
 
 export const generateDomain = (yAxisCount: number) => {
   if (!yAxisCount || yAxisCount === 1) return [0, 1];
@@ -185,6 +161,112 @@ export const getBarChartTraceOffsetSettings = (barmode: BarMode, { yaxis, totalA
       offsetgroup: traceIndex,
       width,
       offset,
+    });
+  }
+
+  return ({});
+};
+
+type UnitTypeMapper = {} | Record<FieldUnitType, { axisKeyName: string, axisCount: number }>;
+type SeriesUnitMapper = {} | Record<SeriesName, FieldUnitType | DefaulAxisKey>;
+type MapperAxisNumber = Record<string, number>;
+type YAxisMapper = Record<SeriesName, AxisName>;
+
+export const generateMappersForYAxis = (
+  { series, units }: { series: AggregationWidgetConfig['series'], units: AggregationWidgetConfig['units'] }): { seriesUnitMapper: SeriesUnitMapper, mapperAxisNumber: MapperAxisNumber, unitTypeMapper: UnitTypeMapper, yAxisMapper: YAxisMapper} => {
+  let axisCount = 1;
+  const unitTypeMapper: {} | UnitTypeMapper = {};
+  const mapper = {};
+  const mapperAxisNumber = {};
+  const seriesUnitMapper = {};
+
+  series.forEach((s: Series) => {
+    const seriesName = s.config.name || s.function;
+    const { field } = parseSeries(s.function) ?? {};
+    const unitType = units?.getFieldUnit(field)?.unitType;
+    const unitTypeKey = unitType || DEFAULT_AXIS_KEY;
+
+    if (!unitTypeMapper[unitTypeKey]) {
+      const axisNameNumberPart = axisCount > 1 ? axisCount : '';
+      const axisKeyName = `yaxis${axisNameNumberPart}`;
+      unitTypeMapper[unitTypeKey] = { axisCount, axisKeyName };
+
+      mapper[seriesName] = `y${axisNameNumberPart}`;
+      mapperAxisNumber[seriesName] = axisCount;
+      axisCount += 1;
+    } else {
+      const currentAxisCount = unitTypeMapper[unitTypeKey].axisCount;
+      const axisNameNumberPart = currentAxisCount > 1 ? currentAxisCount : '';
+      mapper[seriesName] = `y${axisNameNumberPart}`;
+      mapperAxisNumber[seriesName] = currentAxisCount;
+    }
+
+    seriesUnitMapper[seriesName] = unitTypeKey;
+  });
+
+  return ({
+    unitTypeMapper,
+    yAxisMapper: mapper,
+    mapperAxisNumber,
+    seriesUnitMapper,
+  });
+};
+
+const joinValues = (values: Array<Array<number>>, barmode: BarMode): Array<number> => {
+  if (barmode === 'stack' || barmode === 'relative') {
+    return zipWith(...values, (...iterateValues) => sum(iterateValues));
+  }
+
+  return flattenDeep(values);
+};
+
+export const generateLayouts = (
+  { unitTypeMapper, seriesUnitMapper, chartData, barmode }: { unitTypeMapper: UnitTypeMapper, seriesUnitMapper: SeriesUnitMapper, chartData: Array<ChartDefinition>, barmode?: string },
+): Record<string, unknown> => {
+  const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaulAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
+    const seriesName = value.name || value.originalName;
+    const unitType = seriesUnitMapper[seriesName];
+
+    if (!res[unitType]) {
+      res[unitType] = [value.y];
+    } else {
+      res[unitType].push(value.y);
+    }
+
+    return res;
+  }, {});
+
+  console.log({
+    groupYValuesByUnitTypeKey,
+  });
+
+  return transform(unitTypeMapper, (res, { axisKeyName, axisCount }, unitTypeKey: FieldUnitType | DefaulAxisKey) => {
+    const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
+    res[axisKeyName] = getUnitLayoutWithData(unitTypeKey, axisCount, unitValues);
+  });
+};
+
+export const getHoverTemplateSettings = ({ convertedToBaseValues, curUnit, originalName }: {
+  convertedToBaseValues: Array<any>,
+  curUnit: FieldUnit,
+  originalName: string,
+}): { text: Array<string>, hovertemplate: string, meta: string } | {} => {
+  if (curUnit?.unitType === 'time') {
+    const timeBaseUnit = getBaseUnit('time');
+
+    return ({
+      text: convertedToBaseValues.map((value) => {
+        const prettified = curUnit && curUnit.isDefined && getPrettifiedValue(value, {
+          abbrev: timeBaseUnit.abbrev,
+          unitType: timeBaseUnit.unitType,
+        });
+
+        if (!prettified) return null;
+
+        return `${Number(prettified?.value).toFixed(1)} ${prettified.unit.abbrev}`;
+      }),
+      hovertemplate: '%{text}<br><extra>%{meta}</extra>',
+      meta: originalName,
     });
   }
 

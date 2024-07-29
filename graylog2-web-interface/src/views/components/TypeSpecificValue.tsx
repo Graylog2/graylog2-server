@@ -34,7 +34,7 @@ import CustomPropTypes from './CustomPropTypes';
 import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
 import DecoratorValue from './DecoratorValue';
 
-const VALUE_WITH_UNIT_DIGITS = 1;
+export const VALUE_WITH_UNIT_DIGITS = 1;
 
 const defaultComponent = ({ value }: ValueRendererProps) => value;
 

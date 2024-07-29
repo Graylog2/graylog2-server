@@ -58,8 +58,9 @@ export type ConversionParams = FieldUnitState;
 export type ConvertedResult = { value: number | null, unit: Unit };
 
 const unitFromJson = (unitJson: UnitJson): Unit => set<Unit>(omit(unitJson, 'unit_type'), 'unitType', unitJson.unit_type);
+export const mappedUnitsFromJSON: FieldUnitTypes = mapValues(sourceUnits, (unitsJson: Array<UnitJson>):Array<Unit> => unitsJson.map((unitJson) => unitFromJson(unitJson)));
 
-const _getBaseUnit = (units: FieldUnitTypes, unitType: FieldUnitType): Unit => units[unitType].find(({ type }) => type === 'base');
+export const _getBaseUnit = (units: FieldUnitTypes, unitType: FieldUnitType): Unit => units[unitType].find(({ type }) => type === 'base');
 
 const _convertValueToBaseUnit = (units: FieldUnitTypes, value: number, params: ConversionParams): ConvertedResult => {
   const unit = units[params.unitType].find(({ abbrev }) => params.abbrev === abbrev);
@@ -114,7 +115,7 @@ const _convertValueToUnit = (units: FieldUnitTypes, value: number, fromParams: C
   return res;
 };
 
-const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params: ConversionParams): ConvertedResult => {
+export const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params: ConversionParams): ConvertedResult => {
   const currentUnit = units?.[params?.unitType] ?? null;
   if (!(value && currentUnit)) return ({ value, unit: currentUnit ? currentUnit.find(({ abbrev }) => abbrev === params.abbrev) : null });
 
@@ -134,7 +135,7 @@ const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params: Conve
 export type ConvertValueToUnit = (value: number, fromParams: ConversionParams, toParams: ConversionParams) => ConvertedResult
 
 const useFieldUnitTypes = () => {
-  const units = useMemo<FieldUnitTypes>(() => mapValues(sourceUnits, (unitsJson: Array<UnitJson>):Array<Unit> => unitsJson.map((unitJson) => unitFromJson(unitJson))), []);
+  const units = useMemo<FieldUnitTypes>(() => mappedUnitsFromJSON, []);
   const getBaseUnit = useCallback((fieldType: FieldUnitType) => _getBaseUnit(units, fieldType), [units]);
   const convertValueToBaseUnit = useCallback((value: number, params: ConversionParams) => _convertValueToBaseUnit(units, value, params), [units]);
   const convertValueToUnit: ConvertValueToUnit = useCallback((value, fromParams, toParams) => _convertValueToUnit(units, value, fromParams, toParams), [units]);
@@ -145,4 +146,7 @@ const useFieldUnitTypes = () => {
   return { units, unitsByAbbrev, getUnitInfo, getBaseUnit, convertValueToBaseUnit, convertValueToUnit, getPrettifiedValue };
 };
 
+export const convertValueToBaseUnit = (value: number, params: ConversionParams) => _convertValueToBaseUnit(mappedUnitsFromJSON, value, params);
+export const getPrettifiedValue = (value: number, params: ConversionParams) => _getPrettifiedValue(mappedUnitsFromJSON, value, params);
+export const getBaseUnit = (fieldType: FieldUnitType) => _getBaseUnit(mappedUnitsFromJSON, fieldType);
 export default useFieldUnitTypes;

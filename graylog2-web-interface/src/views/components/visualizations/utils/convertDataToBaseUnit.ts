@@ -14,30 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ConvertValueToUnit, ConversionParams } from 'hooks/useFieldUnitTypes';
+import type { ConversionParams } from 'hooks/useFieldUnitTypes';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
-import type { FieldUnitType } from 'views/types';
+import { convertValueToBaseUnit } from 'hooks/useFieldUnitTypes';
 
-const chartLayoutBaseUnitTypes: Record<FieldUnitType, string> = {
-  size: 'b',
-  percent: '%',
-  time: 'ms',
-};
-
-const dataConvertor = (values: Array<number>, convertValueToUnit: ConvertValueToUnit, unit: FieldUnit) => {
+const convertDataToBaseUnit = (values: Array<number>, unit: FieldUnit) => {
   if (!unit?.isDefined) return values;
   const from: ConversionParams = { abbrev: unit.abbrev, unitType: unit.unitType };
-  const to: ConversionParams = { abbrev: chartLayoutBaseUnitTypes[unit.unitType], unitType: unit.unitType };
 
-  const res = values.map((v) => {
-    const converted = convertValueToUnit(v, from, to);
-
-    if (unit.unitType === 'time') return new Date(converted.value);
+  return values.map((v) => {
+    const converted = convertValueToBaseUnit(v, from);
 
     return converted.value;
   });
-
-  return res;
 };
 
-export default dataConvertor;
+export default convertDataToBaseUnit;

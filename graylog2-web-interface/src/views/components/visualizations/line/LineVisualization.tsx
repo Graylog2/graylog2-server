@@ -27,11 +27,15 @@ import useEvents from 'views/components/visualizations/useEvents';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import { generateDomain, generateYAxis } from 'views/components/visualizations/utils/chartLayoytGenerators';
-import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
+import {
+  generateDomain,
+  generateLayouts,
+  generateMappersForYAxis,
+  getHoverTemplateSettings,
+} from 'views/components/visualizations/utils/chartLayoytGenerators';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
-import dataConvertor from 'views/components/visualizations/utils/dataConvertor';
+import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -42,14 +46,8 @@ const LineVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
-  const { convertValueToUnit } = useFieldUnitTypes();
   const widgetUnits = useWidgetUnits(config);
-  const { layouts, yAxisMapper } = useMemo(() => generateYAxis({ series: config.series, units: widgetUnits }), [config]);
-  const _layout = useMemo(() => ({
-    ...layouts,
-    hovermode: 'x',
-    xaxis: { domain: generateDomain(Object.keys(layouts)?.length) },
-  }), [layouts]);
+  const { seriesUnitMapper, yAxisMapper, mapperAxisNumber, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
   const mapKeys = useMapKeys();
@@ -63,16 +61,19 @@ const LineVisualization = makeVisualization(({
     const yaxis = yAxisMapper[name];
     const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
 
+    const convertedToBaseUnitValues = convertDataToBaseUnit(values, curUnit);
+
     return ({
       type,
       name,
       yaxis,
       x: _mapKeys(labels),
-      y: dataConvertor(values, convertValueToUnit, curUnit),
+      y: convertedToBaseUnitValues,
       originalName,
       line: { shape: toPlotly(interpolation) },
+      ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
     });
-  }, [_mapKeys, interpolation]);
+  }, [_mapKeys, config.series, interpolation, widgetUnits, yAxisMapper]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const _chartDataResult = useChartData(rows, {
@@ -83,8 +84,22 @@ const LineVisualization = makeVisualization(({
 
   const { eventChartData, shapes } = useEvents(config, data.events);
 
-  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout = shapes ? { ..._layout, shapes } : _layout;
+  const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
+
+  const layout = useMemo(() => {
+    const generatedLayouts = generateLayouts({ unitTypeMapper, seriesUnitMapper, chartData: chartDataResult });
+    const _layouts = ({
+      ...generatedLayouts,
+      hovermode: 'x',
+      xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },
+    });
+
+    if (shapes) {
+      _layouts.shapes = shapes;
+    }
+
+    return _layouts;
+  }, [unitTypeMapper, seriesUnitMapper, chartDataResult, shapes]);
 
   return (
     <XYPlot config={config}

@@ -27,7 +27,15 @@ import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import type { Generator } from 'views/components/visualizations/ChartData';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import { generateDomain, generateYAxis } from 'views/components/visualizations/utils/chartLayoytGenerators';
+import {
+  generateDomain,
+  generateLayouts,
+  generateMappersForYAxis,
+  getHoverTemplateSettings,
+} from 'views/components/visualizations/utils/chartLayoytGenerators';
+import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
+import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
+import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
 
 import XYPlot from '../XYPlot';
 
@@ -38,12 +46,8 @@ const ScatterVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
-  const { layouts, yAxisMapper } = useMemo(() => generateYAxis(config), [config]);
-  const _layout = useMemo(() => ({
-    ...layouts,
-    hovermode: 'x',
-    xaxis: { domain: generateDomain(Object.keys(layouts)?.length) },
-  }), [layouts]);
+  const widgetUnits = useWidgetUnits(config);
+  const { seriesUnitMapper, yAxisMapper, mapperAxisNumber, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
   const _mapKeys = useCallback((labels: string[]) => labels
@@ -54,15 +58,18 @@ const ScatterVisualization = makeVisualization(({
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => {
     const yaxis = yAxisMapper[name];
+    const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
+    const convertedToBaseUnitValues = convertDataToBaseUnit(values, curUnit);
 
     return ({
       type,
       name,
       x: _mapKeys(labels),
-      y: values,
+      y: convertedToBaseUnitValues,
       mode: 'markers',
       originalName,
       yaxis,
+      ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
     });
   }, [_mapKeys, yAxisMapper]);
   const _chartDataResult = useChartData(rows, {
@@ -71,8 +78,21 @@ const ScatterVisualization = makeVisualization(({
     generator: seriesGenerator,
   });
   const { eventChartData, shapes } = useEvents(config, data.events);
-  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout = shapes ? { ..._layout, shapes } : _layout;
+  const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
+  const layout = useMemo(() => {
+    const generatedLayouts = generateLayouts({ unitTypeMapper, seriesUnitMapper, chartData: chartDataResult });
+    const _layouts = ({
+      ...generatedLayouts,
+      hovermode: 'x',
+      xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },
+    });
+
+    if (shapes) {
+      _layouts.shapes = shapes;
+    }
+
+    return _layouts;
+  }, [unitTypeMapper, seriesUnitMapper, chartDataResult, shapes]);
 
   return (
     <XYPlot config={config}
