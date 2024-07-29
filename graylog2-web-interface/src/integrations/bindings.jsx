@@ -33,6 +33,9 @@ import GreyNoiseAdapterSummary from './dataadapters/GreyNoiseAdapterSummary';
 import GreyNoiseAdapterDocumentation from './dataadapters/GreyNoiseAdapterDocumentation';
 import GreyNoiseCommunityIpLookupAdapterDocumentation
   from './dataadapters/GreyNoiseCommunityIpLookupAdapterDocumentation';
+import TeamsNotificationV2Form from './event-notifications/event-notification-types/TeamsNotificationV2Form';
+import TeamsNotificationV2Summary from './event-notifications/event-notification-types/TeamsNotificationV2Summary';
+import TeamsNotificationV2Details from './event-notifications/event-notification-details/TeamsNotificationV2Details';
 
 const bindings = {
   routes: [
@@ -64,11 +67,19 @@ const bindings = {
     },
     {
       type: 'teams-notification-v1',
-      displayName: 'Microsoft Teams Notification',
+      displayName: 'Microsoft Teams Notification (Deprecated - use V2)',
       formComponent: TeamsNotificationForm,
       summaryComponent: TeamsNotificationSummary,
       detailsComponent: TeamsNotificationDetails,
       defaultConfig: TeamsNotificationForm.defaultConfig,
+    },
+    {
+      type: 'teams-notification-v2',
+      displayName: 'Microsoft Teams Notification V2',
+      formComponent: TeamsNotificationV2Form,
+      summaryComponent: TeamsNotificationV2Summary,
+      detailsComponent: TeamsNotificationV2Details,
+      defaultConfig: TeamsNotificationV2Form.defaultConfig,
     },
   ],
   lookupTableAdapters: [

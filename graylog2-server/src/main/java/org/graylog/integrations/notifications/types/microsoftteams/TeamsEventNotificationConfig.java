@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
 @AutoValue
 @JsonTypeName(TeamsEventNotificationConfig.TYPE_NAME)
 @JsonDeserialize(builder = TeamsEventNotificationConfig.Builder.class)
+@Deprecated
 public abstract class TeamsEventNotificationConfig implements EventNotificationConfig {
 
     public static final String TYPE_NAME = "teams-notification-v1";
