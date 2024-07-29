@@ -24,6 +24,10 @@ import java.util.Set;
 
 public interface ImmutableMessage extends Indexable, Acknowledgeable {
 
+    // Overriding Indexable#getId, because there it's deprecated, but in the context of a Message, it still makes sense
+    @Override
+    String getId();
+
     static ImmutableMessage wrap(Message message) {
         return new SerializationMemoizingMessage(message);
     }
@@ -34,7 +38,7 @@ public interface ImmutableMessage extends Indexable, Acknowledgeable {
 
     String getMessage();
 
-    Object getField(String fieldFullMessage);
+    Object getField(String key);
 
     String getSource();
 
