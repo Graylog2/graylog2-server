@@ -22,12 +22,12 @@ import fetch from 'logic/rest/FetchProvider';
 const fetchShowDatanodeMigration = async () => fetch('GET', qualifyUrl('/datanode/configured'));
 
 const useShowDatanodeMigration = () : boolean => {
-  const { data: showDatanodeMigration } = useQuery(
+  const { data: isDatanodeConfiguredAndUsed } = useQuery(
     ['show_datanode_migration'],
     fetchShowDatanodeMigration,
   );
 
-  return showDatanodeMigration === true;
+  return isDatanodeConfiguredAndUsed === false;
 };
 
 export default useShowDatanodeMigration;
