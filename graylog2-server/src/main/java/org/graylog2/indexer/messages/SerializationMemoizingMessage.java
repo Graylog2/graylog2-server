@@ -19,9 +19,6 @@ package org.graylog2.indexer.messages;
 import com.codahale.metrics.Meter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheStats;
 import jakarta.annotation.Nonnull;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
@@ -30,67 +27,51 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.SoftReference;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 public class SerializationMemoizingMessage implements ImmutableMessage {
     private static final Logger LOG = LoggerFactory.getLogger(SerializationMemoizingMessage.class);
     private static final Logger RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(
-            LOG, 1, Duration.ofSeconds(20));
+            LOG, 1, Duration.ofMinutes(1));
 
     private final Message delegate;
 
-    private final Cache<ObjectMapper, CacheEntry> serializedBytesCache;
+    private volatile SoftReference<CacheEntry> lastSerializationResult;
 
-    private record CacheEntry(byte[] serializedBytes, Meter invalidTimeStampMeter) {}
+    private record CacheEntry(byte[] serializedBytes,
+                              ObjectMapper objectMapper,
+                              Meter invalidTimeStampMeter) {}
 
     public SerializationMemoizingMessage(Message delegate) {
-        this(delegate, LOG.isDebugEnabled());
-    }
-
-    public SerializationMemoizingMessage(Message delegate, boolean enableCacheStats) {
         this.delegate = delegate;
-
-        final var cacheBuilder = CacheBuilder.newBuilder().weakKeys().softValues();
-        if (enableCacheStats) {
-            this.serializedBytesCache = cacheBuilder.recordStats().build();
-        } else {
-            this.serializedBytesCache = cacheBuilder.build();
-        }
     }
 
     @Override
     public synchronized byte[] serialize(ObjectMapper objectMapper, @Nonnull Meter invalidTimestampMeter)
             throws JsonProcessingException {
 
-        try {
-            final var cacheEntry = serializedBytesCache.get(objectMapper, () -> {
-                        final var tsMeter = new Meter();
-                        return new CacheEntry(delegate.serialize(objectMapper, tsMeter), tsMeter);
-                    }
-            );
-            invalidTimestampMeter.mark(cacheEntry.invalidTimeStampMeter().getCount());
-            if (RATE_LIMITED_LOG.isDebugEnabled()) {
-                if (cacheStats().evictionCount() > 0) {
-                    RATE_LIMITED_LOG.debug("The JVM cleared a cached serialized message because of memory pressure.");
-                }
+        CacheEntry cachedEntry = null;
+        if (lastSerializationResult != null) {
+            cachedEntry = lastSerializationResult.get();
+            if (cachedEntry == null) {
+                RATE_LIMITED_LOG.warn("The JVM cleared a cached serialized message because of memory pressure. " +
+                        "This has a performance impact. Please adjust the memory configuration to assign more " +
+                        "heap memory to the JVM.");
             }
-            return cacheEntry.serializedBytes();
-        } catch (ExecutionException e) {
-            if (e.getCause() instanceof JsonProcessingException jsonProcessingException) {
-                throw jsonProcessingException;
-            }
-            throw new RuntimeException(e);
         }
-    }
 
-    /**
-     * See {@link Cache#stats()}
-     */
-    CacheStats cacheStats() {
-        return serializedBytesCache.stats();
+        if (cachedEntry == null || !cachedEntry.objectMapper().equals(objectMapper)) {
+            final var tsMeter = new Meter();
+            final var serializedBytes = delegate.serialize(objectMapper, tsMeter);
+            cachedEntry = new CacheEntry(serializedBytes, objectMapper, tsMeter);
+            this.lastSerializationResult = new SoftReference<>(cachedEntry);
+        }
+
+        invalidTimestampMeter.mark(cachedEntry.invalidTimeStampMeter().getCount());
+        return cachedEntry.serializedBytes();
     }
 
     // only straight-forward delegations below this line

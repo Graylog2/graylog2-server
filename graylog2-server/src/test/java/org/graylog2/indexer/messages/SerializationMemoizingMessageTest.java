@@ -32,47 +32,56 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MessagesExtension.class)
 class SerializationMemoizingMessageTest {
 
     @Test
     void serializeTwice(MessageFactory messageFactory) throws JsonProcessingException {
-        final Message wrappedMsg = messageFactory.createMessage("test message", "test source",
-                DateTime.now(DateTimeZone.UTC));
+        final Message wrappedMsg = spy(messageFactory.createMessage("test message", "test source",
+                DateTime.now(DateTimeZone.UTC)));
         wrappedMsg.addProcessingError(
                 new Message.ProcessingError(ProcessingFailureCause.InvalidTimestampException, "", ""));
 
-        final SerializationMemoizingMessage msg = new SerializationMemoizingMessage(wrappedMsg, true);
+        final SerializationMemoizingMessage msg = new SerializationMemoizingMessage(wrappedMsg);
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+
+        verify(wrappedMsg, times(0)).toElasticSearchObject(eq(objectMapper), any(Meter.class));
 
         final Meter tsMeter = new Meter();
         final byte[] serializedBytes = msg.serialize(objectMapper, tsMeter);
 
-        assertThat(msg.cacheStats().hitCount()).isEqualTo(0);
-        assertThat(msg.cacheStats().loadSuccessCount()).isEqualTo(1);
+        verify(wrappedMsg, times(1)).toElasticSearchObject(eq(objectMapper), any(Meter.class));
         assertThat(new String(serializedBytes, StandardCharsets.UTF_8)).contains("\"message\":\"test message\"");
         assertThat(tsMeter.getCount()).isEqualTo(1);
 
         final Meter tsMeter2 = new Meter();
         final byte[] serializedBytes2 = msg.serialize(objectMapper, tsMeter2);
 
-        assertThat(msg.cacheStats().hitCount()).isEqualTo(1);
-        assertThat(msg.cacheStats().loadSuccessCount()).isEqualTo(1);
+        verify(wrappedMsg, times(1)).toElasticSearchObject(eq(objectMapper), any(Meter.class));
         assertThat(serializedBytes2).isEqualTo(serializedBytes);
         assertThat(tsMeter2.getCount()).isEqualTo(1);
     }
 
     @Test
     void differentObjectMappers(MessageFactory messageFactory) throws JsonProcessingException {
-        final var msg = new SerializationMemoizingMessage(
-                messageFactory.createMessage("test message", "test source", DateTime.now(DateTimeZone.UTC)),
-                true);
+        final Message wrappedMsg = spy(messageFactory.createMessage("test message", "test source",
+                DateTime.now(DateTimeZone.UTC)));
+        final var msg = new SerializationMemoizingMessage(wrappedMsg);
 
-        msg.serialize(new ObjectMapperProvider().get(), new Meter());
-        msg.serialize(new ObjectMapperProvider().get(), new Meter());
+        final ObjectMapper objectMapper1 = new ObjectMapperProvider().get();
+        final ObjectMapper objectMapper2 = new ObjectMapperProvider().get();
 
-        assertThat(msg.cacheStats().loadCount()).isEqualTo(2);
+        msg.serialize(objectMapper1, new Meter());
+        msg.serialize(objectMapper2, new Meter());
+
+        verify(wrappedMsg).toElasticSearchObject(eq(objectMapper1), any(Meter.class));
+        verify(wrappedMsg).toElasticSearchObject(eq(objectMapper2), any(Meter.class));
     }
 }
