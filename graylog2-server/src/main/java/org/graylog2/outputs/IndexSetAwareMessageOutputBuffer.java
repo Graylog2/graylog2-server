@@ -17,7 +17,6 @@
 package org.graylog2.outputs;
 
 import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Size;
@@ -64,7 +63,6 @@ public class IndexSetAwareMessageOutputBuffer {
      */
     @Inject
     public IndexSetAwareMessageOutputBuffer(@Named("output_batch_size") BatchSizeConfig maxBufferSize,
-                                            MetricRegistry metricRegistry,
                                             ObjectMapper objectMapper) {
 
         this.maxBufferSizeCount = maxBufferSize.getAsCount().orElse(0);

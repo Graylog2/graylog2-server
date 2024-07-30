@@ -121,8 +121,7 @@ class BatchedMessageFilterOutputTest {
 
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     private @Nonnull BatchedMessageFilterOutput createOutput(BatchSizeConfig maxBatchSize) {
-        final var buffer = new IndexSetAwareMessageOutputBuffer(maxBatchSize, new MetricRegistry(),
-                objectMapper);
+        final var buffer = new IndexSetAwareMessageOutputBuffer(maxBatchSize, objectMapper);
         return new BatchedMessageFilterOutput(
                 Map.of("targetOutput1", targetOutput1),
                 new AllOutputsFilter(Map.of(ElasticSearchOutput.FILTER_KEY, mock(FilteredMessageOutput.class))),
