@@ -30,6 +30,7 @@ import org.graylog2.validation.ValidObjectId;
 import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -49,6 +50,11 @@ public record IndexSetUpdateRequest(@JsonProperty(FIELD_TITLE) @NotBlank String 
                                     @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTieringConfig,
                                     @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) implements SimpleIndexSetConfig {
 
+
+    @Override
+    public Boolean useLegacyRotation() {
+        return Objects.isNull(useLegacyRotation) || useLegacyRotation;
+    }
 
     public static IndexSetUpdateRequest fromIndexSetConfig(final IndexSetConfig indexSet) {
         return new IndexSetUpdateRequest(

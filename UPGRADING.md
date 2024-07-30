@@ -26,9 +26,9 @@ The following Java Code API changes have been made.
 
 The following REST API changes have been made.
 
-| Endpoint                 | Description                                      |
-|--------------------------|--------------------------------------------------|
-| `tbd`                    | tbd                                              |
+| Endpoint                                 | Description                                                                                                                     |
+|------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `PUT /system/indices/index_set_defaults` | This endpoint now expects an index set template id as payload. The values of the index set template are used as default values. |
 
 ## Deprecated Inputs
 
