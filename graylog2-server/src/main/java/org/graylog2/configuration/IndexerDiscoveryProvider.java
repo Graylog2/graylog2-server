@@ -108,9 +108,9 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
                                         LOG.info("Datanode is not available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
                                     }
 
-                                    // let's try to provision certificates, maybe there are datanodes waiting for these
-                                    graylogCertificateProvisioner.runProvisioning();
                                 }
+                                // let's try to provision certificates, maybe there are datanodes waiting for these
+                                graylogCertificateProvisioner.runProvisioning();
                             }
                         })
                         .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
