@@ -31,7 +31,7 @@ import {
   generateMappersForYAxis,
   getHoverTemplateSettings,
 } from 'views/components/visualizations/utils/chartLayoytGenerators';
-import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
+import useFieldUnitTypes from 'views/components/visualizations/utils/unitConvertors';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
 import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';

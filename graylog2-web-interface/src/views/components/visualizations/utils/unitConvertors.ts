@@ -15,11 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useCallback, useMemo } from 'react';
 import minBy from 'lodash/minBy';
 import maxBy from 'lodash/maxBy';
-import omit from 'lodash/omit';
-import set from 'lodash/set';
 import mapValues from 'lodash/mapValues';
 import get from 'lodash/get';
 import keyBy from 'lodash/keyBy';
@@ -27,7 +24,7 @@ import keyBy from 'lodash/keyBy';
 import type { FieldUnitType } from 'views/types';
 import type { FieldUnitState } from 'views/logic/aggregationbuilder/FieldUnit';
 
-import supportedUnits from '../../../graylog2-server/src/main/resources/units/supported_units.json';
+import supportedUnits from '../../../../../../graylog2-server/src/main/resources/units/supported_units.json';
 
 type UnitConversionAction = 'MULTIPLY' | 'DIVIDE'
 
@@ -37,6 +34,10 @@ export type UnitJson = {
   abbrev: string,
   name: string,
   unit_type: FieldUnitType,
+  ui_options?: {
+    filtrate_from_prettier?: boolean,
+    filtrate_from_options?: boolean,
+  }
   conversion?: {
     value: number,
     action: UnitConversionAction
@@ -47,6 +48,8 @@ export type Unit = {
   abbrev: string,
   name: string,
   unitType: FieldUnitType,
+  filtrateFomPrettier: boolean,
+  filtrateFromOptions: boolean,
   conversion?: {
     value: number,
     action: UnitConversionAction
@@ -57,7 +60,15 @@ type FieldUnitTypes = Record<FieldUnitType, Array<Unit>>
 export type ConversionParams = FieldUnitState;
 export type ConvertedResult = { value: number | null, unit: Unit };
 
-const unitFromJson = (unitJson: UnitJson): Unit => set<Unit>(omit(unitJson, 'unit_type'), 'unitType', unitJson.unit_type);
+const unitFromJson = (unitJson: UnitJson): Unit => ({
+  type: unitJson.type,
+  abbrev: unitJson.abbrev,
+  name: unitJson.name,
+  unitType: unitJson.unit_type,
+  filtrateFomPrettier: !!unitJson?.ui_options?.filtrate_from_prettier,
+  filtrateFromOptions: !!unitJson?.ui_options?.filtrate_from_options,
+  conversion: unitJson.conversion,
+});
 export const mappedUnitsFromJSON: FieldUnitTypes = mapValues(sourceUnits, (unitsJson: Array<UnitJson>):Array<Unit> => unitsJson.map((unitJson) => unitFromJson(unitJson)));
 
 export const _getBaseUnit = (units: FieldUnitTypes, unitType: FieldUnitType): Unit => units[unitType].find(({ type }) => type === 'base');
@@ -121,7 +132,7 @@ export const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params
 
   const allConvertedValues = Object.values(currentUnit).map((unit) => _convertValueToUnit(units, value, params, { abbrev: unit.abbrev, unitType: unit.unitType }));
 
-  const filtratedValues = allConvertedValues.filter(({ value: val }) => val >= 1);
+  const filtratedValues = allConvertedValues.filter(({ value: val, unit: { filtrateFomPrettier } }) => val >= 1 && !filtrateFomPrettier);
 
   if (filtratedValues.length > 0) {
     return minBy(filtratedValues, ({ value: val }) => val);
@@ -133,20 +144,9 @@ export const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params
 };
 
 export type ConvertValueToUnit = (value: number, fromParams: ConversionParams, toParams: ConversionParams) => ConvertedResult
-
-const useFieldUnitTypes = () => {
-  const units = useMemo<FieldUnitTypes>(() => mappedUnitsFromJSON, []);
-  const getBaseUnit = useCallback((fieldType: FieldUnitType) => _getBaseUnit(units, fieldType), [units]);
-  const convertValueToBaseUnit = useCallback((value: number, params: ConversionParams) => _convertValueToBaseUnit(units, value, params), [units]);
-  const convertValueToUnit: ConvertValueToUnit = useCallback((value, fromParams, toParams) => _convertValueToUnit(units, value, fromParams, toParams), [units]);
-  const getPrettifiedValue = useCallback((value: number, params: ConversionParams) => _getPrettifiedValue(units, value, params), [units]);
-  const unitsByAbbrev = useMemo(() => mapValues(units, (list) => keyBy(list, 'abbrev')), [units]);
-  const getUnitInfo = useCallback((unitType: FieldUnitType, abbrev: string) => get(unitsByAbbrev, [unitType, abbrev]), [unitsByAbbrev]);
-
-  return { units, unitsByAbbrev, getUnitInfo, getBaseUnit, convertValueToBaseUnit, convertValueToUnit, getPrettifiedValue };
-};
-
 export const convertValueToBaseUnit = (value: number, params: ConversionParams) => _convertValueToBaseUnit(mappedUnitsFromJSON, value, params);
+export const convertValueToUnit: ConvertValueToUnit = (value, fromParams, toParams) => _convertValueToUnit(mappedUnitsFromJSON, value, fromParams, toParams);
 export const getPrettifiedValue = (value: number, params: ConversionParams) => _getPrettifiedValue(mappedUnitsFromJSON, value, params);
 export const getBaseUnit = (fieldType: FieldUnitType) => _getBaseUnit(mappedUnitsFromJSON, fieldType);
-export default useFieldUnitTypes;
+export const unitsByAbbrev = mapValues(mappedUnitsFromJSON, (list) => keyBy(list, 'abbrev'));
+export const getUnitInfo = (unitType: FieldUnitType, abbrev: string) => get(unitsByAbbrev, [unitType, abbrev]);

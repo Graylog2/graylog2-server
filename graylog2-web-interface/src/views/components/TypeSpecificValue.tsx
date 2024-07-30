@@ -26,7 +26,7 @@ import InputField from 'views/components/fieldtypes/InputField';
 import NodeField from 'views/components/fieldtypes/NodeField';
 import StreamsField from 'views/components/fieldtypes/StreamsField';
 import PercentageField from 'views/components/fieldtypes/PercentageField';
-import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
+import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConvertors';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 import EmptyValue from './EmptyValue';
@@ -59,7 +59,6 @@ type TypeSpecificValueProps = {
 type FormattedValueProps = Omit<TypeSpecificValueProps, 'type'>;
 
 const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit}) => {
-  const { getPrettifiedValue } = useFieldUnitTypes();
   const prettified = getPrettifiedValue(value, { abbrev: unit.abbrev, unitType: unit.unitType });
 
   return <span title={value.toString()}>{`${Number(prettified?.value).toFixed(VALUE_WITH_UNIT_DIGITS)} ${prettified.unit.abbrev}`}</span>;

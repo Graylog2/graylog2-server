@@ -28,7 +28,7 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import {
   getBaseUnit,
   getPrettifiedValue,
-} from 'hooks/useFieldUnitTypes';
+} from 'views/components/visualizations/utils/unitConvertors';
 import { VALUE_WITH_UNIT_DIGITS } from 'views/components/TypeSpecificValue';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
@@ -235,10 +235,6 @@ export const generateLayouts = (
 
     return res;
   }, {});
-
-  console.log({
-    groupYValuesByUnitTypeKey,
-  });
 
   return transform(unitTypeMapper, (res, { axisKeyName, axisCount }, unitTypeKey: FieldUnitType | DefaulAxisKey) => {
     const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);

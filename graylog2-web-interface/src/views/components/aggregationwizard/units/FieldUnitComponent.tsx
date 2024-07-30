@@ -18,12 +18,9 @@ import React, { useEffect, useMemo } from 'react';
 import { styled, css } from 'styled-components';
 import { useFormikContext } from 'formik';
 
-import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import FieldUnitPopover from 'views/components/aggregationwizard/units/FieldUnitPopover';
-import UnitContainer from 'views/components/aggregationwizard/units/UnitContainer';
-import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
+import { getUnitInfo } from 'views/components/visualizations/utils/unitConvertors';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
-import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import useFieldTypesUnits from 'views/hooks/useFieldTypesUnits';
 
 type Props = {
@@ -40,8 +37,7 @@ export const UnitLabel = styled.div(({ theme }) => css`
   height: 25px;
 `);
 
-const FieldUnitComponent = ({ field }) => {
-  const { getUnitInfo } = useFieldUnitTypes();
+const FieldUnitComponent = ({ field }: Props) => {
   const fieldTypesUnits = useFieldTypesUnits();
   const predefinedValue = useMemo(() => fieldTypesUnits?.[field], [fieldTypesUnits]);
   const { setFieldValue } = useFormikContext<WidgetConfigFormValues>();
