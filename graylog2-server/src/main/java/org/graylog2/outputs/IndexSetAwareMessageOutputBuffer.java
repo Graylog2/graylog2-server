@@ -26,6 +26,7 @@ import com.google.common.base.MoreObjects;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.DefaultSerializationContext;
 import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.outputs.filter.FilteredMessage;
 
@@ -151,7 +152,7 @@ public class IndexSetAwareMessageOutputBuffer {
         // to cache the result so that serialization won't be performed twice.
         long msgSize;
         try {
-            msgSize = message.serialize(objectMapper, new Meter()).length + 1; // msg size plus newline
+            msgSize = message.serialize(new DefaultSerializationContext(objectMapper, new Meter())).length + 1; // msg size plus newline
         } catch (JsonProcessingException e) {
             msgSize = 0;
         }

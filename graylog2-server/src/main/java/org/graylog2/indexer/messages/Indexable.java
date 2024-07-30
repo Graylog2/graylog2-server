@@ -48,8 +48,10 @@ public interface Indexable {
 
     DateTime getTimestamp();
 
-    default byte[] serialize(ObjectMapper objectMapper, @Nonnull final Meter invalidTimestampMeter) throws JsonProcessingException {
-        return objectMapper.writeValueAsBytes(toElasticSearchObject(objectMapper, invalidTimestampMeter));
+    default byte[] serialize(SerializationContext context) throws JsonProcessingException {
+        return context.objectMapper().writeValueAsBytes(
+                toElasticSearchObject(context.objectMapper(), context.invalidTimestampMeter())
+        );
     }
 
     /**

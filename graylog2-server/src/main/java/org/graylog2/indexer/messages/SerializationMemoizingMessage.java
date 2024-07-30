@@ -50,8 +50,11 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     }
 
     @Override
-    public synchronized byte[] serialize(ObjectMapper objectMapper, @Nonnull Meter invalidTimestampMeter)
+    public synchronized byte[] serialize(SerializationContext context)
             throws JsonProcessingException {
+
+        final var objectMapper = context.objectMapper();
+        final var invalidTimestampMeter = context.invalidTimestampMeter();
 
         CacheEntry cachedEntry = null;
         if (lastSerializationResult != null) {
@@ -65,7 +68,7 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
 
         if (cachedEntry == null || !cachedEntry.objectMapper().equals(objectMapper)) {
             final var tsMeter = new Meter();
-            final var serializedBytes = delegate.serialize(objectMapper, tsMeter);
+            final var serializedBytes = delegate.serialize(new DefaultSerializationContext(objectMapper, tsMeter));
             cachedEntry = new CacheEntry(serializedBytes, objectMapper, tsMeter);
             this.lastSerializationResult = new SoftReference<>(cachedEntry);
         }

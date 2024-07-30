@@ -55,14 +55,14 @@ class SerializationMemoizingMessageTest {
         verify(wrappedMsg, times(0)).toElasticSearchObject(eq(objectMapper), any(Meter.class));
 
         final Meter tsMeter = new Meter();
-        final byte[] serializedBytes = msg.serialize(objectMapper, tsMeter);
+        final byte[] serializedBytes = msg.serialize(new DefaultSerializationContext(objectMapper, tsMeter));
 
         verify(wrappedMsg, times(1)).toElasticSearchObject(eq(objectMapper), any(Meter.class));
         assertThat(new String(serializedBytes, StandardCharsets.UTF_8)).contains("\"message\":\"test message\"");
         assertThat(tsMeter.getCount()).isEqualTo(1);
 
         final Meter tsMeter2 = new Meter();
-        final byte[] serializedBytes2 = msg.serialize(objectMapper, tsMeter2);
+        final byte[] serializedBytes2 = msg.serialize(new DefaultSerializationContext(objectMapper, tsMeter2));
 
         verify(wrappedMsg, times(1)).toElasticSearchObject(eq(objectMapper), any(Meter.class));
         assertThat(serializedBytes2).isEqualTo(serializedBytes);
@@ -75,13 +75,13 @@ class SerializationMemoizingMessageTest {
                 DateTime.now(DateTimeZone.UTC)));
         final var msg = new SerializationMemoizingMessage(wrappedMsg);
 
-        final ObjectMapper objectMapper1 = new ObjectMapperProvider().get();
-        final ObjectMapper objectMapper2 = new ObjectMapperProvider().get();
+        final var context1 = new DefaultSerializationContext(new ObjectMapperProvider().get(), new Meter());
+        final var context2 = new DefaultSerializationContext(new ObjectMapperProvider().get(), new Meter());
 
-        msg.serialize(objectMapper1, new Meter());
-        msg.serialize(objectMapper2, new Meter());
+        msg.serialize(context1);
+        msg.serialize(context2);
 
-        verify(wrappedMsg).toElasticSearchObject(eq(objectMapper1), any(Meter.class));
-        verify(wrappedMsg).toElasticSearchObject(eq(objectMapper2), any(Meter.class));
+        verify(wrappedMsg).toElasticSearchObject(eq(context1.objectMapper()), any(Meter.class));
+        verify(wrappedMsg).toElasticSearchObject(eq(context2.objectMapper()), any(Meter.class));
     }
 }
