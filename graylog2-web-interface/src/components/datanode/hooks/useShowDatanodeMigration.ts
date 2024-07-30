@@ -18,17 +18,16 @@ import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
 
-const fetchShowDatanodeMigration = async () => fetch('GET', qualifyUrl(ApiRoutes.IndexerClusterApiController.info().url));
+const fetchShowDatanodeMigration = async () => fetch('GET', qualifyUrl('/datanode/configured'));
 
 const useShowDatanodeMigration = () : boolean => {
-  const { data } = useQuery(
-    ['datanode_migration_enabled'],
+  const { data: showDatanodeMigration } = useQuery(
+    ['show_datanode_migration'],
     fetchShowDatanodeMigration,
   );
 
-  return data?.name === 'datanode-cluster';
+  return showDatanodeMigration === true;
 };
 
 export default useShowDatanodeMigration;
