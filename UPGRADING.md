@@ -30,6 +30,23 @@ The following Java Code API changes have been made.
 
 The following REST API changes have been made.
 
-| Endpoint                 | Description                                      |
-|--------------------------|--------------------------------------------------|
-| `tbd`                    | tbd                                              |
+| Endpoint                            | Description                                                                            |
+|-------------------------------------|----------------------------------------------------------------------------------------|
+| `GET licenses/{licenseId}`          | deprecated                                                                             |
+| `GET licenses`                      | deprecated                                                                             |
+| `GET licenses/status`               | deprecated                                                                             |
+| `GET licenses/status/active`        | New: Show status for currently active license                                          |
+| `GET licenses/validity/for-subject` | Check for valid license for given subject                                              |
+| `GET licenses/status/for-subject`   | deprecated                                                                             |
+| `DELETE licenses/{licenseId}`        | When called with a contract ID it will delete the contract and all associated licenses |
+| `GET licenses/traffic-remaining` | Get the time series data for remaining provisioned traffic                             |
+| `GET licenses/metrics` | Get the stats for consumed and remaining provisioned traffic                                                                                       |
+
+## Deprecated Inputs
+
+The following enterprise Google inputs have been deprecated. Also, a new enterprise Google Workspace has been introduced, 
+which supports retrieving many types of Workspace logs, including the logs from the deprecated inputs. Log parsing for 
+the new Workspace input is expected to be delivered in a future Graylog Illuminate version.
+
+- Gmail Log Events
+- Google Workspace Log Events

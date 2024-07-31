@@ -24,6 +24,10 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Suppliers;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioner;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
@@ -31,10 +35,6 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
 
 import java.net.URI;
 import java.util.Collections;
@@ -53,6 +53,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     private final List<URI> hosts;
     private final PreflightConfigService preflightConfigService;
     private final NodeService<DataNodeDto> nodeService;
+    private final GraylogCertificateProvisioner graylogCertificateProvisioner;
 
     private final Supplier<List<URI>> resultsCachingSupplier;
 
@@ -66,12 +67,14 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
             @Named("datanode_startup_connection_attempts") int connectionAttempts,
             @Named("datanode_startup_connection_delay") Duration delayBetweenAttempts,
             PreflightConfigService preflightConfigService,
-            NodeService<DataNodeDto> nodeService) {
+            NodeService<DataNodeDto> nodeService,
+            GraylogCertificateProvisioner graylogCertificateProvisioner) {
         this.hosts = hosts;
         this.connectionAttempts = connectionAttempts;
         this.delayBetweenAttempts = delayBetweenAttempts;
         this.preflightConfigService = preflightConfigService;
         this.nodeService = nodeService;
+        this.graylogCertificateProvisioner = graylogCertificateProvisioner;
         this.resultsCachingSupplier = Suppliers.memoize(this::doGet);
     }
 
@@ -104,7 +107,10 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
                                     } else {
                                         LOG.info("Datanode is not available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
                                     }
+
                                 }
+                                // let's try to provision certificates, maybe there are datanodes waiting for these
+                                graylogCertificateProvisioner.runProvisioning();
                             }
                         })
                         .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
@@ -124,7 +130,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     }
 
     private boolean isEmptyList(Object result) {
-        return result instanceof List<?> && ((List<?>)result).isEmpty();
+        return result instanceof List<?> && ((List<?>) result).isEmpty();
     }
 
     private List<URI> discover() {

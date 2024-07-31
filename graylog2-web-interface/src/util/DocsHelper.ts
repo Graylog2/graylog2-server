@@ -40,7 +40,7 @@ const docsHelper = {
     LOAD_BALANCERS: 'load-balancers',
     LOOKUPTABLES: 'lookuptables',
     OPERATIONS_CHANGELOG: 'changelog-graylog',
-    OPEN_SEARCH_SETUP: 'open-search-setup',
+    OPEN_SEARCH_SETUP: 'upgrading-to-opensearch',
     PAGE_FLEXIBLE_DATE_CONVERTER: 'extractors#normalization',
     PAGE_STANDARD_DATE_CONVERTER: 'extractors#normalization',
     PERMISSIONS: 'permission-management',
