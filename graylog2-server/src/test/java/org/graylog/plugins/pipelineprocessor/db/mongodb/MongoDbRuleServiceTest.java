@@ -20,9 +20,7 @@ import org.bson.types.ObjectId;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.events.ClusterEventBus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +35,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MongoDBExtension.class)
-@ExtendWith(MongoJackExtension.class)
 @ExtendWith(MockitoExtension.class)
 class MongoDbRuleServiceTest {
     @Mock
@@ -46,9 +43,8 @@ class MongoDbRuleServiceTest {
     MongoDbRuleService ruleService;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
-        ruleService = new MongoDbRuleService(mongoDBTestService.mongoConnection(), mongoJackObjectMapperProvider,
-                clusterEventBus);
+    void setUp(MongoCollections mongoCollections) {
+        ruleService = new MongoDbRuleService(mongoCollections, clusterEventBus);
     }
 
     @Test
@@ -76,11 +72,11 @@ class MongoDbRuleServiceTest {
 
     @Test
     void loadAll() {
-        final var rule1 = ruleService.save(dummyRule().toBuilder().title("title 1").build());
+        final var rule1 = ruleService.save(dummyRule().toBuilder().title("title 3").build());
         final var rule2 = ruleService.save(dummyRule().toBuilder().title("title 2").build());
-        final var rule3 = ruleService.save(dummyRule().toBuilder().title("title 3").build());
+        final var rule3 = ruleService.save(dummyRule().toBuilder().title("title 1").build());
 
-        assertThat(ruleService.loadAll()).containsExactlyInAnyOrder(rule1, rule2, rule3);
+        assertThat(ruleService.loadAll()).containsExactly(rule3, rule2, rule1);
     }
 
     @Test
@@ -95,7 +91,7 @@ class MongoDbRuleServiceTest {
     @Test
     void loadNamed() {
         final var rule1 = ruleService.save(dummyRule().toBuilder().title("title 1").build());
-        final var rule2 = ruleService.save(dummyRule().toBuilder().title("title 2").build());
+        final var ignored = ruleService.save(dummyRule().toBuilder().title("title 2").build());
         final var rule3 = ruleService.save(dummyRule().toBuilder().title("title 3").build());
         assertThat(ruleService.loadNamed(Set.of("title 1", "title 3", "title 4"))).containsExactlyInAnyOrder(
                 rule1, rule3
