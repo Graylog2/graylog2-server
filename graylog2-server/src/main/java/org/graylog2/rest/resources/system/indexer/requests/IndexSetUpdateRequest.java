@@ -51,7 +51,6 @@ public record IndexSetUpdateRequest(@JsonProperty(FIELD_TITLE) @NotBlank String 
                                     @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) implements SimpleIndexSetConfig {
 
 
-    @Override
     public Boolean useLegacyRotation() {
         return Objects.isNull(useLegacyRotation) || useLegacyRotation;
     }
