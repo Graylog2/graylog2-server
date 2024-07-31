@@ -134,6 +134,8 @@ public class IndexSetAwareMessageOutputBuffer {
         synchronized (this) {
             flushBatch = buffer;
             buffer = new ArrayList<>(bufferLength);
+            bufferLength = 0;
+            bufferSizeBytes = 0L;
         }
         if (flushBatch != null) {
             lastFlushTime.set(System.nanoTime());
