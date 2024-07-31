@@ -31,9 +31,7 @@ import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
 import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
-import useFieldTypesUnits from 'views/hooks/useFieldTypesUnits';
 import FieldUnitComponent from 'views/components/aggregationwizard/units/FieldUnitComponent';
-import UnitContainer from 'views/components/aggregationwizard/units/UnitContainer';
 
 import FieldSelect from '../FieldSelect';
 

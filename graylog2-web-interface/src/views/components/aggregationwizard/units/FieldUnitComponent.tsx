@@ -22,6 +22,8 @@ import FieldUnitPopover from 'views/components/aggregationwizard/units/FieldUnit
 import { getUnitInfo } from 'views/components/visualizations/utils/unitConvertors';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import useFieldTypesUnits from 'views/hooks/useFieldTypesUnits';
+import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
+import { Properties } from 'views/logic/fieldtypes/FieldType';
 
 type Props = {
   field: string,
@@ -39,14 +41,18 @@ export const UnitLabel = styled.div(({ theme }) => css`
 
 const FieldUnitComponent = ({ field }: Props) => {
   const fieldTypesUnits = useFieldTypesUnits();
+  const { data, isLoading } = useFieldTypes(undefined, undefined);
   const predefinedValue = useMemo(() => fieldTypesUnits?.[field], [fieldTypesUnits]);
   const { setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const showUnitComponent = useMemo(() => !!(data?.find((f) => f.name === field && f?.type?.properties?.contains(Properties.Numeric))), [data, field]);
 
   useEffect(() => {
     if (predefinedValue) {
       setFieldValue(`units.${field}`, { abbrev: predefinedValue.abbrev, unitType: predefinedValue.unitType });
     }
   }, [predefinedValue]);
+
+  if (!showUnitComponent) return null;
 
   if (predefinedValue?.isDefined) return <UnitLabel title={getUnitInfo(predefinedValue.unitType, predefinedValue.abbrev).name}>{predefinedValue.abbrev}</UnitLabel>;
 

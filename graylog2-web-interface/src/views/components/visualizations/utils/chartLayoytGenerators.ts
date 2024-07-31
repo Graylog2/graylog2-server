@@ -156,11 +156,6 @@ type AdditionalSettings = {
 export const getBarChartTraceOffsetSettings = (barmode: BarMode, { yaxis, totalAxis, axisNumber, traceIndex, totalTraces, effectiveTimerange, isTimeline, xAxisItemsLength }: AdditionalSettings) => {
   const offsetMultiplier = (xAxisItemsLength && isTimeline && effectiveTimerange) ? (moment(effectiveTimerange.to).diff(effectiveTimerange.from) / xAxisItemsLength) : 1;
 
-  console.log({
-    offsetMultiplier,
-    totalTraces,
-  });
-
   if (barmode === 'stack' || barmode === 'relative' || barmode === 'overlay') {
     const width = getWidth(totalAxis, offsetMultiplier);
     const offset = getOffset(axisNumber, totalAxis, offsetMultiplier);
