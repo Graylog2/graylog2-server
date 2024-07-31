@@ -18,6 +18,7 @@ package org.graylog.datanode.bootstrap;
 
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -31,15 +32,19 @@ import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.bindings.OpensearchProcessBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
+import org.graylog.datanode.bootstrap.preflight.PreflightClusterConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
+import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.FreshInstallDetectionModule;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.jsoftbiz.utils.OS;
@@ -162,11 +167,12 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
+                new PreflightClusterConfigurationModule(chainingClassLoader),
                 new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new PreflightChecksBindings(),
                 new DatanodeConfigurationBindings(),
-                new Module() {
+        new Module() {
                     @Override
                     public void configure(Binder binder) {
                         preflightCheckModules.forEach(binder::install);

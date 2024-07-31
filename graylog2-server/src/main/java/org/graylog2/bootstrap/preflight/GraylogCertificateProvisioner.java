@@ -14,19 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
+package org.graylog2.bootstrap.preflight;
 
-interface EnterpriseTrafficGraph {
-  layout: string;
-  children: React.ReactNode;
-}
-
-interface LicensePlugin {
-  EnterpriseTrafficGraph?: React.ComponentType<EnterpriseTrafficGraph>;
-}
-
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    license?: LicensePlugin;
-  }
+public interface GraylogCertificateProvisioner {
+    void runProvisioning();
 }
