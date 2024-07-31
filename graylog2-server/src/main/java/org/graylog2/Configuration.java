@@ -85,7 +85,7 @@ public class Configuration extends CaConfiguration {
 
     @Parameter(value = "output_batch_size", required = true, converter = BatchSizeConfig.Converter.class,
                validators = BatchSizeConfig.Validator.class)
-    private BatchSizeConfig outputBatchSize = new BatchSizeConfig("500");
+    private BatchSizeConfig outputBatchSize = BatchSizeConfig.forCount(500);
 
     @Parameter(value = "output_flush_interval", required = true, validators = PositiveIntegerValidator.class)
     private int outputFlushInterval = 1;

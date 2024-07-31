@@ -16,41 +16,65 @@
  */
 package org.graylog2.outputs;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.ValidationException;
-import com.github.joschi.jadconfig.converters.IntegerConverter;
-import com.github.joschi.jadconfig.converters.SizeConverter;
 import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
+/**
+ * This class represents the configuration of a batch size which is measured in bytes but also supports a count based
+ * configuration, e.g. number of messages, for backwards compatibility.
+ */
 public class BatchSizeConfig {
     private final String value;
+    private final Size size;
+    private final Integer count;
 
-    public BatchSizeConfig(String value) {
-        this.value = value;
+    /**
+     * Create a config by parsing the supplied string as a {@link Size}, or an {@link Integer} for backwards
+     * compatibility.
+     */
+    @JsonCreator
+    public static BatchSizeConfig parse(String value) {
+        try {
+            return new BatchSizeConfig(value, Size.parse(value), null);
+        } catch (IllegalArgumentException sizeParsingException) {
+            try {
+                return new BatchSizeConfig(value, null, Integer.valueOf(value));
+            } catch (NumberFormatException ignored) {
+                throw new IllegalArgumentException(f("\"%s\" is neither a size [%s] nor an integer.", value,
+                        sizeParsingException.getLocalizedMessage()));
+            }
+        }
     }
 
-    public BatchSizeConfig(int value) {
-        this.value = String.valueOf(value);
+    /**
+     * Create a count based config for backwards compatibility.
+     */
+    @JsonCreator
+    public static BatchSizeConfig forCount(int count) {
+        return new BatchSizeConfig(String.valueOf(count), null, count);
+    }
+
+    private BatchSizeConfig(String value, Size size, Integer count) {
+        this.value = value;
+        this.size = size;
+        this.count = count;
     }
 
     public Optional<Size> getAsBytes() {
-        try {
-            return Optional.of(new SizeConverter().convertFrom(value));
-        } catch (Exception ignored) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(size);
     }
 
     public Optional<Integer> getAsCount() {
-        try {
-            return Optional.of(new IntegerConverter().convertFrom(value));
-        } catch (Exception ignored) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(count);
     }
 
     /**
@@ -68,15 +92,12 @@ public class BatchSizeConfig {
     public static class Validator implements com.github.joschi.jadconfig.Validator<BatchSizeConfig> {
         @Override
         public void validate(String name, BatchSizeConfig config) throws ValidationException {
-            try {
-                final Size size = Size.parse(config.value);
-                if (size.toMegabytes() > 90) {
-                    throw new ValidationException(
-                            "Parameter <%s> should not be greater than 90MB. (Found <%s>)".formatted(name, size));
-                }
-            } catch (IllegalArgumentException ignored) {
-                final Integer intValue = new IntegerConverter().convertFrom(config.value);
-                new PositiveIntegerValidator().validate(name, intValue);
+            if (config.size != null && config.size.toMegabytes() >= 100) {
+                throw new ValidationException(
+                        "Parameter <%s> should not < 100MB. (Found <%s>)".formatted(name, config.size));
+            }
+            if (config.count != null) {
+                new PositiveIntegerValidator().validate(name, config.count);
             }
         }
     }
@@ -84,7 +105,11 @@ public class BatchSizeConfig {
     public static class Converter implements com.github.joschi.jadconfig.Converter<BatchSizeConfig> {
         @Override
         public BatchSizeConfig convertFrom(String value) {
-            return new BatchSizeConfig(value);
+            try {
+                return BatchSizeConfig.parse(value);
+            } catch (IllegalArgumentException e) {
+                throw new ParameterException(f("Couldn't convert value \"%s\" to batch size config.", value), e);
+            }
         }
 
         @Override

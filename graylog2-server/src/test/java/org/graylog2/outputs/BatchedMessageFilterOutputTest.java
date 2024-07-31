@@ -103,7 +103,7 @@ class BatchedMessageFilterOutputTest {
     class CountBased extends BaseTest {
         @BeforeEach
         void setUp() {
-            output = createOutput(new BatchSizeConfig(String.valueOf(MESSAGES_PER_BATCH)));
+            output = createOutput(BatchSizeConfig.forCount(MESSAGES_PER_BATCH));
         }
     }
 
@@ -115,7 +115,7 @@ class BatchedMessageFilterOutputTest {
                     .map(ImmutableMessage::wrap)
                     .mapToLong(m -> IndexSetAwareMessageOutputBuffer.estimateOsBulkRequestSize(m, objectMapper))
                     .sum();
-            output = createOutput(new BatchSizeConfig(batchSizeBytes + " bytes"));
+            output = createOutput(BatchSizeConfig.parse(batchSizeBytes + " bytes"));
         }
     }
 

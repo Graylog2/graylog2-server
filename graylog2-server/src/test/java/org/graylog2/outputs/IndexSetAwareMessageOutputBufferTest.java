@@ -53,7 +53,7 @@ class IndexSetAwareMessageOutputBufferTest {
     @BeforeEach
     void setUp(MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
-        this.buffer = new IndexSetAwareMessageOutputBuffer(new BatchSizeConfig("5"),
+        this.buffer = new IndexSetAwareMessageOutputBuffer(BatchSizeConfig.forCount(5),
                 new ObjectMapperProvider().get());
     }
 
