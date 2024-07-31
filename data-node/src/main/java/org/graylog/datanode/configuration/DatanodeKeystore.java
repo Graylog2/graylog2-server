@@ -179,7 +179,7 @@ public class DatanodeKeystore {
     }
 
     public Date getCertificateExpiration() {
-        return certValidUntil.get();
+        return doGetCertificateExpiration();
     }
 
     private Date doGetCertificateExpiration() {
