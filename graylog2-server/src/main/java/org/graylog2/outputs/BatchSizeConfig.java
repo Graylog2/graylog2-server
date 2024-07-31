@@ -92,9 +92,9 @@ public class BatchSizeConfig {
     public static class Validator implements com.github.joschi.jadconfig.Validator<BatchSizeConfig> {
         @Override
         public void validate(String name, BatchSizeConfig config) throws ValidationException {
-            if (config.size != null && config.size.toMegabytes() >= 100) {
+            if (config.size != null && config.size.toMegabytes() > 99) {
                 throw new ValidationException(
-                        "Parameter <%s> should not < 100MB. (Found <%s>)".formatted(name, config.size));
+                        "Parameter <%s> must not be greater than 99 MB. (Found <%s>)".formatted(name, config.size));
             }
             if (config.count != null) {
                 new PositiveIntegerValidator().validate(name, config.count);
