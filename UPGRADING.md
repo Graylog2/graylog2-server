@@ -13,6 +13,10 @@ The `default_message_output_class` setting changed from
 org.graylog2.outputs.BatchedMessageFilterOutput` as part of an internal
 refactoring. Regular users should not change the setting.
 
+## New Configuration Settings
+
+`license_manager_url` specifies the base path of the new License Manager component.
+
 ## Java API Changes
 
 The following Java Code API changes have been made.
