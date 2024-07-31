@@ -119,21 +119,15 @@
     "percent": [
       {
         "type": "base",
-        "abbrev": "%",
-        "name": "percent",
-        "unit_type": "percent",
-        "ui_options": {
-          "filtrate_from_prettier": true
-        }
+        "abbrev": "d%",
+        "name": "percent (decimal)",
+        "unit_type": "percent"
       },
       {
         "type": "derived",
-        "abbrev": "% ",
-        "name": "integer_percent",
+        "abbrev": "%",
+        "name": "percent(1..100)",
         "unit_type": "percent",
-        "ui_options": {
-          "filtrate_from_options": true
-        },
         "conversion": {
           "value": 100,
           "action": "DIVIDE"

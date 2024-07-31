@@ -33,16 +33,16 @@ import { VALUE_WITH_UNIT_DIGITS } from 'views/components/TypeSpecificValue';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
-const Y_POSITION_AXIS_STEP = 0.08;
-type DefaulAxisKey = 'withoutUnit';
+const Y_POSITION_AXIS_STEP = 0.1;
+type DefaultAxisKey = 'withoutUnit';
 const DEFAULT_AXIS_KEY = 'withoutUnit';
 const TIME_AXIS_LABELS_QUANTITY = 4;
 
 const getYAxisPosition = (axisCount: number) => {
-  const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
+  const diff = (Math.floor(axisCount / 2)) * Y_POSITION_AXIS_STEP;
 
   if (axisCount % 2 === 0) {
-    return 1 - diff;
+    return 1 - diff + Y_POSITION_AXIS_STEP;
   }
 
   return diff;
@@ -60,6 +60,13 @@ const getYAxisPositioningSettings = (axisCount: number) => ({
   position: getYAxisPosition(axisCount),
   side: getYAxisSide(axisCount),
   overlaying: axisCount > 1 ? 'y' : undefined,
+  // ticklabelposition: 'outside left',
+  /*
+  standoff: 20,
+  tickson: 'boundaries',
+  tickangle: -45,
+
+   */
 });
 
 const defaultSettings = {
@@ -86,7 +93,7 @@ const getFormatSettingsForTime = (values: Array<any>) => {
   });
 };
 
-const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaulAxisKey, values: Array<any>) => {
+const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, values: Array<any>) => {
   switch (unitTypeKey) {
     case 'percent':
       return ({
@@ -106,7 +113,7 @@ const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaulAxisKey, val
   }
 };
 
-export const getUnitLayoutWithData = (unitTypeKey: FieldUnitType | DefaulAxisKey, axisCount: number, values: Array<any>) => ({
+export const getUnitLayoutWithData = (unitTypeKey: FieldUnitType | DefaultAxisKey, axisCount: number, values: Array<any>) => ({
   ...getFormatSettingsByData(unitTypeKey, values),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
@@ -120,7 +127,7 @@ export const generateDomain = (yAxisCount: number) => {
   const leftAxisCount = Math.ceil(yAxisCount / 2);
   const rightAxisCount = Math.floor(yAxisCount / 2);
 
-  return [leftAxisCount * Y_POSITION_AXIS_STEP, 1 - rightAxisCount * Y_POSITION_AXIS_STEP];
+  return [(leftAxisCount - 1) * Y_POSITION_AXIS_STEP, 1 - (rightAxisCount - 1) * Y_POSITION_AXIS_STEP];
 };
 
 const getWidth = (total: number) => (total <= 1 ? undefined : 1 / total);
@@ -168,7 +175,7 @@ export const getBarChartTraceOffsetSettings = (barmode: BarMode, { yaxis, totalA
 };
 
 type UnitTypeMapper = {} | Record<FieldUnitType, { axisKeyName: string, axisCount: number }>;
-type SeriesUnitMapper = {} | Record<SeriesName, FieldUnitType | DefaulAxisKey>;
+type SeriesUnitMapper = {} | Record<SeriesName, FieldUnitType | DefaultAxisKey>;
 type MapperAxisNumber = Record<string, number>;
 type YAxisMapper = Record<SeriesName, AxisName>;
 
@@ -223,7 +230,7 @@ const joinValues = (values: Array<Array<number>>, barmode: BarMode): Array<numbe
 export const generateLayouts = (
   { unitTypeMapper, seriesUnitMapper, chartData, barmode }: { unitTypeMapper: UnitTypeMapper, seriesUnitMapper: SeriesUnitMapper, chartData: Array<ChartDefinition>, barmode?: string },
 ): Record<string, unknown> => {
-  const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaulAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
+  const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaultAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
     const seriesName = value.name || value.originalName;
     const unitType = seriesUnitMapper[seriesName];
 
@@ -236,7 +243,7 @@ export const generateLayouts = (
     return res;
   }, {});
 
-  return transform(unitTypeMapper, (res, { axisKeyName, axisCount }, unitTypeKey: FieldUnitType | DefaulAxisKey) => {
+  return transform(unitTypeMapper, (res, { axisKeyName, axisCount }, unitTypeKey: FieldUnitType | DefaultAxisKey) => {
     const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
     res[axisKeyName] = getUnitLayoutWithData(unitTypeKey, axisCount, unitValues);
   });

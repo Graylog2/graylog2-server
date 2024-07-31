@@ -109,7 +109,7 @@ const BarVisualization = makeVisualization(({
     const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
 
     const convertedToBaseUnitValues = convertDataToBaseUnit(values, curUnit);
-    console.log({ convertedToBaseUnitValues });
+
     const getData = () => ({
       type,
       name,
@@ -142,7 +142,6 @@ const BarVisualization = makeVisualization(({
 
   const layout = useMemo(() => {
     const generatedLayouts = generateLayouts({ unitTypeMapper, seriesUnitMapper, barmode, chartData });
-    console.log('QQQQQQQQQQQQQQQ', { generatedLayouts, chartData });
     const _layouts = ({
       ...generatedLayouts,
       hovermode: 'x',

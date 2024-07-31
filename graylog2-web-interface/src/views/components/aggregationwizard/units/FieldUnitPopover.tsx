@@ -42,7 +42,6 @@ const FieldUnitPopover = ({ field }: { field: string }) => {
   const currentUnitType = useMemo<string>(() => values?.units?.[field]?.unitType, [values, field]);
   const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: key })), [units]);
   const unitOptions = useMemo(() => currentUnitType && units[currentUnitType]
-    .filter(({ filtrateFromOptions }: Unit) => !filtrateFromOptions)
     .map(({ abbrev, name }: Unit) => ({ value: abbrev, label: name })), [units, currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {

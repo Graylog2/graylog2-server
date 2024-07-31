@@ -34,10 +34,6 @@ export type UnitJson = {
   abbrev: string,
   name: string,
   unit_type: FieldUnitType,
-  ui_options?: {
-    filtrate_from_prettier?: boolean,
-    filtrate_from_options?: boolean,
-  }
   conversion?: {
     value: number,
     action: UnitConversionAction
@@ -48,8 +44,7 @@ export type Unit = {
   abbrev: string,
   name: string,
   unitType: FieldUnitType,
-  filtrateFomPrettier: boolean,
-  filtrateFromOptions: boolean,
+  useInPrettier: boolean,
   conversion?: {
     value: number,
     action: UnitConversionAction
@@ -60,14 +55,15 @@ type FieldUnitTypes = Record<FieldUnitType, Array<Unit>>
 export type ConversionParams = FieldUnitState;
 export type ConvertedResult = { value: number | null, unit: Unit };
 
+const isUnitUsableInPrettier = (unitJson: UnitJson): boolean => !(unitJson.unit_type === 'percent' && unitJson.abbrev === 'd%');
+
 const unitFromJson = (unitJson: UnitJson): Unit => ({
   type: unitJson.type,
   abbrev: unitJson.abbrev,
   name: unitJson.name,
   unitType: unitJson.unit_type,
-  filtrateFomPrettier: !!unitJson?.ui_options?.filtrate_from_prettier,
-  filtrateFromOptions: !!unitJson?.ui_options?.filtrate_from_options,
   conversion: unitJson.conversion,
+  useInPrettier: isUnitUsableInPrettier(unitJson),
 });
 export const mappedUnitsFromJSON: FieldUnitTypes = mapValues(sourceUnits, (unitsJson: Array<UnitJson>):Array<Unit> => unitsJson.map((unitJson) => unitFromJson(unitJson)));
 
@@ -132,13 +128,13 @@ export const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params
 
   const allConvertedValues = Object.values(currentUnit).map((unit) => _convertValueToUnit(units, value, params, { abbrev: unit.abbrev, unitType: unit.unitType }));
 
-  const filtratedValues = allConvertedValues.filter(({ value: val, unit: { filtrateFomPrettier } }) => val >= 1 && !filtrateFomPrettier);
+  const filtratedValues = allConvertedValues.filter(({ value: val, unit }) => val >= 1 && unit.useInPrettier);
 
   if (filtratedValues.length > 0) {
     return minBy(filtratedValues, ({ value: val }) => val);
   }
 
-  const filtratedValuesLower = allConvertedValues.filter(({ value: val }) => val < 1);
+  const filtratedValuesLower = allConvertedValues.filter(({ value: val, unit }) => val < 1 && unit.useInPrettier);
 
   return maxBy(filtratedValuesLower, ({ value: val }) => val);
 };
