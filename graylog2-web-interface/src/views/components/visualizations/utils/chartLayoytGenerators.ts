@@ -19,6 +19,7 @@ import transform from 'lodash/transform';
 import zipWith from 'lodash/zipWith';
 import sum from 'lodash/sum';
 import flattenDeep from 'lodash/flattenDeep';
+import moment from 'moment';
 
 import type { FieldUnitType } from 'views/types';
 import type Series from 'views/logic/aggregationbuilder/Series';
@@ -32,6 +33,7 @@ import {
 import { VALUE_WITH_UNIT_DIGITS } from 'views/components/TypeSpecificValue';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 const Y_POSITION_AXIS_STEP = 0.1;
 type DefaultAxisKey = 'withoutUnit';
@@ -130,10 +132,10 @@ export const generateDomain = (yAxisCount: number) => {
   return [(leftAxisCount - 1) * Y_POSITION_AXIS_STEP, 1 - (rightAxisCount - 1) * Y_POSITION_AXIS_STEP];
 };
 
-const getWidth = (total: number) => (total <= 1 ? undefined : 1 / total);
+const getWidth = (total: number, offsetMultiplier: number) => (total <= 1 ? undefined : offsetMultiplier / total);
 
-const getOffset = (offsetNumber: number, totalOffsets: number) => {
-  const width = getWidth(totalOffsets);
+const getOffset = (offsetNumber: number, totalOffsets: number, offsetMultiplier: number) => {
+  const width = getWidth(totalOffsets, offsetMultiplier);
   if (!width) return undefined;
   const firstOffset = (width / 2) * (1 - totalOffsets);
 
@@ -146,12 +148,22 @@ type AdditionalSettings = {
   axisNumber: number,
   traceIndex: number,
   totalTraces: number,
+  effectiveTimerange?: AbsoluteTimeRange,
+  isTimeline?: boolean,
+  xAxisItemsLength?: number
 }
 
-export const getBarChartTraceOffsetSettings = (barmode: BarMode, { yaxis, totalAxis, axisNumber, traceIndex, totalTraces }: AdditionalSettings) => {
+export const getBarChartTraceOffsetSettings = (barmode: BarMode, { yaxis, totalAxis, axisNumber, traceIndex, totalTraces, effectiveTimerange, isTimeline, xAxisItemsLength }: AdditionalSettings) => {
+  const offsetMultiplier = (xAxisItemsLength && isTimeline && effectiveTimerange) ? (moment(effectiveTimerange.to).diff(effectiveTimerange.from) / xAxisItemsLength) : 1;
+
+  console.log({
+    offsetMultiplier,
+    totalTraces,
+  });
+
   if (barmode === 'stack' || barmode === 'relative' || barmode === 'overlay') {
-    const width = getWidth(totalAxis);
-    const offset = getOffset(axisNumber, totalAxis);
+    const width = getWidth(totalAxis, offsetMultiplier);
+    const offset = getOffset(axisNumber, totalAxis, offsetMultiplier);
 
     return ({
       offsetgroup: yaxis,
@@ -161,8 +173,8 @@ export const getBarChartTraceOffsetSettings = (barmode: BarMode, { yaxis, totalA
   }
 
   if (barmode === 'group') {
-    const width = getWidth(totalTraces);
-    const offset = getOffset(traceIndex + 1, totalTraces);
+    const width = getWidth(totalTraces, offsetMultiplier);
+    const offset = getOffset(traceIndex + 1, totalTraces, offsetMultiplier);
 
     return ({
       offsetgroup: traceIndex,
@@ -227,8 +239,15 @@ const joinValues = (values: Array<Array<number>>, barmode: BarMode): Array<numbe
   return flattenDeep(values);
 };
 
+type Params = {
+  unitTypeMapper: UnitTypeMapper,
+  seriesUnitMapper: SeriesUnitMapper,
+  chartData: Array<ChartDefinition>,
+  barmode?: string
+}
+
 export const generateLayouts = (
-  { unitTypeMapper, seriesUnitMapper, chartData, barmode }: { unitTypeMapper: UnitTypeMapper, seriesUnitMapper: SeriesUnitMapper, chartData: Array<ChartDefinition>, barmode?: string },
+  { unitTypeMapper, seriesUnitMapper, chartData, barmode }: Params,
 ): Record<string, unknown> => {
   const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaultAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
     const seriesName = value.name || value.originalName;

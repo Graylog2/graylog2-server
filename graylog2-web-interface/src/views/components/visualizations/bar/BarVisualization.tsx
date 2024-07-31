@@ -105,7 +105,17 @@ const BarVisualization = makeVisualization(({
     const axisNumber = mapperAxisNumber?.[name];
     const totalAxis = Object.keys(unitTypeMapper).length;
 
-    const offsetSettings = getBarChartTraceOffsetSettings(barmode, { yaxis, totalAxis, axisNumber, traceIndex: idx, totalTraces: total });
+    const mappedKeys = _mapKeys(labels);
+    const offsetSettings = getBarChartTraceOffsetSettings(barmode, {
+      yaxis,
+      totalAxis,
+      axisNumber,
+      traceIndex: idx,
+      totalTraces: total,
+      effectiveTimerange,
+      isTimeline: config.isTimeline,
+      xAxisItemsLength: mappedKeys.length,
+    });
     const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
 
     const convertedToBaseUnitValues = convertDataToBaseUnit(values, curUnit);
@@ -113,7 +123,7 @@ const BarVisualization = makeVisualization(({
     const getData = () => ({
       type,
       name,
-      x: _mapKeys(labels),
+      x: mappedKeys,
       y: convertedToBaseUnitValues,
       opacity,
       yaxis,
@@ -141,7 +151,12 @@ const BarVisualization = makeVisualization(({
   }, [_chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to, eventChartData]);
 
   const layout = useMemo(() => {
-    const generatedLayouts = generateLayouts({ unitTypeMapper, seriesUnitMapper, barmode, chartData });
+    const generatedLayouts = generateLayouts({
+      unitTypeMapper,
+      seriesUnitMapper,
+      barmode,
+      chartData,
+    });
     const _layouts = ({
       ...generatedLayouts,
       hovermode: 'x',
