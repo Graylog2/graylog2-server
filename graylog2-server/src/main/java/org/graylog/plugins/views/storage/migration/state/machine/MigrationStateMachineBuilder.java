@@ -106,7 +106,8 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, () -> migrationActions.directoryCompatibilityCheckOk() && migrationActions.provisioningFinished());
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING)
-                .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::allDatanodesPrepared);
+                .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::allDatanodesPrepared)
+                .onExit(migrationActions::stopDatanodes); // they should not run by design, but it may still happen. Let's stop those running
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
                 .onEntry(migrationActions::calculateTrafficEstimate)
