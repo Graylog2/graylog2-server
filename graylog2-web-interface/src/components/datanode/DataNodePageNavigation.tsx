@@ -21,19 +21,24 @@ import PageNavigation from 'components/common/PageNavigation';
 import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 
-const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
+import useShowDatanodeMigration from './hooks/useShowDatanodeMigration';
 
-const NAV_ITEMS = [
-  { title: 'Data Nodes', path: Routes.SYSTEM.DATANODES.LIST, exactPathMatch: true },
-  { title: 'Cluster Management', path: Routes.SYSTEM.DATANODES.CLUSTER },
-  { title: 'Configuration', path: Routes.SYSTEM.DATANODES.CONFIGURATION },
-  enableDataNodeMigration && { title: 'Migration', path: Routes.SYSTEM.DATANODES.MIGRATION },
-];
+const DataNodesPageNavigation = () => {
+  const showDatanodeMigration = useShowDatanodeMigration();
+  const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
 
-const DataNodesPageNavigation = () => (
-  <Row>
-    <PageNavigation items={NAV_ITEMS} />
-  </Row>
-);
+  const NAV_ITEMS = [
+    { title: 'Data Nodes', path: Routes.SYSTEM.DATANODES.LIST, exactPathMatch: true },
+    { title: 'Cluster Management', path: Routes.SYSTEM.DATANODES.CLUSTER },
+    { title: 'Configuration', path: Routes.SYSTEM.DATANODES.CONFIGURATION },
+    showDatanodeMigration && enableDataNodeMigration && { title: 'Migration', path: Routes.SYSTEM.DATANODES.MIGRATION },
+  ];
+
+  return (
+    <Row>
+      <PageNavigation items={NAV_ITEMS} />
+    </Row>
+  );
+};
 
 export default DataNodesPageNavigation;

@@ -34,6 +34,8 @@ export const Headline = styled.h2(({ theme }) => css`
 
 const StreamDataRoutingInstake = ({ stream }: Props) => {
   const hasStreamRules = !!stream.rules?.length;
+  const isDefaultStream = stream.is_default;
+  const isNotEditable = !stream.is_editable;
 
   return (
     <>
@@ -44,33 +46,34 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
 
       <Section title="Stream rules"
                actions={(
-                 <IfPermitted permissions="streams:create">
-                   <CreateStreamRuleButton bsStyle="success"
-                                           streamId={stream.id} />
-                 </IfPermitted>
+                <IfPermitted permissions={`streams:edit:${stream.id}`}>
+                 <CreateStreamRuleButton bsStyle="success"
+                                         disabled={isDefaultStream || isNotEditable}
+                                         streamId={stream.id} />
+               </IfPermitted>
              )}>
-        <Table condensed striped hover>
-          <thead>
-            <tr>
-              <th colSpan={2}>Rule</th>
-            </tr>
-          </thead>
-          <tbody>
-            {hasStreamRules && stream.rules.map((streamRule) => (
-              <DetailsStreamRule key={streamRule.id}
-                                 stream={stream}
-                                 streamRule={streamRule} />
-            ))}
+      <Table condensed striped hover>
+        <thead>
+          <tr>
+            <th colSpan={2}>Rule</th>
+          </tr>
+        </thead>
+        <tbody>
+          {hasStreamRules && stream.rules.map((streamRule) => (
+            <DetailsStreamRule key={streamRule.id}
+                               stream={stream}
+                               streamRule={streamRule} />
+          ))}
 
-            {!hasStreamRules && (
+          {!hasStreamRules && (
             <tr>
               <td>No rules defined.</td>
             </tr>
-            )}
-          </tbody>
-        </Table>
-      </Section>
-    </>
+          )}
+         </tbody>
+       </Table>
+     </Section>
+   </>
   );
 };
 

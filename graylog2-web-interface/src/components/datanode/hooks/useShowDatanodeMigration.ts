@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-interface EnterpriseTrafficGraph {
-  layout: string;
-  children: React.ReactNode;
-}
+import { qualifyUrl } from 'util/URLUtils';
+import fetch from 'logic/rest/FetchProvider';
 
-interface LicensePlugin {
-  EnterpriseTrafficGraph?: React.ComponentType<EnterpriseTrafficGraph>;
-}
+const fetchShowDatanodeMigration = async () => fetch('GET', qualifyUrl('/datanode/configured'));
 
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    license?: LicensePlugin;
-  }
-}
+const useShowDatanodeMigration = () : boolean => {
+  const { data: isDatanodeConfiguredAndUsed } = useQuery(
+    ['show_datanode_migration'],
+    fetchShowDatanodeMigration,
+  );
+
+  return isDatanodeConfiguredAndUsed === false;
+};
+
+export default useShowDatanodeMigration;

@@ -1,0 +1,5 @@
+type="f"
+message="Fix invalid link for OpenSeach documentation"
+
+issues=["19845"]
+pulls=["20025"]
