@@ -1300,3 +1300,12 @@ metric_mappings:
 
   - metric_name: "data_warehouse_iceberg_file_io_local_read"
     match_pattern: "org.graylog.iceberg.file.io.local.read"
+
+  - metric_name: "data_warehouse_journal_writer_written_messages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.DataWarehouseJournalWriter.written-messages"
+
+  - metric_name: "data_warehouse_journal_writer_written_bytes"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.DataWarehouseJournalWriter.written-bytes"
+
+  - metric_name: "data_warehouse_journal_writer_written_failed_write_attempts"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.DataWarehouseJournalWriter.failed-write-attempts"
