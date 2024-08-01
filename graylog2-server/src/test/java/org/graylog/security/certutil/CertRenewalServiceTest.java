@@ -37,7 +37,7 @@ public class CertRenewalServiceTest {
     }
 
     @Test
-    public void testCertRenewalCalculation() throws CertificateException, NoSuchAlgorithmException, OperatorCreationException {
+    public void testCertRenewalCalculationDuration() throws CertificateException, NoSuchAlgorithmException, OperatorCreationException {
         final var now = DateTime.now(DateTimeZone.UTC);
         final JobSchedulerClock clock = new JobSchedulerTestClock(now);
         final var nextRun = clock.nowUTC().plusMinutes(30);
@@ -62,4 +62,26 @@ public class CertRenewalServiceTest {
         final var cert4 = notAfter(now, 24*60, 25);
         assertTrue(service.needsRenewal(nextRun, policy, cert4));
     }
+
+    @Test
+    public void testCertRenewalCalculationPeriod() throws CertificateException, NoSuchAlgorithmException, OperatorCreationException {
+        final var now = DateTime.now(DateTimeZone.UTC);
+        final JobSchedulerClock clock = new JobSchedulerTestClock(now);
+        final var nextRun = clock.nowUTC().plusMinutes(30);
+        final var service = new CertRenewalServiceImpl(null, null, null, null, clock, null);
+        // Using a date period should also work, so here's the test for that. For dates, this sets the renewal date to 23 hours before expiration
+        final var policy = new RenewalPolicy(RenewalPolicy.Mode.MANUAL, "P1D");
+
+        final var cert1 = notAfter(now, 0, 24 * 60);
+        assertFalse(service.needsRenewal(nextRun, policy, cert1));
+
+        final var cert2 = notAfter(now, 0, 23 * 60);
+        assertFalse(service.needsRenewal(nextRun, policy, cert2));
+
+        final var cert3 = notAfter(now, 0, (23 * 60) - 1);
+        assertTrue(service.needsRenewal(nextRun, policy, cert3));
+
+    }
+
+
 }

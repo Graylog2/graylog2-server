@@ -16,13 +16,11 @@
  */
 package org.graylog.security.certutil;
 
-import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
@@ -34,12 +32,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.PeriodDuration;
 
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -48,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
 /**
@@ -66,7 +59,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final JobSchedulerClock clock;
     private final CaKeystore caKeystore;
 
-    // TODO: convert to config?
     private long CERT_RENEWAL_THRESHOLD_PERCENTAGE = 10;
 
     @Inject
@@ -98,8 +90,14 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     Date calculateThreshold(String certificateLifetime) {
-        final var lifetime = Duration.parse(certificateLifetime).dividedBy(CERT_RENEWAL_THRESHOLD_PERCENTAGE);
-        var validUntil = clock.now(ZoneId.systemDefault()).plus(lifetime).toLocalDateTime();
+        Duration threshold;
+        PeriodDuration lifetime = PeriodDuration.parse(certificateLifetime);
+        if (!lifetime.getPeriod().isZero()) {
+            threshold = Duration.ofHours(23);
+        } else {
+            threshold = lifetime.getDuration().dividedBy(CERT_RENEWAL_THRESHOLD_PERCENTAGE);
+        }
+        var validUntil = clock.now(ZoneId.systemDefault()).plus(threshold).toLocalDateTime();
         return convertToDateViaInstant(validUntil);
     }
 

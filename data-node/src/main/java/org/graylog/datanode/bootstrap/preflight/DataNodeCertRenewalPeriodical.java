@@ -27,6 +27,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -98,7 +99,13 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
     }
 
     private boolean expiresSoon(Date expiration, RenewalPolicy renewalPolicy) {
-        final Duration threshold = Duration.parse(renewalPolicy.certificateLifetime()).dividedBy(CERT_RENEWAL_THRESHOLD_PERCENTAGE);
+        Duration threshold;
+        PeriodDuration lifetime = PeriodDuration.parse(renewalPolicy.certificateLifetime());
+        if (!lifetime.getPeriod().isZero()) {
+            threshold = Duration.ofHours(23);
+        } else {
+            threshold = lifetime.getDuration().dividedBy(CERT_RENEWAL_THRESHOLD_PERCENTAGE);
+        }
         final Instant renewalMoment = expiration.toInstant()
                 .minus(threshold)
                 .minus(PERIODICAL_DURATION);

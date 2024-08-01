@@ -389,6 +389,11 @@
                 <artifactId>stateless4j</artifactId>
                 <version>${stateless4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.threeten</groupId>
+                <artifactId>threeten-extra</artifactId>
+                <version>${threeten-extra.version}</version>
+            </dependency>
 
             <!-- Tracing dependencies -->
             <dependency>
