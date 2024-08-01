@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 
 public class CsrRequesterImpl implements CsrRequester {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CsrRequesterImpl.class);
 
     private final NodeId nodeId;
 

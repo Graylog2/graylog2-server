@@ -41,6 +41,9 @@ import org.graylog.integrations.notifications.types.SlackEventNotificationConfig
 import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotification;
 import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfig;
 import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigEntity;
+import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2;
+import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2Entity;
+import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationV2;
 import org.graylog.integrations.pagerduty.PagerDutyNotification;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfig;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfigEntity;
@@ -111,13 +114,21 @@ public class IntegrationsModule extends PluginModule {
                     SlackEventNotificationConfigEntity.TYPE_NAME,
                     SlackEventNotificationConfigEntity.class);
 
-            // Teams Notification
+            // Teams Notification (deprecated with Microsoft's retiring connectors)
             addNotificationType(TeamsEventNotificationConfig.TYPE_NAME,
                     TeamsEventNotificationConfig.class,
                     TeamsEventNotification.class,
                     TeamsEventNotification.Factory.class,
                     TeamsEventNotificationConfigEntity.TYPE_NAME,
                     TeamsEventNotificationConfigEntity.class);
+
+            // Teams Notification V2
+            addNotificationType(TeamsEventNotificationConfigV2.TYPE_NAME,
+                    TeamsEventNotificationConfigV2.class,
+                    TeamsEventNotificationV2.class,
+                    TeamsEventNotificationV2.Factory.class,
+                    TeamsEventNotificationConfigV2Entity.TYPE_NAME,
+                    TeamsEventNotificationConfigV2Entity.class);
 
             // Pager Duty Notification
             addNotificationType(PagerDutyNotificationConfig.TYPE_NAME,

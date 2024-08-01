@@ -34,15 +34,18 @@ export const Headline = styled.h2(({ theme }) => css`
 
 const StreamDataRoutingInstake = ({ stream }: Props) => {
   const hasStreamRules = !!stream.rules?.length;
+  const isDefaultStream = stream.is_default;
+  const isNotEditable = !stream.is_editable;
 
   return (
     <Section title="Stream rules"
              actions={(
-               <IfPermitted permissions="streams:create">
+               <IfPermitted permissions={`streams:edit:${stream.id}`}>
                  <CreateStreamRuleButton bsStyle="success"
+                                         disabled={isDefaultStream || isNotEditable}
                                          streamId={stream.id} />
                </IfPermitted>
-             )}>
+               )}>
       <Table condensed striped hover>
         <thead>
           <tr>
@@ -57,9 +60,9 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
           ))}
 
           {!hasStreamRules && (
-          <tr>
-            <td>No rules defined.</td>
-          </tr>
+            <tr>
+              <td>No rules defined.</td>
+            </tr>
           )}
         </tbody>
       </Table>

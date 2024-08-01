@@ -19,58 +19,25 @@ package org.graylog2.bootstrap.preflight;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog.security.certutil.CaKeystore;
-import org.graylog2.cluster.certificates.CertificateExchange;
-import org.graylog2.plugin.certificates.RenewalPolicy;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 @Singleton
 public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningPeriodical.class);
+    private final GraylogCertificateProvisioner graylogCertificateProvisioner;
 
-    private final CaKeystore caKeystore;
-    private final ClusterConfigService clusterConfigService;
-
-    private final CertificateExchange certificateExchange;
 
     @Inject
-    public GraylogCertificateProvisioningPeriodical(final CaKeystore caKeystore,
-                                                    final ClusterConfigService clusterConfigService,
-                                                    CertificateExchange certificateExchange) {
-        this.caKeystore = caKeystore;
-        this.clusterConfigService = clusterConfigService;
-        this.certificateExchange = certificateExchange;
+    public GraylogCertificateProvisioningPeriodical(final GraylogCertificateProvisioner graylogCertificateProvisioner) {
+        this.graylogCertificateProvisioner = graylogCertificateProvisioner;
     }
 
-    private RenewalPolicy getRenewalPolicy() {
-        return this.clusterConfigService.get(RenewalPolicy.class);
-    }
 
     @Override
     public void doRun() {
-        LOG.debug("checking if there are configuration steps to take care of");
-
-        try {
-            if (!caKeystore.exists()) {
-                LOG.debug("No CA keystore available.");
-                return;
-            }
-
-            final var renewalPolicy = getRenewalPolicy();
-            if (renewalPolicy == null) {
-                LOG.debug("No renewal policy available.");
-                return;
-            }
-
-            certificateExchange.signPendingCertificateRequests(request -> caKeystore.signCertificateRequest(request, renewalPolicy));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        graylogCertificateProvisioner.runProvisioning();
     }
 
     @Nonnull

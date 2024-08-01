@@ -28,6 +28,7 @@ import UserDateTimeProvider from '../src/contexts/UserDateTimeProvider';
 
 import '@graylog/sawmill/fonts';
 import '@mantine/core/styles.css';
+import '@mantine/dropzone/styles.css';
 
 export const adminUser = User.builder()
   .id('admin-id')

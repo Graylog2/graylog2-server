@@ -74,7 +74,7 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
         return new AutoValue_IndexSetSummary(shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass,
                 retentionStrategy, dataTiering, id, title, description, isDefault, canBeDefault, isWritable, indexPrefix,
                 creationDate, indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
-                Optional.ofNullable(templateType), fieldTypeProfile, useLegacyRotation);
+                Optional.ofNullable(templateType), fieldTypeProfile, Objects.isNull(useLegacyRotation) || useLegacyRotation);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {

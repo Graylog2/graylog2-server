@@ -101,7 +101,7 @@
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.26.1</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.1.1</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
         <byte-buddy.version>1.14.18</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
@@ -161,7 +161,7 @@
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.10</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
-        <protobuf.version>3.25.3</protobuf.version>
+        <protobuf.version>3.25.4</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.11.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
@@ -197,7 +197,7 @@
         <mockito.version>5.12.0</mockito.version>
         <restassured.version>5.5.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.20.0</testcontainers.version>
+        <testcontainers.version>1.20.1</testcontainers.version>
         <testcontainers.opensearch.version>2.1.0</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -456,6 +456,17 @@
                 <groupId>org.mongojack</groupId>
                 <artifactId>mongojack</artifactId>
                 <version>${mongojack.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
 
             <!-- test -->
@@ -730,6 +741,7 @@
                     <!-- if the used Java version is too new, don't fail, just do nothing: -->
                     <failOnUnsupportedJava>false</failOnUnsupportedJava>
                     <failOnViolation>true</failOnViolation>
+                    <ignoreSignaturesOfMissingClasses>true</ignoreSignaturesOfMissingClasses>
                     <bundledSignatures>
                         <!-- We want to allow String#formatted without charset. -->
                         <bundledSignature>jdk-unsafe-14</bundledSignature>
