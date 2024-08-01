@@ -28,13 +28,12 @@ import StreamsField from 'views/components/fieldtypes/StreamsField';
 import PercentageField from 'views/components/fieldtypes/PercentageField';
 import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConvertors';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import { DECIMAL_PLACES } from 'views/components/visualizations/Constants';
 
 import EmptyValue from './EmptyValue';
 import CustomPropTypes from './CustomPropTypes';
 import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
 import DecoratorValue from './DecoratorValue';
-
-export const VALUE_WITH_UNIT_DIGITS = 1;
 
 const defaultComponent = ({ value }: ValueRendererProps) => value;
 
@@ -61,7 +60,7 @@ type FormattedValueProps = Omit<TypeSpecificValueProps, 'type'>;
 const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit}) => {
   const prettified = getPrettifiedValue(value, { abbrev: unit.abbrev, unitType: unit.unitType });
 
-  return <span title={value.toString()}>{`${Number(prettified?.value).toFixed(VALUE_WITH_UNIT_DIGITS)} ${prettified.unit.abbrev}`}</span>;
+  return <span title={value.toString()}>{`${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`}</span>;
 };
 
 const FormattedValue = ({ field, value, truncate, render, unit }: FormattedValueProps) => {

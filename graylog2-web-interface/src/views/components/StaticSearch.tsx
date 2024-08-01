@@ -28,6 +28,7 @@ import View from 'views/logic/views/View';
 import SearchResult from 'views/logic/SearchResult';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
+import { Markdown } from 'components/common';
 
 type Props = {
   searchJson: Partial<SearchJson>,

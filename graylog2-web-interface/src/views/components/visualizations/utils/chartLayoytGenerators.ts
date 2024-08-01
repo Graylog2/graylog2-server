@@ -26,19 +26,18 @@ import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import {
-  getBaseUnit,
-  getPrettifiedValue,
-} from 'views/components/visualizations/utils/unitConvertors';
-import { VALUE_WITH_UNIT_DIGITS } from 'views/components/TypeSpecificValue';
+import { getBaseUnit, getPrettifiedValue } from 'views/components/visualizations/utils/unitConvertors';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import {
+  DEFAULT_AXIS_KEY,
+  TIME_AXIS_LABELS_QUANTITY,
+  DECIMAL_PLACES,
+  Y_POSITION_AXIS_STEP,
+} from 'views/components/visualizations/Constants';
 
-const Y_POSITION_AXIS_STEP = 0.1;
 type DefaultAxisKey = 'withoutUnit';
-const DEFAULT_AXIS_KEY = 'withoutUnit';
-const TIME_AXIS_LABELS_QUANTITY = 4;
 
 const getYAxisPosition = (axisCount: number) => {
   const diff = (Math.floor(axisCount / 2)) * Y_POSITION_AXIS_STEP;
@@ -78,16 +77,16 @@ const defaultSettings = {
   rangemode: 'tozero',
 };
 
-const getFormatSettingsForTime = (values: Array<any>) => {
+const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: FieldUnitType) => {
   const min = Math.min(0, ...values);
   const max = Math.max(...values);
   const step = (max - min) / TIME_AXIS_LABELS_QUANTITY;
 
   const tickvals = Array(TIME_AXIS_LABELS_QUANTITY).fill(null).map((_, index) => (index + 1) * step);
-  const timeBaseUnit = getBaseUnit('time');
+  const timeBaseUnit = getBaseUnit(fieldType);
   const prettyValues = tickvals.map((value) => getPrettifiedValue(value, { abbrev: timeBaseUnit.abbrev, unitType: timeBaseUnit.unitType }));
 
-  const ticktext = prettyValues.map((prettified) => `${Number(prettified?.value).toFixed(VALUE_WITH_UNIT_DIGITS)} ${prettified.unit.abbrev}`);
+  const ticktext = prettyValues.map((prettified) => `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`);
 
   return ({
     tickvals,
@@ -99,15 +98,12 @@ const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, va
   switch (unitTypeKey) {
     case 'percent':
       return ({
-        tickformat: '.1%',
+        tickformat: `.${DECIMAL_PLACES}%`,
       });
     case 'size':
-      return ({
-        tickformat: '.2s',
-        ticksuffix: 'B',
-      });
+      return getFormatSettingsWithCustomTickVals(values, 'size');
     case 'time':
-      return getFormatSettingsForTime(values);
+      return getFormatSettingsWithCustomTickVals(values, 'time');
     default:
       return ({
         tickformat: ',~r',
@@ -268,8 +264,8 @@ export const getHoverTemplateSettings = ({ convertedToBaseValues, curUnit, origi
   curUnit: FieldUnit,
   originalName: string,
 }): { text: Array<string>, hovertemplate: string, meta: string } | {} => {
-  if (curUnit?.unitType === 'time') {
-    const timeBaseUnit = getBaseUnit('time');
+  if (curUnit?.unitType === 'time' || curUnit?.unitType === 'size') {
+    const timeBaseUnit = getBaseUnit(curUnit.unitType);
 
     return ({
       text: convertedToBaseValues.map((value) => {
@@ -280,7 +276,7 @@ export const getHoverTemplateSettings = ({ convertedToBaseValues, curUnit, origi
 
         if (!prettified) return null;
 
-        return `${Number(prettified?.value).toFixed(1)} ${prettified.unit.abbrev}`;
+        return `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`;
       }),
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',
       meta: originalName,

@@ -41,10 +41,6 @@ type Props = {
 
 const Wrapper = styled.div``;
 
-const FieldContainer = styled.div`
-  // display: flex;
-`;
-
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
 const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) => {
@@ -120,7 +116,7 @@ const Metric = ({ index }: Props) => {
         </Field>
       </div>
       {hasFieldOption && (
-        <FieldContainer>
+        <div>
           <div className="col-sm-11">
             <Field name={`metrics.${index}.field`}>
               {({ field: { name, value, onChange }, meta: { error } }) => (
@@ -148,7 +144,7 @@ const Metric = ({ index }: Props) => {
             <div className="col-sm-1"><FieldUnitComponent field={metrics?.[index].field} />
             </div>
           )}
-        </FieldContainer>
+        </div>
       )}
       {isPercentile && (
         <div className="col-sm-11">
