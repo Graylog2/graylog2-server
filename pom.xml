@@ -101,7 +101,7 @@
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.26.1</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.1.1</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
         <byte-buddy.version>1.14.18</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
@@ -197,7 +197,7 @@
         <mockito.version>5.12.0</mockito.version>
         <restassured.version>5.5.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.20.0</testcontainers.version>
+        <testcontainers.version>1.20.1</testcontainers.version>
         <testcontainers.opensearch.version>2.1.0</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
