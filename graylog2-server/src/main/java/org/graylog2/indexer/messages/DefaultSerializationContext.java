@@ -14,26 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.messageq.noop;
+package org.graylog2.indexer.messages;
 
-import jakarta.inject.Singleton;
-import org.graylog2.shared.messageq.Acknowledgeable;
-import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nonnull;
 
-import java.util.List;
+import java.util.Objects;
 
-@Singleton
-public class NoopMessageQueueAcknowledger implements MessageQueueAcknowledger {
-
-    @Override
-    public void acknowledge(Object messageId) {
-    }
-
-    @Override
-    public void acknowledge(Acknowledgeable message) {
-    }
-
-    @Override
-    public void acknowledge(List<? extends Acknowledgeable> messages) {
+public record DefaultSerializationContext(@Nonnull ObjectMapper objectMapper, @Nonnull Meter invalidTimestampMeter)
+        implements SerializationContext {
+    public DefaultSerializationContext {
+        Objects.requireNonNull(objectMapper);
+        Objects.requireNonNull(invalidTimestampMeter);
     }
 }

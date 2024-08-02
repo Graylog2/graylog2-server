@@ -14,26 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.messageq.noop;
+package org.graylog2.shared.messageq;
 
-import jakarta.inject.Singleton;
-import org.graylog2.shared.messageq.Acknowledgeable;
-import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import javax.annotation.Nullable;
 
-import java.util.List;
-
-@Singleton
-public class NoopMessageQueueAcknowledger implements MessageQueueAcknowledger {
-
-    @Override
-    public void acknowledge(Object messageId) {
-    }
-
-    @Override
-    public void acknowledge(Acknowledgeable message) {
-    }
-
-    @Override
-    public void acknowledge(List<? extends Acknowledgeable> messages) {
-    }
+/**
+ * An object adhering to this interface can be acknowledged in a message queue by providing a queue-specific ID.
+ * <p>
+ * For example, messages that have been read from the local kafka journal will use a journal offset as message queue ID.
+ * By using that offset to commit to the journal after the messages has been successfully indexed, the message can be
+ * acknowledged in the queue.
+ */
+public interface Acknowledgeable {
+    @Nullable
+    Object getMessageQueueId();
 }
