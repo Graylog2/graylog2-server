@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePipelinesConnectedStream, { type StreamConnectedPipelines } from 'hooks/usePipelinesConnectedStream';
-import { Table, Button } from 'components/bootstrap';
+import { Table, Button, Alert } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { IfPermitted, Section, Icon } from 'components/common';
 import usePipelines from 'hooks/usePipelines';
@@ -41,6 +41,10 @@ const StreamDataRoutingProcessing = () => {
 
   return (
     <>
+      <Alert bsStyle="info">
+        The <b>Illuminate Processing</b> step is an immutable Pipeline that occurs before user Pipelines in the default processing order.<br />
+        It collects messages that meet supported formats from the All Messages stream, parses that data into the Graylog GIM schema fields and routes them to this Stream.
+      </Alert>
       <Section title="Illuminate Processing">
         <p>Illuminate Processing step</p>
       </Section>
