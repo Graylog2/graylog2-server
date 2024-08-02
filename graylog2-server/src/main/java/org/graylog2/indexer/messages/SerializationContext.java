@@ -21,6 +21,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
 
 public interface SerializationContext {
+
+    static SerializationContext of(ObjectMapper objectMapper, Meter invalidTimestampMeter) {
+        return new DefaultSerializationContext(objectMapper, invalidTimestampMeter);
+    }
+
     @Nonnull
     ObjectMapper objectMapper();
 
