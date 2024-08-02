@@ -23,6 +23,10 @@ const StyledMantineDropzone = styled(MantineDropzone)(({ theme }) => css`
   background: transparent;
   color: ${theme.colors.global.textDefault};
   border-color: ${theme.colors.global.textSecondary};
+  
+  &:hover {
+    background-color: transparent;
+  }
 `);
 
 type Props = Pick<DropzoneProps, 'children' | 'onDrop' | 'onReject' | 'loading' | 'accept' | 'inputProps' | 'maxSize'> & { 'data-testid'?: string };
