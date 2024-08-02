@@ -23,6 +23,17 @@ import org.graylog2.shared.messageq.Acknowledgeable;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * The purpose of this interface is to provide access to certain properties of a {@link Message} while ensuring that
+ * it can't be changed anymore. This allows precomputation and re-use of e.g. the serialized JSON of a message (see
+ * {@link Indexable#serialize(SerializationContext)} while ensuring that the precomputed value does not become invalid
+ * when the message content would be changed.
+ * <p>
+ * For example, the interface can be used in the output path to compute the space required by a {@link Message} in a
+ * batch request to OpenSearch. Batch computation happens early in the process and when the actual index request is to
+ * be sent, the precomputed serialized value can be re-used with certainty that the message has not been altered in
+ * the meantime.
+ */
 public interface ImmutableMessage extends Indexable, Acknowledgeable {
 
     static ImmutableMessage wrap(Message message) {
