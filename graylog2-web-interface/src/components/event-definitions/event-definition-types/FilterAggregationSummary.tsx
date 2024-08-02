@@ -39,7 +39,7 @@ import styles from './FilterAggregationSummary.css';
 
 import LinkToReplaySearch from '../replay-search/LinkToReplaySearch';
 
-const StreamOrId = ({ streamOrId } : { streamOrId: Stream | string }) => {
+const StreamOrId = ({ streamOrId }: { streamOrId: Stream | string }) => {
   if (typeof streamOrId === 'string') {
     return <span key={streamOrId}><em>{streamOrId}</em></span>;
   }
@@ -55,8 +55,8 @@ const getConditionType = (config: EventDefinition['config']) => {
   const { group_by: groupBy, series, conditions } = config;
 
   return (isEmpty(groupBy)
-  && (!conditions || isEmpty(conditions) || conditions.expression === null)
-  && isEmpty(series)
+    && (!conditions || isEmpty(conditions) || conditions.expression === null)
+    && isEmpty(series)
     ? 'filter' : 'aggregation');
 };
 
@@ -80,9 +80,10 @@ type Props = {
   streams: Array<Stream>,
   config: EventDefinition['config'],
   currentUser: User,
+  definitionId?: string,
 }
 
-const SearchFilters = ({ filters }: { filters: EventDefinition['config']['filters']}) => {
+const SearchFilters = ({ filters }: { filters: EventDefinition['config']['filters'] }) => {
   if (!filters || filters.length === 0) {
     return <dd>No filters configured</dd>;
   }
@@ -126,7 +127,7 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
   );
 };
 
-const FilterAggregationSummary = ({ config, currentUser }: Props) => {
+const FilterAggregationSummary = ({ config, currentUser, definitionId }: Props) => {
   const streams = useContext(StreamsContext);
   const {
     query,
@@ -197,33 +198,37 @@ const FilterAggregationSummary = ({ config, currentUser }: Props) => {
       <dt>Enable scheduling</dt>
       <dd>{isScheduled ? 'yes' : 'no'}</dd>
       {conditionType === 'filter' && (
-      <>
-        <dt>Event limit</dt>
-        <dd>{event_limit}</dd>
-      </>
+        <>
+          <dt>Event limit</dt>
+          <dd>{event_limit}</dd>
+        </>
       )}
       {conditionType === 'aggregation' && (
-      <>
-        <dt>Group by Field(s)</dt>
-        <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
-        <dt>Create Events if</dt>
-        <dd>
-          {validationResults.isValid
-            ? <AggregationConditionSummary series={series} conditions={conditions} />
-            : (
-              <Alert bsStyle="danger">
-                Condition is not valid: {validationResults.errors.join(', ')}
-              </Alert>
-            )}
-        </dd>
-      </>
+        <>
+          <dt>Group by Field(s)</dt>
+          <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
+          <dt>Create Events if</dt>
+          <dd>
+            {validationResults.isValid
+              ? <AggregationConditionSummary series={series} conditions={conditions} />
+              : (
+                <Alert bsStyle="danger">
+                  Condition is not valid: {validationResults.errors.join(', ')}
+                </Alert>
+              )}
+          </dd>
+        </>
       )}
       <dt>Actions</dt>
       <dd>
-        <LinkToReplaySearch />
+        <LinkToReplaySearch id={definitionId} />
       </dd>
     </dl>
   );
+};
+
+FilterAggregationSummary.defaultProps = {
+  definitionId: undefined,
 };
 
 export default FilterAggregationSummary;
