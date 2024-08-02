@@ -63,7 +63,7 @@ public class MongoIndexSet implements IndexSet {
     // TODO 3.0: Remove this in 3.0, only used for pre 2.2 backwards compatibility.
     public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
     public static final String WARM_INDEX_INFIX = "warm_";
-    private static final String WARM_INDE_INFIX_WITH_SEPERATOR = SEPARATOR + WARM_INDEX_INFIX;
+    private static final String WARM_INDEX_INFIX_WITH_SEPARATOR = SEPARATOR + WARM_INDEX_INFIX;
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexSet.class);
     private final IndexSetConfig config;
     private final String writeIndexAlias;
