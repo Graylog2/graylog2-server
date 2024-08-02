@@ -17,7 +17,7 @@
 package org.graylog2.shared.messageq.noop;
 
 import jakarta.inject.Singleton;
-import org.graylog2.indexer.messages.Acknowledgeable;
+import org.graylog2.shared.messageq.Acknowledgeable;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 
 import java.util.List;

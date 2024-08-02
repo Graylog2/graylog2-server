@@ -16,7 +16,6 @@
  */
 package org.graylog2.shared.messageq;
 
-import org.graylog2.indexer.messages.Acknowledgeable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

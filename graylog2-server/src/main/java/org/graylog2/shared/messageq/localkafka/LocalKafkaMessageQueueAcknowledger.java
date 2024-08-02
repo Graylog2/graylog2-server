@@ -18,9 +18,9 @@ package org.graylog2.shared.messageq.localkafka;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog2.indexer.messages.Acknowledgeable;
 import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.graylog2.shared.messageq.AbstractMessageQueueAcknowledger;
+import org.graylog2.shared.messageq.Acknowledgeable;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 
 import java.util.List;

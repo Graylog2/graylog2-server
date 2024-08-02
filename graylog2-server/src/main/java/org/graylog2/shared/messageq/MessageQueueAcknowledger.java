@@ -20,7 +20,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
 import jakarta.inject.Inject;
-import org.graylog2.indexer.messages.Acknowledgeable;
 
 import javax.annotation.Nullable;
 import java.util.List;

@@ -18,6 +18,7 @@ package org.graylog2.indexer.messages;
 
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.messageq.Acknowledgeable;
 
 import java.util.Map;
 import java.util.Set;
