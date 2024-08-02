@@ -32,6 +32,12 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Wraps a {@link Message} by making it immutable and caching the result of {@link #serialize(SerializationContext)}
+ * calls.
+ * <p>
+ * For more details about the caching behavior, see {@link #serialize(SerializationContext)}
+ */
 public class SerializationMemoizingMessage implements ImmutableMessage {
     private static final Logger LOG = LoggerFactory.getLogger(SerializationMemoizingMessage.class);
     private static final Logger RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(
@@ -49,6 +55,21 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
         this.delegate = delegate;
     }
 
+    /**
+     * Serializes a message to JSON and memoizes the result as a {@link SoftReference}.
+     * <p>
+     * As long as the same {@link SerializationContext#objectMapper()} is used in consecutive calls, the result will
+     * be memoized. If a context with a different object mapper is used, the memoized serialized byte array will be
+     * replaced with a newly serialized value.
+     * <p>
+     * The serialization result will be maintained as a {@link SoftReference}. If the JVM experiences memory pressure,
+     * the memoized value might be cleared, and consecutive calls will cause the serialization operation to execute
+     * again. In that case, a warning will be logged.
+     *
+     * @param context Context required to perform the serialization
+     * @return The serialized value. May return a memoized value according to the rules described above.
+     * @throws IOException If serialization goes wrong.
+     */
     @Override
     public synchronized byte[] serialize(SerializationContext context)
             throws IOException {
