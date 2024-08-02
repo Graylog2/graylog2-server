@@ -32,7 +32,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -59,8 +58,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final JobSchedulerClock clock;
     private final CaKeystore caKeystore;
 
-    private long CERT_RENEWAL_THRESHOLD_PERCENTAGE = 10;
-
     @Inject
     public CertRenewalServiceImpl(final ClusterConfigService clusterConfigService,
                                   final NodeService<DataNodeDto> nodeService,
@@ -81,7 +78,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     boolean needsRenewal(final DateTime nextRenewal, final RenewalPolicy renewalPolicy, final Date cert) {
         // calculate renewal threshold
-        var threshold = calculateThreshold(renewalPolicy.certificateLifetime());
+        var threshold = calculateThreshold(renewalPolicy);
         return threshold.after(cert) || nextRenewal.toDate().after(cert);
     }
 
@@ -89,14 +86,8 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         return Date.from(dateToConvert.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    Date calculateThreshold(String certificateLifetime) {
-        Duration threshold;
-        PeriodDuration lifetime = PeriodDuration.parse(certificateLifetime);
-        if (!lifetime.getPeriod().isZero()) {
-            threshold = Duration.ofHours(23);
-        } else {
-            threshold = lifetime.getDuration().dividedBy(CERT_RENEWAL_THRESHOLD_PERCENTAGE);
-        }
+    Date calculateThreshold(RenewalPolicy renewalPolicy) {
+        Duration threshold = renewalPolicy.getRenewalThreshold();
         var validUntil = clock.now(ZoneId.systemDefault()).plus(threshold).toLocalDateTime();
         return convertToDateViaInstant(validUntil);
     }
@@ -129,7 +120,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         return activeDataNodes.values().stream()
                 .filter(node -> node.getCertValidUntil() != null)
                 .filter(node -> {
-                    var nowPlusThreshold = calculateThreshold(renewalPolicy.certificateLifetime());
+                    var nowPlusThreshold = calculateThreshold(renewalPolicy);
                     return nowPlusThreshold.after(node.getCertValidUntil()) || nextRenewal.toDate().after(node.getCertValidUntil());
                 }).toList();
     }
