@@ -286,7 +286,7 @@ export function fetchPlainText(method, url, body) {
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchStreamingPlainText(method, url, body) {
+export function fetchStreamingPlainText(method, url, body?) {
   const promise = () => new Builder(method, url)
     .streamingplaintext(body)
     .build();
