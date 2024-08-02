@@ -18,45 +18,24 @@ package org.graylog.datanode.bootstrap.preflight;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog.datanode.configuration.DatanodeKeystore;
-import org.graylog.datanode.configuration.DatanodeKeystoreException;
-import org.graylog.security.certutil.cert.CertificateChain;
-import org.graylog2.cluster.certificates.CertificateExchange;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
 public class DataNodeConfigurationPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeConfigurationPeriodical.class);
-
-    private final NodeId nodeId;
-
-    private final CertificateExchange certificateExchange;
-    private final DatanodeKeystore datanodeKeystore;
+    private final DatanodeCertReceiver datanodeCertReceiver;
 
     @Inject
-    public DataNodeConfigurationPeriodical(final NodeId nodeId,
-                                           CertificateExchange certificateExchange,
-                                           DatanodeKeystore datanodeKeystore) {
-        this.nodeId = nodeId;
-        this.certificateExchange = certificateExchange;
-        this.datanodeKeystore = datanodeKeystore;
+    public DataNodeConfigurationPeriodical(DatanodeCertReceiver datanodeCertReceiver) {
+        this.datanodeCertReceiver = datanodeCertReceiver;
     }
 
     @Override
     public void doRun() {
         // always check if there are any certificates that we can accept
-        certificateExchange.pollCertificate(nodeId.getNodeId(), this::processCertificateChain);
-    }
-
-    private void processCertificateChain(CertificateChain certificateChain) {
-        try {
-            datanodeKeystore.replaceCertificatesInKeystore(certificateChain);
-        } catch (DatanodeKeystoreException e) {
-            throw new RuntimeException(e);
-        }
+        datanodeCertReceiver.pollCertificate();
     }
 
     @Override
