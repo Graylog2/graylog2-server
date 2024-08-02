@@ -16,12 +16,11 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.messageq.Acknowledgeable;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The purpose of this interface is to provide access to certain properties of a {@link Message} while ensuring that
@@ -44,9 +43,9 @@ public interface ImmutableMessage extends Indexable, Acknowledgeable {
     @Override
     String getId();
 
-    Set<IndexSet> getIndexSets();
+    ImmutableSet<IndexSet> getIndexSets();
 
-    Map<String, Object> getFields();
+    ImmutableMap<String, Object> getFields();
 
     String getMessage();
 
@@ -54,5 +53,5 @@ public interface ImmutableMessage extends Indexable, Acknowledgeable {
 
     String getSource();
 
-    Set<String> getStreamIds();
+    ImmutableSet<String> getStreamIds();
 }
