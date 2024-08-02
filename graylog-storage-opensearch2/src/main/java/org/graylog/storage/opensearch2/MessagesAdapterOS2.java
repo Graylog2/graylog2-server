@@ -18,7 +18,6 @@ package org.graylog.storage.opensearch2;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import jakarta.inject.Inject;
@@ -255,7 +254,7 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
         final byte[] body;
         try {
             body = request.message().serialize(SerializationContext.of(objectMapper, invalidTimestampMeter));
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return new IndexRequest(request.indexSet().getWriteIndexAlias())

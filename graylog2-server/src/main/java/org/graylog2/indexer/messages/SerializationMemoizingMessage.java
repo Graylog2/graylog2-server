@@ -17,7 +17,6 @@
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.Meter;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
 import org.graylog2.indexer.IndexSet;
@@ -27,6 +26,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.time.Duration;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
 
     @Override
     public synchronized byte[] serialize(SerializationContext context)
-            throws JsonProcessingException {
+            throws IOException {
 
         final var objectMapper = context.objectMapper();
         final var invalidTimestampMeter = context.invalidTimestampMeter();

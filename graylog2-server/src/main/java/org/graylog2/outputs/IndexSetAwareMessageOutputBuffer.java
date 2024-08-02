@@ -17,7 +17,6 @@
 package org.graylog2.outputs;
 
 import com.codahale.metrics.Meter;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.annotations.VisibleForTesting;
@@ -29,6 +28,7 @@ import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.indexer.messages.SerializationContext;
 import org.graylog2.outputs.filter.FilteredMessage;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -153,7 +153,7 @@ public class IndexSetAwareMessageOutputBuffer {
         long msgSize;
         try {
             msgSize = message.serialize(SerializationContext.of(objectMapper, new Meter())).length + 1; // msg size plus newline
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             msgSize = 0;
         }
 

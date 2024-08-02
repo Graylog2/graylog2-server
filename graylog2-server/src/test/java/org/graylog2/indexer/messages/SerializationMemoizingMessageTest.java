@@ -17,7 +17,6 @@
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.Meter;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.failure.ProcessingFailureCause;
 import org.graylog.testing.messages.MessagesExtension;
@@ -29,6 +28,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.verify;
 class SerializationMemoizingMessageTest {
 
     @Test
-    void serializeTwice(MessageFactory messageFactory) throws JsonProcessingException {
+    void serializeTwice(MessageFactory messageFactory) throws IOException {
         final Message wrappedMsg = spy(messageFactory.createMessage("test message", "test source",
                 DateTime.now(DateTimeZone.UTC)));
         wrappedMsg.addProcessingError(
@@ -70,7 +70,7 @@ class SerializationMemoizingMessageTest {
     }
 
     @Test
-    void differentObjectMappers(MessageFactory messageFactory) throws JsonProcessingException {
+    void differentObjectMappers(MessageFactory messageFactory) throws IOException {
         final Message wrappedMsg = spy(messageFactory.createMessage("test message", "test source",
                 DateTime.now(DateTimeZone.UTC)));
         final var msg = new SerializationMemoizingMessage(wrappedMsg);
