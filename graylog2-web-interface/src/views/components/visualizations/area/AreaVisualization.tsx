@@ -35,6 +35,7 @@ import {
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
 import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
+import useFeature from 'hooks/useFeature';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -45,6 +46,7 @@ const AreaVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
+  const unitFeatureEnabled = useFeature('configuration_of_formatting_value');
   const widgetUnits = useWidgetUnits(config);
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
   const { seriesUnitMapper, yAxisMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
@@ -56,23 +58,31 @@ const AreaVisualization = makeVisualization(({
       .map((l, i) => mapKeys(l, rowPivotFields[i]))
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
-  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => {
+
+  const getExtendedChartGeneratorSettings = useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }) => {
+    if (!unitFeatureEnabled) return ({});
+
     const yaxis = yAxisMapper[name];
     const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
     const convertedToBaseUnitValues = convertDataToBaseUnit(values, curUnit);
 
     return ({
-      type,
-      name,
       yaxis,
-      x: _mapKeys(labels),
       y: convertedToBaseUnitValues,
-      fill: 'tozeroy',
-      line: { shape: toPlotly(interpolation) },
-      originalName,
       ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
     });
-  }, [_mapKeys, config.series, interpolation, widgetUnits, yAxisMapper]);
+  }, [config.series, unitFeatureEnabled, widgetUnits, yAxisMapper]);
+
+  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
+    type,
+    name,
+    x: _mapKeys(labels),
+    y: values,
+    fill: 'tozeroy',
+    line: { shape: toPlotly(interpolation) },
+    originalName,
+    ...getExtendedChartGeneratorSettings({ originalName, name, values }),
+  }), [_mapKeys, getExtendedChartGeneratorSettings, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
 
@@ -85,7 +95,9 @@ const AreaVisualization = makeVisualization(({
   const { eventChartData, shapes } = useEvents(config, data.events);
 
   const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
-  const layout = useMemo<Partial<Layout>>(() => {
+  const getLayoutExtendedSettings = useCallback(() => {
+    if (!unitFeatureEnabled) return ({});
+
     const generatedLayouts = generateLayouts({ unitTypeMapper, seriesUnitMapper, chartData: chartDataResult });
     const _layouts: Partial<Layout> = ({
       ...generatedLayouts,
@@ -93,12 +105,13 @@ const AreaVisualization = makeVisualization(({
       xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },
     });
 
-    if (shapes) {
-      _layouts.shapes = shapes;
-    }
-
     return _layouts;
-  }, [unitTypeMapper, seriesUnitMapper, chartDataResult, shapes]);
+  }, [chartDataResult, seriesUnitMapper, unitFeatureEnabled, unitTypeMapper]);
+  const layout = useMemo<Partial<Layout>>(() => {
+    const _layouts = shapes ? { shapes } : {};
+
+    return ({ ..._layouts, ...getLayoutExtendedSettings() });
+  }, [shapes, getLayoutExtendedSettings]);
 
   return (
     <XYPlot config={config}

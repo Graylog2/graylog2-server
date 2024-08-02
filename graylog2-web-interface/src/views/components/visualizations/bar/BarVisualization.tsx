@@ -38,6 +38,7 @@ import {
 import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
 import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
+import useFeature from 'hooks/useFeature';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -86,6 +87,7 @@ const BarVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
+  const unitFeatureEnabled = useFeature('configuration_of_formatting_value');
   const widgetUnits = useWidgetUnits(config);
   const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
 
@@ -100,9 +102,12 @@ const BarVisualization = makeVisualization(({
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
 
-  const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName, total, idx }): ChartDefinition => {
+  const getExtendedChartGeneratorSettings = useCallback(({
+    originalName, name, values, labels, idx, total,
+  }: { originalName: string, name: string, values: Array<any>, labels: Array<string>, idx: number, total: number }) => {
+    if (!unitFeatureEnabled) return ({});
+
     const yaxis = yAxisMapper[name];
-    const opacity = visualizationConfig?.opacity ?? 1.0;
     const axisNumber = mapperAxisNumber?.[name];
     const totalAxis = Object.keys(unitTypeMapper).length;
 
@@ -121,21 +126,31 @@ const BarVisualization = makeVisualization(({
 
     const convertedToBaseUnitValues = convertDataToBaseUnit(values, curUnit);
 
+    return ({
+      yaxis,
+      y: convertedToBaseUnitValues,
+      ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
+      ...offsetSettings,
+    });
+  }, [_mapKeys, barmode, config.isTimeline, config.series, effectiveTimerange, mapperAxisNumber, unitFeatureEnabled, unitTypeMapper, widgetUnits, yAxisMapper]);
+
+  const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName, total, idx }): ChartDefinition => {
+    const opacity = visualizationConfig?.opacity ?? 1.0;
+    const mappedKeys = _mapKeys(labels);
+
     const getData = () => ({
       type,
       name,
       x: mappedKeys,
-      y: convertedToBaseUnitValues,
+      y: values,
       opacity,
-      yaxis,
       originalName,
-      ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
-      ...offsetSettings,
+      ...getExtendedChartGeneratorSettings({ originalName, name, values, idx, total, labels }),
     });
 
     return getData();
   },
-  [yAxisMapper, visualizationConfig?.opacity, mapperAxisNumber, unitTypeMapper, _mapKeys, barmode, effectiveTimerange, config.isTimeline, config.series, widgetUnits]);
+  [visualizationConfig?.opacity, _mapKeys, getExtendedChartGeneratorSettings]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
 
@@ -151,26 +166,38 @@ const BarVisualization = makeVisualization(({
     return defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to);
   }, [_chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to, eventChartData]);
 
-  const layout = useMemo<Partial<Layout>>(() => {
+  const getLayoutExtendedSettings = useCallback(() => {
+    if (!unitFeatureEnabled) return ({});
+
     const generatedLayouts = generateLayouts({
       unitTypeMapper,
       seriesUnitMapper,
       barmode,
       chartData,
     });
+
     const _layouts: Partial<Layout> = ({
       ...generatedLayouts,
       hovermode: 'x',
       xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },
-      barmode,
     });
+
+    return _layouts;
+  }, [barmode, chartData, seriesUnitMapper, unitFeatureEnabled, unitTypeMapper]);
+
+  const layout = useMemo<Partial<Layout>>(() => {
+    const _layouts = {};
 
     if (shapes) {
       _layouts.shapes = shapes;
     }
 
-    return _layouts;
-  }, [unitTypeMapper, seriesUnitMapper, barmode, chartData, shapes]);
+    if (barmode) {
+      _layouts.barmode = barmode;
+    }
+
+    return ({ ..._layouts, ...getLayoutExtendedSettings() });
+  }, [shapes, barmode, getLayoutExtendedSettings]);
 
   return (
     <XYPlot config={config}

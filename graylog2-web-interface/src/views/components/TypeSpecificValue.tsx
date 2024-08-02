@@ -37,13 +37,13 @@ import DecoratorValue from './DecoratorValue';
 
 const defaultComponent = ({ value }: ValueRendererProps) => value;
 
-const _formatValue = (field: string, value: any, truncate: boolean, render: React.ComponentType<ValueRendererProps>) => {
+const _formatValue = (field: string, value: any, truncate: boolean, render: React.ComponentType<ValueRendererProps>, type: string) => {
   const stringified = isString(value) ? value : JSON.stringify(value);
   const Component = render;
 
   return trim(stringified) === ''
     ? <EmptyValue />
-    : <Component field={field} value={(truncate ? trunc(stringified) : stringified)} />;
+    : <Component field={field} value={(truncate ? trunc(stringified) : stringified)} type={type} />;
 };
 
 type TypeSpecificValueProps = {
@@ -63,10 +63,10 @@ const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit
   return <span title={value.toString()}>{`${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`}</span>;
 };
 
-const FormattedValue = ({ field, value, truncate, render, unit }: FormattedValueProps) => {
+const FormattedValue = ({ field, value, truncate, render, unit, type }: FormattedValueProps) => {
   if (unit?.isDefined && value) return <ValueWithUnitRenderer value={value} unit={unit} />;
 
-  return _formatValue(field, value, truncate, render);
+  return _formatValue(field, value, truncate, render, type);
 };
 
 FormattedValue.defaultProps = {
@@ -94,7 +94,7 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
     case 'node': return <NodeField value={String(value)} />;
     case 'streams': return <StreamsField value={value} />;
     case 'percentage': return <PercentageField value={value} />;
-    default: return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} />;
+    default: return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
   }
 };
 
