@@ -17,13 +17,19 @@
 import * as React from 'react';
 import type { DropzoneProps } from '@mantine/dropzone';
 import { Dropzone as MantineDropzone } from '@mantine/dropzone';
+import styled, { css } from 'styled-components';
+
+const StyledMantineDropzone = styled(MantineDropzone)(({ theme }) => css`
+  background: transparent;
+  color: ${theme.colors.global.textDefault};
+  border-color: ${theme.colors.global.textSecondary};
+`);
 
 type Props = DropzoneProps
-
 const Dropzone = ({ children, ...props }: Props) => (
-  <MantineDropzone {...props}>
+  <StyledMantineDropzone {...props}>
     {children}
-  </MantineDropzone>
+  </StyledMantineDropzone>
 );
 
 Dropzone.Accept = MantineDropzone.Accept;
