@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useTheme } from 'styled-components';
 
 import { Spinner } from 'components/common';
 import type { PlotLayout } from 'views/components/visualizations/GenericPlot';
@@ -24,19 +25,62 @@ import GenericPlot from 'views/components/visualizations/GenericPlot';
 type Props = {
   traffic: { [key: string]: number },
   width: number,
-  layoutExtension?: Partial<PlotLayout>,
+  trafficLimit?: number;
 };
 
-const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
+const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
+  const theme = useTheme();
+
+  const getMaxDailyValue = (arr) => arr.reduce((a, b) => Math.max(a, b));
+
+  const range = getMaxDailyValue(Object.values(traffic));
+
   if (!traffic) {
     return <Spinner />;
   }
+
+  const trafficLimitAnnotation: Partial<PlotLayout> = {
+    annotations: [
+      {
+        showarrow: false,
+        text: '<b>Licensed traffic limit</b>',
+        align: 'right',
+        x: 1,
+        xref: 'paper',
+        xanchor: 'right',
+        y: trafficLimit,
+        yanchor: 'bottom',
+        font: {
+          color: theme.colors.variant.danger,
+        },
+      },
+    ],
+  };
+
+  const trafficLimitAnnotationShape: Partial<PlotLayout> = {
+    shapes: [
+      {
+        type: 'line',
+        x0: 0,
+        x1: 1,
+        y0: trafficLimit,
+        y1: trafficLimit,
+        name: 'Traffic Limit',
+        xref: 'paper',
+        yref: 'y',
+        line: {
+          color: theme.colors.variant.danger,
+        },
+      },
+    ],
+  };
 
   const chartData = [{
     type: 'bar',
     x: Object.keys(traffic),
     y: Object.values(traffic),
   }];
+
   const layout: Partial<PlotLayout> = {
     showlegend: false,
     margin: {
@@ -60,13 +104,41 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
       hoverformat: '.4s',
       tickformat: 's',
     },
-    ...layoutExtension,
+    updatemenus: [
+      {
+        buttons: [
+          {
+            args: ['yaxis.range', [0, range]],
+            args2: [{ 'yaxis.autorange': 'True' }, { 'yaxis.range': null }],
+            label: 'Zoom/Reset',
+            method: 'relayout',
+          },
+        ],
+        direction: 'right',
+        showactive: false,
+        bordercolor: theme.colors.global.contentBackground,
+        font: {
+          color: theme.colors.global.link,
+        },
+        active: 1,
+        type: 'buttons',
+        visible: trafficLimit && (range < trafficLimit),
+        xanchor: 'right',
+        yanchor: 'top',
+        x: 1,
+        y: 1.3,
+      },
+    ],
   };
+
+  const layoutWithTrafficLimit = { ...layout, ...trafficLimitAnnotation, ...trafficLimitAnnotationShape };
+
+  const trafficLayout = trafficLimit ? layoutWithTrafficLimit : layout;
 
   return (
     <div style={{ height: '200px', width: width }}>
       <GenericPlot chartData={chartData}
-                   layout={layout} />
+                   layout={trafficLayout} />
     </div>
   );
 };
@@ -74,11 +146,11 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
 TrafficGraph.propTypes = {
   traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
   width: PropTypes.number.isRequired,
-  layoutExtension: PropTypes.object,
+  trafficLimit: PropTypes.number,
 };
 
 TrafficGraph.defaultProps = {
-  layoutExtension: {},
+  trafficLimit: undefined,
 };
 
 export default TrafficGraph;

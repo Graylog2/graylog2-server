@@ -21,6 +21,14 @@ interface EnterpriseTrafficGraph {
   children: React.ReactNode;
 }
 
+type Traffic = {
+    from: string,
+    to: string,
+    output: Record<string, number>,
+    input: Record<string, number>,
+    decoded: Record<string, number>,
+}
+
 interface LicensePlugin {
   EnterpriseTrafficGraph?: React.ComponentType<EnterpriseTrafficGraph>;
 }
