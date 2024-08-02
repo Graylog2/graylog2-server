@@ -34,7 +34,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.Analyz
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentType;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.rest.RestStatus;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
-import org.graylog2.indexer.messages.DefaultSerializationContext;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.indexer.messages.IndexingError;
@@ -44,6 +43,7 @@ import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.IndexingSuccess;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.messages.SerializationContext;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ResultMessageFactory;
 import org.slf4j.Logger;
@@ -252,7 +252,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     private IndexRequest indexRequestFrom(IndexingRequest request) {
         final byte[] body;
         try {
-            body = request.message().serialize(new DefaultSerializationContext(objectMapper, this.invalidTimestampMeter));
+            body = request.message().serialize(SerializationContext.of(objectMapper, this.invalidTimestampMeter));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

@@ -34,7 +34,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.AnalyzeRespo
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentType;
 import org.graylog.shaded.opensearch2.org.opensearch.core.rest.RestStatus;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
-import org.graylog2.indexer.messages.DefaultSerializationContext;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.indexer.messages.IndexingError;
@@ -44,6 +43,7 @@ import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.IndexingSuccess;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.messages.SerializationContext;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ResultMessageFactory;
 import org.slf4j.Logger;
@@ -254,7 +254,7 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
     private IndexRequest indexRequestFrom(IndexingRequest request) {
         final byte[] body;
         try {
-            body = request.message().serialize(new DefaultSerializationContext(objectMapper, invalidTimestampMeter));
+            body = request.message().serialize(SerializationContext.of(objectMapper, invalidTimestampMeter));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

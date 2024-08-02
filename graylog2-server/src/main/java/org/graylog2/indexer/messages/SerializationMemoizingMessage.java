@@ -68,7 +68,7 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
 
         if (cachedEntry == null || !cachedEntry.objectMapper().equals(objectMapper)) {
             final var tsMeter = new Meter();
-            final var serializedBytes = delegate.serialize(new DefaultSerializationContext(objectMapper, tsMeter));
+            final var serializedBytes = delegate.serialize(SerializationContext.of(objectMapper, tsMeter));
             cachedEntry = new CacheEntry(serializedBytes, objectMapper, tsMeter);
             this.lastSerializationResult = new SoftReference<>(cachedEntry);
         }
