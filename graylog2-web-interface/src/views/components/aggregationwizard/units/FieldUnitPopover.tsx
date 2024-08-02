@@ -22,7 +22,7 @@ import Select from 'components/common/Select';
 import Popover from 'components/common/Popover';
 import { HoverForHelp } from 'components/common';
 import { Input } from 'components/bootstrap';
-import type { Unit, UnitJson } from 'views/components/visualizations/utils/unitConvertors';
+import type { Unit } from 'views/components/visualizations/utils/unitConvertors';
 import { mappedUnitsFromJSON as units } from 'views/components/visualizations/utils/unitConvertors';
 import type { FieldUnitsFormValues } from 'views/types';
 import { UnitLabel } from 'views/components/aggregationwizard/units/FieldUnitComponent';
@@ -40,9 +40,9 @@ const FieldUnitPopover = ({ field }: { field: string }) => {
   const [show, setShow] = useState(false);
   const { setFieldValue, values } = useFormikContext<{units: FieldUnitsFormValues }>();
   const currentUnitType = useMemo<string>(() => values?.units?.[field]?.unitType, [values, field]);
-  const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: key })), [units]);
+  const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: key })), []);
   const unitOptions = useMemo(() => currentUnitType && units[currentUnitType]
-    .map(({ abbrev, name }: Unit) => ({ value: abbrev, label: name })), [units, currentUnitType]);
+    .map(({ abbrev, name }: Unit) => ({ value: abbrev, label: name })), [currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {
     setFieldValue(`units.${field}.unitType`, val || undefined);

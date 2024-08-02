@@ -33,7 +33,7 @@ class FieldTypeMapping {
     unit?: FieldUnit,
   };
 
-  constructor(name: string, type: FieldType, unit: FieldUnit) {
+  constructor(name: string, type: FieldType, unit?: FieldUnit) {
     this.value = { name, type, unit };
   }
 
@@ -55,7 +55,7 @@ class FieldTypeMapping {
     return new FieldTypeMapping(name, FieldType.fromJSON(type), FieldUnit.fromJSON(unit));
   }
 
-  static create(name: string, type: FieldType, unit: FieldUnit) {
+  static create(name: string, type: FieldType, unit?: FieldUnit) {
     return new FieldTypeMapping(name, type, unit);
   }
 }

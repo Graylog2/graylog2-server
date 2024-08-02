@@ -234,7 +234,7 @@ type Params = {
   unitTypeMapper: UnitTypeMapper,
   seriesUnitMapper: SeriesUnitMapper,
   chartData: Array<ChartDefinition>,
-  barmode?: string
+  barmode?: BarMode
 }
 
 export const generateLayouts = (

@@ -41,8 +41,8 @@ export const UnitLabel = styled.div(({ theme }) => css`
 
 const FieldUnitComponent = ({ field }: Props) => {
   const fieldTypesUnits = useFieldTypesUnits();
-  const { data, isLoading } = useFieldTypes(undefined, undefined);
-  const predefinedValue = useMemo(() => fieldTypesUnits?.[field], [fieldTypesUnits]);
+  const { data } = useFieldTypes(undefined, undefined);
+  const predefinedValue = useMemo(() => fieldTypesUnits?.[field], [field, fieldTypesUnits]);
   const { setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const showUnitComponent = useMemo(() => !!(data?.find((f) => f.name === field && f?.type?.properties?.contains(Properties.Numeric))), [data, field]);
 
@@ -50,7 +50,7 @@ const FieldUnitComponent = ({ field }: Props) => {
     if (predefinedValue) {
       setFieldValue(`units.${field}`, { abbrev: predefinedValue.abbrev, unitType: predefinedValue.unitType });
     }
-  }, [predefinedValue]);
+  }, [field, predefinedValue, setFieldValue]);
 
   if (!showUnitComponent) return null;
 

@@ -16,6 +16,7 @@
  */
 import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import type { Layout } from 'plotly.js';
 
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -31,7 +32,6 @@ import {
   generateMappersForYAxis,
   getHoverTemplateSettings,
 } from 'views/components/visualizations/utils/chartLayoytGenerators';
-import useFieldUnitTypes from 'views/components/visualizations/utils/unitConvertors';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
 import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
@@ -72,7 +72,7 @@ const AreaVisualization = makeVisualization(({
       originalName,
       ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
     });
-  }, [_mapKeys, interpolation]);
+  }, [_mapKeys, config.series, interpolation, widgetUnits, yAxisMapper]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
 
@@ -85,9 +85,9 @@ const AreaVisualization = makeVisualization(({
   const { eventChartData, shapes } = useEvents(config, data.events);
 
   const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
-  const layout = useMemo(() => {
+  const layout = useMemo<Partial<Layout>>(() => {
     const generatedLayouts = generateLayouts({ unitTypeMapper, seriesUnitMapper, chartData: chartDataResult });
-    const _layouts = ({
+    const _layouts: Partial<Layout> = ({
       ...generatedLayouts,
       hovermode: 'x',
       xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },

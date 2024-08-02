@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import type { Layout } from 'plotly.js';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -47,7 +48,7 @@ const ScatterVisualization = makeVisualization(({
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
   const widgetUnits = useWidgetUnits(config);
-  const { seriesUnitMapper, yAxisMapper, mapperAxisNumber, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
+  const { seriesUnitMapper, yAxisMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
   const _mapKeys = useCallback((labels: string[]) => labels
@@ -71,7 +72,7 @@ const ScatterVisualization = makeVisualization(({
       yaxis,
       ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
     });
-  }, [_mapKeys, yAxisMapper]);
+  }, [_mapKeys, config.series, widgetUnits, yAxisMapper]);
   const _chartDataResult = useChartData(rows, {
     widgetConfig: config,
     chartType: 'scatter',
@@ -79,9 +80,9 @@ const ScatterVisualization = makeVisualization(({
   });
   const { eventChartData, shapes } = useEvents(config, data.events);
   const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
-  const layout = useMemo(() => {
+  const layout = useMemo<Partial<Layout>>(() => {
     const generatedLayouts = generateLayouts({ unitTypeMapper, seriesUnitMapper, chartData: chartDataResult });
-    const _layouts = ({
+    const _layouts: Partial<Layout> = ({
       ...generatedLayouts,
       hovermode: 'x',
       xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },

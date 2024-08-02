@@ -16,6 +16,7 @@
  */
 import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import type { Layout } from 'plotly.js';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -47,7 +48,7 @@ const LineVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const widgetUnits = useWidgetUnits(config);
-  const { seriesUnitMapper, yAxisMapper, mapperAxisNumber, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
+  const { seriesUnitMapper, yAxisMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
   const mapKeys = useMapKeys();
@@ -86,9 +87,9 @@ const LineVisualization = makeVisualization(({
 
   const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
 
-  const layout = useMemo(() => {
+  const layout = useMemo<Partial<Layout>>(() => {
     const generatedLayouts = generateLayouts({ unitTypeMapper, seriesUnitMapper, chartData: chartDataResult });
-    const _layouts = ({
+    const _layouts: Partial<Layout> = ({
       ...generatedLayouts,
       hovermode: 'x',
       xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },

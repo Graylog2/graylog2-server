@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import type { Layout } from 'plotly.js';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -134,7 +135,7 @@ const BarVisualization = makeVisualization(({
 
     return getData();
   },
-  [yAxisMapper, visualizationConfig?.opacity, mapperAxisNumber, unitTypeMapper, barmode, config.series, widgetUnits, _mapKeys]);
+  [yAxisMapper, visualizationConfig?.opacity, mapperAxisNumber, unitTypeMapper, _mapKeys, barmode, effectiveTimerange, config.isTimeline, config.series, widgetUnits]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
 
@@ -150,14 +151,14 @@ const BarVisualization = makeVisualization(({
     return defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to);
   }, [_chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to, eventChartData]);
 
-  const layout = useMemo(() => {
+  const layout = useMemo<Partial<Layout>>(() => {
     const generatedLayouts = generateLayouts({
       unitTypeMapper,
       seriesUnitMapper,
       barmode,
       chartData,
     });
-    const _layouts = ({
+    const _layouts: Partial<Layout> = ({
       ...generatedLayouts,
       hovermode: 'x',
       xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },
