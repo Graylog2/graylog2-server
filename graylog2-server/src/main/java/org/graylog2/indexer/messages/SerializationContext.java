@@ -20,6 +20,14 @@ import com.codahale.metrics.Meter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
 
+/**
+ * Context required to serialize an indexable object into a form required by the indexer. Typically, that is JSON.
+ * <p>
+ * A context contains the object mapper that is doing the heavy lifting of the serialization.
+ * <p>
+ * If more context is required to serialize certain {@link Indexable} objects, this class should be
+ * extended, to provide that. This way, changes to the {@link Indexable} can be kept minimal.
+ */
 public interface SerializationContext {
 
     static SerializationContext of(ObjectMapper objectMapper, Meter invalidTimestampMeter) {
