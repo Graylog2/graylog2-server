@@ -184,7 +184,6 @@
         <jjwt.version>0.12.6</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.3.0</poi.version>
-        <threeten-extra.version>1.8.0</threeten-extra.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>

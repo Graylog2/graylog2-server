@@ -20,9 +20,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
-import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
+import java.time.Period;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
 public record RenewalPolicy(@JsonProperty("mode") @NotNull Mode mode,
@@ -40,19 +41,25 @@ public record RenewalPolicy(@JsonProperty("mode") @NotNull Mode mode,
         }
     }
 
-    public @NotNull PeriodDuration parsedCertificateLifetime() {
-        return PeriodDuration.parse(certificateLifetime);
+    public @NotNull Duration parsedCertificateLifetime() {
+        return safeParse(certificateLifetime);
     }
 
     @JsonIgnore
     public Duration getRenewalThreshold() {
-        Duration threshold;
-        PeriodDuration lifetime = PeriodDuration.parse(certificateLifetime);
-        if (!lifetime.getPeriod().isZero()) {
-            threshold = Duration.ofHours(23);
-        } else {
-            threshold = lifetime.getDuration().dividedBy(CERT_RENEWAL_THRESHOLD_PERCENTAGE);
-        }
-        return threshold;
+        return safeParse(certificateLifetime).dividedBy(CERT_RENEWAL_THRESHOLD_PERCENTAGE);
     }
+
+    private Duration safeParse(String duration) {
+        try {
+            return Duration.parse(duration);
+        } catch (DateTimeParseException ignored) {
+            return periodToDuration(Period.parse(duration));
+        }
+    }
+
+    private Duration periodToDuration(Period period) {
+        return Duration.ofDays(period.getYears() * 365L + period.getMonths() * 30L + period.getDays());
+    }
+
 }
