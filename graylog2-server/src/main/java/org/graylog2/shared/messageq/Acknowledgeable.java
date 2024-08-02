@@ -18,6 +18,13 @@ package org.graylog2.shared.messageq;
 
 import javax.annotation.Nullable;
 
+/**
+ * An object adhering to this interface can be acknowledged in a message queue by providing a queue-specific ID.
+ * <p>
+ * For example, messages that have been read from the local kafka journal will use a journal offset as message queue ID.
+ * By using that offset to commit to the journal after the messages has been successfully indexed, the message can be
+ * acknowledged in the queue.
+ */
 public interface Acknowledgeable {
     @Nullable
     Object getMessageQueueId();
