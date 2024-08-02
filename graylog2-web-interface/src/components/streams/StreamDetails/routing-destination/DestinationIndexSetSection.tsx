@@ -44,7 +44,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
   return (
     <Section title="Index Set">
       <Alert bsStyle="info">
-        Messages routed to the <b>Search Cluster</b>will be searchable in Graylog and count towards Graylog License usage.<br />
+        Messages routed to the <b>Search Cluster</b> will be searchable in Graylog and count towards Graylog License usage.<br />
         These messages will be stored in the defined Index Set until the retention policy criteria is met.<br />
         Note: Messages not routed to the <b>Search Cluster</b> will not be searchable in Graylog.
       </Alert>
