@@ -400,11 +400,11 @@ public class MongoIndexSet implements IndexSet {
     }
 
     public static String hotIndexName(String indexName) {
-        return indexName.replace(WARM_INDE_INFIX_WITH_SEPERATOR, SEPARATOR);
+        return indexName.replace(WARM_INDEX_INFIX_WITH_SEPARATOR, SEPARATOR);
     }
 
     public static boolean indexHasWarmInfix(String indexName) {
-        return indexName.contains(WARM_INDE_INFIX_WITH_SEPERATOR);
+        return indexName.contains(WARM_INDEX_INFIX_WITH_SEPARATOR);
     }
 
     public interface Factory {
