@@ -31,7 +31,7 @@ const useShowDatanodeMigration = () : boolean => {
 
   const { currentStep } = useMigrationState();
 
-  return (isDatanodeConfiguredAndUsed === false) || (currentStep?.state !== 'FINISHED');
+  return !(isDatanodeConfiguredAndUsed && (!currentStep || currentStep?.state === 'FINISHED'));
 };
 
 export default useShowDatanodeMigration;
