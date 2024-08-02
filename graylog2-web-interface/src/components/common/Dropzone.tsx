@@ -25,12 +25,17 @@ const StyledMantineDropzone = styled(MantineDropzone)(({ theme }) => css`
   border-color: ${theme.colors.global.textSecondary};
 `);
 
-type Props = DropzoneProps
+type Props = Pick<DropzoneProps, 'children' | 'onDrop' | 'onReject' | 'loading' | 'accept' | 'inputProps' | 'maxSize'> & { 'data-testid'?: string };
+
 const Dropzone = ({ children, ...props }: Props) => (
   <StyledMantineDropzone {...props}>
     {children}
   </StyledMantineDropzone>
 );
+
+Dropzone.defaultProps = {
+  'data-testid': undefined,
+};
 
 Dropzone.Accept = MantineDropzone.Accept;
 Dropzone.Reject = MantineDropzone.Reject;
