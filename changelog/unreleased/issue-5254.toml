@@ -1,0 +1,4 @@
+type="a"
+message="Display System logs from Kafka topic using file beats"
+
+issues=["5254"]
