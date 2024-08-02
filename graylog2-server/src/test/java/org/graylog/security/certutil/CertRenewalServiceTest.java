@@ -69,16 +69,16 @@ public class CertRenewalServiceTest {
         final JobSchedulerClock clock = new JobSchedulerTestClock(now);
         final var nextRun = clock.nowUTC().plusMinutes(30);
         final var service = new CertRenewalServiceImpl(null, null, null, null, clock, null);
-        // Using a date period should also work, so here's the test for that. For dates, this sets the renewal date to 23 hours before expiration
+        // Using a date period should also work, so here's the test for that. 1 day is 1440 minutes, so it should need the renewal after 143 minutes
         final var policy = new RenewalPolicy(RenewalPolicy.Mode.MANUAL, "P1D");
 
         final var cert1 = notAfter(now, 0, 24 * 60);
         assertFalse(service.needsRenewal(nextRun, policy, cert1));
 
-        final var cert2 = notAfter(now, 0, 23 * 60);
+        final var cert2 = notAfter(now, 0, 144);
         assertFalse(service.needsRenewal(nextRun, policy, cert2));
 
-        final var cert3 = notAfter(now, 0, (23 * 60) - 1);
+        final var cert3 = notAfter(now, 0, 143);
         assertTrue(service.needsRenewal(nextRun, policy, cert3));
 
     }
