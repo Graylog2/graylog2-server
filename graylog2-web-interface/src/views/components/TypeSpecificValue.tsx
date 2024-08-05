@@ -29,6 +29,7 @@ import PercentageField from 'views/components/fieldtypes/PercentageField';
 import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConvertors';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import { DECIMAL_PLACES } from 'views/components/visualizations/Constants';
+import useFeature from 'hooks/useFeature';
 
 import EmptyValue from './EmptyValue';
 import CustomPropTypes from './CustomPropTypes';
@@ -64,7 +65,8 @@ const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit
 };
 
 const FormattedValue = ({ field, value, truncate, render, unit, type }: FormattedValueProps) => {
-  if (unit?.isDefined && value) return <ValueWithUnitRenderer value={value} unit={unit} />;
+  const unitFeatureEnabled = useFeature('configuration_of_formatting_value');
+  if (unit?.isDefined && value && unitFeatureEnabled) return <ValueWithUnitRenderer value={value} unit={unit} />;
 
   return _formatValue(field, value, truncate, render, type);
 };
