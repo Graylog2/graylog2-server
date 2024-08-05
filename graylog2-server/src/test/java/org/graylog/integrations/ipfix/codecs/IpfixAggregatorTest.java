@@ -190,7 +190,7 @@ public class IpfixAggregatorTest {
     @Test
     public void ignoreTrailingRecordPadding() throws IOException {
         final IpfixAggregator ipfixAggregator = new IpfixAggregator();
-        final IpfixCodec codec = new IpfixCodec(new Configuration(Map.of()), ipfixAggregator, messageFactory);
+        final IpfixCodec codec = new IpfixCodec(new Configuration(Map.of()), ipfixAggregator);
         final List<Message> messages = new ArrayList<>();
 
         try (InputStream stream = Resources.getResource("trailingpadding.pcap").openStream()) {
