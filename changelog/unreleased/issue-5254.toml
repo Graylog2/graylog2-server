@@ -1,4 +1,5 @@
 type="a"
-message="Display System logs from Kafka topic using file beats"
+message="Added new Beats Kafka input to ingest system logs from Kafka topic using Filebeat."
 
 issues=["5254"]
+pulls=["20067"]
