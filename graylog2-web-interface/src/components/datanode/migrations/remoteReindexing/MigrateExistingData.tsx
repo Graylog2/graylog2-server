@@ -67,7 +67,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
 
       if (checkConnectionResult?.indices?.length) {
         setAvailableIndices(checkConnectionResult.indices);
-        setSelectedIndices(checkConnectionResult.indices.filter((i) => i.managed));
+        setSelectedIndices(checkConnectionResult.indices.filter((i) => i.managed && !i.closed));
         setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
         saveFormValues(args as RemoteReindexRequest);
       } else if (checkConnectionResult?.error) {
@@ -216,7 +216,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
                          if (areAllIndicesSelected) {
                            setSelectedIndices([]);
                          } else {
-                           setSelectedIndices(filteredIndices);
+                           setSelectedIndices(filteredIndices.filter((i) => !i.closed));
                          }
                        }} />
               )}
