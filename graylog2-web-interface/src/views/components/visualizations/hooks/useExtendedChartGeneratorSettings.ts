@@ -24,9 +24,10 @@ import {
   getBarChartTraceOffsetSettings, getHoverTemplateSettings,
 } from 'views/components/visualizations/utils/chartLayoytGenerators';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
-import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
 import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
+import { NO_FIELD_NAME_SERIES } from 'views/components/visualizations/Constants';
 
 const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange }: {
   config: AggregationWidgetConfig,
@@ -35,12 +36,13 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
 }) => {
   const unitFeatureEnabled = useFeature('configuration_of_formatting_value');
   const widgetUnits = useWidgetUnits(config);
-  const { yAxisMapper, mapperAxisNumber, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
+  const { fieldNameToAxisNameMapper, fieldNameToAxisCountMapper, unitTypeMapper, seriesUnitMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const getExtendedChartGeneratorSettings = useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }) => {
     if (!unitFeatureEnabled) return ({});
 
-    const yaxis = yAxisMapper[name];
-    const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
+    const fieldNameKey = parseSeries(name)?.field ?? NO_FIELD_NAME_SERIES;
+    const yaxis = fieldNameToAxisNameMapper[fieldNameKey];
+    const curUnit = widgetUnits.getFieldUnit(fieldNameKey);
     const convertedToBaseUnitValues = convertDataToBaseUnit(values, curUnit);
 
     return ({
@@ -48,14 +50,15 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
       y: convertedToBaseUnitValues,
       ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
     });
-  }, [config.series, unitFeatureEnabled, widgetUnits, yAxisMapper]);
+  }, [config.series, unitFeatureEnabled, widgetUnits]);
   const getExtendedBarsGeneratorSettings = useCallback(({
     originalName, name, values, idx, total, xAxisItemsLength,
   }: { xAxisItemsLength: number, originalName: string, name: string, values: Array<any>, idx: number, total: number }) => {
     if (!unitFeatureEnabled) return ({});
 
+    const fieldNameKey = parseSeries(name)?.field ?? NO_FIELD_NAME_SERIES;
     const { y: convertedToBaseUnitValues, yaxis, ...hoverTemplateSettings } = getExtendedChartGeneratorSettings({ originalName, name, values });
-    const axisNumber = mapperAxisNumber?.[name];
+    const axisNumber = fieldNameToAxisCountMapper?.[fieldNameKey];
     const totalAxis = Object.keys(unitTypeMapper).length;
 
     const offsetSettings = getBarChartTraceOffsetSettings(barmode, {
@@ -75,7 +78,7 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
       ...hoverTemplateSettings,
       ...offsetSettings,
     });
-  }, [barmode, config.isTimeline, effectiveTimerange, getExtendedChartGeneratorSettings, mapperAxisNumber, unitFeatureEnabled, unitTypeMapper]);
+  }, [barmode, config.isTimeline, effectiveTimerange, getExtendedChartGeneratorSettings, unitFeatureEnabled, unitTypeMapper]);
 
   return ({
     getExtendedBarsGeneratorSettings,

@@ -35,6 +35,7 @@ import {
   TIME_AXIS_LABELS_QUANTITY,
   DECIMAL_PLACES,
   Y_POSITION_AXIS_STEP,
+  NO_FIELD_NAME_SERIES,
 } from 'views/components/visualizations/Constants';
 
 type DefaultAxisKey = 'withoutUnit';
@@ -181,20 +182,33 @@ type UnitTypeMapper = {} | Record<FieldUnitType, { axisKeyName: string, axisCoun
 type SeriesUnitMapper = {} | Record<SeriesName, FieldUnitType | DefaultAxisKey>;
 type MapperAxisNumber = Record<string, number>;
 type YAxisMapper = Record<SeriesName, AxisName>;
+type FieldNameToAxisNameMapper = {} | Record<string, string>;
+type FieldNameToAxisCountMapper = {} | Record<string, number>;
 
 export const generateMappersForYAxis = (
-  { series, units }: { series: AggregationWidgetConfig['series'], units: AggregationWidgetConfig['units'] }): { seriesUnitMapper: SeriesUnitMapper, mapperAxisNumber: MapperAxisNumber, unitTypeMapper: UnitTypeMapper, yAxisMapper: YAxisMapper} => {
+  { series, units }: { series: AggregationWidgetConfig['series'], units: AggregationWidgetConfig['units'] }): {
+  seriesUnitMapper: SeriesUnitMapper,
+  mapperAxisNumber: MapperAxisNumber,
+  unitTypeMapper: UnitTypeMapper,
+  yAxisMapper: YAxisMapper
+  fieldNameToAxisNameMapper: FieldNameToAxisNameMapper,
+  fieldNameToAxisCountMapper: FieldNameToAxisCountMapper,
+} => {
   let axisCount = 1;
   const unitTypeMapper: {} | UnitTypeMapper = {};
   const mapper = {};
   const mapperAxisNumber = {};
   const seriesUnitMapper = {};
 
+  const fieldNameToAxisNameMapper = {};
+  const fieldNameToAxisCountMapper = {};
+
   series.forEach((s: Series) => {
     const seriesName = s.config.name || s.function;
     const { field } = parseSeries(s.function) ?? {};
     const unitType = units?.getFieldUnit(field)?.unitType;
     const unitTypeKey = unitType || DEFAULT_AXIS_KEY;
+    const fieldKey = field ?? NO_FIELD_NAME_SERIES;
 
     if (!unitTypeMapper[unitTypeKey]) {
       const axisNameNumberPart = axisCount > 1 ? axisCount : '';
@@ -203,12 +217,19 @@ export const generateMappersForYAxis = (
 
       mapper[seriesName] = `y${axisNameNumberPart}`;
       mapperAxisNumber[seriesName] = axisCount;
+
+      fieldNameToAxisNameMapper[fieldKey] = `y${axisNameNumberPart}`;
+      fieldNameToAxisCountMapper[fieldKey] = axisCount;
+
       axisCount += 1;
     } else {
       const currentAxisCount = unitTypeMapper[unitTypeKey].axisCount;
       const axisNameNumberPart = currentAxisCount > 1 ? currentAxisCount : '';
       mapper[seriesName] = `y${axisNameNumberPart}`;
       mapperAxisNumber[seriesName] = currentAxisCount;
+
+      fieldNameToAxisNameMapper[fieldKey] = `y${axisNameNumberPart}`;
+      fieldNameToAxisCountMapper[fieldKey] = currentAxisCount;
     }
 
     seriesUnitMapper[seriesName] = unitTypeKey;
@@ -219,6 +240,8 @@ export const generateMappersForYAxis = (
     yAxisMapper: mapper,
     mapperAxisNumber,
     seriesUnitMapper,
+    fieldNameToAxisNameMapper,
+    fieldNameToAxisCountMapper,
   });
 };
 
