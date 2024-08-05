@@ -97,6 +97,8 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.system.traffic.TrafficCounterService;
+import org.graylog2.system.traffic.TrafficUpdater;
 import org.graylog2.telemetry.enterprise.DefaultTelemetryEnterpriseDataProvider;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
 import org.graylog2.users.GrantsCleanupListener;
@@ -206,6 +208,8 @@ public class ServerBindings extends Graylog2Module {
 
         bind(CSPService.class).to(CSPServiceImpl.class).asEagerSingleton();
         bind(CSPEventListener.class).asEagerSingleton();
+
+        OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
     }
 
     private void bindDynamicFeatures() {

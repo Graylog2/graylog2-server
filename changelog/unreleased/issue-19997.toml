@@ -1,0 +1,5 @@
+type="f"
+message="Show previous values in remote reindex migration form"
+
+issues=["19997"]
+pulls=["20008"]

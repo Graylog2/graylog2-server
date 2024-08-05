@@ -23,9 +23,6 @@ interface EnterpriseTrafficGraph {
 
 interface LicensePlugin {
   EnterpriseTrafficGraph?: React.ComponentType<EnterpriseTrafficGraph>;
-  hooks: {
-    useLicensesStatus: () => any
-  }
 }
 
 declare module 'graylog-web-plugin/plugin' {
