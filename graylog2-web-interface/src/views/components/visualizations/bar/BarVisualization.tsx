@@ -31,14 +31,8 @@ import { keySeparator, humanSeparator } from 'views/Constants';
 import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
-import {
-  generateDomain, generateLayouts, generateMappersForYAxis,
-  getBarChartTraceOffsetSettings, getHoverTemplateSettings,
-} from 'views/components/visualizations/utils/chartLayoytGenerators';
-import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
-import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
-import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
-import useFeature from 'hooks/useFeature';
+import useExtendedChartGeneratorSettings from 'views/components/visualizations/hooks/useExtendedChartGeneratorSettings';
+import useLayoutExtendedSettings from 'views/components/visualizations/hooks/useLayoutExtendedSettings';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -87,11 +81,8 @@ const BarVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
-  const unitFeatureEnabled = useFeature('configuration_of_formatting_value');
-  const widgetUnits = useWidgetUnits(config);
   const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
 
-  const { seriesUnitMapper, yAxisMapper, mapperAxisNumber, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const barmode = useMemo(() => (visualizationConfig && visualizationConfig.barmode ? visualizationConfig.barmode : undefined), [visualizationConfig]);
 
   const mapKeys = useMapKeys();
@@ -102,37 +93,7 @@ const BarVisualization = makeVisualization(({
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
 
-  const getExtendedChartGeneratorSettings = useCallback(({
-    originalName, name, values, labels, idx, total,
-  }: { originalName: string, name: string, values: Array<any>, labels: Array<string>, idx: number, total: number }) => {
-    if (!unitFeatureEnabled) return ({});
-
-    const yaxis = yAxisMapper[name];
-    const axisNumber = mapperAxisNumber?.[name];
-    const totalAxis = Object.keys(unitTypeMapper).length;
-
-    const mappedKeys = _mapKeys(labels);
-    const offsetSettings = getBarChartTraceOffsetSettings(barmode, {
-      yaxis,
-      totalAxis,
-      axisNumber,
-      traceIndex: idx,
-      totalTraces: total,
-      effectiveTimerange,
-      isTimeline: config.isTimeline,
-      xAxisItemsLength: mappedKeys.length,
-    });
-    const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
-
-    const convertedToBaseUnitValues = convertDataToBaseUnit(values, curUnit);
-
-    return ({
-      yaxis,
-      y: convertedToBaseUnitValues,
-      ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
-      ...offsetSettings,
-    });
-  }, [_mapKeys, barmode, config.isTimeline, config.series, effectiveTimerange, mapperAxisNumber, unitFeatureEnabled, unitTypeMapper, widgetUnits, yAxisMapper]);
+  const { getExtendedBarsGeneratorSettings } = useExtendedChartGeneratorSettings({ config, effectiveTimerange, barmode });
 
   const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName, total, idx }): ChartDefinition => {
     const opacity = visualizationConfig?.opacity ?? 1.0;
@@ -145,12 +106,12 @@ const BarVisualization = makeVisualization(({
       y: values,
       opacity,
       originalName,
-      ...getExtendedChartGeneratorSettings({ originalName, name, values, idx, total, labels }),
+      ...getExtendedBarsGeneratorSettings({ originalName, name, values, idx, total, xAxisItemsLength: mappedKeys.length }),
     });
 
     return getData();
   },
-  [visualizationConfig?.opacity, _mapKeys, getExtendedChartGeneratorSettings]);
+  [visualizationConfig?.opacity, _mapKeys, getExtendedBarsGeneratorSettings]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
 
@@ -166,24 +127,7 @@ const BarVisualization = makeVisualization(({
     return defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to);
   }, [_chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to, eventChartData]);
 
-  const getLayoutExtendedSettings = useCallback(() => {
-    if (!unitFeatureEnabled) return ({});
-
-    const generatedLayouts = generateLayouts({
-      unitTypeMapper,
-      seriesUnitMapper,
-      barmode,
-      chartData,
-    });
-
-    const _layouts: Partial<Layout> = ({
-      ...generatedLayouts,
-      hovermode: 'x',
-      xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },
-    });
-
-    return _layouts;
-  }, [barmode, chartData, seriesUnitMapper, unitFeatureEnabled, unitTypeMapper]);
+  const { getLayoutExtendedSettings } = useLayoutExtendedSettings({ config, chartData, barmode });
 
   const layout = useMemo<Partial<Layout>>(() => {
     const _layouts = {};

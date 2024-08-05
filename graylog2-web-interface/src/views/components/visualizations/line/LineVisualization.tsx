@@ -28,16 +28,8 @@ import useEvents from 'views/components/visualizations/useEvents';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import {
-  generateDomain,
-  generateLayouts,
-  generateMappersForYAxis,
-  getHoverTemplateSettings,
-} from 'views/components/visualizations/utils/chartLayoytGenerators';
-import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
-import getSeriesUnit from 'views/components/visualizations/utils/getSeriesUnit';
-import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
-import useFeature from 'hooks/useFeature';
+import useLayoutExtendedSettings from 'views/components/visualizations/hooks/useLayoutExtendedSettings';
+import useExtendedChartGeneratorSettings from 'views/components/visualizations/hooks/useExtendedChartGeneratorSettings';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -48,10 +40,8 @@ const LineVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
-  const unitFeatureEnabled = useFeature('configuration_of_formatting_value');
-  const widgetUnits = useWidgetUnits(config);
-  const { seriesUnitMapper, yAxisMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
+  const { getExtendedChartGeneratorSettings } = useExtendedChartGeneratorSettings({ config, effectiveTimerange });
   const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
@@ -60,20 +50,6 @@ const LineVisualization = makeVisualization(({
       .map((l, i) => mapKeys(l, rowPivotFields[i]))
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
-
-  const getExtendedChartGeneratorSettings = useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }) => {
-    if (!unitFeatureEnabled) return ({});
-
-    const yaxis = yAxisMapper[name];
-    const curUnit = getSeriesUnit(config.series, name || originalName, widgetUnits);
-    const convertedToBaseUnitValues = convertDataToBaseUnit(values, curUnit);
-
-    return ({
-      yaxis,
-      y: convertedToBaseUnitValues,
-      ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
-    });
-  }, [config.series, unitFeatureEnabled, widgetUnits, yAxisMapper]);
 
   const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
     type,
@@ -94,18 +70,7 @@ const LineVisualization = makeVisualization(({
   const { eventChartData, shapes } = useEvents(config, data.events);
 
   const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
-  const getLayoutExtendedSettings = useCallback(() => {
-    if (!unitFeatureEnabled) return ({});
-
-    const generatedLayouts = generateLayouts({ unitTypeMapper, seriesUnitMapper, chartData: chartDataResult });
-    const _layouts: Partial<Layout> = ({
-      ...generatedLayouts,
-      hovermode: 'x',
-      xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },
-    });
-
-    return _layouts;
-  }, [chartDataResult, seriesUnitMapper, unitFeatureEnabled, unitTypeMapper]);
+  const { getLayoutExtendedSettings } = useLayoutExtendedSettings({ config, chartData: chartDataResult });
   const layout = useMemo<Partial<Layout>>(() => {
     const _layouts = shapes ? { shapes } : {};
 
