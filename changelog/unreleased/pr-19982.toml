@@ -1,0 +1,10 @@
+type = "a"
+message = "Support configuration of `output_batch_size` by bytes."
+
+pulls = ["19982"]
+
+details.user = """
+The `output_batch_size` setting can now be configured by providing a byte-based value, e.g. `10 mb`. For backward
+compatibility, the default value is still count-based (`500`). Previously configured count-based values are
+still supported.
+"""
