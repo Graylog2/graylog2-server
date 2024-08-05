@@ -100,6 +100,7 @@ type Props = {
   onClickMarker?: (event: OnClickMarkerEvent) => void
   onHoverMarker?: (event: OnHoverMarkerEvent) => void,
   onUnhoverMarker?: () => void,
+  onAfterPlot?: () => void,
 };
 
 type Axis = {
@@ -208,7 +209,7 @@ const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfi
   }), [chartData, colors, setChartColor, theme.colors.global.textDefault]);
 };
 
-const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverMarker, onUnhoverMarker, onZoom }: Props) => {
+const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverMarker, onUnhoverMarker, onZoom, onAfterPlot }: Props) => {
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);
   const plotChartData = usePlotChatData(chartData, setChartColor);
@@ -241,12 +242,17 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
     });
   }, [onClickMarker]);
 
+  const _onAfterPlot = useCallback(() => {
+    onRenderComplete();
+    onAfterPlot();
+  }, [onRenderComplete, onAfterPlot]);
+
   return (
     <StyledPlot data={plotChartData}
                 useResizeHandler
                 layout={plotLayout}
                 style={style}
-                onAfterPlot={onRenderComplete}
+                onAfterPlot={_onAfterPlot}
                 onClick={interactive ? _onMarkerClick : () => false}
                 onHover={_onHoverMarker}
                 onUnhover={onUnhoverMarker}
@@ -262,6 +268,7 @@ GenericPlot.defaultProps = {
   onClickMarker: () => {},
   onHoverMarker: () => {},
   onUnhoverMarker: () => {},
+  onAfterPlot: () => {},
 };
 
 export default GenericPlot;

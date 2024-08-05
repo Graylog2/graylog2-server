@@ -177,7 +177,7 @@ class MessagesBulkIndexRetryingTest {
     private List<MessageWithIndex> messagesWithIds(String... ids) {
         return Arrays.stream(ids)
                 .map(this::messageWithId)
-                .map(m -> new MessageWithIndex(m, mock(IndexSet.class)))
+                .map(m -> new MessageWithIndex(ImmutableMessage.wrap(m), mock(IndexSet.class)))
                 .collect(Collectors.toList());
     }
 
@@ -189,7 +189,7 @@ class MessagesBulkIndexRetryingTest {
     }
 
     private List<MessageWithIndex> messageListWith(Message mockedMessage) {
-        return List.of(new MessageWithIndex(mockedMessage, mock(IndexSet.class)));
+        return List.of(new MessageWithIndex(ImmutableMessage.wrap(mockedMessage), mock(IndexSet.class)));
     }
 
     private IndexingError errorResultItem(String messageId, IndexingError.Type errorType, String errorReason) {

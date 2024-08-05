@@ -14,16 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.preflight;
+package org.graylog2.shared.messageq;
 
-import com.google.inject.AbstractModule;
-import org.graylog2.cluster.certificates.CertificateExchange;
-import org.graylog2.cluster.certificates.CertificateExchangeImpl;
+import javax.annotation.Nullable;
 
-public class DataNodeProvisioningBindings extends AbstractModule {
-
-    @Override
-    protected void configure() {
-        bind(CertificateExchange.class).to(CertificateExchangeImpl.class);
-    }
+/**
+ * An object adhering to this interface can be acknowledged in a message queue by providing a queue-specific ID.
+ * <p>
+ * For example, messages that have been read from the local kafka journal will use a journal offset as message queue ID.
+ * By using that offset to commit to the journal after the messages has been successfully indexed, the message can be
+ * acknowledged in the queue.
+ */
+public interface Acknowledgeable {
+    @Nullable
+    Object getMessageQueueId();
 }

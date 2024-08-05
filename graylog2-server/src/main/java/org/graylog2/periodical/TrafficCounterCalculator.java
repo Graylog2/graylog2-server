@@ -19,21 +19,21 @@ package org.graylog2.periodical;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Size;
+import jakarta.inject.Inject;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.system.traffic.TrafficCounterService;
+import org.graylog2.system.traffic.TrafficUpdater;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
 public class TrafficCounterCalculator extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(TrafficCounterCalculator.class);
     private final NodeId nodeId;
-    private final TrafficCounterService trafficService;
+    private final TrafficUpdater trafficUpdater;
+
     private final MetricRegistry metricRegistry;
     private volatile long previousInputBytes = 0L;
     private volatile long previousOutputBytes = 0L;
@@ -43,9 +43,9 @@ public class TrafficCounterCalculator extends Periodical {
     private Counter decodedCounter;
 
     @Inject
-    public TrafficCounterCalculator(NodeId nodeId, TrafficCounterService trafficService, MetricRegistry metricRegistry) {
+    public TrafficCounterCalculator(NodeId nodeId, TrafficUpdater trafficUpdater, MetricRegistry metricRegistry) {
         this.nodeId = nodeId;
-        this.trafficService = trafficService;
+        this.trafficUpdater = trafficUpdater;
         this.metricRegistry = metricRegistry;
     }
 
@@ -83,7 +83,7 @@ public class TrafficCounterCalculator extends Periodical {
                         in, in.toMegabytes(), out, out.toMegabytes(), decoded, decoded.toMegabytes());
             }
             final DateTime previousMinute = now.minusMinutes(1);
-            trafficService.updateTraffic(previousMinute, nodeId, inputLastMinute, outputBytesLastMinute, decodedBytesLastMinute);
+            trafficUpdater.updateTraffic(previousMinute, nodeId, inputLastMinute, outputBytesLastMinute, decodedBytesLastMinute);
         }
     }
 

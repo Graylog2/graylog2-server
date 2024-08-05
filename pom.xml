@@ -101,7 +101,7 @@
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.26.1</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.1.1</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
         <byte-buddy.version>1.14.18</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
@@ -126,7 +126,7 @@
         <guava.version>33.2.1-jre</guava.version>
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
-        <hamcrest.version>2.2</hamcrest.version>
+        <hamcrest.version>3.0</hamcrest.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.17.2</jackson.version>
@@ -145,7 +145,7 @@
         <joda-time.version>2.12.7</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-path.version>2.9.0</json-path.version>
-        <kafka.version>3.7.1</kafka.version>
+        <kafka.version>3.8.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.23.1</log4j.version>
         <lucene.version>9.11.1</lucene.version>
@@ -197,7 +197,7 @@
         <mockito.version>5.12.0</mockito.version>
         <restassured.version>5.5.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.20.0</testcontainers.version>
+        <testcontainers.version>1.20.1</testcontainers.version>
         <testcontainers.opensearch.version>2.1.0</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -456,6 +456,17 @@
                 <groupId>org.mongojack</groupId>
                 <artifactId>mongojack</artifactId>
                 <version>${mongojack.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
 
             <!-- test -->

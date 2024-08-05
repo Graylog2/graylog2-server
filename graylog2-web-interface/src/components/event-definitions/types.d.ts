@@ -37,6 +37,7 @@ interface EventDefinitionType {
   summaryComponent: React.ComponentType<{
     currentUser: User,
     config: EventDefinition['config'],
+    definitionId?: string,
   }>
 }
 declare module 'graylog-web-plugin/plugin' {

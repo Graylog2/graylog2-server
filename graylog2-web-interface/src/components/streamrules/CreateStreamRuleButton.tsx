@@ -25,6 +25,7 @@ import type { StyleProps } from 'components/bootstrap/Button';
 import type { StreamRule } from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import UserNotification from 'util/UserNotification';
+import { IfPermitted } from 'components/common';
 
 import StreamRuleModal from './StreamRuleModal';
 
@@ -33,10 +34,11 @@ type Props = {
   bsStyle?: StyleProps,
   buttonText?: string,
   className?: string,
+  disabled?: boolean,
   streamId: string,
 }
 
-const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, streamId }: Props) => {
+const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, disabled, streamId }: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const queryClient = useQueryClient();
   const toggleCreateModal = useCallback(() => setShowCreateModal((cur) => !cur), []);
@@ -47,9 +49,10 @@ const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, stream
   }), [streamId, queryClient]);
 
   return (
-    <>
+    <IfPermitted permissions={`streams:edit:${streamId}`}>
       <Button bsSize={bsSize}
               bsStyle={bsStyle}
+              disabled={disabled}
               className={className}
               onClick={toggleCreateModal}>
         {buttonText}
@@ -62,8 +65,8 @@ const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, stream
                          onSubmit={onSaveStreamRule} />
 
       )}
-      {}
-    </>
+
+    </IfPermitted>
   );
 };
 
@@ -80,6 +83,7 @@ CreateStreamRuleButton.defaultProps = {
   bsSize: undefined,
   bsStyle: undefined,
   className: undefined,
+  disabled: false,
   streamId: undefined,
 };
 
