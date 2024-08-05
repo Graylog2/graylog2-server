@@ -180,6 +180,6 @@ describe('CopyToDashboardForm', () => {
         attributeId: 'title',
         direction: 'asc',
       },
-    }));
+    }, { permissions: { canUpdate: true } }));
   });
 });
