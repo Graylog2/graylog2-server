@@ -127,7 +127,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     @Override
     public String start(RemoteReindexRequest request) {
         final AggregatedConnectionResponse response = getAllIndicesFrom(request.uri(), request.username(), request.password(), request.trustUnknownCerts());
-        final List<String> indices = isAllIndices(request.indices()) ? response.indices() : request.indices();
+        final List<String> indices = isAllIndices(request.indices()) ? response.indices().stream().map(ConnectionCheckIndex::name).collect(Collectors.toList()) : request.indices();
         final MigrationConfiguration migration = reindexMigrationService.saveMigration(MigrationConfiguration.forIndices(indices, response.certificates()));
         doStartMigration(migration, request);
         return migration.id();
@@ -231,7 +231,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             reindexAllowlist.validate();
             final AggregatedConnectionResponse results = getAllIndicesFrom(remoteHost, username, password, trustUnknownCerts);
             final List<RemoteIndex> indices = results.indices().stream()
-                    .map(i -> new RemoteIndex(i, indexSetRegistry.isManagedIndex(i)))
+                    .map(i -> new RemoteIndex(i.name(), indexSetRegistry.isManagedIndex(i.name()), i.closed()))
                     .distinct()
                     .toList();
             if (results.error() != null && !results.error().isEmpty()) {
