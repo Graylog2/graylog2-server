@@ -190,6 +190,37 @@ public class IpfixAggregatorTest {
 
     }
 
+    @Test
+    public void ignoreTrailingRecordPadding() throws IOException {
+        final IpfixAggregator ipfixAggregator = new IpfixAggregator();
+        final IpfixCodec codec = new IpfixCodec(new Configuration(Map.of()), ipfixAggregator, messageFactory);
+        final List<Message> messages = new ArrayList<>();
+
+        try (InputStream stream = Resources.getResource("trailingpadding.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(stream);
+            pcap.loop(packet -> {
+                if (packet.hasProtocol(Protocol.UDP)) {
+                    final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                    final InetSocketAddress source = new InetSocketAddress(udp.getParentPacket().getSourceIP(), udp.getSourcePort());
+                    byte[] payload = new byte[udp.getPayload().getReadableBytes()];
+                    udp.getPayload().getBytes(payload);
+                    final ByteBuf buf = Unpooled.wrappedBuffer(payload);
+                    final CodecAggregator.Result result = ipfixAggregator.addChunk(buf, source);
+                    final ByteBuf ipfixRawBuf = result.getMessage();
+                    if (ipfixRawBuf != null) {
+                        byte[] bytes = new byte[ipfixRawBuf.readableBytes()];
+                        ipfixRawBuf.getBytes(0, bytes);
+                        messages.addAll(Objects.requireNonNull(codec.decodeMessages(new RawMessage(bytes))));
+                    }
+                }
+                return true;
+            });
+        } catch (IOException e) {
+            fail("Cannot process PCAP stream");
+        }
+        assertThat(messages).hasSize(2);
+    }
+
     private Map<String, Object> getIxiaConfigmap() throws URISyntaxException {
         final File filePath = new File(Resources.getResource("ixia-ied.json").toURI());
         final Map<String, Object> configMap = Maps.newHashMap();
