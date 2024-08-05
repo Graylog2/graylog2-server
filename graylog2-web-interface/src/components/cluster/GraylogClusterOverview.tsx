@@ -58,16 +58,16 @@ const ClusterInfo = () => {
 
 type Props = {
   layout?: 'default' | 'compact',
-  children: React.ReactNode
+  children: React.ReactNode,
+  showLicenseGraph?: boolean,
 }
 
-const GraylogClusterOverview = ({ layout, children }: Props) => {
+const GraylogClusterOverview = ({ layout, children, showLicenseGraph }: Props) => {
   const licensePlugin = PluginStore.exports('license');
   const currentUser = useCurrentUser();
-  console.log('===is permitted', isPermitted(currentUser.permissions, ['licenses:read']));
-  console.log('===license plugin', licensePlugin[0]?.LicenseGraphWithMetrics);
 
-  const EnterpriseGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.LicenseGraphWithMetrics);
+  const LicenseGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.LicenseGraphWithMetrics) || ClusterTrafficGraph;
+  const EnterpriseGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) || ClusterTrafficGraph;
 
   if (layout === 'compact') {
     return (
@@ -81,7 +81,8 @@ const GraylogClusterOverview = ({ layout, children }: Props) => {
               {children}
             </Col>
             <Col md={6}>
-              <EnterpriseGraphComponent />
+              {showLicenseGraph ? (<LicenseGraphComponent />
+              ) : (<EnterpriseGraphComponent />)}
             </Col>
           </Row>
         </Col>
@@ -98,7 +99,8 @@ const GraylogClusterOverview = ({ layout, children }: Props) => {
         {children}
         <Row>
           <Col md={12}>
-            <EnterpriseGraphComponent />
+            {showLicenseGraph ? (<LicenseGraphComponent />
+            ) : (<EnterpriseGraphComponent />)}
           </Col>
         </Row>
       </Col>
@@ -109,11 +111,13 @@ const GraylogClusterOverview = ({ layout, children }: Props) => {
 GraylogClusterOverview.propTypes = {
   layout: PropTypes.oneOf(['default', 'compact']),
   children: PropTypes.node,
+  showLicenseGraph: PropTypes.bool,
 };
 
 GraylogClusterOverview.defaultProps = {
   layout: 'default',
   children: null,
+  showLicenseGraph: false,
 };
 
 export default GraylogClusterOverview;

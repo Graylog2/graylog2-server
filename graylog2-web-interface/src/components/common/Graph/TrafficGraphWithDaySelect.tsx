@@ -9,11 +9,11 @@ import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import type { Traffic } from 'components/cluster/types';
 import { formatTrafficData } from 'util/TrafficUtils';
-import useGraphWidth from 'hooks/useGraphWidth';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-
-import TrafficGraph from './TrafficGraph';
+import { TrafficGraph, useGraphWidth } from 'components/common/Graph';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 const DAYS = [
   30,
@@ -47,11 +47,15 @@ const Wrapper = styled.div`
 type Props = {
   getTraffic: (days: number) => void,
   traffic: Traffic,
+  trafficLimit?: number,
+  title?: string,
 };
 
-const TrafficGraphWithDaySelect = ({ getTraffic, traffic } : Props) => {
+const TrafficGraphWithDaySelect = ({ getTraffic, traffic, trafficLimit, title } : Props) => {
   const [graphDays, setGraphDays] = useState(DAYS[0]);
   const { graphWidth, graphContainerRef } = useGraphWidth();
+  const { pathname } = useLocation();
+
   const sendTelemetry = useSendTelemetry();
 
   const onGraphDaysChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
@@ -60,8 +64,8 @@ const TrafficGraphWithDaySelect = ({ getTraffic, traffic } : Props) => {
 
     setGraphDays(newDays);
 
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SYSTEM_OVERVIEW_OUTGOING_TRAFFIC_DAYS_CHANGED, {
-      app_pathname: 'system-overview',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'outgoing-traffic',
       app_action_value: 'trafficgraph-days-button',
       event_details: { value: newDays },
@@ -72,7 +76,6 @@ const TrafficGraphWithDaySelect = ({ getTraffic, traffic } : Props) => {
     getTraffic(graphDays);
   }, [getTraffic, graphDays]);
 
-  // const TrafficGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) || TrafficGraph;
   let sumOutput = null;
   let trafficGraph = <Spinner />;
 
@@ -85,6 +88,7 @@ const TrafficGraphWithDaySelect = ({ getTraffic, traffic } : Props) => {
 
     trafficGraph = (
       <TrafficGraph traffic={unixTraffic}
+                    trafficLimit={trafficLimit}
                     width={graphWidth} />
     );
   }
@@ -103,7 +107,7 @@ const TrafficGraphWithDaySelect = ({ getTraffic, traffic } : Props) => {
         </Input>
       </Wrapper>
 
-      <StyledH3 ref={graphContainerRef}>Outgoing traffic {sumOutput}</StyledH3>
+      <StyledH3 ref={graphContainerRef}>{title ?? 'Outgoing traffic'} {sumOutput}</StyledH3>
       {trafficGraph}
     </>
   );
@@ -111,7 +115,14 @@ const TrafficGraphWithDaySelect = ({ getTraffic, traffic } : Props) => {
 
 TrafficGraphWithDaySelect.propTypes = {
   traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
+  trafficLimit: PropTypes.number,
+  getTraffic: PropTypes.func.isRequired,
+  title: PropTypes.string,
+};
 
+TrafficGraphWithDaySelect.defaultProps = {
+  trafficLimit: undefined,
+  title: undefined,
 };
 
 export default TrafficGraphWithDaySelect;
