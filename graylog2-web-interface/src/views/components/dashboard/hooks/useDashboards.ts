@@ -40,13 +40,19 @@ type PaginatedDashboardsResponse = PaginatedListJSON & {
   attributes: Array<Attribute>,
 };
 
-type Options = {
-  enabled: boolean,
+type Permissions = {
+  canUpdate: boolean;
 }
 
-export const fetchDashboards = (searchParams: SearchParams) => {
+type Options = {
+  enabled?: boolean,
+  permissions?: Permissions,
+}
+
+export const fetchDashboards = (searchParams: SearchParams, permissions: Permissions = { canUpdate: false }) => {
+  const baseUrl = permissions.canUpdate ? `${dashboardsUrl}/canUpdate` : dashboardsUrl;
   const url = PaginationURL(
-    dashboardsUrl,
+    baseUrl,
     searchParams.page,
     searchParams.pageSize,
     searchParams.query,
@@ -61,7 +67,7 @@ export const fetchDashboards = (searchParams: SearchParams) => {
   );
 };
 
-const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
+const useDashboards = (searchParams: SearchParams, { enabled, permissions }: Options = { enabled: true, permissions: { canUpdate: false } }): {
   data: {
     list: Readonly<Array<View>>,
     pagination: { total: number },
@@ -72,7 +78,7 @@ const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enab
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     keyFn(searchParams),
-    () => fetchDashboards(searchParams),
+    () => fetchDashboards(searchParams, permissions),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,

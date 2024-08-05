@@ -47,6 +47,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 import static java.util.Locale.ENGLISH;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -83,9 +84,9 @@ public class DashboardsResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Get a list of all dashboards")
+    @ApiOperation("Get a list of all dashboards a user can read")
     @Timed
-    public PageListResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PageListResponse<ViewSummaryDTO> viewsTheUserCanRead(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                   @ApiParam(name = "sort",
                                                             value = "The field to sort the result on",
@@ -95,6 +96,34 @@ public class DashboardsResource extends RestResource {
                                                   @ApiParam(name = "query") @QueryParam("query") String query,
                                                   @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
                                                   @Context SearchUser searchUser) {
+        return views(page, perPage, sortField, order, query, searchUser::canReadView, filters, searchUser);
+    }
+
+    @GET
+    @ApiOperation("Get a list of all dashboards a user can change")
+    @Path("/canUpdate")
+    @Timed
+    public PageListResponse<ViewSummaryDTO> viewsTheUserCanChange(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                  @ApiParam(name = "sort",
+                                                            value = "The field to sort the result on",
+                                                            required = true,
+                                                            allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                                  @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
+                                                  @ApiParam(name = "query") @QueryParam("query") String query,
+                                                  @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+                                                  @Context SearchUser searchUser) {
+        return views(page, perPage, sortField, order, query, searchUser::canUpdateView, filters, searchUser);
+    }
+
+    public PageListResponse<ViewSummaryDTO> views(final int page,
+                                                  final int perPage,
+                                                  String sortField,
+                                                  final SortOrder order,
+                                                  final String query,
+                                                  final Predicate<ViewSummaryDTO> predicate,
+                                                  final List<String> filters,
+                                                  final SearchUser searchUser) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
@@ -106,7 +135,7 @@ public class DashboardsResource extends RestResource {
                     searchUser,
                     ViewDTO.Type.DASHBOARD,
                     dbQuery,
-                    searchUser::canReadView,
+                    predicate,
                     order,
                     sortField,
                     page,
