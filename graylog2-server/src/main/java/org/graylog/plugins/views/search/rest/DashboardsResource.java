@@ -116,7 +116,7 @@ public class DashboardsResource extends RestResource {
         return views(page, perPage, sortField, order, query, searchUser::canUpdateView, filters, searchUser);
     }
 
-    public PageListResponse<ViewSummaryDTO> views(final int page,
+    private PageListResponse<ViewSummaryDTO> views(final int page,
                                                   final int perPage,
                                                   String sortField,
                                                   final SortOrder order,
