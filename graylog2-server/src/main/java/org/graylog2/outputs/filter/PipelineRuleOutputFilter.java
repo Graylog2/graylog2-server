@@ -27,6 +27,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
+import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.messageq.noop.NoopMessageQueueAcknowledger;
@@ -122,7 +123,7 @@ public class PipelineRuleOutputFilter implements OutputFilter {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("No active filter - returning early");
             }
-            return new DefaultFilteredMessage(msg, newMetadata.destinations());
+            return new DefaultFilteredMessage(ImmutableMessage.wrap(msg), newMetadata.destinations());
         }
 
         // Add metadata to message, so we can modify it from the filter rules
@@ -149,7 +150,7 @@ public class PipelineRuleOutputFilter implements OutputFilter {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Message metadata after running filter: {} (message-id={})", metadata, msg.getId());
             }
-            return new DefaultFilteredMessage(msg, metadata.destinations());
+            return new DefaultFilteredMessage(ImmutableMessage.wrap(msg), metadata.destinations());
         }
         // Since we set the metadata before we pass the message into the interpreter, it's a bug if it doesn't exist.
         throw new IllegalStateException(f("No metadata found for message <%s> - this should not happen!", msg.getId()));
