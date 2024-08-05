@@ -1,0 +1,4 @@
+type = "c"
+message = "Implement table border color with more contrast."
+
+pulls = ["20001"]

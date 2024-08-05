@@ -84,7 +84,7 @@ const tableCss = css(({ theme }) => css`
     > tfoot > tr {
       > th,
       > td {
-        border-top-color: ${theme.colors.table.row.backgroundAlt};
+        border-top-color: ${theme.colors.table.row.border};
       }
     }
 
@@ -100,7 +100,7 @@ const tableCss = css(({ theme }) => css`
     }
 
     > tbody + tbody {
-      border-top-color: ${theme.colors.table.row.backgroundAlt};
+      border-top-color: ${theme.colors.table.row.border};
     }
 
     .table {
@@ -109,14 +109,14 @@ const tableCss = css(({ theme }) => css`
   }
 
   &.table-bordered {
-    border-color: ${theme.colors.table.row.backgroundAlt};
+    border-color: ${theme.colors.table.row.border};
 
     > thead > tr,
     > tfoot > tr,
     > tbody > tr {
       > td,
       > th {
-        border-color: ${theme.colors.table.row.backgroundAlt};
+        border-color: ${theme.colors.table.row.border};
       }
     }
   }
