@@ -39,6 +39,7 @@ import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.notifications.Notification;
+import org.graylog2.outputs.BatchSizeConfig;
 import org.graylog2.plugin.Tools;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
@@ -82,8 +83,9 @@ public class Configuration extends CaConfiguration {
     @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
     private String passwordSecret;
 
-    @Parameter(value = "output_batch_size", required = true, validators = PositiveIntegerValidator.class)
-    private int outputBatchSize = 500;
+    @Parameter(value = "output_batch_size", required = true, converter = BatchSizeConfig.Converter.class,
+               validators = BatchSizeConfig.Validator.class)
+    private BatchSizeConfig outputBatchSize = BatchSizeConfig.forCount(500);
 
     @Parameter(value = "output_flush_interval", required = true, validators = PositiveIntegerValidator.class)
     private int outputFlushInterval = 1;
@@ -322,7 +324,7 @@ public class Configuration extends CaConfiguration {
         return passwordSecret.trim();
     }
 
-    public int getOutputBatchSize() {
+    public BatchSizeConfig getOutputBatchSize() {
         return outputBatchSize;
     }
 
