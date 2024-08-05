@@ -26,28 +26,38 @@ const Container = styled.div(({ theme }) => css`
   margin-bottom: ${theme.spacings.xxs};
 `);
 
-const Header = styled.div<{ $alignActionsLeft: boolean; }>(({ theme, $alignActionsLeft }) => css`
+const Header = styled.div`
   display: flex;
-  justify-content: ${$alignActionsLeft ? 'flex-start' : 'space-between'};
-  ${$alignActionsLeft ? `gap: ${theme.spacings.sm};` : 'gap: 5px;'};
+  justify-content: space-between;
+  gap: 5px;
   align-items: center;
   margin-bottom: 10px;
   flex-wrap: wrap;
+`;
+
+const HeaderLeftWrapper = styled.div(({ theme }) => css`
+  display: flex;
+  justify-content: flex-start;
+  gap: ${theme.spacings.sm};
+  align-items: center;
 `);
 
 type Props = React.PropsWithChildren<{
   title: React.ReactNode,
   actions?: React.ReactNode,
-  alignActionLeft?: boolean,
+  headerLeftSection?: React.ReactNode,
 }>
 
 /**
  * Simple section component. Currently only a "filled" version exists.
  */
-const Section = ({ title, actions, children, alignActionLeft }: Props) => (
+const Section = ({ title, actions, headerLeftSection, children }: Props) => (
   <Container>
-    <Header $alignActionsLeft={alignActionLeft}>
-      <h2>{title}</h2>
+    <Header>
+      <HeaderLeftWrapper>
+        <h2>{title}</h2>
+        {headerLeftSection && <div>{headerLeftSection}</div>}
+      </HeaderLeftWrapper>
       {actions && <div>{actions}</div>}
     </Header>
     {children}
@@ -56,7 +66,7 @@ const Section = ({ title, actions, children, alignActionLeft }: Props) => (
 
 Section.defaultProps = {
   actions: undefined,
-  alignActionLeft: false,
+  headerLeftSection: undefined,
 };
 
 export default Section;
