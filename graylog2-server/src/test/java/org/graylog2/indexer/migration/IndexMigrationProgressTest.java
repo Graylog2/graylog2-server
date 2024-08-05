@@ -26,5 +26,6 @@ class IndexMigrationProgressTest {
         Assertions.assertThat(new IndexMigrationProgress(100, 0, 0, 0, 0, 0).progressPercent()).isEqualTo(0);
         Assertions.assertThat(new IndexMigrationProgress(100, 100, 0, 0, 0, 0).progressPercent()).isEqualTo(100);
         Assertions.assertThat(new IndexMigrationProgress(0, 0, 0, 0, 0, 0).progressPercent()).isEqualTo(100);
+        Assertions.assertThat(new IndexMigrationProgress(42500, 42500, 0, 0, 0, 0).progressPercent()).isEqualTo(100);
     }
 }

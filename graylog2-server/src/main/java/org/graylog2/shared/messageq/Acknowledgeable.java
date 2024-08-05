@@ -14,20 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.shared.messageq;
 
-import type { Sort, Attribute } from 'stores/PaginationTypes';
+import javax.annotation.Nullable;
 
-export const DEFAULT_LAYOUT = {
-  entityTableId: 'streamOutputFilter',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['title', 'description', 'status'],
-};
-
-export const COLUMNS_ORDER = ['title', 'description', 'status'];
-
-export const ADDITIONAL_ATTRIBUTES: Array<Attribute> = [
-  { id: 'title', title: 'Rule' },
-  { id: 'description', title: 'Description' },
-  { id: 'status', title: 'Status' },
-];
+/**
+ * An object adhering to this interface can be acknowledged in a message queue by providing a queue-specific ID.
+ * <p>
+ * For example, messages that have been read from the local kafka journal will use a journal offset as message queue ID.
+ * By using that offset to commit to the journal after the messages has been successfully indexed, the message can be
+ * acknowledged in the queue.
+ */
+public interface Acknowledgeable {
+    @Nullable
+    Object getMessageQueueId();
+}
