@@ -240,6 +240,9 @@ public class Configuration extends CaConfiguration {
     @Parameter(value = "minimum_auto_refresh_interval", required = true)
     private Period minimumAutoRefreshInterval = Period.seconds(1);
 
+    @Parameter(value = "ai_investigation_reports_enabled")
+    private boolean aiInvestigationReports = false;
+
     /**
      * Classes considered safe to load by name. A set of prefixes matched against the fully qualified class name.
      */
@@ -497,6 +500,10 @@ public class Configuration extends CaConfiguration {
 
     public FieldValueSuggestionMode getFieldValueSuggestionMode() {
         return fieldValueSuggestionMode;
+    }
+
+    public boolean aiInvestigationReportsEnabled() {
+        return aiInvestigationReports;
     }
 
     /**
