@@ -14,6 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useQuery } from '@tanstack/react-query';
+
+import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
@@ -31,6 +34,7 @@ type PaginatedResponse = {
 }
 export const KEY_PREFIX = ['streams', 'output', 'filters'];
 export const keyFn = (streamId: string, destinationType: string, searchParams?: SearchParams) => [...KEY_PREFIX, streamId, destinationType, searchParams];
+const defaultParams = { page: 1, pageSize: 0, sort: undefined };
 
 export const fetchStreamOutputFilters = async (streamId: string, searchParams: SearchParams) => {
   const url = PaginationURL(
@@ -38,7 +42,7 @@ export const fetchStreamOutputFilters = async (streamId: string, searchParams: S
     searchParams.page,
     searchParams.pageSize,
     searchParams.query,
-    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+    { sort: searchParams.sort?.attributeId, order: searchParams.sort?.direction });
 
   return fetch('GET', qualifyUrl(url)).then((response: PaginatedResponse) => {
     const {
@@ -62,4 +66,33 @@ export const fetchStreamOutputFilters = async (streamId: string, searchParams: S
   });
 };
 
-export default fetchStreamOutputFilters;
+const useStreamOutputFilters = (streamId: string, destinationType: string): {
+  data: {
+    list: Array<StreamOutputFilterRule>,
+    pagination: { total: number }
+  },
+  refetch: () => void,
+  isInitialLoading: boolean,
+  isSuccess: boolean,
+} => {
+  const { data, refetch, isInitialLoading, isSuccess } = useQuery(
+    keyFn(streamId, destinationType),
+    () => fetchStreamOutputFilters(streamId, { ...defaultParams, query: `destination_type:${destinationType}` }),
+    {
+      onError: (errorThrown) => {
+        UserNotification.error(`Loading stream output filters failed with status: ${errorThrown}`,
+          'Could not load stream output filters');
+      },
+      keepPreviousData: true,
+    },
+  );
+
+  return ({
+    data: data,
+    refetch,
+    isInitialLoading,
+    isSuccess,
+  });
+};
+
+export default useStreamOutputFilters;

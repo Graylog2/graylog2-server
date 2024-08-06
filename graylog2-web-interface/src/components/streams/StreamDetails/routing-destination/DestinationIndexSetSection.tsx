@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
-import { Icon, Section } from 'components/common';
+import { Icon, Section, Switch } from 'components/common';
 import { IndexSetsStore, type IndexSet } from 'stores/indices/IndexSetsStore';
 import { Table, Badge, Button, Alert } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
@@ -27,11 +27,20 @@ import { useStore } from 'stores/connect';
 import type { Stream } from 'stores/streams/StreamsStore';
 import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
 import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
+import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
+
+import useStreamOutputFilters from '../../hooks/useStreamOutputFilters';
 
 type Props = {
   indexSet: IndexSet,
   stream: Stream,
 };
+
+export const StyledSwitch = styled(Switch)`
+  > label {
+    margin-bottom: 0px;
+  }
+`;
 
 const ActionButtonsWrap = styled.span(() => css`
   float: right;
@@ -40,9 +49,23 @@ const ActionButtonsWrap = styled.span(() => css`
 const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
   const archivingEnabled = indexSet.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY || indexSet?.data_tiering?.archive_before_deletion;
   const { indexSets } = useStore(IndexSetsStore);
+  const { data, isSuccess: isLoadingFilterSuccess } = useStreamOutputFilters(stream.id, 'indexer');
+
+  const title = true ? 'Enabled' : 'Disabled';
 
   return (
-    <Section title="Index Set" collapsible>
+    <Section title="Index Set"
+             collapsible
+             headerLeftSection={(
+               <>
+                 <StyledSwitch aria-label="Toggle index set"
+                               name="toggle-indexset"
+                               checked
+                               label={title}
+                               onChange={() => {}} />
+                 <SectionCountLabel>FILTERS {isLoadingFilterSuccess ? data.pagination.total : 0}</SectionCountLabel>
+               </>
+            )}>
       <Alert bsStyle="info">
         Messages routed to the <b>Search Cluster</b> will be searchable in Graylog and count towards Graylog License usage.<br />
         These messages will be stored in the defined Index Set until the retention policy criteria is met.<br />

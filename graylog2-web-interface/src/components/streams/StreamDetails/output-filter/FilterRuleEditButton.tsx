@@ -54,11 +54,11 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
 
   return (
     <>
-      <Button bsStyle={isNew ? 'success' : 'link'}
-              bsSize={isNew ? 'md' : 'xsmall'}
+      <Button bsStyle={isNew ? 'default' : 'link'}
+              bsSize="sm"
               onClick={onClick}
               title="Edit">
-        {isNew ? (<>Create rule</>) : (<Icon name="edit_square" />)}
+        {isNew ? (<>+ Create rule</>) : (<Icon name="edit_square" />)}
       </Button>
       {showForm && (
         <FilterRuleForm title={title}

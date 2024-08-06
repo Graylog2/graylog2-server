@@ -94,11 +94,11 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
 
   return (
     <>
-      <Button bsStyle="success"
-              bsSize="xs"
+      <Button bsStyle="default"
+              bsSize="sm"
               onClick={() => setShowAddOutput(true)}
               title="Edit Output">
-        Add Output
+        + Add Output
       </Button>
       {showAddOutput && (
       <BootstrapModalWrapper showModal
