@@ -17,6 +17,12 @@
 
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useDisclosure } from '@mantine/hooks';
+import { Collapse } from '@mantine/core';
+
+import Icon from './Icon';
+
+import { Button } from '../bootstrap';
 
 const Container = styled.div(({ theme }) => css`
   background-color: ${theme.colors.section.filled.background};
@@ -41,32 +47,58 @@ const HeaderLeftWrapper = styled.div(({ theme }) => css`
   gap: ${theme.spacings.sm};
   align-items: center;
 `);
+const HeaderRightWrapper = styled.div(({ theme }) => css`
+  display: flex;
+  justify-content: flex-start;
+  gap: ${theme.spacings.sm};
+  align-items: center;
+`);
 
 type Props = React.PropsWithChildren<{
   title: React.ReactNode,
   actions?: React.ReactNode,
   headerLeftSection?: React.ReactNode,
+  collapsible?: boolean,
+  defaultCollapse?: boolean,
 }>
 
 /**
  * Simple section component. Currently only a "filled" version exists.
  */
-const Section = ({ title, actions, headerLeftSection, children }: Props) => (
-  <Container>
-    <Header>
-      <HeaderLeftWrapper>
-        <h2>{title}</h2>
-        {headerLeftSection && <div>{headerLeftSection}</div>}
-      </HeaderLeftWrapper>
-      {actions && <div>{actions}</div>}
-    </Header>
-    {children}
-  </Container>
-);
+const Section = ({ title, actions, headerLeftSection, collapsible, defaultCollapse, children }: Props) => {
+  const [opened, { toggle }] = useDisclosure(defaultCollapse);
+
+  return (
+    <Container>
+      <Header>
+        <HeaderLeftWrapper>
+          <h2>{title}</h2>
+          {headerLeftSection && <div>{headerLeftSection}</div>}
+        </HeaderLeftWrapper>
+        <HeaderRightWrapper>
+          {actions && <div>{actions}</div>}
+          {collapsible && (
+          <Button bsSize="xs" onClick={toggle} data-testid="collapseButton">
+            <Icon name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+          </Button>
+          )}
+        </HeaderRightWrapper>
+      </Header>
+      {!collapsible && children}
+      {collapsible && (
+      <Collapse in={opened}>
+        {children}
+      </Collapse>
+      )}
+    </Container>
+  );
+};
 
 Section.defaultProps = {
   actions: undefined,
   headerLeftSection: undefined,
+  collapsible: false,
+  defaultCollapse: true,
 };
 
 export default Section;
