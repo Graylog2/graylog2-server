@@ -41,13 +41,7 @@ const Header = styled.div`
   flex-wrap: wrap;
 `;
 
-const HeaderLeftWrapper = styled.div(({ theme }) => css`
-  display: flex;
-  justify-content: flex-start;
-  gap: ${theme.spacings.sm};
-  align-items: center;
-`);
-const HeaderRightWrapper = styled.div(({ theme }) => css`
+const FlexWrapper = styled.div(({ theme }) => css`
   display: flex;
   justify-content: flex-start;
   gap: ${theme.spacings.sm};
@@ -60,29 +54,34 @@ type Props = React.PropsWithChildren<{
   headerLeftSection?: React.ReactNode,
   collapsible?: boolean,
   defaultCollapse?: boolean,
+  disableCollapseButton?: boolean,
 }>
 
 /**
  * Simple section component. Currently only a "filled" version exists.
  */
-const Section = ({ title, actions, headerLeftSection, collapsible, defaultCollapse, children }: Props) => {
+const Section = ({ title, actions, headerLeftSection, collapsible, defaultCollapse, disableCollapseButton, children }: Props) => {
   const [opened, { toggle }] = useDisclosure(defaultCollapse);
 
   return (
     <Container>
       <Header>
-        <HeaderLeftWrapper>
+        <FlexWrapper>
           <h2>{title}</h2>
-          {headerLeftSection && <div>{headerLeftSection}</div>}
-        </HeaderLeftWrapper>
-        <HeaderRightWrapper>
+          {headerLeftSection && <FlexWrapper>{headerLeftSection}</FlexWrapper>}
+        </FlexWrapper>
+        <FlexWrapper>
           {actions && <div>{actions}</div>}
           {collapsible && (
-          <Button bsSize="xs" onClick={toggle} data-testid="collapseButton">
-            <Icon name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-          </Button>
+            <Button bsSize="sm"
+                    bsStyle={opened ? 'primary' : 'default'}
+                    onClick={toggle}
+                    data-testid="collapseButton"
+                    disabled={disableCollapseButton}>
+              <Icon size="sm" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+            </Button>
           )}
-        </HeaderRightWrapper>
+        </FlexWrapper>
       </Header>
       {!collapsible && children}
       {collapsible && (
@@ -99,6 +98,7 @@ Section.defaultProps = {
   headerLeftSection: undefined,
   collapsible: false,
   defaultCollapse: true,
+  disableCollapseButton: false,
 };
 
 export default Section;
