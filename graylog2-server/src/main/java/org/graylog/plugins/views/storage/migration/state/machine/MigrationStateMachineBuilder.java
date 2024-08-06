@@ -110,6 +110,7 @@ public class MigrationStateMachineBuilder {
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
                 .onEntry(migrationActions::calculateTrafficEstimate)
+                .onEntry(migrationActions::stopDatanodes) // they should not run by design, but it may still happen. Let's stop those running)
                 .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP, migrationActions::stopMessageProcessing);
 
         config.configure(MigrationState.MESSAGE_PROCESSING_STOP)
