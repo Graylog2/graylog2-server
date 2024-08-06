@@ -28,6 +28,8 @@ import convertDataToBaseUnit from 'views/components/visualizations/utils/convert
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import { NO_FIELD_NAME_SERIES } from 'views/components/visualizations/Constants';
+import { getBaseUnit } from 'views/components/visualizations/utils/unitConvertors';
+import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange }: {
   config: AggregationWidgetConfig,
@@ -43,12 +45,15 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
     const fieldNameKey = parseSeries(name)?.field ?? NO_FIELD_NAME_SERIES;
     const yaxis = fieldNameToAxisNameMapper[fieldNameKey];
     const curUnit = widgetUnits.getFieldUnit(fieldNameKey);
-    const convertedToBaseUnitValues = convertDataToBaseUnit(values, curUnit);
+    const shouldConvertToBaseUnit = curUnit && curUnit.isDefined && curUnit.unitType === 'percent';
+    const convertedValues = shouldConvertToBaseUnit ? convertDataToBaseUnit(values, curUnit) : values;
+    const baseUnit = shouldConvertToBaseUnit && getBaseUnit(curUnit.unitType);
+    const unit = shouldConvertToBaseUnit ? new FieldUnit(baseUnit.unitType, baseUnit.abbrev) : curUnit;
 
     return ({
       yaxis,
-      y: convertedToBaseUnitValues,
-      ...getHoverTemplateSettings({ curUnit, convertedToBaseValues: convertedToBaseUnitValues, originalName }),
+      y: convertedValues,
+      ...getHoverTemplateSettings({ unit, convertedValues, originalName }),
     });
   }, [config.series, unitFeatureEnabled, widgetUnits]);
   const getExtendedBarsGeneratorSettings = useCallback(({

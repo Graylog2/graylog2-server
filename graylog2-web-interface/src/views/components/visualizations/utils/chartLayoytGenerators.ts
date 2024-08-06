@@ -282,25 +282,25 @@ export const generateLayouts = (
   });
 };
 
-export const getHoverTemplateSettings = ({ convertedToBaseValues, curUnit, originalName }: {
-  convertedToBaseValues: Array<any>,
-  curUnit: FieldUnit,
+export const getHoverTemplateSettings = ({ convertedValues, unit, originalName }: {
+  convertedValues: Array<any>,
+  unit: FieldUnit,
   originalName: string,
 }): { text: Array<string>, hovertemplate: string, meta: string } | {} => {
-  if (curUnit?.unitType === 'time' || curUnit?.unitType === 'size') {
-    const timeBaseUnit = getBaseUnit(curUnit.unitType);
+  if (unit?.unitType === 'time' || unit?.unitType === 'size') {
+    const text = convertedValues.map((value) => {
+      const prettified = unit && unit.isDefined && getPrettifiedValue(value, {
+        abbrev: unit.abbrev,
+        unitType: unit.unitType,
+      });
+
+      if (!prettified) return null;
+
+      return `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`;
+    });
 
     return ({
-      text: convertedToBaseValues.map((value) => {
-        const prettified = curUnit && curUnit.isDefined && getPrettifiedValue(value, {
-          abbrev: timeBaseUnit.abbrev,
-          unitType: timeBaseUnit.unitType,
-        });
-
-        if (!prettified) return null;
-
-        return `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`;
-      }),
+      text,
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',
       meta: originalName,
     });
