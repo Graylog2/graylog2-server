@@ -30,6 +30,7 @@ import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import { NO_FIELD_NAME_SERIES } from 'views/components/visualizations/Constants';
 import { getBaseUnit } from 'views/components/visualizations/utils/unitConvertors';
 import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import isLayoutRequiresBaseUnit from 'views/components/visualizations/utils/isLayoutRequiresBaseUnit';
 
 const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange }: {
   config: AggregationWidgetConfig,
@@ -38,14 +39,14 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
 }) => {
   const unitFeatureEnabled = useFeature('configuration_of_formatting_value');
   const widgetUnits = useWidgetUnits(config);
-  const { fieldNameToAxisNameMapper, fieldNameToAxisCountMapper, unitTypeMapper, seriesUnitMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
+  const { fieldNameToAxisNameMapper, fieldNameToAxisCountMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const getExtendedChartGeneratorSettings = useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }) => {
     if (!unitFeatureEnabled) return ({});
 
     const fieldNameKey = parseSeries(name)?.field ?? NO_FIELD_NAME_SERIES;
     const yaxis = fieldNameToAxisNameMapper[fieldNameKey];
     const curUnit = widgetUnits.getFieldUnit(fieldNameKey);
-    const shouldConvertToBaseUnit = curUnit && curUnit.isDefined && curUnit.unitType === 'percent';
+    const shouldConvertToBaseUnit = isLayoutRequiresBaseUnit(curUnit);
     const convertedValues = shouldConvertToBaseUnit ? convertDataToBaseUnit(values, curUnit) : values;
     const baseUnit = shouldConvertToBaseUnit && getBaseUnit(curUnit.unitType);
     const unit = shouldConvertToBaseUnit ? new FieldUnit(baseUnit.unitType, baseUnit.abbrev) : curUnit;
@@ -55,14 +56,14 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
       y: convertedValues,
       ...getHoverTemplateSettings({ unit, convertedValues, originalName }),
     });
-  }, [config.series, unitFeatureEnabled, widgetUnits]);
+  }, [fieldNameToAxisNameMapper, unitFeatureEnabled, widgetUnits]);
   const getExtendedBarsGeneratorSettings = useCallback(({
     originalName, name, values, idx, total, xAxisItemsLength,
   }: { xAxisItemsLength: number, originalName: string, name: string, values: Array<any>, idx: number, total: number }) => {
     if (!unitFeatureEnabled) return ({});
 
     const fieldNameKey = parseSeries(name)?.field ?? NO_FIELD_NAME_SERIES;
-    const { y: convertedToBaseUnitValues, yaxis, ...hoverTemplateSettings } = getExtendedChartGeneratorSettings({ originalName, name, values });
+    const { y: convertedValues, yaxis, ...hoverTemplateSettings } = getExtendedChartGeneratorSettings({ originalName, name, values });
     const axisNumber = fieldNameToAxisCountMapper?.[fieldNameKey];
     const totalAxis = Object.keys(unitTypeMapper).length;
 
@@ -79,11 +80,11 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
 
     return ({
       yaxis,
-      y: convertedToBaseUnitValues,
+      y: convertedValues,
       ...hoverTemplateSettings,
       ...offsetSettings,
     });
-  }, [barmode, config.isTimeline, effectiveTimerange, getExtendedChartGeneratorSettings, unitFeatureEnabled, unitTypeMapper]);
+  }, [barmode, config.isTimeline, effectiveTimerange, fieldNameToAxisCountMapper, getExtendedChartGeneratorSettings, unitFeatureEnabled, unitTypeMapper]);
 
   return ({
     getExtendedBarsGeneratorSettings,

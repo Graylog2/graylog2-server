@@ -14,15 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type Series from 'views/logic/aggregationbuilder/Series';
-import { parseSeries } from 'views/logic/aggregationbuilder/Series';
-import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 
-const getSeriesUnit = (series: Array<Series>, seriesName: string, units: UnitsConfig) => {
-  const func = series.find((s) => s.config.name === seriesName || s.function === seriesName)?.function;
-  const parsedSeries = parseSeries(func);
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
-  return units.getFieldUnit(parsedSeries?.field);
-};
+const isLayoutRequiresBaseUnit = (unit: FieldUnit) => unit && unit.isDefined && ['percent'].includes(unit.unitType);
 
-export default getSeriesUnit;
+export default isLayoutRequiresBaseUnit;
