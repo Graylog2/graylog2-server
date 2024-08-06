@@ -27,7 +27,7 @@ import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarV
 import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
-import { NO_FIELD_NAME_SERIES } from 'views/components/visualizations/Constants';
+import { NO_FIELD_NAME_SERIES, UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import { getBaseUnit } from 'views/components/visualizations/utils/unitConvertors';
 import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import isLayoutRequiresBaseUnit from 'views/components/visualizations/utils/isLayoutRequiresBaseUnit';
@@ -37,7 +37,7 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
   barmode?: BarMode,
   effectiveTimerange: AbsoluteTimeRange,
 }) => {
-  const unitFeatureEnabled = useFeature('configuration_of_formatting_value');
+  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
   const { fieldNameToAxisNameMapper, fieldNameToAxisCountMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const getExtendedChartGeneratorSettings = useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }) => {

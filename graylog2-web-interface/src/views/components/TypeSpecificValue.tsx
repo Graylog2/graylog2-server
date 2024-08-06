@@ -28,7 +28,7 @@ import StreamsField from 'views/components/fieldtypes/StreamsField';
 import PercentageField from 'views/components/fieldtypes/PercentageField';
 import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConvertors';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
-import { DECIMAL_PLACES } from 'views/components/visualizations/Constants';
+import { DECIMAL_PLACES, UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import useFeature from 'hooks/useFeature';
 
 import EmptyValue from './EmptyValue';
@@ -65,7 +65,7 @@ const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit
 };
 
 const FormattedValue = ({ field, value, truncate, render, unit, type }: FormattedValueProps) => {
-  const unitFeatureEnabled = useFeature('configuration_of_formatting_value');
+  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   if (unit?.isDefined && value && unitFeatureEnabled) return <ValueWithUnitRenderer value={value} unit={unit} />;
 
   return _formatValue(field, value, truncate, render, type);

@@ -32,6 +32,8 @@ import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
 import FieldUnitComponent from 'views/components/aggregationwizard/units/FieldUnitComponent';
+import useFeature from 'hooks/useFeature';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
 import FieldSelect from '../FieldSelect';
 
@@ -52,6 +54,7 @@ const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) =
 };
 
 const Metric = ({ index }: Props) => {
+  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const metricFieldSelectRef = useRef(null);
   const { data: functions, isLoading } = useAggregationFunctions();
   const functionOptions = useMemo(() => (isLoading ? [] : Object.values(functions)
@@ -91,7 +94,7 @@ const Metric = ({ index }: Props) => {
     }
   }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
 
-  const showUnitType = isFunctionAllowsUnit(currentFunction);
+  const showUnitType = unitFeatureEnabled && isFunctionAllowsUnit(currentFunction);
 
   return (
     <Wrapper data-testid={`metric-${index}`}>

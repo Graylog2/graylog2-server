@@ -28,13 +28,14 @@ import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarV
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import useFeature from 'hooks/useFeature';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
 const useLayoutExtendedSettings = ({ config, barmode, chartData }: {
   config: AggregationWidgetConfig,
   barmode?: BarMode,
   chartData: Array<ChartDefinition>,
 }) => {
-  const unitFeatureEnabled = useFeature('configuration_of_formatting_value');
+  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
   const { seriesUnitMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const getLayoutExtendedSettings = useCallback(() => {

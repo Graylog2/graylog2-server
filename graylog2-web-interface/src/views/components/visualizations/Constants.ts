@@ -20,3 +20,5 @@ export const Y_POSITION_AXIS_STEP = 0.1;
 export const DEFAULT_AXIS_KEY = 'withoutUnit';
 export const TIME_AXIS_LABELS_QUANTITY = 4;
 export const NO_FIELD_NAME_SERIES = 'no_field_name_series';
+
+export const UNIT_FEATURE_FLAG = 'configuration_of_formatting_value';
