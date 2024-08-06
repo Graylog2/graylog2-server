@@ -164,10 +164,16 @@ public class SupportBundleService {
         try {
             bundleSpoolDir = prepareBundleSpoolDir();
             final Path finalSpoolDir = bundleSpoolDir; // needed for the lambda
+            final Path dataNodeDir = bundleSpoolDir.resolve("datanodes");
+            var ignored = dataNodeDir.toFile().mkdirs();
 
             // Fetch from all nodes in parallel
-            final List<CompletableFuture<Void>> futures = nodeManifests.entrySet().stream().map(entry ->
-                    CompletableFuture.runAsync(() -> fetchNodeInfos(proxiedResourceHelper, entry.getKey(), entry.getValue(), finalSpoolDir), executor)).toList();
+            final List<CompletableFuture<Void>> futures = Stream.concat(
+                    nodeManifests.entrySet().stream().map(entry ->
+                            CompletableFuture.runAsync(() -> fetchNodeInfos(proxiedResourceHelper, entry.getKey(), entry.getValue(), finalSpoolDir), executor)),
+                    datanodeService.allActive().values().stream().map(datanode ->
+                            CompletableFuture.runAsync(() -> fetchDataNodeInfos(proxiedResourceHelper, datanode, dataNodeDir), executor))
+            ).toList();
             for (CompletableFuture<Void> f : futures) {
                 f.get();
             }
@@ -361,6 +367,40 @@ public class SupportBundleService {
             }
         } catch (Exception e) {
             LOG.warn("Failed to get system stats from node <{}>", nodeId, e);
+        }
+    }
+
+
+    private void fetchDataNodeInfos(ProxiedResourceHelper proxiedResourceHelper, DataNodeDto datanode, Path dataNodeDir) {
+        final Path nodeDir = dataNodeDir.resolve(Objects.requireNonNull(datanode.getHostname()));
+        var ignored = nodeDir.toFile().mkdirs();
+
+        fetchDataNodeLogs(proxiedResourceHelper, datanode, nodeDir);
+    }
+
+    private void fetchDataNodeLogs(ProxiedResourceHelper proxiedResourceHelper, DataNodeDto datanode, Path nodeDir) {
+        getProxiedLog(datanode, nodeDir, "opensearch.log", RemoteDataNodeStatusResource::opensearchStdOut);
+        getProxiedLog(datanode, nodeDir, "opensearch.err", RemoteDataNodeStatusResource::opensearchStdErr);
+    }
+
+    private void getProxiedLog(DataNodeDto datanode, Path nodeDir, String logfile, Function<RemoteDataNodeStatusResource, Call<List<String>>> function) {
+        try (var opensearchLog = new FileOutputStream(nodeDir.resolve(logfile).toFile())) {
+
+            Map<String, List<String>> opensearchOut = datanodeProxy
+                    .remoteInterface(datanode.getHostname(), RemoteDataNodeStatusResource.class, function);
+            if (opensearchOut.containsKey(datanode.getHostname())) {
+                opensearchOut.get(datanode.getHostname()).stream()
+                        .map(line -> line + System.lineSeparator())
+                        .forEach(line -> {
+                            try {
+                                opensearchLog.write(line.getBytes(StandardCharsets.UTF_8));
+                            } catch (IOException e) {
+                                LOG.warn("Failed to write line <{}>", line, e);
+                            }
+                        });
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to get logs from data node <{}>", datanode.getHostname(), e);
         }
     }
 
