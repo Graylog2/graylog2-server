@@ -56,6 +56,7 @@ const DestinationOutputs = ({ stream }: Props) => {
 
   return (
     <Section title="Outputs"
+             collapsible
              actions={(
                <AddOutputButton stream={stream}
                                 availableOutputTypes={availableOutputTypes.types}

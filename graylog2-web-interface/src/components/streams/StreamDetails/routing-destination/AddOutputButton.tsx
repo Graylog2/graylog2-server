@@ -95,6 +95,7 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
   return (
     <>
       <Button bsStyle="success"
+              bsSize="xs"
               onClick={() => setShowAddOutput(true)}
               title="Edit Output">
         Add Output
