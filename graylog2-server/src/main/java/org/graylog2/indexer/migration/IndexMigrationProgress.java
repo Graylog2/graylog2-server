@@ -16,15 +16,22 @@
  */
 package org.graylog2.indexer.migration;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public record IndexMigrationProgress(long total, long created, long updated, long deleted, long versionConflicts,
                                      long noops) {
 
     public int progressPercent() {
 
-        if(total == 0) { // avoid division by zero
+        if (total == 0) { // avoid division by zero
             return 100;
         }
 
-        return (int) Math.min((100.0 / total) * (created + updated + deleted + versionConflicts + noops), 100);
+        return toPercentage(BigDecimal.valueOf(created + updated + deleted + versionConflicts + noops), new BigDecimal(total)).intValue();
+    }
+
+    public static BigDecimal toPercentage(BigDecimal value, BigDecimal total) {
+        return value.divide(total, 4, RoundingMode.HALF_UP).scaleByPowerOfTen(2);
     }
 }

@@ -42,7 +42,7 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
     }
 
     if (!rule?.conditions || (rule?.conditions && rule.conditions.length <= 0)) {
-      errors = { ...errors, rule: 'Rule need to contain at leat one condition.' };
+      errors = { ...errors, rule: 'Rule needs to contain at least one condition.' };
     }
 
     return errors;

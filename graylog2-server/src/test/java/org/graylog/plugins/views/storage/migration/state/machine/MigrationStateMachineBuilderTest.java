@@ -248,6 +248,7 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_STOP_PROCESSING_PAGE);
         verify(migrationActions, times(1)).provisionDataNodes();
+        verify(migrationActions, times(1)).stopDatanodes();
         verifyNoMoreInteractions(migrationActions);
     }
 
