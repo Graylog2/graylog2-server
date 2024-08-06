@@ -601,7 +601,7 @@
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                a99a5e92a48a7c2c0039b89ca074295e5ec10e40c92cb2801bed6a486588188f600d3deb0f805f0833f67fe4fda6d2f6fd199a81c4475927eb20ad76c78312fd
+                                de44a181133a33a08703e8464b52aa2ac29d1d9918d9478c307b98909a571baaaf0c9dcb664349802c3dd85fa53275bd2228248fd129179631b9096d470eb8d5
                             </sha512>
                         </configuration>
                     </execution>
