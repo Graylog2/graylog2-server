@@ -14,20 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.indexer.messages;
 
-import type { Sort, Attribute } from 'stores/PaginationTypes';
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nonnull;
 
-export const DEFAULT_LAYOUT = {
-  entityTableId: 'streamOutputFilter',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['title', 'description', 'status'],
-};
+import java.util.Objects;
 
-export const COLUMNS_ORDER = ['title', 'description', 'status'];
-
-export const ADDITIONAL_ATTRIBUTES: Array<Attribute> = [
-  { id: 'title', title: 'Rule' },
-  { id: 'description', title: 'Description' },
-  { id: 'status', title: 'Status' },
-];
+public record DefaultSerializationContext(@Nonnull ObjectMapper objectMapper, @Nonnull Meter invalidTimestampMeter)
+        implements SerializationContext {
+    public DefaultSerializationContext {
+        Objects.requireNonNull(objectMapper);
+        Objects.requireNonNull(invalidTimestampMeter);
+    }
+}

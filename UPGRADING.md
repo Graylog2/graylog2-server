@@ -8,10 +8,14 @@ Upgrading to Graylog 6.1.x
 
 ## Default Configuration Changes
 
-The `default_message_output_class` setting changed from
+- The `default_message_output_class` setting changed from
 `org.graylog2.outputs.BlockingBatchedESOutput` to 
-org.graylog2.outputs.BatchedMessageFilterOutput` as part of an internal
+`org.graylog2.outputs.BatchedMessageFilterOutput` as part of an internal
 refactoring. Regular users should not change the setting.
+
+- The `output_batch_size` setting can now be configured by providing a byte-based value, e.g. `10 mb`. For backward
+compatibility, the default value is still count-based (`500`). Previously configured count-based values are
+still supported.
 
 ## Java API Changes
 
