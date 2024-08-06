@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -27,7 +28,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 
 @AutoValue
-public abstract class RuleDao {
+public abstract class RuleDao implements MongoEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -36,12 +37,6 @@ public abstract class RuleDao {
     public static final String FIELD_MODFIED_AT = "modfied_at";
     public static final String FIELD_RULEBUILDER = "rulebuilder";
     public static final String FIELD_SIMULATOR_MESSAGE = "simulator_message";
-
-    @JsonProperty(FIELD_ID)
-    @Nullable
-    @Id
-    @ObjectId
-    public abstract String id();
 
     @JsonProperty
     public abstract String title();
@@ -76,7 +71,7 @@ public abstract class RuleDao {
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static RuleDao create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static RuleDao create(@Id @ObjectId @JsonProperty(FIELD_ID) @Nullable String id,
                                  @JsonProperty(FIELD_TITLE) String title,
                                  @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
                                  @JsonProperty(FIELD_SOURCE) String source,
