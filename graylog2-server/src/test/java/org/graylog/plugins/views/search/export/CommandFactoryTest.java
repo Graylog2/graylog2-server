@@ -27,17 +27,30 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.decorators.Decorator;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.OutputService;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamServiceImpl;
+import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,13 +64,34 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.mock;
 
 class CommandFactoryTest {
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    @Mock
+    private StreamRuleService streamRuleService;
+    @Mock
+    private OutputService outputService;
+    @Mock
+    private IndexSetService indexSetService;
+    @Mock
+    private MongoIndexSet.Factory factory;
+    @Mock
+    private EntityOwnershipService entityOwnershipService;
+
+    private StreamServiceImpl mockStreamService;
 
     private CommandFactory sut;
 
     @BeforeEach
     void setUp() {
         final QueryStringDecorators emptyDecorator = new QueryStringDecorators(Optional.empty());
-        sut = new CommandFactory(emptyDecorator);
+        mongodb.start();
+        this.mockStreamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService,
+                outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus(), Set.of());
+        sut = new CommandFactory(emptyDecorator, mockStreamService);
     }
 
     @Test
@@ -355,7 +389,7 @@ class CommandFactoryTest {
             }
         }));
 
-        ExportMessagesCommand command = new CommandFactory(decorators).buildWithSearchOnly(s, ResultFormat.builder().build());
+        ExportMessagesCommand command = new CommandFactory(decorators, mockStreamService).buildWithSearchOnly(s, ResultFormat.builder().build());
 
         assertThat(command.queryString()).isEqualTo(ElasticsearchQueryString.of("decorated"));
     }
