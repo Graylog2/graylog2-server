@@ -31,6 +31,7 @@ import { getBaseUnit } from 'views/components/visualizations/utils/unitConvertor
 import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import isLayoutRequiresBaseUnit from 'views/components/visualizations/utils/isLayoutRequiresBaseUnit';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
+import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 
 const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange }: {
   config: AggregationWidgetConfig,
@@ -40,7 +41,7 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
   const { fieldNameToAxisNameMapper, fieldNameToAxisCountMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
-  const getExtendedChartGeneratorSettings = useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }) => {
+  const getExtendedChartGeneratorSettings = useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }): Partial<ChartDefinition> => {
     if (!unitFeatureEnabled) return ({});
     const fieldNameKey = getFieldNameFromTrace({ name, series: config.series }) ?? NO_FIELD_NAME_SERIES;
     const yaxis = fieldNameToAxisNameMapper[fieldNameKey];
@@ -58,7 +59,7 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
   }, [config.series, fieldNameToAxisNameMapper, unitFeatureEnabled, widgetUnits]);
   const getExtendedBarsGeneratorSettings = useCallback(({
     originalName, name, values, idx, total, xAxisItemsLength,
-  }: { xAxisItemsLength: number, originalName: string, name: string, values: Array<any>, idx: number, total: number }) => {
+  }: { xAxisItemsLength: number, originalName: string, name: string, values: Array<any>, idx: number, total: number }):Partial<ChartDefinition> => {
     if (!unitFeatureEnabled) return ({});
 
     const fieldNameKey = getFieldNameFromTrace({ name, series: config.series }) ?? NO_FIELD_NAME_SERIES;

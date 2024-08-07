@@ -33,12 +33,12 @@ import useFeature from 'hooks/useFeature';
 
 import EmptyValue from './EmptyValue';
 import CustomPropTypes from './CustomPropTypes';
-import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
+import type { ValueRendererProps, ValueRenderer } from './messagelist/decoration/ValueRenderer';
 import DecoratorValue from './DecoratorValue';
 
 const defaultComponent = ({ value }: ValueRendererProps) => value;
 
-const _formatValue = (field: string, value: any, truncate: boolean, render: React.ComponentType<ValueRendererProps>, type: string) => {
+const _formatValue = (field: string, value: any, truncate: boolean, render: ValueRenderer, type: FieldType) => {
   const stringified = isString(value) ? value : JSON.stringify(value);
   const Component = render;
 
@@ -56,15 +56,13 @@ type TypeSpecificValueProps = {
   unit?: FieldUnit,
 };
 
-type FormattedValueProps = Omit<TypeSpecificValueProps, 'type'>;
-
 const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit}) => {
   const prettified = getPrettifiedValue(value, { abbrev: unit.abbrev, unitType: unit.unitType });
 
   return <span title={value.toString()}>{`${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`}</span>;
 };
 
-const FormattedValue = ({ field, value, truncate, render, unit, type }: FormattedValueProps) => {
+const FormattedValue = ({ field, value, truncate, render, unit, type }: TypeSpecificValueProps) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   if (unit?.isDefined && value && unitFeatureEnabled) return <ValueWithUnitRenderer value={value} unit={unit} />;
 

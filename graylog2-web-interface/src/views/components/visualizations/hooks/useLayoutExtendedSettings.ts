@@ -37,7 +37,7 @@ const useLayoutExtendedSettings = ({ config, barmode, chartData }: {
 }) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
-  const { seriesUnitMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
+  const { unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const getLayoutExtendedSettings = useCallback(() => {
     if (!unitFeatureEnabled) return ({});
 

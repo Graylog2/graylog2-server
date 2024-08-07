@@ -130,7 +130,7 @@ const BarVisualization = makeVisualization(({
   const { getLayoutExtendedSettings } = useLayoutExtendedSettings({ config, chartData, barmode });
 
   const layout = useMemo<Partial<Layout>>(() => {
-    const _layouts = {};
+    const _layouts: Partial<Layout> = {};
 
     if (shapes) {
       _layouts.shapes = shapes;
