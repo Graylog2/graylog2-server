@@ -16,14 +16,20 @@
  */
 import * as React from 'react';
 
+import type { PaginatedList as PaginatedListType } from 'stores/PaginationTypes';
 import FilterRulesList from 'components/streams/StreamDetails/output-filter/FilterRuleList';
+import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
 type Props = {
   streamId: string,
+  paginatedFilters: PaginatedListType<StreamOutputFilterRule>,
+
 };
 
-const IndexSetFilters = ({ streamId }: Props) => (
-  <FilterRulesList streamId={streamId} destinationType="indexer" />
+const IndexSetFilters = ({ streamId, paginatedFilters }: Props) => (
+  <FilterRulesList streamId={streamId}
+                   paginatedFilters={paginatedFilters}
+                   destinationType="indexer" />
 );
 
 export default IndexSetFilters;

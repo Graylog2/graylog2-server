@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
-import { Icon, Section, Switch } from 'components/common';
+import { Icon, Section, Spinner, Switch } from 'components/common';
 import { IndexSetsStore, type IndexSet } from 'stores/indices/IndexSetsStore';
 import { Table, Badge, Button, Alert } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
@@ -49,9 +49,15 @@ const ActionButtonsWrap = styled.span(() => css`
 const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
   const archivingEnabled = indexSet.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY || indexSet?.data_tiering?.archive_before_deletion;
   const { indexSets } = useStore(IndexSetsStore);
-  const { data, isSuccess: isLoadingFilterSuccess } = useStreamOutputFilters(stream.id, 'indexer');
+  const { data, isLoading } = useStreamOutputFilters(stream.id, 'indexer');
 
   const title = true ? 'Enabled' : 'Disabled';
+
+  if (isLoading) {
+    <Spinner />;
+  }
+
+  console.log(data);
 
   return (
     <Section title="Index Set"
@@ -63,7 +69,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
                                checked
                                label={title}
                                onChange={() => {}} />
-                 <SectionCountLabel>FILTERS {isLoadingFilterSuccess ? data.pagination.total : 0}</SectionCountLabel>
+                 <SectionCountLabel>FILTERS {data?.pagination?.total || 0}</SectionCountLabel>
                </>
             )}>
       <Alert bsStyle="default">
@@ -105,7 +111,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
           </tr>
         </tbody>
       </Table>
-      <IndexSetFilters streamId={stream.id} />
+      {data && (<IndexSetFilters streamId={stream.id} paginatedFilters={data} />)}
     </Section>
   );
 };
