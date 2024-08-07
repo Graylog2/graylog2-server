@@ -49,11 +49,11 @@ public abstract class LookupResult {
     // Cache erroneous results with a shorter TTL
     private static final long ERROR_CACHE_TTL = Duration.ofSeconds(5).toMillis();
 
-    private static final LookupResult EMPTY_LOOKUP_RESULT = builder()
+    public static final LookupResult EMPTY_LOOKUP_RESULT = builder()
             .cacheTTL(NO_TTL)
             .build();
 
-    private static final LookupResult DEFAULT_ERROR_LOOKUP_RESULT = builder()
+    public static final LookupResult DEFAULT_ERROR_LOOKUP_RESULT = builder()
             .cacheTTL(ERROR_CACHE_TTL)
             .hasError(true)
             .build();
