@@ -55,6 +55,7 @@ const LineVisualization = makeVisualization(({
     type,
     name,
     x: _mapKeys(labels),
+    y: values,
     originalName,
     line: { shape: toPlotly(interpolation) },
     ...getExtendedChartGeneratorSettings({ originalName, name, values }),

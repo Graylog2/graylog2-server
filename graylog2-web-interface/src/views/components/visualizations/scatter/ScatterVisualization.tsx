@@ -53,6 +53,7 @@ const ScatterVisualization = makeVisualization(({
     type,
     name,
     x: _mapKeys(labels),
+    y: values,
     mode: 'markers',
     originalName,
     ...getExtendedChartGeneratorSettings({ originalName, name, values }),
