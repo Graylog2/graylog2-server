@@ -15,17 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
 
-const StyledLabel = styled(Label)(({ theme }) => css`
-  background-color: ${theme.colors.buttons.disabledBackground};
+const StyledLabel = styled(Label)`
   font-weight: bold;
-`);
+`;
 
 const SectionCountLabel = ({ children }: React.PropsWithChildren) => (
-  <StyledLabel>{children}</StyledLabel>
+  <StyledLabel bsStyle="default">{children}</StyledLabel>
 );
 
 export default SectionCountLabel;

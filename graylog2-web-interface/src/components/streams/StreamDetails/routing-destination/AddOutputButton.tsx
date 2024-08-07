@@ -28,6 +28,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
 import type { AvailableOutputRequestedConfiguration, AvailableOutputTypes } from 'components/streams/useAvailableOutputTypes';
+import { Icon } from 'components/common';
 
 type Props = {
   stream: Stream
@@ -98,7 +99,7 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
               bsSize="sm"
               onClick={() => setShowAddOutput(true)}
               title="Edit Output">
-        + Add Output
+        <Icon name="add" size="sm" /> Add Output
       </Button>
       {showAddOutput && (
       <BootstrapModalWrapper showModal

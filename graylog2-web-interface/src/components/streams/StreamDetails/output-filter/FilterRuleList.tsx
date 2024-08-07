@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable/types';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -31,11 +31,18 @@ import { Alert } from 'components/bootstrap';
 
 import FilterStatusCell from './FilterStatusCell';
 
-export const StyledSectionComponent = styled(SectionComponent)`
+export const StyledSectionComponent = styled(SectionComponent)(({ theme }) => css`
   &.content {
-    background-color: transparent;
+    background-color: ${theme.colors.variant.dark.gray};
+    padding: ${theme.spacings.sm} ${theme.spacings.xs};
   }
-`;
+  &.row {
+    margin: 0 ${theme.spacings.xs};
+  }
+  h2 {
+    font-size: ${theme.fonts.size.h3};
+  }
+`);
 
 type Props = {
   streamId: string,
@@ -56,7 +63,7 @@ const FilterRulesList = ({ streamId, destinationType }: Props) => {
   });
 
   return (
-    <StyledSectionComponent title="Filter Rule"
+    <StyledSectionComponent title="Filter Rules"
                             headerActions={(
                               <IfPermitted permissions="">
                                 <FilterRuleEditButton filterRule={{ stream_id: streamId }}
@@ -64,7 +71,7 @@ const FilterRulesList = ({ streamId, destinationType }: Props) => {
                                                       streamId={streamId} />
                               </IfPermitted>
              )}>
-      <Alert bsStyle="info">
+      <Alert bsStyle="default">
         Messages which meet the criteria of the following filter rule(s) will not be routed to the  {destinationType === 'indexer' ? 'Index Set' : 'Data Warehouse'}.
       </Alert>
       <PaginatedEntityTable<StreamOutputFilterRule> humanName="filter"

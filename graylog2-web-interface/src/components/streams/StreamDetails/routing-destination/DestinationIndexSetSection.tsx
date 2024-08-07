@@ -66,7 +66,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
                  <SectionCountLabel>FILTERS {isLoadingFilterSuccess ? data.pagination.total : 0}</SectionCountLabel>
                </>
             )}>
-      <Alert bsStyle="info">
+      <Alert bsStyle="default">
         Messages routed to the <b>Search Cluster</b> will be searchable in Graylog and count towards Graylog License usage.<br />
         These messages will be stored in the defined Index Set until the retention policy criteria is met.<br />
         Note: Messages not routed to the <b>Search Cluster</b> will not be searchable in Graylog.
