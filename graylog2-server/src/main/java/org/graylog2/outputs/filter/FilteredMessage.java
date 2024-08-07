@@ -17,7 +17,7 @@
 package org.graylog2.outputs.filter;
 
 import com.google.common.collect.Multimap;
-import org.graylog2.plugin.Message;
+import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.plugin.streams.Stream;
 
 /**
@@ -29,7 +29,7 @@ public interface FilteredMessage {
      *
      * @return the message
      */
-    Message message();
+    ImmutableMessage message();
 
     /**
      * A multimap of destination streams.

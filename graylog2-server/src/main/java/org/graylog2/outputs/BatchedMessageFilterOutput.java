@@ -81,7 +81,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
                                       MetricRegistry metricRegistry,
                                       Cluster cluster,
                                       MessageQueueAcknowledger acknowledger,
-                                      @Named("output_batch_size") int outputBatchSize,
+                                      IndexSetAwareMessageOutputBuffer indexSetAwareMessageOutputBuffer,
                                       @Named("output_flush_interval") int outputFlushInterval,
                                       @Named("shutdown_timeout") int shutdownTimeoutMs,
                                       @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
@@ -97,6 +97,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
         this.outputFlushInterval = Duration.ofSeconds(outputFlushInterval);
         this.shutdownTimeout = Duration.ofMillis(shutdownTimeoutMs);
         this.daemonScheduler = daemonScheduler;
+        this.buffer = indexSetAwareMessageOutputBuffer;
 
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
         this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
@@ -104,8 +105,6 @@ public class BatchedMessageFilterOutput implements MessageOutput {
         this.bufferFlushesRequested = metricRegistry.meter(name(this.getClass(), "bufferFlushesRequested"));
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
         this.outputWriteFailures = metricRegistry.meter(name(this.getClass(), "outputWriteFailures"));
-
-        this.buffer = new IndexSetAwareMessageOutputBuffer(outputBatchSize);
     }
 
     @Override

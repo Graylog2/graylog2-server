@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer.migration;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.lang.Collections;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 /**
  * Caution: this object will be heavily mutated from outside as the migration progresses.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RemoteReindexMigration {
 
@@ -44,7 +47,8 @@ public class RemoteReindexMigration {
     @JsonProperty("error")
     private String error;
 
-    public RemoteReindexMigration(@NotNull String migrationID, List<RemoteReindexIndex> indices, List<LogEntry> logs) {
+    @JsonCreator
+    public RemoteReindexMigration(@JsonProperty("id") @NotNull String migrationID, @JsonProperty("indices") List<RemoteReindexIndex> indices, @JsonProperty("logs") List<LogEntry> logs) {
         this.id = migrationID;
         this.indices = indices;
         this.logs = logs;

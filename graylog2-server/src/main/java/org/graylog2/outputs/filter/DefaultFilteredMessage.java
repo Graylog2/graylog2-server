@@ -18,6 +18,7 @@ package org.graylog2.outputs.filter;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
@@ -26,7 +27,7 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-public record DefaultFilteredMessage(Message message,
+public record DefaultFilteredMessage(ImmutableMessage message,
                                      Multimap<String, Stream> destinations) implements FilteredMessage {
     public DefaultFilteredMessage {
         requireNonNull(message, "message cannot be null");
@@ -46,7 +47,7 @@ public record DefaultFilteredMessage(Message message,
 
         destinationKeys.forEach(key -> builder.putAll(key, message.getStreams()));
 
-        return new DefaultFilteredMessage(message, builder.build());
+        return new DefaultFilteredMessage(ImmutableMessage.wrap(message), builder.build());
     }
 
     @Override

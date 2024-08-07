@@ -306,4 +306,17 @@ public class MigrationActionsImpl implements MigrationActions {
                 .filter(m -> m.status() == RemoteReindexingMigrationAdapter.Status.FINISHED)
                 .isPresent();
     }
+
+    @Override
+    public void stopDatanodes() {
+        nodeService.allActive().values().stream()
+                .filter(n -> n.getDataNodeStatus() == DataNodeStatus.AVAILABLE)
+                .forEach(node -> {
+                    try {
+                        dataNodeCommandService.stopNode(node.getNodeId());
+                    } catch (Exception ignored) {
+                        // we don't care, we tried and hope for the best
+                    }
+                });
+    }
 }
