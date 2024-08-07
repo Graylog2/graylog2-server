@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled, { css, useTheme } from 'styled-components';
 import PropTypes from 'prop-types';
-import { useTheme } from 'styled-components';
 
 import { Spinner } from 'components/common';
 import type { PlotLayout } from 'views/components/visualizations/GenericPlot';
@@ -27,6 +27,15 @@ type Props = {
   width: number,
   trafficLimit?: number;
 };
+
+const GraphWrapper = styled.div<{
+  $width: number,
+}>(({
+  $width,
+}) => css`
+  height: 200px;
+  width: ${$width}px
+`);
 
 const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
   const theme = useTheme();
@@ -136,10 +145,10 @@ const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
   const trafficLayout = trafficLimit ? layoutWithTrafficLimit : layout;
 
   return (
-    <div style={{ height: '200px', width: width }}>
+    <GraphWrapper $width={width}>
       <GenericPlot chartData={chartData}
                    layout={trafficLayout} />
-    </div>
+    </GraphWrapper>
   );
 };
 

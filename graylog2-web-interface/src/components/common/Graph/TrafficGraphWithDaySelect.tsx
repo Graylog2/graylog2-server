@@ -42,8 +42,8 @@ const StyledH3 = styled.h3(({ theme }) => css`
   margin-bottom: ${theme.spacings.sm};
 `);
 
-const Wrapper = styled.div`
-  margin-bottom: 5px;
+const Wrapper = styled.div(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xs};
 
   .control-label {
     padding-top: 0;
@@ -54,11 +54,10 @@ const Wrapper = styled.div`
     align-items: baseline;
 
     select {
-      padding-top: 3px;
-      height: 28px;
+      padding-top: ${theme.spacings.xxs};
     }
   }
-`;
+`);
 
 type Props = {
   getTraffic: (days: number) => void,
