@@ -38,6 +38,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.indexer.cluster.ClusterAdapter;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -127,6 +128,7 @@ public class SupportBundleService {
     private final List<URI> elasticsearchHosts;
     private final ClusterAdapter searchDbClusterAdapter;
     private final DatanodeRestApiProxy datanodeProxy;
+    private final RemoteReindexingMigrationAdapter migrationService;
 
     @Inject
     public SupportBundleService(@Named("proxiedRequestsExecutorService") ExecutorService executor,
@@ -138,7 +140,7 @@ public class SupportBundleService {
                                 ClusterStatsService clusterStatsService,
                                 VersionProbe searchDbProbe,
                                 @IndexerHosts List<URI> searchDbHosts,
-                                ClusterAdapter searchDbClusterAdapter, DatanodeRestApiProxy datanodeProxy) {
+                                ClusterAdapter searchDbClusterAdapter, DatanodeRestApiProxy datanodeProxy, RemoteReindexingMigrationAdapter migrationService) {
         this.executor = executor;
         this.nodeService = nodeService;
         this.datanodeService = datanodeService;
@@ -150,6 +152,7 @@ public class SupportBundleService {
         this.elasticsearchHosts = searchDbHosts;
         this.searchDbClusterAdapter = searchDbClusterAdapter;
         this.datanodeProxy = datanodeProxy;
+        this.migrationService = migrationService;
     }
 
     public void buildBundle(HttpHeaders httpHeaders, Subject currentSubject) {
@@ -165,7 +168,6 @@ public class SupportBundleService {
             bundleSpoolDir = prepareBundleSpoolDir();
             final Path finalSpoolDir = bundleSpoolDir; // needed for the lambda
             final Path dataNodeDir = bundleSpoolDir.resolve("datanodes");
-            var ignored = dataNodeDir.toFile().mkdirs();
 
             // Fetch from all nodes in parallel
             final List<CompletableFuture<Void>> futures = Stream.concat(
@@ -178,6 +180,7 @@ public class SupportBundleService {
                 f.get();
             }
             fetchClusterInfos(proxiedResourceHelper, nodeManifests, bundleSpoolDir);
+            fetchDataNodeMigrationInfos(dataNodeDir);
             writeZipFile(bundleSpoolDir);
         } catch (Exception e) {
             LOG.warn("Exception while trying to build support bundle", e);
@@ -402,6 +405,19 @@ public class SupportBundleService {
         } catch (Exception e) {
             LOG.warn("Failed to get logs from data node <{}>", datanode.getHostname(), e);
         }
+    }
+
+    private void fetchDataNodeMigrationInfos(Path dataNodeDir) {
+        var ignored = dataNodeDir.toFile().mkdirs();
+        migrationService.getLatestMigrationId()
+                .map(migrationService::status)
+                .ifPresent(status -> {
+                    try (FileOutputStream migrationJson = new FileOutputStream(dataNodeDir.resolve("migration.json").toFile())) {
+                        objectMapper.writerWithDefaultPrettyPrinter().writeValue(migrationJson, status);
+                    } catch (Exception e) {
+                        LOG.warn("Could not write data node migration infos.", e);
+                    }
+                });
     }
 
     @VisibleForTesting
