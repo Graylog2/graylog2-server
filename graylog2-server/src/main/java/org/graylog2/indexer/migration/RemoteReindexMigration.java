@@ -25,6 +25,7 @@ import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -98,7 +99,7 @@ public class RemoteReindexMigration {
                 .map(RemoteReindexMigration::indexProgress)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return IndexMigrationProgress.toPercentage(sum, new BigDecimal(indices.size())).intValue();
+        return sum.divide(BigDecimal.valueOf(indices.size()), 4, RoundingMode.HALF_UP).scaleByPowerOfTen(2).intValue();
     }
 
     /**
@@ -108,7 +109,7 @@ public class RemoteReindexMigration {
         if (i.isCompleted()) { // no matter if success or error, if the index task is completed, the progress is 100%
             return BigDecimal.ONE;
         } else {
-            return i.progress().percent().scaleByPowerOfTen(-2);
+            return i.progress().progress();
         }
     }
 

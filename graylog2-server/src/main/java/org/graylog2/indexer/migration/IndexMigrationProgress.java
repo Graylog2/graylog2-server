@@ -27,18 +27,18 @@ public record IndexMigrationProgress(long total, long created, long updated, lon
     private static final BigDecimal ONE_HUNDRED_PERCENT = new BigDecimal(100);
 
     public int progressPercent() {
-        return percent().intValue();
+        return progress().scaleByPowerOfTen(2).intValue();
     }
 
+    /**
+     * @return Value between 0 and 1, progress of the index migration
+     */
     @JsonIgnore
-    public BigDecimal percent() {
+    public BigDecimal progress() {
         if (total == 0) { // avoid division by zero
-            return ONE_HUNDRED_PERCENT;
+            return BigDecimal.ONE;
         }
-        return toPercentage(BigDecimal.valueOf(created + updated + deleted + versionConflicts + noops), new BigDecimal(total));
-    }
-
-    public static BigDecimal toPercentage(BigDecimal value, BigDecimal total) {
-        return value.divide(total, 4, RoundingMode.HALF_UP).scaleByPowerOfTen(2);
+        final BigDecimal value = BigDecimal.valueOf(created + updated + deleted + versionConflicts + noops);
+        return value.divide(BigDecimal.valueOf(total), 4, RoundingMode.HALF_UP);
     }
 }
