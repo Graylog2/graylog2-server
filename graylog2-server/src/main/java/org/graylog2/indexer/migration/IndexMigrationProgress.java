@@ -16,19 +16,26 @@
  */
 package org.graylog2.indexer.migration;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public record IndexMigrationProgress(long total, long created, long updated, long deleted, long versionConflicts,
                                      long noops) {
 
+    private static final BigDecimal ONE_HUNDRED_PERCENT = new BigDecimal(100);
+
     public int progressPercent() {
+        return percent().intValue();
+    }
 
+    @JsonIgnore
+    public BigDecimal percent() {
         if (total == 0) { // avoid division by zero
-            return 100;
+            return ONE_HUNDRED_PERCENT;
         }
-
-        return toPercentage(BigDecimal.valueOf(created + updated + deleted + versionConflicts + noops), new BigDecimal(total)).intValue();
+        return toPercentage(BigDecimal.valueOf(created + updated + deleted + versionConflicts + noops), new BigDecimal(total));
     }
 
     public static BigDecimal toPercentage(BigDecimal value, BigDecimal total) {
