@@ -29,6 +29,7 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -80,6 +81,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -220,6 +222,13 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             return task.toString();
         } else if (task.task().status().hasFailures()) {
             return String.join(";", task.task().status().failures());
+        } else if (task.response().failures() != null && !task.response().failures().isEmpty()) {
+            return task.response().failures().stream()
+                    .map(TaskResponseFailure::cause)
+                    .filter(Objects::nonNull)
+                    .map(f -> f.type() + ": " + f.reason())
+                    .distinct()
+                    .collect(Collectors.joining(";"));
         }
         return null;
     }

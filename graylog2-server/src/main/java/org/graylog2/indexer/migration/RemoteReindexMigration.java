@@ -22,6 +22,8 @@ import io.jsonwebtoken.lang.Collections;
 import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -92,11 +94,19 @@ public class RemoteReindexMigration {
 
         final double overallProgress = indices.stream()
                 .filter(i -> i.progress() != null)
-                .mapToDouble(i -> i.progress().progressPercent() / 100.0)
+                .mapToDouble(RemoteReindexMigration::indexProgress)
                 .map(relativeProgress -> relativeProgress * indexPortion)
                 .sum();
 
         return Math.min((int) Math.ceil(overallProgress), 100);
+    }
+
+    private static double indexProgress(RemoteReindexIndex i) {
+        if (i.isCompleted()) { // no matter if success or error, if the index task is completed, the progress is 100%
+            return 1.0d;
+        } else {
+            return i.progress().progressPercent() / 100.0;
+        }
     }
 
     public List<LogEntry> getLogs() {
