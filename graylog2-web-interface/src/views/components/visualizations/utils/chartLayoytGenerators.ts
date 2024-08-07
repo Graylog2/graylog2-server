@@ -26,7 +26,10 @@ import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import { getBaseUnit, getPrettifiedValue } from 'views/components/visualizations/utils/unitConvertors';
+import {
+  getBaseUnit,
+  getPrettifiedValue,
+} from 'views/components/visualizations/utils/unitConvertors';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
@@ -37,6 +40,8 @@ import {
   Y_POSITION_AXIS_STEP,
   NO_FIELD_NAME_SERIES,
 } from 'views/components/visualizations/Constants';
+import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
+import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
 
 type DefaultAxisKey = 'withoutUnit';
 
@@ -255,17 +260,20 @@ const joinValues = (values: Array<Array<number>>, barmode: BarMode): Array<numbe
 
 type Params = {
   unitTypeMapper: UnitTypeMapper,
-  seriesUnitMapper: SeriesUnitMapper,
   chartData: Array<ChartDefinition>,
-  barmode?: BarMode
+  barmode?: BarMode,
+  widgetUnits: UnitsConfig,
+  config: AggregationWidgetConfig,
 }
 
 export const generateLayouts = (
-  { unitTypeMapper, seriesUnitMapper, chartData, barmode }: Params,
+  { unitTypeMapper, chartData, barmode, widgetUnits, config }: Params,
 ): Record<string, unknown> => {
   const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaultAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
-    const seriesName = value.name || value.originalName;
-    const unitType = seriesUnitMapper[seriesName];
+    const traceName = value.name || value.originalName;
+    const fieldName = getFieldNameFromTrace({ series: config.series, name: traceName });
+    const unit = widgetUnits.getFieldUnit(fieldName);
+    const unitType = unit?.unitType ?? DEFAULT_AXIS_KEY;
 
     if (!res[unitType]) {
       res[unitType] = [value.y];

@@ -43,9 +43,10 @@ const useLayoutExtendedSettings = ({ config, barmode, chartData }: {
 
     const generatedLayouts = generateLayouts({
       unitTypeMapper,
-      seriesUnitMapper,
       barmode,
       chartData,
+      widgetUnits,
+      config,
     });
 
     const _layouts: Partial<Layout> = ({
@@ -55,7 +56,7 @@ const useLayoutExtendedSettings = ({ config, barmode, chartData }: {
     });
 
     return _layouts;
-  }, [barmode, chartData, seriesUnitMapper, unitFeatureEnabled, unitTypeMapper]);
+  }, [barmode, chartData, config, unitFeatureEnabled, unitTypeMapper, widgetUnits]);
 
   return ({ getLayoutExtendedSettings });
 };

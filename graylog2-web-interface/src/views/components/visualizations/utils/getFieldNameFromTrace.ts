@@ -15,8 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import type Series from 'views/logic/aggregationbuilder/Series';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
-const isLayoutRequiresBaseUnit = (unit: FieldUnit) => unit?.isDefined;
+const getFieldNameFromTrace = ({ series, name }: { series: Array<Series>, name: string }) => {
+  const desireSeries = series.find((s) => {
+    const nameToFInd = s.config.name ?? s.function;
 
-export default isLayoutRequiresBaseUnit;
+    return name.endsWith(nameToFInd);
+  });
+
+  if (!desireSeries) return null;
+
+  return parseSeries(desireSeries.function).field;
+};
+
+export default getFieldNameFromTrace;

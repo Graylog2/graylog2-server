@@ -26,11 +26,11 @@ import {
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import { NO_FIELD_NAME_SERIES, UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import { getBaseUnit } from 'views/components/visualizations/utils/unitConvertors';
 import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import isLayoutRequiresBaseUnit from 'views/components/visualizations/utils/isLayoutRequiresBaseUnit';
+import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
 
 const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange }: {
   config: AggregationWidgetConfig,
@@ -42,27 +42,26 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
   const { fieldNameToAxisNameMapper, fieldNameToAxisCountMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
   const getExtendedChartGeneratorSettings = useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }) => {
     if (!unitFeatureEnabled) return ({});
-
-    const fieldNameKey = parseSeries(name)?.field ?? NO_FIELD_NAME_SERIES;
+    const fieldNameKey = getFieldNameFromTrace({ name, series: config.series }) ?? NO_FIELD_NAME_SERIES;
     const yaxis = fieldNameToAxisNameMapper[fieldNameKey];
     const curUnit = widgetUnits.getFieldUnit(fieldNameKey);
     const shouldConvertToBaseUnit = isLayoutRequiresBaseUnit(curUnit);
     const convertedValues = shouldConvertToBaseUnit ? convertDataToBaseUnit(values, curUnit) : values;
-    const baseUnit = shouldConvertToBaseUnit && getBaseUnit(curUnit.unitType);
-    const unit = shouldConvertToBaseUnit ? new FieldUnit(baseUnit.unitType, baseUnit.abbrev) : curUnit;
+    const baseUnit = shouldConvertToBaseUnit && getBaseUnit(curUnit?.unitType);
+    const unit = shouldConvertToBaseUnit ? new FieldUnit(baseUnit?.unitType, baseUnit?.abbrev) : curUnit;
 
     return ({
       yaxis,
       y: convertedValues,
       ...getHoverTemplateSettings({ unit, convertedValues, originalName }),
     });
-  }, [fieldNameToAxisNameMapper, unitFeatureEnabled, widgetUnits]);
+  }, [config.series, fieldNameToAxisNameMapper, unitFeatureEnabled, widgetUnits]);
   const getExtendedBarsGeneratorSettings = useCallback(({
     originalName, name, values, idx, total, xAxisItemsLength,
   }: { xAxisItemsLength: number, originalName: string, name: string, values: Array<any>, idx: number, total: number }) => {
     if (!unitFeatureEnabled) return ({});
 
-    const fieldNameKey = parseSeries(name)?.field ?? NO_FIELD_NAME_SERIES;
+    const fieldNameKey = getFieldNameFromTrace({ name, series: config.series }) ?? NO_FIELD_NAME_SERIES;
     const { y: convertedValues, yaxis, ...hoverTemplateSettings } = getExtendedChartGeneratorSettings({ originalName, name, values });
     const axisNumber = fieldNameToAxisCountMapper?.[fieldNameKey];
     const totalAxis = Object.keys(unitTypeMapper).length;
@@ -84,7 +83,7 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
       ...hoverTemplateSettings,
       ...offsetSettings,
     });
-  }, [barmode, config.isTimeline, effectiveTimerange, fieldNameToAxisCountMapper, getExtendedChartGeneratorSettings, unitFeatureEnabled, unitTypeMapper]);
+  }, [barmode, config.isTimeline, config.series, effectiveTimerange, fieldNameToAxisCountMapper, getExtendedChartGeneratorSettings, unitFeatureEnabled, unitTypeMapper]);
 
   return ({
     getExtendedBarsGeneratorSettings,
