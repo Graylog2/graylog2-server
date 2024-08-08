@@ -24,10 +24,12 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.certutil.CaTruststore;
 import org.graylog.security.certutil.KeyStoreDto;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.security.CustomCAX509TrustManager;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +47,6 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 @Api(value = "Certificates", description = "Information about certificates used")
-//TODO permissions & doc
 public class CertificatesResource {
     private final Logger log = LoggerFactory.getLogger(CertificatesResource.class);
 
@@ -63,7 +64,8 @@ public class CertificatesResource {
     }
 
     @GET
-    @ApiOperation("Returns the certficates used in this node")
+    @ApiOperation("Returns the certificates used by this node")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_READ)
     public Map<Store, KeyStoreDto> getCertificates() {
         Map<Store, KeyStoreDto> certificates = new HashMap<>();
         caTruststore.getTrustStore().ifPresent(truststore -> {
