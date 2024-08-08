@@ -16,7 +16,7 @@
  */
 package org.graylog.security.certutil;
 
-import org.jetbrains.annotations.NotNull;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -28,12 +28,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public record KeyStoreDto(Map<String, List<CertificateDto>> certificates) {
+import static org.graylog2.shared.utilities.StringUtils.f;
+
+public record KeyStoreDto(@JsonPropertyOrder(alphabetic = true) Map<String, List<CertificateDto>> certificates) {
     public static KeyStoreDto empty() {
         return new KeyStoreDto(new HashMap<>());
     }
 
-    public static @NotNull KeyStoreDto fromKeyStore(KeyStore keystore) throws KeyStoreException {
+    public static KeyStoreDto fromKeyStore(KeyStore keystore) throws KeyStoreException {
         Map<String, List<CertificateDto>> certificates = new HashMap<>();
         Enumeration<String> aliases = keystore.aliases();
         while (aliases.hasMoreElements()) {
@@ -50,6 +52,20 @@ public record KeyStoreDto(Map<String, List<CertificateDto>> certificates) {
             }
         }
         return new KeyStoreDto(certificates);
+    }
+
+    public static KeyStoreDto fromCertificates(String prefix, Certificate[] certificates) {
+        Map<String, List<CertificateDto>> certs = new HashMap<>();
+        for (int i = 0; i < certificates.length; i++) {
+            if (certificates[i] instanceof X509Certificate) {
+                certs.put(f(prefix + "[%03d]", i), List.of(new CertificateDto((X509Certificate) certificates[i])));
+            }
+        }
+        return new KeyStoreDto(certs);
+    }
+
+    public static KeyStoreDto fromSingleCertificate(String alias, X509Certificate certificate) {
+        return new KeyStoreDto(Map.of(alias, List.of(new CertificateDto(certificate))));
     }
 
 }
