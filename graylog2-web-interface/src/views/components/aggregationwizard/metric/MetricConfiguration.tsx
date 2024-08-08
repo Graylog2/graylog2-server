@@ -218,7 +218,6 @@ const Metric = ({ index }: Props) => {
       )}
       <div className="col-sm-11">
         <FormikInput id="name"
-                     className="col-sm-11"
                      label={<>Name <Opt /></>}
                      bsSize="small"
                      placeholder="Specify display name"
