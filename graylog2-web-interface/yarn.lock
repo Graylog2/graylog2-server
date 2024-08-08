@@ -1776,10 +1776,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-3.1.1.tgz#63085d2995ca0f0e55aa8b8a07d69bfd48b844fe"
   integrity sha512-a7cxGcJ2wIlMFLlh8z2ONm+715QkPHiyJcxwQlKOz/03GPw1COpfhcmC9wm4xlZfp//jWHNNMwzjtqHXVWU9KA==
 
-"@cyclonedx/cyclonedx-library@^6.6.0":
-  version "6.7.2"
-  resolved "https://registry.yarnpkg.com/@cyclonedx/cyclonedx-library/-/cyclonedx-library-6.7.2.tgz#a98463dc8dd4dd8befab29a53854e6aa3a82de61"
-  integrity sha512-TefAbEgGA8W8cyLVnzEXpf4dBTXfLZ5fWN/SzCvSOE676giSFf6gxdj39DoEt0iRH13buL62zj8mIn2PVU1GJQ==
+"@cyclonedx/cyclonedx-library@^6.11.0":
+  version "6.11.0"
+  resolved "https://registry.yarnpkg.com/@cyclonedx/cyclonedx-library/-/cyclonedx-library-6.11.0.tgz#1d8f4caede27918b1f793333e7c3b3ae97b171f2"
+  integrity sha512-T2R49+ia3NmluV+56Ev1NSIjG7DKUFM3EzzhHwJqWRUMuFK3Z8AIKIbNezAxoyl+4kJ6MzT8lke7t8mkZom+/A==
   dependencies:
     packageurl-js ">=0.0.6 <0.0.8 || ^1"
     spdx-expression-parse "^3.0.1 || ^4"
@@ -1791,11 +1791,11 @@
     xmlbuilder2 "^3.0.2"
 
 "@cyclonedx/webpack-plugin@^3.9.1":
-  version "3.12.0"
-  resolved "https://registry.yarnpkg.com/@cyclonedx/webpack-plugin/-/webpack-plugin-3.12.0.tgz#2ae843f66da92bb94ed5e8941f15df66f2e4d951"
-  integrity sha512-S4JqGGUzl6A2U/jSUsaIqy2MEY7nxG51gLJ1aZokLjIrjP0A5PmutpwILADwwn9/XEluYzvgF5QZdSindEJnOA==
+  version "3.13.0"
+  resolved "https://registry.yarnpkg.com/@cyclonedx/webpack-plugin/-/webpack-plugin-3.13.0.tgz#3c056dc4d8e74740d5441279fc560d4b2c0eb44f"
+  integrity sha512-iY//zT44BNl9MxbA6w5o7QmPjXFOWvfXTVsww1/cDzVREe2NEmzfqXk8L/SUEBtQyGTY+2WOJIcSN5lLSz4xXw==
   dependencies:
-    "@cyclonedx/cyclonedx-library" "^6.6.0"
+    "@cyclonedx/cyclonedx-library" "^6.11.0"
     normalize-package-data "^3||^4||^5||^6"
     xmlbuilder2 "^3.0.2"
 
