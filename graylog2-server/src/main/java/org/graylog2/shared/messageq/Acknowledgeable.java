@@ -14,19 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
+package org.graylog2.shared.messageq;
 
-interface EnterpriseTrafficGraph {
-  layout: string;
-  children: React.ReactNode;
-}
+import javax.annotation.Nullable;
 
-interface LicensePlugin {
-  EnterpriseTrafficGraph?: React.ComponentType<EnterpriseTrafficGraph>;
-}
-
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    license?: LicensePlugin;
-  }
+/**
+ * An object adhering to this interface can be acknowledged in a message queue by providing a queue-specific ID.
+ * <p>
+ * For example, messages that have been read from the local kafka journal will use a journal offset as message queue ID.
+ * By using that offset to commit to the journal after the messages has been successfully indexed, the message can be
+ * acknowledged in the queue.
+ */
+public interface Acknowledgeable {
+    @Nullable
+    Object getMessageQueueId();
 }

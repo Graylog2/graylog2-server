@@ -24,6 +24,7 @@ package org.graylog2.inputs.codecs;
 
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
+import org.graylog.plugins.beats.Beats2Codec;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.codecs.Codec;
 
@@ -40,5 +41,7 @@ public class CodecsModule extends Graylog2Module {
         installCodec(mapBinder, RandomHttpMessageCodec.class);
         installCodec(mapBinder, GelfCodec.class);
         installCodec(mapBinder, JsonPathCodec.class);
+        installCodec(mapBinder, Beats2Codec.class);
+
     }
 }

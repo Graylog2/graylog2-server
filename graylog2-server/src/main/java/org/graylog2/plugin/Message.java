@@ -40,6 +40,7 @@ import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.utilities.date.DateTimeConverter;
 import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
+import org.graylog2.shared.messageq.Acknowledgeable;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -84,7 +85,7 @@ import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
 @NotThreadSafe
-public class Message implements Messages, Indexable {
+public class Message implements Messages, Indexable, Acknowledgeable {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
     private static final Logger RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(LOG, 3, Duration.ofMinutes(1));
 
@@ -854,6 +855,7 @@ public class Message implements Messages, Indexable {
         return sequenceNr;
     }
 
+    @Override
     @Nullable
     public Object getMessageQueueId() {
         return messageQueueId;

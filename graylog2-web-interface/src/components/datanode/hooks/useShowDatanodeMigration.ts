@@ -19,6 +19,8 @@ import { useQuery } from '@tanstack/react-query';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
+import useMigrationState from './useMigrationState';
+
 const fetchShowDatanodeMigration = async () => fetch('GET', qualifyUrl('/datanode/configured'));
 
 const useShowDatanodeMigration = () : boolean => {
@@ -27,7 +29,9 @@ const useShowDatanodeMigration = () : boolean => {
     fetchShowDatanodeMigration,
   );
 
-  return isDatanodeConfiguredAndUsed === false;
+  const { currentStep } = useMigrationState();
+
+  return !(isDatanodeConfiguredAndUsed && (!currentStep || currentStep?.state === 'FINISHED'));
 };
 
 export default useShowDatanodeMigration;
