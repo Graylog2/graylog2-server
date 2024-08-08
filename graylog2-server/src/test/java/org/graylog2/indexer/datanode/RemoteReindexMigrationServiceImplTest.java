@@ -22,6 +22,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.indexer.migration.LogEntry;
 import org.graylog2.indexer.migration.LogLevel;
 import org.joda.time.DateTime;
@@ -42,7 +43,7 @@ class RemoteReindexMigrationServiceImplTest {
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
-        migrationService = new RemoteReindexMigrationServiceImpl(mongodb.mongoConnection(), mongoJackObjectMapperProvider);
+        migrationService = new RemoteReindexMigrationServiceImpl(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
     }
 
     @Test
@@ -87,4 +88,12 @@ class RemoteReindexMigrationServiceImplTest {
                             .contains("info entry", "error entry");
                 });
     }
+
+    @Test
+    void testLatestMigrationId() {
+        MigrationConfiguration migration1 = migrationService.saveMigration(MigrationConfiguration.forIndices(List.of("index_1", "index_2"), Collections.emptyList()));
+        MigrationConfiguration migration2 = migrationService.saveMigration(MigrationConfiguration.forIndices(List.of("index_3", "index_4"), Collections.emptyList()));
+        Assertions.assertThat(migrationService.getLatestMigrationId()).hasValue(migration2.id());
+    }
+
 }

@@ -254,6 +254,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
+    @Override
+    public Optional<String> getLatestMigrationId() {
+        return reindexMigrationService.getLatestMigrationId();
+    }
+
     private String clusterAllowlistSetting() {
         return client.execute((restHighLevelClient, requestOptions) -> {
             final ClusterGetSettingsRequest request = new ClusterGetSettingsRequest();
