@@ -1,0 +1,5 @@
+type = "added"
+message = "Added Microsoft Teams Notification V2 which is compatible with Microsoft Workflows."
+
+issues = ["Graylog2/graylog-plugin-enterprise#7794"]
+pulls = ["19983"]

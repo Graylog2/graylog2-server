@@ -29,27 +29,26 @@ import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 
+import static org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2.DEFAULT_ADAPTIVE_CARD;
+import static org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2.DEFAULT_BACKLOG_SIZE;
+import static org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2.FIELD_ADAPTIVE_CARD;
+import static org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2.FIELD_TIME_ZONE;
+import static org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2.FIELD_WEBHOOK_URL;
+
 @AutoValue
-@JsonTypeName(TeamsEventNotificationConfigEntity.TYPE_NAME)
-@JsonDeserialize(builder = TeamsEventNotificationConfigEntity.Builder.class)
-@Deprecated
-public abstract class TeamsEventNotificationConfigEntity implements EventNotificationConfigEntity {
+@JsonTypeName(TeamsEventNotificationConfigV2Entity.TYPE_NAME)
+@JsonDeserialize(builder = TeamsEventNotificationConfigV2Entity.Builder.class)
+public abstract class TeamsEventNotificationConfigV2Entity implements EventNotificationConfigEntity {
 
-    public static final String TYPE_NAME = "teams-notification-v1";
+    public static final String TYPE_NAME = "teams-notification-v2";
 
-    @JsonProperty(TeamsEventNotificationConfig.TEAMS_COLOR)
-    public abstract ValueReference color();
-
-    @JsonProperty(TeamsEventNotificationConfig.FIELD_WEBHOOK_URL)
+    @JsonProperty(FIELD_WEBHOOK_URL)
     public abstract ValueReference webhookUrl();
 
-    @JsonProperty(TeamsEventNotificationConfig.TEAMS_CUSTOM_MESSAGE)
-    public abstract ValueReference customMessage();
+    @JsonProperty(FIELD_ADAPTIVE_CARD)
+    public abstract ValueReference adaptiveCard();
 
-    @JsonProperty(TeamsEventNotificationConfig.TEAMS_ICON_URL)
-    public abstract ValueReference iconUrl();
-
-    @JsonProperty(TeamsEventNotificationConfig.TEAMS_TIME_ZONE)
+    @JsonProperty(FIELD_TIME_ZONE)
     public abstract ValueReference timeZone();
 
     public static Builder builder() {
@@ -63,38 +62,31 @@ public abstract class TeamsEventNotificationConfigEntity implements EventNotific
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_TeamsEventNotificationConfigEntity.Builder()
+            return new AutoValue_TeamsEventNotificationConfigV2Entity.Builder()
                     .type(TYPE_NAME)
+                    .adaptiveCard(ValueReference.of(DEFAULT_ADAPTIVE_CARD))
                     .timeZone(ValueReference.of("UTC"));
         }
 
-        @JsonProperty(TeamsEventNotificationConfig.TEAMS_COLOR)
-        public abstract Builder color(ValueReference color);
-
-        @JsonProperty(TeamsEventNotificationConfig.FIELD_WEBHOOK_URL)
+        @JsonProperty(FIELD_WEBHOOK_URL)
         public abstract Builder webhookUrl(ValueReference webhookUrl);
 
-        @JsonProperty(TeamsEventNotificationConfig.TEAMS_CUSTOM_MESSAGE)
-        public abstract Builder customMessage(ValueReference customMessage);
+        @JsonProperty(FIELD_ADAPTIVE_CARD)
+        public abstract Builder adaptiveCard(ValueReference customMessage);
 
-        @JsonProperty(TeamsEventNotificationConfig.TEAMS_ICON_URL)
-        public abstract Builder iconUrl(ValueReference iconUrl);
-
-        @JsonProperty(TeamsEventNotificationConfig.TEAMS_TIME_ZONE)
+        @JsonProperty(FIELD_TIME_ZONE)
         public abstract Builder timeZone(ValueReference timeZone);
 
-        public abstract TeamsEventNotificationConfigEntity build();
+        public abstract TeamsEventNotificationConfigV2Entity build();
     }
 
     @Override
     public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
-        return TeamsEventNotificationConfig.builder()
-                .color(color().asString(parameters))
+        return TeamsEventNotificationConfigV2.builder()
                 .webhookUrl(webhookUrl().asString(parameters))
-                .customMessage(customMessage().asString(parameters))
-                .customMessage(customMessage().asString(parameters))
-                .iconUrl(iconUrl().asString(parameters))
+                .adaptiveCard(adaptiveCard().asString(parameters))
                 .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
+                .backlogSize(DEFAULT_BACKLOG_SIZE)
                 .build();
     }
 }
