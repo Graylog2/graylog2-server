@@ -45,7 +45,7 @@ class NotificationsFactory {
       case 'data_node_needs_provisioning':
         return {
           values: {
-            DATA_NODE_CONFIGURATION: Routes.SYSTEM.configurationsSection('Data Node'),
+            DATA_NODE_CONFIGURATION: Routes.SYSTEM.DATANODES.CONFIGURATION,
           },
         };
 
