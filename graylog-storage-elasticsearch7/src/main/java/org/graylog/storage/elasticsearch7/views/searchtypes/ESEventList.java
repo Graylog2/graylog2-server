@@ -34,7 +34,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog2.streams.StreamService;
 
 import java.util.List;
 import java.util.Map;
@@ -44,21 +43,17 @@ import java.util.stream.StreamSupport;
 
 public class ESEventList implements ESSearchTypeHandler<EventList> {
     private final ObjectMapper objectMapper;
-    private final StreamService streamService;
 
     @Inject
-    public ESEventList(ObjectMapper objectMapper, StreamService streamService) {
+    public ESEventList(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        this.streamService = streamService;
     }
 
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     ESGeneratedQueryContext queryContext) {
-        final Set<String> queryStreamIds = query.usedStreamIds();
-        queryStreamIds.addAll(streamService.mapCategoriesToIds(query.usedStreamCategories()));
         final Set<String> effectiveStreams = eventList.streams().isEmpty()
-                ? queryStreamIds
+                ? query.usedStreamIds()
                 : eventList.streams();
 
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);

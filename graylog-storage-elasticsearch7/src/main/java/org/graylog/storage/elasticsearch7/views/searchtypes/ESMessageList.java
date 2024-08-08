@@ -43,7 +43,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
-import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -61,17 +60,14 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     private final LegacyDecoratorProcessor decoratorProcessor;
     private final ResultMessageFactory resultMessageFactory;
-    private final StreamService streamService;
     private final boolean allowHighlighting;
 
     @Inject
     public ESMessageList(LegacyDecoratorProcessor decoratorProcessor,
                          ResultMessageFactory resultMessageFactory,
-                         StreamService streamService,
                          @Named("allow_highlighting") boolean allowHighlighting) {
         this.decoratorProcessor = decoratorProcessor;
         this.resultMessageFactory = resultMessageFactory;
-        this.streamService = streamService;
         this.allowHighlighting = allowHighlighting;
     }
 

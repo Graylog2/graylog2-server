@@ -34,7 +34,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog2.streams.StreamService;
 
 import java.util.List;
 import java.util.Map;
@@ -44,21 +43,17 @@ import java.util.stream.StreamSupport;
 
 public class OSEventList implements EventListStrategy {
     private final ObjectMapper objectMapper;
-    private final StreamService streamService;
 
     @Inject
-    public OSEventList(ObjectMapper objectMapper, StreamService streamService) {
+    public OSEventList(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        this.streamService = streamService;
     }
 
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {
-        final Set<String> queryStreamIds = query.usedStreamIds();
-        queryStreamIds.addAll(streamService.mapCategoriesToIds(query.usedStreamCategories()));
         final Set<String> effectiveStreams = eventList.streams().isEmpty()
-                ? queryStreamIds
+                ? query.usedStreamIds()
                 : eventList.streams();
 
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
