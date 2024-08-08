@@ -290,25 +290,26 @@ export const generateLayouts = (
   });
 };
 
+const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>,
+  unit: FieldUnit }) => convertedValues.map((value) => {
+  const prettified = unit && unit.isDefined && getPrettifiedValue(value, {
+    abbrev: unit.abbrev,
+    unitType: unit.unitType,
+  });
+
+  if (!prettified) return null;
+
+  return `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`;
+});
+
 export const getHoverTemplateSettings = ({ convertedValues, unit, originalName }: {
   convertedValues: Array<any>,
   unit: FieldUnit,
   originalName: string,
 }): { text: Array<string>, hovertemplate: string, meta: string } | {} => {
   if (unit?.unitType === 'time' || unit?.unitType === 'size') {
-    const text = convertedValues.map((value) => {
-      const prettified = unit && unit.isDefined && getPrettifiedValue(value, {
-        abbrev: unit.abbrev,
-        unitType: unit.unitType,
-      });
-
-      if (!prettified) return null;
-
-      return `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`;
-    });
-
     return ({
-      text,
+      text: getHoverTexts({ convertedValues, unit }),
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',
       meta: originalName,
     });
@@ -316,3 +317,14 @@ export const getHoverTemplateSettings = ({ convertedValues, unit, originalName }
 
   return ({});
 };
+
+export const getPieHoverTemplateSettings = ({ convertedValues, unit, originalName }: {
+  convertedValues: Array<any>,
+  unit: FieldUnit,
+  originalName: string,
+}): { text: Array<string>, hovertemplate: string, meta: string } | {} => ({
+  text: getHoverTexts({ convertedValues, unit }),
+  hovertemplate: '<b>%{label}</b><br>%{text}<br>%{percent}',
+  meta: originalName,
+  textinfo: 'percent',
+});

@@ -54,6 +54,13 @@ export type ChartDefinition = {
   originalName: string,
   meta?: string,
   yaxis?: string,
+  hole?: number,
+  labels?: Array<string>,
+  originalLabels?: Array<string>,
+  domain?: {
+    x: string,
+    y: string,
+  }
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
