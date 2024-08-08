@@ -54,7 +54,7 @@ const _horizontalDimensions = (idx: number, total: number) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _generateSeries = (mapKeys: KeyMapper, getExtendedPieGeneratorSettings: (props: { originalName: string, name: string, values: Array<any> }) => Partial<ChartDefinition>): Generator => ({
+const _generateSeries = (mapKeys: KeyMapper, getExtendedPieGeneratorSettings): Generator => ({
   type,
   name,
   labels,

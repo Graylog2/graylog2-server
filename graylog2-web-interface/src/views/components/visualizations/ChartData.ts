@@ -57,10 +57,7 @@ export type ChartDefinition = {
   hole?: number,
   labels?: Array<string>,
   originalLabels?: Array<string>,
-  domain?: {
-    x: string,
-    y: string,
-  }
+  domain?: { x: [number, number]; y: [number, number] }
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
