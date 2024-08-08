@@ -83,7 +83,7 @@ public class CertificatesResource {
                     certificates.put(Store.HTTP, KeyStoreDto.fromSingleCertificate("tlscert", (X509Certificate) certFactory.generateCertificate(inStream)));
                 }
             } catch (CertificateException | IOException e) {
-                throw new RuntimeException(e);
+                log.error("Error reading http tls certificate", e);
             }
         }
 
