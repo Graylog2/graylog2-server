@@ -48,6 +48,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.RemoteInfo;
 import org.graylog.shaded.opensearch2.org.opensearch.tasks.Task;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.datanode.IndexMigrationConfiguration;
 import org.graylog2.indexer.datanode.MigrationConfiguration;
@@ -66,6 +67,7 @@ import org.graylog2.indexer.migration.TaskStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -81,6 +83,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -122,6 +125,28 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.objectMapper = objectMapper;
         this.reindexMigrationService = reindexMigrationService;
         this.datanodeRestApiProxy = datanodeRestApiProxy;
+    }
+
+    @Override
+    public boolean isMigrationRunning(IndexSet indexSet) {
+        return reindexMigrationService.getLatestMigrationId()
+                .map(this::status)
+                .map(migration -> isIndexSetCurrentlyMigrated(indexSet, migration))
+                .orElse(false);
+    }
+
+    @NotNull
+    private Boolean isIndexSetCurrentlyMigrated(IndexSet indexSet, RemoteReindexMigration mig) {
+        if (mig.status() == Status.NOT_STARTED || mig.status() == Status.RUNNING) {
+            final Set<String> runningIndices = mig.indices().stream()
+                    .filter(i -> !i.isCompleted())
+                    .map(RemoteReindexIndex::name)
+                    .collect(Collectors.toSet());
+            final Set<IndexSet> migratedIndexSets = indexSetRegistry.getForIndices(runningIndices);
+            return migratedIndexSets.contains(indexSet);
+        } else {
+            return false;
+        }
     }
 
     @Override
