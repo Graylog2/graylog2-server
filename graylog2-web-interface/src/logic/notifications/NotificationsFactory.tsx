@@ -49,6 +49,14 @@ class NotificationsFactory {
           },
         };
 
+      case 'remote_reindex_running':
+      case 'remote_reindex_finished':
+        return {
+          values: {
+            DATA_NODE_MIGRATION_WIZARD: Routes.SYSTEM.DATANODES.MIGRATION,
+          },
+        };
+
       default:
         return undefined;
     }
