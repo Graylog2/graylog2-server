@@ -51,7 +51,7 @@ class RemoteReindexMigrationTest {
             case ERROR -> new IndexMigrationProgress(100, 100, 0, 0, 0, 0);
             default -> new IndexMigrationProgress(100, 0, 0, 0, 0, 0);
         };
-        return new RemoteReindexIndex(indexName, status, null, null, progress, null);
+        return new RemoteReindexIndex(null, indexName, status, null, null, progress, null);
     }
 
     @Test

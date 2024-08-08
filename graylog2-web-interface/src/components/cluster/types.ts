@@ -14,21 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
 
-import org.graylog2.indexer.migration.LogEntry;
-
-import java.util.Optional;
-
-public interface RemoteReindexMigrationService {
-
-    Optional<MigrationConfiguration> getMigration(String migrationId);
-
-    MigrationConfiguration saveMigration(MigrationConfiguration migrationConfiguration);
-
-    void assignTask(String migrationID, String indexName, String taskId);
-
-    void appendLogEntry(String migrationId, LogEntry log);
-
-    Optional<String> getLatestMigrationId();
+export type Traffic = {
+    from: string,
+    to: string,
+    output: Record<string, number>,
+    input: Record<string, number>,
+    decoded: Record<string, number>,
 }

@@ -14,21 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+package org.graylog2.shared.rest.resources.system;
 
-import org.graylog2.indexer.migration.LogEntry;
+import com.fasterxml.jackson.databind.JsonNode;
+import retrofit2.Call;
+import retrofit2.http.GET;
 
-import java.util.Optional;
+import java.util.List;
 
-public interface RemoteReindexMigrationService {
+public interface RemoteDataNodeStatusResource {
 
-    Optional<MigrationConfiguration> getMigration(String migrationId);
+    @GET("/")
+    Call<JsonNode> status();
 
-    MigrationConfiguration saveMigration(MigrationConfiguration migrationConfiguration);
+    @GET("/logs/stdout")
+    Call<List<String>> opensearchStdOut();
 
-    void assignTask(String migrationID, String indexName, String taskId);
+    @GET("/logs/stderr")
+    Call<List<String>> opensearchStdErr();
 
-    void appendLogEntry(String migrationId, LogEntry log);
-
-    Optional<String> getLatestMigrationId();
 }

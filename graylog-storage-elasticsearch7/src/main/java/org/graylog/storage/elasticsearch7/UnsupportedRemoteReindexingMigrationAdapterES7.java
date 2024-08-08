@@ -24,6 +24,7 @@ import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
 import java.net.URI;
+import java.util.Optional;
 
 public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteReindexingMigrationAdapter {
 
@@ -41,6 +42,11 @@ public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteRei
 
     @Override
     public IndexerConnectionCheckResult checkConnection(@Nonnull URI uri, @Nullable String username, @Nullable String password, @Nullable String allowlist, boolean trustUnknownCerts) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
+    }
+
+    @Override
+    public Optional<String> getLatestMigrationId() {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 }

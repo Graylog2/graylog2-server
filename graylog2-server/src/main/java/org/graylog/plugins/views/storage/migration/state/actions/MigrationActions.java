@@ -64,4 +64,6 @@ public interface MigrationActions {
     boolean isCompatibleInPlaceMigrationVersion();
 
     void getElasticsearchHosts();
+
+    void stopDatanodes();
 }

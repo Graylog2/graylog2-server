@@ -14,21 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
 
-import org.graylog2.indexer.migration.LogEntry;
-
-import java.util.Optional;
-
-public interface RemoteReindexMigrationService {
-
-    Optional<MigrationConfiguration> getMigration(String migrationId);
-
-    MigrationConfiguration saveMigration(MigrationConfiguration migrationConfiguration);
-
-    void assignTask(String migrationID, String indexName, String taskId);
-
-    void appendLogEntry(String migrationId, LogEntry log);
-
-    Optional<String> getLatestMigrationId();
-}
+export { default as TrafficGraphWithDaySelect } from './TrafficGraphWithDaySelect';
+export { default as TrafficGraph } from './TrafficGraph';
+export { default as useGraphWidth } from './useGraphWidth';

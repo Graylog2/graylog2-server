@@ -150,7 +150,15 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private void createIndicesInNewCluster(MigrationConfiguration migration) {
         migration.indices().forEach(index -> {
             if (!this.indices.exists(index.indexName())) {
-                this.indices.create(index.indexName(), indexSetRegistry.getForIndex(index.indexName()).orElse(indexSetRegistry.getDefault()));
+                final boolean created = this.indices.create(index.indexName(), indexSetRegistry.getForIndex(index.indexName()).orElse(indexSetRegistry.getDefault()));
+                if (created) {
+                    logInfo(migration, "Created new target index " + index.indexName());
+                } else {
+                    final String message = "Could not create new target index <" + index.indexName() + ">.";
+                    logError(migration, message, null);
+                    throw new IllegalStateException(message);
+
+                }
             } else {
                 logInfo(migration, String.format(Locale.ROOT, "Index %s does already exist in target indexer. Data will be migrated into existing index.", index.indexName()));
             }
@@ -162,7 +170,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         if (!allowlist.isClusterSettingMatching(clusterAllowlistSetting())) {
             // this is expected state for fresh datanode cluster - there is no value configured in the reindex.remote.allowlist
             // we have to add it to the configuration and wait till the whole cluster restarts
-            logInfo(migration, "Preparing cluster for remote reindexing, setting allowlist to: " + req.allowlist());
+            logInfo(migration, "Preparing cluster for remote reindex migration " + migration.id() + ", setting allowlist to: " + req.allowlist());
             allowReindexing(allowlist, migration);
             waitForClusterRestart(allowlist, migration);
         } else {
@@ -198,15 +206,17 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
         IndexMigrationProgress progress = toProgress(task.task().status());
 
+        final String taskID = task.task().taskID();
+
         if (task.completed()) {
             final String errors = getErrors(task);
             if (errors != null) {
-                return new RemoteReindexIndex(indexName, Status.ERROR, created, duration, progress, errors);
+                return new RemoteReindexIndex(taskID, indexName, Status.ERROR, created, duration, progress, errors);
             } else {
-                return new RemoteReindexIndex(indexName, Status.FINISHED, created, duration, progress, null);
+                return new RemoteReindexIndex(taskID, indexName, Status.FINISHED, created, duration, progress, null);
             }
         } else {
-            return new RemoteReindexIndex(indexName, Status.RUNNING, created, duration, progress, null);
+            return new RemoteReindexIndex(taskID, indexName, Status.RUNNING, created, duration, progress, null);
         }
     }
 
@@ -242,6 +252,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         } catch (Exception e) {
             return IndexerConnectionCheckResult.failure(e);
         }
+    }
+
+    @Override
+    public Optional<String> getLatestMigrationId() {
+        return reindexMigrationService.getLatestMigrationId();
     }
 
     private String clusterAllowlistSetting() {
@@ -320,7 +335,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         return new AggregatedConnectionResponse(responses);
     }
 
-    private static String uriToString(URI uri){
+    private static String uriToString(URI uri) {
         try {
             return uri.toURL().toString();
         } catch (MalformedURLException e) {
@@ -432,7 +447,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             if (errors != null) {
                 onTaskFailure(migration, index, errors, duration);
             } else {
-                onTaskSuccess(migration, index, t.task().status(), duration);
+                onTaskSuccess(migration, index, t.task(), duration);
             }
         });
     }
@@ -447,8 +462,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         logError(migration, message, null);
     }
 
-    private void onTaskSuccess(MigrationConfiguration migration, String index, TaskStatus taskStatus, Duration duration) {
-        String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index, humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
+    private void onTaskSuccess(MigrationConfiguration migration, String index, org.graylog.storage.opensearch2.Task task, Duration duration) {
+        final TaskStatus taskStatus = task.status();
+        String message = String.format(Locale.ROOT, "Index %s, task %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index, task.taskID(), humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
         if (taskStatus.noops() > 0 || taskStatus.versionConflicts() > 0) {
             message += String.format(Locale.ROOT, " %d documents were not migrated (%d version conflicts, %d ignored)", taskStatus.versionConflicts() + taskStatus.noops(), taskStatus.versionConflicts(), taskStatus.noops());
         }

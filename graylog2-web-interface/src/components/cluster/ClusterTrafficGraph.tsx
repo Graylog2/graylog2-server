@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
 
-interface EnterpriseTrafficGraph {
-  layout: string;
-  children: React.ReactNode;
-}
+import * as React from 'react';
 
-interface LicensePlugin {
-  EnterpriseTrafficGraph?: React.ComponentType<EnterpriseTrafficGraph>;
-}
+import { useStore } from 'stores/connect';
+import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
+import { TrafficGraphWithDaySelect } from 'components/common/Graph';
 
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    license?: LicensePlugin;
-  }
-}
+const ClusterTrafficGraph = () => {
+  const { traffic } = useStore(ClusterTrafficStore);
+
+  return (
+    <TrafficGraphWithDaySelect traffic={traffic}
+                               getTraffic={ClusterTrafficActions.getTraffic} />
+  );
+};
+
+export default ClusterTrafficGraph;
