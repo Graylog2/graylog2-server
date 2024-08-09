@@ -19,7 +19,6 @@ import { styled, css } from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import FieldUnitPopover from 'views/components/aggregationwizard/units/FieldUnitPopover';
-import { getUnitInfo } from 'views/components/visualizations/utils/unitConvertors';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import useFieldTypesUnits from 'views/hooks/useFieldTypesUnits';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
@@ -54,9 +53,7 @@ const FieldUnitComponent = ({ field }: Props) => {
 
   if (!showUnitComponent) return null;
 
-  if (predefinedValue?.isDefined) return <UnitLabel title={getUnitInfo(predefinedValue.unitType, predefinedValue.abbrev).name}>{predefinedValue.abbrev}</UnitLabel>;
-
-  return <FieldUnitPopover field={field} />;
+  return <FieldUnitPopover field={field} predefinedUnit={predefinedValue} />;
 };
 
 export default FieldUnitComponent;

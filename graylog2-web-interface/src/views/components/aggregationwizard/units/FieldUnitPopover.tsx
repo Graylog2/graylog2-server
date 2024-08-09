@@ -21,11 +21,12 @@ import { Field, useFormikContext } from 'formik';
 import Select from 'components/common/Select';
 import Popover from 'components/common/Popover';
 import { HoverForHelp } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { Alert, Input } from 'components/bootstrap';
 import type { Unit } from 'views/components/visualizations/utils/unitConvertors';
 import { mappedUnitsFromJSON as units } from 'views/components/visualizations/utils/unitConvertors';
 import type { FieldUnitsFormValues } from 'views/types';
 import { UnitLabel } from 'views/components/aggregationwizard/units/FieldUnitComponent';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 const Container = styled.div`
   display: flex;
@@ -34,9 +35,11 @@ const Container = styled.div`
   & .control-label {
     font-weight: normal;
   }
+
+  width: 300px;
 `;
 
-const FieldUnitPopover = ({ field }: { field: string }) => {
+const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefinedUnit: FieldUnit }) => {
   const [show, setShow] = useState(false);
   const { setFieldValue, values } = useFormikContext<{units: FieldUnitsFormValues }>();
   const currentUnitType = useMemo<string>(() => values?.units?.[field]?.unitType, [values, field]);
@@ -54,6 +57,14 @@ const FieldUnitPopover = ({ field }: { field: string }) => {
 
     return curUnit || '...';
   }, [field, values?.units]);
+
+  const predefinedInfo = useMemo(() => {
+    if (!predefinedUnit?.isDefined) return null;
+
+    const unitName = units[predefinedUnit.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
+
+    return <>Unit <b>{unitName}</b> was defined by Graylog. Changing this unit might display incorrect values</>;
+  }, [predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType]);
 
   return (
     <Popover position="right" opened={show} withArrow>
@@ -102,6 +113,7 @@ const FieldUnitPopover = ({ field }: { field: string }) => {
             )}
           </Field>
           )}
+          {predefinedInfo && <Alert bsStyle="info">{predefinedInfo}</Alert>}
         </Container>
       </Popover.Dropdown>
     </Popover>
