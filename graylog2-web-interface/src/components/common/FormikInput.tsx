@@ -23,6 +23,7 @@ import { Input } from 'components/bootstrap';
 
 type BaseProps = {
   autoComplete?: string,
+  addonAfter?: React.ReactElement | string,
   bsSize?: 'large' | 'small' | 'xsmall',
   buttonAfter?: React.ReactElement | string,
   children?: React.ReactNode,
@@ -93,6 +94,7 @@ const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, 
 
 FormikInput.propTypes = {
   autoComplete: PropTypes.string,
+  addonAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   bsSize: PropTypes.string,
   buttonAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   children: PropTypes.oneOfType([
@@ -121,6 +123,7 @@ FormikInput.propTypes = {
 
 FormikInput.defaultProps = {
   autoComplete: undefined,
+  addonAfter: undefined,
   bsSize: undefined,
   buttonAfter: undefined,
   children: null,

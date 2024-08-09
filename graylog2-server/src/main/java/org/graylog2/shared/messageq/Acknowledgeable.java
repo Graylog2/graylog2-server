@@ -14,21 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.shared.messageq;
 
-import React from 'react';
+import javax.annotation.Nullable;
 
-import { Alert } from 'components/bootstrap';
-
-class GreyNoiseCommunityIpLookupAdapterDocumentation extends React.Component {
-  render() {
-    return (
-      <div>
-        <Alert style={{ marginBottom: 10 }} bsStyle="warning" title="Deprecation Warning">
-          <p>The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.</p>
-        </Alert>
-      </div>
-    );
-  }
+/**
+ * An object adhering to this interface can be acknowledged in a message queue by providing a queue-specific ID.
+ * <p>
+ * For example, messages that have been read from the local kafka journal will use a journal offset as message queue ID.
+ * By using that offset to commit to the journal after the messages has been successfully indexed, the message can be
+ * acknowledged in the queue.
+ */
+public interface Acknowledgeable {
+    @Nullable
+    Object getMessageQueueId();
 }
-
-export default GreyNoiseCommunityIpLookupAdapterDocumentation;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
+import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
@@ -144,6 +145,17 @@ type DataTiering = {
   WarmTierReadinessInfo: React.ComponentType,
 }
 
+type License = {
+  EnterpriseTrafficGraph: React.ComponentType,
+  LicenseGraphWithMetrics: React.ComponentType,
+  EnterpriseProductLink: React.ComponentType<{
+    children: React.ReactNode,
+    href: string,
+    clusterId: string,
+    licenseSubject?: string
+  }>,
+}
+
 type FieldValueProvider = {
   type: string,
   displayName: string,
@@ -174,11 +186,11 @@ interface PluginDataWarehouse {
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
   DataWarehouseJobs: React.ComponentType<{}>,
-  streamDataWarehouseTableElements: {
+  getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
     columnRenderer: ColumnRenderers<Stream>,
-  }
+  } | undefined,
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -190,6 +202,7 @@ declare module 'graylog-web-plugin/plugin' {
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>;
     fieldValueProviders?:Array<FieldValueProvider>;
+    license?: Array<License>,
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,

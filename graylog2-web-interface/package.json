@@ -72,7 +72,7 @@
     "leaflet": "^1.5.1",
     "lodash": "^4.17.4",
     "marked": "^13.0.0",
-    "material-symbols": "^0.15.0",
+    "material-symbols": "^0.22.0",
     "md5": "^2.2.1",
     "moment-duration-format": "2.3.2",
     "moment-precise-range-plugin": "^1.3.0",
@@ -178,6 +178,6 @@
   "resolutions": {
     "@types/react": "18.0.28",
     "nth-check": "2.0.1",
-    "typescript": "5.5.2"
+    "typescript": "5.5.4"
   }
 }

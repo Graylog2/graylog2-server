@@ -32,6 +32,7 @@ import java.util.Map;
 @AutoValue
 @JsonTypeName(TeamsEventNotificationConfigEntity.TYPE_NAME)
 @JsonDeserialize(builder = TeamsEventNotificationConfigEntity.Builder.class)
+@Deprecated
 public abstract class TeamsEventNotificationConfigEntity implements EventNotificationConfigEntity {
 
     public static final String TYPE_NAME = "teams-notification-v1";

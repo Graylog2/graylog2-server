@@ -38,7 +38,7 @@ import java.util.Optional;
  */
 public class V202211021200_CreateDefaultIndexTemplate extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V202211021200_CreateDefaultIndexTemplate.class);
-    public static final String TEMPLATE_DESCRIPTION = "Generated template that is used for index sets which are created automatically.";
+    public static final String TEMPLATE_DESCRIPTION = "A generated template used for index sets that are created automatically, such as by Illuminate packs.";
 
     private final ClusterConfigService clusterConfigService;
     private final IndexSetDefaultTemplateConfigFactory factory;

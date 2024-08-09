@@ -14,16 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.preflight;
+package org.graylog.storage.opensearch2;
 
-import com.google.inject.AbstractModule;
-import org.graylog2.cluster.certificates.CertificateExchange;
-import org.graylog2.cluster.certificates.CertificateExchangeImpl;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.POST;
 
-public class DataNodeProvisioningBindings extends AbstractModule {
+public interface DatanodeRemoteConnectionCheckResource {
 
-    @Override
-    protected void configure() {
-        bind(CertificateExchange.class).to(CertificateExchangeImpl.class);
-    }
+    @POST("connection-check/opensearch")
+    Call<ConnectionCheckResponse> opensearch(@Body @Valid @NotNull ConnectionCheckRequest request);
+
 }

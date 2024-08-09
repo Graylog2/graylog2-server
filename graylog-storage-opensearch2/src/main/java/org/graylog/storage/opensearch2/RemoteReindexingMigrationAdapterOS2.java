@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
@@ -29,7 +28,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -53,7 +51,6 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.datanode.IndexMigrationConfiguration;
 import org.graylog2.indexer.datanode.MigrationConfiguration;
-import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.indexer.datanode.RemoteReindexMigrationService;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
@@ -62,10 +59,12 @@ import org.graylog2.indexer.migration.IndexMigrationProgress;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.LogEntry;
 import org.graylog2.indexer.migration.LogLevel;
+import org.graylog2.indexer.migration.RemoteIndex;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.indexer.migration.TaskStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -73,12 +72,10 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -153,7 +150,15 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private void createIndicesInNewCluster(MigrationConfiguration migration) {
         migration.indices().forEach(index -> {
             if (!this.indices.exists(index.indexName())) {
-                this.indices.create(index.indexName(), indexSetRegistry.getForIndex(index.indexName()).orElse(indexSetRegistry.getDefault()));
+                final boolean created = this.indices.create(index.indexName(), indexSetRegistry.getForIndex(index.indexName()).orElse(indexSetRegistry.getDefault()));
+                if (created) {
+                    logInfo(migration, "Created new target index " + index.indexName());
+                } else {
+                    final String message = "Could not create new target index <" + index.indexName() + ">.";
+                    logError(migration, message, null);
+                    throw new IllegalStateException(message);
+
+                }
             } else {
                 logInfo(migration, String.format(Locale.ROOT, "Index %s does already exist in target indexer. Data will be migrated into existing index.", index.indexName()));
             }
@@ -165,7 +170,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         if (!allowlist.isClusterSettingMatching(clusterAllowlistSetting())) {
             // this is expected state for fresh datanode cluster - there is no value configured in the reindex.remote.allowlist
             // we have to add it to the configuration and wait till the whole cluster restarts
-            logInfo(migration, "Preparing cluster for remote reindexing, setting allowlist to: " + req.allowlist());
+            logInfo(migration, "Preparing cluster for remote reindex migration " + migration.id() + ", setting allowlist to: " + req.allowlist());
             allowReindexing(allowlist, migration);
             waitForClusterRestart(allowlist, migration);
         } else {
@@ -201,15 +206,17 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
         IndexMigrationProgress progress = toProgress(task.task().status());
 
+        final String taskID = task.task().taskID();
+
         if (task.completed()) {
             final String errors = getErrors(task);
             if (errors != null) {
-                return new RemoteReindexIndex(indexName, Status.ERROR, created, duration, progress, errors);
+                return new RemoteReindexIndex(taskID, indexName, Status.ERROR, created, duration, progress, errors);
             } else {
-                return new RemoteReindexIndex(indexName, Status.FINISHED, created, duration, progress, null);
+                return new RemoteReindexIndex(taskID, indexName, Status.FINISHED, created, duration, progress, null);
             }
         } else {
-            return new RemoteReindexIndex(indexName, Status.RUNNING, created, duration, progress, null);
+            return new RemoteReindexIndex(taskID, indexName, Status.RUNNING, created, duration, progress, null);
         }
     }
 
@@ -233,14 +240,23 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             final RemoteReindexAllowlist reindexAllowlist = new RemoteReindexAllowlist(remoteHost, allowlist);
             reindexAllowlist.validate();
             final AggregatedConnectionResponse results = getAllIndicesFrom(remoteHost, username, password, trustUnknownCerts);
+            final List<RemoteIndex> indices = results.indices().stream()
+                    .map(i -> new RemoteIndex(i, indexSetRegistry.isManagedIndex(i)))
+                    .distinct()
+                    .toList();
             if (results.error() != null && !results.error().isEmpty()) {
                 return IndexerConnectionCheckResult.failure(results.error());
             } else {
-                return IndexerConnectionCheckResult.success(results.indices());
+                return IndexerConnectionCheckResult.success(indices);
             }
         } catch (Exception e) {
             return IndexerConnectionCheckResult.failure(e);
         }
+    }
+
+    @Override
+    public Optional<String> getLatestMigrationId() {
+        return reindexMigrationService.getLatestMigrationId();
     }
 
     private String clusterAllowlistSetting() {
@@ -314,25 +330,12 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
      * will be used to display better error message or transported back to the datanodes as trusted, if user decides so.
      */
     private AggregatedConnectionResponse getAllIndicesFrom(final URI uri, final String username, final String password, boolean trustUnknownCerts) {
-        final ByteArrayInputStream body = new ByteArrayInputStream("""
-                {
-                    "host": "%s",
-                    "username": "%s",
-                    "password": "%s",
-                    "trust_unknown_certs": %b
-                }
-                """.formatted(uriToString(uri), username, password, trustUnknownCerts).getBytes(StandardCharsets.UTF_8));
-        try {
-            final ProxyRequestAdapter.ProxyResponse response = datanodeRestApiProxy.request(new ProxyRequestAdapter.ProxyRequest("POST", "/connection-check/opensearch", body, "all", new MultivaluedHashMap<>()));
-            // datanode_hostname -> ConnectionCheckResponse
-            TypeReference<Map<String, ConnectionCheckResponse>> typeRef = new TypeReference<>() {};
-            return new AggregatedConnectionResponse(objectMapper.readValue(response.response(), typeRef));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final ConnectionCheckRequest req = new ConnectionCheckRequest(uriToString(uri), username, password, trustUnknownCerts);
+        final Map<String, ConnectionCheckResponse> responses = datanodeRestApiProxy.remoteInterface(DatanodeResolver.ALL_NODES_KEYWORD, DatanodeRemoteConnectionCheckResource.class, resource -> resource.opensearch(req));
+        return new AggregatedConnectionResponse(responses);
     }
 
-    private static String uriToString(URI uri){
+    private static String uriToString(URI uri) {
         try {
             return uri.toURL().toString();
         } catch (MalformedURLException e) {
@@ -444,7 +447,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             if (errors != null) {
                 onTaskFailure(migration, index, errors, duration);
             } else {
-                onTaskSuccess(migration, index, t.task().status(), duration);
+                onTaskSuccess(migration, index, t.task(), duration);
             }
         });
     }
@@ -459,8 +462,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         logError(migration, message, null);
     }
 
-    private void onTaskSuccess(MigrationConfiguration migration, String index, TaskStatus taskStatus, Duration duration) {
-        String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index, humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
+    private void onTaskSuccess(MigrationConfiguration migration, String index, org.graylog.storage.opensearch2.Task task, Duration duration) {
+        final TaskStatus taskStatus = task.status();
+        String message = String.format(Locale.ROOT, "Index %s, task %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index, task.taskID(), humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
         if (taskStatus.noops() > 0 || taskStatus.versionConflicts() > 0) {
             message += String.format(Locale.ROOT, " %d documents were not migrated (%d version conflicts, %d ignored)", taskStatus.versionConflicts() + taskStatus.noops(), taskStatus.versionConflicts(), taskStatus.noops());
         }

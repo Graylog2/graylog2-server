@@ -219,18 +219,24 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
         {(interactive) => (
           <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
             {locked && <div className={style.overlay} style={{ height, width }} />}
-            <MapContainer center={viewport.center}
-                          boundsOptions={{ maxZoom: 19, animate: interactive }}
-                          zoom={viewport.zoom}
+            <MapContainer boundsOptions={{ maxZoom: 19, animate: interactive }}
+                          center={viewport.center}
                           className={style.map}
+                          closePopupOnClick={interactive}
+                          doubleClickZoom={interactive}
+                          dragging={interactive}
                           fadeAnimation={interactive}
-                          key={`visualization-${id}-${width}-${height}`}
                           id={`visualization-${id}`}
+                          key={`visualization-${id}-${width}-${height}`}
                           markerZoomAnimation={interactive}
-                          scrollWheelZoom
+                          scrollWheelZoom={interactive}
                           style={{ height, width }}
+                          touchZoom={interactive}
+                          trackResize={interactive}
                           whenReady={this._handleMapReady}
-                          zoomAnimation={interactive}>
+                          zoom={viewport.zoom}
+                          zoomAnimation={interactive}
+                          zoomControl={interactive}>
               <MapEvents onViewportChanged={onChange} />
               <TileLayer url={url} attribution={attribution} eventHandlers={{ load: this._handleTilesReady }} />
               {markers}
