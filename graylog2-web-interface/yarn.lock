@@ -11409,10 +11409,10 @@ material-colors@^1.2.1:
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
-material-symbols@^0.21.1:
-  version "0.21.3"
-  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.21.3.tgz#a184193f21c355307c1795dd9c4b91b42c9a4338"
-  integrity sha512-MW1pD2gcbmUKokgJaD2TZ9lYNUQDUdLdflnBNWbDtWDpAmbk86/MH7QmB/QWTFWA20Z5vxbNIuBq/+Xj+WYY6w==
+material-symbols@^0.22.0:
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.22.0.tgz#1e1b4c0e3f37e4e4768744a98cdb163536342ee0"
+  integrity sha512-SrfUYKNdOFhfpQ84slrcLSFIbFZQ24IuF17jaM6uS2pIyVOd1rnzyWqjK8vGzpuzFO/1gYDH2aJb8b1TPC0Ggw==
 
 math-log2@^1.0.1:
   version "1.0.1"
