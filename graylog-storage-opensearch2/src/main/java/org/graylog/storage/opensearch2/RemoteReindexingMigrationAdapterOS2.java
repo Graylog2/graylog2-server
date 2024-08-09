@@ -82,7 +82,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -459,12 +458,22 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 onTaskSuccess(migration, index, t.task(), duration);
             }
         });
-        if (Objects.nonNull(migration.id())) {
-            Status status = status(migration.id()).status();
-            if (status == Status.FINISHED || status == Status.ERROR) {
-                createSystemNotification(status);
-            }
+        Status status = getMigrationStatus(migration);
+        if (status == Status.FINISHED || status == Status.ERROR) {
+            onMigrationFinished(status);
         }
+    }
+
+    private void onMigrationFinished(Status status) {
+        createSystemNotification(status);
+    }
+
+    private Status getMigrationStatus(MigrationConfiguration migration) {
+        return Optional.ofNullable(migration)
+                .map(MigrationConfiguration::id)
+                .map(this::status)
+                .map(RemoteReindexMigration::status)
+                .orElse(Status.RUNNING);
     }
 
     private static Duration getDuration(GetTaskResponse t) {
