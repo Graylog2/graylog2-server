@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
@@ -86,7 +87,7 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See method description.", required = true)
-            @QueryParam("range") @PositiveOrZero int range,
+            @QueryParam("range") @NotNull @PositiveOrZero Integer range,
             @ApiParam(name = "limit", value = "Maximum number of messages to return.") @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset") @QueryParam("offset") int offset,
             @ApiParam(name = "filter", value = "Filter") @QueryParam("filter") String filter,
@@ -117,7 +118,7 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See method description.", required = true)
-            @QueryParam("range") @PositiveOrZero int range,
+            @QueryParam("range") @NotNull @PositiveOrZero Integer range,
             @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "batch_size", value = "Batch size for the backend storage export request.", required = false) @QueryParam("batch_size") @DefaultValue(DEFAULT_SCROLL_BATCH_SIZE) int batchSize,
