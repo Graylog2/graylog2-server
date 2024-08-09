@@ -7396,7 +7396,7 @@ eslint-config-airbnb@19.0.4:
     eslint-plugin-compat "4.2.0"
     eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
-    eslint-plugin-jest "28.7.0"
+    eslint-plugin-jest "28.8.0"
     eslint-plugin-jest-dom "5.4.0"
     eslint-plugin-jest-formatting "3.1.0"
     eslint-plugin-jsx-a11y "6.9.0"
@@ -7486,10 +7486,10 @@ eslint-plugin-jest-formatting@3.1.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-jest-formatting/-/eslint-plugin-jest-formatting-3.1.0.tgz#b26dd5a40f432b642dcc880021a771bb1c93dcd2"
   integrity sha512-XyysraZ1JSgGbLSDxjj5HzKKh0glgWf+7CkqxbTqb7zEhW7X2WHo5SBQ8cGhnszKN+2Lj3/oevBlHNbHezoc/A==
 
-eslint-plugin-jest@28.7.0:
-  version "28.7.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-28.7.0.tgz#8ff262c26520242492f85f9268995bbf624758a4"
-  integrity sha512-fzPGN7awL2ftVRQh/bsCi+16ArUZWujZnD1b8EGJqy8nr4//7tZ3BIdc/9edcJBtB3hpci3GtdMNFVDwHU0Eag==
+eslint-plugin-jest@28.8.0:
+  version "28.8.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-28.8.0.tgz#54f597b5a3295ad04ec946baa245ad02b9b2bca0"
+  integrity sha512-Tubj1hooFxCl52G4qQu0edzV/+EZzPUeN8p2NnW5uu4fbDs+Yo7+qDVDc4/oG3FbCqEBmu/OC3LSsyiU22oghw==
   dependencies:
     "@typescript-eslint/utils" "^6.0.0 || ^7.0.0 || ^8.0.0"
 
@@ -11415,10 +11415,10 @@ material-colors@^1.2.1:
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
-material-symbols@^0.21.1:
-  version "0.21.3"
-  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.21.3.tgz#a184193f21c355307c1795dd9c4b91b42c9a4338"
-  integrity sha512-MW1pD2gcbmUKokgJaD2TZ9lYNUQDUdLdflnBNWbDtWDpAmbk86/MH7QmB/QWTFWA20Z5vxbNIuBq/+Xj+WYY6w==
+material-symbols@^0.22.0:
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.22.0.tgz#1e1b4c0e3f37e4e4768744a98cdb163536342ee0"
+  integrity sha512-SrfUYKNdOFhfpQ84slrcLSFIbFZQ24IuF17jaM6uS2pIyVOd1rnzyWqjK8vGzpuzFO/1gYDH2aJb8b1TPC0Ggw==
 
 math-log2@^1.0.1:
   version "1.0.1"
