@@ -49,6 +49,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.RemoteInfo;
 import org.graylog.shaded.opensearch2.org.opensearch.tasks.Task;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.datanode.IndexMigrationConfiguration;
 import org.graylog2.indexer.datanode.MigrationConfiguration;
@@ -85,6 +86,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -131,6 +133,28 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.reindexMigrationService = reindexMigrationService;
         this.datanodeRestApiProxy = datanodeRestApiProxy;
         this.notificationService = notificationService;
+    }
+
+    @Override
+    public boolean isMigrationRunning(IndexSet indexSet) {
+        return reindexMigrationService.getLatestMigrationId()
+                .map(this::status)
+                .map(migration -> isIndexSetCurrentlyMigrated(indexSet, migration))
+                .orElse(false);
+    }
+
+    @Nonnull
+    private Boolean isIndexSetCurrentlyMigrated(IndexSet indexSet, RemoteReindexMigration mig) {
+        if (mig.status() == Status.NOT_STARTED || mig.status() == Status.RUNNING) {
+            final Set<String> runningIndices = mig.indices().stream()
+                    .filter(i -> !i.isCompleted())
+                    .map(RemoteReindexIndex::name)
+                    .collect(Collectors.toSet());
+            final Set<IndexSet> migratedIndexSets = indexSetRegistry.getForIndices(runningIndices);
+            return migratedIndexSets.contains(indexSet);
+        } else {
+            return false;
+        }
     }
 
     @Override

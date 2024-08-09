@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch7;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
@@ -29,6 +30,11 @@ import java.util.Optional;
 public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteReindexingMigrationAdapter {
 
     public static final String UNSUPPORTED_MESSAGE = "This operation should never be called. We remote-reindex into the DataNode that contains OpenSearch. This adapter only exists for API completeness";
+
+    @Override
+    public boolean isMigrationRunning(IndexSet indexSet) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
+    }
 
     @Override
     public String start(RemoteReindexRequest request) {
