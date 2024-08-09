@@ -28,6 +28,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import jakarta.inject.Named;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.InvalidOffsetException;
@@ -65,8 +66,6 @@ import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Named;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -507,7 +506,7 @@ public class KafkaTransport extends ThrottleableTransport {
 
             cr.addField(new BooleanField(CK_LEGACY,
                     "Legacy mode",
-                    true,
+                    false,
                     "Use old ZooKeeper-based consumer API. (Used before Graylog 3.3)",
                     10
             ));

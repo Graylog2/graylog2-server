@@ -17,6 +17,9 @@ refactoring. Regular users should not change the setting.
 compatibility, the default value is still count-based (`500`). Previously configured count-based values are
 still supported.
 
+- The legacy mode configuration setting of newly created Kafka based inputs has been changed to false. The default mode
+will now use the high level consumer API that has been available since Kafka 1.x.
+
 ## Java API Changes
 
 The following Java Code API changes have been made.
