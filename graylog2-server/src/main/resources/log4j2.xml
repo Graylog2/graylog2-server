@@ -38,6 +38,8 @@
         <Logger name="org.apache.hadoop" level="warn"/>
         <Logger name="org.apache.parquet.hadoop.InternalParquetRecordReader" level="warn"/>
         <Logger name="org.apache.avro.Schema" level="error"/>
+        <Logger name="org.apache.iceberg.BaseMetastoreCatalog" level="warn"/>
+        <Logger name="org.apache.iceberg.BaseMetastoreTableOperations" level="warn"/>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="graylog-internal-logs"/>
