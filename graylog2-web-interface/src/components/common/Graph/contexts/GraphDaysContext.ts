@@ -14,28 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
-import { useEffect } from 'react';
 
-import { useStore } from 'stores/connect';
-import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
-import { TrafficGraphWithDaySelect } from 'components/common/Graph';
-import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
+import { singleton } from 'logic/singleton';
+import { DAYS } from 'components/common/Graph/types';
 
-const ClusterTrafficGraph = () => {
-  const { traffic } = useStore(ClusterTrafficStore);
-  const { graphDays } = useGraphDays();
-
-  useEffect(() => {
-    if (graphDays) {
-      ClusterTrafficActions.getTraffic(graphDays);
-    }
-  }, [graphDays]);
-
-  return (
-    <TrafficGraphWithDaySelect traffic={traffic?.output} />
-  );
+export type GraphDaysContextType = {
+  graphDays: number,
+  setGraphDays: (days: number) => void,
 };
 
-export default ClusterTrafficGraph;
+const defaultContext = {
+  graphDays: DAYS[0],
+  setGraphDays: () => undefined,
+};
+
+const GraphDaysContext = React.createContext<GraphDaysContextType>(defaultContext);
+
+export default singleton('contexts.GraphDays', () => GraphDaysContext);

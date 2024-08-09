@@ -27,6 +27,7 @@ import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import ClusterTrafficGraph from 'components/cluster/ClusterTrafficGraph';
+import GraphDaysContextProvider from 'components/common/Graph/contexts/GraphDaysContextProvider';
 
 const StyledDl = styled.dl`
   margin-bottom: 0;
@@ -71,40 +72,44 @@ const GraylogClusterOverview = ({ layout, children, showLicenseGraph }: Props) =
 
   if (layout === 'compact') {
     return (
+      <GraphDaysContextProvider>
+        <Row className="content">
+          <Col md={12}>
+            <Header />
+            <Row>
+              <Col md={6}>
+                <ClusterInfo />
+                <hr />
+                {children}
+              </Col>
+              <Col md={6}>
+                {showLicenseGraph ? (<LicenseGraphComponent />
+                ) : (<EnterpriseGraphComponent />)}
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </GraphDaysContextProvider>
+    );
+  }
+
+  return (
+    <GraphDaysContextProvider>
       <Row className="content">
         <Col md={12}>
           <Header />
+          <ClusterInfo />
+          <hr />
+          {children}
           <Row>
-            <Col md={6}>
-              <ClusterInfo />
-              <hr />
-              {children}
-            </Col>
-            <Col md={6}>
+            <Col md={12}>
               {showLicenseGraph ? (<LicenseGraphComponent />
               ) : (<EnterpriseGraphComponent />)}
             </Col>
           </Row>
         </Col>
       </Row>
-    );
-  }
-
-  return (
-    <Row className="content">
-      <Col md={12}>
-        <Header />
-        <ClusterInfo />
-        <hr />
-        {children}
-        <Row>
-          <Col md={12}>
-            {showLicenseGraph ? (<LicenseGraphComponent />
-            ) : (<EnterpriseGraphComponent />)}
-          </Col>
-        </Row>
-      </Col>
-    </Row>
+    </GraphDaysContextProvider>
   );
 };
 

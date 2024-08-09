@@ -14,28 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useState, useMemo } from 'react';
 
-import { useStore } from 'stores/connect';
-import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
-import { TrafficGraphWithDaySelect } from 'components/common/Graph';
-import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
+import GraphDaysContext from 'components/common/Graph/contexts/GraphDaysContext';
+import { DAYS } from 'components/common/Graph/types';
 
-const ClusterTrafficGraph = () => {
-  const { traffic } = useStore(ClusterTrafficStore);
-  const { graphDays } = useGraphDays();
-
-  useEffect(() => {
-    if (graphDays) {
-      ClusterTrafficActions.getTraffic(graphDays);
-    }
-  }, [graphDays]);
+const GraphDaysContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
+  const [graphDays, setGraphDays] = useState<number>(DAYS[0]);
 
   return (
-    <TrafficGraphWithDaySelect traffic={traffic?.output} />
+    <GraphDaysContext.Provider value={useMemo(() => ({ graphDays, setGraphDays }), [graphDays])}>
+      {children}
+    </GraphDaysContext.Provider>
   );
 };
 
-export default ClusterTrafficGraph;
+export default GraphDaysContextProvider;
