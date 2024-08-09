@@ -69,7 +69,6 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -142,7 +141,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 .orElse(false);
     }
 
-    @NotNull
+    @Nonnull
     private Boolean isIndexSetCurrentlyMigrated(IndexSet indexSet, RemoteReindexMigration mig) {
         if (mig.status() == Status.NOT_STARTED || mig.status() == Status.RUNNING) {
             final Set<String> runningIndices = mig.indices().stream()
