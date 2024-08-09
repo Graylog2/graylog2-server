@@ -22,6 +22,7 @@ import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
 import java.net.URI;
+import java.util.Optional;
 
 public interface RemoteReindexingMigrationAdapter {
     enum Status {
@@ -36,4 +37,6 @@ public interface RemoteReindexingMigrationAdapter {
     RemoteReindexMigration status(@Nonnull String migrationID);
 
     IndexerConnectionCheckResult checkConnection(@Nonnull final URI uri, @Nullable final String username, @Nullable final String password, @Nullable String allowlist, boolean trustUnknownCerts);
+
+    Optional<String> getLatestMigrationId();
 }

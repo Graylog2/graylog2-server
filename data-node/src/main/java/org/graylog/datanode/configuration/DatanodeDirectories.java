@@ -16,9 +16,10 @@
  */
 package org.graylog.datanode.configuration;
 
+import jakarta.annotation.Nonnull;
+import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog2.plugin.system.NodeId;
-import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,12 +91,20 @@ public class DatanodeDirectories {
         return dataTargetDir.toAbsolutePath();
     }
 
+    public String getDataTargetDirSpace() {
+        return FileUtils.byteCountToDisplaySize(dataTargetDir.toFile().getFreeSpace());
+    }
+
     /**
      * This directory is used by the managed opensearch to store its logs in it.
      * Read-write permissions required.
      */
     public Path getLogsTargetDir() {
         return logsTargetDir.toAbsolutePath();
+    }
+
+    public String getLogsTargetDirSpace() {
+        return FileUtils.byteCountToDisplaySize(logsTargetDir.toFile().getFreeSpace());
     }
 
 
@@ -125,6 +134,10 @@ public class DatanodeDirectories {
      */
     public Path getConfigurationTargetDir() {
         return configurationTargetDir.toAbsolutePath();
+    }
+
+    public String getConfigurationTargetDirSpace() {
+        return FileUtils.byteCountToDisplaySize(configurationTargetDir.toFile().getFreeSpace());
     }
 
     public Path createConfigurationFile(Path relativePath) throws IOException {

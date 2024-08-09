@@ -64,6 +64,8 @@ import org.graylog2.indexer.migration.RemoteIndex;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.indexer.migration.TaskStatus;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
@@ -90,6 +92,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog2.notifications.Notification.Type.REMOTE_REINDEX_FINISHED;
+import static org.graylog2.notifications.Notification.Type.REMOTE_REINDEX_RUNNING;
 
 @Singleton
 public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigrationAdapter {
@@ -108,6 +112,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final RemoteReindexMigrationService reindexMigrationService;
 
     private final DatanodeRestApiProxy datanodeRestApiProxy;
+    private final NotificationService notificationService;
 
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
@@ -116,7 +121,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                final ClusterEventBus eventBus,
                                                final ObjectMapper objectMapper,
                                                RemoteReindexMigrationService reindexMigrationService,
-                                               DatanodeRestApiProxy datanodeRestApiProxy) {
+                                               DatanodeRestApiProxy datanodeRestApiProxy,
+                                               NotificationService notificationService) {
         this.client = client;
         this.indices = indices;
         this.indexSetRegistry = indexSetRegistry;
@@ -124,6 +130,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.objectMapper = objectMapper;
         this.reindexMigrationService = reindexMigrationService;
         this.datanodeRestApiProxy = datanodeRestApiProxy;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -142,6 +149,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 prepareCluster(request, migration);
                 createIndicesInNewCluster(migration);
                 startAsyncTasks(migration, request);
+                createSystemNotification(Status.RUNNING);
             }).start();
         } catch (Exception e) {
             LOG.error("Failed to start remote reindex migration", e);
@@ -261,6 +269,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         } catch (Exception e) {
             return IndexerConnectionCheckResult.failure(e);
         }
+    }
+
+    @Override
+    public Optional<String> getLatestMigrationId() {
+        return reindexMigrationService.getLatestMigrationId();
     }
 
     private String clusterAllowlistSetting() {
@@ -454,6 +467,22 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 onTaskSuccess(migration, index, t.task(), duration);
             }
         });
+        Status status = getMigrationStatus(migration);
+        if (status == Status.FINISHED || status == Status.ERROR) {
+            onMigrationFinished(status);
+        }
+    }
+
+    private void onMigrationFinished(Status status) {
+        createSystemNotification(status);
+    }
+
+    private Status getMigrationStatus(MigrationConfiguration migration) {
+        return Optional.ofNullable(migration)
+                .map(MigrationConfiguration::id)
+                .map(this::status)
+                .map(RemoteReindexMigration::status)
+                .orElse(Status.RUNNING);
     }
 
     private static Duration getDuration(GetTaskResponse t) {
@@ -478,4 +507,16 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private String humanReadable(Duration duration) {
         return DurationFormatUtils.formatDurationWords(duration.getMillis(), true, true);
     }
+
+    private void createSystemNotification(Status status) {
+        if (status != Status.RUNNING) {
+            notificationService.destroyAllByType(REMOTE_REINDEX_RUNNING);
+        }
+        Notification notification = notificationService.buildNow();
+        notification.addType(status == Status.RUNNING ? REMOTE_REINDEX_RUNNING : REMOTE_REINDEX_FINISHED);
+        notification.addDetail("status", status.name());
+        notification.addSeverity(Notification.Severity.NORMAL);
+        notificationService.publishIfFirst(notification);
+    }
+
 }
