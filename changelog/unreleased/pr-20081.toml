@@ -1,0 +1,5 @@
+type = "f"
+message = "Exclude closed indices from datanode remote reindex migration"
+
+pulls = ["20081"]
+issues = ["20068"]

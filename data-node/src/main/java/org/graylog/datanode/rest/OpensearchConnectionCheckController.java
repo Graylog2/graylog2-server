@@ -26,6 +26,7 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
+import org.graylog.storage.opensearch2.ConnectionCheckIndex;
 import org.graylog.storage.opensearch2.ConnectionCheckRequest;
 import org.graylog.storage.opensearch2.ConnectionCheckResponse;
 import org.graylog2.security.TrustAllX509TrustManager;
@@ -42,6 +43,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -74,19 +76,24 @@ public class OpensearchConnectionCheckController {
         final List<X509Certificate> unknownCertificates = new LinkedList<>();
         try {
             unknownCertificates.addAll(extractUnknownCertificates(request.host()));
-            final List<String> indices = getAllIndicesFrom(request.host(), request.username(), request.password(), request.trustUnknownCerts());
+            final List<ConnectionCheckIndex> indices = getAllIndicesFrom(request.host(), request.username(), request.password(), request.trustUnknownCerts());
             return ConnectionCheckResponse.success(indices, unknownCertificates);
         } catch (Exception e) {
             return ConnectionCheckResponse.error(e, unknownCertificates);
         }
     }
 
-    List<String> getAllIndicesFrom(final String host, final String username, final String password, boolean trustUnknownCerts) {
-        var url = (host.endsWith("/") ? host : host + "/") + "_cat/indices?h=index";
+    List<ConnectionCheckIndex> getAllIndicesFrom(final String host, final String username, final String password, boolean trustUnknownCerts) {
+        var url = (host.endsWith("/") ? host : host + "/") + "_cat/indices?h=index,status";
         try (var response = getClient(trustUnknownCerts).newCall(new Request.Builder().url(url).header("Authorization", Credentials.basic(username, password)).build()).execute()) {
             if (response.isSuccessful() && response.body() != null) {
                 // filtering all indices that start with "." as they indicate a system index - we don't want to reindex those
-                return new BufferedReader(new StringReader(response.body().string())).lines().filter(i -> !i.startsWith(".")).sorted().toList();
+                return new BufferedReader(new StringReader(response.body().string()))
+                        .lines()
+                        .filter(i -> !i.startsWith("."))
+                        .map(this::parseIndexLine)
+                        .sorted(Comparator.comparing(ConnectionCheckIndex::name, Comparator.naturalOrder()))
+                        .toList();
             } else {
                 String message = String.format(Locale.ROOT, "Could not read list of indices from %s. Code=%d, message=%s", host, response.code(), response.message());
                 throw new RuntimeException(message);
@@ -94,6 +101,11 @@ public class OpensearchConnectionCheckController {
         } catch (IOException e) {
             throw new RuntimeException("Could not read list of indices from " + host + ", " + e.getMessage(), e);
         }
+    }
+
+    private ConnectionCheckIndex parseIndexLine(String line) {
+        final String[] parts = line.split("\\s+");
+        return new ConnectionCheckIndex(parts[0], parts[1].contains("close"));
     }
 
 

@@ -39,11 +39,11 @@ import java.util.stream.Collectors;
 
 public record AggregatedConnectionResponse(Map<String, ConnectionCheckResponse> responses) {
     @Nonnull
-    public List<String> indices() {
+    public List<ConnectionCheckIndex> indices() {
         return responses.values().stream()
                 .filter(v -> Objects.nonNull(v.indices()))
                 .flatMap(v -> v.indices().stream())
-                .sorted(Comparator.naturalOrder())
+                .sorted(Comparator.comparing(ConnectionCheckIndex::name, Comparator.naturalOrder()))
                 .distinct()
                 .collect(Collectors.toList());
     }
