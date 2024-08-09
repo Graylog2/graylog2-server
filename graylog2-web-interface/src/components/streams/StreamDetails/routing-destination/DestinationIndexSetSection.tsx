@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
-import { Icon, Section, Spinner, Switch, Timestamp, Tooltip } from 'components/common';
+import { Icon, Section, Spinner, Switch, Timestamp } from 'components/common';
 import { IndexSetsStore, type IndexSet } from 'stores/indices/IndexSetsStore';
 import { Table, Button, Alert } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
@@ -28,8 +29,10 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
 import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
 import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
-import NumberUtils from 'util/NumberUtils';
 import useIndexSetStats from 'hooks/useIndexSetStats';
+import NumberUtils from 'util/NumberUtils';
+
+import IndexSetArchivingCell from './IndexSetArchivingCell';
 
 import useStreamOutputFilters from '../../hooks/useStreamOutputFilters';
 
@@ -46,10 +49,6 @@ export const StyledSwitch = styled(Switch)`
 
 const ActionButtonsWrap = styled.span(() => css`
   float: right;
-`);
-
-const Wrapper = styled.div<{ $enabled: boolean }>(({ theme, $enabled }) => css`
-  color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
 `);
 
 const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
@@ -96,11 +95,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
             <td>{(isStatsLoaded && indexSetStats?.size) ? NumberUtils.formatBytes(indexSetStats.size) : 0}</td>
             <td><Timestamp dateTime={indexSet.creation_date} /></td>
             <td>
-              <Tooltip withArrow position="top" label={`Archiving is ${archivingEnabled ? 'enabled' : 'disabled'}`}>
-                <Wrapper $enabled={archivingEnabled}>
-                  <Icon name={archivingEnabled ? 'check_circle' : 'cancel'} />
-                </Wrapper>
-              </Tooltip>
+              <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
             </td>
             {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <td>
