@@ -66,4 +66,6 @@ public interface MigrationActions {
     void getElasticsearchHosts();
 
     void stopDatanodes();
+
+    void finishRemoteReindexMigration();
 }

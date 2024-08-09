@@ -33,6 +33,8 @@ import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.certificates.RenewalPolicy;
@@ -76,6 +78,7 @@ public class MigrationActionsImpl implements MigrationActions {
     private final List<URI> elasticsearchHosts;
 
     private final Version graylogVersion = Version.CURRENT_CLASSPATH;
+    private final NotificationService notificationService;
 
     @Inject
     public MigrationActionsImpl(@Assisted MigrationStateMachineContext stateMachineContext,
@@ -87,7 +90,8 @@ public class MigrationActionsImpl implements MigrationActions {
                                 final MetricRegistry metricRegistry,
                                 final DatanodeRestApiProxy datanodeProxy,
                                 ElasticsearchVersionProvider searchVersionProvider,
-                                @Named("elasticsearch_hosts") List<URI> elasticsearchHosts) {
+                                @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
+                                NotificationService notificationService) {
         this.stateMachineContext = stateMachineContext;
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
@@ -100,6 +104,7 @@ public class MigrationActionsImpl implements MigrationActions {
         this.datanodeProxy = datanodeProxy;
         this.searchVersionProvider = searchVersionProvider;
         this.elasticsearchHosts = elasticsearchHosts;
+        this.notificationService = notificationService;
     }
 
 
@@ -318,5 +323,10 @@ public class MigrationActionsImpl implements MigrationActions {
                         // we don't care, we tried and hope for the best
                     }
                 });
+    }
+
+    @Override
+    public void finishRemoteReindexMigration() {
+        notificationService.destroyAllByType(Notification.Type.REMOTE_REINDEX_FINISHED);
     }
 }
