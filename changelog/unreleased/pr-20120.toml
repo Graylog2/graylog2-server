@@ -1,0 +1,5 @@
+type = "a"
+message = "Add certificates used by data nodes and Graylog to support bundle."
+
+pulls = ["20120"]
+issues = ["graylog-plugin-enterprise#7968", "graylog-plugin-enterprise#7969", "graylog-plugin-enterprise#7970"]
