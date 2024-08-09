@@ -14,24 +14,38 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
-import { Icon, Section } from 'components/common';
+import { Icon, Section, Spinner, Switch, Timestamp } from 'components/common';
 import { IndexSetsStore, type IndexSet } from 'stores/indices/IndexSetsStore';
-import { Table, Badge, Button, Alert } from 'components/bootstrap';
+import { Table, Button, Alert } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
 import type { Stream } from 'stores/streams/StreamsStore';
 import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
 import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
+import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
+import useIndexSetStats from 'hooks/useIndexSetStats';
+import NumberUtils from 'util/NumberUtils';
+
+import IndexSetArchivingCell from './IndexSetArchivingCell';
+
+import useStreamOutputFilters from '../../hooks/useStreamOutputFilters';
 
 type Props = {
   indexSet: IndexSet,
   stream: Stream,
 };
+
+export const StyledSwitch = styled(Switch)`
+  > label {
+    margin-bottom: 0px;
+  }
+`;
 
 const ActionButtonsWrap = styled.span(() => css`
   float: right;
@@ -40,28 +54,49 @@ const ActionButtonsWrap = styled.span(() => css`
 const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
   const archivingEnabled = indexSet.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY || indexSet?.data_tiering?.archive_before_deletion;
   const { indexSets } = useStore(IndexSetsStore);
+  const { data, isLoading } = useStreamOutputFilters(stream.id, 'indexer');
+  /* eslint-disable no-constant-condition */
+  const title = true ? 'Enabled' : 'Disabled'; // TODO use api to check if enabled
+  const { data: indexSetStats, isSuccess: isStatsLoaded } = useIndexSetStats(indexSet.id);
+
+  if (isLoading) {
+    <Spinner />;
+  }
 
   return (
-    <Section title="Index Set">
-      <Alert bsStyle="info">
+    <Section title="Index Set"
+             collapsible
+             headerLeftSection={(
+               <>
+                 <StyledSwitch aria-label="Toggle index set"
+                               name="toggle-indexset"
+                               checked
+                               label={title}
+                               onChange={() => {}} />
+                 <SectionCountLabel>FILTERS {data?.pagination?.total || 0}</SectionCountLabel>
+               </>
+            )}>
+      <Alert bsStyle="default">
         Messages routed to the <b>Search Cluster</b> will be searchable in Graylog and count towards Graylog License usage.<br />
         These messages will be stored in the defined Index Set until the retention policy criteria is met.<br />
         Note: Messages not routed to the <b>Search Cluster</b> will not be searchable in Graylog.
       </Alert>
-      <Table>
+      <Table stripped>
         <thead>
           <tr>
             <td>Name</td>
+            <td>Total size</td>
+            <td>Oldest Message (date)</td>
             <td colSpan={2}>Archiving</td>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>{indexSet?.title}</td>
+            <td>{(isStatsLoaded && indexSetStats?.size) ? NumberUtils.formatBytes(indexSetStats.size) : 0}</td>
+            <td><Timestamp dateTime={indexSet.creation_date} /></td>
             <td>
-              <Badge bsStyle={archivingEnabled ? 'success' : 'warning'}>
-                {archivingEnabled ? 'enabled' : 'disabled'}
-              </Badge>
+              <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
             </td>
             {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <td>
@@ -82,7 +117,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
           </tr>
         </tbody>
       </Table>
-      <IndexSetFilters streamId={stream.id} />
+      {data && (<IndexSetFilters streamId={stream.id} paginatedFilters={data} />)}
     </Section>
   );
 };

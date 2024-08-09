@@ -15,21 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import type { PaginatedList as PaginatedListType } from 'stores/PaginationTypes';
-import FilterRulesList from 'components/streams/StreamDetails/output-filter/FilterRuleList';
-import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
+import { Label } from 'components/bootstrap';
 
-type Props = {
-  streamId: string,
-  paginatedFilters: PaginatedListType<StreamOutputFilterRule>,
+const StyledLabel = styled(Label)`
+  font-weight: bold;
+`;
 
-};
-
-const IndexSetFilters = ({ streamId, paginatedFilters }: Props) => (
-  <FilterRulesList streamId={streamId}
-                   paginatedFilters={paginatedFilters}
-                   destinationType="indexer" />
+const SectionCountLabel = ({ children }: React.PropsWithChildren) => (
+  <StyledLabel bsStyle="default">{children}</StyledLabel>
 );
 
-export default IndexSetFilters;
+export default SectionCountLabel;
