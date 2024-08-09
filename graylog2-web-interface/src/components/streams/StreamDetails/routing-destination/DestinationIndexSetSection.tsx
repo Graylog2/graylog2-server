@@ -55,6 +55,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
   const archivingEnabled = indexSet.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY || indexSet?.data_tiering?.archive_before_deletion;
   const { indexSets } = useStore(IndexSetsStore);
   const { data, isLoading } = useStreamOutputFilters(stream.id, 'indexer');
+  /* eslint-disable no-constant-condition */
   const title = true ? 'Enabled' : 'Disabled'; // TODO use api to check if enabled
   const { data: indexSetStats, isSuccess: isStatsLoaded } = useIndexSetStats(indexSet.id);
 

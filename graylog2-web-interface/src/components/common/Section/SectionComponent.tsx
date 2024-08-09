@@ -21,7 +21,7 @@ import { Collapse } from '@mantine/core';
 
 import Spinner from 'components/common/Spinner';
 import { Row, Col, Button } from 'components/bootstrap';
-import Icon from '../Icon';
+import Icon from 'components/common/Icon';
 
 type Props = {
   children: React.ReactNode,
@@ -101,6 +101,9 @@ SectionComponent.defaultProps = {
   className: '',
   showLoading: false,
   headerActions: undefined,
+  collapsible: false,
+  defaultCollapse: true,
+  disableCollapseButton: false,
 };
 
 export default SectionComponent;
