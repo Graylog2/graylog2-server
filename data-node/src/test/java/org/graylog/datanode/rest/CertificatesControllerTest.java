@@ -17,7 +17,7 @@
 package org.graylog.datanode.rest;
 
 import org.graylog.datanode.configuration.DatanodeKeystore;
-import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.configuration.OpensearchKeystoreProvider;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
@@ -32,7 +32,6 @@ import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.time.Duration;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
@@ -43,27 +42,29 @@ public class CertificatesControllerTest {
 
     @Mock
     private DatanodeKeystore datanodeKeystore;
-    @Mock
-    private OpensearchProcess opensearchProcess;
+
 
     private CertificatesController certificatesController;
 
     @BeforeEach
     public void setup() {
-        certificatesController = new CertificatesController(datanodeKeystore, opensearchProcess);
+        certificatesController = new CertificatesController(datanodeKeystore, Map.of(
+                OpensearchKeystoreProvider.Store.TRUSTSTORE, KeyStoreDto.empty(),
+                OpensearchKeystoreProvider.Store.HTTP, KeyStoreDto.empty(),
+                OpensearchKeystoreProvider.Store.TRANSPORT, KeyStoreDto.empty())
+        );
     }
 
     @Test
     public void testOptionalSecurityConfiguration() throws Exception {
-        when(opensearchProcess.getOpensearchConfiguration()).thenReturn(Optional.empty());
         when(datanodeKeystore.loadKeystore()).thenReturn(testKeyStore());
-        Map<CertificatesController.Store, KeyStoreDto> certificates = certificatesController.getCertificates();
+        Map<OpensearchKeystoreProvider.Store, KeyStoreDto> certificates = certificatesController.getCertificates();
         assertThat(certificates).hasSize(4);
-        assertThat(certificates.get(CertificatesController.Store.CONFIGURED).certificates()).hasSize(3);
-        assertThat(certificates.get(CertificatesController.Store.CONFIGURED).certificates().get("ca")).hasSize(1);
-        assertThat(certificates.get(CertificatesController.Store.CONFIGURED).certificates().get("host")).hasSize(2);
-        assertThat(certificates.get(CertificatesController.Store.CONFIGURED).certificates().get("cert")).hasSize(1);
-        assertThat(certificates.get(CertificatesController.Store.TRUSTSTORE).certificates()).hasSize(0);
+        assertThat(certificates.get(OpensearchKeystoreProvider.Store.CONFIGURED).certificates()).hasSize(3);
+        assertThat(certificates.get(OpensearchKeystoreProvider.Store.CONFIGURED).certificates().get("ca")).hasSize(1);
+        assertThat(certificates.get(OpensearchKeystoreProvider.Store.CONFIGURED).certificates().get("host")).hasSize(2);
+        assertThat(certificates.get(OpensearchKeystoreProvider.Store.CONFIGURED).certificates().get("cert")).hasSize(1);
+        assertThat(certificates.get(OpensearchKeystoreProvider.Store.TRUSTSTORE).certificates()).hasSize(0);
     }
 
     private KeyStore testKeyStore() throws Exception {

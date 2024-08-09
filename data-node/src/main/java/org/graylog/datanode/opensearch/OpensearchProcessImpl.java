@@ -417,8 +417,4 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         }
     }
 
-    @Override
-    public Optional<OpensearchConfiguration> getOpensearchConfiguration() {
-        return opensearchConfiguration;
-    }
 }
