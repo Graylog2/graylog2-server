@@ -27,17 +27,22 @@ import org.graylog2.database.filtering.HasAttributeFilter;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CommandFactory {
     private final QueryStringDecorators queryStringDecorator;
+    private final StreamService streamService;
 
     @Inject
-    public CommandFactory(QueryStringDecorators queryStringDecorator) {
+    public CommandFactory(QueryStringDecorators queryStringDecorator,
+                          StreamService streamService) {
         this.queryStringDecorator = queryStringDecorator;
+        this.streamService = streamService;
     }
 
     public ExportMessagesCommand buildFromRequest(MessagesRequest request) {
@@ -56,6 +61,8 @@ public class CommandFactory {
 
     public ExportMessagesCommand buildWithSearchOnly(Search search, ResultFormat resultFormat) {
         Query query = queryFrom(search);
+        final Set<String> queryStreamIds = query.usedStreamIds();
+        queryStreamIds.addAll(streamService.mapCategoriesToIds(query.usedStreamCategories()));
 
         return builderFrom(resultFormat)
                 .timeRange(resultFormat.timerange().orElse(toAbsolute(query.timerange())))
@@ -65,7 +72,7 @@ public class CommandFactory {
                         .flatMap(List::stream)
                         .collect(Collectors.toList())
                 )
-                .streams(query.usedStreamIds())
+                .streams(queryStreamIds)
                 .build();
     }
 

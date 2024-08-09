@@ -168,9 +168,21 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         return Sets.union(queryStreamIds, searchTypeStreamIds);
     }
 
+    public Set<String> usedStreamCategories() {
+        return queries().stream()
+                .map(Query::usedStreamCategories)
+                .reduce(Collections.emptySet(), Sets::union);
+    }
+
     public Set<String> streamIdsForPermissionsCheck() {
         return queries().stream()
                 .map(Query::streamIdsForPermissionsCheck)
+                .reduce(Collections.emptySet(), Sets::union);
+    }
+
+    public Set<String> streamCategoriesForPermissionsCheck() {
+        return queries().stream()
+                .map(Query::usedStreamCategories)
                 .reduce(Collections.emptySet(), Sets::union);
     }
 

@@ -32,6 +32,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.filter.AndFilter;
+import org.graylog.plugins.views.search.filter.StreamCategoryFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
@@ -210,6 +211,20 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                 .orElse(Collections.emptySet());
     }
 
+    @SuppressWarnings("UnstableApiUsage")
+    public Set<String> usedStreamCategories() {
+        return Optional.ofNullable(filter())
+                .map(optFilter -> {
+                    final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
+                    return StreamSupport.stream(filterTraverser.breadthFirst(optFilter).spliterator(), false)
+                            .filter(filter -> filter instanceof StreamCategoryFilter)
+                            .map(streamFilter -> ((StreamCategoryFilter) streamFilter).category())
+                            .filter(Objects::nonNull)
+                            .collect(toSet());
+                })
+                .orElse(Collections.emptySet());
+    }
+
     public Set<String> streamIdsForPermissionsCheck() {
         final Set<String> searchTypeStreamIds = searchTypes().stream()
                 .map(SearchType::streams)
@@ -219,7 +234,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
     }
 
     public boolean hasStreams() {
-        return !usedStreamIds().isEmpty();
+        return !(usedStreamIds().isEmpty() && usedStreamCategories().isEmpty());
     }
 
     public boolean hasReferencedStreamFilters() {

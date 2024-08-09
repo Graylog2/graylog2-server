@@ -70,6 +70,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
+import static org.graylog2.streams.StreamImpl.FIELD_ID;
 import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
 import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 
@@ -280,6 +281,16 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         final DBObject query = QueryBuilder.start(StreamImpl.FIELD_ID).in(objectIds).get();
 
         return ImmutableSet.copyOf(loadAll(query));
+    }
+
+    @Override
+    public Set<String> mapCategoriesToIds(Collection<String> categories) {
+        final DBObject query = QueryBuilder.start(StreamImpl.FIELD_CATEGORIES).in(categories).get();
+        final DBObject onlyIdField = DBProjection.include(FIELD_ID);
+        try (var cursor = collection(StreamImpl.class).find(query, onlyIdField);
+             var stream = StreamSupport.stream(cursor.spliterator(), false)) {
+            return stream.map(s -> s.get(FIELD_ID).toString()).collect(Collectors.toSet());
+        }
     }
 
     @Override
