@@ -14,16 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import GroupingElement from './grouping';
-import MetricElement from './metric';
-import SortElement from './sort';
-import VisualizationElement from './visualization';
-import UnitsElement from './units';
 
-export default [
-  GroupingElement,
-  MetricElement,
-  SortElement,
-  VisualizationElement,
-  UnitsElement,
-];
+export const DECIMAL_PLACES = 1;
+export const Y_POSITION_AXIS_STEP = 0.1;
+export const DEFAULT_AXIS_KEY = 'withoutUnit';
+export const TIME_AXIS_LABELS_QUANTITY = 4;
+export const NO_FIELD_NAME_SERIES = 'no_field_name_series';
+
+export const UNIT_FEATURE_FLAG = 'configuration_of_formatting_value';

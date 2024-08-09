@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import type { Layout } from 'plotly.js';
 
-import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -28,23 +28,10 @@ import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import type { Generator } from 'views/components/visualizations/ChartData';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
+import useExtendedChartGeneratorSettings from 'views/components/visualizations/hooks/useExtendedChartGeneratorSettings';
+import useLayoutExtendedSettings from 'views/components/visualizations/hooks/useLayoutExtendedSettings';
 
 import XYPlot from '../XYPlot';
-
-const seriesGenerator = (mapKeys: (labels: string[]) => string[]): Generator => ({
-  type,
-  name,
-  labels,
-  values,
-  originalName,
-}) => ({
-  type,
-  name,
-  x: mapKeys(labels),
-  y: values,
-  mode: 'markers',
-  originalName,
-});
 
 const ScatterVisualization = makeVisualization(({
   config,
@@ -53,6 +40,7 @@ const ScatterVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
+  const { getExtendedChartGeneratorSettings } = useExtendedChartGeneratorSettings({ config, effectiveTimerange });
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
   const _mapKeys = useCallback((labels: string[]) => labels
@@ -61,15 +49,28 @@ const ScatterVisualization = makeVisualization(({
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
   const rows = useMemo(() => retrieveChartData(data), [data]);
+  const seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
+    type,
+    name,
+    x: _mapKeys(labels),
+    y: values,
+    mode: 'markers',
+    originalName,
+    ...getExtendedChartGeneratorSettings({ originalName, name, values }),
+  }), [_mapKeys, getExtendedChartGeneratorSettings]);
   const _chartDataResult = useChartData(rows, {
     widgetConfig: config,
     chartType: 'scatter',
-    generator: seriesGenerator(_mapKeys),
+    generator: seriesGenerator,
   });
   const { eventChartData, shapes } = useEvents(config, data.events);
+  const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
+  const { getLayoutExtendedSettings } = useLayoutExtendedSettings({ config, chartData: chartDataResult });
+  const layout = useMemo<Partial<Layout>>(() => {
+    const _layouts = shapes ? { shapes } : {};
 
-  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
+    return ({ ..._layouts, ...getLayoutExtendedSettings() });
+  }, [shapes, getLayoutExtendedSettings]);
 
   return (
     <XYPlot config={config}

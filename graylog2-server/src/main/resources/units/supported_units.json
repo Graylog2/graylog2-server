@@ -119,9 +119,19 @@
     "percent": [
       {
         "type": "base",
-        "abbrev": "%",
-        "name": "percent",
+        "abbrev": "d%",
+        "name": "percent (decimal)",
         "unit_type": "percent"
+      },
+      {
+        "type": "derived",
+        "abbrev": "%",
+        "name": "percent(1..100)",
+        "unit_type": "percent",
+        "conversion": {
+          "value": 100,
+          "action": "DIVIDE"
+        }
       }
     ]
   }

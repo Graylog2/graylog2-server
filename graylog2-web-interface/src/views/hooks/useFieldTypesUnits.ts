@@ -14,16 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import GroupingElement from './grouping';
-import MetricElement from './metric';
-import SortElement from './sort';
-import VisualizationElement from './visualization';
-import UnitsElement from './units';
+import { useMemo } from 'react';
 
-export default [
-  GroupingElement,
-  MetricElement,
-  SortElement,
-  VisualizationElement,
-  UnitsElement,
-];
+import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
+
+const useFieldTypesUnits = () => {
+  const { data, isLoading } = useFieldTypes(undefined, undefined);
+
+  return useMemo(() => {
+    if (isLoading) return {};
+
+    return data
+      .filter((ft) => ft?.unit?.isDefined)
+      .reduce((res, ft) => {
+        res[ft.name] = ft.unit;
+
+        return res;
+      }, {});
+  }, [data, isLoading]);
+};
+
+export default useFieldTypesUnits;

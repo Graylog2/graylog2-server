@@ -14,16 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import GroupingElement from './grouping';
-import MetricElement from './metric';
-import SortElement from './sort';
-import VisualizationElement from './visualization';
-import UnitsElement from './units';
+const ALLOWED_UNIT_FUNCTIONS = ['sum', 'latest', 'avg', 'min', 'max', 'percentage', 'stddev', 'variance', 'sumofsquares', 'percentile'];
 
-export default [
-  GroupingElement,
-  MetricElement,
-  SortElement,
-  VisualizationElement,
-  UnitsElement,
-];
+const isFunctionAllowsUnit = (func: string) => ALLOWED_UNIT_FUNCTIONS.includes(func);
+
+export default isFunctionAllowsUnit;

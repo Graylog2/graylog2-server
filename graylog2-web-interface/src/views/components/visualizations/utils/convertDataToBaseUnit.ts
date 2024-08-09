@@ -14,16 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import GroupingElement from './grouping';
-import MetricElement from './metric';
-import SortElement from './sort';
-import VisualizationElement from './visualization';
-import UnitsElement from './units';
+import type { ConversionParams } from 'views/components/visualizations/utils/unitConvertors';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import { convertValueToBaseUnit } from 'views/components/visualizations/utils/unitConvertors';
 
-export default [
-  GroupingElement,
-  MetricElement,
-  SortElement,
-  VisualizationElement,
-  UnitsElement,
-];
+const convertDataToBaseUnit = (values: Array<number>, unit: FieldUnit) => {
+  if (!unit?.isDefined) return values;
+  const from: ConversionParams = { abbrev: unit.abbrev, unitType: unit.unitType };
+
+  return values.map((v) => {
+    const converted = convertValueToBaseUnit(v, from);
+
+    return converted.value;
+  });
+};
+
+export default convertDataToBaseUnit;

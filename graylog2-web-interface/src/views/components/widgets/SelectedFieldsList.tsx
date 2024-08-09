@@ -22,6 +22,9 @@ import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
+import FieldUnitComponent from 'views/components/aggregationwizard/units/FieldUnitComponent';
+import useFeature from 'hooks/useFeature';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -58,6 +61,10 @@ type ListItemProps = {
   testIdPrefix: string,
 }
 
+const Actions = styled.div`
+  display: flex;
+`;
+
 const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   selectSize,
   className,
@@ -70,6 +77,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   testIdPrefix,
 }: ListItemProps, ref) => {
   const [isEditing, setIsEditing] = useState(false);
+  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
 
   const _onChange = (newFieldName: string) => {
     onChange(newFieldName);
@@ -99,10 +107,11 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
             <Icon name="drag_indicator" />
           </DragHandle>
           <FieldTitle>{item.title}</FieldTitle>
-          <div>
+          <Actions>
+            {unitFeatureEnabled && <FieldUnitComponent field={item.title} />}
             <IconButton name="edit_square" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
             <IconButton name="delete" title={`Remove ${item.title} field`} onClick={onRemove} />
-          </div>
+          </Actions>
         </>
       )}
     </ListItemContainer>

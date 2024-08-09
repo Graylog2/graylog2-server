@@ -52,6 +52,12 @@ export type ChartDefinition = {
   zmin?: number,
   zmax?: number,
   originalName: string,
+  meta?: string,
+  yaxis?: string,
+  hole?: number,
+  labels?: Array<string>,
+  originalLabels?: Array<string>,
+  domain?: { x: [number, number]; y: [number, number] }
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];

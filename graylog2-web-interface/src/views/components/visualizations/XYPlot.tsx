@@ -17,6 +17,7 @@
 
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
+import merge from 'lodash/merge';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -101,16 +102,16 @@ const XYPlot = ({
     const normalizedFrom = formatTime(effectiveTimerange.from, 'internal');
     const normalizedTo = formatTime(effectiveTimerange.to, 'internal');
 
-    layout.xaxis = {
+    layout.xaxis = merge(layout.xaxis, {
       range: [normalizedFrom, normalizedTo],
       type: 'date',
-    };
+    });
   } else {
-    layout.xaxis = {
+    layout.xaxis = merge(layout.xaxis, {
       fixedrange: true,
       /* disable plotly sorting by setting the type of the xaxis to category */
       type: config.sort.length > 0 ? 'category' : undefined,
-    };
+    });
   }
 
   return (

@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
-import type { IconName, RotateProp, IconType } from 'components/common/Icon';
+import type { IconName, RotateProp, IconType, SizeProp } from 'components/common/Icon';
 
 const Wrapper = styled.button<{ disabled: boolean }>(({ theme, disabled }) => css`
   display: inline-flex;
@@ -51,7 +51,8 @@ type Props = {
   iconType?: IconType,
   disabled?: boolean,
   rotation?: RotateProp,
-  'data-testid'?: string
+  'data-testid'?: string,
+  size?: SizeProp,
 };
 
 const handleClick = (onClick: () => void | undefined) => {
@@ -98,6 +99,7 @@ IconButton.defaultProps = {
   rotation: undefined,
   iconType: undefined,
   'data-testid': undefined,
+  size: undefined,
 };
 
 export default IconButton;
