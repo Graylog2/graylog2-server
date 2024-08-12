@@ -95,7 +95,9 @@ public interface Notification extends Persisted {
         SIDECAR_STATUS_UNKNOWN,
         CERTIFICATE_NEEDS_RENEWAL,
         EVENT_LIMIT_REACHED,
-        DRAWDOWN_LICENSE_ERROR
+        DRAWDOWN_LICENSE_ERROR,
+        REMOTE_REINDEX_RUNNING,
+        REMOTE_REINDEX_FINISHED
     }
 
     enum Severity {

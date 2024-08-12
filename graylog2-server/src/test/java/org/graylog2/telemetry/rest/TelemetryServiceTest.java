@@ -199,7 +199,8 @@ public class TelemetryServiceTest {
                 eventBus,
                 telemetryClusterService,
                 "unknown",
-                nodeService);
+                nodeService,
+                false);
     }
 
     private void mockUserTelemetryEnabled(boolean isTelemetryEnabled) {

@@ -16,16 +16,11 @@
  */
 package org.graylog.storage.opensearch2;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * This class duplicates the original opensearch GetTaskResponse with one significant exception - it can read the
- * error of the task, which is missing in the original response
- * TODO: add link to an feature request issue in opensearch java client
- */
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record GetTaskResponse(@JsonProperty("completed") boolean completed, @JsonProperty("task") Task task,
-                              @JsonProperty("error") TaskError error, @JsonProperty("response") GetTaskSearchResponse response) {
+public record GetTaskSearchResponse(@JsonProperty("failures") List<TaskResponseFailure> failures) {
 }
