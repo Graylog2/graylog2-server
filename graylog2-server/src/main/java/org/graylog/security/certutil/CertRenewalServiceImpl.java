@@ -16,13 +16,11 @@
  */
 package org.graylog.security.certutil;
 
-import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
@@ -35,11 +33,6 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -48,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
 /**
@@ -65,9 +57,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final DBJobTriggerService jobTriggerService;
     private final JobSchedulerClock clock;
     private final CaKeystore caKeystore;
-
-    // TODO: convert to config?
-    private long CERT_RENEWAL_THRESHOLD_PERCENTAGE = 10;
 
     @Inject
     public CertRenewalServiceImpl(final ClusterConfigService clusterConfigService,
@@ -89,7 +78,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     boolean needsRenewal(final DateTime nextRenewal, final RenewalPolicy renewalPolicy, final Date cert) {
         // calculate renewal threshold
-        var threshold = calculateThreshold(renewalPolicy.certificateLifetime());
+        var threshold = calculateThreshold(renewalPolicy);
         return threshold.after(cert) || nextRenewal.toDate().after(cert);
     }
 
@@ -97,9 +86,9 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         return Date.from(dateToConvert.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    Date calculateThreshold(String certificateLifetime) {
-        final var lifetime = Duration.parse(certificateLifetime).dividedBy(CERT_RENEWAL_THRESHOLD_PERCENTAGE);
-        var validUntil = clock.now(ZoneId.systemDefault()).plus(lifetime).toLocalDateTime();
+    Date calculateThreshold(RenewalPolicy renewalPolicy) {
+        Duration threshold = renewalPolicy.getRenewalThreshold();
+        var validUntil = clock.now(ZoneId.systemDefault()).plus(threshold).toLocalDateTime();
         return convertToDateViaInstant(validUntil);
     }
 
@@ -131,7 +120,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         return activeDataNodes.values().stream()
                 .filter(node -> node.getCertValidUntil() != null)
                 .filter(node -> {
-                    var nowPlusThreshold = calculateThreshold(renewalPolicy.certificateLifetime());
+                    var nowPlusThreshold = calculateThreshold(renewalPolicy);
                     return nowPlusThreshold.after(node.getCertValidUntil()) || nextRenewal.toDate().after(node.getCertValidUntil());
                 }).toList();
     }
