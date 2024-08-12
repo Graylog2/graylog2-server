@@ -125,6 +125,32 @@ public class PivotAggregationSearchIT {
                 new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream_isolation_test", "facility", true)
         );
 
+        final String eventDefinitionID = graylogApis.eventDefinitions().createEventDefinition(notificationID, List.of(), List.of(streamId));
+
+        postMessagesToOtherStream();
+        postMessages();
+
+        waitForWebHook(eventDefinitionID, "my alert def: count()=3.0");
+
+        graylogApis.eventsNotifications().deleteNotification(notificationID);
+        graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
+    }
+
+    @ContainerMatrixTest
+    void testPivotAggregationWithGroupingIsIsolatedToStream() throws ExecutionException, RetryException {
+        graylogApis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+
+        final String notificationID = graylogApis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
+
+        final String defaultStreamIndexSetId = graylogApis.streams().getStream(DEFAULT_STREAM_ID).extract().path("index_set_id");
+        final var streamId = graylogApis.streams().createStream(
+                "Stream for testing event definition isolation",
+                defaultStreamIndexSetId,
+                true,
+                DefaultStreamMatches.KEEP,
+                new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream_isolation_test", "facility", true)
+        );
+
         final String eventDefinitionID = graylogApis.eventDefinitions().createEventDefinition(notificationID, List.of("http_response_code"), List.of(streamId));
 
         postMessagesToOtherStream();
