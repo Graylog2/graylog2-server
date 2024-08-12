@@ -26,7 +26,7 @@ import InputField from 'views/components/fieldtypes/InputField';
 import NodeField from 'views/components/fieldtypes/NodeField';
 import StreamsField from 'views/components/fieldtypes/StreamsField';
 import PercentageField from 'views/components/fieldtypes/PercentageField';
-import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConvertors';
+import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import { DECIMAL_PLACES, UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import useFeature from 'hooks/useFeature';
@@ -40,7 +40,7 @@ const defaultComponent = ({ value }: ValueRendererProps) => value;
 
 const _formatValue = (field: string, value: any, truncate: boolean, render: ValueRenderer, type: FieldType) => {
   const stringified = isString(value) ? value : JSON.stringify(value);
-  const Component = render;
+  const Component: ValueRenderer = render;
 
   return trim(stringified) === ''
     ? <EmptyValue />

@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Input } from 'components/bootstrap';
+import { Col, Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
@@ -98,7 +98,7 @@ const Metric = ({ index }: Props) => {
 
   return (
     <Wrapper data-testid={`metric-${index}`}>
-      <div className="col-sm-11">
+      <Col sm={11}>
         <Field name={`metrics.${index}.function`}>
           {({ field: { name, value }, meta: { error } }) => (
             <Input id="metric-function-select"
@@ -117,10 +117,10 @@ const Metric = ({ index }: Props) => {
             </Input>
           )}
         </Field>
-      </div>
+      </Col>
       {hasFieldOption && (
-        <div>
-          <div className="col-sm-11">
+        <>
+          <Col sm={11}>
             <Field name={`metrics.${index}.field`}>
               {({ field: { name, value, onChange }, meta: { error } }) => (
                 <Input id="metric-field"
@@ -142,15 +142,15 @@ const Metric = ({ index }: Props) => {
                 </Input>
               )}
             </Field>
-          </div>
+          </Col>
           {showUnitType && (
             <div className="col-sm-1"><FieldUnitComponent field={metrics?.[index].field} />
             </div>
           )}
-        </div>
+        </>
       )}
       {isPercentile && (
-        <div className="col-sm-11">
+        <Col sm={11}>
           <Field name={`metrics.${index}.percentile`}>
             {({ field: { name, value, onChange }, meta: { error } }) => (
               <Input id="metric-percentile-select"
@@ -169,11 +169,11 @@ const Metric = ({ index }: Props) => {
               </Input>
             )}
           </Field>
-        </div>
+        </Col>
       )}
       {isPercentage && (
         <>
-          <div className="col-sm-11">
+          <Col sm={11}>
             <Field name={`metrics.${index}.strategy`}>
               {({ field: { name, value, onChange }, meta: { error } }) => (
                 <Input id="metric-percentage-strategy-select"
@@ -192,8 +192,8 @@ const Metric = ({ index }: Props) => {
                 </Input>
               )}
             </Field>
-          </div>
-          <div className="col-sm-11">
+          </Col>
+          <Col sm={11}>
             <Field name={`metrics.${index}.field`}>
               {({ field: { name, value, onChange }, meta: { error } }) => (
                 <Input id="metric-field"
@@ -213,10 +213,10 @@ const Metric = ({ index }: Props) => {
                 </Input>
               )}
             </Field>
-          </div>
+          </Col>
         </>
       )}
-      <div className="col-sm-11">
+      <Col sm={11}>
         <FormikInput id="name"
                      label={<>Name <Opt /></>}
                      bsSize="small"
@@ -224,7 +224,7 @@ const Metric = ({ index }: Props) => {
                      name={`metrics.${index}.name`}
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" />
-      </div>
+      </Col>
     </Wrapper>
   );
 };

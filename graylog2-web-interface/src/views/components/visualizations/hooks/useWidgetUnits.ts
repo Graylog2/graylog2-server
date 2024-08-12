@@ -37,17 +37,19 @@ const useWidgetUnits = (config: AggregationWidgetConfig) => {
   const allFields: Array<string> = useMemo(() => uniq(compact([...usedFieldsInSeries, ...usedFieldsInRowPivots, ...usedFieldsInColumnPivots])), [usedFieldsInColumnPivots, usedFieldsInRowPivots, usedFieldsInSeries]);
 
   return useMemo(() => {
-    let widgetUnits = config.units;
+    const widgetUnits = config.units;
 
-    allFields.forEach((field) => {
+    const filtratedFields = Object.fromEntries(allFields.filter((field) => {
       const predefinedUnit = fieldTypesUnits?.[field];
 
-      if (!widgetUnits?.[field] && !!predefinedUnit) {
-        widgetUnits = widgetUnits.toBuilder().setFieldUnit(field, predefinedUnit).build();
-      }
-    });
+      return !widgetUnits?.[field] && !!predefinedUnit;
+    }).map((field) => {
+      const predefinedUnit = fieldTypesUnits[field];
 
-    return widgetUnits;
+      return [field, predefinedUnit];
+    }));
+
+    return widgetUnits.toBuilder().merge(filtratedFields).build();
   }, [allFields, config?.units, fieldTypesUnits]);
 };
 

@@ -40,18 +40,18 @@ export default class UnitsConfig {
   toJSON(): UnitsConfigJson {
     const units = this._value;
 
-    return mapValues(units, (unit) => unit.toJSON());
+    return mapValues<UnitsConfigJson>(units, (unit: FieldUnit) => unit.toJSON());
   }
 
   toFormValues(): FieldUnitsFormValues {
     const units = this._value;
 
-    return mapValues(units, (unit) => ({ unitType: unit.unitType, abbrev: unit.abbrev }));
+    return mapValues<FieldUnitsFormValues>(units, (unit: FieldUnit) => ({ unitType: unit.unitType, abbrev: unit.abbrev }));
   }
 
   static fromJSON(value: UnitsConfigJson) {
     const unitsJson = value;
-    const units = mapValues(unitsJson, (unit) => FieldUnit.fromJSON(unit));
+    const units = mapValues(unitsJson, (unit: FieldUnitJson) => FieldUnit.fromJSON(unit));
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(units)).build();
@@ -83,6 +83,10 @@ export class Builder {
 
   setFieldUnit(fieldName: FieldName, value: FieldUnit) {
     return new Builder(this.value.set(fieldName, value));
+  }
+
+  merge(values: InternalState) {
+    return new Builder(this.value.merge(values));
   }
 
   build() {

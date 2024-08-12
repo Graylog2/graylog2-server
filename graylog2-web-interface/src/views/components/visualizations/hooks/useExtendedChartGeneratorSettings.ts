@@ -22,12 +22,12 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import {
   generateMappersForYAxis,
   getBarChartTraceOffsetSettings, getHoverTemplateSettings,
-} from 'views/components/visualizations/utils/chartLayoytGenerators';
+} from 'views/components/visualizations/utils/chartLayoutGenerators';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { NO_FIELD_NAME_SERIES, UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
-import { getBaseUnit } from 'views/components/visualizations/utils/unitConvertors';
+import { getBaseUnit } from 'views/components/visualizations/utils/unitConverters';
 import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import isLayoutRequiresBaseUnit from 'views/components/visualizations/utils/isLayoutRequiresBaseUnit';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';

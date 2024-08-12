@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ConversionParams } from 'views/components/visualizations/utils/unitConvertors';
+import type { ConversionParams } from 'views/components/visualizations/utils/unitConverters';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
-import { convertValueToBaseUnit } from 'views/components/visualizations/utils/unitConvertors';
+import { convertValueToBaseUnit } from 'views/components/visualizations/utils/unitConverters';
 
 const convertDataToBaseUnit = (values: Array<number>, unit: FieldUnit) => {
   if (!unit?.isDefined) return values;

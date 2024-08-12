@@ -29,7 +29,7 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import {
   getBaseUnit,
   getPrettifiedValue,
-} from 'views/components/visualizations/utils/unitConvertors';
+} from 'views/components/visualizations/utils/unitConverters';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
@@ -42,6 +42,7 @@ import {
 } from 'views/components/visualizations/Constants';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
+import type { PieHoverTemplateSettings } from 'views/components/visualizations/hooks/useExtendedPieChartSettings';
 
 type DefaultAxisKey = 'withoutUnit';
 
@@ -322,7 +323,7 @@ export const getPieHoverTemplateSettings = ({ convertedValues, unit, originalNam
   convertedValues: Array<any>,
   unit: FieldUnit,
   originalName: string,
-}): { text: Array<string>, hovertemplate: string, meta: string } | {} => ({
+}): PieHoverTemplateSettings | {} => ({
   text: getHoverTexts({ convertedValues, unit }),
   hovertemplate: '<b>%{label}</b><br>%{text}<br>%{percent}',
   meta: originalName,

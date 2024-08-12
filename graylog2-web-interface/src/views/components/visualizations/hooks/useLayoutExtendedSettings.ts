@@ -22,7 +22,7 @@ import {
   generateDomain,
   generateLayouts,
   generateMappersForYAxis,
-} from 'views/components/visualizations/utils/chartLayoytGenerators';
+} from 'views/components/visualizations/utils/chartLayoutGenerators';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';

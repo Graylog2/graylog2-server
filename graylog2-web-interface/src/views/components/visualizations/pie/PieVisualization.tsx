@@ -28,6 +28,9 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { keySeparator, humanSeparator } from 'views/Constants';
+import type {
+  GetExtendedPieGeneratorSettings,
+} from 'views/components/visualizations/hooks/useExtendedPieChartSettings';
 import useExtendedPieChartSettings from 'views/components/visualizations/hooks/useExtendedPieChartSettings';
 
 import type { ChartConfig } from '../GenericPlot';
@@ -54,7 +57,7 @@ const _horizontalDimensions = (idx: number, total: number) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _generateSeries = (mapKeys: KeyMapper, getExtendedPieGeneratorSettings): Generator => ({
+const _generateSeries = (mapKeys: KeyMapper, getExtendedPieGeneratorSettings: GetExtendedPieGeneratorSettings): Generator => ({
   type,
   name,
   labels,
@@ -67,7 +70,7 @@ const _generateSeries = (mapKeys: KeyMapper, getExtendedPieGeneratorSettings): G
   const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
   const extendedSettings = getExtendedPieGeneratorSettings({ values, originalName, name });
 
-  const definition : ChartDefinition = {
+  const definition = {
     type,
     name,
     hole: 0.4,
@@ -80,7 +83,7 @@ const _generateSeries = (mapKeys: KeyMapper, getExtendedPieGeneratorSettings): G
     },
     originalName,
     ...extendedSettings,
-  };
+  } as ChartDefinition;
 
   return definition;
 };

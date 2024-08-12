@@ -21,15 +21,17 @@ import useFeature from 'hooks/useFeature';
 import { NO_FIELD_NAME_SERIES, UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
-import { getPieHoverTemplateSettings } from 'views/components/visualizations/utils/chartLayoytGenerators';
+import { getPieHoverTemplateSettings } from 'views/components/visualizations/utils/chartLayoutGenerators';
+
+export type PieHoverTemplateSettings = { text: Array<string>, hovertemplate: string, meta: string, textinfo: 'percent' };
+export type GetExtendedPieGeneratorSettings = (props: { originalName: string, name: string, values: Array<any> }) => PieHoverTemplateSettings | {};
 
 const useExtendedPieChartSettings = ({ config }: { config: AggregationWidgetConfig }) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
 
-  const getExtendedPieGeneratorSettings = useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }): Partial<ChartDefinition> => {
+  const getExtendedPieGeneratorSettings = useCallback<GetExtendedPieGeneratorSettings>(({ originalName, name, values }) => {
     if (!unitFeatureEnabled) return ({});
 
     const fieldNameKey = getFieldNameFromTrace({ name, series: config.series }) ?? NO_FIELD_NAME_SERIES;
