@@ -66,6 +66,7 @@ import org.graylog2.indexer.migration.TaskStatus;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
@@ -117,6 +118,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final DatanodeRestApiProxy datanodeRestApiProxy;
     private final NotificationService notificationService;
 
+    private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
     private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
     private final SystemJobManager systemJobManager;
 
@@ -129,6 +131,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                RemoteReindexMigrationService reindexMigrationService,
                                                DatanodeRestApiProxy datanodeRestApiProxy,
                                                NotificationService notificationService,
+                                               IndexRangesCleanupPeriodical indexRangesCleanupPeriodical,
                                                CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
                                                SystemJobManager systemJobManager) {
         this.client = client;
@@ -139,6 +142,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.reindexMigrationService = reindexMigrationService;
         this.datanodeRestApiProxy = datanodeRestApiProxy;
         this.notificationService = notificationService;
+        this.indexRangesCleanupPeriodical = indexRangesCleanupPeriodical;
         this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
         this.systemJobManager = systemJobManager;
     }
@@ -494,6 +498,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private void onMigrationFinished(Status status) {
+        LOG.info("Remote reindexing migration finished");
+        this.indexRangesCleanupPeriodical.doRun();
         createSystemNotification(status);
     }
 
