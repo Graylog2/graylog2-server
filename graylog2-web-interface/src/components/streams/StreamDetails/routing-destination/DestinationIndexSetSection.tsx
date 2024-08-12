@@ -116,7 +116,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
             <td>
               <ActionButtonsWrap>
                 <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
-                  <Button bsStyle="link"
+                  <Button bsStyle="default"
                           bsSize="xsmall"
                           onClick={() => {}}
                           title="View index set">

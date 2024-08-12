@@ -66,7 +66,7 @@ const DestinationOutputs = ({ stream }: Props) => {
   return (
     <Section title="Outputs"
              collapsible
-             defaultCollapse={hasAssignedOutput}
+             defaultClosed
              disableCollapseButton={!hasAssignedOutput}
              headerLeftSection={(
                <>

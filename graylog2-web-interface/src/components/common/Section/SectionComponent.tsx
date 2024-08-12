@@ -30,7 +30,7 @@ type Props = {
   headerActions?: React.ReactElement,
   className?: string,
   collapsible?: boolean,
-  defaultCollapse?: boolean,
+  defaultClosed?: boolean,
   disableCollapseButton?: boolean,
 
 };
@@ -62,8 +62,8 @@ const FlexWrapper = styled.div(({ theme }) => css`
   align-items: center;
 `);
 
-const SectionComponent = ({ children, title, showLoading = false, headerActions, className, collapsible, defaultCollapse, disableCollapseButton }: Props) => {
-  const [opened, { toggle }] = useDisclosure(defaultCollapse);
+const SectionComponent = ({ children, title, showLoading = false, headerActions, className, collapsible, defaultClosed, disableCollapseButton }: Props) => {
+  const [opened, { toggle }] = useDisclosure(!defaultClosed);
 
   return (
     <Row className={`content ${className}`}>
@@ -102,7 +102,7 @@ SectionComponent.defaultProps = {
   showLoading: false,
   headerActions: undefined,
   collapsible: false,
-  defaultCollapse: true,
+  defaultClosed: false,
   disableCollapseButton: false,
 };
 
