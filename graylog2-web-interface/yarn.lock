@@ -4112,10 +4112,10 @@ accepts@~1.3.4, accepts@~1.3.5, accepts@~1.3.8:
     mime-types "~2.1.34"
     negotiator "0.6.3"
 
-ace-builds@1.35.2, ace-builds@^1.32.8:
-  version "1.35.2"
-  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.35.2.tgz#2c26d2317ed8e378927e90e5c0d4fa17be92db79"
-  integrity sha512-06d00u4jDZx+ieI0jLlgy/uefx8kcgz7lhI0mCIFEu8NVWirH00U5IEP7tePHy4sjPsRcJUH4VbJZacoit2Hng==
+ace-builds@1.35.4, ace-builds@^1.32.8:
+  version "1.35.4"
+  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.35.4.tgz#f41d7ef57c3a7d424cd7e3300bef0cbef905c84f"
+  integrity sha512-r0KQclhZ/uk5a4zOqRYQkJuQuu4vFMiA6VTj54Tk4nI1TUR3iEMMppZkWbNoWEgWwv4ciDloObb9Rf4V55Qgjw==
 
 acorn-globals@^4.1.0:
   version "4.3.4"
