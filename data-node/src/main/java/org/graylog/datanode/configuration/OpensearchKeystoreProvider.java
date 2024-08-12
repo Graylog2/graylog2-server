@@ -22,6 +22,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.security.certutil.KeyStoreDto;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+@Singleton
 public class OpensearchKeystoreProvider implements Provider<Map<OpensearchKeystoreProvider.Store, KeyStoreDto>> {
 
     public enum Store {CONFIGURED, TRUSTSTORE, HTTP, TRANSPORT}
@@ -48,12 +50,14 @@ public class OpensearchKeystoreProvider implements Provider<Map<OpensearchKeysto
     @Subscribe
     @SuppressWarnings("unused")
     public void onConfigurationChangeEvent(OpensearchConfigurationChangeEvent event) {
-        log.error("Blub blub blub");
         this.opensearchSecurityConfiguration = Suppliers.memoize(() -> event.config().opensearchSecurityConfiguration());
     }
 
     @Override
     public Map<Store, KeyStoreDto> get() {
+        if (opensearchSecurityConfiguration == null) {
+            return Map.of();
+        }
         OpensearchSecurityConfiguration config = opensearchSecurityConfiguration.get();
 
         Map<Store, KeyStoreDto> certificates = new HashMap<>();
