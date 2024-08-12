@@ -17,8 +17,9 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { IfPermitted, DataTable, PaginatedList, NoSearchResult } from 'components/common';
+import { IfPermitted, DataTable, PaginatedList, NoSearchResult, Text } from 'components/common';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import FilterRuleEditButton from 'components/streams/StreamDetails/output-filter/FilterRuleEditButton';
 import { Alert } from 'components/bootstrap';
@@ -41,6 +42,10 @@ export const StyledSectionComponent = styled(SectionComponent)(({ theme }) => cs
   h2 {
     font-size: ${theme.fonts.size.h3};
   }
+
+  .table > tbody > tr > td {
+    vertical-align: middle;
+  }
   .table > tbody > tr {
     background-color: transparent;
    }
@@ -48,25 +53,32 @@ export const StyledSectionComponent = styled(SectionComponent)(({ theme }) => cs
     border-bottom-color: ${theme.utils.colorLevel(theme.colors.variant.default, -5)};
     border-bottom-width: 1px;
   }
+  .table.striped > tbody > tr:nth-of-type(even) {
+    background-color: ${theme.colors.table.row.backgroundStriped};
+  }
 `);
-
+const StyledText = styled(Text)(({ theme }) => css`
+  color: ${theme.colors.gray[50]};
+`);
 type Props = {
   streamId: string,
   destinationType: string,
   paginatedFilters: PaginatedListType<StreamOutputFilterRule>,
+  onPaginationChange: (newPage: number, newPerPage: number) => void,
 };
 const _headerCellFormatter = (header: string) => (<th>{header}</th>);
 const buildFilterItem = (destinationType: string) => (filter: StreamOutputFilterRule) => (
   <tr key={filter.id}>
-    <td>{filter.title}
-      {filter.description}
+    <td>
+      {filter.title}
+      <StyledText>{filter.description}</StyledText>
     </td>
     <td><FilterStatusCell filterOutputRule={filter} /></td>
     <td><FilterActions filterRule={filter} destinationType={destinationType} /></td>
   </tr>
 );
 
-const FilterRulesList = ({ streamId, destinationType, paginatedFilters }: Props) => {
+const FilterRulesList = ({ streamId, destinationType, paginatedFilters, onPaginationChange }: Props) => {
   const { list: filters, pagination: { total } } = paginatedFilters;
 
   return (
@@ -81,9 +93,13 @@ const FilterRulesList = ({ streamId, destinationType, paginatedFilters }: Props)
       <Alert bsStyle="default">
         Messages which meet the criteria of the following filter rule(s) will not be routed to the  {destinationType === 'indexer' ? 'Index Set' : 'Data Warehouse'}.
       </Alert>
-      <PaginatedList totalItems={total}>
+      <PaginatedList totalItems={total}
+                     pageSize={DEFAULT_PAGE_SIZES[0]}
+                     onChange={onPaginationChange}
+                     useQueryParameter={false}
+                     showPageSizeSelect={false}>
         <DataTable id="filter-list"
-                   className=""
+                   className="striped"
                    rowClassName="no-bm"
                    headers={TABLE_HEADERS}
                    headerCellFormatter={_headerCellFormatter}

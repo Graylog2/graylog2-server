@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
@@ -31,6 +32,7 @@ import IndexSetFilters from 'components/streams/StreamDetails/routing-destinatio
 import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
 import useIndexSetStats from 'hooks/useIndexSetStats';
 import NumberUtils from 'util/NumberUtils';
+import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 
 import IndexSetArchivingCell from './IndexSetArchivingCell';
 
@@ -52,9 +54,10 @@ const ActionButtonsWrap = styled.span(() => css`
 `);
 
 const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const archivingEnabled = indexSet.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY || indexSet?.data_tiering?.archive_before_deletion;
   const { indexSets } = useStore(IndexSetsStore);
-  const { data, isLoading } = useStreamOutputFilters(stream.id, 'indexer');
+  const { data, isLoading } = useStreamOutputFilters(stream.id, 'indexer', pagination);
   /* eslint-disable no-constant-condition */
   const title = true ? 'Enabled' : 'Disabled'; // TODO use api to check if enabled
   const { data: indexSetStats, isSuccess: isStatsLoaded } = useIndexSetStats(indexSet.id);
@@ -62,6 +65,12 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
   if (isLoading) {
     <Spinner />;
   }
+
+  const onPaginationChange = (newPage: number, newPerPage: number) => setPagination({
+    ...pagination,
+    page: newPage,
+    perPage: newPerPage,
+  });
 
   return (
     <Section title="Index Set"
@@ -75,13 +84,18 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
                                onChange={() => {}} />
                  <SectionCountLabel>FILTERS {data?.pagination?.total || 0}</SectionCountLabel>
                </>
+             )}
+             actions={(
+               <IndexSetUpdateForm initialValues={{ index_set_id: indexSet.id }}
+                                   indexSets={indexSets}
+                                   stream={stream} />
             )}>
       <Alert bsStyle="default">
         Messages routed to the <b>Search Cluster</b> will be searchable in Graylog and count towards Graylog License usage.<br />
         These messages will be stored in the defined Index Set until the retention policy criteria is met.<br />
         Note: Messages not routed to the <b>Search Cluster</b> will not be searchable in Graylog.
       </Alert>
-      <Table stripped>
+      <Table>
         <thead>
           <tr>
             <td>Name</td>
@@ -109,15 +123,12 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
                     <Icon name="pageview" type="regular" />
                   </Button>
                 </LinkContainer>
-                <IndexSetUpdateForm initialValues={{ index_set_id: indexSet.id }}
-                                    indexSets={indexSets}
-                                    stream={stream} />
               </ActionButtonsWrap>
             </td>
           </tr>
         </tbody>
       </Table>
-      {data && (<IndexSetFilters streamId={stream.id} paginatedFilters={data} />)}
+      {data && (<IndexSetFilters streamId={stream.id} paginatedFilters={data} onPaginationChange={onPaginationChange} />)}
     </Section>
   );
 };

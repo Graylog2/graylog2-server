@@ -23,13 +23,15 @@ import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/ou
 type Props = {
   streamId: string,
   paginatedFilters: PaginatedListType<StreamOutputFilterRule>,
-
+  onPaginationChange: (newPage: number, newPerPage: number) => void,
 };
 
-const IndexSetFilters = ({ streamId, paginatedFilters }: Props) => (
+const IndexSetFilters = ({ streamId, paginatedFilters, onPaginationChange }: Props) => (
   <FilterRulesList streamId={streamId}
                    paginatedFilters={paginatedFilters}
-                   destinationType="indexer" />
+                   destinationType="indexer"
+                   onPaginationChange={onPaginationChange} />
+
 );
 
 export default IndexSetFilters;

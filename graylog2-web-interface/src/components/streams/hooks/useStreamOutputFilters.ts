@@ -35,7 +35,7 @@ type PaginatedResponse = {
 }
 export const KEY_PREFIX = ['streams', 'output', 'filters'];
 export const keyFn = (streamId: string, destinationType: string, pagination?: Pagination) => [...KEY_PREFIX, streamId, destinationType, pagination];
-const defaultParams = { page: 1, perPage: 0 };
+const defaultParams = { page: 1, perPage: 10, query: '' };
 
 export const fetchStreamOutputFilters = async (streamId: string, pagination: Pagination) => {
   const url = PaginationURL(
@@ -69,15 +69,15 @@ export const fetchStreamOutputFilters = async (streamId: string, pagination: Pag
   });
 };
 
-const useStreamOutputFilters = (streamId: string, destinationType: string): {
+const useStreamOutputFilters = (streamId: string, destinationType: string, pagination: Pagination = defaultParams): {
   data: PaginatedList<StreamOutputFilterRule>,
   refetch: () => void,
   isLoading: boolean,
   isSuccess: boolean,
 } => {
   const { data, refetch, isLoading, isSuccess } = useQuery(
-    keyFn(streamId, destinationType),
-    () => fetchStreamOutputFilters(streamId, { ...defaultParams, query: `destination_type:${destinationType}` }),
+    keyFn(streamId, destinationType, pagination),
+    () => fetchStreamOutputFilters(streamId, { ...pagination, query: `destination_type:${destinationType}` }),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading stream output filters failed with status: ${errorThrown}`,
