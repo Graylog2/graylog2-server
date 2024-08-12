@@ -117,7 +117,8 @@ public class TelemetryServiceWithDbTest {
                 eventBus,
                 telemetryClusterService,
                 "unknown",
-                nodeService);
+                nodeService,
+                false);
     }
 
     @Test
