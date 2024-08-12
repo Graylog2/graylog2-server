@@ -72,7 +72,7 @@ const StreamDataRoutingProcessing = () => {
                 <td>
                   <ActionButtonsWrap className="align-right">
                     <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
-                      <Button bsStyle="link"
+                      <Button bsStyle="default"
                               bsSize="xsmall"
                               title="View">
                         <Icon name="pageview" type="regular" />

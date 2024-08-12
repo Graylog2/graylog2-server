@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -29,6 +30,10 @@ type Props ={
   streamId: string,
   destinationType: string,
 };
+
+const StyledButton = styled(Button)(({ theme }) => css`
+  margin: 0 ${theme.spacings.xxs};
+`);
 
 const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) => {
   const [showForm, setShowForm] = useState(false);
@@ -54,12 +59,12 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
 
   return (
     <>
-      <Button bsStyle={isNew ? 'default' : 'link'}
-              bsSize="sm"
-              onClick={onClick}
-              title="Edit">
+      <StyledButton bsStyle={isNew ? 'default' : 'default'}
+                    bsSize={isNew ? 'sm' : 'xs'}
+                    onClick={onClick}
+                    title="Edit">
         {isNew ? (<><Icon name="add" size="sm" /> Create rule</>) : (<Icon name="edit_square" />)}
-      </Button>
+      </StyledButton>
       {showForm && (
         <FilterRuleForm title={title}
                         filterRule={filterRule}
