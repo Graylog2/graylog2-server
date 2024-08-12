@@ -29,7 +29,6 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -64,11 +63,14 @@ import org.graylog2.indexer.migration.RemoteIndex;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.indexer.migration.TaskStatus;
+import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -85,6 +87,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -114,6 +117,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final DatanodeRestApiProxy datanodeRestApiProxy;
     private final NotificationService notificationService;
 
+    private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
+    private final SystemJobManager systemJobManager;
+
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
                                                final Indices indices,
@@ -122,7 +128,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                final ObjectMapper objectMapper,
                                                RemoteReindexMigrationService reindexMigrationService,
                                                DatanodeRestApiProxy datanodeRestApiProxy,
-                                               NotificationService notificationService) {
+                                               NotificationService notificationService,
+                                               CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
+                                               SystemJobManager systemJobManager) {
         this.client = client;
         this.indices = indices;
         this.indexSetRegistry = indexSetRegistry;
@@ -131,6 +139,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.reindexMigrationService = reindexMigrationService;
         this.datanodeRestApiProxy = datanodeRestApiProxy;
         this.notificationService = notificationService;
+        this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
+        this.systemJobManager = systemJobManager;
     }
 
     @Override
@@ -467,9 +477,19 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 onTaskSuccess(migration, index, t.task(), duration);
             }
         });
+        recalculateIndexRanges(index);
         Status status = getMigrationStatus(migration);
         if (status == Status.FINISHED || status == Status.ERROR) {
             onMigrationFinished(status);
+        }
+    }
+
+    private void recalculateIndexRanges(String index) {
+        indices.refresh(index);
+        try {
+            systemJobManager.submit(singleIndexRangeJobFactory.create(Set.of(), index));
+        } catch (SystemJobConcurrencyException e) {
+            LOG.warn("Unable to trigger index range calculation for index: {}", index, e);
         }
     }
 
