@@ -149,6 +149,7 @@
                 <groupId>org.apache.directory.api</groupId>
                 <artifactId>api-all</artifactId>
                 <version>${apache-directory-version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
