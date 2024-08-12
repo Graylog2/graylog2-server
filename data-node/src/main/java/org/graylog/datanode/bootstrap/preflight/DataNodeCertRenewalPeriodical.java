@@ -37,7 +37,6 @@ import java.util.function.Supplier;
 @Singleton
 public class DataNodeCertRenewalPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeCertRenewalPeriodical.class);
-    private static final long CERT_RENEWAL_THRESHOLD_PERCENTAGE = 10;
     public static final Duration PERIODICAL_DURATION = Duration.ofMinutes(30);
 
     private final DatanodeKeystore datanodeKeystore;
@@ -98,7 +97,7 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
     }
 
     private boolean expiresSoon(Date expiration, RenewalPolicy renewalPolicy) {
-        final Duration threshold = Duration.parse(renewalPolicy.certificateLifetime()).dividedBy(CERT_RENEWAL_THRESHOLD_PERCENTAGE);
+        Duration threshold = renewalPolicy.getRenewalThreshold();
         final Instant renewalMoment = expiration.toInstant()
                 .minus(threshold)
                 .minus(PERIODICAL_DURATION);

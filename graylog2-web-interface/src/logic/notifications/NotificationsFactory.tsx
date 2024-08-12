@@ -45,7 +45,15 @@ class NotificationsFactory {
       case 'data_node_needs_provisioning':
         return {
           values: {
-            DATA_NODE_CONFIGURATION: Routes.SYSTEM.configurationsSection('Data Node'),
+            DATA_NODE_CONFIGURATION: Routes.SYSTEM.DATANODES.CONFIGURATION,
+          },
+        };
+
+      case 'remote_reindex_running':
+      case 'remote_reindex_finished':
+        return {
+          values: {
+            DATA_NODE_MIGRATION_WIZARD: Routes.SYSTEM.DATANODES.MIGRATION,
           },
         };
 
