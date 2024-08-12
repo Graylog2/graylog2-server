@@ -14,20 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { css } from 'styled-components';
+package org.graylog2.shared.rest.resources.system;
 
-const TableHeaderCell = styled.th<{ $isNumeric?: boolean, $borderedHeader?: boolean }>(({ $isNumeric, $borderedHeader, theme }) => css`
-  && {
-    background-color: ${theme.colors.table.head.background};
-    min-width: 50px;
-    border: ${$borderedHeader ? `1px solid ${theme.colors.table.row.divider}` : '0'};
-    padding: 0 5px;
-    vertical-align: middle;
-    white-space: nowrap;
-    font-weight: normal;
-    font-size: ${theme.fonts.size.small};
-    ${$isNumeric ? 'text-align: right' : ''}
-  }
-`);
+import com.fasterxml.jackson.databind.JsonNode;
+import retrofit2.Call;
+import retrofit2.http.GET;
 
-export default TableHeaderCell;
+import java.util.List;
+
+public interface RemoteDataNodeStatusResource {
+
+    @GET("/")
+    Call<JsonNode> status();
+
+    @GET("/logs/stdout")
+    Call<List<String>> opensearchStdOut();
+
+    @GET("/logs/stderr")
+    Call<List<String>> opensearchStdErr();
+
+}

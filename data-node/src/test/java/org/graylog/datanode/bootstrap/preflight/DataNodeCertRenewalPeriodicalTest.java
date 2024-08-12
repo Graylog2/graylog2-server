@@ -55,7 +55,7 @@ class DataNodeCertRenewalPeriodicalTest {
         final DatanodeKeystore datanodeKeystore = datanodeKeystore(Duration.ofNanos(1));
         final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
         final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(
-                datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(1)),
+                datanodeKeystore, autoRenewalPolicy("PT1M"),
                 csrRequester,
                 () -> false
         );
@@ -68,7 +68,7 @@ class DataNodeCertRenewalPeriodicalTest {
     void testExpiringSoon() throws Exception {
         final DatanodeKeystore datanodeKeystore = datanodeKeystore(Duration.ofMinutes(1));
         final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
-        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(1)), csrRequester, () -> false);
+        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolicy("PT1M"), csrRequester, () -> false);
         periodical.doRun();
         Mockito.verify(csrRequester, Mockito.times(1)).triggerCertificateSigningRequest();
     }
@@ -78,14 +78,14 @@ class DataNodeCertRenewalPeriodicalTest {
     void testExpiringInFarFuture() throws Exception {
         final DatanodeKeystore datanodeKeystore = datanodeKeystore(Duration.ofDays(30));
         final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
-        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolic(Duration.ofMinutes(30)), csrRequester, () -> false);
+        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolicy("P3M"), csrRequester, () -> false);
         periodical.doRun();
         Mockito.verify(csrRequester, Mockito.never()).triggerCertificateSigningRequest();
     }
 
     @Nonnull
-    private static Supplier<RenewalPolicy> autoRenewalPolic(Duration duration) {
-        return () -> new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, duration.toString());
+    private static Supplier<RenewalPolicy> autoRenewalPolicy(String duration) {
+        return () -> new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, duration);
     }
 
 
