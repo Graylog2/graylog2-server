@@ -127,8 +127,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     @Override
     public String start(RemoteReindexRequest request) {
         final AggregatedConnectionResponse response = getAllIndicesFrom(request.uri(), request.username(), request.password(), request.trustUnknownCerts());
-        final List<String> indices = isAllIndices(request.indices()) ? response.indices().stream().map(ConnectionCheckIndex::name).collect(Collectors.toList()) : request.indices();
-        final MigrationConfiguration migration = reindexMigrationService.saveMigration(MigrationConfiguration.forIndices(indices, response.certificates()));
+        final MigrationConfiguration migration = reindexMigrationService.saveMigration(MigrationConfiguration.forIndices(request.indices(), response.certificates()));
         doStartMigration(migration, request);
         return migration.id();
 
@@ -341,10 +340,6 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    boolean isAllIndices(final List<String> indices) {
-        return indices == null || indices.isEmpty() || (indices.size() == 1 && "*".equals(indices.get(0)));
     }
 
     private void startAsyncTasks(MigrationConfiguration migration, RemoteReindexRequest request) {
