@@ -33,7 +33,7 @@ public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteRei
 
     @Override
     public boolean isMigrationRunning(IndexSet indexSet) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
+        return false; // we'll never run a remote reindex migration against elasticsearch target. It's always OS in datanode.
     }
 
     @Override
@@ -53,6 +53,6 @@ public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteRei
 
     @Override
     public Optional<String> getLatestMigrationId() {
-        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
+        return Optional.empty();
     }
 }
