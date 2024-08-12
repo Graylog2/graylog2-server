@@ -16,6 +16,7 @@
  */
 package org.graylog2.audit;
 
+import java.util.Collections;
 import java.util.Map;
 
 public interface AuditEventSender {
@@ -26,6 +27,8 @@ public interface AuditEventSender {
     void failure(AuditActor actor, AuditEventType type);
 
     void failure(AuditActor actor, AuditEventType type, Map<String, Object> context);
+
+    void successIgnoreLicense(AuditActor actor, AuditEventType type, Map<String, Object> context);
 
     // Some convenience default methods which an audit event type of "String".
 
@@ -43,5 +46,13 @@ public interface AuditEventSender {
 
     default void failure(AuditActor actor, String type, Map<String, Object> context) {
         failure(actor, AuditEventType.create(type), context);
+    }
+
+    default void successIgnoreLicense(AuditActor actor, String type, Map<String, Object> context) {
+        successIgnoreLicense(actor, AuditEventType.create(type), context);
+    }
+
+    default void successIgnoreLicense(AuditActor actor, String type) {
+        successIgnoreLicense(actor, AuditEventType.create(type), Collections.emptyMap());
     }
 }

@@ -34,4 +34,8 @@ public class NullAuditEventSender implements AuditEventSender {
     @Override
     public void failure(AuditActor actor, AuditEventType type, Map<String, Object> context) {
     }
+
+    @Override
+    public void successIgnoreLicense(AuditActor actor, AuditEventType type, Map<String, Object> context) {
+    }
 }
