@@ -21,16 +21,20 @@ import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.WebhookRequest;
 import org.graylog.testing.completebackend.WebhookServerInstance;
+import org.graylog.testing.completebackend.apis.DefaultStreamMatches;
 import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.utils.GelfInputUtils;
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
 public class PivotAggregationSearchIT {
@@ -60,14 +64,7 @@ public class PivotAggregationSearchIT {
 
         postMessages();
 
-        final List<WebhookRequest> requests = webhookTester.waitForRequests((req) -> req.bodyAsJsonPath().read("event_definition_id").equals(eventDefinitionID));
-
-        Assertions.assertThat(requests)
-                .isNotEmpty()
-                .allSatisfy(req -> {
-                    final String message = req.bodyAsJsonPath().read("event.message");
-                    Assertions.assertThat(message).isEqualTo("my alert def: 200|ssh - count()=3.0");
-                });
+        waitForWebHook(eventDefinitionID, "my alert def: 200|ssh - count()=3.0");
 
         graylogApis.eventsNotifications().deleteNotification(notificationID);
         graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
@@ -87,14 +84,7 @@ public class PivotAggregationSearchIT {
 
         postMessages();
 
-        final List<WebhookRequest> requests = webhookTester.waitForRequests((req) -> req.bodyAsJsonPath().read("event_definition_id").equals(eventDefinitionID));
-
-        Assertions.assertThat(requests)
-                .isNotEmpty()
-                .allSatisfy(req -> {
-                    final String message = req.bodyAsJsonPath().read("event.message");
-                    Assertions.assertThat(message).isEqualTo("my alert def: 200|(Empty Value)|ssh - count()=3.0");
-                });
+        waitForWebHook(eventDefinitionID, "my alert def: 200|(Empty Value)|ssh - count()=3.0");
 
         graylogApis.eventsNotifications().deleteNotification(notificationID);
         graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
@@ -114,23 +104,52 @@ public class PivotAggregationSearchIT {
 
         postMessages();
 
+        waitForWebHook(eventDefinitionID, "my alert def: (Empty Value)|(Empty Value)|(Empty Value) - count()=3.0");
+
+        graylogApis.eventsNotifications().deleteNotification(notificationID);
+        graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
+    }
+
+    @ContainerMatrixTest
+    void testPivotAggregationIsolatedToStream() throws ExecutionException, RetryException {
+        graylogApis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+
+        final String notificationID = graylogApis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
+
+        final String defaultStreamIndexSetId = graylogApis.streams().getStream(DEFAULT_STREAM_ID).extract().path("index_set_id");
+        final var streamId = graylogApis.streams().createStream(
+                "Stream for testing event definition isolation",
+                defaultStreamIndexSetId,
+                true,
+                DefaultStreamMatches.KEEP,
+                new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream_isolation_test", "facility", true)
+        );
+
+        final String eventDefinitionID = graylogApis.eventDefinitions().createEventDefinition(notificationID, List.of("http_response_code"), List.of(streamId));
+
+        postMessagesToOtherStream();
+        postMessages();
+
+        waitForWebHook(eventDefinitionID, "my alert def: 200 - count()=3.0");
+
+        graylogApis.eventsNotifications().deleteNotification(notificationID);
+        graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
+    }
+
+    private void waitForWebHook(String eventDefinitionID, String eventMessage) throws ExecutionException, RetryException {
         try {
             final List<WebhookRequest> requests = webhookTester.waitForRequests((req) -> req.bodyAsJsonPath().read("event_definition_id").equals(eventDefinitionID));
             Assertions.assertThat(requests)
                     .isNotEmpty()
                     .allSatisfy(req -> {
                         final String message = req.bodyAsJsonPath().read("event.message");
-                        Assertions.assertThat(message).isEqualTo("my alert def: (Empty Value)|(Empty Value)|(Empty Value) - count()=3.0");
+                        Assertions.assertThat(message).isEqualTo(eventMessage);
                     });
 
         } catch (ExecutionException | RetryException e) {
             LOG.error(this.graylogApis.backend().getLogs());
             throw e;
         }
-
-
-        graylogApis.eventsNotifications().deleteNotification(notificationID);
-        graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
     }
 
     private void postMessages() {
@@ -163,5 +182,20 @@ public class PivotAggregationSearchIT {
                         "resource": "posts"
                         }""");
         graylogApis.search().waitForMessagesCount(3);
+    }
+
+    private void postMessagesToOtherStream() {
+        graylogApis.gelf().createGelfHttpInput()
+                .postMessage("""
+                        {
+                        "short_message":"pivot-aggregation-search-test-1",
+                        "host":"example.org",
+                        "type":"ssh",
+                        "source":"example.org",
+                        "http_response_code":200,
+                        "resource": "posts",
+                        "facility": "stream_isolation_test"
+                        }""");
+        graylogApis.search().waitForMessagesCount(1);
     }
 }
