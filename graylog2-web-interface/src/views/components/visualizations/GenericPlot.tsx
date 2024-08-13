@@ -171,7 +171,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
     }));
 
     return interactive ? plotLayout : merge({}, plotLayout, nonInteractiveLayout);
-  }, [colors, interactive, layout, theme.colors.global.textDefault, theme.colors.variant.lightest.default, theme.fonts.family.body, theme.fonts.size.small]);
+  }, [colors, interactive, layout, theme]);
 };
 
 const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfig, color: ColorMapper) => ChartColor) => {
@@ -240,13 +240,6 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
     onRenderComplete();
     onAfterPlot();
   }, [onRenderComplete, onAfterPlot]);
-
-  console.log({
-    plotChartData,
-    style,
-    plotLayout,
-    config,
-  });
 
   return (
     <StyledPlot data={plotChartData}
