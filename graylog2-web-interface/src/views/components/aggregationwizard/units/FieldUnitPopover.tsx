@@ -82,7 +82,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
     const unitName = units[predefinedUnit.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
 
     return <>Unit <b>{unitName}</b> was defined for field <b>{field}</b>by Graylog. Changing this unit might represent data incorrectly on the charts</>;
-  }, [field, predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit.unitType]);
+  }, [field, predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType]);
 
   const onClear = useCallback(() => {
     setFieldValue(`units.${field}`, { unitType: undefined, abbrev: undefined });
