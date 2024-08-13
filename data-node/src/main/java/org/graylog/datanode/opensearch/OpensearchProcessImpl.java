@@ -64,6 +64,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.TrustManagerAggregator;
+import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -263,6 +264,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
      *
      * @return free memory minus buffer of 2 GB
      */
+    @SuppressForbidden("Deliberate use of com.sun package, handling exception if not available")
     long getFreeMemory() {
         try {
             OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
