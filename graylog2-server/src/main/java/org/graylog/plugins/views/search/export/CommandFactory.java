@@ -30,7 +30,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CommandFactory {
@@ -57,7 +56,6 @@ public class CommandFactory {
 
     public ExportMessagesCommand buildWithSearchOnly(Search search, ResultFormat resultFormat) {
         Query query = queryFrom(search);
-        final Set<String> queryStreamIds = query.usedStreamIds();
 
         return builderFrom(resultFormat)
                 .timeRange(resultFormat.timerange().orElse(toAbsolute(query.timerange())))
@@ -67,7 +65,7 @@ public class CommandFactory {
                         .flatMap(List::stream)
                         .collect(Collectors.toList())
                 )
-                .streams(queryStreamIds)
+                .streams(query.usedStreamIds())
                 .build();
     }
 
