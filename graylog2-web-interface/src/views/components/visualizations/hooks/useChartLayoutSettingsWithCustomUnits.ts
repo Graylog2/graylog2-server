@@ -30,7 +30,7 @@ import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
-const useLayoutExtendedSettings = ({ config, barmode, chartData }: {
+const useChartLayoutSettingsWithCustomUnits = ({ config, barmode, chartData }: {
   config: AggregationWidgetConfig,
   barmode?: BarMode,
   chartData: Array<ChartDefinition>,
@@ -38,7 +38,8 @@ const useLayoutExtendedSettings = ({ config, barmode, chartData }: {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
   const { unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
-  const getLayoutExtendedSettings = useCallback(() => {
+
+  return useCallback(() => {
     if (!unitFeatureEnabled) return ({});
 
     const generatedLayouts = generateLayouts({
@@ -57,8 +58,6 @@ const useLayoutExtendedSettings = ({ config, barmode, chartData }: {
 
     return _layouts;
   }, [barmode, chartData, config, unitFeatureEnabled, unitTypeMapper, widgetUnits]);
-
-  return ({ getLayoutExtendedSettings });
 };
 
-export default useLayoutExtendedSettings;
+export default useChartLayoutSettingsWithCustomUnits;

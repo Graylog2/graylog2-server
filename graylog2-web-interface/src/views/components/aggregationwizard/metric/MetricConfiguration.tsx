@@ -31,7 +31,7 @@ import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
 import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
-import FieldUnitComponent from 'views/components/aggregationwizard/units/FieldUnitComponent';
+import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
@@ -144,7 +144,7 @@ const Metric = ({ index }: Props) => {
             </Field>
           </Col>
           {showUnitType && (
-            <div className="col-sm-1"><FieldUnitComponent field={metrics?.[index].field} />
+            <div className="col-sm-1"><FieldUnit field={metrics?.[index].field} />
             </div>
           )}
         </>

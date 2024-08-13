@@ -22,7 +22,7 @@ import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
-import FieldUnitComponent from 'views/components/aggregationwizard/units/FieldUnitComponent';
+import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
@@ -108,7 +108,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
           </DragHandle>
           <FieldTitle>{item.title}</FieldTitle>
           <Actions>
-            {unitFeatureEnabled && <FieldUnitComponent field={item.title} />}
+            {unitFeatureEnabled && <FieldUnit field={item.title} />}
             <IconButton name="edit_square" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
             <IconButton name="delete" title={`Remove ${item.title} field`} onClick={onRemove} />
           </Actions>

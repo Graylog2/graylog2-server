@@ -27,8 +27,8 @@ import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
-import useExtendedChartGeneratorSettings from 'views/components/visualizations/hooks/useExtendedChartGeneratorSettings';
-import useLayoutExtendedSettings from 'views/components/visualizations/hooks/useLayoutExtendedSettings';
+import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
+import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -40,7 +40,7 @@ const AreaVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
-  const { getExtendedChartGeneratorSettings } = useExtendedChartGeneratorSettings({ config, effectiveTimerange });
+  const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
   const { interpolation = 'linear' } = visualizationConfig;
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
@@ -58,8 +58,8 @@ const AreaVisualization = makeVisualization(({
     fill: 'tozeroy',
     line: { shape: toPlotly(interpolation) },
     originalName,
-    ...getExtendedChartGeneratorSettings({ originalName, name, values }),
-  }), [_mapKeys, getExtendedChartGeneratorSettings, interpolation]);
+    ...getChartDataSettingsWithCustomUnits({ originalName, name, values }),
+  }), [_mapKeys, getChartDataSettingsWithCustomUnits, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
 
@@ -72,12 +72,12 @@ const AreaVisualization = makeVisualization(({
   const { eventChartData, shapes } = useEvents(config, data.events);
 
   const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
-  const { getLayoutExtendedSettings } = useLayoutExtendedSettings({ config, chartData: chartDataResult });
+  const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({ config, chartData: chartDataResult });
   const layout = useMemo<Partial<Layout>>(() => {
     const _layouts = shapes ? { shapes } : {};
 
-    return ({ ..._layouts, ...getLayoutExtendedSettings() });
-  }, [shapes, getLayoutExtendedSettings]);
+    return ({ ..._layouts, ...getChartLayoutSettingsWithCustomUnits() });
+  }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
   return (
     <XYPlot config={config}

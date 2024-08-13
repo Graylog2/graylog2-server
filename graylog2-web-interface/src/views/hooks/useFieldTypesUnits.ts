@@ -22,15 +22,10 @@ const useFieldTypesUnits = () => {
   const { data, isLoading } = useFieldTypes(undefined, undefined);
 
   return useMemo(() => {
-    if (isLoading) return {};
+    if (isLoading) return ({});
 
-    return data
-      .filter((ft) => ft?.unit?.isDefined)
-      .reduce((res, ft) => {
-        res[ft.name] = ft.unit;
-
-        return res;
-      }, {});
+    return Object
+      .fromEntries(data?.filter((ft) => ft?.unit?.isDefined).map((ft) => [ft.name, ft.unit]) ?? []);
   }, [data, isLoading]);
 };
 

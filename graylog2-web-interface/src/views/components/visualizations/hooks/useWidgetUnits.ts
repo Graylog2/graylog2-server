@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMemo } from 'react';
-import flatten from 'lodash/flatten';
 import compact from 'lodash/compact';
 import uniq from 'lodash/uniq';
 
@@ -31,8 +30,8 @@ const useWidgetUnits = (config: AggregationWidgetConfig) => {
 
     return field;
   }), [config.series]);
-  const usedFieldsInRowPivots = useMemo(() => flatten(config.rowPivots.map((p) => p.fields)), [config.rowPivots]);
-  const usedFieldsInColumnPivots = useMemo(() => flatten(config.columnPivots.map((p) => p.fields)), [config.columnPivots]);
+  const usedFieldsInRowPivots = useMemo(() => config.rowPivots.flatMap((p) => p.fields), [config.rowPivots]);
+  const usedFieldsInColumnPivots = useMemo(() => config.columnPivots.flatMap((p) => p.fields), [config.columnPivots]);
 
   const allFields: Array<string> = useMemo(() => uniq(compact([...usedFieldsInSeries, ...usedFieldsInRowPivots, ...usedFieldsInColumnPivots])), [usedFieldsInColumnPivots, usedFieldsInRowPivots, usedFieldsInSeries]);
 

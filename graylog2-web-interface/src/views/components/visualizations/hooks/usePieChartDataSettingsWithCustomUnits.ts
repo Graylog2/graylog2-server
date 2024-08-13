@@ -27,11 +27,11 @@ import { getPieHoverTemplateSettings } from 'views/components/visualizations/uti
 export type PieHoverTemplateSettings = { text: Array<string>, hovertemplate: string, meta: string, textinfo: 'percent' };
 export type GetExtendedPieGeneratorSettings = (props: { originalName: string, name: string, values: Array<any> }) => PieHoverTemplateSettings | {};
 
-const useExtendedPieChartSettings = ({ config }: { config: AggregationWidgetConfig }) => {
+const usePieChartDataSettingsWithCustomUnits = ({ config }: { config: AggregationWidgetConfig }) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
 
-  const getExtendedPieGeneratorSettings = useCallback<GetExtendedPieGeneratorSettings>(({ originalName, name, values }) => {
+  return useCallback<GetExtendedPieGeneratorSettings>(({ originalName, name, values }) => {
     if (!unitFeatureEnabled) return ({});
 
     const fieldNameKey = getFieldNameFromTrace({ name, series: config.series }) ?? NO_FIELD_NAME_SERIES;
@@ -41,10 +41,6 @@ const useExtendedPieChartSettings = ({ config }: { config: AggregationWidgetConf
       ...getPieHoverTemplateSettings({ convertedValues: values, unit, originalName }),
     });
   }, [config.series, unitFeatureEnabled, widgetUnits]);
-
-  return ({
-    getExtendedPieGeneratorSettings,
-  });
 };
 
-export default useExtendedPieChartSettings;
+export default usePieChartDataSettingsWithCustomUnits;

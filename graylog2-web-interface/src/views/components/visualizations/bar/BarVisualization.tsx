@@ -31,8 +31,10 @@ import { keySeparator, humanSeparator } from 'views/Constants';
 import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
-import useExtendedChartGeneratorSettings from 'views/components/visualizations/hooks/useExtendedChartGeneratorSettings';
-import useLayoutExtendedSettings from 'views/components/visualizations/hooks/useLayoutExtendedSettings';
+import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
+import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
+import useBarChartDataSettingsWithCustomUnits
+  from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -93,25 +95,23 @@ const BarVisualization = makeVisualization(({
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
 
-  const { getExtendedBarsGeneratorSettings } = useExtendedChartGeneratorSettings({ config, effectiveTimerange, barmode });
+  const getBarChartDataSettingsWithCustomUnits = useBarChartDataSettingsWithCustomUnits({ config, effectiveTimerange, barmode });
 
   const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName, total, idx }): ChartDefinition => {
     const opacity = visualizationConfig?.opacity ?? 1.0;
     const mappedKeys = _mapKeys(labels);
 
-    const getData = () => ({
+    return ({
       type,
       name,
       x: mappedKeys,
       y: values,
       opacity,
       originalName,
-      ...getExtendedBarsGeneratorSettings({ originalName, name, values, idx, total, xAxisItemsLength: mappedKeys.length }),
-    });
-
-    return getData();
+      ...getBarChartDataSettingsWithCustomUnits({ originalName, name, values, idx, total, xAxisItemsLength: mappedKeys.length }),
+    }) as ChartDefinition;
   },
-  [visualizationConfig?.opacity, _mapKeys, getExtendedBarsGeneratorSettings]);
+  [visualizationConfig?.opacity, _mapKeys, getBarChartDataSettingsWithCustomUnits]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
 
@@ -127,7 +127,7 @@ const BarVisualization = makeVisualization(({
     return defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to);
   }, [_chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to, eventChartData]);
 
-  const { getLayoutExtendedSettings } = useLayoutExtendedSettings({ config, chartData, barmode });
+  const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({ config, chartData, barmode });
 
   const layout = useMemo<Partial<Layout>>(() => {
     const _layouts: Partial<Layout> = {};
@@ -140,8 +140,8 @@ const BarVisualization = makeVisualization(({
       _layouts.barmode = barmode;
     }
 
-    return ({ ..._layouts, ...getLayoutExtendedSettings() });
-  }, [shapes, barmode, getLayoutExtendedSettings]);
+    return ({ ..._layouts, ...getChartLayoutSettingsWithCustomUnits() });
+  }, [shapes, barmode, getChartLayoutSettingsWithCustomUnits]);
 
   return (
     <XYPlot config={config}

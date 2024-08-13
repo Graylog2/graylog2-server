@@ -28,8 +28,8 @@ import useEvents from 'views/components/visualizations/useEvents';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import useLayoutExtendedSettings from 'views/components/visualizations/hooks/useLayoutExtendedSettings';
-import useExtendedChartGeneratorSettings from 'views/components/visualizations/hooks/useExtendedChartGeneratorSettings';
+import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
+import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -41,7 +41,7 @@ const LineVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
-  const { getExtendedChartGeneratorSettings } = useExtendedChartGeneratorSettings({ config, effectiveTimerange });
+  const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config, effectiveTimerange });
   const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
@@ -58,8 +58,8 @@ const LineVisualization = makeVisualization(({
     y: values,
     originalName,
     line: { shape: toPlotly(interpolation) },
-    ...getExtendedChartGeneratorSettings({ originalName, name, values }),
-  }), [_mapKeys, getExtendedChartGeneratorSettings, interpolation]);
+    ...getChartDataSettingsWithCustomUnits({ originalName, name, values }),
+  }), [_mapKeys, getChartDataSettingsWithCustomUnits, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const _chartDataResult = useChartData(rows, {
@@ -71,12 +71,12 @@ const LineVisualization = makeVisualization(({
   const { eventChartData, shapes } = useEvents(config, data.events);
 
   const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
-  const { getLayoutExtendedSettings } = useLayoutExtendedSettings({ config, chartData: chartDataResult });
+  const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({ config, chartData: chartDataResult });
   const layout = useMemo<Partial<Layout>>(() => {
     const _layouts = shapes ? { shapes } : {};
 
-    return ({ ..._layouts, ...getLayoutExtendedSettings() });
-  }, [shapes, getLayoutExtendedSettings]);
+    return ({ ..._layouts, ...getChartLayoutSettingsWithCustomUnits() });
+  }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
   return (
     <XYPlot config={config}

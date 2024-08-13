@@ -42,7 +42,7 @@ import {
 } from 'views/components/visualizations/Constants';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
-import type { PieHoverTemplateSettings } from 'views/components/visualizations/hooks/useExtendedPieChartSettings';
+import type { PieHoverTemplateSettings } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 
 type DefaultAxisKey = 'withoutUnit';
 

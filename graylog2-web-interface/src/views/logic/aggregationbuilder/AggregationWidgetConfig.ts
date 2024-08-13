@@ -178,7 +178,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       visualization,
       visualization_config: visualizationConfig,
       event_annotation: eventAnnotation,
-      units: units.toJSON(),
+      units,
     };
   }
 

@@ -130,6 +130,10 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
         const fieldName = getFieldNameFromTrace({ series, name: field });
         const unit = units.getFieldUnit(fieldName);
 
+        console.log('!!!!!!',
+          columnNameToField(field, series),
+        );
+
         return (
           <Column key={key}
                   field={field}

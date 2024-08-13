@@ -36,7 +36,9 @@ const ElementActions = styled.div`
   flex-direction: row;
   justify-content: end;
   align-items: center;
-  width: 100%;
+  position: absolute;
+  right: 0;
+  z-index: 1;
 `;
 
 const StyledIconButton = styled(IconButton)`
@@ -74,7 +76,7 @@ const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(({ child
         <Icon size="sm" name="drag_indicator" />
       </DragHandle>
       )}
-      {onRemove && <StyledIconButton size="sm" onClick={onRemove} name="close" title={`Remove ${elementTitle}`} />}
+      {onRemove && <StyledIconButton size="sm" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
     </ElementActions>
     <ElementConfiguration>
       {children}

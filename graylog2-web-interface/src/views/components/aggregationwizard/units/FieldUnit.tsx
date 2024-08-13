@@ -38,7 +38,7 @@ export const UnitLabel = styled.div(({ theme }) => css`
   height: 25px;
 `);
 
-const FieldUnitComponent = ({ field }: Props) => {
+const FieldUnit = ({ field }: Props) => {
   const fieldTypesUnits = useFieldTypesUnits();
   const { data } = useFieldTypes(undefined, undefined);
   const predefinedValue = useMemo(() => fieldTypesUnits?.[field], [field, fieldTypesUnits]);
@@ -56,4 +56,4 @@ const FieldUnitComponent = ({ field }: Props) => {
   return <FieldUnitPopover field={field} predefinedUnit={predefinedValue} />;
 };
 
-export default FieldUnitComponent;
+export default FieldUnit;

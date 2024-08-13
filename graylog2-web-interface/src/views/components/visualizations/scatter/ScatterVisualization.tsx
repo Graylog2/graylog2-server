@@ -28,8 +28,8 @@ import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import type { Generator } from 'views/components/visualizations/ChartData';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import useExtendedChartGeneratorSettings from 'views/components/visualizations/hooks/useExtendedChartGeneratorSettings';
-import useLayoutExtendedSettings from 'views/components/visualizations/hooks/useLayoutExtendedSettings';
+import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
+import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 
 import XYPlot from '../XYPlot';
 
@@ -40,7 +40,7 @@ const ScatterVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
-  const { getExtendedChartGeneratorSettings } = useExtendedChartGeneratorSettings({ config, effectiveTimerange });
+  const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
   const _mapKeys = useCallback((labels: string[]) => labels
@@ -56,8 +56,8 @@ const ScatterVisualization = makeVisualization(({
     y: values,
     mode: 'markers',
     originalName,
-    ...getExtendedChartGeneratorSettings({ originalName, name, values }),
-  }), [_mapKeys, getExtendedChartGeneratorSettings]);
+    ...getChartDataSettingsWithCustomUnits({ originalName, name, values }),
+  }), [_mapKeys, getChartDataSettingsWithCustomUnits]);
   const _chartDataResult = useChartData(rows, {
     widgetConfig: config,
     chartType: 'scatter',
@@ -65,12 +65,12 @@ const ScatterVisualization = makeVisualization(({
   });
   const { eventChartData, shapes } = useEvents(config, data.events);
   const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
-  const { getLayoutExtendedSettings } = useLayoutExtendedSettings({ config, chartData: chartDataResult });
+  const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({ config, chartData: chartDataResult });
   const layout = useMemo<Partial<Layout>>(() => {
     const _layouts = shapes ? { shapes } : {};
 
-    return ({ ..._layouts, ...getLayoutExtendedSettings() });
-  }, [shapes, getLayoutExtendedSettings]);
+    return ({ ..._layouts, ...getChartLayoutSettingsWithCustomUnits() });
+  }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
   return (
     <XYPlot config={config}

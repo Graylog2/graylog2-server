@@ -30,8 +30,8 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import { keySeparator, humanSeparator } from 'views/Constants';
 import type {
   GetExtendedPieGeneratorSettings,
-} from 'views/components/visualizations/hooks/useExtendedPieChartSettings';
-import useExtendedPieChartSettings from 'views/components/visualizations/hooks/useExtendedPieChartSettings';
+} from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
+import usePieChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 
 import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
@@ -103,8 +103,8 @@ const rowPivotsToFields = (config: AggregationWidgetConfig) => config?.rowPivots
 const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const mapKeys = useMapKeys();
-  const { getExtendedPieGeneratorSettings } = useExtendedPieChartSettings({ config });
-  const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries(mapKeys, getExtendedPieGeneratorSettings) });
+  const getPieChartDataSettingsWithCustomUnits = usePieChartDataSettingsWithCustomUnits({ config });
+  const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries(mapKeys, getPieChartDataSettingsWithCustomUnits) });
 
   return (
     <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} labelFields={rowPivotsToFields} neverHide>

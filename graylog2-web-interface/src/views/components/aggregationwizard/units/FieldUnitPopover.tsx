@@ -20,12 +20,12 @@ import { Field, useFormikContext } from 'formik';
 
 import Select from 'components/common/Select';
 import Popover from 'components/common/Popover';
-import { HoverForHelp } from 'components/common';
-import { Alert, Input } from 'components/bootstrap';
+import { HoverForHelp, ModalButtonToolbar } from 'components/common';
+import { Alert, Button, ButtonToolbar, Input } from 'components/bootstrap';
 import type { Unit } from 'views/components/visualizations/utils/unitConverters';
 import { mappedUnitsFromJSON as units } from 'views/components/visualizations/utils/unitConverters';
 import type { FieldUnitsFormValues } from 'views/types';
-import { UnitLabel } from 'views/components/aggregationwizard/units/FieldUnitComponent';
+import { UnitLabel } from 'views/components/aggregationwizard/units/FieldUnit';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 const Container = styled.div`
@@ -48,8 +48,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
     .map(({ abbrev, name }: Unit) => ({ value: abbrev, label: name })), [currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {
-    setFieldValue(`units.${field}.unitType`, val || undefined);
-    setFieldValue(`units.${field}.abbrev`, undefined);
+    setFieldValue(`units.${field}`, { unitType: val || undefined, abbrev: undefined });
   }, [field, setFieldValue]);
 
   const badgeLabel = useMemo(() => {
@@ -65,6 +64,11 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
 
     return <>Unit <b>{unitName}</b> was defined by Graylog. Changing this unit might display incorrect values</>;
   }, [predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType]);
+
+  const onClear = useCallback(() => {
+    setFieldValue(`units.${field}`, { unitType: undefined, abbrev: undefined });
+    toggleShow();
+  }, [field, setFieldValue]);
 
   return (
     <Popover position="right" opened={show} withArrow>
@@ -98,7 +102,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
           <Field name={`units.${field}.abbrev`}>
             {({ field: { name, value, onChange }, meta: { error } }) => (
               <Input id="metric-unit-field"
-                     label={<span>Unit <HoverForHelp displayLeftMargin>Field value unit which is used in Data Base</HoverForHelp></span>}
+                     label={<span>Unit <HoverForHelp displayLeftMargin>Unit which is used to format values of metric in charts</HoverForHelp></span>}
                      error={error}
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9">
@@ -114,6 +118,10 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
           </Field>
           )}
           {predefinedInfo && <Alert bsStyle="info">{predefinedInfo}</Alert>}
+          <ModalButtonToolbar>
+            <Button bsSize="xs" onClick={onClear}>Clear</Button>
+            <Button bsSize="xs" bsStyle="success" onClick={toggleShow}>OK</Button>
+          </ModalButtonToolbar>
         </Container>
       </Popover.Dropdown>
     </Popover>

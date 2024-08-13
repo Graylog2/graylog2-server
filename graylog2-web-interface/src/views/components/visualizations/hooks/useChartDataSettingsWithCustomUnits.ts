@@ -20,12 +20,9 @@ import useFeature from 'hooks/useFeature';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import {
-  generateMappersForYAxis,
-  getBarChartTraceOffsetSettings, getHoverTemplateSettings,
+  generateMappersForYAxis, getHoverTemplateSettings,
 } from 'views/components/visualizations/utils/chartLayoutGenerators';
-import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import convertDataToBaseUnit from 'views/components/visualizations/utils/convertDataToBaseUnit';
-import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { NO_FIELD_NAME_SERIES, UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import { getBaseUnit } from 'views/components/visualizations/utils/unitConverters';
 import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
@@ -33,15 +30,14 @@ import isLayoutRequiresBaseUnit from 'views/components/visualizations/utils/isLa
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 
-const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange }: {
+const useChartDataSettingsWithCustomUnits = ({ config }: {
   config: AggregationWidgetConfig,
-  barmode?: BarMode,
-  effectiveTimerange: AbsoluteTimeRange,
 }) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
-  const { fieldNameToAxisNameMapper, fieldNameToAxisCountMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
-  const getExtendedChartGeneratorSettings = useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }): Partial<ChartDefinition> => {
+  const { fieldNameToAxisNameMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
+
+  return useCallback(({ originalName, name, values }: { originalName: string, name: string, values: Array<any> }): Partial<ChartDefinition> => {
     if (!unitFeatureEnabled) return ({});
     const fieldNameKey = getFieldNameFromTrace({ name, series: config.series }) ?? NO_FIELD_NAME_SERIES;
     const yaxis = fieldNameToAxisNameMapper[fieldNameKey];
@@ -57,39 +53,6 @@ const useExtendedChartGeneratorSettings = ({ config, barmode, effectiveTimerange
       ...getHoverTemplateSettings({ unit, convertedValues, originalName }),
     });
   }, [config.series, fieldNameToAxisNameMapper, unitFeatureEnabled, widgetUnits]);
-  const getExtendedBarsGeneratorSettings = useCallback(({
-    originalName, name, values, idx, total, xAxisItemsLength,
-  }: { xAxisItemsLength: number, originalName: string, name: string, values: Array<any>, idx: number, total: number }):Partial<ChartDefinition> => {
-    if (!unitFeatureEnabled) return ({});
-
-    const fieldNameKey = getFieldNameFromTrace({ name, series: config.series }) ?? NO_FIELD_NAME_SERIES;
-    const { y: convertedValues, yaxis, ...hoverTemplateSettings } = getExtendedChartGeneratorSettings({ originalName, name, values });
-    const axisNumber = fieldNameToAxisCountMapper?.[fieldNameKey];
-    const totalAxis = Object.keys(unitTypeMapper).length;
-
-    const offsetSettings = getBarChartTraceOffsetSettings(barmode, {
-      yaxis,
-      totalAxis,
-      axisNumber,
-      traceIndex: idx,
-      totalTraces: total,
-      effectiveTimerange,
-      isTimeline: config.isTimeline,
-      xAxisItemsLength: xAxisItemsLength,
-    });
-
-    return ({
-      yaxis,
-      y: convertedValues,
-      ...hoverTemplateSettings,
-      ...offsetSettings,
-    });
-  }, [barmode, config.isTimeline, config.series, effectiveTimerange, fieldNameToAxisCountMapper, getExtendedChartGeneratorSettings, unitFeatureEnabled, unitTypeMapper]);
-
-  return ({
-    getExtendedBarsGeneratorSettings,
-    getExtendedChartGeneratorSettings,
-  });
 };
 
-export default useExtendedChartGeneratorSettings;
+export default useChartDataSettingsWithCustomUnits;
