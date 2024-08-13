@@ -30,6 +30,7 @@ import { getPrettifiedValue } from 'views/components/visualizations/utils/unitCo
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import { DECIMAL_PLACES, UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import useFeature from 'hooks/useFeature';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
 
 import EmptyValue from './EmptyValue';
 import CustomPropTypes from './CustomPropTypes';
@@ -64,7 +65,8 @@ const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit
 
 const FormattedValue = ({ field, value, truncate, render, unit, type }: TypeSpecificValueProps) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
-  if (unit?.isDefined && value && unitFeatureEnabled) return <ValueWithUnitRenderer value={value} unit={unit} />;
+  const shouldRenderValueWithUnit = unitFeatureEnabled && unit?.isDefined && value && value !== MISSING_BUCKET_NAME && unitFeatureEnabled;
+  if (shouldRenderValueWithUnit) return <ValueWithUnitRenderer value={value} unit={unit} />;
 
   return _formatValue(field, value, truncate, render, type);
 };

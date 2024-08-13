@@ -31,7 +31,6 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
-import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
 
 import TableDataCell from './TableDataCell';
 
@@ -127,18 +126,15 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
     <tr className={`fields-row ${classes}`}>
       {columns.map(({ field, value, path, source }, idx) => {
         const key = `${activeQuery}-${field}=${value}-${idx}`;
-        const fieldName = getFieldNameFromTrace({ series, name: field });
-        const unit = units.getFieldUnit(fieldName);
-
-        console.log('!!!!!!',
-          columnNameToField(field, series),
-        );
+        const nameForField = columnNameToField(field, series);
+        const fieldNameForUnit = parseSeries(nameForField)?.field ?? nameForField;
+        const unit = units.getFieldUnit(fieldNameForUnit);
 
         return (
           <Column key={key}
                   field={field}
                   value={value}
-                  type={fieldTypeFor(columnNameToField(field, series), types)}
+                  type={fieldTypeFor(nameForField, types)}
                   valuePath={path.slice()}
                   source={source}
                   unit={unit} />
