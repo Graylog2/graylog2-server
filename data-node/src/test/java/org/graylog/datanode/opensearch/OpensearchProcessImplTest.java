@@ -30,6 +30,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.datanode.DataNodeNotficationEvent;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
@@ -50,7 +52,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -79,12 +83,14 @@ public class OpensearchProcessImplTest {
     RestHighLevelClient restClient;
     @Mock
     ClusterClient clusterClient;
+    @Mock
+    ClusterEventBus clusterEventBus;
 
     @Before
     public void setup() throws IOException {
         when(datanodeConfiguration.processLogsBufferSize()).thenReturn(100);
         this.opensearchProcess = spy(new OpensearchProcessImpl(datanodeConfiguration, trustmManager, configuration,
-                nodeService, objectMapper, processState, nodeName, nodeId, eventBus));
+                nodeService, objectMapper, processState, nodeName, nodeId, eventBus, clusterEventBus));
         when(opensearchProcess.restClient()).thenReturn(Optional.of(restClient));
         when(restClient.cluster()).thenReturn(clusterClient);
     }
@@ -130,6 +136,24 @@ public class OpensearchProcessImplTest {
         opensearchProcess.checkRemovalStatus();
         verify(opensearchProcess).stop();
         verify(executor).shutdown();
+    }
+
+    @Test
+    public void testHeapThresholdWarning() {
+        when(configuration.getHostname()).thenReturn("datanode");
+        when(configuration.getOpensearchHeap()).thenReturn("1g");
+        when(opensearchProcess.getFreeMemory()).thenReturn(8 * 1024 * 1024 * 1024L);
+        opensearchProcess.checkConfiguredHeap();
+        verify(clusterEventBus, times(1)).post(any(DataNodeNotficationEvent.class));
+    }
+
+    @Test
+    public void testNoHeapThresholdWarning() {
+        when(configuration.getHostname()).thenReturn("datanode");
+        when(configuration.getOpensearchHeap()).thenReturn("1g");
+        when(opensearchProcess.getFreeMemory()).thenReturn(2 * 1024 * 1024 * 1024L);
+        opensearchProcess.checkConfiguredHeap();
+        verifyNoInteractions(clusterEventBus);
     }
 
 }
