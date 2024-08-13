@@ -32,14 +32,14 @@ const Container = styled.div(({ theme }) => css`
   margin-bottom: ${theme.spacings.xxs};
 `);
 
-const Header = styled.div`
+const Header = styled.div(({ theme }) => css`
   display: flex;
   justify-content: space-between;
-  gap: 5px;
+  gap: ${theme.spacings.xs};
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: ${theme.spacings.xs};
   flex-wrap: wrap;
-`;
+`);
 
 const FlexWrapper = styled.div(({ theme }) => css`
   display: flex;

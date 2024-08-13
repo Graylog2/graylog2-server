@@ -29,7 +29,6 @@ const ActionWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  
 `;
 
 const FilterActions = ({ filterRule, destinationType }: Props) => (

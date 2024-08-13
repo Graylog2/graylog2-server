@@ -32,7 +32,6 @@ type Props = {
   collapsible?: boolean,
   defaultClosed?: boolean,
   disableCollapseButton?: boolean,
-
 };
 
 const Header = styled.div`

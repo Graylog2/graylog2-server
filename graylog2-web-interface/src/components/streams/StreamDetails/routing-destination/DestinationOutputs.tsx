@@ -32,7 +32,7 @@ type Props = {
 };
 export const StyledSwitch = styled(Switch)`
   > label {
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
 `;
 

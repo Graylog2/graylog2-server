@@ -27,16 +27,14 @@ import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
 import type { Stream } from 'stores/streams/StreamsStore';
+import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
+import IndexSetArchivingCell from 'components/streams/StreamDetails/routing-destination/IndexSetArchivingCell';
 import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
 import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
 import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
 import useIndexSetStats from 'hooks/useIndexSetStats';
 import NumberUtils from 'util/NumberUtils';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
-
-import IndexSetArchivingCell from './IndexSetArchivingCell';
-
-import useStreamOutputFilters from '../../hooks/useStreamOutputFilters';
 
 type Props = {
   indexSet: IndexSet,

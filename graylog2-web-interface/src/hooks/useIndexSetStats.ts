@@ -37,8 +37,8 @@ const useIndexSetStats = (indexSetId: string): {
     () => fetchIndexSetStats(indexSetId),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading indexSet stats failed with status: ${errorThrown}`,
-          'Could not load indexSet stats.');
+        UserNotification.error(`Loading index set stats failed with status: ${errorThrown}`,
+          'Could not load index set stats.');
       },
       notifyOnChangeProps: ['data', 'error'],
     },
