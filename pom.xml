@@ -116,7 +116,7 @@
         <commons-validator.version>1.9.0</commons-validator.version>
         <commons-io.version>2.16.1</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.29.2</error-prone.version>
+        <error-prone.version>2.30.0</error-prone.version>
         <freemarker.version>2.3.33</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.0</geoip2.version>
@@ -171,7 +171,7 @@
         <snappy-java.version>1.1.10.6</snappy-java.version>
         <oshi.version>6.6.2</oshi.version>
         <siv-mode.version>1.5.2</siv-mode.version>
-        <slf4j.version>2.0.15</slf4j.version>
+        <slf4j.version>2.0.16</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
         <swagger.version>1.6.14</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
