@@ -77,6 +77,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchBackend.class);
@@ -158,6 +159,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                     final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
                     final Set<String> effectiveStreamIds = query.effectiveStreams(searchType);
+
                     final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
                             .must(searchTypeSourceBuilder.query())
                             .must(
