@@ -3487,10 +3487,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/plotly.js@*", "@types/plotly.js@2.29.5":
-  version "2.29.5"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.29.5.tgz#5a6fa275710f3e7197e6c47c4b3e9aa9c9f6630c"
-  integrity sha512-VPaCOCUTHLbtQxur7o7RqKL7/hEDtgYZcXL41o4xe9mqZ4HVxbC70j0lTsCdiVp2SI+BYsER4oPO+ck17jtnkg==
+"@types/plotly.js@*", "@types/plotly.js@2.33.3":
+  version "2.33.3"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.33.3.tgz#18891de51834c963ce8bf4da7f5e4d3aec613c13"
+  integrity sha512-Uu9aC8Z5oMj+oq1QHKtZAug9uAdPV66KPZrIa+r26bhktfuAbSCIq2HDN1kFPrcci0QKNCh8Gqj1GtMYvfoEUQ==
 
 "@types/prop-types@*":
   version "15.7.3"
@@ -12632,10 +12632,10 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-plotly.js@2.33.0:
-  version "2.33.0"
-  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.33.0.tgz#9b7a0cbc37a3396995787fdc891c4ff52e877810"
-  integrity sha512-pzuf6hSUCaSYmEag2b2DngkHdYMn+U/QMSC/UJOLIS8yd2UwIG1iGUmOR7pqZIS87oKx/+cMoG8aknGytgJKig==
+plotly.js@2.34.0:
+  version "2.34.0"
+  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.34.0.tgz#880d4dcede6b52baafacbc4d38dc182957306c37"
+  integrity sha512-dG2LC6wY6AUR1jsnriBi9xbigLPEEXXOHhLo97dRiZAWZVS6lZCmXXZ227U4rsoluXyfyqQezaKq7svolap8Dw==
   dependencies:
     "@plotly/d3" "3.8.2"
     "@plotly/d3-sankey" "0.7.2"
