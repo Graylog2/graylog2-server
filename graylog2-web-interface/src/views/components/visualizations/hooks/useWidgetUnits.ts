@@ -41,7 +41,7 @@ const useWidgetUnits = (config: AggregationWidgetConfig) => {
     const filtratedFields = Object.fromEntries(allFields.filter((field) => {
       const predefinedUnit = fieldTypesUnits?.[field];
 
-      return !widgetUnits?.[field] && !!predefinedUnit;
+      return !widgetUnits?.getFieldUnit(field) && !!predefinedUnit;
     }).map((field) => {
       const predefinedUnit = fieldTypesUnits[field];
 

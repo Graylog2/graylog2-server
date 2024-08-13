@@ -42,14 +42,14 @@ const FieldUnit = ({ field }: Props) => {
   const fieldTypesUnits = useFieldTypesUnits();
   const { data } = useFieldTypes(undefined, undefined);
   const predefinedValue = useMemo(() => fieldTypesUnits?.[field], [field, fieldTypesUnits]);
-  const { setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
   const showUnitComponent = useMemo(() => !!(data?.find((f) => f.name === field && f?.type?.properties?.contains(Properties.Numeric))), [data, field]);
 
   useEffect(() => {
-    if (predefinedValue) {
+    if (predefinedValue && !values.units[field]) {
       setFieldValue(`units.${field}`, { abbrev: predefinedValue.abbrev, unitType: predefinedValue.unitType });
     }
-  }, [field, predefinedValue, setFieldValue]);
+  }, [field, predefinedValue, setFieldValue, values.units]);
 
   if (!showUnitComponent) return null;
 
