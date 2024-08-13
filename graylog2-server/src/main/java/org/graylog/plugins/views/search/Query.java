@@ -255,8 +255,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
         Set<String> streamIds = categoryMappingFunction.apply(usedStreamCategories())
                 .filter(streamPermissions::canReadStream)
                 .collect(toSet());
-        final Filter newFilter = addStreamsTo(filter(), streamIds);
-        return toBuilder().filter(newFilter).build();
+        return addStreamsToFilter(streamIds);
     }
 
     private Filter addStreamsTo(Filter filter, Set<String> streamIds) {
