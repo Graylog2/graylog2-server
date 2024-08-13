@@ -15,17 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
-import { styled } from 'styled-components';
+import { styled, css } from 'styled-components';
 import { Field, useFormikContext } from 'formik';
 
 import Select from 'components/common/Select';
 import Popover from 'components/common/Popover';
 import { HoverForHelp, ModalButtonToolbar } from 'components/common';
-import { Alert, Button, ButtonToolbar, Input } from 'components/bootstrap';
+import { Alert, Button, Input } from 'components/bootstrap';
 import type { Unit } from 'views/components/visualizations/utils/unitConverters';
 import { mappedUnitsFromJSON as units } from 'views/components/visualizations/utils/unitConverters';
 import type { FieldUnitsFormValues } from 'views/types';
-import { UnitLabel } from 'views/components/aggregationwizard/units/FieldUnit';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 const Container = styled.div`
@@ -38,6 +37,26 @@ const Container = styled.div`
 
   width: 300px;
 `;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  height: 25px;
+`;
+
+export const StyledButton = styled(Button)(({ theme }) => css`
+  background-color: ${theme.colors.gray[60]};
+  padding: 1px 2px;
+  min-width: 20px;
+  border-radius: 3px;
+  color: ${theme.colors.variant.lightest.default};
+  &:hover {
+    background-color: ${theme.colors.gray[80]};
+    color: ${theme.colors.variant.lightest.default};
+  }
+`);
 
 const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefinedUnit: FieldUnit }) => {
   const [show, setShow] = useState(false);
@@ -73,11 +92,9 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
   return (
     <Popover position="right" opened={show} withArrow>
       <Popover.Target>
-        <UnitLabel onClick={toggleShow}
-                   title="Unit settings"
-                   role="button">
-          {badgeLabel}
-        </UnitLabel>
+        <ButtonContainer>
+          <StyledButton bsSize="xs" onClick={toggleShow} title="Unit settings">{badgeLabel}</StyledButton>
+        </ButtonContainer>
       </Popover.Target>
       <Popover.Dropdown title="Metrics Unit Settings">
         <Container>

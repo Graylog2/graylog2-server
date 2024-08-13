@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useMemo } from 'react';
-import { styled, css } from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import FieldUnitPopover from 'views/components/aggregationwizard/units/FieldUnitPopover';
@@ -27,16 +26,6 @@ import { Properties } from 'views/logic/fieldtypes/FieldType';
 type Props = {
   field: string,
 }
-
-export const UnitLabel = styled.div(({ theme }) => css`
-  color: ${theme.colors.gray[60]};
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 25px;
-  height: 25px;
-`);
 
 const FieldUnit = ({ field }: Props) => {
   const fieldTypesUnits = useFieldTypesUnits();
