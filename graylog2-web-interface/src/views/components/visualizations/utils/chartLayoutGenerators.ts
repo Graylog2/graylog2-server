@@ -20,6 +20,7 @@ import zipWith from 'lodash/zipWith';
 import sum from 'lodash/sum';
 import flattenDeep from 'lodash/flattenDeep';
 import moment from 'moment';
+import type { DefaultTheme } from 'styled-components';
 
 import type { FieldUnitType } from 'views/types';
 import type Series from 'views/logic/aggregationbuilder/Series';
@@ -43,6 +44,7 @@ import {
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
 import type { PieHoverTemplateSettings } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
+import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
 
 type DefaultAxisKey = 'withoutUnit';
 
@@ -118,10 +120,11 @@ const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, va
   }
 };
 
-export const getUnitLayoutWithData = (unitTypeKey: FieldUnitType | DefaultAxisKey, axisCount: number, values: Array<any>) => ({
+export const getUnitLayoutWithData = (unitTypeKey: FieldUnitType | DefaultAxisKey, axisCount: number, values: Array<any>, theme: DefaultTheme) => ({
   ...getFormatSettingsByData(unitTypeKey, values),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
+  ...getDefaultPlotYLayoutSettings(theme),
 });
 
 type SeriesName = string;
@@ -265,10 +268,11 @@ type Params = {
   barmode?: BarMode,
   widgetUnits: UnitsConfig,
   config: AggregationWidgetConfig,
+  theme: DefaultTheme
 }
 
 export const generateLayouts = (
-  { unitTypeMapper, chartData, barmode, widgetUnits, config }: Params,
+  { unitTypeMapper, chartData, barmode, widgetUnits, config, theme }: Params,
 ): Record<string, unknown> => {
   const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaultAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
     const traceName = value.name || value.originalName;
@@ -287,7 +291,7 @@ export const generateLayouts = (
 
   return transform(unitTypeMapper, (res, { axisKeyName, axisCount }, unitTypeKey: FieldUnitType | DefaultAxisKey) => {
     const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
-    res[axisKeyName] = getUnitLayoutWithData(unitTypeKey, axisCount, unitValues);
+    res[axisKeyName] = getUnitLayoutWithData(unitTypeKey, axisCount, unitValues, theme);
   });
 };
 

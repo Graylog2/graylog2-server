@@ -17,6 +17,7 @@
 
 import { useCallback, useMemo } from 'react';
 import type { Layout } from 'plotly.js';
+import { useTheme } from 'styled-components';
 
 import {
   generateDomain,
@@ -35,6 +36,7 @@ const useChartLayoutSettingsWithCustomUnits = ({ config, barmode, chartData }: {
   barmode?: BarMode,
   chartData: Array<ChartDefinition>,
 }) => {
+  const theme = useTheme();
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
   const { unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
@@ -48,6 +50,7 @@ const useChartLayoutSettingsWithCustomUnits = ({ config, barmode, chartData }: {
       chartData,
       widgetUnits,
       config,
+      theme,
     });
 
     const _layouts: Partial<Layout> = ({

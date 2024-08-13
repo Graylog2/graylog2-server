@@ -24,6 +24,7 @@ import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import { ROOT_FONT_SIZE } from 'theme/constants';
+import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
 
 import ChartColorContext from './ChartColorContext';
 
@@ -152,14 +153,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
       title: {
         font: fontSettings,
       },
-      yaxis: {
-        automargin: true,
-        gridcolor: theme.colors.variant.lightest.default,
-        tickfont: fontSettings,
-        title: {
-          font: fontSettings,
-        },
-      },
+      yaxis: getDefaultPlotYLayoutSettings(theme),
       xaxis: {
         automargin: true,
         tickfont: fontSettings,
@@ -246,6 +240,13 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
     onRenderComplete();
     onAfterPlot();
   }, [onRenderComplete, onAfterPlot]);
+
+  console.log({
+    plotChartData,
+    style,
+    plotLayout,
+    config,
+  });
 
   return (
     <StyledPlot data={plotChartData}
