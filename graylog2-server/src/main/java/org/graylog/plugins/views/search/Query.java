@@ -34,6 +34,7 @@ import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamCategoryFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
@@ -51,13 +52,16 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -242,6 +246,15 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
     }
 
     public Query addStreamsToFilter(Set<String> streamIds) {
+        final Filter newFilter = addStreamsTo(filter(), streamIds);
+        return toBuilder().filter(newFilter).build();
+    }
+
+    public Query mapStreamCategoriesToIds(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                          StreamPermissions streamPermissions) {
+        Set<String> streamIds = categoryMappingFunction.apply(usedStreamCategories())
+                .filter(streamPermissions::canReadStream)
+                .collect(toSet());
         final Filter newFilter = addStreamsTo(filter(), streamIds);
         return toBuilder().filter(newFilter).build();
     }

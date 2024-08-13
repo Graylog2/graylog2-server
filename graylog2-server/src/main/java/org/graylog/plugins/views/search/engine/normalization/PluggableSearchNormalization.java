@@ -103,6 +103,7 @@ public class PluggableSearchNormalization implements SearchNormalization {
         if (!query.hasStreams()) {
             normalizedQuery = query.addStreamsToFilter(searchUser.streams().loadMessageStreamsWithFallback());
         } else if (!query.usedStreamCategories().isEmpty()) {
+            normalizedQuery = query.mapStreamCategoriesToIds(streamCategoryMapper, searchUser);
         }
 
         if (!executionState.equals(ExecutionState.empty())) {
