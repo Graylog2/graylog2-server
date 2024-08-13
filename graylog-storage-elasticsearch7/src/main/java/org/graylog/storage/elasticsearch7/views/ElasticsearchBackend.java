@@ -59,7 +59,6 @@ import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +87,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
     private final StatsCollector<QueryExecutionStats> executionStatsCollector;
-    private final StreamService streamService;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -97,7 +95,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
                                 StatsCollector<QueryExecutionStats> executionStatsCollector,
-                                StreamService streamService,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
@@ -106,7 +103,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
         this.executionStatsCollector = executionStatsCollector;
-        this.streamService = streamService;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -163,7 +159,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
                     final Set<String> effectiveStreamIds = query.effectiveStreams(searchType);
-                    effectiveStreamIds.addAll(streamService.mapCategoriesToIds(query.usedStreamCategories()));
+
                     final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
                             .must(searchTypeSourceBuilder.query())
                             .must(
@@ -242,9 +238,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         LOG.debug("Running query {} for job {}", query.id(), job.getId());
         final HashMap<String, SearchType.Result> resultsMap = Maps.newHashMap();
 
-        final Set<String> usedStreams = query.usedStreamIds();
-        usedStreams.addAll(streamService.mapCategoriesToIds(query.usedStreamCategories()));
-        final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(usedStreams, query.timerange());
+        final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(query.usedStreamIds(), query.timerange());
 
         final Map<String, SearchSourceBuilder> searchTypeQueries = queryContext.searchTypeQueries();
         final List<String> searchTypeIds = new ArrayList<>(searchTypeQueries.keySet());
