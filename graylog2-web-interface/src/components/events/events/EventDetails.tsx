@@ -20,6 +20,7 @@ import isEmpty from 'lodash/isEmpty';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Col, Row } from 'components/bootstrap';
 import { Timestamp } from 'components/common';
+import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import EventFields from 'components/events/events/EventFields';
 import EventDefinitionLink from 'components/event-definitions/event-definitions/EventDefinitionLink';
@@ -74,6 +75,18 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
             &emsp;
             ({(plugin && plugin.displayName) || event.event_definition_type})
           </dd>
+          <dt>Remediation Steps</dt>
+          <dd>
+            {eventDefinitionContext?.remediation_steps ? (
+              <MarkdownPreview show
+                               withFullView
+                               noBorder
+                               noBackground
+                               value={eventDefinitionContext.remediation_steps} />
+            ) : (
+              <i>No remediation steps</i>
+            )}
+          </dd>
           {event.replay_info && (
             <>
               <dt>Actions</dt>
@@ -88,14 +101,14 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
       <Col md={6}>
         <dl>
           {event.timerange_start && event.timerange_end && (
-          <>
-            <dt>Aggregation time range</dt>
-            <dd>
-              <Timestamp dateTime={event.timerange_start} />
-                  &ensp;&mdash;&ensp;
-              <Timestamp dateTime={event.timerange_end} />
-            </dd>
-          </>
+            <>
+              <dt>Aggregation time range</dt>
+              <dd>
+                <Timestamp dateTime={event.timerange_start} />
+                &ensp;&mdash;&ensp;
+                <Timestamp dateTime={event.timerange_end} />
+              </dd>
+            </>
           )}
           <dt>Event Key</dt>
           <dd>{event.key || 'No Key set for this Event.'}</dd>

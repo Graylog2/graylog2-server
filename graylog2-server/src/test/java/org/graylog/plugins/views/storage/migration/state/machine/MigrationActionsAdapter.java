@@ -20,24 +20,15 @@ import org.graylog.plugins.views.storage.migration.state.actions.MigrationAction
 
 public class MigrationActionsAdapter implements MigrationActions {
 
-    MigrationStateMachineContext context;
+    protected final MigrationStateMachineContext context;
 
-    public MigrationActionsAdapter() {
-        this.context = new MigrationStateMachineContext();
+    public MigrationActionsAdapter(MigrationStateMachineContext context) {
+        this.context = context;
     }
 
     @Override
     public boolean dataNodeStartupFinished() {
         return false;
-    }
-
-    public void setStateMachineContext(MigrationStateMachineContext context) {
-        this.context = context;
-    }
-
-    @Override
-    public MigrationStateMachineContext getStateMachineContext() {
-        return context;
     }
 
     @Override
@@ -68,6 +59,14 @@ public class MigrationActionsAdapter implements MigrationActions {
     @Override
     public void getElasticsearchHosts() {
 
+    }
+
+    @Override
+    public void stopDatanodes() {
+    }
+
+    @Override
+    public void finishRemoteReindexMigration() {
     }
 
     @Override
@@ -121,6 +120,11 @@ public class MigrationActionsAdapter implements MigrationActions {
 
     @Override
     public boolean caAndRenewalPolicyExist() {
+        return false;
+    }
+
+    @Override
+    public boolean compatibleDatanodesRunning() {
         return false;
     }
 

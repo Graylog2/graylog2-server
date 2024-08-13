@@ -19,13 +19,17 @@ package org.graylog2.indexer.migration;
 import java.util.Collections;
 import java.util.List;
 
-public record IndexerConnectionCheckResult(List<String> indices, String error) {
+public record IndexerConnectionCheckResult(List<RemoteIndex> indices, String error) {
 
-    public static IndexerConnectionCheckResult success(List<String> indexNames) {
+    public static IndexerConnectionCheckResult success(List<RemoteIndex> indexNames) {
         return new IndexerConnectionCheckResult(indexNames, null);
     }
 
     public static IndexerConnectionCheckResult failure(Exception e) {
         return new IndexerConnectionCheckResult(Collections.emptyList(), e.getMessage());
+    }
+
+    public static IndexerConnectionCheckResult failure(String errorMessage) {
+        return new IndexerConnectionCheckResult(Collections.emptyList(), errorMessage);
     }
 }

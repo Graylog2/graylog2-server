@@ -146,6 +146,7 @@ public class MigrationStateMachineBuilderTest {
     @Test
     public void testRemoteReindexWelcomePage() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_SELECTION_PAGE);
+        when(migrationActions.compatibleDatanodesRunning()).thenReturn(true);
         stateMachine.fire(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
         verify(migrationActions).reindexUpgradeSelected();
@@ -161,6 +162,7 @@ public class MigrationStateMachineBuilderTest {
     @Test
     public void testProvisionDatanodeCertificatesRunning() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
+        when(migrationActions.compatibleDatanodesRunning()).thenReturn(true);
         stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
         verify(migrationActions, times(1)).dataNodeStartupFinished();
         verify(migrationActions, times(1)).provisionAndStartDataNodes();
@@ -202,6 +204,7 @@ public class MigrationStateMachineBuilderTest {
     @Test
     public void testRollingUpgradeMigrationWelcomePage() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_SELECTION_PAGE);
+        when(migrationActions.compatibleDatanodesRunning()).thenReturn(true);
         when(migrationActions.isCompatibleInPlaceMigrationVersion()).thenReturn(true);
         stateMachine.fire(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE);
@@ -213,6 +216,7 @@ public class MigrationStateMachineBuilderTest {
     @Test
     public void testDirectoryCompatibilityCheckPage() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE);
+        when(migrationActions.compatibleDatanodesRunning()).thenReturn(true);
         stateMachine.fire(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK);
@@ -244,6 +248,7 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_STOP_PROCESSING_PAGE);
         verify(migrationActions, times(1)).provisionDataNodes();
+        verify(migrationActions, times(1)).stopDatanodes();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -304,6 +309,7 @@ public class MigrationStateMachineBuilderTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
         when(migrationActions.isOldClusterStopped()).thenReturn(true);
         stateMachine.fire(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED);
+        verify(migrationActions, times(1)).finishRemoteReindexMigration();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
 

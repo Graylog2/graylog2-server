@@ -16,22 +16,21 @@
  */
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePipelinesConnectedStream, { type StreamConnectedPipelines } from 'hooks/usePipelinesConnectedStream';
-import { Table, Button } from 'components/bootstrap';
+import { Table, Button, Alert } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { IfPermitted, Section, Icon } from 'components/common';
 import usePipelines from 'hooks/usePipelines';
 import { LinkContainer } from 'components/common/router';
+import StreamPipelinesConnectionForm from 'components/streams/StreamDetails/StreamPipelinesConnectionForm';
 
-import StreamPipelinesConnectionForm from './StreamPipelinesConnectionForm';
-
-const ActionButtonsWrap = styled.span`
-  margin-right: 6px;
+const ActionButtonsWrap = styled.span(({ theme }) => css`
+  margin-right: ${theme.spacings.xxs};
   float: right;
-`;
+`);
 
 const StreamDataRoutingProcessing = () => {
   const { streamId } = useParams<{streamId: string}>();
@@ -42,6 +41,10 @@ const StreamDataRoutingProcessing = () => {
 
   return (
     <>
+      <Alert bsStyle="info">
+        The <b>Illuminate Processing</b> step is an immutable Pipeline that occurs before user Pipelines in the default processing order.<br />
+        It collects messages that meet supported formats from the All Messages stream, parses that data into the Graylog GIM schema fields and routes them to this Stream.
+      </Alert>
       <Section title="Illuminate Processing">
         <p>Illuminate Processing step</p>
       </Section>

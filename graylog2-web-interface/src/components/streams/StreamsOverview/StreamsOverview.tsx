@@ -18,21 +18,20 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
+import useCurrentUser from 'hooks/useCurrentUser';
 import QueryHelper from 'components/common/QueryHelper';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { keyFn, fetchStreams, KEY_PREFIX } from 'components/streams/hooks/useStreams';
-import {
-  DEFAULT_LAYOUT,
-  ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER,
-} from 'components/streams/StreamsOverview/Constants';
+import getStreamTableElements from 'components/streams/StreamsOverview/Constants';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
 import CustomColumnRenderers from './ColumnRenderers';
+import usePipelineColumn from './hooks/usePipelineColumn';
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
@@ -52,21 +51,26 @@ type Props = {
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
+  const { isPipelineColumnPermitted } = usePipelineColumn();
+  const currentUser = useCurrentUser();
 
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
   useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries(KEY_PREFIX));
 
-  const columnRenderers = useMemo(() => CustomColumnRenderers(indexSets), [indexSets]);
+  const columnRenderers = useMemo(() => CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions), [indexSets, isPipelineColumnPermitted, currentUser.permissions]);
+  const streamTableElements = useMemo(() => getStreamTableElements(currentUser.permissions, isPipelineColumnPermitted), [currentUser.permissions, isPipelineColumnPermitted]);
+  const { columnOrder, additionalAttributes, defaultLayout } = streamTableElements;
 
   return (
     <PaginatedEntityTable<Stream> humanName="streams"
-                                  columnsOrder={COLUMNS_ORDER}
-                                  additionalAttributes={ADDITIONAL_ATTRIBUTES}
+                                  columnsOrder={columnOrder}
+                                  additionalAttributes={additionalAttributes}
                                   queryHelpComponent={<QueryHelper entityName="stream" />}
                                   entityActions={entityActions}
-                                  tableLayout={DEFAULT_LAYOUT}
+                                  tableLayout={defaultLayout}
                                   fetchEntities={fetchStreams}
                                   keyFn={keyFn}
+                                  actionsCellWidth={180}
                                   expandedSectionsRenderer={expandedSections}
                                   bulkSelection={{ actions: bulkActions }}
                                   entityAttributesAreCamelCase={false}

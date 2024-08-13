@@ -155,7 +155,7 @@ export type DataNodeResponse = {
 }
 
 const useDataNodes = (searchParams: SearchParams = {
-  query: '',
+  query: '-datanode_status:UNAVAILABLE',
   page: 1,
   pageSize: 0,
   sort: undefined,

@@ -16,11 +16,26 @@
  */
 
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import styled from 'styled-components';
 
+import { Button } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import SelectedFieldsList from 'views/components/widgets/SelectedFieldsList';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+
+const FIELD_LIST_LIMIT = 1;
+
+const ToggleButton = styled(Button)`
+  padding: 0;
+  margin-bottom: 10px;
+  display: block;
+`;
+
+const ToggleIcon = styled(Icon)`
+  margin-left: 5px;
+`;
 
 type Props = {
   createSelectPlaceholder?: string
@@ -31,6 +46,9 @@ type Props = {
   selectSize?: 'normal' | 'small',
   selectedFields: Array<string>,
   testPrefix?: string,
+  showSelectAllRest?: boolean,
+  showDeSelectAll?: boolean,
+  showListCollapseButton?: boolean
 }
 
 const FieldsConfiguration = ({
@@ -42,18 +60,49 @@ const FieldsConfiguration = ({
   selectSize,
   selectedFields,
   testPrefix,
+  showSelectAllRest,
+  showDeSelectAll,
+  showListCollapseButton,
 }: Props) => {
+  const [showSelectedList, setShowSelectedList] = useState(true);
   const onAddField = useCallback((newField: string) => (
     onChange([...selectedFields, newField])
   ), [onChange, selectedFields]);
 
+  const _showListCollapseButton = showListCollapseButton && selectedFields.length > FIELD_LIST_LIMIT;
+
+  const onSelectAllRest = (newFields: Array<string>) => {
+    const _selectedFields = [...selectedFields, ...newFields];
+    onChange(_selectedFields);
+
+    if (showListCollapseButton && _selectedFields.length > FIELD_LIST_LIMIT) {
+      setShowSelectedList(false);
+    }
+  };
+
+  const onDeselectAll = () => {
+    onChange([]);
+    setShowSelectedList(true);
+  };
+
   return (
     <>
+      {_showListCollapseButton && (
+      <ToggleButton bsStyle="link"
+                    bsSize="xs"
+                    onClick={() => {
+                      setShowSelectedList((cur) => !cur);
+                    }}>
+        {showSelectedList ? `Hide ${selectedFields.length} selected fields` : `Show ${selectedFields.length} selected fields`}<ToggleIcon name={showSelectedList ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+      </ToggleButton>
+      )}
+      {showSelectedList && (
       <SelectedFieldsList testPrefix={testPrefix}
                           selectedFields={selectedFields}
                           selectSize={selectSize}
                           displayOverlayInPortal={displaySortableListOverlayInPortal}
                           onChange={onChange} />
+      )}
       <FieldSelect id="field-create-select"
                    onChange={onAddField}
                    clearable={false}
@@ -65,7 +114,11 @@ const FieldsConfiguration = ({
                    menuPortalTarget={menuPortalTarget}
                    excludedFields={selectedFields ?? []}
                    placeholder={createSelectPlaceholder}
-                   ariaLabel={createSelectPlaceholder} />
+                   ariaLabel={createSelectPlaceholder}
+                   onSelectAllRest={showSelectAllRest && onSelectAllRest}
+                   showSelectAllRest={showSelectAllRest}
+                   onDeSelectAll={onDeselectAll}
+                   showDeSelectAll={showDeSelectAll && !!selectedFields.length} />
     </>
   );
 };
@@ -77,6 +130,9 @@ FieldsConfiguration.defaultProps = {
   selectSize: undefined,
   menuPortalTarget: undefined,
   testPrefix: '',
+  showSelectAllRest: false,
+  showDeSelectAll: false,
+  showListCollapseButton: false,
 };
 
 export default FieldsConfiguration;

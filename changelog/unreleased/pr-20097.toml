@@ -1,0 +1,4 @@
+type = "a"
+message = "bumping the OpenSearch (client, server in DataNode) to 2.15"
+
+pulls = ["20097"]

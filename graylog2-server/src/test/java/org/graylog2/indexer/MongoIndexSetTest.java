@@ -50,6 +50,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
+import static org.graylog2.indexer.MongoIndexSet.hotIndexName;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -232,7 +233,7 @@ public class MongoIndexSetTest {
     }
 
     @Test
-    public void testCleanupAliases() throws Exception {
+    public void testCleanupAliases() {
         final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cleanupAliases(ImmutableSet.of("graylog_2", "graylog_3", "foobar"));
         verify(indices).removeAliases("graylog_deflector", ImmutableSet.of("graylog_2", "foobar"));
@@ -347,6 +348,12 @@ public class MongoIndexSetTest {
         final MongoIndexSet mongoIndexSet = createIndexSet(restoredArchives);
 
         assertThat(mongoIndexSet.isManagedIndex(indexName)).isTrue();
+    }
+
+    @Test
+    public void testHotIndexNameOfWarmIndex() {
+        assertThat(hotIndexName("gl_warm_1")).isEqualTo("gl_1");
+        assertThat(hotIndexName("gl_testwarm_1")).isEqualTo("gl_testwarm_1");
     }
 
     private MongoIndexSet createIndexSet(IndexSetConfig indexSetConfig) {

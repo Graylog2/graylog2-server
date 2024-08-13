@@ -22,9 +22,10 @@ import org.junit.jupiter.api.Test;
 class IndexMigrationProgressTest {
     @Test
     void testProgressPercent() {
-        Assertions.assertThat(new IndexMigrationProgress(100, 30, 10, 10).progressPercent()).isEqualTo(50);
-        Assertions.assertThat(new IndexMigrationProgress(100, 0, 0, 0).progressPercent()).isEqualTo(0);
-        Assertions.assertThat(new IndexMigrationProgress(100, 100, 0, 0).progressPercent()).isEqualTo(100);
-        Assertions.assertThat(new IndexMigrationProgress(0, 0, 0, 0).progressPercent()).isEqualTo(100);
+        Assertions.assertThat(new IndexMigrationProgress(100, 20, 10, 10, 5, 5).progressPercent()).isEqualTo(50);
+        Assertions.assertThat(new IndexMigrationProgress(100, 0, 0, 0, 0, 0).progressPercent()).isEqualTo(0);
+        Assertions.assertThat(new IndexMigrationProgress(100, 100, 0, 0, 0, 0).progressPercent()).isEqualTo(100);
+        Assertions.assertThat(new IndexMigrationProgress(0, 0, 0, 0, 0, 0).progressPercent()).isEqualTo(100);
+        Assertions.assertThat(new IndexMigrationProgress(42500, 42500, 0, 0, 0, 0).progressPercent()).isEqualTo(100);
     }
 }

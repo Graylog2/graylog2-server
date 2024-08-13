@@ -1,0 +1,4 @@
+type = "a"
+message = "Add guard for matching graylog/datanode version in data node migration."
+
+pulls = ["19828"]
