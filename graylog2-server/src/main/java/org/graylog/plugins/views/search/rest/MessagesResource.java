@@ -81,11 +81,11 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final SearchExecutionGuard executionGuard;
     private final ExportJobService exportJobService;
     private final QueryValidationService queryValidationService;
+    private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
 
     //allow mocking
     Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsync;
     Function<AuditContext, MessagesExporter> messagesExporterFactory;
-    Function<Collection<String>, Stream<String>> streamCategoryMapper;
 
     @Inject
     public MessagesResource(
@@ -97,13 +97,24 @@ public class MessagesResource extends RestResource implements PluginRestResource
             ExportJobService exportJobService,
             QueryValidationService queryValidationService,
             StreamService streamService) {
+        this(exporter, commandFactory, searchDomain, executionGuard, eventBus, exportJobService, queryValidationService, categories -> streamService.mapCategoriesToIds(categories).stream());
+    }
+
+    MessagesResource(MessagesExporter exporter,
+                     CommandFactory commandFactory,
+                     SearchDomain searchDomain,
+                     SearchExecutionGuard executionGuard,
+                     @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
+                     ExportJobService exportJobService,
+                     QueryValidationService queryValidationService,
+                     Function<Collection<String>, Stream<String>> streamCategoryMapper) {
         this.commandFactory = commandFactory;
         this.searchDomain = searchDomain;
         this.executionGuard = executionGuard;
         this.exportJobService = exportJobService;
         this.queryValidationService = queryValidationService;
         this.messagesExporterFactory = context -> new AuditingMessagesExporter(context, eventBus, exporter);
-        this.streamCategoryMapper = categories -> streamService.mapCategoriesToIds(categories).stream();
+        this.streamCategoryMapper = streamCategoryMapper;
     }
 
     @ApiOperation(
