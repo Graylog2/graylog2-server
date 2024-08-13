@@ -23,8 +23,6 @@ import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
-import useFeature from 'hooks/useFeature';
-import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -59,6 +57,7 @@ type ListItemProps = {
   selectedFields: Array<string>,
   selectSize: 'normal' | 'small',
   testIdPrefix: string,
+  showUnit: boolean,
 }
 
 const Actions = styled.div`
@@ -75,9 +74,9 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   onRemove,
   selectedFields,
   testIdPrefix,
+  showUnit,
 }: ListItemProps, ref) => {
   const [isEditing, setIsEditing] = useState(false);
-  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
 
   const _onChange = (newFieldName: string) => {
     onChange(newFieldName);
@@ -108,7 +107,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
           </DragHandle>
           <FieldTitle>{item.title}</FieldTitle>
           <Actions>
-            {unitFeatureEnabled && <FieldUnit field={item.title} />}
+            {showUnit && <FieldUnit field={item.title} />}
             <IconButton name="edit_square" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
             <IconButton name="delete" title={`Remove ${item.title} field`} onClick={onRemove} />
           </Actions>
@@ -123,10 +122,11 @@ type Props = {
   displayOverlayInPortal?: boolean,
   selectedFields: Array<string>
   testPrefix?: string,
-  selectSize?: 'normal' | 'small'
+  selectSize?: 'normal' | 'small',
+  showUnit?: boolean
 };
 
-const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, displayOverlayInPortal }: Props) => {
+const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, displayOverlayInPortal, showUnit }: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
@@ -151,8 +151,9 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, 
               dragHandleProps={dragHandleProps}
               draggableProps={draggableProps}
               className={className}
-              ref={ref} />
-  ), [selectSize, selectedFields, testPrefix, onChangeField, onRemoveField]);
+              ref={ref}
+              showUnit={showUnit} />
+  ), [selectSize, selectedFields, testPrefix, showUnit, onChangeField, onRemoveField]);
 
   const onSortChange = useCallback((newFieldsList: Array<{ id: string, title: string }>) => {
     onChange(newFieldsList.map(({ id }) => id));
@@ -163,10 +164,10 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, 
   }
 
   return (
-    <SortableList items={fieldsForList}
-                  onMoveItem={onSortChange}
-                  customListItemRender={SortableListItem}
-                  displayOverlayInPortal={displayOverlayInPortal} />
+    <SortableList<{id: string, title: string}> items={fieldsForList}
+                                               onMoveItem={onSortChange}
+                                               customListItemRender={SortableListItem}
+                                               displayOverlayInPortal={displayOverlayInPortal} />
   );
 };
 
@@ -174,6 +175,7 @@ SelectedFieldsList.defaultProps = {
   displayOverlayInPortal: false,
   testPrefix: undefined,
   selectSize: undefined,
+  showUnit: false,
 };
 
 export default SelectedFieldsList;
