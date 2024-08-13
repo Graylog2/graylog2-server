@@ -39,8 +39,6 @@ import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.Period;
-import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -81,25 +79,9 @@ public class CsrSigner {
         return name == dNSName;
     }
 
-    private Duration periodToDuration(Period period) {
-        return Duration.ofDays(period.getYears() * 365L + period.getMonths() * 30L + period.getDays());
-    }
-
-    private Duration safeParse(String duration) {
-        try {
-            return Duration.parse(duration);
-        } catch (DateTimeParseException ignored) {
-            return periodToDuration(Period.parse(duration));
-        }
-    }
-
-    private Instant plusIsoDuration(Instant validFrom, String duration) {
-        return validFrom.plus(safeParse(duration));
-    }
-
     public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, RenewalPolicy renewalPolicy) throws Exception {
         Instant validFrom = Instant.now(clock);
-        var validUntil = plusIsoDuration(validFrom, renewalPolicy.certificateLifetime());
+        var validUntil = validFrom.plus(renewalPolicy.parsedCertificateLifetime());
 
         return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
     }

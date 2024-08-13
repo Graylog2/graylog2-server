@@ -159,17 +159,22 @@ public class CaffeineLookupCache extends LookupCache {
         final Function<LookupCacheKey, LookupResult> mapFunction = unused -> {
             try {
                 final LookupResult result = loader.call();
-                if (ignoreResult(result, config.ignoreNull())) {
-                    LOG.trace("Ignoring failed lookup for key {}", key);
-                    return LookupResult.builder()
-                            .cacheTTL(0L)
-                            .build();
+                if (result.hasError()) {
+                    // Bubble up errors unaltered
+                    return result;
                 }
                 if (isResultEmpty(result)) {
-                    LOG.trace("Empty lookup for key {} with TTL {}", key, ttlEmptyMillis());
-                    return LookupResult.builder()
-                            .cacheTTL(ttlEmptyMillis())
-                            .build();
+                    if (Boolean.TRUE.equals(config.ignoreNull())) {
+                        LOG.trace("Ignoring empty lookup for key {}", key);
+                        return LookupResult.builder()
+                                .cacheTTL(0L)
+                                .build();
+                    } else {
+                        LOG.trace("Empty lookup for key {} with TTL {}", key, ttlEmptyMillis());
+                        return LookupResult.builder()
+                                .cacheTTL(ttlEmptyMillis())
+                                .build();
+                    }
                 }
                 return result;
             } catch (Exception e) {
@@ -178,16 +183,10 @@ public class CaffeineLookupCache extends LookupCache {
                         String.format(Locale.ENGLISH, "Loading value from data adapter failed for key <%s>: %s", key.toString(), e.getMessage()));
             }
         };
+
         try (final Timer.Context ignored = lookupTimer()) {
             return cache.get(key, mapFunction);
         }
-    }
-
-    private boolean ignoreResult(LookupResult result, Boolean ignoreNull) {
-        if (Boolean.TRUE.equals(ignoreNull)) {
-            return isResultEmpty(result);
-        }
-        return false;
     }
 
     private boolean isResultEmpty(LookupResult result) {
