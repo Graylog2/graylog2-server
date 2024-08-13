@@ -2,4 +2,4 @@ type="f"
 message="Fixes handling of error results in the lookup cache."
 
 issues=["19159"]
-pulls=["19670"]
+pulls=["20167", "19670"]
