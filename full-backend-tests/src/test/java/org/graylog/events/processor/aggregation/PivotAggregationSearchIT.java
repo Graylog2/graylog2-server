@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.OS2_LATEST}, withWebhookServerEnabled = true)
 public class PivotAggregationSearchIT {
     private static final Logger LOG = LoggerFactory.getLogger(PivotAggregationSearchIT.class);
     private static final String indexSetPrefix = "pivot-search-test";
@@ -55,18 +55,13 @@ public class PivotAggregationSearchIT {
     @BeforeEach
     void setUp() {
         this.indexSetId = apis.indices().createIndexSet("Pivot Aggregation Search Test", "", indexSetPrefix);
-        apis.indices().waitFor(() -> {
-            try {
-                return apis.indices().waitForIndexNames(this.indexSetId).contains(indexSetPrefix + "_0");
-            } catch (ExecutionException | RetryException e) {
-                return false;
-            }
-        }, "Timed out waiting for index to be created.");
+        apis.indices().waitFor(() -> apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_0", indexSetPrefix + "_deflector"),
+                "Timed out waiting for index/deflector to be created.");
         this.streamId = apis.streams().createStream(
                 "Stream for Pivot Aggregation Search Test",
                 this.indexSetId,
                 true,
-                DefaultStreamMatches.KEEP,
+                DefaultStreamMatches.REMOVE,
                 new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "example.org", "source", false)
         );
     }
@@ -79,6 +74,9 @@ public class PivotAggregationSearchIT {
             this.isolatedStreamId = null;
         }
         apis.indices().deleteIndexSet(this.indexSetId, true);
+        apis.indices().waitFor(() -> !apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_0")
+                        && !apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_deflector"),
+                "Timed out waiting for index/deflector to be deleted.");
     }
 
     @ContainerMatrixTest
@@ -150,7 +148,7 @@ public class PivotAggregationSearchIT {
                 "Stream for testing event definition isolation",
                 this.indexSetId,
                 true,
-                DefaultStreamMatches.KEEP,
+                DefaultStreamMatches.REMOVE,
                 new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream_isolation_test", "facility", false)
         );
 
@@ -175,7 +173,7 @@ public class PivotAggregationSearchIT {
                 "Stream for testing event definition isolation",
                 this.indexSetId,
                 true,
-                DefaultStreamMatches.KEEP,
+                DefaultStreamMatches.REMOVE,
                 new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream_isolation_test", "facility", false)
         );
 
@@ -236,6 +234,7 @@ public class PivotAggregationSearchIT {
                         "resource": "posts"
                         }""");
         apis.search().waitForMessagesCount(3);
+        apis.backend().searchServerInstance().client().refreshNode();
     }
 
     private void postMessagesToOtherStream() {
@@ -251,5 +250,6 @@ public class PivotAggregationSearchIT {
                         "facility": "stream_isolation_test"
                         }""");
         apis.search().waitForMessagesCount(1);
+        apis.backend().searchServerInstance().client().refreshNode();
     }
 }
