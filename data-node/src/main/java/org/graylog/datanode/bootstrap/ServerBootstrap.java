@@ -169,27 +169,6 @@ public abstract class ServerBootstrap extends DatanodeCmdLineTool {
         }
     }
 
-    public void runMigrations() {
-        LOG.info("Running {} migrations...", 0);
-    }
-
-    protected void savePidFile(final String pidFile) {
-        final String pid = Tools.getPID();
-        final Path pidFilePath = Paths.get(pidFile);
-        pidFilePath.toFile().deleteOnExit();
-
-        try {
-            if (isNullOrEmpty(pid) || "unknown".equals(pid)) {
-                throw new Exception("Could not determine PID.");
-            }
-
-            Files.write(pidFilePath, pid.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW, LinkOption.NOFOLLOW_LINKS);
-        } catch (Exception e) {
-            LOG.error("Could not write PID file: " + e.getMessage(), e);
-            System.exit(1);
-        }
-    }
-
     @Override
     protected List<Module> getSharedBindingsModules() {
         final List<Module> result = super.getSharedBindingsModules();
