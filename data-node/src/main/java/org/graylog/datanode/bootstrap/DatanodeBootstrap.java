@@ -49,11 +49,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-public abstract class ServerBootstrap extends DatanodeCmdLineTool {
-    private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
+public abstract class DatanodeBootstrap extends DatanodeCmdLineTool {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeBootstrap.class);
     protected Configuration configuration;
 
-    protected ServerBootstrap(String commandName, Configuration configuration) {
+    protected DatanodeBootstrap(String commandName, Configuration configuration) {
         super(commandName);
         this.commandName = commandName;
         this.configuration = configuration;

@@ -29,8 +29,8 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.PeriodicalBindings;
 import org.graylog.datanode.bindings.ServerBindings;
+import org.graylog.datanode.bootstrap.DatanodeBootstrap;
 import org.graylog.datanode.bootstrap.Main;
-import org.graylog.datanode.bootstrap.ServerBootstrap;
 import org.graylog.datanode.configuration.DatanodeProvisioningBindings;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.rest.RestBindings;
@@ -57,19 +57,19 @@ import java.util.List;
 
 
 @Command(name = "datanode", description = "Start the Graylog DataNode")
-public class Server extends ServerBootstrap {
-    private static final Logger LOG = LoggerFactory.getLogger(Server.class);
+public class Datanode extends DatanodeBootstrap {
+    private static final Logger LOG = LoggerFactory.getLogger(Datanode.class);
 
     protected static final Configuration configuration = new Configuration();
     private final S3RepositoryConfiguration s3RepositoryConfiguration = new S3RepositoryConfiguration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
 
-    public Server() {
+    public Datanode() {
         super("datanode", configuration);
     }
 
-    public Server(String commandName) {
+    public Datanode(String commandName) {
         super(commandName, configuration);
     }
 

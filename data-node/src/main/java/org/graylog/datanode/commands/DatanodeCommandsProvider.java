@@ -20,9 +20,9 @@ import com.github.rvesse.airline.builder.CliBuilder;
 import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.bootstrap.CliCommandsProvider;
 
-public class ServerCommandsProvider implements CliCommandsProvider {
+public class DatanodeCommandsProvider implements CliCommandsProvider {
     @Override
     public void addTopLevelCommandsOrGroups(CliBuilder<CliCommand> builder) {
-        builder.withCommand(Server.class);
+        builder.withCommand(Datanode.class);
     }
 }
