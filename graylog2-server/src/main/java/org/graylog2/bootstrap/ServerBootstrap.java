@@ -97,7 +97,7 @@ import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
 import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_PREFLIGHT_WEB_ENABLED;
 
-public abstract class ServerBootstrap extends CmdLineTool {
+public abstract class ServerBootstrap extends CmdLineTool<Configuration> {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
 

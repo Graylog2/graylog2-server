@@ -55,6 +55,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.Configuration;
+import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.configuration.PathConfiguration;
@@ -102,7 +103,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
-public abstract class CmdLineTool implements CliCommand {
+public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfiguration> implements CliCommand {
 
     public static final String GRAYLOG_ENVIRONMENT_VAR_PREFIX = "GRAYLOG_";
     public static final String GRAYLOG_SYSTEM_PROP_PREFIX = "graylog.";
@@ -119,7 +120,7 @@ public abstract class CmdLineTool implements CliCommand {
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
-    protected final Configuration configuration;
+    protected final NodeConfiguration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog configuration and exit")
@@ -144,11 +145,11 @@ public abstract class CmdLineTool implements CliCommand {
     protected FeatureFlags featureFlags;
     protected PluginLoader pluginLoader;
 
-    protected CmdLineTool(Configuration configuration) {
+    protected CmdLineTool(NodeConfiguration configuration) {
         this(null, configuration);
     }
 
-    protected CmdLineTool(String commandName, Configuration configuration) {
+    protected CmdLineTool(String commandName, NodeConfiguration configuration) {
         jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new GuavaConverterFactory());
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
@@ -299,10 +300,12 @@ public abstract class CmdLineTool implements CliCommand {
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
         featureFlags = getFeatureFlags(metricRegistry);
 
-        pluginLoader = getPluginLoader(pluginLoaderConfig, chainingClassLoader);
+        if (configuration.withPlugins())
+            pluginLoader = getPluginLoader(pluginLoaderConfig, chainingClassLoader);
 
         installCommandConfig();
-        installPluginBootstrapConfig(pluginLoader);
+        if (configuration.withPlugins())
+            installPluginBootstrapConfig(pluginLoader);
 
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
@@ -311,16 +314,18 @@ public abstract class CmdLineTool implements CliCommand {
         installConfigRepositories();
 
         beforeStart();
-        beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
+        //beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
 
         processConfiguration(jadConfig);
 
         bootstrapConfigInjector = setupBootstrapConfigInjector();
 
-        final Set<Plugin> plugins = loadPlugins();
-
-        installPluginConfig(plugins);
-        processConfiguration(jadConfig);
+        Set<Plugin> plugins = new HashSet<>();
+        if (configuration.withPlugins()) {
+            plugins = loadPlugins();
+            installPluginConfig(plugins);
+            processConfiguration(jadConfig);
+        }
 
         if (isDumpConfig()) {
             dumpCurrentConfigAndExit();
@@ -451,7 +456,9 @@ public abstract class CmdLineTool implements CliCommand {
 
     private void dumpDefaultConfigAndExit() {
         bootstrapConfigInjector = setupBootstrapConfigInjector();
-        installPluginConfig(pluginLoader.loadPlugins(bootstrapConfigInjector));
+        if (configuration.withPlugins()) {
+            installPluginConfig(pluginLoader.loadPlugins(bootstrapConfigInjector));
+        }
         dumpCurrentConfigAndExit();
     }
 
@@ -604,8 +611,9 @@ public abstract class CmdLineTool implements CliCommand {
             //noinspection ThrowableResultOfMethodCallIgnored
             final Throwable rootCause = ExceptionUtils.getRootCause(message.getCause());
             if (rootCause instanceof NodeIdPersistenceException) {
-                LOG.error(UI.wallString(
-                        "Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
+                //TODO: Check configuration
+//                LOG.error(UI.wallString(
+//                        "Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
                 System.exit(-1);
             } else if (rootCause instanceof AccessDeniedException) {
                 LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));
