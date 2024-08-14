@@ -7262,9 +7262,9 @@ es6-weak-map@^2.0.3:
     es6-symbol "^3.1.1"
 
 esbuild-loader@^4.0.1:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/esbuild-loader/-/esbuild-loader-4.2.0.tgz#4aa4967e8721fddfc629695bb3c25ebec010066d"
-  integrity sha512-BhwHchuDknxIa69AqOPeZh2fIFqj2AzZKC1E3RBRvXSuyk5drsqMrwsgYZJufX41yrauLYjDM3KBmruoGl1NWQ==
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/esbuild-loader/-/esbuild-loader-4.2.2.tgz#cce9032097767d325d6aa231edbd7d66a5d7fa1b"
+  integrity sha512-Mdq/A1L8p37hkibp8jGFwuQTDSWhDmlueAefsrCPRwNWThEOlQmIglV7Gd6GE2mO5bt7ksfxKOMwkuY7jjVTXg==
   dependencies:
     esbuild "^0.21.0"
     get-tsconfig "^4.7.0"
