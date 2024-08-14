@@ -17,7 +17,6 @@
 package org.graylog.datanode.commands;
 
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
@@ -74,13 +73,6 @@ public class Server extends ServerBootstrap {
         super(commandName, configuration);
     }
 
-    @Option(name = {"-l", "--local"}, description = "Run Graylog DataNode in local mode. Only interesting for Graylog developers.")
-    private boolean local = false;
-
-    public boolean isLocal() {
-        return local;
-    }
-
     @Override
     protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
@@ -102,6 +94,11 @@ public class Server extends ServerBootstrap {
                 mongoDbConfiguration,
                 tlsConfiguration,
                 s3RepositoryConfiguration);
+    }
+
+    @Override
+    protected Class<? extends Runnable> shutdownHook() {
+        return ShutdownHook.class;
     }
 
     private static class ShutdownHook implements Runnable {
@@ -140,11 +137,6 @@ public class Server extends ServerBootstrap {
                 .setHostname(Tools.getLocalCanonicalHostname())
                 .setDataNodeStatus(DataNodeStatus.STARTING)
                 .build());
-    }
-
-    @Override
-    protected Class<? extends Runnable> shutdownHook() {
-        return ShutdownHook.class;
     }
 
     @Override
