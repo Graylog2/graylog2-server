@@ -16,27 +16,21 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
 import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
 import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import type { Traffic } from 'components/cluster/types';
 import { formatTrafficData } from 'util/TrafficUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TrafficGraph, useGraphWidth } from 'components/common/Graph';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-
-const DAYS = [
-  30,
-  90,
-  180,
-  365,
-];
+import type { Traffic } from 'components/common/Graph/types';
+import { DAYS } from 'components/common/Graph/types';
+import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
 
 const StyledH3 = styled.h3(({ theme }) => css`
   margin-bottom: ${theme.spacings.sm};
@@ -60,14 +54,13 @@ const Wrapper = styled.div(({ theme }) => css`
 `);
 
 type Props = {
-  getTraffic: (days: number) => void,
   traffic: Traffic,
   trafficLimit?: number,
   title?: string,
 };
 
-const TrafficGraphWithDaySelect = ({ getTraffic, traffic, trafficLimit, title } : Props) => {
-  const [graphDays, setGraphDays] = useState(DAYS[0]);
+const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title } : Props) => {
+  const { graphDays, setGraphDays } = useGraphDays();
   const { graphWidth, graphContainerRef } = useGraphWidth();
   const { pathname } = useLocation();
 
@@ -87,19 +80,15 @@ const TrafficGraphWithDaySelect = ({ getTraffic, traffic, trafficLimit, title } 
     });
   };
 
-  useEffect(() => {
-    getTraffic(graphDays);
-  }, [getTraffic, graphDays]);
-
   let sumOutput = null;
   let trafficGraph = <Spinner />;
 
   if (traffic) {
-    const bytesOut = reduce(traffic.output, (result, value) => result + value);
+    const bytesOut = reduce(traffic, (result, value) => result + value);
 
     sumOutput = <small>Last {graphDays} days: {NumberUtils.formatBytes(bytesOut)}</small>;
 
-    const unixTraffic = formatTrafficData(traffic.output);
+    const unixTraffic = formatTrafficData(traffic);
 
     trafficGraph = (
       <TrafficGraph traffic={unixTraffic}
@@ -131,7 +120,6 @@ const TrafficGraphWithDaySelect = ({ getTraffic, traffic, trafficLimit, title } 
 TrafficGraphWithDaySelect.propTypes = {
   traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
   trafficLimit: PropTypes.number,
-  getTraffic: PropTypes.func.isRequired,
   title: PropTypes.string,
 };
 
