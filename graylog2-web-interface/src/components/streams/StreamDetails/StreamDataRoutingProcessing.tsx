@@ -43,7 +43,6 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
   const hasConnectedPipelines = !isLoadingConnectPipelines && connectedPipelines?.length > 0;
   const { data: pipelines } = usePipelines();
   const sortPipelines = (pipelinesList: StreamConnectedPipelines) => pipelinesList.sort((s1, s2) => naturalSort(s1.title, s2.title));
-
   const StreamIlluminateProcessingSection = PluginStore.exports('dataWarehouse')?.[0]?.StreamIlluminateProcessingSection;
 
   return (
@@ -73,7 +72,7 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
                 <td>
                   <ActionButtonsWrap className="align-right">
                     <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
-                      <Button bsStyle="link"
+                      <Button bsStyle="default"
                               bsSize="xsmall"
                               title="View">
                         <Icon name="pageview" type="regular" />
