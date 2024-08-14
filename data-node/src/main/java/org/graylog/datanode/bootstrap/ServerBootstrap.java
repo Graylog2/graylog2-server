@@ -62,7 +62,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 public abstract class ServerBootstrap extends DatanodeCmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
-    private boolean isFreshInstallation;
     protected Configuration configuration;
 
     protected ServerBootstrap(String commandName, Configuration configuration) {
@@ -72,14 +71,6 @@ public abstract class ServerBootstrap extends DatanodeCmdLineTool {
     }
 
     protected abstract void startNodeRegistration(Injector injector);
-
-    private boolean isFreshInstallation() {
-        return isFreshInstallation;
-    }
-
-    private void registerFreshInstallation() {
-        this.isFreshInstallation = true;
-    }
 
     @Override
     protected void beforeInjectorCreation(Set<Plugin> plugins) {
@@ -96,7 +87,6 @@ public abstract class ServerBootstrap extends DatanodeCmdLineTool {
 
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
-        preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
         getPreflightInjector(preflightCheckModules).getInstance(PreflightCheckService.class).runChecks();
     }
@@ -111,10 +101,6 @@ public abstract class ServerBootstrap extends DatanodeCmdLineTool {
         } catch (PreflightCheckException e) {
             LOG.error("Preflight check failed with error: {}", e.getLocalizedMessage());
             throw e;
-        }
-
-        if (mongoDBPreflightCheck.isFreshInstallation()) {
-            registerFreshInstallation();
         }
     }
 
@@ -235,7 +221,6 @@ public abstract class ServerBootstrap extends DatanodeCmdLineTool {
     @Override
     protected List<Module> getSharedBindingsModules() {
         final List<Module> result = super.getSharedBindingsModules();
-        result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
