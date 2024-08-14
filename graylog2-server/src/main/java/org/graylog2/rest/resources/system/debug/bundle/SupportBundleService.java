@@ -34,6 +34,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.shiro.subject.Subject;
+import org.graylog.security.certutil.KeyStoreDto;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.configuration.IndexerHosts;
@@ -371,6 +372,17 @@ public class SupportBundleService {
         } catch (Exception e) {
             LOG.warn("Failed to get system stats from node <{}>", nodeId, e);
         }
+
+        try (var certificatesFile = new FileOutputStream(nodeDir.resolve("certificates.json").toFile())) {
+            final ProxiedResource.NodeResponse<Map<String, KeyStoreDto>> certificatesResponse = proxiedResourceHelper.doNodeApiCall(nodeId,
+                    RemoteCertificatesResource.class, RemoteCertificatesResource::certificates, Function.identity(), CALL_TIMEOUT
+            );
+            if (certificatesResponse.entity().isPresent()) {
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(certificatesFile, certificatesResponse.entity().get());
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to get certificates from node <{}>", nodeId, e);
+        }
     }
 
 
@@ -379,6 +391,15 @@ public class SupportBundleService {
         var ignored = nodeDir.toFile().mkdirs();
 
         fetchDataNodeLogs(proxiedResourceHelper, datanode, nodeDir);
+        try (var certificatesFile = new FileOutputStream(nodeDir.resolve("certificates.json").toFile())) {
+
+            Map<String, Map<String, KeyStoreDto>> certificates = datanodeProxy.remoteInterface(datanode.getHostname(), RemoteCertificatesResource.class, RemoteCertificatesResource::certificates);
+            if (certificates.containsKey(datanode.getHostname())) {
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(certificatesFile, certificates.get(datanode.getHostname()));
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to get certificates from data node <{}>", datanode.getHostname(), e);
+        }
     }
 
     private void fetchDataNodeLogs(ProxiedResourceHelper proxiedResourceHelper, DataNodeDto datanode, Path nodeDir) {
@@ -640,5 +661,12 @@ public class SupportBundleService {
     interface RemoteSystemStatsResource {
         @GET("system/stats")
         Call<SystemStats> systemStats();
+
+    }
+
+    interface RemoteCertificatesResource {
+        @GET("certificates")
+        Call<Map<String, KeyStoreDto>> certificates();
+
     }
 }
