@@ -1311,37 +1311,37 @@ metric_mappings:
     match_pattern: "org.graylog.plugins.datawarehouse.output.DataWarehouseJournalWriter.failed-write-attempts"
 
   - metric_name: "data_warehouse_journal_last_flush_time"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.lastFlushTime"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.lastFlushTime"
 
   - metric_name: "data_warehouse_journal_log_end_offset"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.logEndOffset"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.logEndOffset"
 
   - metric_name: "data_warehouse_journal_number_of_segments"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.numberOfSegments"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.numberOfSegments"
 
   - metric_name: "data_warehouse_journal_read_messages"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.readMessages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.readMessages"
 
   - metric_name: "data_warehouse_journal_read_time"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.readTime"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.readTime"
 
   - metric_name: "data_warehouse_journal_recovery_point"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.recoveryPoint"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.recoveryPoint"
 
   - metric_name: "data_warehouse_journal_size"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.size"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.size"
 
   - metric_name: "data_warehouse_journal_uncommitted_messages"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.uncommittedMessages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.uncommittedMessages"
 
   - metric_name: "data_warehouse_journal_unflushed_messages"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.unflushedMessages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.unflushedMessages"
 
   - metric_name: "data_warehouse_journal_write_discarded_messages"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.writeDiscardedMessages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.writeDiscardedMessages"
 
   - metric_name: "data_warehouse_journal_write_time"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.writeTime"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.writeTime"
 
   - metric_name: "data_warehouse_journal_written_messages"
-    match_pattern: "org.graylog.plugins.datawarehouse.output.data.warehouse.journal.writtenMessages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.writtenMessages"
