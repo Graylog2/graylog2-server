@@ -25,7 +25,7 @@ type Props = {
   streamId: string,
 }
 const Wrapper = styled.div<{ $enabled: boolean }>(({ theme, $enabled }) => css`
-  color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
+  color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.darker};
 `);
 const StyledDiv = styled.div`
   display: flex;
