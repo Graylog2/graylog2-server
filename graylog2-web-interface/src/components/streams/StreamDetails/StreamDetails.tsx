@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
@@ -34,7 +34,6 @@ import {
 import UserNotification from 'util/UserNotification';
 import { Icon, IfPermitted } from 'components/common';
 import { StreamsStore, type Stream } from 'stores/streams/StreamsStore';
-import SectionGrid from 'components/common/Section/SectionGrid';
 import { useStore } from 'stores/connect';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import useHistory from 'routing/useHistory';
@@ -56,15 +55,15 @@ const DESTINATIONS_SEGMENT = 'destinations';
 const SEGMENTS_DETAILS = [
   {
     value: 'intake' as const,
-    label: 'Intake',
+    label: '1: Intake',
   },
   {
     value: 'processing' as const,
-    label: 'Processing',
+    label: '2: Processing',
   },
   {
     value: 'destinations' as const,
-    label: 'Destinations',
+    label: '3: Destinations',
   },
 ];
 
@@ -113,9 +112,22 @@ const FullHeightCol = styled(Col)`
   height: 100%;
 `;
 
-const StyledSectionGrid = styled(SectionGrid)`
+const StyledSectionGrid = styled.div(({ theme }) => css`
+  display: flex;
   align-items: center;
-`;
+  align-content: center;
+  gap: ${theme.spacings.md};
+`);
+const StyledSegmentedControl = styled(SegmentedControl)(({ theme }) => css`
+  background-color: ${theme.colors.section.filled.background};
+  border: 1px solid ${theme.colors.section.filled.border};
+  .mantine-SegmentedControl-innerLabel {
+    vertical-align: middle;
+  }
+  .mantine-SegmentedControl-indicator {
+    height: 70% !important;
+  }
+`);
 
 const StreamDetails = ({ stream }: Props) => {
   const navigate = useNavigate();
@@ -174,12 +186,13 @@ const StreamDetails = ({ stream }: Props) => {
 
         <Row className="content no-bm">
           <Col xs={12}>
-            <StyledSectionGrid $columns="1fr 8fr">
+            <StyledSectionGrid>
               <h3>Data Routing</h3>
               <MainDetailsRow>
-                <SegmentedControl<DetailsSegment> data={SEGMENTS_DETAILS}
-                                                  value={currentSegment}
-                                                  onChange={onSegmentChange} />
+                <StyledSegmentedControl<DetailsSegment> data={SEGMENTS_DETAILS}
+                                                        radius="sm"
+                                                        value={currentSegment}
+                                                        onChange={onSegmentChange} />
               </MainDetailsRow>
             </StyledSectionGrid>
           </Col>

@@ -91,7 +91,7 @@ public class MessagesResourceTest {
 
     class MessagesTestResource extends MessagesResource {
         public MessagesTestResource(MessagesExporter exporter, CommandFactory commandFactory, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams, ObjectMapper objectMapper, EventBus eventBus, QueryValidationService validationService) {
-            super(exporter, commandFactory, searchDomain, executionGuard, eventBus, mock(ExportJobService.class), validationService);
+            super(exporter, commandFactory, searchDomain, executionGuard, eventBus, mock(ExportJobService.class), validationService, categories -> Stream.of());
         }
 
         @Nullable

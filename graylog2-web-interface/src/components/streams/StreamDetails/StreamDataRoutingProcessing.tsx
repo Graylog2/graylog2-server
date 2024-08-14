@@ -41,7 +41,7 @@ const StreamDataRoutingProcessing = () => {
 
   return (
     <>
-      <Alert bsStyle="info">
+      <Alert bsStyle="default">
         The <b>Illuminate Processing</b> step is an immutable Pipeline that occurs before user Pipelines in the default processing order.<br />
         It collects messages that meet supported formats from the All Messages stream, parses that data into the Graylog GIM schema fields and routes them to this Stream.
       </Alert>
@@ -72,7 +72,7 @@ const StreamDataRoutingProcessing = () => {
                 <td>
                   <ActionButtonsWrap className="align-right">
                     <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
-                      <Button bsStyle="link"
+                      <Button bsStyle="default"
                               bsSize="xsmall"
                               title="View">
                         <Icon name="pageview" type="regular" />

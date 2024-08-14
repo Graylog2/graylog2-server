@@ -61,7 +61,6 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +77,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchBackend.class);
@@ -89,7 +89,6 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
     private final StatsCollector<QueryExecutionStats> executionStatsCollector;
-    private final StreamService streamService;
 
     @Inject
     public OpenSearchBackend(Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -98,7 +97,6 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                              OSGeneratedQueryContext.Factory queryContextFactory,
                              UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
                              StatsCollector<QueryExecutionStats> executionStatsCollector,
-                             StreamService streamService,
                              @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.openSearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
@@ -107,7 +105,6 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
         this.executionStatsCollector = executionStatsCollector;
-        this.streamService = streamService;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -162,7 +159,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                     final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
                     final Set<String> effectiveStreamIds = query.effectiveStreams(searchType);
-                    effectiveStreamIds.addAll(streamService.mapCategoriesToIds(query.usedStreamCategories()));
+
                     final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
                             .must(searchTypeSourceBuilder.query())
                             .must(
@@ -245,9 +242,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         LOG.debug("Running query {} for job {}", query.id(), job.getId());
         final HashMap<String, SearchType.Result> resultsMap = Maps.newHashMap();
 
-        final Set<String> usedStreams = query.usedStreamIds();
-        usedStreams.addAll(streamService.mapCategoriesToIds(query.usedStreamCategories()));
-        final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(usedStreams, query.timerange());
+        final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(query.usedStreamIds(), query.timerange());
 
         final Map<String, SearchSourceBuilder> searchTypeQueries = queryContext.searchTypeQueries();
         final List<String> searchTypeIds = new ArrayList<>(searchTypeQueries.keySet());
