@@ -32,12 +32,9 @@ import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog.datanode.bootstrap.preflight.PreflightClusterConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
-import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
-import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.Tools;
-import org.graylog2.shared.bindings.FreshInstallDetectionModule;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -83,35 +80,10 @@ public abstract class ServerBootstrap extends DatanodeCmdLineTool {
             return;
         }
 
-        runMongoPreflightCheck();
-
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
 
         getPreflightInjector(preflightCheckModules).getInstance(PreflightCheckService.class).runChecks();
-    }
-
-    private void runMongoPreflightCheck() {
-        // The MongoDBPreflightCheck is not run via the PreflightCheckService,
-        // because it also detects whether we are running on a fresh Graylog installation
-        final Injector injector = getMongoPreFlightInjector();
-        final MongoDBPreflightCheck mongoDBPreflightCheck = injector.getInstance(MongoDBPreflightCheck.class);
-        try {
-            mongoDBPreflightCheck.runCheck();
-        } catch (PreflightCheckException e) {
-            LOG.error("Preflight check failed with error: {}", e.getLocalizedMessage());
-            throw e;
-        }
-    }
-
-    private Injector getMongoPreFlightInjector() {
-        return Guice.createInjector(
-                new IsDevelopmentBindings(),
-                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
-                new ConfigurationModule(configuration),
-                new DatanodeConfigurationBindings()
-
-        );
     }
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
