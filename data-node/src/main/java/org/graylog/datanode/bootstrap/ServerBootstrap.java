@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.bootstrap;
 
-import com.github.rvesse.airline.annotations.Option;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
@@ -72,21 +71,7 @@ public abstract class ServerBootstrap extends DatanodeCmdLineTool {
         this.configuration = configuration;
     }
 
-    @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog DataNode")
-    private String pidFile = TMPDIR + FILE_SEPARATOR + "datanode.pid";
-
-    @Option(name = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
-    private boolean noPidFile = false;
-
     protected abstract void startNodeRegistration(Injector injector);
-
-    public String getPidFile() {
-        return pidFile;
-    }
-
-    public boolean isNoPidFile() {
-        return noPidFile;
-    }
 
     private boolean isFreshInstallation() {
         return isFreshInstallation;
