@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import FilterRuleEditButton from 'components/streams/StreamDetails/output-filter/FilterRuleEditButton';
 import FilterDeleteButton from 'components/streams/StreamDetails/output-filter/FilterDeleteButton';
@@ -24,14 +25,19 @@ type Props = {
   filterRule: StreamOutputFilterRule,
   destinationType: string,
 }
+const ActionWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`;
 
 const FilterActions = ({ filterRule, destinationType }: Props) => (
-  <>
+  <ActionWrapper>
     <FilterRuleEditButton filterRule={filterRule}
                           destinationType={destinationType}
                           streamId={filterRule.stream_id} />
     <FilterDeleteButton streamId={filterRule.stream_id} filterOutputRule={filterRule} />
-  </>
+  </ActionWrapper>
 );
 
 export default FilterActions;
