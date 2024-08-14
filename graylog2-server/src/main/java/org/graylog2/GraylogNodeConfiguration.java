@@ -28,5 +28,9 @@ public interface GraylogNodeConfiguration {
     boolean withEventBus();
 
     boolean withPlugins();
-    
+
+    String getEnvironmentVariablePrefix();
+
+    String getSystemPropertyPrefix();
+
 }

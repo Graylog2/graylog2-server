@@ -105,9 +105,6 @@ import static com.google.common.base.Strings.nullToEmpty;
 
 public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfiguration> implements CliCommand {
 
-    public static final String GRAYLOG_ENVIRONMENT_VAR_PREFIX = "GRAYLOG_";
-    public static final String GRAYLOG_SYSTEM_PROP_PREFIX = "graylog.";
-
     static {
         // Set up JDK Logging adapter, https://logging.apache.org/log4j/2.x/log4j-jul/index.html
         System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
@@ -133,10 +130,10 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     private boolean debug = false;
 
     @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog")
-    private String configFile = "/etc/graylog/server/server.conf";
+    protected String configFile = "/etc/graylog/server/server.conf";
 
     @Option(name = {"-ff", "--featureflagfile"}, description = "Configuration file for Graylog feature flags")
-    private String customFeatureFlagFile = "/etc/graylog/server/feature-flag.conf";
+    protected String customFeatureFlagFile = "/etc/graylog/server/feature-flag.conf";
 
     protected String commandName = "command";
 
@@ -470,7 +467,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     }
 
     private FeatureFlags getFeatureFlags(MetricRegistry metricRegistry) {
-        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile, metricRegistry);
+        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile, metricRegistry, configuration);
     }
 
     protected Set<Plugin> loadPlugins() {
@@ -505,8 +502,8 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
     protected Collection<Repository> getConfigRepositories(String configFile) {
         return Arrays.asList(
-                new EnvironmentRepository(GRAYLOG_ENVIRONMENT_VAR_PREFIX),
-                new SystemPropertiesRepository(GRAYLOG_SYSTEM_PROP_PREFIX),
+                new EnvironmentRepository(configuration.getEnvironmentVariablePrefix()),
+                new SystemPropertiesRepository(configuration.getSystemPropertyPrefix()),
                 // Legacy prefixes
                 new EnvironmentRepository("GRAYLOG2_"),
                 new SystemPropertiesRepository("graylog2."),

@@ -21,20 +21,33 @@ package org.graylog2;
  */
 public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
 
+    @Override
     default boolean withMongoDb() {
         return true;
     }
 
+    @Override
     default boolean withScheduler() {
         return true;
     }
 
+    @Override
     default boolean withEventBus() {
         return true;
     }
 
+    @Override
     default boolean withPlugins() {
         return false;
     }
 
+    @Override
+    default String getEnvironmentVariablePrefix() {
+        return "GRAYLOG_";
+    };
+
+    @Override
+    default String getSystemPropertyPrefix() {
+        return "graylog.";
+    };
 }
