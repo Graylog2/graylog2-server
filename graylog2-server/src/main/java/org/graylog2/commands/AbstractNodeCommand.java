@@ -17,6 +17,7 @@
 package org.graylog2.commands;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.bindings.GraylogNodeModule;
@@ -48,6 +49,7 @@ public abstract class AbstractNodeCommand extends CmdLineTool<CommonNodeConfigur
     @Override
     protected List<Module> getCommandBindings(final FeatureFlags featureFlags) {
         final List<Module> modules = Lists.newArrayList(
+                Binder::requireExplicitBindings,
                 nodeModule
         );
         modules.addAll(getNodeCommandBindings(featureFlags));
