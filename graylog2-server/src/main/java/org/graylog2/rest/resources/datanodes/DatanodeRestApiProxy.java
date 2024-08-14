@@ -166,7 +166,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
                             .build();
                     try {
                         final retrofit2.Response<RemoteResponseType> response = function.apply(retrofit.create(interfaceClass)).execute();
-                        if (response.isSuccessful() && response.body() != null) {
+                        if (response.isSuccessful() && response.body() != null) { // TODO: this causes exceptions when the remote if returns no body but ok state!
                             return response.body();
                         } else {
                             throw new IllegalStateException("Failed to trigger datanode request. Code: " + response.code() + ", message: " + response.message());

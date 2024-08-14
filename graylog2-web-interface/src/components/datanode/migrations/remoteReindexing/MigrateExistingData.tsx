@@ -67,7 +67,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
 
       if (checkConnectionResult?.indices?.length) {
         setAvailableIndices(checkConnectionResult.indices);
-        setSelectedIndices(checkConnectionResult.indices.filter((i) => i.managed && !i.closed));
+        setSelectedIndices(checkConnectionResult.indices.filter((i) => i.managed));
         setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
         saveFormValues(args as RemoteReindexRequest);
       } else if (checkConnectionResult?.error) {
@@ -216,7 +216,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
                          if (areAllIndicesSelected) {
                            setSelectedIndices([]);
                          } else {
-                           setSelectedIndices(filteredIndices.filter((i) => !i.closed));
+                           setSelectedIndices(filteredIndices);
                          }
                        }} />
               )}
@@ -235,11 +235,11 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
                              )}
                              {index.closed && (
                                <Icon name="warning"
-                                     title="This index is closed and can't be migrated" />
+                                     title="This index is closed, will be reopened and closed again during the migration." />
                              )}
                            </>
                          )}
-                         disabled={isLoading || index.closed}
+                         disabled={isLoading}
                          checked={filteredSelectedIndices.includes(index)}
                          onChange={() => handleSelectIndices(index)} />
                 ))}

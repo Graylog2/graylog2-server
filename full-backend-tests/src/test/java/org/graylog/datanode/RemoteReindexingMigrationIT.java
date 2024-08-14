@@ -27,6 +27,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexResponse;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
@@ -78,6 +79,8 @@ public class RemoteReindexingMigrationIT {
         final String messageContent = ingestRandomMessage(indexName);
         final String messageContent2 = ingestRandomMessage(indexName2);
 
+        closeIndex(indexName);
+
         // flush the newly created document
         openSearchInstance.client().refreshNode();
 
@@ -102,6 +105,10 @@ public class RemoteReindexingMigrationIT {
         Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
         Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
 
+    }
+
+    private void closeIndex(String indexName) {
+        openSearchInstance.openSearchClient().execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().close(new CloseIndexRequest(indexName), requestOptions));
     }
 
     /**

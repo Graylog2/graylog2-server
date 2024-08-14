@@ -20,6 +20,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog2.security.CustomCAX509TrustManager;
@@ -34,6 +35,7 @@ import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.Optional;
 
+@Singleton
 public class DatanodeTrustManagerProvider implements Provider<X509TrustManager> {
 
     private final CustomCAX509TrustManager customCAX509TrustManager;

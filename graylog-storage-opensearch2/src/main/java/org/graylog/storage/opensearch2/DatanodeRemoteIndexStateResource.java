@@ -14,18 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.storage.opensearch2;
 
-import org.graylog2.plugin.inject.Graylog2Module;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
 
-public class RestBindings extends Graylog2Module {
-    @Override
-    protected void configure() {
-        addSystemRestResource(StatusController.class);
-        addSystemRestResource(LogsController.class);
-        addSystemRestResource(ManagementController.class);
-        addSystemRestResource(IndicesDirectoryController.class);
-        addSystemRestResource(OpensearchConnectionCheckController.class);
-        addSystemRestResource(IndexStateController.class);
-    }
+public interface DatanodeRemoteIndexStateResource {
+
+    @POST("index-state/get")
+    Call<IndexState> readState(@Body @Valid @NotNull IndexStateGetRequest request);
+
+    @POST("index-state/set")
+    Call<IndexState> changeState(@Body @Valid @NotNull IndexStateChangeRequest request);
+
+
 }
