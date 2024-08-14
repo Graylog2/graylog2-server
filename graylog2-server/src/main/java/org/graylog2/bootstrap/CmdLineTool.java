@@ -273,24 +273,27 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     }
 
     public void doRun(Level logLevel) {
-        final PluginLoaderConfig pluginLoaderConfig = getPluginLoaderConfig(configFile);
+        PluginLoaderConfig pluginLoaderConfig = null;
+        if (configuration.withPlugins()) { //TODO: change path configuration handling
+            pluginLoaderConfig = getPluginLoaderConfig(configFile);
 
-        // Move the zstd temp folder from /tmp to our native lib dir to avoid issues with noexec-mounted /tmp directories.
-        // See: https://github.com/Graylog2/graylog2-server/issues/17837
-        // WARNING: This needs to be set before the first use of the zstd library. Our in-memory logger is using
-        //          zstd library, so we need to set it before the first usage of the Logger instance.
-        //          Setting it after the first library usage wouldn't have any effect.
-        if (Native.isLoaded()) {
-            LOG.warn("The zstd library is already loaded. Setting the ZstdTempFolder property doesn't have any effect!");
-        }
-        final Path nativeLibPath = pluginLoaderConfig.getNativeLibDir().toAbsolutePath();
-        try {
-            // We are very early in the startup process and the data_dir and native lib dir don't exist yet. Since the
-            // zstd library doesn't create its own temp directory, we have to do it to avoid errors on startup.
-            Files.createDirectories(nativeLibPath);
-            System.setProperty("ZstdTempFolder", nativeLibPath.toString());
-        } catch (IOException e) {
-            LOG.warn("Couldn't create native lib dir <{}>. Unable to set ZstdTempFolder system property.", nativeLibPath, e);
+            // Move the zstd temp folder from /tmp to our native lib dir to avoid issues with noexec-mounted /tmp directories.
+            // See: https://github.com/Graylog2/graylog2-server/issues/17837
+            // WARNING: This needs to be set before the first use of the zstd library. Our in-memory logger is using
+            //          zstd library, so we need to set it before the first usage of the Logger instance.
+            //          Setting it after the first library usage wouldn't have any effect.
+            if (Native.isLoaded()) {
+                LOG.warn("The zstd library is already loaded. Setting the ZstdTempFolder property doesn't have any effect!");
+            }
+            final Path nativeLibPath = pluginLoaderConfig.getNativeLibDir().toAbsolutePath();
+            try {
+                // We are very early in the startup process and the data_dir and native lib dir don't exist yet. Since the
+                // zstd library doesn't create its own temp directory, we have to do it to avoid errors on startup.
+                Files.createDirectories(nativeLibPath);
+                System.setProperty("ZstdTempFolder", nativeLibPath.toString());
+            } catch (IOException e) {
+                LOG.warn("Couldn't create native lib dir <{}>. Unable to set ZstdTempFolder system property.", nativeLibPath, e);
+            }
         }
 
         // This is holding all our metrics.
