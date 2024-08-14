@@ -42,20 +42,12 @@ import org.jsoftbiz.utils.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 public abstract class ServerBootstrap extends DatanodeCmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
@@ -102,24 +94,13 @@ public abstract class ServerBootstrap extends DatanodeCmdLineTool {
                 });
     }
 
-    private void setNettyNativeDefaults(Configuration configuration) {
-        // Give netty a better spot than /tmp to unpack its tcnative libraries
-        if (System.getProperty("io.netty.native.workdir") == null) {
-            System.setProperty("io.netty.native.workdir", configuration.getNativeLibDir().toAbsolutePath().toString());
-        }
-        // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
-        if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
-            System.setProperty("io.netty.native.deleteLibAfterLoading", "false");
-        }
-    }
-
     @Override
     protected void startCommand() {
         final String systemInformation = Tools.getSystemInformation();
 
         final OS os = OS.getOs();
 
-        LOG.info("Graylog {} {} starting up", commandName, version);
+        LOG.info("Graylog DataNode {} {} starting up", commandName, version);
         LOG.info("JRE: {}", systemInformation);
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());
