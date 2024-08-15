@@ -187,24 +187,4 @@ public class Indices implements GraylogRestApi {
                 .ifValidationFails()
                 .statusCode(202);
     }
-
-    public record Deflector(String target, boolean isUp) {}
-
-    public Deflector deflector(String indexSetId) {
-        final ValidatableResponse response = given()
-                .spec(api.requestSpecification())
-                .log().ifValidationFails()
-                .when()
-                .get("/system/indexer/overview/" + indexSetId)
-                .then()
-                .log().ifError()
-                .log()
-                .ifValidationFails()
-                .statusCode(200);
-
-        final var deflectorTarget = response.extract().jsonPath().getString("deflector.current_target");
-        final var isUp = response.extract().jsonPath().getBoolean("deflector.is_up");
-
-        return new Deflector(deflectorTarget, isUp);
-    }
 }
