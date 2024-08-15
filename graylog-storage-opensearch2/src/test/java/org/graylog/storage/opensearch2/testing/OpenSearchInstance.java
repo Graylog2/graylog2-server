@@ -227,6 +227,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withEnv("START_PERF_ANALYZER", "false")
+                .withEnv("search.max_aggregation_rewrite_filters", "0")
                 .withNetwork(network)
                 .withNetworkAliases(hostname);
 
