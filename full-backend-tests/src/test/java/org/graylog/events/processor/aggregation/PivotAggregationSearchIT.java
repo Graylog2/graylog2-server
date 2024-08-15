@@ -28,36 +28,64 @@ import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
-
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
 public class PivotAggregationSearchIT {
-
     private static final Logger LOG = LoggerFactory.getLogger(PivotAggregationSearchIT.class);
+    private static final String indexSetPrefix = "pivot-search-test";
 
-    private final GraylogApis graylogApis;
+    private final GraylogApis apis;
     private final WebhookServerInstance webhookTester;
+    private String indexSetId;
+    private String streamId;
+    private String isolatedStreamId;
 
-
-    public PivotAggregationSearchIT(GraylogApis graylogApis) {
-        this.graylogApis = graylogApis;
-        this.webhookTester = graylogApis.backend().getWebhookServerInstance().orElseThrow(() -> new IllegalStateException("Webhook tester not found!"));
+    public PivotAggregationSearchIT(GraylogApis apis) {
+        this.apis = apis;
+        this.webhookTester = apis.backend().getWebhookServerInstance().orElseThrow(() -> new IllegalStateException("Webhook tester not found!"));
     }
 
+    @BeforeEach
+    void setUp() {
+        this.indexSetId = apis.indices().createIndexSet("Pivot Aggregation Search Test", "", indexSetPrefix);
+        apis.indices().waitFor(() -> apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_0", indexSetPrefix + "_deflector"),
+                "Timed out waiting for index/deflector to be created.");
+        this.streamId = apis.streams().createStream(
+                "Stream for Pivot Aggregation Search Test",
+                this.indexSetId,
+                true,
+                DefaultStreamMatches.REMOVE,
+                new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "example.org", "source", false)
+        );
+    }
+
+    @AfterEach
+    void tearDown() {
+        apis.streams().deleteStream(this.streamId);
+        if (this.isolatedStreamId != null) {
+            apis.streams().deleteStream(this.isolatedStreamId);
+            this.isolatedStreamId = null;
+        }
+        apis.indices().deleteIndexSet(this.indexSetId, true);
+        apis.indices().waitFor(() -> !apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_0")
+                        && !apis.backend().searchServerInstance().client().indicesExists(indexSetPrefix + "_deflector"),
+                "Timed out waiting for index/deflector to be deleted.");
+    }
 
     @ContainerMatrixTest
     void testPivotAggregationSearchAllKnownFields() throws ExecutionException, RetryException {
-        graylogApis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+        apis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
 
-        final String notificationID = graylogApis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
+        final String notificationID = apis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
 
-        final String eventDefinitionID = graylogApis.eventDefinitions().createEventDefinition(notificationID, List.of(
+        final String eventDefinitionID = apis.eventDefinitions().createEventDefinition(notificationID, List.of(
                 "http_response_code",
                 "type"
         ));
@@ -66,17 +94,17 @@ public class PivotAggregationSearchIT {
 
         waitForWebHook(eventDefinitionID, "my alert def: 200|ssh - count()=3.0");
 
-        graylogApis.eventsNotifications().deleteNotification(notificationID);
-        graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
+        apis.eventsNotifications().deleteNotification(notificationID);
+        apis.eventDefinitions().deleteDefinition(eventDefinitionID);
     }
 
     @ContainerMatrixTest
     void testPivotAggregationSearchOneUnknownField() throws ExecutionException, RetryException {
-        graylogApis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+        apis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
 
-        final String notificationID = graylogApis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
+        final String notificationID = apis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
 
-        final String eventDefinitionID = graylogApis.eventDefinitions().createEventDefinition(notificationID, List.of(
+        final String eventDefinitionID = apis.eventDefinitions().createEventDefinition(notificationID, List.of(
                 "http_response_code",
                 "unknown_field",
                 "type"
@@ -86,17 +114,17 @@ public class PivotAggregationSearchIT {
 
         waitForWebHook(eventDefinitionID, "my alert def: 200|(Empty Value)|ssh - count()=3.0");
 
-        graylogApis.eventsNotifications().deleteNotification(notificationID);
-        graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
+        apis.eventsNotifications().deleteNotification(notificationID);
+        apis.eventDefinitions().deleteDefinition(eventDefinitionID);
     }
 
     @ContainerMatrixTest
     void testPivotAggregationSearchAllUnknownFields() throws ExecutionException, RetryException {
-        graylogApis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+        apis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
 
-        final String notificationID = graylogApis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
+        final String notificationID = apis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
 
-        final String eventDefinitionID = graylogApis.eventDefinitions().createEventDefinition(notificationID, List.of(
+        final String eventDefinitionID = apis.eventDefinitions().createEventDefinition(notificationID, List.of(
                 "unknown_field_1",
                 "unknown_field_2",
                 "unknown_field_3"
@@ -106,34 +134,58 @@ public class PivotAggregationSearchIT {
 
         waitForWebHook(eventDefinitionID, "my alert def: (Empty Value)|(Empty Value)|(Empty Value) - count()=3.0");
 
-        graylogApis.eventsNotifications().deleteNotification(notificationID);
-        graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
+        apis.eventsNotifications().deleteNotification(notificationID);
+        apis.eventDefinitions().deleteDefinition(eventDefinitionID);
     }
 
     @ContainerMatrixTest
     void testPivotAggregationIsolatedToStream() throws ExecutionException, RetryException {
-        graylogApis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+        apis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
 
-        final String notificationID = graylogApis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
+        final String notificationID = apis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
 
-        final String defaultStreamIndexSetId = graylogApis.streams().getStream(DEFAULT_STREAM_ID).extract().path("index_set_id");
-        final var streamId = graylogApis.streams().createStream(
+        this.isolatedStreamId = apis.streams().createStream(
                 "Stream for testing event definition isolation",
-                defaultStreamIndexSetId,
+                this.indexSetId,
                 true,
-                DefaultStreamMatches.KEEP,
-                new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream_isolation_test", "facility", true)
+                DefaultStreamMatches.REMOVE,
+                new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream_isolation_test", "facility", false)
         );
 
-        final String eventDefinitionID = graylogApis.eventDefinitions().createEventDefinition(notificationID, List.of("http_response_code"), List.of(streamId));
+        final String eventDefinitionID = apis.eventDefinitions().createEventDefinition(notificationID, List.of(), List.of(isolatedStreamId));
 
         postMessagesToOtherStream();
         postMessages();
 
-        waitForWebHook(eventDefinitionID, "my alert def: 200 - count()=3.0");
+        waitForWebHook(eventDefinitionID, "my alert def: count()=1.0");
 
-        graylogApis.eventsNotifications().deleteNotification(notificationID);
-        graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
+        apis.eventsNotifications().deleteNotification(notificationID);
+        apis.eventDefinitions().deleteDefinition(eventDefinitionID);
+    }
+
+    @ContainerMatrixTest
+    void testPivotAggregationWithGroupingIsIsolatedToStream() throws ExecutionException, RetryException {
+        apis.system().urlWhitelist(webhookTester.getContainerizedCollectorURI());
+
+        final String notificationID = apis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
+
+        this.isolatedStreamId = apis.streams().createStream(
+                "Stream for testing event definition isolation",
+                this.indexSetId,
+                true,
+                DefaultStreamMatches.REMOVE,
+                new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream_isolation_test", "facility", false)
+        );
+
+        final String eventDefinitionID = apis.eventDefinitions().createEventDefinition(notificationID, List.of("http_response_code"), List.of(isolatedStreamId));
+
+        postMessagesToOtherStream();
+        postMessages();
+
+        waitForWebHook(eventDefinitionID, "my alert def: 500 - count()=1.0");
+
+        apis.eventsNotifications().deleteNotification(notificationID);
+        apis.eventDefinitions().deleteDefinition(eventDefinitionID);
     }
 
     private void waitForWebHook(String eventDefinitionID, String eventMessage) throws ExecutionException, RetryException {
@@ -147,13 +199,13 @@ public class PivotAggregationSearchIT {
                     });
 
         } catch (ExecutionException | RetryException e) {
-            LOG.error(this.graylogApis.backend().getLogs());
+            LOG.error(this.apis.backend().getLogs());
             throw e;
         }
     }
 
     private void postMessages() {
-        graylogApis.gelf().createGelfHttpInput()
+        apis.gelf().createGelfHttpInput()
                 .postMessage("""
                         {
                         "short_message":"pivot-aggregation-search-test-1",
@@ -181,21 +233,23 @@ public class PivotAggregationSearchIT {
                         "http_response_code":200,
                         "resource": "posts"
                         }""");
-        graylogApis.search().waitForMessagesCount(3);
+        apis.search().waitForMessagesCount(3);
+        apis.backend().searchServerInstance().client().refreshNode();
     }
 
     private void postMessagesToOtherStream() {
-        graylogApis.gelf().createGelfHttpInput()
+        apis.gelf().createGelfHttpInput()
                 .postMessage("""
                         {
                         "short_message":"pivot-aggregation-search-test-1",
                         "host":"example.org",
                         "type":"ssh",
                         "source":"example.org",
-                        "http_response_code":200,
+                        "http_response_code":500,
                         "resource": "posts",
                         "facility": "stream_isolation_test"
                         }""");
-        graylogApis.search().waitForMessagesCount(1);
+        apis.search().waitForMessagesCount(1);
+        apis.backend().searchServerInstance().client().refreshNode();
     }
 }
