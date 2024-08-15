@@ -39,7 +39,7 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
 
   return (
     <>
-      <Alert bsStyle="info">
+      <Alert bsStyle="default">
         Stream Rules take effect first in the default processing order, and are used to direct messages from Inputs into Streams.
         Any message that meets the criteria of the Stream Rule(s) will be directed into this Stream.
       </Alert>
