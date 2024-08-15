@@ -2879,12 +2879,12 @@
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
   integrity sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==
 
-"@puppeteer/browsers@2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@puppeteer/browsers/-/browsers-2.3.0.tgz#791ea7d80450fea24eb19fb1d70c367ad4e08cae"
-  integrity sha512-ioXoq9gPxkss4MYhD+SFaU9p1IHFUX0ILAWFPyjGaBdjLsYAlZw6j1iLA0N/m12uVHLFDfSYNF7EQccjinIMDA==
+"@puppeteer/browsers@2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@puppeteer/browsers/-/browsers-2.3.1.tgz#238200dbdce5c00ae28c8f2a55ac053c3be71668"
+  integrity sha512-uK7o3hHkK+naEobMSJ+2ySYyXtQkBxIH8Gn4MK9ciePjNV+Pf+PgY/W7iPzn2MTjl3stcYB5AlcTmPYw7AXDwA==
   dependencies:
-    debug "^4.3.5"
+    debug "^4.3.6"
     extract-zip "^2.0.1"
     progress "^2.0.3"
     proxy-agent "^6.4.0"
@@ -12971,27 +12971,29 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer-core@23.0.2:
-  version "23.0.2"
-  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-23.0.2.tgz#343c8d003e609620febfe35f76847a0014cdc97c"
-  integrity sha512-MvOHn+g1TYkAR2oVd/bf/YWXKqFTJmkhyyurYgxkrjh8rBOL1ZH5VyOsLJi0bLO7/yoipAmk1gFZEx9HUJnaoA==
+puppeteer-core@23.1.0:
+  version "23.1.0"
+  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-23.1.0.tgz#50703d2e27c1d73d523c25b807f6e6d95a6b1c47"
+  integrity sha512-SvAsu+xnLN2FMXE/59bp3s3WXp8ewqUGzVV4AQtml/2xmsciZnU/bXcCW+eETHPWQ6Agg2vTI7QzWXPpEARK2g==
   dependencies:
-    "@puppeteer/browsers" "2.3.0"
+    "@puppeteer/browsers" "2.3.1"
     chromium-bidi "0.6.4"
     debug "^4.3.6"
     devtools-protocol "0.0.1312386"
+    typed-query-selector "^2.12.0"
     ws "^8.18.0"
 
 puppeteer@^23.0.2:
-  version "23.0.2"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-23.0.2.tgz#73391e87407da4ae6d630e156f42623a5a7619cd"
-  integrity sha512-I/l1P8s8brcLG+oW9AwF8hUaOSGGJcGKMflXRgULUH0S3ABptlLI9ZKjqWDo8ipY6v789ZKd+bNKtcCwpTh5Ww==
+  version "23.1.0"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-23.1.0.tgz#3abe4980670f214c8edfe689012e83418f81f9aa"
+  integrity sha512-m+CyicDlGN1AVUeOsCa6/+KQydJzxfsPowL7fQy+VGNeaWafB0m8G5aGfXdfZztKMxzCsdz7KNNzbJPeG9wwFw==
   dependencies:
-    "@puppeteer/browsers" "2.3.0"
+    "@puppeteer/browsers" "2.3.1"
     chromium-bidi "0.6.4"
     cosmiconfig "^9.0.0"
     devtools-protocol "0.0.1312386"
-    puppeteer-core "23.0.2"
+    puppeteer-core "23.1.0"
+    typed-query-selector "^2.12.0"
 
 pure-rand@^6.0.0:
   version "6.0.1"
@@ -15794,6 +15796,11 @@ typed-array-length@^1.0.6:
     has-proto "^1.0.3"
     is-typed-array "^1.1.13"
     possible-typed-array-names "^1.0.0"
+
+typed-query-selector@^2.12.0:
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/typed-query-selector/-/typed-query-selector-2.12.0.tgz#92b65dbc0a42655fccf4aeb1a08b1dddce8af5f2"
+  integrity sha512-SbklCd1F0EiZOyPiW192rrHZzZ5sBijB6xM+cpmrwDqObvdtunOHHIk9fCGsoK5JVIYXoyEp4iEdE3upFH3PAg==
 
 typedarray-pool@^1.1.0:
   version "1.2.0"
