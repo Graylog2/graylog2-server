@@ -38,13 +38,16 @@ import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.EventProcessorDependencyCheck;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
+import org.graylog.events.processor.EventProcessorPermissionService;
 import org.graylog.events.processor.EventProcessorPreconditionException;
+import org.graylog.events.processor.EventProcessorSearchUser;
 import org.graylog.events.processor.EventStreamService;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.ParameterExpansionError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -100,6 +103,7 @@ public class AggregationEventProcessor implements EventProcessor {
     private final PermittedStreams permittedStreams;
     private final Set<EventQuerySearchTypeSupplier> eventQueryModifiers;
     private final MessageFactory messageFactory;
+    private final EventProcessorPermissionService permissionService;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -111,7 +115,8 @@ public class AggregationEventProcessor implements EventProcessor {
                                      Messages messages, NotificationService notificationService,
                                      PermittedStreams permittedStreams,
                                      Set<EventQuerySearchTypeSupplier> eventQueryModifiers,
-                                     MessageFactory messageFactory) {
+                                     MessageFactory messageFactory,
+                                     EventProcessorPermissionService permissionService) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -124,6 +129,7 @@ public class AggregationEventProcessor implements EventProcessor {
         this.permittedStreams = permittedStreams;
         this.eventQueryModifiers = eventQueryModifiers;
         this.messageFactory = messageFactory;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -230,11 +236,14 @@ public class AggregationEventProcessor implements EventProcessor {
      */
     private Set<String> getStreams(AggregationEventProcessorParameters parameters) {
         if (parameters.streams().isEmpty()) {
-            Set<String> configStreams = new HashSet<>(config.streams());
+            final Set<String> configStreams = new HashSet<>(config.streams());
             if (!config.streamCategories().isEmpty()) {
-                // TODO: We need to account for permissions of the user who created the event here in place of
-                //      a blanket `true` here.
-                configStreams.addAll(permittedStreams.loadWithCategories(config.streamCategories(), streamId -> true));
+                final Optional<EventProcessorSearchUser> searchUser = permissionService.getOwner(eventDefinition.id())
+                        .map(permissionService::getSearchUser);
+                final StreamPermissions streamPermissions = searchUser
+                        .<StreamPermissions>map(eventProcessorSearchUser -> eventProcessorSearchUser)
+                        .orElseGet(() -> streamId -> true);
+                configStreams.addAll(permittedStreams.loadWithCategories(config.streamCategories(), streamPermissions));
             }
             return configStreams;
         } else {

@@ -26,6 +26,8 @@ import jakarta.inject.Inject;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.events.processor.EventProcessorPermissionService;
+import org.graylog.events.processor.EventProcessorSearchUser;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.ParameterProvider;
@@ -44,6 +46,7 @@ import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -68,10 +71,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -102,6 +107,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final PermittedStreams permittedStreams;
     private final NotificationService notificationService;
     private final QueryStringDecorators queryStringDecorators;
+    private final EventProcessorPermissionService permissionService;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
@@ -115,7 +121,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   MoreSearch moreSearch,
                                   PermittedStreams permittedStreams,
                                   NotificationService notificationService,
-                                  QueryStringDecorators queryStringDecorators) {
+                                  QueryStringDecorators queryStringDecorators,
+                                  EventProcessorPermissionService permissionService) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
@@ -128,6 +135,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.permittedStreams = permittedStreams;
         this.notificationService = notificationService;
         this.queryStringDecorators = queryStringDecorators;
+        this.permissionService = permissionService;
     }
 
     private String metricName(SeriesSpec series) {
@@ -378,10 +386,16 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .queries(ImmutableSet.of(getAggregationQuery(parameters, searchWithinMs, executeEveryMs), getSourceStreamsQuery(parameters)))
                 .parameters(config.queryParameters())
                 .build();
-        // This adds all streams if none were provided
-        // TODO: Once we introduce "EventProcessor owners" this should only load the permitted streams of the
-        //       user who created this EventProcessor.
-        search = search.addStreamsToQueriesWithoutStreams(() -> permittedStreams.loadAllMessageStreams((streamId) -> true));
+        // This adds all streams that the event definition creator has read permissions for if none were provided
+        // If the event definition creator's user no longer exists, the event definition was created by the system,
+        // or the event definition was created by the admin user all streams are added.
+        Optional<EventProcessorSearchUser> searchUser = permissionService.getOwner(eventDefinition.id())
+                .map(permissionService::getSearchUser);
+        final Supplier<Set<String>> streamProvider = searchUser
+                .<Supplier<Set<String>>>map(value -> () -> permittedStreams.loadAllMessageStreams(value))
+                .orElseGet(() -> () -> permittedStreams.loadAllMessageStreams((streamId) -> true));
+        search = search.addStreamsToQueriesWithoutStreams(streamProvider);
+
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username, NO_CANCELLATION), Collections.emptySet(), user.timezone());
         try {
             Uninterruptibles.getUninterruptibly(
@@ -524,8 +538,12 @@ public class PivotAggregationSearch implements AggregationSearch {
         Set<String> streamIds = parameters.streams().isEmpty() ? config.streams() : parameters.streams();
         if (parameters.streams().isEmpty() && !config.streamCategories().isEmpty()) {
             streamIds = new HashSet<>(streamIds);
-            // TODO: How to take into consideration StreamPermissions here???
-            streamIds.addAll(permittedStreams.loadWithCategories(config.streamCategories(), (streamId) -> true));
+            final Optional<EventProcessorSearchUser> searchUser = permissionService.getOwner(eventDefinition.id())
+                    .map(permissionService::getSearchUser);
+            final StreamPermissions streamPermissions = searchUser
+                    .<StreamPermissions>map(eventProcessorSearchUser -> eventProcessorSearchUser)
+                    .orElseGet(() -> streamId -> true);
+            streamIds.addAll(permittedStreams.loadWithCategories(config.streamCategories(), streamPermissions));
         }
         final Set<String> existingStreams = moreSearch.loadStreams(streamIds).stream()
                 .map(Stream::getId)
@@ -533,7 +551,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final Set<String> nonExistingStreams = streamIds.stream()
                 .filter(stream -> !existingStreams.contains(stream))
                 .collect(toSet());
-        if (nonExistingStreams.size() != 0) {
+        if (!nonExistingStreams.isEmpty()) {
             LOG.warn("Removing non-existing streams <{}> from event definition <{}>/<{}>",
                     nonExistingStreams,
                     eventDefinition.id(),

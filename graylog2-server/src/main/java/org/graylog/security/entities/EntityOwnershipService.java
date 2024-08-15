@@ -16,6 +16,8 @@
  */
 package org.graylog.security.entities;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
@@ -27,8 +29,7 @@ import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import java.util.Optional;
 
 @Singleton
 public class EntityOwnershipService {
@@ -113,6 +114,16 @@ public class EntityOwnershipService {
 
     public void unregisterEventNotification(String id) {
         removeGrantsForTarget(grnRegistry.newGRN(GRNTypes.EVENT_NOTIFICATION, id));
+    }
+
+    public Optional<String> getOwnerGranteeId(GRNType type, String id) {
+        final GRN grn = grnRegistry.newGRN(type, id);
+        for (GrantDTO grant : dbGrantService.getForTarget(grn)) {
+            if (Capability.OWN.equals(grant.capability())) {
+                return Optional.of(grant.grantee().entity());
+            }
+        }
+        return Optional.empty();
     }
 
     private void removeGrantsForTarget(GRN target) {
