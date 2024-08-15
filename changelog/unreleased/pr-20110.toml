@@ -1,0 +1,4 @@
+type = "a"
+message = "Added categories to Streams to allow Illuminate content to be scoped to multiple products."
+
+pulls = ["20110"]
