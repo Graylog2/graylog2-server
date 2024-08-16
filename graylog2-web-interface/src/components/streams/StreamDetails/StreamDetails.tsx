@@ -165,7 +165,7 @@ const StreamDetails = ({ stream }: Props) => {
 
   return (
     <>
-      {DataWarehouseJobComponent && <DataWarehouseJobComponent />}
+      {DataWarehouseJobComponent && <DataWarehouseJobComponent streamId={stream.id} />}
       <Container>
         <Header>
           <LeftCol>
