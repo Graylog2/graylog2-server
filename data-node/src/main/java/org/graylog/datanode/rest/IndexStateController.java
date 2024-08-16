@@ -37,6 +37,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Locale;
+import java.util.Objects;
 
 import static org.graylog.datanode.rest.OpensearchConnectionCheckController.CONNECT_TIMEOUT;
 import static org.graylog.datanode.rest.OpensearchConnectionCheckController.READ_TIMEOUT;
@@ -65,8 +66,10 @@ public class IndexStateController {
     public IndexState get(IndexStateChangeRequest indexStateChangeRequest) {
         final String host = indexStateChangeRequest.host().endsWith("/") ? indexStateChangeRequest.host() : indexStateChangeRequest.host() + "/";
         final Request.Builder request = new Request.Builder()
-                .url(host + "_cat/indices/" + indexStateChangeRequest.indexName() + "/?h=status")
-                .header("Authorization", Credentials.basic(indexStateChangeRequest.username(), indexStateChangeRequest.password()));
+                .url(host + "_cat/indices/" + indexStateChangeRequest.indexName() + "/?h=status");
+        if (Objects.nonNull(indexStateChangeRequest.username()) && Objects.nonNull(indexStateChangeRequest.password())) {
+            request.header("Authorization", Credentials.basic(indexStateChangeRequest.username(), indexStateChangeRequest.password()));
+        }
         try (var response = getClient().newCall(request.build()).execute()) {
             if (response.isSuccessful() && response.body() != null) {
                 final String state = response.body().string().trim().toUpperCase(Locale.ROOT);
@@ -89,9 +92,10 @@ public class IndexStateController {
         final String host = indexStateChangeRequest.host().endsWith("/") ? indexStateChangeRequest.host() : indexStateChangeRequest.host() + "/";
         final Request.Builder request = new Request.Builder()
                 .post(RequestBody.create("", okhttp3.MediaType.parse(MediaType.APPLICATION_JSON)))
-                .url(host + indexStateChangeRequest.indexName() + "/" + (indexStateChangeRequest.action() == IndexState.OPEN ? "_open" : "_close"))
-                .header("Authorization", Credentials.basic(indexStateChangeRequest.username(), indexStateChangeRequest.password()));
-
+                .url(host + indexStateChangeRequest.indexName() + "/" + (indexStateChangeRequest.action() == IndexState.OPEN ? "_open" : "_close"));
+        if (Objects.nonNull(indexStateChangeRequest.username()) && Objects.nonNull(indexStateChangeRequest.password())) {
+            request.header("Authorization", Credentials.basic(indexStateChangeRequest.username(), indexStateChangeRequest.password()));
+        }
         try (var response = getClient().newCall(request.build()).execute()) {
             if (response.isSuccessful()) {
                 return indexStateChangeRequest.action();
