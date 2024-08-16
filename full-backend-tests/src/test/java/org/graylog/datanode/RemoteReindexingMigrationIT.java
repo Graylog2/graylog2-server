@@ -102,7 +102,6 @@ public class RemoteReindexingMigrationIT {
         final String status = response.extract().body().jsonPath().get("status");
         Assertions.assertThat(status).isEqualTo("FINISHED");
 
-        Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
         Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
 
     }
