@@ -77,7 +77,8 @@ public class PluggableSearchNormalization implements SearchNormalization {
     public Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
         final Search searchWithStreams = search
                 .addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadMessageStreamsWithFallback())
-                .addStreamsToQueriesWithCategories(streamCategoryMapper, searchUser);
+                .addStreamsToQueriesWithCategories(streamCategoryMapper, searchUser)
+                .addStreamsToSearchTypesWithCategories(streamCategoryMapper, searchUser);
         final var now = referenceDateFromOverrideOrNow(executionState);
         final var normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()))
                 .withReferenceDate(now);
