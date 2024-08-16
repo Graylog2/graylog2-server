@@ -38,6 +38,10 @@ const ActionButtonsWrap = styled.span(({ theme }) => css`
   float: right;
 `);
 
+const StyledDeleteButton = styled(Button)(({ theme }) => css`
+  margin: 0 ${theme.spacings.xxs};
+`);
+
 type Props = {
   matchData?: {
     matches: boolean,
@@ -84,12 +88,12 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
 
   const _formatActionItems = () => (
     <ActionButtonsWrap className="align-right">
-      <Button bsStyle="link"
-              bsSize="xsmall"
-              onClick={() => setShowStreamRuleForm(true)}
-              title="Edit stream rule">
+      <StyledDeleteButton bsStyle="default"
+                          bsSize="xsmall"
+                          onClick={() => setShowStreamRuleForm(true)}
+                          title="Edit stream rule">
         <Icon name="edit_square" type="regular" />
-      </Button>
+      </StyledDeleteButton>
       <Button bsStyle="danger"
               bsSize="xsmall"
               onClick={() => setShowConfirmDelete(true)}
