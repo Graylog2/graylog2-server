@@ -14,7 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.migration;
+import * as React from 'react';
+import styled from 'styled-components';
 
-public record RemoteIndex(String name, boolean managed, boolean closed) {
-}
+import { Label } from 'components/bootstrap';
+
+const StyledLabel = styled(Label)`
+  font-weight: bold;
+`;
+
+const SectionCountLabel = ({ children }: React.PropsWithChildren) => (
+  <StyledLabel bsStyle="default">{children}</StyledLabel>
+);
+
+export default SectionCountLabel;
