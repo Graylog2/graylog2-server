@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.migration;
+package org.graylog.storage.opensearch2;
 
-public record RemoteIndex(String name, boolean managed, boolean closed) {
+public record IndexStateGetRequest(String indexName, String host, String username, String password) {
 }
