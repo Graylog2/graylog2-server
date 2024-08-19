@@ -38,6 +38,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settin
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.tasks.TaskSubmissionResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
@@ -160,8 +161,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     @Override
     public String start(RemoteReindexRequest request) {
         final AggregatedConnectionResponse response = getAllIndicesFrom(request.uri(), request.username(), request.password(), request.trustUnknownCerts());
-        final List<String> indices = isAllIndices(request.indices()) ? response.indices() : request.indices();
-        final MigrationConfiguration migration = reindexMigrationService.saveMigration(MigrationConfiguration.forIndices(indices, response.certificates()));
+        final MigrationConfiguration migration = reindexMigrationService.saveMigration(MigrationConfiguration.forIndices(request.indices(), response.certificates()));
         doStartMigration(migration, request);
         return migration.id();
 
@@ -282,7 +282,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             reindexAllowlist.validate();
             final AggregatedConnectionResponse results = getAllIndicesFrom(remoteHost, username, password, trustUnknownCerts);
             final List<RemoteIndex> indices = results.indices().stream()
-                    .map(i -> new RemoteIndex(i, indexSetRegistry.isManagedIndex(i)))
+                    .map(i -> new RemoteIndex(i.name(), indexSetRegistry.isManagedIndex(i.name()), i.closed()))
                     .distinct()
                     .toList();
             if (results.error() != null && !results.error().isEmpty()) {
@@ -384,10 +384,6 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    boolean isAllIndices(final List<String> indices) {
-        return indices == null || indices.isEmpty() || (indices.size() == 1 && "*".equals(indices.get(0)));
-    }
-
     private void startAsyncTasks(MigrationConfiguration migration, RemoteReindexRequest request) {
         final int threadsCount = Math.max(1, Math.min(request.threadsCount(), migration.indices().size()));
 
@@ -403,7 +399,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void executeReindexAsync(MigrationConfiguration migration, URI uri, String username, String password, IndexMigrationConfiguration index) {
         final String indexName = index.indexName();
+
         try (XContentBuilder builder = JsonXContent.contentBuilder().prettyPrint()) {
+            final boolean closeAfterMigration = openIndexIfNeeded(migration, uri, username, password, indexName);
             final BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
             logInfo(migration, "Executing async reindex for " + indexName);
             final TaskSubmissionResponse task = client.execute((c, requestOptions) -> {
@@ -414,10 +412,51 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             });
             reindexMigrationService.assignTask(migration.id(), indexName, task.getTask());
             waitForTaskCompleted(migration, indexName, task.getTask());
+            if(closeAfterMigration) {
+                closeMigratedIndex(migration, uri, username, password, indexName);
+            }
         } catch (Exception e) {
             final String message = "Could not reindex index: " + indexName + " - " + e.getMessage();
             logError(migration, message, e);
         }
+    }
+
+    private void closeMigratedIndex(MigrationConfiguration migration, URI uri, String username, String password, String indexName) {
+        closeRemoteIndex(uri, username, password, indexName);
+        client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().close(new CloseIndexRequest(indexName), requestOptions));
+        logInfo(migration, "Restoring original index state, both source and target index " + indexName + " closed after migration");
+    }
+
+    private boolean openIndexIfNeeded(MigrationConfiguration migration, URI uri, String username, String password, String indexName) {
+        final IndexState indexState = getIndexState(uri, username, password, indexName);
+
+        boolean closeAfterMigration = false;
+
+        if(indexState == IndexState.CLOSE) {
+            logInfo(migration, "Source index " + indexName + " is closed, reopening for the migration");
+            closeAfterMigration = true;
+            openRemoteIndex(uri, username, password, indexName);
+        }
+        return closeAfterMigration;
+    }
+
+    private void openRemoteIndex(URI uri, String username, String password, String indexName) {
+        datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, datanodeRemoteIndexStateResource -> datanodeRemoteIndexStateResource.changeState(new IndexStateChangeRequest(
+                indexName, IndexState.OPEN, uri.toString(), username, password
+        )));
+    }
+
+    private void closeRemoteIndex(URI uri, String username, String password, String indexName) {
+        datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, datanodeRemoteIndexStateResource -> datanodeRemoteIndexStateResource.changeState(new IndexStateChangeRequest(
+                indexName, IndexState.CLOSE, uri.toString(), username, password
+        )));
+    }
+
+    private IndexState getIndexState(URI uri, String username, String password, String indexName) {
+        final IndexState indexState = datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, resource -> resource.readState(new IndexStateGetRequest(
+                indexName, uri.toString(), username, password
+        ))).values().iterator().next();
+        return indexState;
     }
 
 

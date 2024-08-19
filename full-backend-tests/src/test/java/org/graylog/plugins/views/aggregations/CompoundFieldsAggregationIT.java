@@ -17,15 +17,11 @@
 package org.graylog.plugins.views.aggregations;
 
 import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 import org.graylog.testing.completebackend.apis.DefaultStreamMatches;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.plugin.streams.StreamRuleType;
@@ -33,7 +29,6 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
@@ -58,8 +53,8 @@ public class CompoundFieldsAggregationIT {
         final String streamA = api.streams().createStream("Stream A", indexSetA, DefaultStreamMatches.REMOVE, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "streamA", "target_stream", false));
         final String streamB = api.streams().createStream("Stream B", indexSetB, DefaultStreamMatches.REMOVE, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "streamB", "target_stream", false));
 
-        final List<String> indexNamesA = waitForIndexNames(indexSetA);
-        final List<String> indexNamesB = waitForIndexNames(indexSetB);
+        final List<String> indexNamesA = api.indices().waitForIndexNames(indexSetA);
+        final List<String> indexNamesB = api.indices().waitForIndexNames(indexSetB);
 
         final String indexA = indexNamesA.iterator().next();
         final String indexB = indexNamesB.iterator().next();
@@ -76,15 +71,6 @@ public class CompoundFieldsAggregationIT {
                 """);
 
         api.search().waitForMessages("compound-field-test-a", "compound-field-test-b");
-    }
-
-    private List<String> waitForIndexNames(String indexSetName) throws ExecutionException, RetryException {
-        return RetryerBuilder.<List<String>>newBuilder()
-                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(30))
-                .retryIfResult(List::isEmpty)
-                .build()
-                .call(() -> api.indices().listOpenIndices(indexSetName).properJSONPath().read("indices.*.index_name"));
     }
 
     @ContainerMatrixTest
