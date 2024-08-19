@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { scales } from 'plotly.js/src/components/colorscale';
-import * as chroma from 'chroma-js';
+import chroma from 'chroma-js';
 
 const plotlyScaleToChroma = (plotlyScale: Array<[domain: number, color: string]>) => {
   const domains = plotlyScale.map(([domain]) => domain);
