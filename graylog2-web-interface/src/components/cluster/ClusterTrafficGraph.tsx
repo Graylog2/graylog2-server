@@ -16,17 +16,25 @@
  */
 
 import * as React from 'react';
+import { useEffect } from 'react';
 
 import { useStore } from 'stores/connect';
 import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
 import { TrafficGraphWithDaySelect } from 'components/common/Graph';
+import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
 
 const ClusterTrafficGraph = () => {
   const { traffic } = useStore(ClusterTrafficStore);
+  const { graphDays } = useGraphDays();
+
+  useEffect(() => {
+    if (graphDays) {
+      ClusterTrafficActions.getTraffic(graphDays);
+    }
+  }, [graphDays]);
 
   return (
-    <TrafficGraphWithDaySelect traffic={traffic}
-                               getTraffic={ClusterTrafficActions.getTraffic} />
+    <TrafficGraphWithDaySelect traffic={traffic?.output} />
   );
 };
 

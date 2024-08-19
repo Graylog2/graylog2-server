@@ -58,9 +58,8 @@ public class ContainerMatrixEngineDescriptor extends EngineDescriptor implements
         MutableExtensionRegistry extensionRegistry = MutableExtensionRegistry.createRegistryWithDefaultExtensions(
                 context.getConfiguration());
         EngineExecutionListener executionListener = context.getExecutionListener();
-        ExecutableInvoker executableInvoker = new DefaultExecutableInvoker(context);
         ExtensionContext extensionContext = new ContainerMatrixExtensionContext(executionListener, this,
-                context.getConfiguration(), executableInvoker);
+                context.getConfiguration());
 
         // @formatter:off
         return context.extend()

@@ -29,6 +29,7 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -37,6 +38,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settin
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.tasks.TaskSubmissionResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
@@ -48,6 +50,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.RemoteInfo;
 import org.graylog.shaded.opensearch2.org.opensearch.tasks.Task;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.datanode.IndexMigrationConfiguration;
 import org.graylog2.indexer.datanode.MigrationConfiguration;
@@ -63,6 +66,8 @@ import org.graylog2.indexer.migration.RemoteIndex;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.indexer.migration.TaskStatus;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
@@ -80,7 +85,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -88,6 +95,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog2.notifications.Notification.Type.REMOTE_REINDEX_FINISHED;
+import static org.graylog2.notifications.Notification.Type.REMOTE_REINDEX_RUNNING;
 
 @Singleton
 public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigrationAdapter {
@@ -106,6 +115,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final RemoteReindexMigrationService reindexMigrationService;
 
     private final DatanodeRestApiProxy datanodeRestApiProxy;
+    private final NotificationService notificationService;
 
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
@@ -114,7 +124,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                final ClusterEventBus eventBus,
                                                final ObjectMapper objectMapper,
                                                RemoteReindexMigrationService reindexMigrationService,
-                                               DatanodeRestApiProxy datanodeRestApiProxy) {
+                                               DatanodeRestApiProxy datanodeRestApiProxy,
+                                               NotificationService notificationService) {
         this.client = client;
         this.indices = indices;
         this.indexSetRegistry = indexSetRegistry;
@@ -122,13 +133,35 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.objectMapper = objectMapper;
         this.reindexMigrationService = reindexMigrationService;
         this.datanodeRestApiProxy = datanodeRestApiProxy;
+        this.notificationService = notificationService;
+    }
+
+    @Override
+    public boolean isMigrationRunning(IndexSet indexSet) {
+        return reindexMigrationService.getLatestMigrationId()
+                .map(this::status)
+                .map(migration -> isIndexSetCurrentlyMigrated(indexSet, migration))
+                .orElse(false);
+    }
+
+    @Nonnull
+    private Boolean isIndexSetCurrentlyMigrated(IndexSet indexSet, RemoteReindexMigration mig) {
+        if (mig.status() == Status.NOT_STARTED || mig.status() == Status.RUNNING) {
+            final Set<String> runningIndices = mig.indices().stream()
+                    .filter(i -> !i.isCompleted())
+                    .map(RemoteReindexIndex::name)
+                    .collect(Collectors.toSet());
+            final Set<IndexSet> migratedIndexSets = indexSetRegistry.getForIndices(runningIndices);
+            return migratedIndexSets.contains(indexSet);
+        } else {
+            return false;
+        }
     }
 
     @Override
     public String start(RemoteReindexRequest request) {
         final AggregatedConnectionResponse response = getAllIndicesFrom(request.uri(), request.username(), request.password(), request.trustUnknownCerts());
-        final List<String> indices = isAllIndices(request.indices()) ? response.indices() : request.indices();
-        final MigrationConfiguration migration = reindexMigrationService.saveMigration(MigrationConfiguration.forIndices(indices, response.certificates()));
+        final MigrationConfiguration migration = reindexMigrationService.saveMigration(MigrationConfiguration.forIndices(request.indices(), response.certificates()));
         doStartMigration(migration, request);
         return migration.id();
 
@@ -140,6 +173,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 prepareCluster(request, migration);
                 createIndicesInNewCluster(migration);
                 startAsyncTasks(migration, request);
+                createSystemNotification(Status.RUNNING);
             }).start();
         } catch (Exception e) {
             LOG.error("Failed to start remote reindex migration", e);
@@ -230,6 +264,13 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             return task.toString();
         } else if (task.task().status().hasFailures()) {
             return String.join(";", task.task().status().failures());
+        } else if (task.response().failures() != null && !task.response().failures().isEmpty()) {
+            return task.response().failures().stream()
+                    .map(TaskResponseFailure::cause)
+                    .filter(Objects::nonNull)
+                    .map(f -> f.type() + ": " + f.reason())
+                    .distinct()
+                    .collect(Collectors.joining(";"));
         }
         return null;
     }
@@ -241,7 +282,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             reindexAllowlist.validate();
             final AggregatedConnectionResponse results = getAllIndicesFrom(remoteHost, username, password, trustUnknownCerts);
             final List<RemoteIndex> indices = results.indices().stream()
-                    .map(i -> new RemoteIndex(i, indexSetRegistry.isManagedIndex(i)))
+                    .map(i -> new RemoteIndex(i.name(), indexSetRegistry.isManagedIndex(i.name()), i.closed()))
                     .distinct()
                     .toList();
             if (results.error() != null && !results.error().isEmpty()) {
@@ -252,6 +293,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         } catch (Exception e) {
             return IndexerConnectionCheckResult.failure(e);
         }
+    }
+
+    @Override
+    public Optional<String> getLatestMigrationId() {
+        return reindexMigrationService.getLatestMigrationId();
     }
 
     private String clusterAllowlistSetting() {
@@ -338,10 +384,6 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    boolean isAllIndices(final List<String> indices) {
-        return indices == null || indices.isEmpty() || (indices.size() == 1 && "*".equals(indices.get(0)));
-    }
-
     private void startAsyncTasks(MigrationConfiguration migration, RemoteReindexRequest request) {
         final int threadsCount = Math.max(1, Math.min(request.threadsCount(), migration.indices().size()));
 
@@ -357,7 +399,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void executeReindexAsync(MigrationConfiguration migration, URI uri, String username, String password, IndexMigrationConfiguration index) {
         final String indexName = index.indexName();
+
         try (XContentBuilder builder = JsonXContent.contentBuilder().prettyPrint()) {
+            final boolean closeAfterMigration = openIndexIfNeeded(migration, uri, username, password, indexName);
             final BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
             logInfo(migration, "Executing async reindex for " + indexName);
             final TaskSubmissionResponse task = client.execute((c, requestOptions) -> {
@@ -368,10 +412,51 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             });
             reindexMigrationService.assignTask(migration.id(), indexName, task.getTask());
             waitForTaskCompleted(migration, indexName, task.getTask());
+            if(closeAfterMigration) {
+                closeMigratedIndex(migration, uri, username, password, indexName);
+            }
         } catch (Exception e) {
             final String message = "Could not reindex index: " + indexName + " - " + e.getMessage();
             logError(migration, message, e);
         }
+    }
+
+    private void closeMigratedIndex(MigrationConfiguration migration, URI uri, String username, String password, String indexName) {
+        closeRemoteIndex(uri, username, password, indexName);
+        client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().close(new CloseIndexRequest(indexName), requestOptions));
+        logInfo(migration, "Restoring original index state, both source and target index " + indexName + " closed after migration");
+    }
+
+    private boolean openIndexIfNeeded(MigrationConfiguration migration, URI uri, String username, String password, String indexName) {
+        final IndexState indexState = getIndexState(uri, username, password, indexName);
+
+        boolean closeAfterMigration = false;
+
+        if(indexState == IndexState.CLOSE) {
+            logInfo(migration, "Source index " + indexName + " is closed, reopening for the migration");
+            closeAfterMigration = true;
+            openRemoteIndex(uri, username, password, indexName);
+        }
+        return closeAfterMigration;
+    }
+
+    private void openRemoteIndex(URI uri, String username, String password, String indexName) {
+        datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, datanodeRemoteIndexStateResource -> datanodeRemoteIndexStateResource.changeState(new IndexStateChangeRequest(
+                indexName, IndexState.OPEN, uri.toString(), username, password
+        )));
+    }
+
+    private void closeRemoteIndex(URI uri, String username, String password, String indexName) {
+        datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, datanodeRemoteIndexStateResource -> datanodeRemoteIndexStateResource.changeState(new IndexStateChangeRequest(
+                indexName, IndexState.CLOSE, uri.toString(), username, password
+        )));
+    }
+
+    private IndexState getIndexState(URI uri, String username, String password, String indexName) {
+        final IndexState indexState = datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, resource -> resource.readState(new IndexStateGetRequest(
+                indexName, uri.toString(), username, password
+        ))).values().iterator().next();
+        return indexState;
     }
 
 
@@ -445,6 +530,22 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 onTaskSuccess(migration, index, t.task(), duration);
             }
         });
+        Status status = getMigrationStatus(migration);
+        if (status == Status.FINISHED || status == Status.ERROR) {
+            onMigrationFinished(status);
+        }
+    }
+
+    private void onMigrationFinished(Status status) {
+        createSystemNotification(status);
+    }
+
+    private Status getMigrationStatus(MigrationConfiguration migration) {
+        return Optional.ofNullable(migration)
+                .map(MigrationConfiguration::id)
+                .map(this::status)
+                .map(RemoteReindexMigration::status)
+                .orElse(Status.RUNNING);
     }
 
     private static Duration getDuration(GetTaskResponse t) {
@@ -469,4 +570,16 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private String humanReadable(Duration duration) {
         return DurationFormatUtils.formatDurationWords(duration.getMillis(), true, true);
     }
+
+    private void createSystemNotification(Status status) {
+        if (status != Status.RUNNING) {
+            notificationService.destroyAllByType(REMOTE_REINDEX_RUNNING);
+        }
+        Notification notification = notificationService.buildNow();
+        notification.addType(status == Status.RUNNING ? REMOTE_REINDEX_RUNNING : REMOTE_REINDEX_FINISHED);
+        notification.addDetail("status", status.name());
+        notification.addSeverity(Notification.Severity.NORMAL);
+        notificationService.publishIfFirst(notification);
+    }
+
 }
