@@ -43,6 +43,7 @@ const SearchContainer = styled.div`
 type RemoteIndex = {
   name: string,
   managed: boolean,
+  closed: boolean,
 }
 
 type RemoteReindexCheckConnection = {
@@ -228,9 +229,13 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
                          label={(
                            <>
                              <span>{index.name} </span>
-                             {!index.managed && (
+                             {!index.managed && !index.closed && (
                                <Icon name="warning"
                                      title="This is an index not managed by Graylog. If you import it, you will not be able to query it in Graylog." />
+                             )}
+                             {index.closed && (
+                               <Icon name="warning"
+                                     title="This index is closed, will be reopened and closed again during the migration." />
                              )}
                            </>
                          )}
