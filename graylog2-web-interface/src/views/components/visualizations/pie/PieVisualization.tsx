@@ -29,7 +29,7 @@ import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import type {
-  GetExtendedPieGeneratorSettings,
+  PieChartDataSettingsWithCustomUnits,
 } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import usePieChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 
@@ -38,7 +38,7 @@ import GenericPlot from '../GenericPlot';
 
 const maxItemsPerRow = 4;
 
-const _verticalDimensions = (idx: number, total: number) => {
+const _verticalDimensions = (idx: number, total: number): [number, number] => {
   const rows = Math.ceil(total / maxItemsPerRow);
   const position = Math.floor(idx / maxItemsPerRow);
 
@@ -48,7 +48,7 @@ const _verticalDimensions = (idx: number, total: number) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _horizontalDimensions = (idx: number, total: number) => {
+const _horizontalDimensions = (idx: number, total: number): [number, number] => {
   const position = idx % maxItemsPerRow;
 
   const sliceSize = 1 / Math.min(total, maxItemsPerRow);
@@ -57,7 +57,7 @@ const _horizontalDimensions = (idx: number, total: number) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _generateSeries = (mapKeys: KeyMapper, getExtendedPieGeneratorSettings: GetExtendedPieGeneratorSettings): Generator => ({
+const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUnits: PieChartDataSettingsWithCustomUnits): Generator => ({
   type,
   name,
   labels,
@@ -66,9 +66,9 @@ const _generateSeries = (mapKeys: KeyMapper, getExtendedPieGeneratorSettings: Ge
   total,
   originalName,
   config,
-}) => {
+}): ChartDefinition => {
   const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
-  const extendedSettings = getExtendedPieGeneratorSettings({ values, originalName, name });
+  const extendedSettings = getPieChartDataSettingsWithCustomUnits({ values, originalName, name });
 
   const definition = {
     type,
@@ -83,7 +83,7 @@ const _generateSeries = (mapKeys: KeyMapper, getExtendedPieGeneratorSettings: Ge
     },
     originalName,
     ...extendedSettings,
-  } as ChartDefinition;
+  };
 
   return definition;
 };

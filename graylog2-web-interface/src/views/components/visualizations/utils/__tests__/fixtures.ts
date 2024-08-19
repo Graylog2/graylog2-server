@@ -186,6 +186,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
     offset: -2500961.5384615385,
     marker: {
       color: '#4478b3',
+      size: 1,
     },
   },
   {
@@ -246,6 +247,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
     offset: -833653.8461538462,
     marker: {
       color: '#fd9e48',
+      size: 1,
     },
   },
   {
@@ -289,6 +291,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
     offset: 833653.846153846,
     marker: {
       color: '#5d8947',
+      size: 1,
     },
   },
   {
@@ -332,6 +335,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
     offset: 2500961.5384615385,
     marker: {
       color: '#ffcdd2',
+      size: 1,
     },
   },
 ];

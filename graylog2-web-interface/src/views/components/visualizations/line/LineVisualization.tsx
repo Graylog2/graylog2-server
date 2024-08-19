@@ -41,7 +41,7 @@ const LineVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
-  const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config, effectiveTimerange });
+  const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
   const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);

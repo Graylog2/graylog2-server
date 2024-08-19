@@ -53,7 +53,7 @@ export type Unit = {
   } | undefined
 }
 type FieldUnitTypesJson = Record<FieldUnitType, Array<UnitJson>>
-type FieldUnitTypes = {[key: FieldUnitType]: Array<Unit>}
+type FieldUnitTypes = Record<FieldUnitType, Array<Unit>>
 export type ConversionParams = FieldUnitState;
 export type ConvertedResult = { value: number | null, unit: Unit };
 
@@ -67,7 +67,7 @@ const unitFromJson = (unitJson: UnitJson): Unit => ({
   conversion: unitJson.conversion,
   useInPrettier: isUnitUsableInPrettier(unitJson),
 });
-export const mappedUnitsFromJSON: FieldUnitTypes = mapValues<Array<Unit>>(sourceUnits, (unitsJson: Array<UnitJson>):Array<Unit> => unitsJson.map((unitJson): Unit => unitFromJson(unitJson)));
+export const mappedUnitsFromJSON: FieldUnitTypes = <FieldUnitTypes>mapValues(sourceUnits, (unitsJson: Array<UnitJson>):Array<Unit> => unitsJson.map((unitJson: UnitJson): Unit => unitFromJson(unitJson)));
 
 export const _getBaseUnit = (units: FieldUnitTypes, unitType: FieldUnitType): Unit => units[unitType].find(({ type }) => type === 'base');
 
@@ -133,7 +133,7 @@ export const _getPrettifiedValue = (units: FieldUnitTypes, initValue: number | s
   const value = initValue === null ? null : toNumber(initValue);
   if (!(value && currentUnit)) return ({ value, unit: currentUnit ? currentUnit.find(({ abbrev }) => abbrev === params.abbrev) : null });
 
-  const allConvertedValues = Object.values(currentUnit).map((unit) => _convertValueToUnit(units, value, params, { abbrev: unit.abbrev, unitType: unit.unitType }));
+  const allConvertedValues = Object.values(currentUnit).map((unit: Unit) => _convertValueToUnit(units, value, params, { abbrev: unit.abbrev, unitType: unit.unitType }));
 
   const filtratedValues = allConvertedValues.filter(({ value: val, unit }) => val >= 1 && unit.useInPrettier);
 

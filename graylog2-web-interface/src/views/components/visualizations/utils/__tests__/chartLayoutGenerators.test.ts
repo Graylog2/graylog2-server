@@ -15,12 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import {
-  convertValueToBaseUnit,
-  convertValueToUnit,
-  getPrettifiedValue,
-} from 'views/components/visualizations/utils/unitConverters';
-import type { AdditionalSettings, UnitTypeMapper, GenerateLayoutsParams } from 'views/components/visualizations/utils/chartLayoutGenerators';
+import type { AdditionalSettings, GenerateLayoutsParams } from 'views/components/visualizations/utils/chartLayoutGenerators';
 import {
   getBarChartTraceOffsetSettings,
   generateMappersForYAxis,
@@ -40,8 +35,6 @@ import {
   layoutsFor4axis,
 } from 'views/components/visualizations/utils/__tests__/fixtures';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
-import type { ChartDefinition } from 'views/components/visualizations/ChartData';
-import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
 describe('Chart Layout Generators', () => {
   describe('getBarChartTraceOffsetSettings', () => {

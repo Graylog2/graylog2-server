@@ -31,7 +31,6 @@ import { keySeparator, humanSeparator } from 'views/Constants';
 import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
-import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useBarChartDataSettingsWithCustomUnits
   from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';

@@ -31,6 +31,7 @@ import useBarChartDataSettingsWithCustomUnits
   from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
 import * as chartLayoutGenerators from 'views/components/visualizations/utils/chartLayoutGenerators';
+import type { MappersForYAxis } from 'views/components/visualizations/utils/chartLayoutGenerators';
 
 jest.mock('views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits');
 jest.mock('hooks/useFeature');
@@ -69,7 +70,7 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
     asMock(useWidgetUnits).mockReturnValue(units);
     asMock(getFieldNameFromTrace).mockReturnValue('fieldTime');
 
-    asMock(chartLayoutGenerators.generateMappersForYAxis).mockReturnValue({
+    const mappers: MappersForYAxis = {
       fieldNameToAxisCountMapper: {
         fieldTime: 1,
         fieldSize: 2,
@@ -94,7 +95,12 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
           axisKeyName: 'yaxis4',
         },
       },
-    });
+      yAxisMapper: {},
+      mapperAxisNumber: {},
+      fieldNameToAxisNameMapper: {},
+      seriesUnitMapper: {},
+    };
+    asMock(chartLayoutGenerators.generateMappersForYAxis).mockReturnValue(mappers);
 
     asMock(chartLayoutGenerators.getBarChartTraceOffsetSettings).mockReturnValue({
       offsetgroup: 1,

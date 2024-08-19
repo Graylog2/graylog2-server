@@ -24,7 +24,7 @@ import type { FieldUnitsFormValues } from 'views/types';
 type FieldName = string;
 export type UnitsConfigJson = Record<FieldName, FieldUnitJson>
 
-type InternalState = Record<string, FieldUnit>
+type InternalState = Record<FieldName, FieldUnit>
 
 export default class UnitsConfig {
   private readonly _value: InternalState;
@@ -38,15 +38,15 @@ export default class UnitsConfig {
   }
 
   toJSON(): UnitsConfigJson {
-    const units = this._value;
+    const units: InternalState = this._value;
 
-    return mapValues<UnitsConfigJson>(units, (unit: FieldUnit) => unit.toJSON());
+    return <UnitsConfigJson>mapValues(units, (unit: FieldUnit) => unit.toJSON());
   }
 
   toFormValues(): FieldUnitsFormValues {
     const units = this._value;
 
-    return mapValues<FieldUnitsFormValues>(units, (unit: FieldUnit) => ({ unitType: unit.unitType, abbrev: unit.abbrev }));
+    return mapValues(units, (unit: FieldUnit) => ({ unitType: unit.unitType, abbrev: unit.abbrev }));
   }
 
   static fromJSON(value: UnitsConfigJson) {

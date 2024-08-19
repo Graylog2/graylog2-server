@@ -47,7 +47,7 @@ export default class FieldUnit {
     return this._value.abbrev && this._value.unitType;
   }
 
-  toJSON() {
+  toJSON(): FieldUnitJson {
     const { abbrev, unitType } = this._value;
 
     return { abbrev, unit_type: unitType };

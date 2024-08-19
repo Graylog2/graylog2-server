@@ -170,7 +170,7 @@ export const getBarChartTraceOffsetSettings = (barmode: BarMode, {
   effectiveTimerange,
   isTimeline,
   xAxisItemsLength,
-}: AdditionalSettings): BarChartTraceOffsetSettings => {
+}: AdditionalSettings): BarChartTraceOffsetSettings | {} => {
   const offsetMultiplier = (xAxisItemsLength && isTimeline && effectiveTimerange) ? (moment(effectiveTimerange.to).diff(effectiveTimerange.from) / xAxisItemsLength) : 1;
 
   if (barmode === 'stack' || barmode === 'relative' || barmode === 'overlay') {
@@ -204,16 +204,17 @@ type MapperAxisNumber = Record<string, number>;
 type YAxisMapper = Record<SeriesName, AxisName>;
 type FieldNameToAxisNameMapper = {} | Record<string, string>;
 type FieldNameToAxisCountMapper = {} | Record<string, number>;
-
-export const generateMappersForYAxis = (
-  { series, units }: { series: AggregationWidgetConfig['series'], units: AggregationWidgetConfig['units'] }): {
+export type MappersForYAxis = {
   seriesUnitMapper: SeriesUnitMapper,
   mapperAxisNumber: MapperAxisNumber,
   unitTypeMapper: UnitTypeMapper,
   yAxisMapper: YAxisMapper
   fieldNameToAxisNameMapper: FieldNameToAxisNameMapper,
   fieldNameToAxisCountMapper: FieldNameToAxisCountMapper,
-} => {
+}
+
+export const generateMappersForYAxis = (
+  { series, units }: { series: AggregationWidgetConfig['series'], units: AggregationWidgetConfig['units'] }): MappersForYAxis => {
   let axisCount = 1;
   const unitTypeMapper: {} | UnitTypeMapper = {};
   const mapper = {};
