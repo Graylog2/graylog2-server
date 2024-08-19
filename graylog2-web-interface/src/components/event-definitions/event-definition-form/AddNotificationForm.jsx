@@ -142,8 +142,7 @@ class AddNotificationForm extends React.Component {
                       placeholder="Select Notification"
                       onChange={this.handleSelectNotificationChange}
                       options={this.formatNotifications(notifications)}
-                      value={selectedNotification}
-                      menuPlacement="bottom" />
+                      value={selectedNotification} />
               <HelpBlock>
                 Select a Notification to use on Alerts of this kind or create a new Notification that you can
                 later use in other Alerts.
