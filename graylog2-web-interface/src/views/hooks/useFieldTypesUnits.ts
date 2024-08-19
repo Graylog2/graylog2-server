@@ -20,7 +20,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
-const useFieldTypesUnits = (enabled: boolean = true) => {
+const useFieldTypesUnits = () => {
   const isFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const { data, isLoading } = useFieldTypes(undefined, undefined, isFeatureEnabled);
 
