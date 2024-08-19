@@ -22,8 +22,13 @@ import useFieldTypesUnits from 'views/hooks/useFieldTypesUnits';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
+import useFeature from 'hooks/useFeature';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
+import UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 
 const useWidgetUnits = (config: AggregationWidgetConfig) => {
+  const isFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
+  if (!isFeatureEnabled) return UnitsConfig.empty();
   const fieldTypesUnits = useFieldTypesUnits();
   const usedFieldsInSeries = useMemo(() => config.series.map((s: Series) => {
     const { field } = parseSeries(s.function) ?? {};
