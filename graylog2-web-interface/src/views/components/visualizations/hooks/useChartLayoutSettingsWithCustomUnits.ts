@@ -20,7 +20,6 @@ import type { Layout } from 'plotly.js';
 import { useTheme } from 'styled-components';
 
 import {
-  generateDomain,
   generateLayouts,
   generateMappersForYAxis,
 } from 'views/components/visualizations/utils/chartLayoutGenerators';
@@ -30,6 +29,7 @@ import type { ChartDefinition } from 'views/components/visualizations/ChartData'
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
+import generateDomain from 'views/components/visualizations/utils/generateDomain';
 
 const useChartLayoutSettingsWithCustomUnits = ({ config, barmode, chartData }: {
   config: AggregationWidgetConfig,

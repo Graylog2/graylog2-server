@@ -20,6 +20,8 @@ import maxBy from 'lodash/maxBy';
 import mapValues from 'lodash/mapValues';
 import get from 'lodash/get';
 import keyBy from 'lodash/keyBy';
+import isNumber from 'lodash/isNumber';
+import toNumber from 'lodash/toNumber';
 
 import type { FieldUnitType } from 'views/types';
 import type { FieldUnitState } from 'views/logic/aggregationbuilder/FieldUnit';
@@ -70,6 +72,7 @@ export const mappedUnitsFromJSON: FieldUnitTypes = mapValues<Array<Unit>>(source
 export const _getBaseUnit = (units: FieldUnitTypes, unitType: FieldUnitType): Unit => units[unitType].find(({ type }) => type === 'base');
 
 const _convertValueToBaseUnit = (units: FieldUnitTypes, value: number, params: ConversionParams): ConvertedResult => {
+  if (!(isNumber(value) && params?.unitType && params?.abbrev)) return ({ value: null, unit: null });
   const unit = units[params.unitType].find(({ abbrev }) => params.abbrev === abbrev);
   const baseUnit = _getBaseUnit(units, params.unitType);
   const res: ConvertedResult = ({
@@ -95,6 +98,8 @@ const _convertValueToBaseUnit = (units: FieldUnitTypes, value: number, params: C
 };
 
 const _convertValueToUnit = (units: FieldUnitTypes, value: number, fromParams: ConversionParams, toParams: ConversionParams): ConvertedResult => {
+  if (!(isNumber(value) && fromParams?.unitType && fromParams?.abbrev && toParams?.abbrev && toParams?.unitType)) return ({ value: null, unit: null });
+
   if (fromParams.unitType === toParams.unitType && fromParams.abbrev === toParams.abbrev) {
     const unit = units[toParams.unitType].find(({ abbrev }) => toParams.abbrev === abbrev);
 
@@ -122,8 +127,10 @@ const _convertValueToUnit = (units: FieldUnitTypes, value: number, fromParams: C
   return res;
 };
 
-export const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params: ConversionParams): ConvertedResult => {
+export const _getPrettifiedValue = (units: FieldUnitTypes, initValue: number | string, params: ConversionParams): ConvertedResult => {
   const currentUnit = units?.[params?.unitType] ?? null;
+
+  const value = initValue === null ? null : toNumber(initValue);
   if (!(value && currentUnit)) return ({ value, unit: currentUnit ? currentUnit.find(({ abbrev }) => abbrev === params.abbrev) : null });
 
   const allConvertedValues = Object.values(currentUnit).map((unit) => _convertValueToUnit(units, value, params, { abbrev: unit.abbrev, unitType: unit.unitType }));

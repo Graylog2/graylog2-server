@@ -27,10 +27,7 @@ import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import {
-  getBaseUnit,
-  getPrettifiedValue,
-} from 'views/components/visualizations/utils/unitConverters';
+import { getBaseUnit, getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
@@ -43,7 +40,9 @@ import {
 } from 'views/components/visualizations/Constants';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
-import type { PieHoverTemplateSettings } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
+import type {
+  PieHoverTemplateSettings,
+} from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
 
 type DefaultAxisKey = 'withoutUnit';
@@ -120,7 +119,7 @@ const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, va
   }
 };
 
-export const getUnitLayoutWithData = (unitTypeKey: FieldUnitType | DefaultAxisKey, axisCount: number, values: Array<any>, theme: DefaultTheme) => ({
+const getUnitLayoutWithData = (unitTypeKey: FieldUnitType | DefaultAxisKey, axisCount: number, values: Array<any>, theme: DefaultTheme) => ({
   ...getFormatSettingsByData(unitTypeKey, values),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
@@ -129,14 +128,6 @@ export const getUnitLayoutWithData = (unitTypeKey: FieldUnitType | DefaultAxisKe
 
 type SeriesName = string;
 type AxisName = string;
-
-export const generateDomain = (yAxisCount: number) => {
-  if (!yAxisCount || yAxisCount === 1) return [0, 1];
-  const leftAxisCount = Math.ceil(yAxisCount / 2);
-  const rightAxisCount = Math.floor(yAxisCount / 2);
-
-  return [(leftAxisCount - 1) * Y_POSITION_AXIS_STEP, 1 - (rightAxisCount - 1) * Y_POSITION_AXIS_STEP];
-};
 
 const getWidth = (total: number, offsetMultiplier: number) => (total <= 1 ? undefined : offsetMultiplier / total);
 
@@ -148,18 +139,38 @@ const getOffset = (offsetNumber: number, totalOffsets: number, offsetMultiplier:
   return firstOffset + width * (offsetNumber - 1);
 };
 
-type AdditionalSettings = {
-  yaxis: string,
-  totalAxis: number,
-  axisNumber: number,
-  traceIndex: number,
-  totalTraces: number,
+export type AdditionalSettings = {
+  yaxis: string, /**  y axis name y, y2 etc */
+  totalAxis: number, /**  total number of y-axis */
+  axisNumber: number, /**  number of y-axis (1...N) */
+  totalTraces: number, /**  total number of traces for each x value (in fact total amount of series) */
+  traceIndex: number, /**  number (0...N) */
   effectiveTimerange?: AbsoluteTimeRange,
   isTimeline?: boolean,
-  xAxisItemsLength?: number
+  xAxisItemsLength?: number, /** total amount of x values */
 }
 
-export const getBarChartTraceOffsetSettings = (barmode: BarMode, { yaxis, totalAxis, axisNumber, traceIndex, totalTraces, effectiveTimerange, isTimeline, xAxisItemsLength }: AdditionalSettings) => {
+type BarChartTraceOffsetSettings = {
+  /** Needs to group traces. In case if barmode: 'stack' | 'relative' | 'overlay'
+   * we are grouping by y-axis to join traces into same trace on chart */
+  offsetgroup: number | string,
+  /** In case if barmode: 'stack' | 'relative' | 'overlay'we are divide whole possible
+   * width for traces by total axis. In other case we divide by total traces */
+  width: number,
+  /** alignment is relative to the trace center */
+  offset: number,
+}
+
+export const getBarChartTraceOffsetSettings = (barmode: BarMode, {
+  yaxis,
+  totalAxis,
+  axisNumber,
+  traceIndex,
+  totalTraces,
+  effectiveTimerange,
+  isTimeline,
+  xAxisItemsLength,
+}: AdditionalSettings): BarChartTraceOffsetSettings => {
   const offsetMultiplier = (xAxisItemsLength && isTimeline && effectiveTimerange) ? (moment(effectiveTimerange.to).diff(effectiveTimerange.from) / xAxisItemsLength) : 1;
 
   if (barmode === 'stack' || barmode === 'relative' || barmode === 'overlay') {
@@ -187,7 +198,7 @@ export const getBarChartTraceOffsetSettings = (barmode: BarMode, { yaxis, totalA
   return ({});
 };
 
-type UnitTypeMapper = {} | Record<FieldUnitType, { axisKeyName: string, axisCount: number }>;
+export type UnitTypeMapper = {} | Record<FieldUnitType, { axisKeyName: string, axisCount: number }>;
 type SeriesUnitMapper = {} | Record<SeriesName, FieldUnitType | DefaultAxisKey>;
 type MapperAxisNumber = Record<string, number>;
 type YAxisMapper = Record<SeriesName, AxisName>;
@@ -262,7 +273,7 @@ const joinValues = (values: Array<Array<number>>, barmode: BarMode): Array<numbe
   return flattenDeep(values);
 };
 
-type Params = {
+export type GenerateLayoutsParams = {
   unitTypeMapper: UnitTypeMapper,
   chartData: Array<ChartDefinition>,
   barmode?: BarMode,
@@ -272,7 +283,7 @@ type Params = {
 }
 
 export const generateLayouts = (
-  { unitTypeMapper, chartData, barmode, widgetUnits, config, theme }: Params,
+  { unitTypeMapper, chartData, barmode, widgetUnits, config, theme }: GenerateLayoutsParams,
 ): Record<string, unknown> => {
   const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaultAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
     const traceName = value.name || value.originalName;
@@ -302,7 +313,7 @@ const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>,
     unitType: unit.unitType,
   });
 
-  if (!prettified) return null;
+  if (!prettified) return value;
 
   return `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`;
 });
