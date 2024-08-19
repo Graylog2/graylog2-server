@@ -60,7 +60,7 @@ const useChartLayoutSettingsWithCustomUnits = ({ config, barmode, chartData }: {
     });
 
     return _layouts;
-  }, [barmode, chartData, config, unitFeatureEnabled, unitTypeMapper, widgetUnits]);
+  }, [barmode, chartData, config, theme, unitFeatureEnabled, unitTypeMapper, widgetUnits]);
 };
 
 export default useChartLayoutSettingsWithCustomUnits;
