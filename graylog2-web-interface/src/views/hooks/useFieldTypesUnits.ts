@@ -17,9 +17,12 @@
 import { useMemo } from 'react';
 
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
+import useFeature from 'hooks/useFeature';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
-const useFieldTypesUnits = () => {
-  const { data, isLoading } = useFieldTypes(undefined, undefined);
+const useFieldTypesUnits = (enabled: boolean = true) => {
+  const isFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
+  const { data, isLoading } = useFieldTypes(undefined, undefined, isFeatureEnabled);
 
   return useMemo(() => {
     if (isLoading) return ({});

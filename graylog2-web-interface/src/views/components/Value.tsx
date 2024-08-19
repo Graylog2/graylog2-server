@@ -44,7 +44,7 @@ const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 const InteractiveValue = ({ field, value, render, type, unit }: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
-  const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field, unit]);
+  const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} unit={unit} />;
 
   return (
