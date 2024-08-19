@@ -165,6 +165,7 @@ const ApiRoutes = {
     list: (stats) => ({ url: `/system/indices/index_sets?stats=${stats}` }),
     listPaginated: (skip, limit, stats) => ({ url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}` }),
     get: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}` }),
+    getIndexSetStats: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}/stats` }),
     create: () => ({ url: '/system/indices/index_sets' }),
     delete: (indexSetId: string, deleteIndices) => ({ url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}` }),
     searchPaginated: (searchTerm, skip, limit, stats) => ({ url: `/system/indices/index_sets/search?searchTitle=${searchTerm}&skip=${skip}&limit=${limit}&stats=${stats}` }),

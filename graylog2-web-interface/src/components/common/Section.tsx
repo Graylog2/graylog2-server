@@ -17,6 +17,12 @@
 
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useDisclosure } from '@mantine/hooks';
+import { Collapse } from '@mantine/core';
+
+import Icon from './Icon';
+
+import { Button } from '../bootstrap';
 
 const Container = styled.div(({ theme }) => css`
   background-color: ${theme.colors.section.filled.background};
@@ -26,37 +32,73 @@ const Container = styled.div(({ theme }) => css`
   margin-bottom: ${theme.spacings.xxs};
 `);
 
-const Header = styled.div<{ $alignActionsLeft: boolean; }>(({ theme, $alignActionsLeft }) => css`
+const Header = styled.div(({ theme }) => css`
   display: flex;
-  justify-content: ${$alignActionsLeft ? 'flex-start' : 'space-between'};
-  ${$alignActionsLeft ? `gap: ${theme.spacings.sm};` : 'gap: 5px;'};
+  justify-content: space-between;
+  gap: ${theme.spacings.xs};
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: ${theme.spacings.xs};
   flex-wrap: wrap;
+`);
+
+const FlexWrapper = styled.div(({ theme }) => css`
+  display: flex;
+  justify-content: flex-start;
+  gap: ${theme.spacings.sm};
+  align-items: center;
 `);
 
 type Props = React.PropsWithChildren<{
   title: React.ReactNode,
   actions?: React.ReactNode,
-  alignActionLeft?: boolean,
+  headerLeftSection?: React.ReactNode,
+  collapsible?: boolean,
+  defaultClosed?: boolean,
+  disableCollapseButton?: boolean,
 }>
 
 /**
  * Simple section component. Currently only a "filled" version exists.
  */
-const Section = ({ title, actions, children, alignActionLeft }: Props) => (
-  <Container>
-    <Header $alignActionsLeft={alignActionLeft}>
-      <h2>{title}</h2>
-      {actions && <div>{actions}</div>}
-    </Header>
-    {children}
-  </Container>
-);
+const Section = ({ title, actions, headerLeftSection, collapsible, defaultClosed, disableCollapseButton, children }: Props) => {
+  const [opened, { toggle }] = useDisclosure(!defaultClosed);
+
+  return (
+    <Container>
+      <Header>
+        <FlexWrapper>
+          <h2>{title}</h2>
+          {headerLeftSection && <FlexWrapper>{headerLeftSection}</FlexWrapper>}
+        </FlexWrapper>
+        <FlexWrapper>
+          {actions && <div>{actions}</div>}
+          {collapsible && (
+            <Button bsSize="sm"
+                    bsStyle={opened ? 'primary' : 'default'}
+                    onClick={toggle}
+                    data-testid="collapseButton"
+                    disabled={disableCollapseButton}>
+              <Icon size="sm" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+            </Button>
+          )}
+        </FlexWrapper>
+      </Header>
+      {!collapsible && children}
+      {collapsible && (
+      <Collapse in={opened}>
+        {children}
+      </Collapse>
+      )}
+    </Container>
+  );
+};
 
 Section.defaultProps = {
   actions: undefined,
-  alignActionLeft: false,
+  headerLeftSection: undefined,
+  collapsible: false,
+  defaultClosed: false,
+  disableCollapseButton: false,
 };
 
 export default Section;
