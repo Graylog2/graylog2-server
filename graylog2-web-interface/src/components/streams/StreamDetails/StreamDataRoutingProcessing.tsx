@@ -28,7 +28,7 @@ import { LinkContainer } from 'components/common/router';
 import StreamPipelinesConnectionForm from 'components/streams/StreamDetails/StreamPipelinesConnectionForm';
 import type { Stream } from 'logic/streams/types';
 
-type Props ={
+type Props = {
   stream: Stream,
 };
 
