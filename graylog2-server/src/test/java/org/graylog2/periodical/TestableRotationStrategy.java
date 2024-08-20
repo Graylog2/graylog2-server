@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class TestableRotationStrategy implements RotationStrategy {
+class TestableRotationStrategy implements RotationStrategy {
 
     private final List<IndexSet> rotatedIndices = new ArrayList<>();
 
