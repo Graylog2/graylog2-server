@@ -37,6 +37,7 @@ const docsHelper = {
     INDEXER_FAILURES: 'indexer-failures',
     INDEX_MODEL: 'index-model',
     LICENSE: 'license',
+    LICENSE_MANAGEMENT: 'license-management',
     LOAD_BALANCERS: 'load-balancers',
     LOOKUPTABLES: 'lookuptables',
     OPERATIONS_CHANGELOG: 'changelog-graylog',
