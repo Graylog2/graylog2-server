@@ -187,6 +187,24 @@ interface PluginDataWarehouse {
   StreamDataWarehouse: React.ComponentType<{}>,
   DataWarehouseJobs: React.ComponentType<{}>,
   StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
+  fetchStreamDataWarehouseStatus: (streamId: string) => Promise<{
+    id: string,
+    archive_name: string,
+    enabled: boolean,
+    stream_id: string,
+    retention_time: number,
+  }>,
+  fetchStreamDataWarehouse: (streamId: string) => Promise<{
+    id: string,
+    archive_config_id: string,
+    message_count: number,
+    archive_name: string,
+    timestamp_from: string,
+    timestamp_to: string,
+    restore_history: Array<{id:string}>,
+
+  }>;
+  DataWarehouseStreamDeleteWarning: React.ComponentType<{}>,
   getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
