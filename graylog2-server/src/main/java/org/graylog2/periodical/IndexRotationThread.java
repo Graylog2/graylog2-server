@@ -113,7 +113,11 @@ public class IndexRotationThread extends Periodical {
 
 
     private boolean isCurrentlyMigrated(IndexSet indexSet) {
-        return migrationService.isMigrationRunning(indexSet);
+        final boolean migrationIsRunning = migrationService.isMigrationRunning(indexSet);
+        if (migrationIsRunning) {
+            LOG.info("Index set {} is being migrated, skipping index rotation", indexSet.getConfig().title());
+        }
+        return migrationIsRunning;
     }
 
     @Override

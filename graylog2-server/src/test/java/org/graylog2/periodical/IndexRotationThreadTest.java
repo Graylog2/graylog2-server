@@ -44,7 +44,6 @@ import org.mockito.junit.MockitoRule;
 import jakarta.inject.Provider;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 
 import static org.mockito.Mockito.never;
@@ -129,8 +128,8 @@ public class IndexRotationThreadTest {
     @Test
     public void testSkipRotationDuringMigration() throws NoTargetIndexException {
         TestableRotationStrategy testableRotationStrategy = new TestableRotationStrategy();
-        final IndexSet indexSetFinished = mockIndexSet(true, testableRotationStrategy);
-        final IndexSet indexSetMigrated = mockIndexSet(true, testableRotationStrategy);
+        final IndexSet indexSetFinished = mockIndexSet("finished_index_set", true, testableRotationStrategy);
+        final IndexSet indexSetMigrated = mockIndexSet("migrating_index_set", true, testableRotationStrategy);
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 Mockito.mock(NotificationService.class),
@@ -157,11 +156,12 @@ public class IndexRotationThreadTest {
         return migrationAdapter;
     }
 
-    private IndexSet mockIndexSet(boolean writable, RotationStrategy testableRotationStrategy) {
+    private IndexSet mockIndexSet(String indexSetTitle, boolean writable, RotationStrategy testableRotationStrategy) {
         final IndexSet indexSet = Mockito.mock(IndexSet.class);
         final IndexSetConfig config = Mockito.mock(IndexSetConfig.class);
         Mockito.when(config.isWritable()).thenReturn(writable);
         Mockito.when(config.rotationStrategyClass()).thenReturn(testableRotationStrategy.getStrategyName());
+        Mockito.when(config.title()).thenReturn(indexSetTitle);
         Mockito.when(indexSet.getConfig()).thenReturn(config);
         return indexSet;
     }
