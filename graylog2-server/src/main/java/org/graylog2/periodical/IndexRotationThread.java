@@ -91,12 +91,9 @@ public class IndexRotationThread extends Periodical {
     public void doRun() {
         // Point deflector to a new index if required.
         if (cluster.isConnected()) {
-            indexSetRegistry
-                    .getAll().stream()
-                    .filter(indexSet -> !isCurrentlyMigrated(indexSet))
-                    .forEach((indexSet) -> {
+            indexSetRegistry.forEach((indexSet) -> {
                 try {
-                    if (indexSet.getConfig().isWritable()) {
+                    if (indexSet.getConfig().isWritable() && !isCurrentlyMigrated(indexSet)) {
                         checkAndRepair(indexSet);
                         checkForRotation(indexSet);
                     } else {

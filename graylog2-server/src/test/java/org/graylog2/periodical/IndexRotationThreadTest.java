@@ -18,6 +18,7 @@ package org.graylog2.periodical;
 
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Provider;
 import org.assertj.core.api.Assertions;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.IndexSet;
@@ -41,10 +42,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import jakarta.inject.Provider;
-
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
+import java.util.function.Consumer;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -174,9 +174,17 @@ public class IndexRotationThreadTest {
 
     @Nonnull
     private IndexSetRegistry mockIndexSetRegistry(IndexSet... indexSets) {
-        final IndexSetRegistry indexSetRegistry = Mockito.mock(IndexSetRegistry.class);
-        Mockito.when(indexSetRegistry.getAll()).thenReturn(new HashSet<>(Arrays.asList(indexSets)));
-        return indexSetRegistry;
+        final IndexSetRegistry registry = Mockito.mock(IndexSetRegistry.class);
+        final List<IndexSet> sets = Arrays.asList(indexSets);
+
+        // mock the Iterable forEach implementation :-/
+        Mockito.doAnswer(invocation -> {
+            Consumer<IndexSet> action = invocation.getArgument(0);
+            sets.forEach(action);
+            return null;
+        }).when(registry).forEach(Mockito.any());
+
+        return registry;
     }
 
     @Test
