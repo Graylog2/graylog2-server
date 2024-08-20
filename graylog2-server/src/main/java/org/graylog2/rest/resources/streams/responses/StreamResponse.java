@@ -27,6 +27,7 @@ import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -79,6 +80,10 @@ public abstract class StreamResponse {
     @JsonProperty("is_editable")
     public abstract boolean isEditable();
 
+    @JsonProperty("categories")
+    @Nullable
+    public abstract List<String> categories();
+
     @JsonCreator
     public static StreamResponse create(@JsonProperty("id") String id,
                                         @JsonProperty("creator_user_id") String creatorUserId,
@@ -92,7 +97,8 @@ public abstract class StreamResponse {
                                         @JsonProperty("content_pack") @Nullable String contentPack,
                                         @JsonProperty("is_default") @Nullable Boolean isDefault,
                                         @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream,
-                                        @JsonProperty("index_set_id") String indexSetId) {
+                                        @JsonProperty("index_set_id") String indexSetId,
+                                        @JsonProperty("categories") @Nullable List<String> categories) {
         return new AutoValue_StreamResponse(
                 id,
                 creatorUserId,
@@ -107,6 +113,7 @@ public abstract class StreamResponse {
                 firstNonNull(isDefault, false),
                 firstNonNull(removeMatchesFromDefaultStream, false),
                 indexSetId,
-                Stream.streamIsEditable(id));
+                Stream.streamIsEditable(id),
+                categories);
     }
 }

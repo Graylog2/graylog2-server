@@ -90,10 +90,15 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     }
 
     private ValidationRequest prepareRequest(ValidationRequestDTO validationRequest, SearchUser searchUser) {
+        ImmutableSet.Builder<String> allRequestedStreams = ImmutableSet.<String>builder()
+                .addAll(searchUser.streams().readableOrAllIfEmpty(validationRequest.streams()));
+        if (validationRequest.streamCategories().isPresent()) {
+            allRequestedStreams.addAll(searchUser.streams().loadStreamsWithCategories(validationRequest.streamCategories().get()));
+        }
         final ValidationRequest.Builder q = ValidationRequest.Builder.builder()
                 .query(validationRequest.query())
                 .timerange(validationRequest.timerange().orElse(defaultTimeRange()))
-                .streams(searchUser.streams().readableOrAllIfEmpty(validationRequest.streams()))
+                .streams(allRequestedStreams.build())
                 .parameters(resolveParameters(validationRequest))
                 .validationMode(validationRequest.validationMode().toInternalRepresentation());
 

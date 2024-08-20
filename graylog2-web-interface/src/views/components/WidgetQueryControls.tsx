@@ -23,7 +23,7 @@ import isEmpty from 'lodash/isEmpty';
 import { useIsFetching } from '@tanstack/react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
-import { StreamsStore } from 'views/stores/StreamsStore';
+import {StreamsStore, Stream} from 'views/stores/StreamsStore';
 import connect from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
@@ -87,7 +87,7 @@ const SearchInputAndValidation = styled.div`
 `;
 
 type Props = {
-  availableStreams: Array<{ key: string, value: string }>,
+  availableStreams: Array<Stream>,
 };
 
 export const updateWidgetSearchControls = (widget, { timerange, streams, queryString }) => widget.toBuilder()
@@ -182,6 +182,10 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const _onSubmit = useCallback((values: CombinedSearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, widget), [dispatch, pluggableSearchBarControls, widget]);
   const _resetTimeRangeOverride = useCallback(() => dispatch(resetTimeRangeOverride), [dispatch]);
   const _resetQueryOverride = useCallback(() => dispatch(resetQueryOverride), [dispatch]);
+  const allStreams = availableStreams.map((stream) => ({
+    key: stream.title,
+    value: stream.id,
+  }))
 
   useBindApplySearchControlsChanges(formRef);
 
@@ -215,7 +219,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                 <Field name="streams">
                   {({ field: { name, value, onChange } }) => (
                     <StreamsFilter value={value}
-                                   streams={availableStreams}
+                                   streams={allStreams}
                                    onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
                   )}
                 </Field>
@@ -281,6 +285,6 @@ export default connect(
   },
   ({ availableStreams: { streams = [] }, ...rest }) => ({
     ...rest,
-    availableStreams: streams.map((stream) => ({ key: stream.title, value: stream.id })),
+    availableStreams: streams,
   }),
 );

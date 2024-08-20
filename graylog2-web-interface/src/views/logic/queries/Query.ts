@@ -89,6 +89,50 @@ export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | u
   return filters.map(filtersToStreamSet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
 };
 
+const _streamCategoryFilters = (selectedCategories: Array<string>) => Immutable.List(selectedCategories.map((category) => Immutable.Map({ type: 'stream_category', category: category })));
+
+export const categoryFiltersForQuery = (categories: Array<string> | null | undefined): FilterType | null | undefined => {
+  if (!categories || categories.length === 0) {
+    return null;
+  }
+
+  const categoryFilters = _streamCategoryFilters(categories);
+
+  return Immutable.Map({
+    type: 'or',
+    filters: categoryFilters,
+  });
+};
+
+export const newFiltersForQuery = (streams: Array<string> | null | undefined, categories: Array<string> | null | undefined): FilterType | null | undefined => {
+  const streamFilter: FilterType = filtersForQuery(streams);
+  const categoryFilter: FilterType = categoryFiltersForQuery(categories);
+  if (streamFilter && categoryFilter) {
+    const combinedFilter = Immutable.List.of(streamFilter, categoryFilter);
+    return Immutable.Map({
+      type: 'or',
+      filters: combinedFilter
+    })
+  }
+  return streamFilter ? streamFilter : categoryFilter;
+};
+
+export const filtersToStreamCategorySet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {
+  if (!filter) {
+    return Immutable.Set();
+  }
+
+  const type = filter.get('type');
+
+  if (type === 'stream_category') {
+    return Immutable.Set([filter.get('category')]);
+  }
+
+  const filters = filter.get('filters', Immutable.List());
+
+  return filters.map(filtersToStreamCategorySet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
+};
+
 export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';

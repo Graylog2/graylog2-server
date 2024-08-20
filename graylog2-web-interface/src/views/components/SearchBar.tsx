@@ -36,7 +36,11 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
-import { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
+import {
+  createElasticsearchQueryString,
+  filtersToStreamSet,
+  filtersToStreamCategorySet, newFiltersForQuery,
+} from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -77,6 +81,8 @@ import {
   useInitialSearchValues as usePluggableInitialValues,
   pluggableValidationPayload,
 } from '../logic/searchbar/pluggableSearchBarControlsHandler';
+import { defaultCompare } from 'logic/DefaultCompare';
+import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 
 const StreamsAndRefresh = styled.div`
   display: flex;
@@ -85,13 +91,13 @@ const StreamsAndRefresh = styled.div`
 `;
 
 const defaultOnSubmit = async (dispatch: AppDispatch, values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query) => {
-  const { timerange, streams, queryString } = values;
+  const { timerange, streams, streamCategories, queryString } = values;
 
   const queryWithPluginData = await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls, currentQuery);
 
   const newQuery = queryWithPluginData.toBuilder()
     .timerange(timerange)
-    .filter(filtersForQuery(streams))
+    .filter(newFiltersForQuery(streams, streamCategories))
     .query(createElasticsearchQueryString(queryString))
     .build();
 
@@ -116,14 +122,16 @@ const useInitialFormValues = ({ currentQuery, queryFilters }: {
   const { query_string: queryString } = query ?? {};
   const initialValuesFromPlugins = usePluggableInitialValues(currentQuery);
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
+  const streamCategories = filtersToStreamCategorySet(queryFilters.get(id, Immutable.Map())).toJS();
 
-  return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
+  return ({ timerange, streams, queryString, streamCategories, ...initialValuesFromPlugins });
 };
 
 const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string, context: HandlerContext) => {
   const request = {
     timeRange: values?.timerange,
     streams: values?.streams,
+    streamCategories: values?.streamCategories,
     queryString: values?.queryString,
     ...pluggableValidationPayload(values, context, pluggableSearchBarControls),
   };
@@ -142,6 +150,15 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
     key: stream.title,
     value: stream.id,
   })));
+  const availableStreamCategories = useStore(StreamsStore, ({ streams }) => streams.flatMap((stream) => {
+    if (stream.categories) {
+      return stream.categories.map(s => ({ key: s, value: s }));
+    } else {
+      return [];
+    }
+  }).filter((element, index, self) =>
+    index === self.findIndex((e) => e.value === element.value)
+  ).sort((a, b) => defaultCompare(a.value, b.value)));
   const { config } = useSearchConfiguration();
   const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
@@ -201,6 +218,18 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                                              onChange={(newStreams) => onChange({
                                                target: {
                                                  value: newStreams,
+                                                 name,
+                                               },
+                                             })} />
+                            )}
+                          </Field>
+                          <Field name="streamCategories">
+                            {({ field: { name, value, onChange } }) => (
+                              <StreamCategoryFilter value={value}
+                                                    streamCategories={availableStreamCategories}
+                                             onChange={(newCategories) => onChange({
+                                               target: {
+                                                 value: newCategories,
                                                  name,
                                                },
                                              })} />
