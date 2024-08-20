@@ -107,14 +107,17 @@ export const categoryFiltersForQuery = (categories: Array<string> | null | undef
 export const newFiltersForQuery = (streams: Array<string> | null | undefined, categories: Array<string> | null | undefined): FilterType | null | undefined => {
   const streamFilter: FilterType = filtersForQuery(streams);
   const categoryFilter: FilterType = categoryFiltersForQuery(categories);
+
   if (streamFilter && categoryFilter) {
     const combinedFilter = Immutable.List.of(streamFilter, categoryFilter);
+
     return Immutable.Map({
       type: 'or',
-      filters: combinedFilter
-    })
+      filters: combinedFilter,
+    });
   }
-  return streamFilter ? streamFilter : categoryFilter;
+
+  return streamFilter || categoryFilter;
 };
 
 export const filtersToStreamCategorySet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {

@@ -73,6 +73,8 @@ import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import { defaultCompare } from 'logic/DefaultCompare';
+import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -81,8 +83,6 @@ import {
   useInitialSearchValues as usePluggableInitialValues,
   pluggableValidationPayload,
 } from '../logic/searchbar/pluggableSearchBarControlsHandler';
-import { defaultCompare } from 'logic/DefaultCompare';
-import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 
 const StreamsAndRefresh = styled.div`
   display: flex;
@@ -152,12 +152,11 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   })));
   const availableStreamCategories = useStore(StreamsStore, ({ streams }) => streams.flatMap((stream) => {
     if (stream.categories) {
-      return stream.categories.map(s => ({ key: s, value: s }));
-    } else {
-      return [];
+      return stream.categories.map((s) => ({ key: s, value: s }));
     }
-  }).filter((element, index, self) =>
-    index === self.findIndex((e) => e.value === element.value)
+
+    return [];
+  }).filter((element, index, self) => index === self.findIndex((e) => e.value === element.value),
   ).sort((a, b) => defaultCompare(a.value, b.value)));
   const { config } = useSearchConfiguration();
   const { userTimezone } = useUserDateTime();
@@ -227,12 +226,12 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                             {({ field: { name, value, onChange } }) => (
                               <StreamCategoryFilter value={value}
                                                     streamCategories={availableStreamCategories}
-                                             onChange={(newCategories) => onChange({
-                                               target: {
-                                                 value: newCategories,
-                                                 name,
-                                               },
-                                             })} />
+                                                    onChange={(newCategories) => onChange({
+                                                      target: {
+                                                        value: newCategories,
+                                                        name,
+                                                      },
+                                                    })} />
                             )}
                           </Field>
 

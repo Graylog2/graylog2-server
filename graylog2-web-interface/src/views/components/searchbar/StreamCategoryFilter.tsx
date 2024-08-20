@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Select from 'components/common/Select';
-import {defaultCompare} from 'logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 const Container = styled.div`
   flex: 1;
@@ -60,7 +60,7 @@ const StreamCategoryFilter = ({ disabled, value, streamCategories, onChange }: P
 StreamCategoryFilter.propTypes = {
   disabled: PropTypes.bool,
   value: PropTypes.arrayOf(PropTypes.string),
-  stream_categories: PropTypes.arrayOf(
+  streamCategories: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
       value: PropTypes.string.isRequired,

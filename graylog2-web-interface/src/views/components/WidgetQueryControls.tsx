@@ -23,7 +23,8 @@ import isEmpty from 'lodash/isEmpty';
 import { useIsFetching } from '@tanstack/react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
-import {StreamsStore, Stream} from 'views/stores/StreamsStore';
+import type { Stream } from 'views/stores/StreamsStore';
+import { StreamsStore } from 'views/stores/StreamsStore';
 import connect from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
@@ -185,7 +186,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const allStreams = availableStreams.map((stream) => ({
     key: stream.title,
     value: stream.id,
-  }))
+  }));
 
   useBindApplySearchControlsChanges(formRef);
 
