@@ -147,7 +147,7 @@ type Props<Entity extends EntityBase> = {
   /**
    * Needs to be defined when not all action cells in every row have the same width.
    * When they have the same width, the column width will be calculated automatically.
-   * Should not include the actions col padding. Should be teh max width an action cell can have.
+   * Should not include the actions col padding. Should be the max width an action cell can have.
    */
   actionsCellWidth?: number
   /** Currently active sort */
