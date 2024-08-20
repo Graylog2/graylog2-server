@@ -94,10 +94,10 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
     <Popover position="right" opened={show} withArrow>
       <Popover.Target>
         <ButtonContainer>
-          <StyledButton bsSize="xs" onClick={toggleShow} title="Unit settings">{badgeLabel}</StyledButton>
+          <StyledButton bsSize="xs" onClick={toggleShow} title={`${field} unit settings`}>{badgeLabel}</StyledButton>
         </ButtonContainer>
       </Popover.Target>
-      <Popover.Dropdown title="Metrics Unit Settings">
+      <Popover.Dropdown title={`${field} unit settings`}>
         <Container>
           <Field name={`units.${field}.unitType`}>
             {({ field: { name, value }, meta: { error } }) => (
