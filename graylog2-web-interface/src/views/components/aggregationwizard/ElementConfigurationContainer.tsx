@@ -38,7 +38,6 @@ const ElementActions = styled.div`
   align-items: center;
   position: absolute;
   right: 0;
-  z-index: 1;
 `;
 
 const StyledIconButton = styled(IconButton)`

@@ -17,6 +17,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { styled, css } from 'styled-components';
 import { Field, useFormikContext } from 'formik';
+import capitalize from 'lodash/capitalize';
 
 import Select from 'components/common/Select';
 import Popover from 'components/common/Popover';
@@ -62,9 +63,9 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
   const [show, setShow] = useState(false);
   const { setFieldValue, values } = useFormikContext<{units: FieldUnitsFormValues }>();
   const currentUnitType = useMemo<string>(() => values?.units?.[field]?.unitType, [values, field]);
-  const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: key })), []);
+  const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: capitalize(key) })), []);
   const unitOptions = useMemo(() => currentUnitType && units[currentUnitType]
-    .map(({ abbrev, name }: Unit) => ({ value: abbrev, label: name })), [currentUnitType]);
+    .map(({ abbrev, name }: Unit) => ({ value: abbrev, label: capitalize(name) })), [currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {
     setFieldValue(`units.${field}`, { unitType: val || undefined, abbrev: undefined });
@@ -81,7 +82,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
 
     const unitName = units[predefinedUnit.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
 
-    return <>Unit <b>{unitName}</b> was defined for field <b>{field}</b>by Graylog. Changing this unit might represent data incorrectly on the charts</>;
+    return <>Unit <b>{unitName}</b> was defined for field <b>{field}</b> by Graylog. Changing this unit might represent data incorrectly on the charts</>;
   }, [field, predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType]);
 
   const onClear = useCallback(() => {
