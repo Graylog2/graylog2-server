@@ -17,11 +17,14 @@
 package org.graylog2.periodical;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nonnull;
+import org.assertj.core.api.Assertions;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.notifications.NotificationService;
@@ -34,10 +37,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import jakarta.inject.Provider;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -86,7 +94,9 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTieringOrchestrator);
+                dataTieringOrchestrator,
+                Mockito.mock(RemoteReindexingMigrationAdapter.class)
+        );
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
         rotationThread.checkForRotation(indexSet);
@@ -106,12 +116,67 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTieringOrchestrator);
+                dataTieringOrchestrator,
+                Mockito.mock(RemoteReindexingMigrationAdapter.class)
+        );
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
         rotationThread.checkForRotation(indexSet);
 
         verify(indexSet, never()).cycle();
+    }
+
+    @Test
+    public void testSkipRotationDuringMigration() throws NoTargetIndexException {
+        TestableRotationStrategy testableRotationStrategy = new TestableRotationStrategy();
+        final IndexSet indexSetFinished = mockIndexSet(true, testableRotationStrategy);
+        final IndexSet indexSetMigrated = mockIndexSet(true, testableRotationStrategy);
+
+        final IndexRotationThread rotationThread = new IndexRotationThread(
+                Mockito.mock(NotificationService.class),
+                Mockito.mock(Indices.class),
+                mockIndexSetRegistry(indexSetFinished, indexSetMigrated),
+                mockCluster(true),
+                new NullActivityWriter(),
+                new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"),
+                testableRotationStrategy.toProviderMap(),
+                Mockito.mock(DataTieringOrchestrator.class),
+                mockMigrationAdapter(indexSetMigrated)
+        );
+        rotationThread.doRun();
+
+        Assertions.assertThat(testableRotationStrategy.getRotatedIndices())
+                .contains(indexSetFinished)
+                .doesNotContain(indexSetMigrated);
+    }
+
+    @Nonnull
+    private RemoteReindexingMigrationAdapter mockMigrationAdapter(IndexSet migrationRunningForThisSet) {
+        final RemoteReindexingMigrationAdapter migrationAdapter = Mockito.mock(RemoteReindexingMigrationAdapter.class);
+        Mockito.when(migrationAdapter.isMigrationRunning(migrationRunningForThisSet)).thenReturn(true);
+        return migrationAdapter;
+    }
+
+    private IndexSet mockIndexSet(boolean writable, RotationStrategy testableRotationStrategy) {
+        final IndexSet indexSet = Mockito.mock(IndexSet.class);
+        final IndexSetConfig config = Mockito.mock(IndexSetConfig.class);
+        Mockito.when(config.isWritable()).thenReturn(writable);
+        Mockito.when(config.rotationStrategyClass()).thenReturn(testableRotationStrategy.getStrategyName());
+        Mockito.when(indexSet.getConfig()).thenReturn(config);
+        return indexSet;
+    }
+
+    private Cluster mockCluster(boolean connected) {
+        final Cluster cluster = Mockito.mock(Cluster.class);
+        Mockito.when(cluster.isConnected()).thenReturn(connected);
+        return cluster;
+    }
+
+    @Nonnull
+    private IndexSetRegistry mockIndexSetRegistry(IndexSet... indexSets) {
+        final IndexSetRegistry indexSetRegistry = Mockito.mock(IndexSetRegistry.class);
+        Mockito.when(indexSetRegistry.getAll()).thenReturn(new HashSet<>(Arrays.asList(indexSets)));
+        return indexSetRegistry;
     }
 
     @Test
@@ -127,7 +192,9 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTieringOrchestrator);
+                dataTieringOrchestrator,
+                Mockito.mock(RemoteReindexingMigrationAdapter.class)
+        );
         rotationThread.doRun();
 
         verify(indexSet, never()).cycle();

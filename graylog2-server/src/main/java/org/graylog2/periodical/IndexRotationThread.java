@@ -21,6 +21,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
@@ -51,6 +52,7 @@ public class IndexRotationThread extends Periodical {
     private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
     private final DataTieringOrchestrator dataTieringOrchestrator;
     private final NotificationService notificationService;
+    private final RemoteReindexingMigrationAdapter migrationService;
 
     @Inject
     public IndexRotationThread(NotificationService notificationService,
@@ -60,7 +62,7 @@ public class IndexRotationThread extends Periodical {
                                ActivityWriter activityWriter,
                                NodeId nodeId,
                                Map<String, Provider<RotationStrategy>> rotationStrategyMap,
-                               DataTieringOrchestrator dataTieringOrchestrator) {
+                               DataTieringOrchestrator dataTieringOrchestrator, RemoteReindexingMigrationAdapter migrationService) {
         this.notificationService = notificationService;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -69,6 +71,7 @@ public class IndexRotationThread extends Periodical {
         this.nodeId = nodeId;
         this.rotationStrategyMap = rotationStrategyMap;
         this.dataTieringOrchestrator = dataTieringOrchestrator;
+        this.migrationService = migrationService;
     }
 
     @Override
@@ -88,7 +91,10 @@ public class IndexRotationThread extends Periodical {
     public void doRun() {
         // Point deflector to a new index if required.
         if (cluster.isConnected()) {
-            indexSetRegistry.forEach((indexSet) -> {
+            indexSetRegistry
+                    .getAll().stream()
+                    .filter(indexSet -> !isCurrentlyMigrated(indexSet))
+                    .forEach((indexSet) -> {
                 try {
                     if (indexSet.getConfig().isWritable()) {
                         checkAndRepair(indexSet);
@@ -103,6 +109,11 @@ public class IndexRotationThread extends Periodical {
         } else {
             LOG.warn("Elasticsearch cluster isn't healthy. Skipping index rotation.");
         }
+    }
+
+
+    private boolean isCurrentlyMigrated(IndexSet indexSet) {
+        return migrationService.isMigrationRunning(indexSet);
     }
 
     @Override
