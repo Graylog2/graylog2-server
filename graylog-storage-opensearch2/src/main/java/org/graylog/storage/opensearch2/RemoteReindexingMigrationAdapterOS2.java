@@ -408,13 +408,19 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
             List<Runnable> postMigrationActions = new ArrayList<>();
 
-            if(getRemoteIndexState(uri, username, password, indexName) == IndexState.CLOSE) {
+            final boolean remoteClosed = getRemoteIndexState(uri, username, password, indexName) == IndexState.CLOSE;
+            final boolean localClosed = getLocalIndexState(indexName) == IndexState.CLOSE;
+
+            if(remoteClosed) {
                 openRemoteIndex(migration, uri, username, password, indexName);
                 postMigrationActions.add(() -> closeRemoteIndex(migration, uri, username, password, indexName));
             }
 
-            if(getLocalIndexState(indexName) == IndexState.CLOSE) {
+            if(localClosed) {
                 openLocalIndex(migration, indexName);
+            }
+
+            if(remoteClosed || localClosed) {
                 postMigrationActions.add(() -> closeLocalIndex(migration, indexName));
             }
 
@@ -472,7 +478,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             final Response statusResponse = restHighLevelClient.getLowLevelClient().performRequest(new Request("GET", "_cat/indices/" + indexName + "/?h=status"));
             try (final InputStream is = statusResponse.getEntity().getContent()) {
                 String result = IOUtils.toString(is, StandardCharsets.UTF_8);
-                return IndexState.valueOf(result.toUpperCase(Locale.ROOT));
+                return IndexState.valueOf(result.trim().toUpperCase(Locale.ROOT));
             }
         });
     }
