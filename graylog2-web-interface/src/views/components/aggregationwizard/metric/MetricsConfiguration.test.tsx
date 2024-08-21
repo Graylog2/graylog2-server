@@ -111,10 +111,7 @@ describe('MetricsConfiguration', () => {
   ];
 
   it('should render FieldUnit for allowed function and only numeric fields', async () => {
-    render(<SUT index={0}
-                initialValues={{
-                  metrics: metrics,
-                }} />);
+    render(<SUT initialValues={{ metrics: metrics }} />);
 
     const allMetricsWithField = await screen.findAllByTitle(/unit settings$/i);
     await screen.findByTitle(/field-allowed-0 unit settings/);
