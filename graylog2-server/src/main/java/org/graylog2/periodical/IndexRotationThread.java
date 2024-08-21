@@ -16,12 +16,14 @@
  */
 package org.graylog2.periodical;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
+import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
@@ -37,9 +39,6 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 import java.util.Map;
 
 public class IndexRotationThread extends Periodical {
@@ -52,7 +51,7 @@ public class IndexRotationThread extends Periodical {
     private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
     private final DataTieringOrchestrator dataTieringOrchestrator;
     private final NotificationService notificationService;
-    private final RemoteReindexingMigrationAdapter migrationService;
+    private final DatanodeMigrationLockService migrationLockService;
 
     @Inject
     public IndexRotationThread(NotificationService notificationService,
@@ -62,7 +61,7 @@ public class IndexRotationThread extends Periodical {
                                ActivityWriter activityWriter,
                                NodeId nodeId,
                                Map<String, Provider<RotationStrategy>> rotationStrategyMap,
-                               DataTieringOrchestrator dataTieringOrchestrator, RemoteReindexingMigrationAdapter migrationService) {
+                               DataTieringOrchestrator dataTieringOrchestrator, DatanodeMigrationLockService migrationLockService) {
         this.notificationService = notificationService;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -71,7 +70,7 @@ public class IndexRotationThread extends Periodical {
         this.nodeId = nodeId;
         this.rotationStrategyMap = rotationStrategyMap;
         this.dataTieringOrchestrator = dataTieringOrchestrator;
-        this.migrationService = migrationService;
+        this.migrationLockService = migrationLockService;
     }
 
     @Override
@@ -93,9 +92,11 @@ public class IndexRotationThread extends Periodical {
         if (cluster.isConnected()) {
             indexSetRegistry.forEach((indexSet) -> {
                 try {
-                    if (indexSet.getConfig().isWritable() && !isCurrentlyMigrated(indexSet)) {
-                        checkAndRepair(indexSet);
-                        checkForRotation(indexSet);
+                    if (indexSet.getConfig().isWritable()) {
+                        migrationLockService.tryRun(indexSet, IndexRotationThread.class, () -> {
+                            checkAndRepair(indexSet);
+                            checkForRotation(indexSet);
+                        });
                     } else {
                         LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
                     }
@@ -106,15 +107,6 @@ public class IndexRotationThread extends Periodical {
         } else {
             LOG.warn("Elasticsearch cluster isn't healthy. Skipping index rotation.");
         }
-    }
-
-
-    private boolean isCurrentlyMigrated(IndexSet indexSet) {
-        final boolean migrationIsRunning = migrationService.isMigrationRunning(indexSet);
-        if (migrationIsRunning) {
-            LOG.info("Index set {} is being migrated, skipping index rotation", indexSet.getConfig().title());
-        }
-        return migrationIsRunning;
     }
 
     @Override

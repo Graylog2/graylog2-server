@@ -25,7 +25,8 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
+import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
+import org.graylog2.indexer.datanode.DatanodeMigrationLockServiceImpl;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.notifications.NotificationService;
@@ -94,7 +95,7 @@ public class IndexRotationThreadTest {
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
                 dataTieringOrchestrator,
-                Mockito.mock(RemoteReindexingMigrationAdapter.class)
+                Mockito.mock(DatanodeMigrationLockServiceImpl.class)
         );
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
@@ -116,7 +117,7 @@ public class IndexRotationThreadTest {
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
                 dataTieringOrchestrator,
-                Mockito.mock(RemoteReindexingMigrationAdapter.class)
+                Mockito.mock(DatanodeMigrationLockService.class)
         );
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
@@ -150,10 +151,9 @@ public class IndexRotationThreadTest {
     }
 
     @Nonnull
-    private RemoteReindexingMigrationAdapter mockMigrationAdapter(IndexSet migrationRunningForThisSet) {
-        final RemoteReindexingMigrationAdapter migrationAdapter = Mockito.mock(RemoteReindexingMigrationAdapter.class);
-        Mockito.when(migrationAdapter.isMigrationRunning(migrationRunningForThisSet)).thenReturn(true);
-        return migrationAdapter;
+    private DatanodeMigrationLockServiceImpl mockMigrationAdapter(IndexSet migrationRunningForThisSet) {
+        final DatanodeMigrationLockServiceImpl migrationService = Mockito.mock(DatanodeMigrationLockServiceImpl.class);
+        return migrationService;
     }
 
     private IndexSet mockIndexSet(String indexSetTitle, boolean writable, RotationStrategy testableRotationStrategy) {
@@ -201,7 +201,7 @@ public class IndexRotationThreadTest {
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
                 dataTieringOrchestrator,
-                Mockito.mock(RemoteReindexingMigrationAdapter.class)
+                Mockito.mock(DatanodeMigrationLockServiceImpl.class)
         );
         rotationThread.doRun();
 
