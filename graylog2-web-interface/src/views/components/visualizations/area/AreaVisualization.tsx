@@ -50,7 +50,7 @@ const AreaVisualization = makeVisualization(({
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
 
-  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
+  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName, fullPath }) => ({
     type,
     name,
     x: _mapKeys(labels),
@@ -58,7 +58,7 @@ const AreaVisualization = makeVisualization(({
     fill: 'tozeroy',
     line: { shape: toPlotly(interpolation) },
     originalName,
-    ...getChartDataSettingsWithCustomUnits({ originalName, name, values }),
+    ...getChartDataSettingsWithCustomUnits({ originalName, fullPath, values }),
   }), [_mapKeys, getChartDataSettingsWithCustomUnits, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);

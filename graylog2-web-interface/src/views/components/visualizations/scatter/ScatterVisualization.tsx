@@ -49,14 +49,14 @@ const ScatterVisualization = makeVisualization(({
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
   const rows = useMemo(() => retrieveChartData(data), [data]);
-  const seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
+  const seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName, fullPath }) => ({
     type,
     name,
     x: _mapKeys(labels),
     y: values,
     mode: 'markers',
     originalName,
-    ...getChartDataSettingsWithCustomUnits({ originalName, name, values }),
+    ...getChartDataSettingsWithCustomUnits({ originalName, fullPath: fullPath, values }),
   }), [_mapKeys, getChartDataSettingsWithCustomUnits]);
   const _chartDataResult = useChartData(rows, {
     widgetConfig: config,

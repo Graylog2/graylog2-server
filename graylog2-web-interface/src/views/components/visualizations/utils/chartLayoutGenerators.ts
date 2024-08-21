@@ -287,8 +287,8 @@ export const generateLayouts = (
   { unitTypeMapper, chartData, barmode, widgetUnits, config, theme }: GenerateLayoutsParams,
 ): Record<string, unknown> => {
   const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaultAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
-    const traceName = value.name || value.originalName;
-    const fieldName = getFieldNameFromTrace({ series: config.series, name: traceName });
+    const traceName = value.fullPath;
+    const fieldName = getFieldNameFromTrace({ series: config.series, fullPath: traceName });
     const unit = widgetUnits.getFieldUnit(fieldName);
     const unitType = unit?.unitType ?? DEFAULT_AXIS_KEY;
 

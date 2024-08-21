@@ -131,6 +131,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
   {
     type: 'bar',
     name: 'Name1',
+    fullPath: 'Name1',
     x: [
       '2024-08-11T16:00:00.000+02:00',
       '2024-08-11T18:00:00.000+02:00',
@@ -192,6 +193,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
   {
     type: 'bar',
     name: 'Name2',
+    fullPath: 'Name2',
     x: [
       '2024-08-11T16:00:00.000+02:00',
       '2024-08-11T18:00:00.000+02:00',
@@ -253,6 +255,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
   {
     type: 'bar',
     name: 'Name3',
+    fullPath: 'Name3',
     x: [
       '2024-08-11T16:00:00.000+02:00',
       '2024-08-11T18:00:00.000+02:00',
@@ -297,6 +300,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
   {
     type: 'bar',
     name: 'count()',
+    fullPath: 'count()',
     x: [
       '2024-08-11T16:00:00.000+02:00',
       '2024-08-11T18:00:00.000+02:00',

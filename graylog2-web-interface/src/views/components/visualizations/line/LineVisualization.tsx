@@ -51,14 +51,14 @@ const LineVisualization = makeVisualization(({
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
 
-  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
+  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName, fullPath }) => ({
     type,
     name,
     x: _mapKeys(labels),
     y: values,
     originalName,
     line: { shape: toPlotly(interpolation) },
-    ...getChartDataSettingsWithCustomUnits({ originalName, name, values }),
+    ...getChartDataSettingsWithCustomUnits({ originalName, fullPath, values }),
   }), [_mapKeys, getChartDataSettingsWithCustomUnits, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);

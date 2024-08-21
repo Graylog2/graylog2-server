@@ -42,12 +42,12 @@ const useBarChartDataSettingsWithCustomUnits = ({ config, barmode, effectiveTime
   const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
 
   return useCallback(({
-    originalName, name, values, idx, total, xAxisItemsLength,
-  }: { xAxisItemsLength: number, originalName: string, name: string, values: Array<any>, idx: number, total: number }):Partial<ChartDefinition> => {
+    originalName, values, idx, total, xAxisItemsLength, fullPath,
+  }: { xAxisItemsLength: number, originalName: string, name: string, values: Array<any>, idx: number, total: number, fullPath: string }):Partial<ChartDefinition> => {
     if (!unitFeatureEnabled) return ({});
 
-    const fieldNameKey = getFieldNameFromTrace({ name, series: config.series }) ?? NO_FIELD_NAME_SERIES;
-    const { y: convertedValues, yaxis, ...hoverTemplateSettings } = getChartDataSettingsWithCustomUnits({ originalName, name, values });
+    const fieldNameKey = getFieldNameFromTrace({ fullPath, series: config.series }) ?? NO_FIELD_NAME_SERIES;
+    const { y: convertedValues, yaxis, ...hoverTemplateSettings } = getChartDataSettingsWithCustomUnits({ originalName, fullPath, values });
     const axisNumber = fieldNameToAxisCountMapper?.[fieldNameKey];
     const totalAxis = Object.keys(unitTypeMapper).length;
 
@@ -65,6 +65,7 @@ const useBarChartDataSettingsWithCustomUnits = ({ config, barmode, effectiveTime
     return ({
       yaxis,
       y: convertedValues,
+      fullPath,
       ...hoverTemplateSettings,
       ...offsetSettings,
     });

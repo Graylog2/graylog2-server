@@ -25,19 +25,20 @@ import getFieldNameFromTrace from 'views/components/visualizations/utils/getFiel
 import { getPieHoverTemplateSettings } from 'views/components/visualizations/utils/chartLayoutGenerators';
 
 export type PieHoverTemplateSettings = { text: Array<string>, hovertemplate: string, meta: string, textinfo: 'percent' };
-export type PieChartDataSettingsWithCustomUnits = (props: { originalName: string, name: string, values: Array<any> }) => PieHoverTemplateSettings | {};
+export type PieChartDataSettingsWithCustomUnits = (props: { originalName: string, fullPath: string, values: Array<any> }) => PieHoverTemplateSettings | {};
 
 const usePieChartDataSettingsWithCustomUnits = ({ config }: { config: AggregationWidgetConfig }) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
 
-  return useCallback<PieChartDataSettingsWithCustomUnits>(({ originalName, name, values }) => {
+  return useCallback<PieChartDataSettingsWithCustomUnits>(({ originalName, fullPath, values }) => {
     if (!unitFeatureEnabled) return ({});
 
-    const fieldNameKey = getFieldNameFromTrace({ name, series: config.series }) ?? NO_FIELD_NAME_SERIES;
+    const fieldNameKey = getFieldNameFromTrace({ fullPath, series: config.series }) ?? NO_FIELD_NAME_SERIES;
     const unit = widgetUnits.getFieldUnit(fieldNameKey);
 
     return ({
+      fullPath,
       ...getPieHoverTemplateSettings({ convertedValues: values, unit, originalName }),
     });
   }, [config.series, unitFeatureEnabled, widgetUnits]);

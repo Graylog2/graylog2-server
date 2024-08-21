@@ -28,31 +28,31 @@ describe('getFieldNameFromTrace', () => {
   ];
 
   it('shows field name when series doesnt have a name and column has only function(field) in name', () => {
-    const result = getFieldNameFromTrace({ series, name: 'avg(field1)' });
+    const result = getFieldNameFromTrace({ series, fullPath: 'avg(field1)' });
 
     expect(result).toEqual('field1');
   });
 
   it('shows field name when series doesnt have a name and column has only somePath-function(field) in name', () => {
-    const result = getFieldNameFromTrace({ series, name: 'field5Value-field6Value-avg(field1)' });
+    const result = getFieldNameFromTrace({ series, fullPath: 'field5Value-field6Value-avg(field1)' });
 
     expect(result).toEqual('field1');
   });
 
   it('shows field name when series has a name and column has only function(field) in name', () => {
-    const result = getFieldNameFromTrace({ series, name: 'SeriesName' });
+    const result = getFieldNameFromTrace({ series, fullPath: 'SeriesName' });
 
     expect(result).toEqual('field2');
   });
 
   it('shows field name when series has a name and column has only somePath-function(field) in name', () => {
-    const result = getFieldNameFromTrace({ series, name: 'field5Value-field6Value-SeriesName' });
+    const result = getFieldNameFromTrace({ series, fullPath: 'field5Value-field6Value-SeriesName' });
 
     expect(result).toEqual('field2');
   });
 
   it('return null when no series found', () => {
-    const result = getFieldNameFromTrace({ series, name: 'field5Value-field6Value-SeriesName2' });
+    const result = getFieldNameFromTrace({ series, fullPath: 'field5Value-field6Value-SeriesName2' });
 
     expect(result).toEqual(null);
   });

@@ -126,7 +126,7 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
 
     act(() => {
       barChartDataSettingsWithCustomUnits = result.current(
-        { originalName: 'Name1', name: 'Name1', values: [1000, 2000, 3000], idx: 1, total: 4, xAxisItemsLength: 10 },
+        { originalName: 'Name1', name: 'Name1', fullPath: 'Name1', values: [1000, 2000, 3000], idx: 1, total: 4, xAxisItemsLength: 10 },
       );
     });
 
@@ -136,7 +136,7 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
     });
 
     expect(useChartDataSettingsWithCustomUnits).toHaveBeenCalledWith({ config: testConfig });
-    expect(getFieldNameFromTrace).toHaveBeenCalledWith({ series: testConfig.series, name: 'Name1' });
+    expect(getFieldNameFromTrace).toHaveBeenCalledWith({ series: testConfig.series, fullPath: 'Name1' });
 
     expect(chartLayoutGenerators.getBarChartTraceOffsetSettings).toHaveBeenCalledWith('group', {
       yaxis: 'y1',
@@ -154,6 +154,7 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
     });
 
     expect(barChartDataSettingsWithCustomUnits).toEqual({
+      fullPath: 'Name1',
       offset: -0.375,
       offsetgroup: 1,
       width: 0.25,

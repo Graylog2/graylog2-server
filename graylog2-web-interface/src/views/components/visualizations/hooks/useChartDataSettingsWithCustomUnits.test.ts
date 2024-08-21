@@ -66,11 +66,12 @@ describe('useChartDataSettingsWithCustomUnits', () => {
 
     act(() => {
       chartDataSettingsWithCustomUnits = result.current(
-        { originalName: 'Name1', name: 'Name1', values: [1000, 2000, 3000] },
+        { originalName: 'Name1', fullPath: 'Name1', values: [1000, 2000, 3000] },
       );
     });
 
     expect(chartDataSettingsWithCustomUnits).toEqual({
+      fullPath: 'Name1',
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',
       meta: 'Name1',
       text: ['1.0 s', '2.0 s', '3.0 s'],
@@ -88,11 +89,12 @@ describe('useChartDataSettingsWithCustomUnits', () => {
 
     act(() => {
       chartDataSettingsWithCustomUnits = result.current(
-        { originalName: 'Name2', name: 'Name2', values: [1000, 2000, 3000] },
+        { originalName: 'Name2', fullPath: 'Name2', values: [1000, 2000, 3000] },
       );
     });
 
     expect(chartDataSettingsWithCustomUnits).toEqual({
+      fullPath: 'Name2',
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',
       meta: 'Name2',
       text: ['1.0 Mb', '2.0 Mb', '3.0 Mb'],
@@ -110,11 +112,12 @@ describe('useChartDataSettingsWithCustomUnits', () => {
 
     act(() => {
       chartDataSettingsWithCustomUnits = result.current(
-        { originalName: 'Name3', name: 'Name3', values: [100, 200, 300] },
+        { originalName: 'Name3', fullPath: 'Name3', values: [100, 200, 300] },
       );
     });
 
     expect(chartDataSettingsWithCustomUnits).toEqual({
+      fullPath: 'Name3',
       y: [1, 2, 3],
       yaxis: 'y3',
     });
@@ -129,11 +132,12 @@ describe('useChartDataSettingsWithCustomUnits', () => {
 
     act(() => {
       chartDataSettingsWithCustomUnits = result.current(
-        { originalName: 'count()', name: 'count()', values: [100, 200, 300] },
+        { originalName: 'count()', fullPath: 'count()', values: [100, 200, 300] },
       );
     });
 
     expect(chartDataSettingsWithCustomUnits).toEqual({
+      fullPath: 'count()',
       y: [100, 200, 300],
       yaxis: 'y4',
     });

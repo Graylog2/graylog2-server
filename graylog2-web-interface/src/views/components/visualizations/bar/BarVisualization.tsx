@@ -96,7 +96,7 @@ const BarVisualization = makeVisualization(({
 
   const getBarChartDataSettingsWithCustomUnits = useBarChartDataSettingsWithCustomUnits({ config, effectiveTimerange, barmode });
 
-  const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName, total, idx }): ChartDefinition => {
+  const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName, total, idx, fullPath }): ChartDefinition => {
     const opacity = visualizationConfig?.opacity ?? 1.0;
     const mappedKeys = _mapKeys(labels);
 
@@ -107,7 +107,7 @@ const BarVisualization = makeVisualization(({
       y: values,
       opacity,
       originalName,
-      ...getBarChartDataSettingsWithCustomUnits({ originalName, name, values, idx, total, xAxisItemsLength: mappedKeys.length }),
+      ...getBarChartDataSettingsWithCustomUnits({ originalName, name, fullPath, values, idx, total, xAxisItemsLength: mappedKeys.length }),
     }) as ChartDefinition;
   },
   [visualizationConfig?.opacity, _mapKeys, getBarChartDataSettingsWithCustomUnits]);

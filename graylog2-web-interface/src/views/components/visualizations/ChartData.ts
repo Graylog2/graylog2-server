@@ -61,9 +61,11 @@ export type ChartDefinition = {
   offsetgroup?: string | number,
   width?: number,
   offset?: number,
+  fullPath?: string,
 };
 
-export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
+type FullTracePath = string;
+export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>, FullTracePath?];
 export type ExtractedSeries = Array<ChartData>;
 export type ValuesBySeries = { [key: string]: Array<number> };
 
@@ -78,7 +80,8 @@ type ChartInput = {
   data: Array<Array<any>>,
   idx: number,
   total: number,
-  config: AggregationWidgetConfig
+  config: AggregationWidgetConfig,
+  fullPath: FullTracePath,
 };
 export type Generator = (chartInput: ChartInput) => ChartDefinition;
 
@@ -97,11 +100,13 @@ export const flattenLeafs = (leafs: Array<Leaf>, matcher: (value: Value) => bool
 export const formatSeries = ({
   valuesBySeries = {},
   xLabels = [],
-}: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => Object.keys(valuesBySeries).map((value) => [
+  seriesFullTracePathMapper = {},
+}: { valuesBySeries: ValuesBySeries, xLabels: Array<any>, seriesFullTracePathMapper: Record<string, FullTracePath> }): ExtractedSeries => Object.keys(valuesBySeries).map((value) => [
   value,
   xLabels,
   valuesBySeries[value],
   [],
+  seriesFullTracePathMapper[value],
 ]);
 
 const isLeaf = (row: Row): row is Leaf => (row.source === 'leaf');
@@ -115,6 +120,7 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
   const xLabels = getXLabelsFromLeafs(leafs);
   const flatLeafs = flattenLeafs(leafs, leafValueMatcher);
   const valuesBySeries = {};
+  const seriesFullTracePathMapper: Record<string, FullTracePath> = {};
 
   flatLeafs.forEach(([key, value]) => {
     const joinedKey = keyJoiner(value.key);
@@ -122,10 +128,13 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
 
     if (value.value !== null && value.value !== undefined) {
       set(valuesBySeries, [joinedKey, targetIdx], value.value);
+      seriesFullTracePathMapper[joinedKey] = _defaultKeyJoiner(value.key);
     }
   });
 
-  return { valuesBySeries, xLabels };
+  console.log({ valuesBySeries, xLabels, flatLeafs, seriesFullNameMapper: seriesFullTracePathMapper });
+
+  return { valuesBySeries, xLabels, seriesFullTracePathMapper };
 };
 
 export const generateChart = (
@@ -137,25 +146,26 @@ export const generateChart = (
   const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
 
   return (results: ExtractedSeries) => {
-    const allCharts = results.map(([value, x, values, z]) => ({
+    const allCharts = results.map(([value, x, values, z, fullPath]) => ({
       type: chartType,
       name: value.split(keySeparator).map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key)).join(humanSeparator),
       labels: x.map((key) => key.join(keySeparator)),
       values,
       data: z,
       originalName: value,
+      fullPath,
     }));
 
     return allCharts.map((args, idx) => generator({ ...args, idx, total: allCharts.length, config }));
   };
 };
 
-export const removeNulls = (): ((series: ExtractedSeries) => ExtractedSeries) => (results: ExtractedSeries) => results.map(([name, keys, values, z]) => {
+export const removeNulls = (): ((series: ExtractedSeries) => ExtractedSeries) => (results: ExtractedSeries) => results.map(([name, keys, values, z, fullName]) => {
   const nullIndices = Array.from(values).reduce((indices, value, index) => ((value === null || value === undefined) ? [...indices, index] : indices), []);
   const newKeys = keys.filter((_, idx) => !nullIndices.includes(idx));
   const newValues = values.filter((_, idx) => !nullIndices.includes(idx));
 
-  return [name, newKeys, newValues, z];
+  return [name, newKeys, newValues, z, fullName];
 });
 
 const doNotSuffixTraceForSingleSeries = (keys: Array<Key>) => (keys.length > 1 ? keys.slice(0, -1).join(keySeparator) : keys[0]);
