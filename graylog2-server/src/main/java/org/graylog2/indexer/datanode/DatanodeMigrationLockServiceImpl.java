@@ -17,8 +17,7 @@
 package org.graylog2.indexer.datanode;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import jakarta.inject.Inject;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.indexer.IndexSet;
@@ -35,7 +34,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Singleton
 public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeMigrationLockServiceImpl.class);
