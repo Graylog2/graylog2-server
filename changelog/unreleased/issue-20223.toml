@@ -1,0 +1,4 @@
+type="a"
+message="Added new Palo Alto version 11 input to ingest PAN OS 11 logs and parse via illuminate."
+
+issues=["20223"]

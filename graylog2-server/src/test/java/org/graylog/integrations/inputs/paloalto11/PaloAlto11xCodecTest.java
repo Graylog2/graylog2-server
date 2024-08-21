@@ -29,7 +29,6 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PaloAlto11xCodecTest {
-
     private static final String TEST_SOURCE = "Test Source";
     private static final DateTime TEST_DATE_TIME = DateTime.now(DateTimeZone.UTC);
     private static final String TEST_RAW_MESSAGE = "Foo,Bar,Baz,This,That,GLOBALPROTECT";
@@ -110,5 +109,4 @@ public class PaloAlto11xCodecTest {
     private void thenOutputMessageIsNull() {
         assertThat(out, nullValue());
     }
-
 }

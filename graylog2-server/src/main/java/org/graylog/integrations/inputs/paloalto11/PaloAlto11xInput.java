@@ -28,8 +28,6 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PaloAlto11xInput extends MessageInput {
 
@@ -37,13 +35,13 @@ public class PaloAlto11xInput extends MessageInput {
 
     @Inject
     public PaloAlto11xInput(@Assisted Configuration configuration,
-                           MetricRegistry metricRegistry,
-                           SyslogTcpTransport.Factory transport,
-                           LocalMetricRegistry localRegistry,
-                           PaloAlto11xCodec.Factory codec,
-                           PaloAlto11xInput.Config config,
-                           PaloAlto11xInput.Descriptor descriptor,
-                           ServerStatus serverStatus) {
+                            MetricRegistry metricRegistry,
+                            SyslogTcpTransport.Factory transport,
+                            LocalMetricRegistry localRegistry,
+                            PaloAlto11xCodec.Factory codec,
+                            PaloAlto11xInput.Config config,
+                            PaloAlto11xInput.Descriptor descriptor,
+                            ServerStatus serverStatus) {
         super(
                 metricRegistry,
                 configuration,
@@ -87,4 +85,3 @@ public class PaloAlto11xInput extends MessageInput {
         }
     }
 }
-
