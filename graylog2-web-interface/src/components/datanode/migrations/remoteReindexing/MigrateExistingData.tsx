@@ -23,6 +23,7 @@ import styled from 'styled-components';
 import { Alert, Input, Row, Col } from 'components/bootstrap';
 import { SearchForm, Spinner, Icon } from 'components/common';
 import { getValueFromInput } from 'util/FormsUtils';
+import { compare as naturalSort } from 'logic/DefaultCompare';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
@@ -66,7 +67,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
       const checkConnectionResult = data?.response as RemoteReindexCheckConnection;
 
       if (checkConnectionResult?.indices?.length) {
-        setAvailableIndices(checkConnectionResult.indices);
+        setAvailableIndices(checkConnectionResult.indices.sort((a, b) => naturalSort({ numeric: true, sensitivity: 'base' })(a.name, b.name)));
         setSelectedIndices(checkConnectionResult.indices.filter((i) => i.managed));
         setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
         saveFormValues(args as RemoteReindexRequest);
