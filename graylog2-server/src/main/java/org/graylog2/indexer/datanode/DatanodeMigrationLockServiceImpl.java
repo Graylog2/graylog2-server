@@ -44,15 +44,13 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
     private final LockService lockService;
 
 
-    private final ScheduledExecutorService executorService;
-
-    private final Set<Lock> activeLocks = Collections.synchronizedSet(new HashSet<>());
+      private final Set<Lock> activeLocks = Collections.synchronizedSet(new HashSet<>());
 
     @Inject
     public DatanodeMigrationLockServiceImpl(LockService lockService) {
         this.lockService = lockService;
-        this.executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("migration-locks-service-backend-%d").setDaemon(true).setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG)).build());
-        this.executorService.scheduleAtFixedRate(() -> {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("migration-locks-service-backend-%d").setDaemon(true).setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG)).build());
+        executorService.scheduleAtFixedRate(() -> {
             final Set<Optional<Lock>> extendedLocks = activeLocks.stream().map(lockService::extendLock).collect(Collectors.toSet());
             if (!extendedLocks.isEmpty()) {
                 LOG.info("Extended TTL of {} datanode migration locks", extendedLocks.size());
