@@ -44,7 +44,6 @@ import java.util.stream.Collectors;
 public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeMigrationLockServiceImpl.class);
-    public static final int ACQUIRE_LOCK_SLEEP_MILLIS = 100;
     public static final int LOCK_EXTEND_PERIOD_SECONDS = 10;
     private static final String LOCK_RESOURCE_PREFIX = "remote-reindex-migration_";
 
