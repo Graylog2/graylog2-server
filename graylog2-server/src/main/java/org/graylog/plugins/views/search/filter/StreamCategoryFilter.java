@@ -52,6 +52,10 @@ public abstract class StreamCategoryFilter implements Filter {
 
     public abstract Builder toBuilder();
 
+    public static StreamCategoryFilter ofCategory(String category) {
+        return builder().category(category).build();
+    }
+
     @Override
     public Filter.Builder toGenericBuilder() {
         return toBuilder();
