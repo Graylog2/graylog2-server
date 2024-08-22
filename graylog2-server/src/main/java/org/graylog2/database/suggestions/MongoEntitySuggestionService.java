@@ -17,6 +17,7 @@
 package org.graylog2.database.suggestions;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Streams;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -48,6 +49,10 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         this.permissionsUtils = permissionsUtils;
     }
 
+    private boolean addAdminToSuggestions(final String collection, final String valueColumn) {
+        return "users".equals(collection) && "username".equals(valueColumn);
+    }
+
     @Override
     public EntitySuggestionResponse suggest(final String collection,
                                             final String valueColumn,
@@ -56,6 +61,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final int perPage,
                                             final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
+        final boolean addAdminToSuggestions = addAdminToSuggestions(collection, valueColumn);
 
         final var bsonFilter = !Strings.isNullOrEmpty(query)
                 ? Filters.regex(valueColumn, query, "i")
@@ -67,20 +73,23 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 .sort(Sorts.ascending(valueColumn));
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
-        final var skip = (page - 1) * perPage;
+        final var skip = (page - 1) * perPage + (addAdminToSuggestions ? 1 : 0);
         final var checkPermission = permissionsUtils.createPermissionCheck(subject, collection);
         final var documents = userCanReadAllEntities
-                ? mongoPaginate(resultWithoutPagination, perPage, skip)
-                : paginateWithPermissionCheck(resultWithoutPagination, perPage, skip, checkPermission);
+                ? mongoPaginate(resultWithoutPagination, perPage - (addAdminToSuggestions ? 1 : 0), skip)
+                : paginateWithPermissionCheck(resultWithoutPagination, perPage - (addAdminToSuggestions ? 1 : 0), skip, checkPermission);
 
-        final List<EntitySuggestion> suggestions = documents
+        final List<EntitySuggestion> staticEntry = addAdminToSuggestions ? List.of(new EntitySuggestion("admin", "admin")) : List.of();
+
+        final Stream<EntitySuggestion> suggestionsFromDB = documents
                 .map(doc ->
                         new EntitySuggestion(
                                 doc.getObjectId(ID_FIELD).toString(),
                                 doc.getString(valueColumn)
                         )
-                )
-                .toList();
+                );
+
+        final List<EntitySuggestion> suggestions = Streams.concat(staticEntry.stream(), suggestionsFromDB).toList();
 
         final long total = userCanReadAllEntities
                 ? mongoCollection.countDocuments(bsonFilter)
