@@ -85,6 +85,7 @@ const tableCss = css(({ theme }) => css`
       > th,
       > td {
         border-top-color: ${theme.colors.table.row.divider};
+        border-width: 1px;
       }
     }
 
@@ -92,6 +93,7 @@ const tableCss = css(({ theme }) => css`
       background: ${theme.colors.table.head.background};
       white-space: nowrap;
       border-bottom-color: ${theme.colors.table.row.divider};
+      border-width: 1px;
     }
 
     > tbody > tr {
@@ -101,6 +103,7 @@ const tableCss = css(({ theme }) => css`
 
     > tbody + tbody {
       border-top-color: ${theme.colors.table.row.divider};
+      border-width: 1px;
     }
 
     .table {
