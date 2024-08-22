@@ -132,8 +132,6 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
     }
   });
 
-  console.log({ valuesBySeries, xLabels, flatLeafs, seriesFullNameMapper: seriesFullTracePathMapper });
-
   return { valuesBySeries, xLabels, seriesFullTracePathMapper };
 };
 
