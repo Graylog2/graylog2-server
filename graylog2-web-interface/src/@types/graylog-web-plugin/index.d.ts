@@ -188,7 +188,10 @@ interface PluginDataWarehouse {
   DataWarehouseJobs: React.ComponentType<{
     streamId: string,
   }>,
-  StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
+  StreamIlluminateProcessingSection: React.ComponentType<{
+    stream: Stream,
+  }>,
+ StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
   getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
