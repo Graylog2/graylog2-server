@@ -53,6 +53,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
+import org.graylog2.indexer.datanode.DatanodeMigrationLockWaitConfig;
 import org.graylog2.indexer.datanode.IndexMigrationConfiguration;
 import org.graylog2.indexer.datanode.MigrationConfiguration;
 import org.graylog2.indexer.datanode.RemoteReindexMigrationService;
@@ -175,10 +176,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private void doStartMigration(MigrationConfiguration migration, RemoteReindexRequest request) {
         try {
             new Thread(() -> {
-                    prepareCluster(request, migration);
-                    createIndicesInNewCluster(migration);
-                    startAsyncTasks(migration, request);
-                    createSystemNotification(Status.RUNNING);
+                prepareCluster(request, migration);
+                final Set<Lock> locks = lockIndexSets(migration);
+                createIndicesInNewCluster(migration);
+                startAsyncTasks(migration, request, locks);
+                createSystemNotification(Status.RUNNING);
             }).start();
         } catch (Exception e) {
             LOG.error("Failed to start remote reindex migration", e);
@@ -187,13 +189,20 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private Set<Lock> lockIndexSets(MigrationConfiguration migration) {
+
+        final DatanodeMigrationLockWaitConfig lockWaitConfig = new DatanodeMigrationLockWaitConfig(
+                java.time.Duration.ofSeconds(5),
+                java.time.Duration.ofMinutes(30),
+                (indexSet, caller, attemptNumber) -> logInfo(migration, "Awaiting lock of index set " + indexSet.getConfig().title() + ", attempt #" + attemptNumber)
+        );
+
         return migration.indices().stream()
                 .map(IndexMigrationConfiguration::indexName)
                 .map(indexSetRegistry::getForIndex)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .distinct()
-                .map(indexSet -> migrationLockService.acquireLock(indexSet, RemoteReindexingMigrationAdapterOS2.class))
+                .map(indexSet -> migrationLockService.acquireLock(indexSet, RemoteReindexingMigrationAdapterOS2.class, lockWaitConfig))
                 .collect(Collectors.toSet());
     }
 
@@ -400,10 +409,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    private void startAsyncTasks(MigrationConfiguration migration, RemoteReindexRequest request) {
-
-        final Set<Lock> locks = lockIndexSets(migration);
-
+    private void startAsyncTasks(MigrationConfiguration migration, RemoteReindexRequest request, Set<Lock> locks) {
         final int threadsCount = Math.max(1, Math.min(request.threadsCount(), migration.indices().size()));
 
         final ExecutorService executorService = Executors.newFixedThreadPool(threadsCount, new ThreadFactoryBuilder()
@@ -437,7 +443,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             });
             reindexMigrationService.assignTask(migration.id(), indexName, task.getTask());
             waitForTaskCompleted(migration, indexName, task.getTask(), locks);
-            if(closeAfterMigration) {
+            if (closeAfterMigration) {
                 closeMigratedIndex(migration, uri, username, password, indexName);
             }
         } catch (Exception e) {
@@ -457,7 +463,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
         boolean closeAfterMigration = false;
 
-        if(indexState == IndexState.CLOSE) {
+        if (indexState == IndexState.CLOSE) {
             logInfo(migration, "Source index " + indexName + " is closed, reopening for the migration");
             closeAfterMigration = true;
             openRemoteIndex(uri, username, password, indexName);

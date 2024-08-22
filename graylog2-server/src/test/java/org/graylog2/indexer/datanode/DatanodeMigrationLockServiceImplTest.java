@@ -54,7 +54,7 @@ class DatanodeMigrationLockServiceImplTest {
         final DatanodeMigrationLockServiceImpl datanodeMigrationLockService = new DatanodeMigrationLockServiceImpl(lockService);
 
         final IndexSet indexSet = mockIndexSet("set-A");
-        final Lock lock = datanodeMigrationLockService.acquireLock(indexSet, CallerA.class);
+        final Lock lock = datanodeMigrationLockService.acquireLock(indexSet, CallerA.class, new DatanodeMigrationLockWaitConfig(Duration.ofSeconds(1), Duration.ofSeconds(10), (indexSet1, caller, attemptNumber) -> {}));
         Assertions.assertThat(lock).isNotNull();
 
         final AtomicBoolean executed = new AtomicBoolean(false);

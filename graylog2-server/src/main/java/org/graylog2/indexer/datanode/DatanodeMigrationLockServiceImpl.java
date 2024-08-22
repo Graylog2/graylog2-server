@@ -16,6 +16,12 @@
  */
 package org.graylog2.indexer.datanode;
 
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import org.graylog2.cluster.lock.Lock;
@@ -29,6 +35,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -63,14 +70,14 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
     }
 
     @Override
-    public synchronized Lock acquireLock(IndexSet indexSet, Class<?> caller) {
+    public Lock acquireLock(IndexSet indexSet, Class<?> caller, DatanodeMigrationLockWaitConfig config) {
         final String indexSetID = indexSet.getConfig().id();
         final String resource = LOCK_RESOURCE_PREFIX + indexSetID;
-        return lock(resource, caller);
+        return waitForLock(resource, caller, indexSet, config);
     }
 
     @Override
-    public synchronized void tryRun(IndexSet indexSet, Class<?> caller, Runnable runnable) {
+    public void tryRun(IndexSet indexSet, Class<?> caller, Runnable runnable) {
         final Optional<Lock> lock = tryLock(indexSet, caller);
         // here we have to keep the lock refreshed every now and then
         lock.ifPresentOrElse(l -> {
@@ -83,7 +90,7 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
     }
 
     @Override
-    public synchronized void release(Lock lock) {
+    public void release(Lock lock) {
         activeLocks.remove(lock);
         lockService.unlock(lock);
     }
@@ -93,23 +100,29 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
         return doLock(resource, caller);
     }
 
-    private Optional<Lock> doLock(String resource, Class<?> caller) {
+    private synchronized Optional<Lock> doLock(String resource, Class<?> caller) {
         final Optional<Lock> lock = lockService.lock(resource, caller.getName());
         lock.ifPresent(activeLocks::add);
         return lock;
     }
 
-    private Lock lock(String resource, Class<?> caller) {
-
-        Optional<Lock> lock;
-        while ((lock = doLock(resource, caller)).isEmpty()) {
-            try {
-                LOG.info("Caller {} is Waiting for a lock {}, retrying in 100ms", caller.getName(), resource);
-                Thread.sleep(ACQUIRE_LOCK_SLEEP_MILLIS);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+    private Lock waitForLock(String resource, Class<?> caller, IndexSet indexSet, DatanodeMigrationLockWaitConfig waitConfig) {
+        try {
+            return RetryerBuilder.<Optional<Lock>>newBuilder()
+                    .withRetryListener(new RetryListener() {
+                        @Override
+                        public <V> void onRetry(Attempt<V> attempt) {
+                            waitConfig.lockAcquireListerer().onRetry(indexSet, caller, attempt.getAttemptNumber());
+                        }
+                    })
+                    .withStopStrategy(StopStrategies.stopAfterDelay(waitConfig.lockAcquireTimeout().getSeconds(), TimeUnit.SECONDS))
+                    .withWaitStrategy(WaitStrategies.fixedWait(waitConfig.delayBetweenAttempts().toMillis(), TimeUnit.MILLISECONDS))
+                    .retryIfResult(Optional::isEmpty)
+                    .build()
+                    .call(() -> doLock(resource, caller))
+                    .orElseThrow(() -> new RuntimeException("Failed to obtain index set " + indexSet.getConfig().title() + " lock"));
+        } catch (ExecutionException | RetryException e) {
+            throw new RuntimeException("Failed to obtain index set " + indexSet.getConfig().title() + " lock", e);
         }
-        return lock.get();
     }
 }
