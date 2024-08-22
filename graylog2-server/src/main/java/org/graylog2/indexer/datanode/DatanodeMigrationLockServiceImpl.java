@@ -49,6 +49,10 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
     @Inject
     public DatanodeMigrationLockServiceImpl(LockService lockService) {
         this.lockService = lockService;
+        startLocksExtendingThread(lockService);
+    }
+
+    private void startLocksExtendingThread(LockService lockService) {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("migration-locks-service-backend-%d").setDaemon(true).setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG)).build());
         executorService.scheduleAtFixedRate(() -> {
             final Set<Optional<Lock>> extendedLocks = activeLocks.stream().map(lockService::extendLock).collect(Collectors.toSet());
@@ -56,6 +60,32 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
                 LOG.info("Extended TTL of {} datanode migration locks", extendedLocks.size());
             }
         }, LOCK_EXTEND_PERIOD_SECONDS, LOCK_EXTEND_PERIOD_SECONDS, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public synchronized Lock acquireLock(IndexSet indexSet, Class<?> caller) {
+        final String indexSetID = indexSet.getConfig().id();
+        final String resource = LOCK_RESOURCE_PREFIX + indexSetID;
+        return lock(resource, caller);
+    }
+
+    @Override
+    public synchronized void tryRun(IndexSet indexSet, Class<?> caller, Runnable runnable) {
+        final Optional<Lock> lock = tryLock(indexSet, caller);
+        // here we have to keep the lock refreshed every now and then
+        lock.ifPresentOrElse(l -> {
+            try {
+                runnable.run();
+            } finally {
+                release(l);
+            }
+        }, () -> LOG.info("Couldn't enquire a lock of index set {}({}) for {}, skipping execution", indexSet.getConfig().title(), indexSet.getConfig().id(), caller.getName()));
+    }
+
+    @Override
+    public synchronized void release(Lock lock) {
+        activeLocks.remove(lock);
+        lockService.unlock(lock);
     }
 
     private Optional<Lock> tryLock(IndexSet indexSet, Class<?> caller) {
@@ -67,19 +97,6 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
         final Optional<Lock> lock = lockService.lock(resource, caller.getName());
         lock.ifPresent(activeLocks::add);
         return lock;
-    }
-
-    @Override
-    public void release(Lock lock) {
-        activeLocks.remove(lock);
-        lockService.unlock(lock);
-    }
-
-    @Override
-    public Lock acquireLock(IndexSet indexSet, Class<?> caller) {
-        final String indexSetID = indexSet.getConfig().id();
-        final String resource = LOCK_RESOURCE_PREFIX + indexSetID;
-        return lock(resource, caller);
     }
 
     private Lock lock(String resource, Class<?> caller) {
@@ -94,18 +111,5 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
             }
         }
         return lock.get();
-    }
-
-    @Override
-    public void tryRun(IndexSet indexSet, Class<?> caller, Runnable runnable) {
-        final Optional<Lock> lock = tryLock(indexSet, caller);
-        // here we have to keep the lock refreshed every now and then
-        lock.ifPresentOrElse(l -> {
-            try {
-                runnable.run();
-            } finally {
-                release(l);
-            }
-        }, () -> LOG.info("Couldn't enquire a lock of index set {}({}) for {}, skipping execution", indexSet.getConfig().title(), indexSet.getConfig().id(), caller.getName()));
     }
 }
