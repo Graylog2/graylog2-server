@@ -50,7 +50,7 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
     private final LockService lockService;
 
 
-      private final Set<Lock> activeLocks = Collections.synchronizedSet(new HashSet<>());
+    private final Set<Lock> activeLocks = Collections.synchronizedSet(new HashSet<>());
 
     @Inject
     public DatanodeMigrationLockServiceImpl(LockService lockService) {
@@ -69,10 +69,10 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
     }
 
     @Override
-    public Lock acquireLock(IndexSet indexSet, Class<?> caller, DatanodeMigrationLockWaitConfig config) {
+    public Lock acquireLock(IndexSet indexSet, Class<?> caller, String context, DatanodeMigrationLockWaitConfig config) {
         final String indexSetID = indexSet.getConfig().id();
         final String resource = LOCK_RESOURCE_PREFIX + indexSetID;
-        return waitForLock(resource, caller, indexSet, config);
+        return waitForLock(resource, caller, context, indexSet, config);
     }
 
     @Override
@@ -96,16 +96,16 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
 
     private Optional<Lock> tryLock(IndexSet indexSet, Class<?> caller) {
         final String resource = LOCK_RESOURCE_PREFIX + indexSet.getConfig().id();
-        return doLock(resource, caller);
+        return doLock(resource, caller, null);
     }
 
-    private synchronized Optional<Lock> doLock(String resource, Class<?> caller) {
-        final Optional<Lock> lock = lockService.lock(resource, caller.getName());
+    private synchronized Optional<Lock> doLock(String resource, Class<?> caller, String context) {
+        final Optional<Lock> lock = lockService.lock(resource, caller.getName() + ":" + context);
         lock.ifPresent(activeLocks::add);
         return lock;
     }
 
-    private Lock waitForLock(String resource, Class<?> caller, IndexSet indexSet, DatanodeMigrationLockWaitConfig waitConfig) {
+    private Lock waitForLock(String resource, Class<?> caller, String context, IndexSet indexSet, DatanodeMigrationLockWaitConfig waitConfig) {
         try {
             return RetryerBuilder.<Optional<Lock>>newBuilder()
                     .withRetryListener(new RetryListener() {
@@ -118,10 +118,10 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
                     .withWaitStrategy(WaitStrategies.fixedWait(waitConfig.delayBetweenAttempts().toMillis(), TimeUnit.MILLISECONDS))
                     .retryIfResult(Optional::isEmpty)
                     .build()
-                    .call(() -> doLock(resource, caller))
-                    .orElseThrow(() -> new RuntimeException("Failed to obtain index set " + indexSet.getConfig().title() + " lock"));
+                    .call(() -> doLock(resource, caller, context))
+                    .orElseThrow(() -> new DatanodeMigrationLockException("Failed to obtain index set " + indexSet.getConfig().title() + " lock"));
         } catch (ExecutionException | RetryException e) {
-            throw new RuntimeException("Failed to obtain index set " + indexSet.getConfig().title() + " lock", e);
+            throw new DatanodeMigrationLockException("Failed to obtain index set " + indexSet.getConfig().title() + " lock", e);
         }
     }
 }

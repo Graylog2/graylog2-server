@@ -202,7 +202,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .distinct()
-                .map(indexSet -> migrationLockService.acquireLock(indexSet, RemoteReindexingMigrationAdapterOS2.class, lockWaitConfig))
+                .map(indexSet -> migrationLockService.acquireLock(indexSet, RemoteReindexingMigrationAdapterOS2.class, migration.id(), lockWaitConfig))
                 .collect(Collectors.toSet());
     }
 

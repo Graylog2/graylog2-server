@@ -16,20 +16,12 @@
  */
 package org.graylog2.indexer.datanode;
 
-import org.graylog2.cluster.lock.Lock;
-import org.graylog2.indexer.IndexSet;
+public class DatanodeMigrationLockException extends RuntimeException {
+    public DatanodeMigrationLockException(String message) {
+        super(message);
+    }
 
-public interface DatanodeMigrationLockService {
-    /**
-     * This is a blocking method. It will try to acquire a lock indefinitely.
-     */
-    Lock acquireLock(IndexSet indexSet, Class<?> caller, String context, DatanodeMigrationLockWaitConfig config);
-
-    /**
-     * Will run the runnable only if it can get a lock on the first try. If the lock is taken, it will skip
-     * the execution.
-     */
-    void tryRun(IndexSet indexSet, Class<?> caller, Runnable runnable);
-
-    void release(Lock lock);
+    public DatanodeMigrationLockException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

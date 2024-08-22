@@ -54,7 +54,7 @@ class DatanodeMigrationLockServiceImplTest {
         final DatanodeMigrationLockServiceImpl datanodeMigrationLockService = new DatanodeMigrationLockServiceImpl(lockService);
 
         final IndexSet indexSet = mockIndexSet("set-A");
-        final Lock lock = datanodeMigrationLockService.acquireLock(indexSet, CallerA.class, new DatanodeMigrationLockWaitConfig(Duration.ofSeconds(1), Duration.ofSeconds(10), (indexSet1, caller, attemptNumber) -> {}));
+        final Lock lock = datanodeMigrationLockService.acquireLock(indexSet, CallerA.class, "", new DatanodeMigrationLockWaitConfig(Duration.ofSeconds(1), Duration.ofSeconds(10), (indexSet1, caller, attemptNumber) -> {}));
         Assertions.assertThat(lock).isNotNull();
 
         final AtomicBoolean executed = new AtomicBoolean(false);
@@ -66,6 +66,19 @@ class DatanodeMigrationLockServiceImplTest {
         datanodeMigrationLockService.tryRun(indexSet, CallerB.class, () -> executed.set(true));
 
         Assertions.assertThat(executed.get()).isTrue();
+    }
+
+    @Test
+    void testOneCallerTwoTasks() {
+        final MongoLockService lockService = new MongoLockService(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), mongodb.mongoConnection(), Duration.ofSeconds(5));
+        final DatanodeMigrationLockServiceImpl datanodeMigrationLockService = new DatanodeMigrationLockServiceImpl(lockService);
+
+        final IndexSet indexSet = mockIndexSet("set-A");
+        final Lock lock1 = datanodeMigrationLockService.acquireLock(indexSet, CallerA.class, "migration-1", new DatanodeMigrationLockWaitConfig(Duration.ofMillis(100), Duration.ofMillis(500), (indexSet1, caller, attemptNumber) -> {}));
+        Assertions.assertThat(lock1).isNotNull();
+
+        Assertions.assertThatThrownBy(() -> datanodeMigrationLockService.acquireLock(indexSet, CallerA.class, "migration-2", new DatanodeMigrationLockWaitConfig(Duration.ofMillis(100), Duration.ofMillis(500), (indexSet1, caller, attemptNumber) -> {})))
+                .isInstanceOf(DatanodeMigrationLockException.class);
     }
 
     @Nonnull

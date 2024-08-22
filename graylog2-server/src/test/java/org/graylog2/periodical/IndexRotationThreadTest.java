@@ -156,7 +156,7 @@ public class IndexRotationThreadTest {
     private DatanodeMigrationLockService mockMigrationLocks(IndexSet lockedIndexSet) {
         return new DatanodeMigrationLockService() {
             @Override
-            public Lock acquireLock(IndexSet indexSet, Class<?> caller, DatanodeMigrationLockWaitConfig config) {
+            public Lock acquireLock(IndexSet indexSet, Class<?> caller, String context, DatanodeMigrationLockWaitConfig config) {
                 return null;
             }
 
