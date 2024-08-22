@@ -18,6 +18,8 @@ package org.graylog2.database.suggestions;
 
 import org.apache.shiro.subject.Subject;
 
+import java.util.List;
+
 public interface EntitySuggestionService {
 
     EntitySuggestionResponse suggest(final String collection,
@@ -25,5 +27,6 @@ public interface EntitySuggestionService {
                                      final String query,
                                      final int page,
                                      final int perPage,
-                                     final Subject subject);
+                                     final Subject subject,
+                                     final List<String> staticEntries);
 }

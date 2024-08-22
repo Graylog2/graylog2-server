@@ -54,7 +54,8 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final String query,
                                             final int page,
                                             final int perPage,
-                                            final Subject subject) {
+                                            final Subject subject,
+                                            final List<String> staticEntries) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
 
         final var bsonFilter = !Strings.isNullOrEmpty(query)
@@ -67,13 +68,24 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 .sort(Sorts.ascending(valueColumn));
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
-        final var skip = (page - 1) * perPage;
+
+        final var lengthStaticEntries = staticEntries.size();
+        final var start = (page - 1) * perPage;
+
+        final var skip = start < lengthStaticEntries ? 0 : start - lengthStaticEntries;
+        final var limit = perPage - (skip % perPage);
+
         final var checkPermission = permissionsUtils.createPermissionCheck(subject, collection);
         final var documents = userCanReadAllEntities
-                ? mongoPaginate(resultWithoutPagination, perPage, skip)
-                : paginateWithPermissionCheck(resultWithoutPagination, perPage, skip, checkPermission);
+                ? mongoPaginate(resultWithoutPagination, limit, skip)
+                : paginateWithPermissionCheck(resultWithoutPagination, limit, skip, checkPermission);
 
-        final List<EntitySuggestion> suggestions = documents
+        final var from = start > lengthStaticEntries ? 0 : start;
+        final var to = start > lengthStaticEntries ? 0 : start + perPage > lengthStaticEntries ? lengthStaticEntries : start + page;
+
+        final List<EntitySuggestion> staticEntriesList = staticEntries.subList(from, to).stream().map(e -> new EntitySuggestion(e, e)).toList();
+
+        final List<EntitySuggestion> suggestionsFromMongo = documents
                 .map(doc ->
                         new EntitySuggestion(
                                 doc.getObjectId(ID_FIELD).toString(),
@@ -82,9 +94,11 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 )
                 .toList();
 
-        final long total = userCanReadAllEntities
+        final List<EntitySuggestion> suggestions = Stream.of(staticEntriesList, suggestionsFromMongo).flatMap(java.util.Collection::stream).toList();
+
+        final long total = (userCanReadAllEntities
                 ? mongoCollection.countDocuments(bsonFilter)
-                : MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD))).filter(checkPermission).count();
+                : MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD))).filter(checkPermission).count()) + lengthStaticEntries;
 
         return new EntitySuggestionResponse(suggestions,
                 PaginatedList.PaginationInfo.create((int) total,

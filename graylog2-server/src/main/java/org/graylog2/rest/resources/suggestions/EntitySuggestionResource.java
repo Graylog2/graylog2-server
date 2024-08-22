@@ -34,6 +34,9 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -61,8 +64,9 @@ public class EntitySuggestionResource extends RestResource {
                                             @ApiParam(name = "per_page")
                                             @QueryParam("per_page") @DefaultValue("10") int perPage,
                                             @ApiParam(name = "query")
-                                            @QueryParam("query") @DefaultValue("") String query) {
+                                            @QueryParam("query") @DefaultValue("") String query,
+                                            @ApiParam(name = "staticEntries") @QueryParam("staticEntries") @DefaultValue("") String staticEntries) {
 
-        return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject());
+        return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject(), staticEntries == null ? List.of() : Arrays.asList(staticEntries.split(",")));
     }
 }

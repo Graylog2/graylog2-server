@@ -20,6 +20,7 @@ import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import {Attribute} from 'stores/PaginationTypes';
 
 const DEFAULT_DATA = {
   pagination: {
@@ -39,30 +40,35 @@ type PaginatedSuggestions = {
   suggestions: Array<{ id: string, value: string }>,
 }
 
-const fetchFilterValueSuggestions = async (collection: string, { query, page, pageSize }: SearchParams, collectionProperty: string = 'title'): Promise<PaginatedSuggestions | undefined> => {
+const fetchFilterValueSuggestions = async (collection: string, { query, page, pageSize }: SearchParams, staticEntries: string, collectionProperty: string = 'title'): Promise<PaginatedSuggestions | undefined> => {
   const additional = {
     collection,
     column: collectionProperty,
   };
-  const url = PaginationURL('entity_suggestions', page, pageSize, query, additional);
+  let url = PaginationURL('entity_suggestions', page, pageSize, query, additional);
+
+  if (staticEntries) {
+    url = `${url}&staticEntries=${staticEntries}`;
+  }
 
   return fetch('GET', qualifyUrl(url));
 };
 
 const useFilterValueSuggestions = (
-  attributeId: string,
-  collection: string,
+  attribute: Attribute,
   searchParams: SearchParams,
-  collectionProperty: string,
 ): {
   data: PaginatedSuggestions | undefined
   isInitialLoading: boolean
 } => {
-  if (!collection) {
-    throw Error(`Attribute meta data for attribute "${attributeId}" is missing related collection.`);
+  if (!attribute.related_collection) {
+    throw Error(`Attribute meta data for attribute "${attribute.id}" is missing related collection.`);
   }
 
-  const { data, isInitialLoading } = useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(collection, searchParams, collectionProperty), {
+  console.log({ attribute });
+  const staticEntries = attribute.filter_options?.filter((value) => value.title === 'static').map((value) => value.value).join(',');
+
+  const { data, isInitialLoading } = useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(attribute.related_collection, searchParams, staticEntries, attribute.related_property), {
     onError: (errorThrown) => {
       UserNotification.error(`Loading suggestions for filter failed with status: ${errorThrown}`,
         'Could not load filter suggestions');
