@@ -60,7 +60,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   const [selectedIndices, setSelectedIndices] = useState<RemoteIndex[]>([]);
   const [queryIndex, setQueryIndex] = useState<string>('');
 
-  const { initialValues, saveFormValues } = useSaveRemoteReindexMigrationFormValues(!hideActions);
+  const { initialValues, saveFormValues } = useSaveRemoteReindexMigrationFormValues();
 
   const handleConnectionCheck = (step: MigrationActions, data: MigrationState, args?: StepArgs) => {
     if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
