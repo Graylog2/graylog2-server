@@ -14,6 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+export type IndexRange = {
+  index_name: string,
+  begin: number,
+  end: number,
+  is_warm_tiered: boolean
+}
+
 export type QueryValidationState = {
   status: 'OK' | 'ERROR' | 'WARNING',
   explanations: Array<{
@@ -27,4 +35,7 @@ export type QueryValidationState = {
     endColumn: number,
     relatedProperty?: string,
   }>,
+  context: {
+    searched_index_ranges: Array<IndexRange>
+  }
 };

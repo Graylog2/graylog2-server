@@ -14,10 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const observe = jest.fn();
-const unobserve = jest.fn();
-
 window.IntersectionObserver = jest.fn(() => ({
-  observe,
-  unobserve,
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
 }));

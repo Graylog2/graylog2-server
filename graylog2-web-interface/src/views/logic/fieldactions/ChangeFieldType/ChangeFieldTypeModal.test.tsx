@@ -18,17 +18,20 @@ import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
+import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import type { Attributes } from 'stores/PaginationTypes';
 import suppressConsole from 'helpers/suppressConsole';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 const onCloseMock = jest.fn();
 const renderChangeFieldTypeModal = ({
@@ -116,12 +119,24 @@ jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation',
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
+jest.mock('components/indices/hooks/useIndexSetsList');
+
+jest.mock('stores/indices/IndexSetsStore', () => ({
+  IndexSetsActions: {
+    list: jest.fn(),
+  },
+  IndexSetsStore: MockStore(['getInitialState', () => ({
+    indexSets: [
+      { id: 'id-1', title: 'Index Title 1' },
+      { id: 'id-2', title: 'Index Title 2' },
+    ],
+  })]),
+}));
+
 describe('ChangeFieldTypeModal', () => {
   const putFieldTypeMutationMock = jest.fn(() => Promise.resolve());
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useFieldTypesForMappings).mockReturnValue({
@@ -133,6 +148,20 @@ describe('ChangeFieldTypeModal', () => {
           bool: 'Boolean',
         },
       },
+    });
+
+    asMock(useIndexSetsList).mockReturnValue({
+      data: {
+        indexSets: [
+          { id: 'id-1', title: 'Index Title 1' },
+          { id: 'id-2', title: 'Index Title 2' },
+        ] as Array<IndexSet>,
+        indexSetsCount: 2,
+        indexSetStats: null,
+      },
+      isSuccess: true,
+      isInitialLoading: false,
+      refetch: () => {},
     });
 
     asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFieldTypeMutation: putFieldTypeMutationMock });

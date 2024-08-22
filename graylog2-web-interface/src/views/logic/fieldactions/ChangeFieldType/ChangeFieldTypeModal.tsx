@@ -18,7 +18,7 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import mapValues from 'lodash/mapValues';
 
-import { Badge, BootstrapModalForm, Alert, Input } from 'components/bootstrap';
+import { BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
@@ -39,6 +39,7 @@ import type {
 } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import type { Stream } from 'logic/streams/types';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -49,8 +50,6 @@ const StyledLabel = styled.h5`
   font-weight: bold;
   margin-bottom: 5px;
 `;
-
-const BetaBadge = () => <Badge bsStyle="danger">Beta Feature</Badge>;
 
 const failureStreamId = '000000000000000000000004';
 
@@ -73,7 +72,7 @@ const FailureStreamLink = () => {
 
   return (
     <span>
-      <StreamLink stream={isErrorFailureStream ? { id: failureStreamId, title: 'Processing and Indexing Failures' } : failureStream} />
+      <StreamLink stream={isErrorFailureStream ? { id: failureStreamId, title: 'Processing and Indexing Failures' } as Stream : failureStream} />
       <i> (<Link to={Routes.SYSTEM.ENTERPRISE}>Enterprise Plugin</Link> required)</i>
     </span>
   );
@@ -156,7 +155,7 @@ const ChangeFieldTypeModal = ({
   }, [initialSelectedIndexSets, setIndexSetSelection]);
 
   return (
-    <BootstrapModalForm title={<span>Change {fieldName} Field Type <BetaBadge /></span>}
+    <BootstrapModalForm title={<span>Change {fieldName} Field Type</span>}
                         submitButtonText={fieldTypeMutationIsLading ? 'Changing field type...' : 'Change field type'}
                         onSubmitForm={onSubmit}
                         onCancel={onCancel}

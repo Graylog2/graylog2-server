@@ -24,7 +24,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -56,7 +56,7 @@ public class MessageCountRotationStrategyTest {
         when(indices.numberOfMessages("name")).thenReturn(10L);
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
+        when(indexSetConfig.rotationStrategyConfig()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
         final MessageCountRotationStrategy strategy = createStrategy();
 
@@ -70,7 +70,7 @@ public class MessageCountRotationStrategyTest {
         when(indices.numberOfMessages("name")).thenReturn(1L);
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
+        when(indexSetConfig.rotationStrategyConfig()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
         final MessageCountRotationStrategy strategy = createStrategy();
 
@@ -85,7 +85,7 @@ public class MessageCountRotationStrategyTest {
         doThrow(IndexNotFoundException.class).when(indices).numberOfMessages("name");
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
+        when(indexSetConfig.rotationStrategyConfig()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
         final MessageCountRotationStrategy strategy = createStrategy();
 
@@ -94,7 +94,7 @@ public class MessageCountRotationStrategyTest {
         reset(indexSet);
     }
 
-    @NotNull
+    @Nonnull
     private MessageCountRotationStrategy createStrategy() {
         return new MessageCountRotationStrategy(indices, new IndexRotator(indices, auditEventSender, nodeId));
     }

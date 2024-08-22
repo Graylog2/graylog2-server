@@ -20,6 +20,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
+import org.graylog2.indexer.indexset.CustomFieldMapping;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -38,9 +40,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -159,7 +164,7 @@ public class IndexSetValidatorTest {
 
         // rotation strategy is not time-based
         final IndexSetConfig modifiedConfig = testIndexSetConfig().toBuilder()
-                .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
                 .build();
         assertThat(validator.validate(modifiedConfig)).isNotPresent();
@@ -177,7 +182,7 @@ public class IndexSetValidatorTest {
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
         when(newConfig.indexPrefix()).thenReturn(prefix);
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
-        when(newConfig.retentionStrategy()).thenReturn(retentionStrategyConfig);
+        when(newConfig.retentionStrategyConfig()).thenReturn(retentionStrategyConfig);
 
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
@@ -191,13 +196,13 @@ public class IndexSetValidatorTest {
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
 
 
-        assertThat(validator.validate(testIndexSetConfig().toBuilder().retentionStrategy(null).build())).hasValueSatisfying(v ->
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().retentionStrategyConfig(null).build())).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("retention_strategy cannot be null")
         );
         assertThat(validator.validate(testIndexSetConfig().toBuilder().retentionStrategyClass(null).build())).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("retention_strategy_class cannot be null")
         );
-        assertThat(validator.validate(testIndexSetConfig().toBuilder().rotationStrategy(null).build())).hasValueSatisfying(v ->
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().rotationStrategyConfig(null).build())).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("rotation_strategy cannot be null")
         );
         assertThat(validator.validate(testIndexSetConfig().toBuilder().rotationStrategyClass(null).build())).hasValueSatisfying(v ->
@@ -213,7 +218,7 @@ public class IndexSetValidatorTest {
 
         this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
 
-        IndexSetConfig config = testIndexSetConfig().toBuilder().dataTiering(mock(DataTieringConfig.class)).build();
+        IndexSetConfig config = testIndexSetConfig().toBuilder().dataTieringConfig(mock(DataTieringConfig.class)).build();
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
                 assertThat(v.message()).isEqualTo("data tiering feature is disabled!"));
 
@@ -231,6 +236,68 @@ public class IndexSetValidatorTest {
                 assertThat(v.message()).contains("contains reserved keyword 'warm_'!"));
     }
 
+    @Test
+    public void testValidationOfProfilesInIndexSetConfig() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
+        IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldTypeProfile("smth").build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Profiles cannot be set for events and failures index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType("failures").fieldTypeProfile("smth").build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Profiles cannot be set for events and failures index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldTypeProfile("").build();
+        assertThat(validator.validate(config)).isEmpty();
+        config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldTypeProfile(null).build();
+        assertThat(validator.validate(config)).isEmpty();
+        config = testIndexSetConfig().toBuilder().indexTemplateType("failures").fieldTypeProfile("").build();
+        assertThat(validator.validate(config)).isEmpty();
+        config = testIndexSetConfig().toBuilder().indexTemplateType("failures").fieldTypeProfile(null).build();
+        assertThat(validator.validate(config)).isEmpty();
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE).fieldTypeProfile("smth").build();
+        assertThat(validator.validate(config)).isEmpty();
+    }
+
+    @Test
+    public void testValidationOfCustomMappingsInIndexSetConfig() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
+        IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE)
+                .customFieldMappings(new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))))
+                .build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Custom field mappings cannot be set for events and failures index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType("failures")
+                .customFieldMappings(new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))))
+                .build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Custom field mappings cannot be set for events and failures index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE)
+                .customFieldMappings(new CustomFieldMappings())
+                .build();
+        assertThat(validator.validate(config)).isEmpty();
+        config = testIndexSetConfig().toBuilder().indexTemplateType("failures")
+                .customFieldMappings(new CustomFieldMappings())
+                .build();
+        assertThat(validator.validate(config)).isEmpty();
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE)
+                .customFieldMappings(new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))))
+                .build();
+        assertThat(validator.validate(config)).isEmpty();
+    }
+
     private IndexSetConfig testIndexSetConfig() {
         return IndexSetConfig.builder()
                 .isWritable(true)
@@ -238,9 +305,9 @@ public class IndexSetValidatorTest {
                 .description("A test index-set.")
                 .indexPrefix("graylog1")
                 .indexWildcard("graylog1_*")
-                .rotationStrategy(TimeBasedRotationStrategyConfig.builder().maxRotationPeriod(Period.days(1)).build())
+                .rotationStrategyConfig(TimeBasedRotationStrategyConfig.builder().maxRotationPeriod(Period.days(1)).build())
                 .rotationStrategyClass(TimeBasedRotationStrategyConfig.class.getCanonicalName())
-                .retentionStrategy(NoopRetentionStrategyConfig.create(10))
+                .retentionStrategyConfig(NoopRetentionStrategyConfig.create(10))
                 .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
                 .shards(4)
                 .replicas(0)

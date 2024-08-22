@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.ImmutableList.of;
@@ -50,16 +51,18 @@ public class CsvMapConversion extends AbstractFunction<Map> {
     private final ParameterDescriptor<String, Character> escapeCharParam;
     private final ParameterDescriptor<Boolean, Boolean> strictQuotesParam;
     private final ParameterDescriptor<Boolean, Boolean> trimParam;
+    private final ParameterDescriptor<Boolean, Boolean> ignoreExtraFieldNamesParam;
 
 
     public CsvMapConversion() {
         this.valueParam = string(VALUE).ruleBuilderVariable().description("Map-like value to convert").build();
-        this.fieldsParam = string("fieldNames").description("Comma-separated list of field names").build();
-        this.separatorParam = string("separator", Character.class).optional().transform(this::getFirstChar).description("Character to split lines by, will be shortened to first character").build();
-        this.quoteCharParam = string("quoteChar", Character.class).optional().transform(this::getFirstChar).description("Character used to quote fields").build();
-        this.escapeCharParam = string("escapeChar", Character.class).optional().transform(this::getFirstChar).description("Character used to escape the separator and quote characters").build();
-        this.strictQuotesParam = bool("strictQuotes").optional().description("Ignore content outside of quotes").build();
-        this.trimParam = bool("trimLeadingWhitespace").optional().description("Trim leading whitespace").build();
+        this.fieldsParam = string("fieldNames").description("List of field names separated by the <separator> character").build();
+        this.separatorParam = string("separator", Character.class).optional().transform(this::getFirstChar).description("Character to split lines by, will be shortened to first character (default is <,>)").defaultValue(Optional.of(String.valueOf(CSVParser.DEFAULT_SEPARATOR))).build();
+        this.quoteCharParam = string("quoteChar", Character.class).optional().transform(this::getFirstChar).description("Character used to quote fields (default is <\">)").defaultValue(Optional.of(String.valueOf(CSVParser.DEFAULT_QUOTE_CHARACTER))).build();
+        this.escapeCharParam = string("escapeChar", Character.class).optional().transform(this::getFirstChar).description("Character used to escape the separator and quote characters (default is <\\>)").defaultValue(Optional.of(String.valueOf(CSVParser.DEFAULT_ESCAPE_CHARACTER))).build();
+        this.strictQuotesParam = bool("strictQuotes").optional().description("Ignore content outside of quotes").defaultValue(Optional.of(false)).build();
+        this.trimParam = bool("trimLeadingWhitespace").optional().description("Trim leading whitespace").defaultValue(Optional.of(false)).build();
+        this.ignoreExtraFieldNamesParam = bool("ignoreExtraFieldNames").optional().description("Ignore extra fieldName values, which do not have a corresponding value.").defaultValue(Optional.of(false)).build();
     }
 
     private Character getFirstChar(String s) {
@@ -77,6 +80,7 @@ public class CsvMapConversion extends AbstractFunction<Map> {
         final Character escapeChar = escapeCharParam.optional(args, context).orElse(CSVParser.DEFAULT_ESCAPE_CHARACTER);
         final boolean strictQuotes = strictQuotesParam.optional(args, context).orElse(false);
         final boolean trimLeadingWhiteSpace = trimParam.optional(args, context).orElse(true);
+        final boolean ignoreExtraFieldNames = ignoreExtraFieldNamesParam.optional(args, context).orElse(false);
 
         final CSVParser parser = new CSVParser(separator,
                 quoteChar,
@@ -94,7 +98,14 @@ public class CsvMapConversion extends AbstractFunction<Map> {
             final Map<String, String> map = Maps.newHashMap();
             try {
                 final String[] strings = parser.parseLine(value);
-                if (strings.length != fieldNames.length) {
+
+                if (ignoreExtraFieldNames) {
+                    if (strings.length > fieldNames.length) {
+                        log.error("More columns of CSV data ({}) were specified than field names ({}). Discarding input.",
+                                strings.length, fieldNames.length);
+                        return Collections.emptyMap();
+                    }
+                } else if (strings.length != fieldNames.length) {
                     log.error("Different number of columns in CSV data ({}) and configured field names ({}). Discarding input.",
                             strings.length, fieldNames.length);
                     return Collections.emptyMap();
@@ -109,7 +120,7 @@ public class CsvMapConversion extends AbstractFunction<Map> {
             return map;
 
         } catch (IOException e) {
-            log.error("Error parsing csv", e.getMessage());
+            log.error("Error parsing csv: {}", e.getMessage());
             return Collections.emptyMap();
         }
 
@@ -127,7 +138,8 @@ public class CsvMapConversion extends AbstractFunction<Map> {
                         quoteCharParam,
                         escapeCharParam,
                         strictQuotesParam,
-                        trimParam
+                        trimParam,
+                        ignoreExtraFieldNamesParam
                 ))
                 .description("Converts a single line of a CSV string into a map usable by set_fields()")
                 .ruleBuilderEnabled()

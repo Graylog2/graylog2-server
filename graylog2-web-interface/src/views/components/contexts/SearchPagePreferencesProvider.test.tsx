@@ -29,7 +29,7 @@ import { PreferencesActions } from 'stores/users/PreferencesStore';
 import type User from 'logic/users/User';
 import useCurrentUser from 'hooks/useCurrentUser';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { createSearch } from 'fixtures/searches';
 import View from 'views/logic/views/View';
 
@@ -53,9 +53,7 @@ jest.mock('logic/local-storage/Store', () => ({
 }));
 
 describe('SearchPagePreferencesProvider', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);

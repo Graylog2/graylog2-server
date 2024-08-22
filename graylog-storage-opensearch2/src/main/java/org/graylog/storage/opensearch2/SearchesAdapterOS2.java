@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch2;
 
 import com.google.common.collect.Streams;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
@@ -29,14 +30,13 @@ import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Set;
@@ -52,14 +52,17 @@ public class SearchesAdapterOS2 implements SearchesAdapter {
     private final OpenSearchClient client;
     private final Scroll scroll;
     private final SearchRequestFactory searchRequestFactory;
+    private final ResultMessageFactory resultMessageFactory;
 
     @Inject
     public SearchesAdapterOS2(OpenSearchClient client,
                               Scroll scroll,
-                              SearchRequestFactory searchRequestFactory) {
+                              SearchRequestFactory searchRequestFactory,
+                              ResultMessageFactory resultMessageFactory) {
         this.client = client;
         this.scroll = scroll;
         this.searchRequestFactory = searchRequestFactory;
+        this.resultMessageFactory = resultMessageFactory;
     }
 
     @Override
@@ -132,7 +135,7 @@ public class SearchesAdapterOS2 implements SearchesAdapter {
 
     private List<ResultMessage> extractResultMessages(SearchResponse searchResult) {
         return Streams.stream(searchResult.getHits())
-                .map(hit -> ResultMessage.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
+                .map(hit -> resultMessageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
                 .collect(Collectors.toList());
     }
 

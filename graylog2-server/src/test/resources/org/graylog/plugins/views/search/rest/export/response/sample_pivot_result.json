@@ -1,0 +1,419 @@
+{
+  "name": "chart",
+  "id": "1031c586-2eb1-4459-8c2c-2a91dec5dd72",
+  "rows": [
+    {
+      "key": [
+        "index"
+      ],
+      "values": [
+        {
+          "key": [
+            "count()"
+          ],
+          "value": 1507337,
+          "rollup": true,
+          "source": "row-leaf"
+        },
+        {
+          "key": [
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": true,
+          "source": "row-leaf"
+        },
+        {
+          "key": [
+            "GET",
+            "count()"
+          ],
+          "value": 1296526,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "GET",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "DELETE",
+            "count()"
+          ],
+          "value": 75322,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "DELETE",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "POST",
+            "count()"
+          ],
+          "value": 75163,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "POST",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "PUT",
+            "count()"
+          ],
+          "value": 60326,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "PUT",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        }
+      ],
+      "source": "leaf"
+    },
+    {
+      "key": [
+        "show"
+      ],
+      "values": [
+        {
+          "key": [
+            "count()"
+          ],
+          "value": 444038,
+          "rollup": true,
+          "source": "row-leaf"
+        },
+        {
+          "key": [
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": true,
+          "source": "row-leaf"
+        },
+        {
+          "key": [
+            "GET",
+            "count()"
+          ],
+          "value": 381846,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "GET",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "POST",
+            "count()"
+          ],
+          "value": 22271,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "POST",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "DELETE",
+            "count()"
+          ],
+          "value": 22229,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "DELETE",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "PUT",
+            "count()"
+          ],
+          "value": 17692,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "PUT",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        }
+      ],
+      "source": "leaf"
+    },
+    {
+      "key": [
+        "login"
+      ],
+      "values": [
+        {
+          "key": [
+            "count()"
+          ],
+          "value": 377715,
+          "rollup": true,
+          "source": "row-leaf"
+        },
+        {
+          "key": [
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": true,
+          "source": "row-leaf"
+        },
+        {
+          "key": [
+            "GET",
+            "count()"
+          ],
+          "value": 325040,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "GET",
+            "max(http_response_code)"
+          ],
+          "value": 200,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "DELETE",
+            "count()"
+          ],
+          "value": 18773,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "DELETE",
+            "max(http_response_code)"
+          ],
+          "value": 204,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "POST",
+            "count()"
+          ],
+          "value": 18761,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "POST",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "PUT",
+            "count()"
+          ],
+          "value": 15141,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "PUT",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        }
+      ],
+      "source": "leaf"
+    },
+    {
+      "key": [
+        "edit"
+      ],
+      "values": [
+        {
+          "key": [
+            "count()"
+          ],
+          "value": 68699,
+          "rollup": true,
+          "source": "row-leaf"
+        },
+        {
+          "key": [
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": true,
+          "source": "row-leaf"
+        },
+        {
+          "key": [
+            "GET",
+            "count()"
+          ],
+          "value": 58912,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "GET",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "DELETE",
+            "count()"
+          ],
+          "value": 3540,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "DELETE",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "POST",
+            "count()"
+          ],
+          "value": 3488,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "POST",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "PUT",
+            "count()"
+          ],
+          "value": 2759,
+          "rollup": false,
+          "source": "col-leaf"
+        },
+        {
+          "key": [
+            "PUT",
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": false,
+          "source": "col-leaf"
+        }
+      ],
+      "source": "leaf"
+    },
+    {
+      "key": [],
+      "values": [
+        {
+          "key": [
+            "count()"
+          ],
+          "value": 2397789,
+          "rollup": true,
+          "source": "row-inner"
+        },
+        {
+          "key": [
+            "max(http_response_code)"
+          ],
+          "value": 504,
+          "rollup": true,
+          "source": "row-inner"
+        }
+      ],
+      "source": "non-leaf"
+    }
+  ],
+  "total": 2397789,
+  "type": "pivot",
+  "effective_timerange": {
+    "from": "2024-04-11T11:06:00.186Z",
+    "to": "2024-04-16T11:06:00.186Z",
+    "type": "absolute"
+  }
+}

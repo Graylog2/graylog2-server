@@ -30,7 +30,7 @@ import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { createSearch } from 'fixtures/searches';
 import { setTimerange } from 'views/logic/slices/viewSlice';
 
@@ -77,9 +77,7 @@ describe('XYPlot', () => {
     currentQuery: defaultCurrentQuery,
   };
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useCurrentQuery).mockReturnValue(defaultCurrentQuery);

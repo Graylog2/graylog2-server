@@ -23,7 +23,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -56,7 +56,7 @@ public class SizeBasedRotationStrategyTest {
         when(indices.getStoreSizeInBytes("name")).thenReturn(Optional.of(1000L));
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
+        when(indexSetConfig.rotationStrategyConfig()).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
 
         final SizeBasedRotationStrategy strategy = createStrategy();
 
@@ -71,7 +71,7 @@ public class SizeBasedRotationStrategyTest {
         when(indices.getStoreSizeInBytes("name")).thenReturn(Optional.of(1000L));
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100000L));
+        when(indexSetConfig.rotationStrategyConfig()).thenReturn(SizeBasedRotationStrategyConfig.create(100000L));
 
         final SizeBasedRotationStrategy strategy = createStrategy();
 
@@ -86,7 +86,7 @@ public class SizeBasedRotationStrategyTest {
         when(indices.getStoreSizeInBytes("name")).thenReturn(Optional.empty());
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
+        when(indexSetConfig.rotationStrategyConfig()).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
 
         final SizeBasedRotationStrategy strategy = createStrategy();
 
@@ -95,7 +95,7 @@ public class SizeBasedRotationStrategyTest {
         reset(indexSet);
     }
 
-    @NotNull
+    @Nonnull
     private SizeBasedRotationStrategy createStrategy() {
         return new SizeBasedRotationStrategy(indices, new IndexRotator(indices, auditEventSender, nodeId));
     }

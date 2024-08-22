@@ -16,16 +16,24 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.search.validation.ValidationMessage;
 
 import java.util.List;
 import java.util.Set;
 
+import static org.graylog.plugins.views.search.ExplainResults.IndexRangeResult;
+
 @AutoValue
 public abstract class ValidationResponseDTO {
+
+    public static ValidationResponseDTO create(final ValidationStatusDTO status,
+                                               final List<ValidationMessageDTO> explanations,
+                                               final Set<IndexRangeResult> searchedIndexRanges) {
+        return new AutoValue_ValidationResponseDTO(status, explanations, Context.create(searchedIndexRanges));
+    }
 
     @JsonProperty
     public abstract ValidationStatusDTO status();
@@ -34,7 +42,20 @@ public abstract class ValidationResponseDTO {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public abstract List<ValidationMessageDTO> explanations();
 
-    public static ValidationResponseDTO create(final ValidationStatusDTO status, final List<ValidationMessageDTO> explanations) {
-        return new AutoValue_ValidationResponseDTO(status, explanations);
+    @JsonProperty
+    public abstract Context context();
+
+    @AutoValue
+    public static abstract class Context {
+
+        public static final String SEARCHED_INDEX_RANGES = "searched_index_ranges";
+
+        @JsonCreator
+        public static Context create(@JsonProperty(SEARCHED_INDEX_RANGES) Set<IndexRangeResult> searchedIndexRanges) {
+            return new AutoValue_ValidationResponseDTO_Context(searchedIndexRanges);
+        }
+
+        @JsonProperty(SEARCHED_INDEX_RANGES)
+        public abstract Set<IndexRangeResult> searchedIndexRanges();
     }
 }

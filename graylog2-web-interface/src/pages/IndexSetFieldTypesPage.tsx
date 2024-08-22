@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import { useStore } from 'stores/connect';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
@@ -28,9 +28,11 @@ import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexS
 import ChangeFieldTypeButton from 'components/indices/IndexSetFieldTypes/ChangeFieldTypeButton';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 import { IndicesPageNavigation } from 'components/indices';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { indexSet } = useStore(IndexSetsStore);
   const hasMappingPermission = useHasTypeMappingPermission();
@@ -39,9 +41,11 @@ const IndexSetFieldTypesPage = () => {
     if (!hasMappingPermission) {
       navigate(Routes.NOTFOUND);
     } else {
-      IndexSetsActions.get(indexSetId);
+      IndexSetsActions.get(indexSetId).then(() => setIsLoading(false));
     }
   }, [hasMappingPermission, indexSetId, navigate]);
+
+  const indexFieldTypeChangeAllowed = useMemo(() => isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
 
   return (
     <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
@@ -51,7 +55,7 @@ const IndexSetFieldTypesPage = () => {
                     title: 'Index model documentation',
                     path: DocsHelper.PAGES.INDEX_MODEL,
                   }}
-                  actions={<ChangeFieldTypeButton indexSetId={indexSetId} />}>
+                  actions={indexFieldTypeChangeAllowed && <ChangeFieldTypeButton indexSetId={indexSetId} />}>
         <span>
           The data represents field types from 2 last indices and the fields with custom field type. You can modify the current field types configuration for this index set.
         </span>
@@ -59,7 +63,7 @@ const IndexSetFieldTypesPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <IndexSetFieldTypesList />
+          {isLoading ? <Spinner /> : <IndexSetFieldTypesList />}
         </Col>
       </Row>
     </DocumentTitle>

@@ -37,7 +37,8 @@ const EventDefinitionLink = ({ event, eventDefinitionContext }: Props) => {
   return isPermitted(currentUser.permissions,
     `eventdefinitions:edit:${eventDefinitionContext.id}`)
     ? <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>{eventDefinitionContext.title}</Link>
-    : <>eventDefinitionContext.title</>;
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    : <>{eventDefinitionContext.title}</>;
 };
 
 export default EventDefinitionLink;

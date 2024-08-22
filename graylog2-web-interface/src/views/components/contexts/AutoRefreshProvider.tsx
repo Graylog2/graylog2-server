@@ -22,27 +22,44 @@ import type { RefreshConfig } from 'views/components/contexts/AutoRefreshContext
 import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
 import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
+import useAppSelector from 'stores/useAppSelector';
+import { selectJobIds } from 'views/logic/slices/searchExecutionSelectors';
 
 const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
   const dispatch = useAppDispatch();
-  const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
-
+  const jobIds = useAppSelector(selectJobIds);
   const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(null);
   const startAutoRefresh = useCallback((interval: number) => setRefreshConfig({ enabled: true, interval }), []);
   const stopAutoRefresh = useCallback(() => setRefreshConfig((cur) => ({ ...cur, enabled: false })), []);
+  const refreshSearch = useCallback(() => {
+    if (!jobIds) {
+      dispatch(execute());
+    }
+  }, [jobIds, dispatch]);
+
+  useEffect(() => {
+    let refreshInterval = null;
+
+    if (refreshConfig?.enabled && !jobIds) {
+      refreshInterval = setInterval(() => {
+        refreshSearch();
+      }, refreshConfig.interval);
+    }
+
+    return () => {
+      clearInterval(refreshInterval);
+    };
+  }, [refreshSearch, refreshConfig?.enabled, refreshConfig?.interval, jobIds]);
+
   const contextValue = useMemo(() => ({
     refreshConfig,
     startAutoRefresh,
     stopAutoRefresh,
-  }), [refreshConfig, startAutoRefresh, stopAutoRefresh]);
-
-  useEffect(() => {
-    const refreshInterval = refreshConfig?.enabled
-      ? setInterval(() => refreshSearch(), refreshConfig.interval)
-      : null;
-
-    return () => clearInterval(refreshInterval);
-  }, [refreshSearch, refreshConfig?.enabled, refreshConfig?.interval]);
+  }), [
+    refreshConfig,
+    startAutoRefresh,
+    stopAutoRefresh,
+  ]);
 
   return (
     <AutoRefreshContext.Provider value={contextValue}>

@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -146,17 +145,11 @@ public class SearchQueryParser {
     }
 
     public SearchQuery parse(String encodedQueryString) {
-        String queryString = encodedQueryString;
-
-        if (Strings.isNullOrEmpty(queryString) || "*".equals(queryString)) {
-            return new SearchQuery(queryString);
+        if (Strings.isNullOrEmpty(encodedQueryString) || "*".equals(encodedQueryString)) {
+            return new SearchQuery(encodedQueryString);
         }
 
-        try {
-            queryString = URLDecoder.decode(encodedQueryString, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            LOG.warn("Could not find correct character set for decoding: {}", e.getMessage());
-        }
+        final var queryString = URLDecoder.decode(encodedQueryString, StandardCharsets.UTF_8);
 
         final Matcher matcher = querySplitterMatcher(requireNonNull(queryString).trim());
         final ImmutableMultimap.Builder<String, FieldValue> builder = ImmutableMultimap.builder();

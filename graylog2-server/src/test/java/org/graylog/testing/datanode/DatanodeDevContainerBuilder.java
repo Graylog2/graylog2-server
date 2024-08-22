@@ -21,6 +21,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
+import java.util.Map;
 
 public interface DatanodeDevContainerBuilder {
     DatanodeDevContainerBuilder mongoDbUri(final String mongoDbUri);
@@ -39,6 +40,8 @@ public interface DatanodeDevContainerBuilder {
     DatanodeDevContainerBuilder customizer(DatanodeDockerHooks hooks);
 
     DatanodeDevContainerBuilder network(Network network);
+
+    DatanodeDevContainerBuilder env(Map<String, String> env);
 
     GenericContainer<?> build();
 }

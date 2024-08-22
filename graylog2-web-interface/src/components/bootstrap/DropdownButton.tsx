@@ -24,6 +24,7 @@ import Button from './Button';
 
 const StyledIcon = styled(Icon)`
   width: 10px;
+  height: 10px;
   overflow: hidden;
   display: flex;
   align-items: center;

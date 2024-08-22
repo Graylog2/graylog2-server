@@ -136,22 +136,29 @@ export const renewDatanodeCertificate = (nodeId: string) => fetch('POST', qualif
     UserNotification.error(`Certificate renewal failed with error: ${error}`);
   });
 
-const fetchDataNodes = async (params?: Partial<SearchParams>) => {
-  const url = PaginationURL('/system/cluster/datanodes', params?.page, params?.pageSize, params?.query, { sort: params?.sort?.attributeId, order: params?.sort?.direction });
+export const fetchDataNodes = async (params: SearchParams) => {
+  const url = PaginationURL('/system/cluster/datanodes', params.page, params.pageSize, params.query, { sort: params.sort?.attributeId, order: params.sort?.direction });
 
-  return fetch('GET', qualifyUrl(url));
+  return fetch('GET', qualifyUrl(url)).then(({ attributes, pagination, elements }) => ({
+    attributes,
+    list: elements,
+    pagination,
+  }));
 };
 
+export const keyFn = (searchParams: SearchParams) => ['datanodes', searchParams];
+
 export type DataNodeResponse = {
-  elements: DataNodes,
+  list: DataNodes,
   pagination: PaginatedResponseType,
   attributes: Array<Attribute>
 }
 
-const useDataNodes = (params: Partial<SearchParams> = {
-  query: '',
+const useDataNodes = (searchParams: SearchParams = {
+  query: '-datanode_status:UNAVAILABLE',
   page: 1,
   pageSize: 0,
+  sort: undefined,
 }, { enabled }: Options = { enabled: true }, refetchInterval : number | false = 5000) : {
   data: DataNodeResponse,
   refetch: () => void,
@@ -159,8 +166,8 @@ const useDataNodes = (params: Partial<SearchParams> = {
   error: FetchError,
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery<DataNodeResponse, FetchError>(
-    ['datanodes'],
-    () => fetchDataNodes(params),
+    keyFn(searchParams),
+    () => fetchDataNodes(searchParams),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading Data Nodes failed with status: ${errorThrown}`,
@@ -175,7 +182,7 @@ const useDataNodes = (params: Partial<SearchParams> = {
   return ({
     data: data || {
       attributes: [],
-      elements: [],
+      list: [],
       pagination: {
         query: '',
         page: 1,

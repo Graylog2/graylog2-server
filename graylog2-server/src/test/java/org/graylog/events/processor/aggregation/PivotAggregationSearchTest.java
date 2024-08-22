@@ -98,7 +98,7 @@ public class PivotAggregationSearchTest {
         final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
                 config,
                 parameters,
-                "test",
+                new AggregationSearch.User("test", DateTimeZone.UTC),
                 eventDefinition,
                 Collections.emptyList(),
                 searchJobService,
@@ -199,7 +199,7 @@ public class PivotAggregationSearchTest {
         final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
                 config,
                 parameters,
-                "test",
+                new AggregationSearch.User("test", DateTimeZone.UTC),
                 eventDefinition,
                 Collections.emptyList(),
                 searchJobService,
@@ -273,7 +273,7 @@ public class PivotAggregationSearchTest {
         final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
                 config,
                 parameters,
-                "test",
+                new AggregationSearch.User("test", DateTimeZone.UTC),
                 eventDefinition,
                 List.of(Pivot.builder()
                         .id("risk-asset-1")
@@ -344,7 +344,7 @@ public class PivotAggregationSearchTest {
         final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
                 config,
                 parameters,
-                "test",
+                new AggregationSearch.User("test", DateTimeZone.UTC),
                 eventDefinition,
                 Collections.emptyList(),
                 searchJobService,
@@ -482,7 +482,7 @@ public class PivotAggregationSearchTest {
         final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
                 config,
                 parameters,
-                "test",
+                new AggregationSearch.User("test", DateTimeZone.UTC),
                 eventDefinition,
                 Collections.emptyList(),
                 searchJobService,
@@ -528,7 +528,7 @@ public class PivotAggregationSearchTest {
         final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
                 config,
                 parameters,
-                "test",
+                new AggregationSearch.User("test", DateTimeZone.UTC),
                 eventDefinition,
                 List.of(Pivot.builder()
                         .id("risk-asset-1")

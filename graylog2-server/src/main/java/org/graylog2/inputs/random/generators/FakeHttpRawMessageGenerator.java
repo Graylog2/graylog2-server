@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
@@ -109,20 +110,20 @@ public class FakeHttpRawMessageGenerator {
         return generatorState;
     }
 
-    public static Message generateMessage(GeneratorState state) {
+    public static Message generateMessage(MessageFactory messageFactory, GeneratorState state) {
         Message msg = null;
         switch (state.method) {
             case GET:
-                msg = simulateGET(state, RANDOM);
+                msg = simulateGET(messageFactory, state, RANDOM);
                 break;
             case POST:
-                msg = simulatePOST(state, RANDOM);
+                msg = simulatePOST(messageFactory, state, RANDOM);
                 break;
             case DELETE:
-                msg = simulateDELETE(state, RANDOM);
+                msg = simulateDELETE(messageFactory, state, RANDOM);
                 break;
             case PUT:
-                msg = simulatePUT(state, RANDOM);
+                msg = simulatePUT(messageFactory, state, RANDOM);
                 break;
         }
         return msg;
@@ -164,8 +165,9 @@ public class FakeHttpRawMessageGenerator {
                 .build();
     }
 
-    private static Message createMessage(GeneratorState state, int httpCode, Resource resource, int tookMs) {
-        final Message msg = new Message(shortMessage(state.timeStamp, state.method, state.resource, httpCode, tookMs), state.source, state.timeStamp);
+    private static Message createMessage(MessageFactory messageFactory, GeneratorState state, int httpCode,
+                                         Resource resource, int tookMs) {
+        final Message msg = messageFactory.createMessage(shortMessage(state.timeStamp, state.method, state.resource, httpCode, tookMs), state.source, state.timeStamp);
         msg.addField("sequence_nr", state.msgSequenceNr);
         msg.addFields(ingestTimeFields(state.timeStamp));
         msg.addFields(resourceFields(resource));
@@ -178,7 +180,7 @@ public class FakeHttpRawMessageGenerator {
         return msg;
     }
 
-    public static Message simulateGET(GeneratorState state, Random rand) {
+    public static Message simulateGET(MessageFactory messageFactory, GeneratorState state, Random rand) {
         int msBase = 50;
         int deviation = 30;
         int code = state.isSuccessful ? 200 : 500;
@@ -195,11 +197,11 @@ public class FakeHttpRawMessageGenerator {
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
-        return createMessage(state, code, resource, tookMs);
+        return createMessage(messageFactory, state, code, resource, tookMs);
     }
 
 
-    private static Message simulatePOST(GeneratorState state, Random rand) {
+    private static Message simulatePOST(MessageFactory messageFactory, GeneratorState state, Random rand) {
         int msBase = 150;
         int deviation = 20;
         int code = state.isSuccessful ? 201 : 500;
@@ -216,10 +218,10 @@ public class FakeHttpRawMessageGenerator {
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
-        return createMessage(state, code, resource, tookMs);
+        return createMessage(messageFactory, state, code, resource, tookMs);
     }
 
-    private static Message simulatePUT(GeneratorState state, Random rand) {
+    private static Message simulatePUT(MessageFactory messageFactory, GeneratorState state, Random rand) {
         int msBase = 100;
         int deviation = 30;
         int code = state.isSuccessful ? 200 : 500;
@@ -236,10 +238,10 @@ public class FakeHttpRawMessageGenerator {
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
-        return createMessage(state, code, resource, tookMs);
+        return createMessage(messageFactory, state, code, resource, tookMs);
     }
 
-    private static Message simulateDELETE(GeneratorState state, Random rand) {
+    private static Message simulateDELETE(MessageFactory messageFactory, GeneratorState state, Random rand) {
         int msBase = 75;
         int deviation = 40;
         int code = state.isSuccessful ? 204 : 500;
@@ -256,7 +258,7 @@ public class FakeHttpRawMessageGenerator {
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
-        return createMessage(state, code, resource, tookMs);
+        return createMessage(messageFactory, state, code, resource, tookMs);
     }
 
     private static abstract class Weighted {

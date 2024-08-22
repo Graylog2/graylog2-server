@@ -53,10 +53,12 @@ import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type SearchResult from 'views/logic/SearchResult';
 import type { WidgetMapping } from 'views/logic/views/types';
-import type { Event } from 'components/events/events/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import type { JobIds } from 'views/stores/SearchJobs';
+import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
+import type { ExportPayload } from 'util/MessagesExportUtils';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -181,12 +183,14 @@ interface SearchType<T, R> {
   defaults: {};
 }
 
-interface ExportFormat {
+export interface ExportFormat {
+  order?: number;
   type: string;
   displayName: () => string;
   disabled?: () => boolean;
   mimeType: string;
   fileExtension: string;
+  formatSpecificFileDownloader?: (format: string, widget: Widget, view: View, executionState: SearchExecutionState, currentUser: User, currentQuery: Query, exportPayload: ExportPayload,) => Promise<void>
 }
 
 export interface SystemConfigurationComponentProps {
@@ -261,8 +265,18 @@ type DashboardActionComponentProps = {
   modalRef: () => unknown,
 }
 
+type EventWidgetActionComponentProps = {
+  eventId: string,
+  modalRef: () => unknown,
+}
+
 type DashboardActionModalProps = {
   dashboard: View,
+  ref: React.Ref<unknown>,
+}
+
+type EventActionModalProps = {
+  eventId: string,
   ref: React.Ref<unknown>,
 }
 
@@ -290,12 +304,19 @@ type DashboardAction = {
   useCondition?: () => boolean,
 }
 
+type EventWidgetAction = {
+  key: string,
+  component: React.ComponentType<EventWidgetActionComponentProps>,
+  modal?: React.ComponentType<EventActionModalProps>,
+  useCondition?: () => boolean,
+}
+
 type AssetInformation = {
   component: React.ComponentType<AssetInformationComponentProps>,
 }
 
 type EventActionComponentProps = {
-  event: Event,
+  eventId: string,
 }
 
 type MessageActionComponentProps = {
@@ -378,11 +399,13 @@ export type SearchExecutionResult = {
   widgetMapping: WidgetMapping,
 };
 
+export type JobIdsState = JobIds | null;
 export interface SearchExecution {
   executionState: SearchExecutionState;
   result: SearchExecutionResult;
   isLoading: boolean;
   widgetsToSearch: Array<string>,
+  jobIds?: JobIds | null,
 }
 
 export interface SearchMetadataState {
@@ -446,6 +469,14 @@ declare module 'graylog-web-plugin/plugin' {
       key: string,
       useCondition: () => boolean,
     }>;
+    'views.components.widgets.events.filterComponents'?: FilterComponents;
+    'views.components.widgets.events.attributes'?: Attributes;
+    'views.components.widgets.events.detailsComponent'?: Array<{
+      component: React.ComponentType<{ eventId: string }>,
+      useCondition: () => boolean,
+      key: string,
+    }>;
+    'views.components.widgets.events.actions'?: Array<EventWidgetAction>;
     'views.components.searchActions'?: Array<SearchAction>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
@@ -463,6 +494,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
+    'views.widgets.exportAction'?: Array<{ action: WidgetActionType, useCondition: () => boolean }>;
     'views.reducers'?: Array<ViewsReducer>;
     'views.requires.provided'?: Array<string>;
     'views.queryInput.commands'?: Array<CustomCommand>;

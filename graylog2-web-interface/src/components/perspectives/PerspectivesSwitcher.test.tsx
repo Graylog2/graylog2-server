@@ -29,7 +29,6 @@ import PerspectivesSwitcher from './PerspectivesSwitcher';
 
 jest.mock('components/perspectives/hooks/usePerspectives', () => jest.fn());
 jest.mock('components/perspectives/hooks/useActivePerspective', () => jest.fn());
-jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_perspectives');
 jest.mock('routing/useHistory');
 
 describe('PerspectivesSwitcher', () => {

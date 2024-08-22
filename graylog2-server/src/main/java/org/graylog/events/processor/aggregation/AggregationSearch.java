@@ -19,14 +19,16 @@ package org.graylog.events.processor.aggregation;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.SearchType;
+import org.joda.time.DateTimeZone;
 
 import java.util.List;
 
 public interface AggregationSearch {
+    record User(String name, DateTimeZone timezone) {}
     interface Factory {
         AggregationSearch create(AggregationEventProcessorConfig config,
                                  AggregationEventProcessorParameters parameters,
-                                 String searchOwner,
+                                 User searchOwner,
                                  EventDefinition eventDefinition,
                                  List<SearchType> additionalSearchTypes);
     }

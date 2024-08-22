@@ -20,6 +20,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.fields.DropdownField;
@@ -67,13 +69,14 @@ public class SyslogCodecTest {
     private Timer mockedTimer;
 
     private SyslogCodec codec;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
         when(metricRegistry.timer(any(String.class))).thenReturn(mockedTimer);
         when(mockedTimer.time()).thenReturn(mock(Timer.Context.class));
 
-        codec = new SyslogCodec(configuration, metricRegistry);
+        codec = new SyslogCodec(configuration, metricRegistry, messageFactory);
     }
 
     @Test
@@ -116,7 +119,7 @@ public class SyslogCodecTest {
     public void testDecodeStructuredIssue845WithExpandStructuredData() throws Exception {
         when(configuration.getBoolean(SyslogCodec.CK_EXPAND_STRUCTURED_DATA)).thenReturn(true);
 
-        final SyslogCodec codec = new SyslogCodec(configuration, metricRegistry);
+        final SyslogCodec codec = new SyslogCodec(configuration, metricRegistry, messageFactory);
         final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845));
 
         assertNotNull(message);
@@ -442,7 +445,7 @@ public class SyslogCodecTest {
     public void testDefaultTimezoneConfig() {
         when(configuration.getString("timezone")).thenReturn("MST");
 
-        SyslogCodec codec = new SyslogCodec(configuration, metricRegistry);
+        SyslogCodec codec = new SyslogCodec(configuration, metricRegistry, messageFactory);
         final Message msgWithoutTimezone = codec.decode(buildRawMessage(UNSTRUCTURED));
         final Message msgWithUTCTimezone = codec.decode(buildRawMessage(STRUCTURED));
         final Message msgWithTimezoneOffset = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845_EMPTY));
@@ -456,7 +459,7 @@ public class SyslogCodecTest {
     public void testDefaultTimezoneConfigNotConfiguredStillUsesSystemTime() {
         when(configuration.getString("timezone")).thenReturn(DropdownField.NOT_CONFIGURED);
 
-        SyslogCodec codec = new SyslogCodec(configuration, metricRegistry);
+        SyslogCodec codec = new SyslogCodec(configuration, metricRegistry, messageFactory);
         final Message msgWithoutTimezone = codec.decode(buildRawMessage(UNSTRUCTURED));
         final Message msgWithUTCTimezone = codec.decode(buildRawMessage(STRUCTURED));
         final Message msgWithTimezoneOffset = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845_EMPTY));

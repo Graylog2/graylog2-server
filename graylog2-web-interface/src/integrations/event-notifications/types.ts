@@ -18,9 +18,17 @@ export type TeamsNotificationSummaryType = {
     type: string,
     notification: NotificationType,
 }
+export type TeamsNotificationSummaryV2Type = {
+    type: string,
+    notification: NotificationV2Type,
+}
 
 export type NotificationType = {
     config: ConfigType,
+}
+
+export type NotificationV2Type = {
+    config: ConfigV2Type,
 }
 
 export interface ConfigType {
@@ -33,17 +41,30 @@ export interface ConfigType {
     time_zone?: string,
 }
 
+export interface ConfigV2Type {
+  backlog_size?: number,
+  adaptive_card: string,
+  webhook_url?: string,
+  time_zone?: string,
+}
+
 export type ValidationType = {
     failed?: boolean,
     errors?: ErrorType,
 }
 
 export interface ErrorType {
-    webhook_url: string[],
-    color: string[],
-    icon_url: string,
-    backlog_size: number,
-    custom_message: string,
+  webhook_url: string[],
+  color: string[],
+  icon_url: string,
+  backlog_size: number,
+  custom_message: string,
+  adaptive_card: string,
+  url: string,
+  api_key: string,
+  api_secret: string,
+  headers: string[],
+  body_template: string,
 }
 
 export type SlackNotificationSummaryType = {

@@ -27,7 +27,6 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
-import { appPrefixed } from 'util/URLUtils';
 import isActiveRoute from 'components/navigation/util/isActiveRoute';
 import { navigation as securityNavigation } from 'components/security/bindings';
 
@@ -67,7 +66,7 @@ const PluginRoute = ({
   return (
     <NavigationLink key={description}
                     description={BadgeComponent ? <BadgeComponent text={description} /> : description}
-                    path={appPrefixed(path)}
+                    path={path}
                     topLevel={topLevel} />
   );
 };
@@ -156,6 +155,13 @@ const pluginMenuItemExists = (navigationItems: Array<PluginNavigation>, descript
   return !!navigationItems.find((value) => value.description?.toLowerCase() === description.toLowerCase());
 };
 
+const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, description: string) => {
+  if (!navigationItems?.length) return false;
+  const menuItem = navigationItems.find((value) => value.description?.toLowerCase() === description.toLowerCase());
+
+  return menuItem && Object.keys(menuItem).includes('useIsValidLicense') ? menuItem.useIsValidLicense() : true;
+};
+
 const sortItemsByPosition = <T extends { position: typeof LAST_POSITION | undefined }>(navigationItems: Array<T>) => navigationItems.sort((route1, route2) => {
   if (route1.position === LAST_POSITION) {
     return 1;
@@ -177,6 +183,7 @@ const useNavigationItems = () => {
     const navigationItems = mergeDuplicateDropdowns(allNavigationItems);
     const enterpriseMenuIsMissing = !pluginMenuItemExists(navigationItems, ENTERPRISE_ROUTE_DESCRIPTION);
     const securityMenuIsMissing = !pluginMenuItemExists(navigationItems, SECURITY_ROUTE_DESCRIPTION);
+    const securityLicenseInvalid = !pluginLicenseValid(navigationItems, SECURITY_ROUTE_DESCRIPTION);
     const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
 
     if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
@@ -187,8 +194,13 @@ const useNavigationItems = () => {
       });
     }
 
-    if (securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
+    if ((securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) || securityLicenseInvalid) {
       // no security plugin menu, so we will add one
+      if (!securityMenuIsMissing) {
+        // remove the existing security menu item
+        navigationItems.splice(navigationItems.findIndex((item) => item.description === SECURITY_ROUTE_DESCRIPTION), 1);
+      }
+
       navigationItems.push(securityNavigation);
     }
 

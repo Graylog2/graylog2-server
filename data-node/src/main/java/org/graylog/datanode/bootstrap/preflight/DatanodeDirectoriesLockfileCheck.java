@@ -17,13 +17,12 @@
 package org.graylog.datanode.bootstrap.preflight;
 
 import com.google.common.io.CharStreams;
+import jakarta.inject.Inject;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.plugin.system.NodeId;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -61,11 +60,10 @@ public class DatanodeDirectoriesLockfileCheck implements PreflightCheck {
     @Override
     public void runCheck() throws PreflightCheckException {
         checkDatanodeLock(directories.getConfigurationTargetDir());
-        checkDatanodeLock(directories.getDataTargetDir());
         checkDatanodeLock(directories.getLogsTargetDir());
     }
 
-    private void checkDatanodeLock(Path dir) {
+    public void checkDatanodeLock(Path dir) {
         final Path lockfile = dir.resolve(DATANODE_LOCKFILE);
         try (FileChannel channel = FileChannel.open(lockfile, StandardOpenOption.READ, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
             doCheckLockFile(channel, dir);

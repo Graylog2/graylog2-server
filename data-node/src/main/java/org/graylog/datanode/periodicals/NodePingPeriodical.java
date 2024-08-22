@@ -16,22 +16,23 @@
  */
 package org.graylog.datanode.periodicals;
 
+import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.management.OpensearchProcess;
-import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.configuration.DatanodeKeystore;
+import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.plugin.Version;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-
 import java.net.URI;
+import java.util.Date;
 import java.util.function.Supplier;
 
 public class NodePingPeriodical extends Periodical {
@@ -42,13 +43,16 @@ public class NodePingPeriodical extends Periodical {
     private final Supplier<URI> opensearchBaseUri;
     private final Supplier<String> opensearchClusterUri;
     private final Supplier<String> datanodeRestApiUri;
-    private final Supplier<Boolean> isLeader;
     private final Configuration configuration;
-    private final Supplier<ProcessState> processState;
+    private final Supplier<OpensearchState> processState;
+
+    private final Supplier<Date> certValidUntil;
+
+    private final Version version = Version.CURRENT_CLASSPATH;
 
 
     @Inject
-    public NodePingPeriodical(NodeService<DataNodeDto> nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch) {
+    public NodePingPeriodical(NodeService<DataNodeDto> nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch, DatanodeKeystore datanodeKeystore) {
         this(
                 nodeService,
                 nodeId,
@@ -56,8 +60,8 @@ public class NodePingPeriodical extends Periodical {
                 managedOpenSearch::getOpensearchBaseUrl,
                 managedOpenSearch::getOpensearchClusterUrl,
                 managedOpenSearch::getDatanodeRestApiUrl,
-                managedOpenSearch::isLeaderNode,
-                () -> managedOpenSearch.processInfo().state()
+                () -> managedOpenSearch.processInfo().state(),
+                datanodeKeystore::getCertificateExpiration
         );
     }
 
@@ -68,17 +72,17 @@ public class NodePingPeriodical extends Periodical {
             Supplier<URI> opensearchBaseUri,
             Supplier<String> opensearchClusterUri,
             Supplier<String> datanodeRestApiUri,
-            Supplier<Boolean> isLeader,
-            Supplier<ProcessState> processState
+            Supplier<OpensearchState> processState,
+            Supplier<Date> certValidUntil
     ) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;
         this.opensearchBaseUri = opensearchBaseUri;
         this.opensearchClusterUri = opensearchClusterUri;
         this.datanodeRestApiUri = datanodeRestApiUri;
-        this.isLeader = isLeader;
         this.configuration = configuration;
         this.processState = processState;
+        this.certValidUntil = certValidUntil;
     }
 
     @Override
@@ -126,12 +130,13 @@ public class NodePingPeriodical extends Periodical {
     public void doRun() {
         final DataNodeDto dto = DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
-                .setLeader(isLeader.get())
                 .setTransportAddress(opensearchBaseUri.get().toString())
                 .setClusterAddress(opensearchClusterUri.get())
                 .setDataNodeStatus(processState.get().getDataNodeStatus())
                 .setHostname(configuration.getHostname())
                 .setRestApiAddress(datanodeRestApiUri.get())
+                .setCertValidUntil(certValidUntil.get())
+                .setDatanodeVersion(version.getVersion().toString())
                 .build();
 
         nodeService.ping(dto);
@@ -141,11 +146,12 @@ public class NodePingPeriodical extends Periodical {
     private void registerServer() {
         final boolean registrationSucceeded = nodeService.registerServer(DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
-                .setLeader(isLeader.get())
                 .setTransportAddress(opensearchBaseUri.get().toString())
                 .setClusterAddress(opensearchClusterUri.get())
                 .setHostname(configuration.getHostname())
                 .setDataNodeStatus(DataNodeStatus.STARTING)
+                .setCertValidUntil(certValidUntil.get())
+                .setDatanodeVersion(version.getVersion().toString())
                 .build());
 
         if (!registrationSucceeded) {

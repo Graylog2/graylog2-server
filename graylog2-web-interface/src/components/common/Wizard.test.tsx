@@ -18,7 +18,7 @@ import React from 'react';
 import { act, render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import type { Steps } from 'components/common/Wizard';
+import type { StepsType } from 'components/common/Wizard';
 import Wizard from 'components/common/Wizard';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -26,7 +26,7 @@ const previousButton = () => screen.findByRole('button', { name: /Previous/i });
 const nextButton = () => screen.findByRole('button', { name: /Next/i });
 
 describe('<Wizard />', () => {
-  const steps: Steps = [
+  const steps: StepsType = [
     { key: 'Key1', title: 'Title1', component: (<div>Component1</div>) },
     { key: 'Key2', title: 'Title2', component: (<div>Component2</div>) },
     { key: 'Key3', title: 'Title3', component: (<div>Component3</div>) },

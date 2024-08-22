@@ -1,0 +1,60 @@
+{
+  "roles": [
+    {
+      "_id": {
+        "$oid": "77777ef17ad37b64ee87eb57"
+      },
+      "name": "Admin",
+      "permissions": [
+        "*"
+      ],
+      "description": "Grants all permissions for Graylog administrators (built-in)",
+      "read_only": true,
+      "name_lower": "admin"
+    },
+    {
+      "_id": {
+        "$oid": "77777ef17ad37b64ee87ebdd"
+      },
+      "name": "Field Type Mappings Manager",
+      "permissions": [
+      ],
+      "description": "A poor role that died young",
+      "read_only": true,
+      "name_lower": "field type mappings manager"
+    }
+  ],
+  "users": [
+    {
+      "_id": {
+        "$oid": "33333ef17ad37b64ee87eb57"
+      },
+      "full_name": "test-admin-user",
+      "username": "test-admin-user-with-both-roles",
+      "email": "admin@graylog.org",
+      "password": "{bcrypt}$2a$10$7kEUkcibcUkUKs2q9OHCpumI5XcBPHVmO37/D0YBYtWgR/Jisqkyi{salt}$2a$10$7kEUkcibcUkUKs2q9OHCpu",
+      "permissions": [
+      ],
+      "timezone": "UTC",
+      "roles": [
+        { "$oid": "77777ef17ad37b64ee87eb57" },
+        { "$oid": "77777ef17ad37b64ee87ebdd" }
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "33333ef17ad37b64ee87eb58"
+      },
+      "full_name": "test-user",
+      "username": "test-user-with-field-type-manager-role-only",
+      "email": "testuser@graylog.org",
+      "password": "{bcrypt}$2a$10$7kEUkcibcUkUKs2q9OHCpumI5XcBPHVmO37/D0YBYtWgR/Jisqkyi{salt}$2a$10$7kEUkcibcUkUKs2q9OHCpu",
+      "permissions": [
+      ],
+      "timezone": "UTC",
+      "roles": [
+        { "$oid": "77777ef17ad37b64ee87ebdd" }
+      ]
+    }
+  ]
+}

@@ -16,13 +16,15 @@
  */
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import ClipboardJS from 'clipboard';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
 import Scratchpad from './Scratchpad';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
+
 const setScratchpadVisibility = jest.fn();
+document.execCommand = jest.fn();
 
 const SUT = () => (
   <ScratchpadContext.Provider value={{
@@ -33,8 +35,6 @@ const SUT = () => (
     <Scratchpad />
   </ScratchpadContext.Provider>
 );
-
-jest.mock('clipboard');
 
 describe('<Scratchpad />', () => {
   it('properly renders', async () => {
@@ -85,7 +85,7 @@ describe('<Scratchpad />', () => {
     await screen.findByText(/auto saved\./i);
   });
 
-  it('shows copied status', () => {
+  it('shows copied status', async () => {
     render(<SUT />);
 
     const textarea = screen.getByRole('textbox');
@@ -94,15 +94,11 @@ describe('<Scratchpad />', () => {
 
     const btnCopy = screen.getByRole('button', { name: /copy/i });
 
-    const clipboard = new ClipboardJS(btnCopy);
-
     fireEvent.click(btnCopy);
 
-    clipboard.on('success', () => {
-      expect(screen.getByText(/copied!/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/copied!/i);
 
-    expect(clipboard.on).toHaveBeenCalled();
+    expect(document.execCommand).toHaveBeenCalledWith('copy');
   });
 
   it('confirms before clearing data', async () => {

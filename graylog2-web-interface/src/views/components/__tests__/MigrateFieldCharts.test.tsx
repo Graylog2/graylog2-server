@@ -25,7 +25,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Store from 'logic/local-storage/Store';
 import type ViewState from 'views/logic/views/ViewState';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -102,9 +102,7 @@ const renderAndMigrate = async () => {
 };
 
 describe('MigrateFieldCharts', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(createSearch).mockImplementation(async (s) => s);

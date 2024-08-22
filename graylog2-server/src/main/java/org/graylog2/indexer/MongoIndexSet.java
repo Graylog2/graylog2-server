@@ -63,6 +63,7 @@ public class MongoIndexSet implements IndexSet {
     // TODO 3.0: Remove this in 3.0, only used for pre 2.2 backwards compatibility.
     public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
     public static final String WARM_INDEX_INFIX = "warm_";
+    private static final String WARM_INDEX_INFIX_WITH_SEPARATOR = SEPARATOR + WARM_INDEX_INFIX;
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexSet.class);
     private final IndexSetConfig config;
     private final String writeIndexAlias;
@@ -120,7 +121,7 @@ public class MongoIndexSet implements IndexSet {
         // also allow restore archives to be returned
         final List<String> result = indexNames.stream()
                 .filter(this::isManagedIndex)
-                .collect(Collectors.toList());
+                .toList();
 
         return result.toArray(new String[result.size()]);
     }
@@ -184,7 +185,7 @@ public class MongoIndexSet implements IndexSet {
 
     private int indexPrefixLength(String indexName) {
         int length = config.indexPrefix().length() + 1;
-        if (indexName.contains("_" + WARM_INDEX_INFIX)) {
+        if (indexHasWarmInfix(indexName)) {
             length += WARM_INDEX_INFIX.length();
         }
         return length;
@@ -396,6 +397,14 @@ public class MongoIndexSet implements IndexSet {
     @Override
     public String toString() {
         return "MongoIndexSet{" + "config=" + config + '}';
+    }
+
+    public static String hotIndexName(String indexName) {
+        return indexName.replace(WARM_INDEX_INFIX_WITH_SEPARATOR, SEPARATOR);
+    }
+
+    public static boolean indexHasWarmInfix(String indexName) {
+        return indexName.contains(WARM_INDEX_INFIX_WITH_SEPARATOR);
     }
 
     public interface Factory {

@@ -17,12 +17,12 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import Alert from 'components/bootstrap/Alert';
 import DocsHelper from 'util/DocsHelper';
 import Section from 'preflight/components/common/Section';
 import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ConfigurationWizard from 'preflight/components/ConfigurationWizard';
-import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
 
 const P = styled.p`
   max-width: 700px;
@@ -34,6 +34,9 @@ type Props = {
 
 const Setup = ({ setIsWaitingForStartup }: Props) => (
   <>
+    <Alert bsStyle="warning">
+      Data Node is currently in beta. Feel free to check it out and tell us about your experience!
+    </Alert>
     <Section title="Welcome!" titleOrder={1} dataTestid="welcome-section">
       <P>
         It looks like you are starting Graylog for the first time and have not configured a data node.<br />
@@ -42,9 +45,6 @@ const Setup = ({ setIsWaitingForStartup }: Props) => (
       <P>
         You can either implement a <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node manually.
         For the manual OpenSearch configuration you need to adjust the Graylog configuration and restart the Graylog server. After the restart this page will not show up again.
-      </P>
-      <P>
-        You can always skip the configuration and <ResumeStartupButton variant="light" compact setIsWaitingForStartup={setIsWaitingForStartup}>resume startup</ResumeStartupButton>.
       </P>
     </Section>
     <Section title="Graylog Data Nodes" titleOrder={2}>

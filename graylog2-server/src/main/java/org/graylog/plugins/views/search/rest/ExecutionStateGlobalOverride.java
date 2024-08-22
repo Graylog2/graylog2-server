@@ -20,11 +20,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -53,6 +53,9 @@ public abstract class ExecutionStateGlobalOverride {
     @JsonProperty
     public abstract ImmutableSet<String> keepQueries();
 
+    @JsonProperty
+    public abstract Optional<DateTime> now();
+
     public abstract Builder toBuilder();
 
     public static Builder builder() {
@@ -66,7 +69,8 @@ public abstract class ExecutionStateGlobalOverride {
                 offset().isPresent() ||
                 !searchTypes().isEmpty() ||
                 !keepSearchTypes().isEmpty() ||
-                !keepQueries().isEmpty();
+                !keepQueries().isEmpty() ||
+                now().isPresent();
     }
 
     public static ExecutionStateGlobalOverride empty() {
@@ -101,6 +105,9 @@ public abstract class ExecutionStateGlobalOverride {
 
         @JsonProperty
         public abstract Builder searchTypes(ImmutableMap<String, SearchTypeExecutionState> searchTypes);
+
+        @JsonProperty
+        public abstract Builder now(@Nullable DateTime now);
 
         public abstract ImmutableMap.Builder<String, SearchTypeExecutionState> searchTypesBuilder();
 

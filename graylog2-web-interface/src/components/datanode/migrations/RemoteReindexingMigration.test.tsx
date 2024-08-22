@@ -16,12 +16,21 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { useQueryParam } from 'use-query-params';
 
 import type { MigrationState, MigrationStateItem } from 'components/datanode/Types';
+import { asMock } from 'helpers/mocking';
 
 import RemoteReindexingMigration from './RemoteReindexingMigration';
 
 import { MIGRATION_STATE } from '../Constants';
+
+jest.mock('use-query-params', () => ({
+  ...jest.requireActual('use-query-params'),
+  useQueryParam: jest.fn(),
+}));
+
+jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '' })));
 
 jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() => ({
   data: {
@@ -48,7 +57,7 @@ jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() =>
 jest.mock('components/datanode/hooks/useDataNodes', () => jest.fn(() => ({
   data: {
     attributes: [],
-    elements: [{
+    list: [{
       cert_valid_until: '2053-11-02T13:20:58',
       error_msg: null,
       hostname: 'datanode1',
@@ -70,7 +79,8 @@ jest.mock('components/datanode/hooks/useDataNodes', () => jest.fn(() => ({
       count: 0,
     },
   },
-  refetch: () => {},
+  refetch: () => {
+  },
   isInitialLoading: false,
   error: null,
 })));
@@ -83,10 +93,15 @@ const renderStep = (_state: MigrationStateItem) => {
     response: null,
   } as MigrationState);
 
-  render(<RemoteReindexingMigration onTriggerStep={async () => ({} as MigrationState)} currentStep={getCurrentStep(_state)} />);
+  render(<RemoteReindexingMigration onTriggerStep={async () => ({} as MigrationState)}
+                                    currentStep={getCurrentStep(_state)} />);
 };
 
 describe('RemoteReindexingMigration', () => {
+  beforeEach(() => {
+    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
+  });
+
   it('should render Welcome step', async () => {
     renderStep(MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key);
 
@@ -97,19 +112,11 @@ describe('RemoteReindexingMigration', () => {
     await screen.findByRole('heading', { name: /Welcome/i });
   });
 
-  it('should render CertificatesProvisioning page step', async () => {
-    renderStep(MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key);
-
-    await screen.findByRole('button', {
-      name: /2. Provision Data Node with certificates/i,
-    });
-  });
-
   it('should render CertificatesProvisioning running step', async () => {
     renderStep(MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key);
 
     await screen.findByRole('button', {
-      name: /3. Provision the Data Node's certificate./i,
+      name: /2. Provision the Data Node's certificate./i,
     });
   });
 
@@ -117,29 +124,31 @@ describe('RemoteReindexingMigration', () => {
     renderStep(MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key);
 
     await screen.findByRole('button', {
-      name: /4. Migrate existing data question/i,
+      name: /3. Migrate existing data question/i,
     });
 
     await screen.findByText(/Do you want to migrate your existing data?/);
+    await screen.findByText(/line from your Graylog configuration file/);
   });
 
   it('should render MigrateExistingData step', async () => {
     renderStep(MIGRATION_STATE.MIGRATE_EXISTING_DATA.key);
 
     await screen.findByRole('button', {
-      name: /5. Migrate existing data/i,
+      name: /4. Migrate existing data/i,
     });
 
-    await screen.findByLabelText(/Cluster URI/);
+    await screen.findByLabelText(/Hostname/);
     await screen.findByLabelText(/Username/);
     await screen.findByLabelText(/Password/);
+    await screen.findByLabelText(/Allowlist/);
   });
 
   it('should render RemoteReindexRunning step', async () => {
     renderStep(MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key);
 
     await screen.findByRole('button', {
-      name: /6. Remote reindexing migration running/i,
+      name: /5. Remote reindexing migration running/i,
     });
 
     await screen.findByText(/We are currently migrating your existing data asynchronically/);
@@ -149,19 +158,21 @@ describe('RemoteReindexingMigration', () => {
     renderStep(MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key);
 
     await screen.findByRole('button', {
-      name: /7. Shut down old cluster/i,
+      name: /6. Shut down old cluster/i,
     });
 
     await screen.findByText(/To finish please shut down your/);
   });
 
-  it('should render ConnectionStringRemovalStep step', async () => {
-    renderStep(MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key);
+  it('should render RemoteReindexRunning step and show Logs', async () => {
+    asMock(useQueryParam).mockImplementation((field: string) => {
+      const value = field === 'show_logs' ? 'true' : undefined;
 
-    await screen.findByRole('button', {
-      name: /8. Remove connection string/i,
+      return [value, () => {}];
     });
 
-    await screen.findByText(/line from your Graylog configuration file/);
+    renderStep(MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key);
+
+    await screen.findByText(/Remote Reindex Migration Logs/);
   });
 });

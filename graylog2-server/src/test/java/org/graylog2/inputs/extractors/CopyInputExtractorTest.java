@@ -18,6 +18,8 @@ package org.graylog2.inputs.extractors;
 
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Extractor;
 import org.junit.Test;
@@ -25,9 +27,11 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class CopyInputExtractorTest extends AbstractExtractorTest {
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     @Test
     public void testCopy() throws Extractor.ReservedFieldException, ConfigurationException {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         msg.addField("somefield", "foo");
 

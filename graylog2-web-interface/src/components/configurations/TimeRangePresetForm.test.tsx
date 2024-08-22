@@ -22,22 +22,16 @@ import debounce from 'lodash/debounce';
 import Immutable from 'immutable';
 import { Formik } from 'formik';
 
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 
 import TimeRangePresetForm from './TimeRangePresetForm';
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-}));
-
 jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 jest.mock('lodash/debounce', () => jest.fn());
 jest.mock('logic/generateId', () => jest.fn(() => 'tr-id-3'));
+jest.mock('hooks/useHotkey', () => jest.fn());
 
 const mockOnUpdate = jest.fn();
 
@@ -52,6 +46,8 @@ const renderForm = () => render(
 
 describe('TimeRangePresetForm', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
+
     asMock(useSearchConfiguration).mockReturnValue({
       config: mockSearchesClusterConfig,
       refresh: jest.fn(),
@@ -104,15 +100,17 @@ describe('TimeRangePresetForm', () => {
     ]));
   });
 
-  it('edit time range action trigger onUpdate', async () => {
+  it('edit time range action triggers onUpdate', async () => {
     renderForm();
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const timerangeFilter = await within(timerangeItem).findByText('5 minutes ago');
     fireEvent.click(timerangeFilter);
     const fromInput = await screen.findByTitle('Set the from value');
     fireEvent.change(fromInput, { target: { value: 15 } });
-    const submit = await screen.findByTitle('Update time range');
-    fireEvent.click(submit);
+    const submitButton = await screen.findByRole('button', { name: /update time range/i });
+
+    await waitFor(() => expect(submitButton).toBeEnabled());
+    fireEvent.click(submitButton);
 
     await waitFor(() => expect(mockOnUpdate).toHaveBeenCalledWith(Immutable.List([
       { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 900, type: 'relative' } },

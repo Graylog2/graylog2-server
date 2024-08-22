@@ -17,14 +17,18 @@
 package org.graylog.events.fields.providers;
 
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 
 public abstract class FieldValueProviderTest {
+    private MessageFactory messageFactory = new TestMessageFactory();
+
     protected Message newMessage(Map<String, Object> fields) {
-        final Message message = new Message("test message", "test", DateTime.now(DateTimeZone.UTC));
+        final Message message = messageFactory.createMessage("test message", "test", DateTime.now(DateTimeZone.UTC));
         message.addFields(fields);
         return message;
     }

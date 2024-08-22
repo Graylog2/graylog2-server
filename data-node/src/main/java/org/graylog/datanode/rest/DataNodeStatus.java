@@ -18,14 +18,25 @@ package org.graylog.datanode.rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog2.plugin.Version;
 
-import java.util.List;
+public record DataNodeStatus(@JsonIgnore Version appVersion, SystemInfo operatingSystem, StatusResponse opensearch,
+                             DatanodeDirectories datanodeDirectories) {
 
-public record DataNodeStatus(@JsonIgnore Version appVersion, StatusResponse opensearch) {
+    DataNodeStatus(Version appVersion, StatusResponse opensearch, DatanodeDirectories datanodeDirectories) {
+        this(appVersion, new SystemInfo(), opensearch, datanodeDirectories);
+    }
 
     @JsonProperty
     public String dataNodeVersion() {
         return this.appVersion.toString();
     }
+
+    record SystemInfo(String osName, String osVersion, String javaVersion, String userName) {
+        public SystemInfo() {
+            this(System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("java.version"), System.getProperty("user.name"));
+        }
+    }
+
 }

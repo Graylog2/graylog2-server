@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState, useMemo } from 'react';
+import { useContext, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
@@ -32,9 +32,8 @@ import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
-import { TableHeaderCell } from 'views/components/datatable';
-
-import InteractiveContext from '../contexts/InteractiveContext';
+import { TableHeaderCell, TableHead } from 'views/components/datatable';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 const Table = styled.table(({ theme }) => css`
   position: relative;
@@ -43,6 +42,10 @@ const Table = styled.table(({ theme }) => css`
   border-collapse: collapse;
   width: 100%;
   word-break: break-all;
+
+  > tbody > tr > td {
+    border-color: ${theme.colors.table.row.divider};
+  }
 
   @media print {
     font-size: ${theme.fonts.size.body};
@@ -81,18 +84,6 @@ const TableWrapper = styled.div(({ theme }) => css`
   }
 `);
 
-const TableHead = styled.thead(({ theme }) => css`
-  background-color: ${theme.colors.gray[90]};
-  color: ${theme.utils.readableColor(theme.colors.gray[90])};
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  
-  && > tr > th {
-    min-width: 50px;
-  }
-`);
-
 type Props = {
   activeQueryId: string,
   config: MessagesWidgetConfig,
@@ -106,7 +97,7 @@ type Props = {
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) => ((fields
   && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
 
-const _getFormattedMessages = (messages): Array<Message> => messages.map((m) => ({
+const _getFormattedMessages = (messages: Array<BackendMessage>): Array<Message> => messages.map((m) => ({
   fields: m.message,
   formatted_fields: MessageFieldsFilter.filterFields(m.message),
   id: m.message._id,
@@ -138,7 +129,8 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
   const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
   const selectedFields = useMemo(() => Immutable.OrderedSet<string>(config?.fields ?? []), [config?.fields]);
-  const toggleDetail = useCallback((id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages, stopAutoRefresh), [expandedMessages, stopAutoRefresh]);
+  const interactive = useContext(InteractiveContext);
+  const toggleDetail = useMemo(() => (interactive ? (id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages, stopAutoRefresh) : () => {}), [expandedMessages, interactive, stopAutoRefresh]);
 
   return (
     <MessageTableProviders>
@@ -148,6 +140,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => {
                 const type = _fieldTypeFor(selectedFieldName, fields);
+                const isCompound = type.isCompound();
 
                 return (
                   <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
@@ -156,14 +149,12 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
                            queryId={activeQueryId}>
                       {selectedFieldName}
                     </Field>
-                    <InteractiveContext.Consumer>
-                      {(interactive) => (interactive && (
-                        <FieldSortIcon fieldName={selectedFieldName}
-                                       onSortChange={onSortChange}
-                                       setLoadingState={setLoadingState}
-                                       config={config} />
-                      ))}
-                    </InteractiveContext.Consumer>
+                    {(interactive && !isCompound && (
+                    <FieldSortIcon fieldName={selectedFieldName}
+                                   onSortChange={onSortChange}
+                                   setLoadingState={setLoadingState}
+                                   config={config} />
+                    ))}
                   </TableHeaderCell>
                 );
               }).toArray()}

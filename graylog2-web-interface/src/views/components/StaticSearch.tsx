@@ -51,10 +51,13 @@ const StaticSearch = ({ searchJson, viewJson, searchJobResult }: Props) => {
     widgetMapping: view.widgetMapping,
   }), [searchJobResult, view.widgetMapping]);
 
-  const searchExecutors: SearchExecutors = useMemo(() => ({
+  const searchExecutors = useMemo<SearchExecutors>(() => ({
     execute: async () => searchResult,
     parse: async () => searchMetadata,
     resultMapper: (result) => result,
+    cancelJob: () => Promise.resolve(null),
+    startJob: () => Promise.resolve({ asyncSearchId: '1nbmnbmnb1', nodeId: '222' }),
+    executeJobResult: () => Promise.resolve(searchResult),
   }), [searchResult]);
 
   return (

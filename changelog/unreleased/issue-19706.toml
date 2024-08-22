@@ -1,0 +1,5 @@
+type="f"
+message="Disable automatic datanode cert renewal during preflight mode"
+
+issues=["19706"]
+pulls=["19709"]

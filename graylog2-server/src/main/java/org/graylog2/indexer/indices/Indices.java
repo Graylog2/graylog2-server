@@ -21,6 +21,9 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.datatiering.WarmIndexDeletedEvent;
@@ -33,7 +36,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -43,14 +46,10 @@ import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
-import jakarta.validation.constraints.NotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -140,6 +139,10 @@ public class Indices {
         return indicesAdapter.numberOfMessages(indexName);
     }
 
+    public IndexSetStats getIndexSetStats() {
+        return indicesAdapter.getIndexSetStats();
+    }
+
     public JsonNode getIndexStats(final IndexSet indexSet) {
         return indicesAdapter.getIndexStats(Collections.singleton(indexSet.getIndexWildcard()));
     }
@@ -201,15 +204,15 @@ public class Indices {
     }
 
     public Template getIndexTemplate(IndexSet indexSet) {
-        final TemplateIndexSetConfig templateIndexSetConfig = getTemplateIndexSetConfig(indexSet, indexSet.getConfig(), profileService);
+        final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(indexSet, indexSet.getConfig(), profileService);
         return indexMappingFactory.createIndexMapping(indexSet.getConfig())
-                .toTemplate(templateIndexSetConfig);
+                .toTemplate(indexSetMappingTemplate);
     }
 
     Template buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
-        final TemplateIndexSetConfig templateIndexSetConfig = getTemplateIndexSetConfig(indexSet, indexSetConfig, profileService);
+        final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(indexSet, indexSetConfig, profileService);
         return indexMappingFactory.createIndexMapping(indexSetConfig)
-                .toTemplate(templateIndexSetConfig, 0L);
+                .toTemplate(indexSetMappingTemplate, 0L);
     }
 
     public void deleteIndexTemplate(IndexSet indexSet) {
@@ -222,26 +225,28 @@ public class Indices {
     }
 
     public boolean create(String indexName, IndexSet indexSet) {
-        final IndexSettings indexSettings = IndexSettings.create(
+        return create(indexName, indexSet, null );
+    }
+
+    public boolean create(String indexName, IndexSet indexSet, Map<String, Object> indexMapping) {
+        IndexSettings indexSettings = IndexSettings.create(
                 indexSet.getConfig().shards(),
                 indexSet.getConfig().replicas()
         );
-
         try {
             // Make sure our index template exists before creating an index!
             ensureIndexTemplate(indexSet);
-            indicesAdapter.create(indexName, indexSettings);
+            indicesAdapter.create(indexName, indexSettings, indexMapping);
         } catch (Exception e) {
             LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage(), e);
             auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
             return false;
         }
-
         auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         return true;
     }
 
-    public TemplateIndexSetConfig getTemplateIndexSetConfig(
+    public IndexSetMappingTemplate getTemplateIndexSetConfig(
             final IndexSet indexSet,
             final IndexSetConfig indexSetConfig,
             final IndexFieldTypeProfileService profileService) {
@@ -250,13 +255,13 @@ public class Indices {
         if (profileId != null && !profileId.isEmpty()) {
             final Optional<IndexFieldTypeProfile> fieldTypeProfile = profileService.get(profileId);
             if (fieldTypeProfile.isPresent() && !fieldTypeProfile.get().customFieldMappings().isEmpty()) {
-                return new TemplateIndexSetConfig(indexSetConfig.indexAnalyzer(),
+                return new IndexSetMappingTemplate(indexSetConfig.indexAnalyzer(),
                         indexSet.getIndexWildcard(),
                         fieldTypeProfile.get().customFieldMappings().mergeWith(customFieldMappings));
             }
         }
 
-        return new TemplateIndexSetConfig(indexSetConfig.indexAnalyzer(),
+        return new IndexSetMappingTemplate(indexSetConfig.indexAnalyzer(),
                 indexSet.getIndexWildcard(),
                 customFieldMappings);
     }
@@ -418,5 +423,9 @@ public class Indices {
 
     public void refresh(String... indices) {
         indicesAdapter.refresh(indices);
+    }
+
+    public Map<String, Object> indexMapping(String index) {
+        return indicesAdapter.getIndexMapping(index);
     }
 }

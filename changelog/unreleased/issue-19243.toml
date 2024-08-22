@@ -1,0 +1,5 @@
+type="f"
+message="Removed basic auth for datanode rest api. Only JWT supported now."
+
+issues=["19243"]
+pulls=["19244"]

@@ -169,13 +169,6 @@ jest.mock('stores/users/CurrentUserStore', () => ({
   },
 }));
 
-jest.mock('../event-definition-types/withStreams', () => ({
-  __esModule: true,
-  default: (Component: React.FC) => (props: any) => (
-    <Component {...props} streams={[{ id: 'stream-id', title: 'stream-title' }]} />
-  ),
-}));
-
 jest.mock('logic/telemetry/withTelemetry', () => ({
   __esModule: true,
   default: (Component: React.FC) => (props: any) => (
@@ -193,6 +186,12 @@ jest.mock('routing/useLocation');
 jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('hooks/useScopePermissions');
 jest.mock('hooks/useCurrentUser');
+
+jest.mock('components/perspectives/hooks/useActivePerspective', () => () => ({
+  id: 'security',
+  title: 'Security',
+  welcomeRoute: '/security',
+}));
 
 describe('EventDefinitionFormContainer', () => {
   beforeEach(() => {
@@ -226,18 +225,18 @@ describe('EventDefinitionFormContainer', () => {
 
   it('should render Filters & Aggregation form enabled', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
-
-    const tab = await screen.findByRole('button', { name: /filter & aggregation/i });
+    const tab = await screen.findByRole('button', { name: /condition/i });
     userEvent.click(tab);
+    const conditionTypeSelect = await screen.findByLabelText('Condition Type');
 
-    expect(screen.getByRole('textbox', { name: /search query/i })).toBeEnabled();
+    expect(conditionTypeSelect).toBeInTheDocument();
   });
 
   it('Filters & Aggregation should not be accessible for immutable entities', async () => {
     asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeImmutable);
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
-    const tab = await screen.findByRole('button', { name: /filter & aggregation/i });
+    const tab = await screen.findByRole('button', { name: /condition/i });
     userEvent.click(tab);
 
     expect(screen.getByText(/cannot be edited/i)).toBeVisible();

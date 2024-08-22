@@ -19,12 +19,12 @@ package org.graylog2.indexer;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.SimpleIndexSetConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
@@ -41,10 +41,10 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 import static org.graylog2.indexer.MongoIndexSet.WARM_INDEX_INFIX;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_RETENTION_STRATEGY;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_ROTATION_STRATEGY;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_ROTATION_STRATEGY_CLASS;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexSetValidator {
@@ -74,53 +74,71 @@ public class IndexSetValidator {
             }
         }
 
-        final Violation refreshIntervalViolation = validateRefreshInterval(newConfig.fieldTypeRefreshInterval());
-        if (refreshIntervalViolation != null) {
+        final Violation fieldMappingViolation = validateMappingChangesAreLegal(newConfig);
+        if (fieldMappingViolation != null) {
+            return Optional.of(fieldMappingViolation);
+        }
+
+        Violation refreshIntervalViolation = validateSimpleIndexSetConfig(newConfig);
+        if (refreshIntervalViolation != null){
             return Optional.of(refreshIntervalViolation);
         }
+        return Optional.empty();
+    }
 
-        if (newConfig.dataTiering() != null) {
-            if (!dataTieringChecker.isEnabled()) {
-                return Optional.of(Violation.create("data tiering feature is disabled!"));
-            }
-            final Violation dataTiersViolation = validateDataTieringConfig(newConfig.dataTiering());
-            if (dataTiersViolation != null) {
-                return Optional.of(dataTiersViolation);
-            }
+    private Violation validateSimpleIndexSetConfig(SimpleIndexSetConfig newConfig) {
+        final Violation refreshIntervalViolation = validateRefreshInterval(newConfig.fieldTypeRefreshInterval());
+        if (refreshIntervalViolation != null) {
+            return refreshIntervalViolation;
+        }
+        if (newConfig.dataTieringConfig() != null) {
+            return validateDataTieringConfig(newConfig.dataTieringConfig());
         } else {
-            if (newConfig.retentionStrategy() == null) {
-                return Optional.of(Violation.create(FIELD_RETENTION_STRATEGY + " cannot be null!"));
-            }
-
-            if (newConfig.retentionStrategyClass() == null) {
-                return Optional.of(Violation.create(FIELD_RETENTION_STRATEGY_CLASS + " cannot be null!"));
-            }
-
-            if (newConfig.rotationStrategy() == null) {
-                return Optional.of(Violation.create(FIELD_ROTATION_STRATEGY + " cannot be null!"));
-            }
-
-            if (newConfig.rotationStrategyClass() == null) {
-                return Optional.of(Violation.create(FIELD_ROTATION_STRATEGY_CLASS + " cannot be null!"));
-            }
-
-            final Violation rotationViolation = validateRotation(newConfig.rotationStrategy());
-            if (rotationViolation != null) {
-                return Optional.of(rotationViolation);
-            }
+            return validateStrategyFields(newConfig);
+        }
+    }
 
 
-            final Violation retentionConfigViolation = validateRetentionConfig(newConfig.retentionStrategy());
-            if (retentionConfigViolation != null) {
-                return Optional.of(retentionConfigViolation);
-            }
-
-            return Optional.ofNullable(validateRetentionPeriod(newConfig.rotationStrategy(),
-                    newConfig.retentionStrategy()));
+    public Violation validateStrategyFields(SimpleIndexSetConfig newConfig) {
+        if (newConfig.retentionStrategyConfig() == null) {
+            return Violation.create(FIELD_RETENTION_STRATEGY + " cannot be null!");
         }
 
-        return Optional.empty();
+        if (newConfig.retentionStrategyClass() == null) {
+            return Violation.create(FIELD_RETENTION_STRATEGY_CLASS + " cannot be null!");
+        }
 
+        if (newConfig.rotationStrategyConfig() == null) {
+            return Violation.create(FIELD_ROTATION_STRATEGY + " cannot be null!");
+        }
+
+        if (newConfig.rotationStrategyClass() == null) {
+            return Violation.create(FIELD_ROTATION_STRATEGY_CLASS + " cannot be null!");
+        }
+
+        final Violation rotationViolation = validateRotation(newConfig.rotationStrategyConfig());
+        if (rotationViolation != null) {
+            return rotationViolation;
+        }
+
+        final Violation retentionConfigViolation = validateRetentionConfig(newConfig.retentionStrategyConfig());
+        if (retentionConfigViolation != null) {
+            return retentionConfigViolation;
+        }
+
+        return validateRetentionPeriod(newConfig.rotationStrategyConfig(),
+                newConfig.retentionStrategyConfig());
+    }
+
+
+    public Violation validateMappingChangesAreLegal(final IndexSetConfig config) {
+        if (!config.canHaveProfile() && config.fieldTypeProfile() != null && !config.fieldTypeProfile().isEmpty()) {
+            return Violation.create("Profiles cannot be set for events and failures index sets");
+        }
+        if (!config.canHaveCustomFieldMappings() && config.customFieldMappings() != null && !config.customFieldMappings().isEmpty()) {
+            return Violation.create("Custom field mappings cannot be set for events and failures index sets");
+        }
+        return null;
     }
 
     @Nullable
@@ -173,9 +191,20 @@ public class IndexSetValidator {
         return null;
     }
 
+    @Nullable
+    public Violation checkDataTieringNotNull(Boolean useLegacyRotation, DataTieringConfig dataTieringConfig) {
+        if (!useLegacyRotation && dataTieringConfig == null) {
+            return Violation.create(SimpleIndexSetConfig.FIELD_DATA_TIERING + " cannot be null!");
+        }
+        return null;
+    }
+
 
     @Nullable
     public Violation validateDataTieringConfig(DataTieringConfig dataTieringConfig) {
+        if (!dataTieringChecker.isEnabled()) {
+            return Violation.create("data tiering feature is disabled!");
+        }
         return dataTieringOrchestrator.validate(dataTieringConfig).orElse(null);
     }
 

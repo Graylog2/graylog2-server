@@ -16,10 +16,16 @@
  */
 import { useState, useEffect } from 'react';
 
-import type { MigrationActions, MigrationState, OnTriggerStepFunction } from '../Types';
+import type { MigrationActions, MigrationState, OnTriggerStepFunction, StepArgs } from '../Types';
 import { MIGRATION_STATE } from '../Constants';
 
 export type MigrationStatus = 'NOT_STARTED'|'STARTING'|'RUNNING'|'ERROR'|'FINISHED';
+
+export type RemoteReindexLog = {
+  timestamp: string,
+  log_level: string,
+  message: string,
+}
 
 export type RemoteReindexIndex = {
   took: string,
@@ -36,15 +42,22 @@ export type RemoteReindexMigration = {
   error: string,
   status: MigrationStatus,
   progress: number,
+  logs: RemoteReindexLog[],
+  tasks_progress: { [task: string]: number },
 }
 
 export type RemoteReindexRequest = {
+  allowlist: string,
   hostname: string,
   password: string,
   indices: string[],
   synchronous: boolean,
   user: string,
+  threads: number,
+  trust_unknown_certs: boolean,
 }
+
+export const RemoteReindexFinishedStatusActions: MigrationActions[] = ['RETRY_MIGRATE_EXISTING_DATA', 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER'];
 
 const useRemoteReindexMigrationStatus = (
   currentStep: MigrationState,
@@ -53,40 +66,51 @@ const useRemoteReindexMigrationStatus = (
 ) : {
   nextSteps: MigrationActions[],
   migrationStatus: RemoteReindexMigration,
+  handleTriggerStep: OnTriggerStepFunction,
 } => {
   const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['RETRY_MIGRATE_EXISTING_DATA']);
   const [migrationStatus, setMigrationStatus] = useState<RemoteReindexMigration>(undefined);
 
   useEffect(() => {
+    let interval;
+
     const fetchCurrentMigrationStatus = async () => {
-      if (
-        (currentStep?.state === MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key)
-        && ((migrationStatus?.progress || 0) < 100)
-      ) {
-        onTriggerStep('REQUEST_MIGRATION_STATUS').then((data) => {
-          const _migrationStatus = data?.response as RemoteReindexMigration;
+      if (currentStep?.state === MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key) {
+        if (
+          migrationStatus?.progress === 100
+          && (migrationStatus?.status === 'FINISHED' || migrationStatus?.status === 'ERROR')
+        ) {
+          setNextSteps(currentStep?.next_steps.filter((action) => RemoteReindexFinishedStatusActions.includes(action)));
+          clearInterval(interval);
+        } else {
+          onTriggerStep('REQUEST_MIGRATION_STATUS').then((data) => {
+            const _migrationStatus = data?.response as RemoteReindexMigration;
 
-          if (_migrationStatus) {
-            setMigrationStatus(_migrationStatus);
-
-            if (_migrationStatus?.progress === 100) {
-              setNextSteps(['RETRY_MIGRATE_EXISTING_DATA', 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER']);
+            if (_migrationStatus) {
+              setMigrationStatus(_migrationStatus);
             }
-          }
-        });
+          });
+        }
       }
     };
 
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       fetchCurrentMigrationStatus();
     }, refetchInterval);
 
     return () => clearInterval(interval);
-  }, [onTriggerStep, migrationStatus, currentStep?.state, refetchInterval]);
+  }, [onTriggerStep, migrationStatus, currentStep?.state, currentStep?.next_steps, refetchInterval]);
+
+  const handleTriggerStep = (step: MigrationActions, args?: StepArgs) => onTriggerStep(step, args).then((data) => {
+    setMigrationStatus(undefined);
+
+    return data;
+  });
 
   return ({
     nextSteps,
     migrationStatus,
+    handleTriggerStep,
   });
 };
 

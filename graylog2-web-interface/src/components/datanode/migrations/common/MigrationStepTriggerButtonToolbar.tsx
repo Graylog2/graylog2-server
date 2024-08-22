@@ -15,15 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { MigrationActions, OnTriggerStepFunction, StepArgs } from 'components/datanode/Types';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { MIGRATION_ACTIONS } from 'components/datanode/Constants';
 
-const StyledButtonToolbar = styled(ButtonToolbar)`
+const StyledButtonToolbar = styled(ButtonToolbar)(({ theme }) => css`
+  margin-top: ${theme.spacings.md};
   flex-wrap: wrap;
-`;
+`);
+
+const getSortedNextSteps = (nextSteps: MigrationActions[]) => nextSteps.reduce((sortedNextSteps, step) => {
+  if (!MIGRATION_ACTIONS[step]?.label) {
+    return [step, ...sortedNextSteps];
+  }
+
+  sortedNextSteps.push(step);
+
+  return sortedNextSteps;
+}, []);
 
 type Props = {
     nextSteps?: Array<MigrationActions>,
@@ -31,16 +42,18 @@ type Props = {
     onTriggerStep: OnTriggerStepFunction,
     args?: StepArgs,
     hidden?: boolean,
+    children?: React.ReactNode,
 }
 
-const MigrationStepTriggerButtonToolbar = ({ nextSteps, disabled, onTriggerStep, args, hidden }: Props) => {
+const MigrationStepTriggerButtonToolbar = ({ nextSteps, disabled, onTriggerStep, args, hidden, children }: Props) => {
   if (hidden) {
     return null;
   }
 
   return (
     <StyledButtonToolbar>
-      {nextSteps.map((step) => <Button key={step} bsStyle="success" bsSize="small" disabled={disabled} onClick={() => onTriggerStep(step, args)}>{MIGRATION_ACTIONS[step]?.label || 'Next'}</Button>)}
+      {getSortedNextSteps(nextSteps).map((step, index) => <Button key={step} bsStyle={index ? 'default' : 'success'} bsSize="small" disabled={disabled} onClick={() => onTriggerStep(step, args)}>{MIGRATION_ACTIONS[step]?.label || 'Next'}</Button>)}
+      {children}
     </StyledButtonToolbar>
   );
 };
@@ -50,6 +63,7 @@ MigrationStepTriggerButtonToolbar.defaultProps = {
   disabled: false,
   args: {},
   hidden: false,
+  children: undefined,
 };
 
 export default MigrationStepTriggerButtonToolbar;

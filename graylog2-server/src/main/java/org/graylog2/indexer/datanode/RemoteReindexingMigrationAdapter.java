@@ -16,18 +16,30 @@
  */
 package org.graylog2.indexer.datanode;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Optional;
 
 public interface RemoteReindexingMigrationAdapter {
+    boolean isMigrationRunning(IndexSet indexSet);
+
     enum Status {
-        NOT_STARTED, STARTING, RUNNING, ERROR, FINISHED
+        NOT_STARTED, RUNNING, ERROR, FINISHED
     }
 
-    RemoteReindexMigration start(URI uri, String username, String password, List<String> indices, boolean synchronous);
+    /**
+     * @return ID of the migration, useful for obraining migration process info via {@link #status(String)}
+     */
+    String start(RemoteReindexRequest request);
 
-    RemoteReindexMigration status(@NotNull String migrationID);
+    RemoteReindexMigration status(@Nonnull String migrationID);
+
+    IndexerConnectionCheckResult checkConnection(@Nonnull final URI uri, @Nullable final String username, @Nullable final String password, @Nullable String allowlist, boolean trustUnknownCerts);
+
+    Optional<String> getLatestMigrationId();
 }

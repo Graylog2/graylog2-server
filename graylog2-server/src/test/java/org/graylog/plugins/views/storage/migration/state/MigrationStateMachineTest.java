@@ -29,9 +29,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 class MigrationStateMachineTest {
@@ -41,60 +38,25 @@ class MigrationStateMachineTest {
     @Test
     void testPersistence() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
-
-        AtomicBoolean directoryCheckTriggered = new AtomicBoolean(false);
-        AtomicReference<Map<String, Object>> capturedArgs = new AtomicReference<>();
-
-        final MigrationActionsAdapter migrationActions = new MigrationActionsAdapter() {
-
-            @Override
-            public boolean runDirectoryCompatibilityCheck() {
-                String key = "foo";
-                String value = getStateMachineContext().getActionArgument(key, String.class);
-                capturedArgs.set(Map.of(key, value));
-                return true;
-            }
-
-            @Override
-            public boolean directoryCompatibilityCheckOk() {
-                directoryCheckTriggered.set(true);
-                return true;
-            }
-        };
-
-        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(persistence, migrationActions).get();
+        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(persistence, MigrationActionsAdapter::new).get();
         migrationStateMachine.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
-        migrationStateMachine.trigger(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK, Collections.singletonMap("foo", "bar"));
-        migrationStateMachine.trigger(MigrationStep.SHOW_CA_CREATION, Collections.emptyMap());
 
 
         Assertions.assertThat(persistence.getConfiguration())
                 .isPresent()
                 .hasValueSatisfying(configuration -> {
-                    Assertions.assertThat(configuration.currentState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
+                    Assertions.assertThat(configuration.currentState()).isEqualTo(MigrationState.MIGRATION_WELCOME_PAGE);
                 });
-
-        Assertions.assertThat(directoryCheckTriggered.get())
-                .as("Directory check should be triggered during the migration process")
-                .isEqualTo(true);
-
-        System.out.println(migrationStateMachine.serialize());
-
-
-        Assertions.assertThat(capturedArgs.get())
-                .isNotNull()
-                .containsEntry("foo", "bar");
     }
 
     @Test
     void testReset() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
-        final MigrationStateMachineProvider provider = new MigrationStateMachineProvider(persistence, new MigrationActionsAdapter());
+        final MigrationStateMachineProvider provider = new MigrationStateMachineProvider(persistence, MigrationActionsAdapter::new);
         final MigrationStateMachine sm = provider.get();
         sm.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
-        sm.trigger(MigrationStep.SKIP_DIRECTORY_COMPATIBILITY_CHECK, Collections.emptyMap());
 
-        Assertions.assertThat(sm.getState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
+        Assertions.assertThat(sm.getState()).isEqualTo(MigrationState.MIGRATION_WELCOME_PAGE);
 
         sm.reset();
 
@@ -104,7 +66,7 @@ class MigrationStateMachineTest {
 
     @Test
     void testSerialization() {
-        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(new InMemoryStateMachinePersistence(), new MigrationActionsAdapter()).get();
+        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(new InMemoryStateMachinePersistence(), MigrationActionsAdapter::new).get();
         final String serialized = migrationStateMachine.serialize();
         Assertions.assertThat(serialized).isNotEmpty().startsWith("digraph G {");
         final String fragment = URLEncoder.encode(serialized, StandardCharsets.UTF_8).replace("+", "%20");

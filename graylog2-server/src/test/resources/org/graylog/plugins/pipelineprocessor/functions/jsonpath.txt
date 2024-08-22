@@ -21,4 +21,12 @@ then
   // Don't fail on missing field
   let missing_fields = select_jsonpath(x, { some_field: "$.i_dont_exist", this_should_exist: "$['store']['book'][-1:]['author']" });
   set_fields(missing_fields);
+
+  // No match yields empty array
+  let empty_array_fields = select_jsonpath(x, { expected_empty_array: "$.[?(@.nothing)]..value" });
+  set_fields(empty_array_fields);
+
+  // Suppress empty array
+  let suppressed_empty_array_fields = select_jsonpath(x, { suppressed_empty_array: "$.[?(@.nothing)]..value" }, true);
+  set_fields(suppressed_empty_array_fields);
 end

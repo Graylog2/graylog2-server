@@ -31,6 +31,9 @@ import org.graylog.plugins.views.migrations.V20191204000000_RemoveLegacyViewsPer
 import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards.V20200204122000_MigrateUntypedViewsToDashboards;
 import org.graylog.plugins.views.migrations.V20200409083200_RemoveRootQueriesFromMigratedDashboards;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
+import org.graylog.plugins.views.migrations.V20240605120000_RemoveUnitFieldFromSearchDocuments;
+import org.graylog.plugins.views.migrations.V20240626143000_CreateDashboardsView;
+import org.graylog.plugins.views.migrations.V20240704100700_DashboardAddLastUpdated;
 import org.graylog.plugins.views.providers.ExportBackendProvider;
 import org.graylog.plugins.views.providers.QuerySuggestionsProvider;
 import org.graylog.plugins.views.search.SearchRequirements;
@@ -75,6 +78,9 @@ import org.graylog.plugins.views.search.rest.contexts.SearchUserBinder;
 import org.graylog.plugins.views.search.rest.exceptionmappers.IllegalTimeRangeExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
+import org.graylog.plugins.views.search.rest.export.AggregationWidgetExportResource;
+import org.graylog.plugins.views.search.rest.export.response.AggregationWidgetExportResponseWriter;
+import org.graylog.plugins.views.search.rest.remote.SearchJobsStatusResource;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -120,6 +126,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO
 import org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
+import org.graylog.plugins.views.search.views.widgets.events.EventsWidgetConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.plugins.views.startpage.StartPageResource;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityUpdatesListener;
@@ -143,6 +150,7 @@ public class ViewsBindings extends ViewsModule {
     protected void configure() {
         registerExportBackendProvider();
 
+        addSystemRestResource(AggregationWidgetExportResource.class);
         addSystemRestResource(DashboardsResource.class);
         addSystemRestResource(StartPageResource.class);
         addSystemRestResource(FavoritesResource.class);
@@ -153,6 +161,7 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(QualifyingViewsResource.class);
         addSystemRestResource(SavedSearchesResource.class);
         addSystemRestResource(SearchResource.class);
+        addSystemRestResource(SearchJobsStatusResource.class);
         addSystemRestResource(SearchMetadataResource.class);
         addSystemRestResource(ViewsResource.class);
         addSystemRestResource(SuggestionsResource.class);
@@ -231,6 +240,9 @@ public class ViewsBindings extends ViewsModule {
         addMigration(V20200204122000_MigrateUntypedViewsToDashboards.class);
         addMigration(V20200409083200_RemoveRootQueriesFromMigratedDashboards.class);
         addMigration(V20200730000000_AddGl2MessageIdFieldAliasForEvents.class);
+        addMigration(V20240605120000_RemoveUnitFieldFromSearchDocuments.class);
+        addMigration(V20240626143000_CreateDashboardsView.class);
+        addMigration(V20240704100700_DashboardAddLastUpdated.class);
 
         addAuditEventTypes(ViewsAuditEventTypes.class);
 
@@ -251,6 +263,8 @@ public class ViewsBindings extends ViewsModule {
 
         addExportFormat(() -> MoreMediaTypes.TEXT_CSV_TYPE);
 
+
+        jerseyAdditionalComponentsBinder().addBinding().toInstance(AggregationWidgetExportResponseWriter.class);
         jerseyAdditionalComponentsBinder().addBinding().toInstance(SimpleMessageChunkCsvWriter.class);
         jerseyAdditionalComponentsBinder().addBinding().toInstance(MessageExportFormatFilter.class);
         jerseyAdditionalComponentsBinder().addBinding().toInstance(SearchUserBinder.class);
@@ -267,6 +281,10 @@ public class ViewsBindings extends ViewsModule {
 
         bind(LastUsedQueryStringsService.class).to(MongoLastUsedQueryStringsService.class);
         addSystemRestResource(QueryStringsResource.class);
+
+        // The Set<StaticReferencedSearch> binder must be explicitly initialized to avoid an initialization error when
+        // no values are bound.
+        staticReferencedSearchBinder();
     }
 
     private void registerExportBackendProvider() {
@@ -286,6 +304,8 @@ public class ViewsBindings extends ViewsModule {
 
         registerJacksonSubtype(TimeHistogramConfigDTO.class);
         registerJacksonSubtype(ValueConfigDTO.class);
+
+        registerJacksonSubtype(EventsWidgetConfigDTO.class);
     }
 
     private void registerVisualizationConfigSubtypes() {
@@ -308,4 +328,5 @@ public class ViewsBindings extends ViewsModule {
         addJerseyExceptionMapper(PermissionExceptionMapper.class);
         addJerseyExceptionMapper(IllegalTimeRangeExceptionMapper.class);
     }
+
 }

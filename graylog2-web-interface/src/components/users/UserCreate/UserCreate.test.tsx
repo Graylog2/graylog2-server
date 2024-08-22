@@ -15,19 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import * as Immutable from 'immutable';
 import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
-import { alice as existingUser } from 'fixtures/userOverviews';
+import { alice as existingUser } from 'fixtures/users';
 import { rolesList } from 'fixtures/roles';
 import { UsersActions } from 'stores/users/UsersStore';
+import { asMock } from 'helpers/mocking';
+import FetchError from 'logic/errors/FetchError';
 
 import UserCreate from './UserCreate';
 
-const mockLoadUsersPromise = Promise.resolve(Immutable.List([existingUser]));
 const mockLoadRolesPromise = Promise.resolve({
   list: rolesList,
   pagination: {
@@ -38,20 +38,11 @@ const mockLoadRolesPromise = Promise.resolve({
   count: 0,
   total: 0,
 });
-const mockExistingUser = existingUser.username;
 
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
     create: jest.fn(() => Promise.resolve()),
-    loadUsers: jest.fn(() => mockLoadUsersPromise),
-    loadByUsername: jest.fn((u) => {
-      if (u === mockExistingUser) {
-        Promise.resolve();
-      } else {
-        // eslint-disable-next-line no-throw-literal
-        throw {};
-      }
-    }),
+    loadByUsername: jest.fn(),
   },
 }));
 
@@ -68,18 +59,22 @@ const extendedTimeout = applyTimeoutMultiplier(15000);
 describe('<UserCreate />', () => {
   const findSubmitButton = () => screen.findByRole('button', { name: /create user/i });
 
-  it('should create user', async () => {
-    const { findByLabelText, findByPlaceholderText, findByText } = render(<UserCreate />);
+  beforeEach(() => {
+    asMock(UsersActions.loadByUsername).mockImplementation(() => Promise.reject(new FetchError('', 404, {})));
+  });
 
-    const usernameInput = await findByLabelText('Username');
-    const firstNameInput = await findByLabelText('First Name');
-    const lastNameInput = await findByLabelText('Last Name');
-    const emailInput = await findByLabelText('E-Mail Address');
-    const timeoutAmountInput = await findByPlaceholderText('Timeout amount');
-    const timezoneSelect = await findByLabelText('Time Zone');
-    const roleSelect = await findByText(/search for roles/i);
-    const passwordInput = await findByPlaceholderText('Password');
-    const passwordRepeatInput = await findByPlaceholderText('Repeat password');
+  it('should create user', async () => {
+    render(<UserCreate />);
+
+    const usernameInput = await screen.findByLabelText('Username');
+    const firstNameInput = await screen.findByLabelText('First Name');
+    const lastNameInput = await screen.findByLabelText('Last Name');
+    const emailInput = await screen.findByLabelText('E-Mail Address');
+    const timeoutAmountInput = await screen.findByPlaceholderText('Timeout amount');
+    const timezoneSelect = await screen.findByLabelText('Time Zone');
+    const roleSelect = await screen.findByText(/search for roles/i);
+    const passwordInput = await screen.findByPlaceholderText('Password');
+    const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
     const submitButton = await findSubmitButton();
     await userEvent.type(usernameInput, 'The username');
 
@@ -112,6 +107,7 @@ describe('<UserCreate />', () => {
     await userEvent.type(passwordInput, 'thepassword');
     await userEvent.type(passwordRepeatInput, 'thepassword');
 
+    await waitFor(() => expect(submitButton).toBeEnabled());
     await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
@@ -128,14 +124,14 @@ describe('<UserCreate />', () => {
   }, extendedTimeout);
 
   it('should trim the username', async () => {
-    const { findByLabelText, findByPlaceholderText } = render(<UserCreate />);
+    render(<UserCreate />);
 
-    const usernameInput = await findByLabelText('Username');
-    const firstNameInput = await findByLabelText('First Name');
-    const lastNameInput = await findByLabelText('Last Name');
-    const emailInput = await findByLabelText('E-Mail Address');
-    const passwordInput = await findByPlaceholderText('Password');
-    const passwordRepeatInput = await findByPlaceholderText('Repeat password');
+    const usernameInput = await screen.findByLabelText('Username');
+    const firstNameInput = await screen.findByLabelText('First Name');
+    const lastNameInput = await screen.findByLabelText('Last Name');
+    const emailInput = await screen.findByLabelText('E-Mail Address');
+    const passwordInput = await screen.findByPlaceholderText('Password');
+    const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
     const submitButton = await findSubmitButton();
 
     await userEvent.type(usernameInput, '   username   ');
@@ -150,6 +146,7 @@ describe('<UserCreate />', () => {
     await userEvent.type(passwordInput, 'thepassword');
     await userEvent.type(passwordRepeatInput, 'thepassword');
 
+    await waitFor(() => expect(submitButton).toBeEnabled());
     await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
@@ -164,27 +161,28 @@ describe('<UserCreate />', () => {
   }, extendedTimeout);
 
   it('should display warning if username is already taken', async () => {
-    const { findByLabelText, findByText } = render(<UserCreate />);
+    asMock(UsersActions.loadByUsername).mockReturnValue(Promise.resolve(existingUser));
 
-    const usernameInput = await findByLabelText('Username');
+    render(<UserCreate />);
+
+    const usernameInput = await screen.findByLabelText('Username');
 
     await userEvent.type(usernameInput, existingUser.username);
 
     await userEvent.tab();
-
-    await findByText(/Username is already taken/);
+    await screen.findByText(/Username is already taken/);
   }, extendedTimeout);
 
   it('should display warning, if password repeat does not match password', async () => {
-    const { findByPlaceholderText, findByText } = render(<UserCreate />);
+    render(<UserCreate />);
 
-    const passwordInput = await findByPlaceholderText('Password');
-    const passwordRepeatInput = await findByPlaceholderText('Repeat password');
+    const passwordInput = await screen.findByPlaceholderText('Password');
+    const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
 
     await userEvent.type(passwordInput, 'thepassword');
     await userEvent.type(passwordRepeatInput, 'notthepassword');
     await userEvent.tab();
 
-    await findByText(/Passwords do not match/);
+    await screen.findByText(/Passwords do not match/);
   }, extendedTimeout);
 });

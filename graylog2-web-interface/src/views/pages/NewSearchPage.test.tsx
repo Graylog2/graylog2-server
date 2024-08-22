@@ -27,10 +27,11 @@ import useQuery from 'routing/useQuery';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import type View from 'views/logic/views/View';
+import type { Stream } from 'logic/streams/types';
 
 import NewSearchPage from './NewSearchPage';
 
@@ -51,14 +52,12 @@ describe('NewSearchPage', () => {
     relative: '300',
   };
   const SimpleNewSearchPage = () => (
-    <StreamsContext.Provider value={[{ id: 'stream1', title: 'Stream 1' }]}>
+    <StreamsContext.Provider value={[{ id: 'stream1', title: 'Stream 1' } as Stream]}>
       <NewSearchPage />
     </StreamsContext.Provider>
   );
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useQuery).mockReturnValue(query);

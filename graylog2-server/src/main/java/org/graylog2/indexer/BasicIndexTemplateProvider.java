@@ -18,7 +18,7 @@ package org.graylog2.indexer;
 
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.storage.SearchVersion;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 
 import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
@@ -26,9 +26,9 @@ import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
 public abstract class BasicIndexTemplateProvider<T extends IndexMappingTemplate> implements IndexTemplateProvider<T> {
 
-    @NotNull
+    @Nonnull
     @Override
-    public T create(@NotNull SearchVersion searchVersion,
+    public T create(@Nonnull SearchVersion searchVersion,
                                        IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
         if (isProperSearchVersion(searchVersion)) {
             return createTemplateInstance();
@@ -37,7 +37,7 @@ public abstract class BasicIndexTemplateProvider<T extends IndexMappingTemplate>
         }
     }
 
-    private boolean isProperSearchVersion(@NotNull SearchVersion searchVersion) {
+    private boolean isProperSearchVersion(@Nonnull SearchVersion searchVersion) {
         return searchVersion.satisfies(ELASTICSEARCH, "^7.0.0")
                 || searchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")
                 || searchVersion.satisfies(DATANODE, "^5.2.0");

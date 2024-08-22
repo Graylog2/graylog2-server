@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix index set deletion issues."
+
+issues = ["18994"]
+pulls = ["19030"]

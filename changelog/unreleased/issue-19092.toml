@@ -1,0 +1,5 @@
+type="f"
+message="Fix display tooltip for help icons in disabled menu items."
+
+issues=["19092"]
+pulls=["19093"]

@@ -1,0 +1,4 @@
+type = "c"
+message = "Introduce `MessageFactory` and `ResultMessageFactory` Java interfaces and change `Message` constructors to be package-private. (See upgrading notes for details!)"
+
+pulls = ["18535", "Graylog2/graylog-plugin-enterprise#6723"]

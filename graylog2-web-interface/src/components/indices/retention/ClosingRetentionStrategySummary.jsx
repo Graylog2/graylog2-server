@@ -17,19 +17,30 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const ClosingRetentionStrategySummary = ({ config }) => (
+import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'stores/indices/IndicesStore';
+
+const ClosingRetentionStrategySummary = ({ config, rotationStrategyClass }) => (
   <div>
     <dl>
       <dt>Index retention strategy:</dt>
       <dd>Close</dd>
-      <dt>Max number of indices:</dt>
-      <dd>{config.max_number_of_indices}</dd>
+      {rotationStrategyClass !== TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY && (
+      <>
+        <dt>Max number of indices:</dt>
+        <dd>{config.max_number_of_indices}</dd>
+      </>
+      )}
     </dl>
   </div>
 );
 
 ClosingRetentionStrategySummary.propTypes = {
   config: PropTypes.object.isRequired,
+  rotationStrategyClass: PropTypes.string,
+};
+
+ClosingRetentionStrategySummary.defaultProps = {
+  rotationStrategyClass: undefined,
 };
 
 export default ClosingRetentionStrategySummary;

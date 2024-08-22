@@ -24,16 +24,14 @@ import { updateWidgets } from 'views/logic/slices/widgetActions';
 import mockDispatch from 'views/test/mockDispatch';
 import { createViewWithWidgets } from 'fixtures/searches';
 import type { RootState } from 'views/types';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   updateWidgets: jest.fn(),
 }));
 
 describe('AddToAllTablesActionHandler', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('should add a field to all message widgets', async () => {
     const messageWidgetConfig = MessageWidgetConfig.builder()

@@ -22,9 +22,8 @@ import { Formik, Form, Field } from 'formik';
 
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import { FormikInput, Icon } from 'components/common';
-import { Input, Button, Label } from 'components/bootstrap';
-import { Dropzone } from 'preflight/components/common';
+import { FormikInput, Icon, Dropzone } from 'components/common';
+import { Button, Label, Alert } from 'components/bootstrap';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
@@ -60,7 +59,7 @@ const File = styled.div`
   align-items: center;
 `;
 
-const DeleteIcon: React.ComponentType<{ name: 'xmark', onClick: () => void }> = styled(Icon)`
+const DeleteIcon = styled(Icon)`
   cursor: pointer;
 `;
 
@@ -148,7 +147,7 @@ const CAUpload = () => {
                 <Files>
                   {value?.filter((file) => !!file).map(({ name: fileName }, index) => (
                     <File key={fileName}>
-                      <Icon name="draft" /> {fileName} <DeleteIcon name="xmark"
+                      <Icon name="draft" /> {fileName} <DeleteIcon name="cancel"
                                                                    onClick={() => {
                                                                      const newValue = value.filter((_ignored, idx) => idx !== index);
                                                                      onChange({ target: { name, value: newValue } });
@@ -156,7 +155,7 @@ const CAUpload = () => {
                     </File>
                   ))}
                 </Files>
-                {error && <Input.Error>{error}</Input.Error>}
+                {error && <Alert bsStyle="warning">{error}</Alert>}
               </>
             )}
           </Field>
@@ -167,7 +166,7 @@ const CAUpload = () => {
                        type="password"
                        label="Password" />
           <UnsecureConnectionAlert renderIfSecure={<br />} />
-          <Button disabled={!isValid} type="submit">
+          <Button bsStyle="primary" bsSize="small" disabled={!isValid} type="submit">
             {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
           </Button>
         </Form>

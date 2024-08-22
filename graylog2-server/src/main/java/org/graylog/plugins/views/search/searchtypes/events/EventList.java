@@ -22,16 +22,20 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EventListEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.database.filtering.AttributeFilter;
+import org.graylog2.database.filtering.HasAttributeFilter;
 import org.graylog2.plugin.Message;
 
 import javax.annotation.Nullable;
@@ -48,10 +52,10 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID
 @AutoValue
 @JsonTypeName(EventList.NAME)
 @JsonDeserialize(builder = EventList.Builder.class)
-public abstract class EventList implements SearchType {
+public abstract class EventList implements SearchType, HasAttributeFilter {
     public static final int DEFAULT_PAGE_SIZE = 10;
     public static final String NAME = "events";
-    private static final Set<String> FILTER_FIELD_ALLOWLIST = Set.of("priority", "event_definition_id");
+    public static final Set<String> KNOWN_ATTRIBUTES = Set.of("priority", "event_definition_id", "alert");
     public static final SortConfig DEFAULT_SORT = new SortConfig(Message.FIELD_TIMESTAMP, Direction.DESC);
 
     public enum Direction {
@@ -83,6 +87,7 @@ public abstract class EventList implements SearchType {
     @JsonProperty
     public abstract Optional<Integer> perPage();
 
+    @Override
     @JsonProperty
     public abstract List<AttributeFilter> attributes();
 
@@ -91,6 +96,11 @@ public abstract class EventList implements SearchType {
 
     public SortConfig sortWithDefault() {
         return sort().orElse(DEFAULT_SORT);
+    }
+
+    @Override
+    public boolean isExportable() {
+        return true;
     }
 
     @JsonCreator
@@ -111,24 +121,16 @@ public abstract class EventList implements SearchType {
             state.page().ifPresent(builder::page);
             state.perPage().ifPresent(builder::perPage);
             return builder.build();
+        } else if (state.limit().isPresent() &&
+                (state.offset().isEmpty() || state.offset().get().equals(0))
+        ) {
+            final var builder = toBuilder();
+            builder.page(1);
+            builder.perPage(state.limit().get());
+            return builder.build();
         }
 
         return this;
-    }
-
-    @Override
-    public SearchType withQuery(BackendQuery query) {
-        return toBuilder().query(query).build();
-    }
-
-    @Override
-    public SearchType withFilter(Filter filter) {
-        return toBuilder().filter(filter).build();
-    }
-
-    @Override
-    public SearchType withFilters(List<UsedSearchFilter> filters) {
-        return toBuilder().filters(filters).build();
     }
 
     @Override
@@ -137,7 +139,7 @@ public abstract class EventList implements SearchType {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements SearchTypeBuilder {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
@@ -172,12 +174,12 @@ public abstract class EventList implements SearchType {
         public abstract Builder streams(Set<String> streams);
 
         @JsonProperty
-        public abstract Builder page(int page);
+        public abstract Builder page(@Nullable Integer page);
 
         abstract Optional<Integer> page();
 
         @JsonProperty
-        public abstract Builder perPage(int pageSize);
+        public abstract Builder perPage(@Nullable Integer pageSize);
 
         abstract Optional<Integer> perPage();
 
@@ -217,14 +219,17 @@ public abstract class EventList implements SearchType {
         @JsonProperty
         public abstract List<CommonEventSummary> events();
 
+        @JsonProperty
+        public abstract long totalResults();
+
         public static Builder builder() {
             return new AutoValue_EventList_Result.Builder().type(EventList.NAME);
         }
 
         abstract Builder toBuilder();
 
-        public Result withEvents(List<CommonEventSummary> events) {
-            return toBuilder().events(events).build();
+        public Result withEvents(List<CommonEventSummary> events, long totalResults) {
+            return toBuilder().events(events).totalResults(totalResults).build();
         }
 
         public static Builder result(String searchTypeId) {
@@ -250,6 +255,9 @@ public abstract class EventList implements SearchType {
             @JsonProperty
             public abstract Builder events(List<CommonEventSummary> events);
 
+            @JsonProperty
+            public abstract Builder totalResults(long count);
+
             public abstract Result build();
         }
     }
@@ -259,12 +267,17 @@ public abstract class EventList implements SearchType {
         return EventListEntity.builder()
                 .streams(mappedStreams(entityDescriptorIds))
                 .filter(filter())
-                .filters(filters())
+                .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .id(id())
                 .name(name().orElse(null))
                 .query(query().orElse(null))
                 .type(type())
                 .timerange(timerange().orElse(null))
                 .build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

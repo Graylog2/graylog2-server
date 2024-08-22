@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Do not show confirm dialog when saving event notification."
+
+issues = ["19014"]
+pulls = ["19073"]

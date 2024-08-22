@@ -21,6 +21,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import org.apache.commons.collections.CollectionUtils;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -29,6 +32,7 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
@@ -56,9 +60,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ForbiddenException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public abstract class SearchResource extends RestResource {
 
         final Optional<String> streamId = Searches.extractStreamId(filter);
 
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+        final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
 
         return extractSearchResponse(searchJob, query, decorate, fieldList, timeRange, streamId);
     }
@@ -239,6 +240,12 @@ public abstract class SearchResource extends RestResource {
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Missing query result"));
+
+        if (!CollectionUtils.isEmpty(queryResult.errors())) {
+            final var errorText = String.join(", ", queryResult.errors().stream().map(SearchError::description).toList());
+            throw new RuntimeException("Failed to obtain results: " + errorText);
+        }
+
         final MessageList.Result result = queryResult.searchTypes()
                 .values()
                 .stream()

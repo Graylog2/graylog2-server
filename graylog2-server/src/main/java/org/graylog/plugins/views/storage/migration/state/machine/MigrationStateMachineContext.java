@@ -34,6 +34,8 @@ public class MigrationStateMachineContext {
 
     public static final String KEY_MIGRATION_ID = "migrationID";
 
+    public static final String KEY_COMPATIBILITY_CHECK_PASSED = "compatibilityCheckResult";
+
     @JsonProperty
     protected MigrationStep currentStep;
     @JsonProperty

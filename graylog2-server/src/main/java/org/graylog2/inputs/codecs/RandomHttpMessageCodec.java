@@ -18,8 +18,10 @@ package org.graylog2.inputs.codecs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.annotations.Codec;
@@ -33,9 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState;
@@ -44,11 +43,14 @@ import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.
 public class RandomHttpMessageCodec extends AbstractCodec {
     private static final Logger log = LoggerFactory.getLogger(RandomHttpMessageCodec.class);
     private final ObjectMapper objectMapper;
+    private final MessageFactory messageFactory;
 
     @Inject
-    public RandomHttpMessageCodec(@Assisted Configuration configuration, ObjectMapper objectMapper) {
+    public RandomHttpMessageCodec(@Assisted Configuration configuration, ObjectMapper objectMapper,
+                                  MessageFactory messageFactory) {
         super(configuration);
         this.objectMapper = objectMapper;
+        this.messageFactory = messageFactory;
     }
 
     @Nullable
@@ -61,7 +63,7 @@ public class RandomHttpMessageCodec extends AbstractCodec {
         }
         try {
             final GeneratorState state = objectMapper.readValue(rawMessage.getPayload(), GeneratorState.class);
-            final Message message = FakeHttpRawMessageGenerator.generateMessage(state);
+            final Message message = FakeHttpRawMessageGenerator.generateMessage(messageFactory, state);
             return message;
         } catch (IOException e) {
             log.error("Cannot decode message to class FakeHttpRawMessageGenerator.GeneratorState", e);

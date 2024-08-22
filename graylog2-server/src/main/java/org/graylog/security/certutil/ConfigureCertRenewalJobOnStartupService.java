@@ -57,7 +57,6 @@ public class ConfigureCertRenewalJobOnStartupService extends AbstractIdleService
                     .jobDefinitionId(jobDefinition.id())
                     .jobDefinitionType(CheckForCertRenewalJob.TYPE_NAME)
                     .schedule(cronJobSchedule)
-                    .status(JobTriggerStatus.RUNNABLE)
                     .build();
 
             jobTriggerService.create(trigger);

@@ -25,7 +25,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
@@ -44,9 +44,7 @@ const WrappedHeatMap = (props: React.ComponentProps<typeof HeatmapVisualization>
 );
 
 describe('HeatmapVisualization', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('generates correct props for plot component', () => {
     const columnPivot = Pivot.createValues(['http_status']);
@@ -78,6 +76,7 @@ describe('HeatmapVisualization', () => {
 
     const wrapper = mount(<WrappedHeatMap data={fixtures.validData}
                                           config={config}
+                                          setLoadingState={() => {}}
                                           effectiveTimerange={effectiveTimerange}
                                           fields={Immutable.List()}
                                           height={1024}
@@ -125,6 +124,7 @@ describe('HeatmapVisualization', () => {
 
     const wrapper = mount(<WrappedHeatMap data={{ chart: [] }}
                                           config={config}
+                                          setLoadingState={() => {}}
                                           effectiveTimerange={effectiveTimerange}
                                           fields={Immutable.List()}
                                           height={1024}

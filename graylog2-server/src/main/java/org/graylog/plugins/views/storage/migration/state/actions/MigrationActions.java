@@ -16,13 +16,11 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
-import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
-
 /**
  * Set of callbacks used during the migration in different states.
  */
 public interface MigrationActions {
-    boolean runDirectoryCompatibilityCheck();
+    void runDirectoryCompatibilityCheck();
 
     boolean isOldClusterStopped();
 
@@ -38,8 +36,10 @@ public interface MigrationActions {
 
     void startMessageProcessing();
     boolean caDoesNotExist();
-    boolean removalPolicyDoesNotExist();
-    boolean caAndRemovalPolicyExist();
+    boolean renewalPolicyDoesNotExist();
+    boolean caAndRenewalPolicyExist();
+
+    boolean compatibleDatanodesRunning();
 
     void provisionDataNodes();
 
@@ -47,17 +47,25 @@ public interface MigrationActions {
 
     boolean provisioningFinished();
 
+    boolean allDatanodesPrepared();
+
     void startDataNodes();
 
     boolean dataNodeStartupFinished();
-
-    void setStateMachineContext(MigrationStateMachineContext context);
-
-    MigrationStateMachineContext getStateMachineContext();
 
     void startRemoteReindex();
 
     void requestMigrationStatus();
 
     void calculateTrafficEstimate();
+
+    void verifyRemoteIndexerConnection();
+
+    boolean isCompatibleInPlaceMigrationVersion();
+
+    void getElasticsearchHosts();
+
+    void stopDatanodes();
+
+    void finishRemoteReindexMigration();
 }

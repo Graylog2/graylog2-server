@@ -22,7 +22,7 @@ import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
 const StyledButton = styled(Button)`
-  padding: 6px 11px;
+  padding: 6px 10px;
 `;
 
 type Props = {

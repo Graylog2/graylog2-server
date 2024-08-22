@@ -47,7 +47,6 @@ import org.graylog2.cluster.lock.LockServiceModule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
-import org.graylog2.indexer.SetIndexReadOnlyJob;
 import org.graylog2.indexer.fieldtypes.FieldTypesModule;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
@@ -98,6 +97,8 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.system.traffic.TrafficCounterService;
+import org.graylog2.system.traffic.TrafficUpdater;
 import org.graylog2.telemetry.enterprise.DefaultTelemetryEnterpriseDataProvider;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
 import org.graylog2.users.GrantsCleanupListener;
@@ -162,7 +163,6 @@ public class ServerBindings extends Graylog2Module {
         // System Jobs
         install(new FactoryModuleBuilder().build(RebuildIndexRangesJob.Factory.class));
         install(new FactoryModuleBuilder().build(OptimizeIndexJob.Factory.class));
-        install(new FactoryModuleBuilder().build(SetIndexReadOnlyJob.Factory.class));
         install(new FactoryModuleBuilder().build(IndexSetCleanupJob.Factory.class));
         install(new FactoryModuleBuilder().build(CreateNewSingleIndexRangeJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByDeleteJob.Factory.class));
@@ -208,6 +208,8 @@ public class ServerBindings extends Graylog2Module {
 
         bind(CSPService.class).to(CSPServiceImpl.class).asEagerSingleton();
         bind(CSPEventListener.class).asEagerSingleton();
+
+        OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
     }
 
     private void bindDynamicFeatures() {

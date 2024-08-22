@@ -15,23 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
+import FormWarningsProvider from 'contexts/FormWarningsProvider';
+import StreamsContext from 'contexts/StreamsContext';
+
 import FilterAggregationForm from './FilterAggregationForm';
-import withStreams from './withStreams';
 
-type Props = {
-  action: 'create' | 'edit',
-  validation: {},
-  eventDefinition: {},
-  fieldTypes: {},
-  onChange: () => void,
-  currentUser: {
-    permissions: Array<string>,
-  }
+type Props = Omit<React.ComponentProps<typeof FilterAggregationForm>, 'streams'>;
+
+const FilterAggregationFormContainer = (props: Props) => {
+  const streams = useContext(StreamsContext);
+
+  return (
+    <FormWarningsProvider>
+      <FilterAggregationForm streams={streams} {...props} />
+    </FormWarningsProvider>
+  );
 };
-
-const FilterAggregationFormContainer = (props: Props) => <FilterAggregationForm {...props} />;
 
 FilterAggregationFormContainer.propTypes = {
   action: PropTypes.oneOf(['create', 'edit']).isRequired,
@@ -41,4 +43,4 @@ FilterAggregationFormContainer.propTypes = {
   currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
 };
 
-export default withStreams(FilterAggregationFormContainer);
+export default FilterAggregationFormContainer;

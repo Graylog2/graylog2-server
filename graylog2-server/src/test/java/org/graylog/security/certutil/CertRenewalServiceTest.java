@@ -16,14 +16,7 @@
  */
 package org.graylog.security.certutil;
 
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.plugin.certificates.RenewalPolicy;
@@ -31,64 +24,64 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
-import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CertRenewalServiceTest {
-    private X509Certificate generate(final DateTime now, final int subtractMinutes, final int addMinutes) throws OperatorCreationException, CertificateException, NoSuchAlgorithmException {
-        final Date notBefore = now.minusMinutes(subtractMinutes).toDate();
-        final Date notAfter = now.plusMinutes(addMinutes).toDate();
-
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
-        java.security.KeyPair keyPair = keyGen.generateKeyPair();
-
-        final ContentSigner contentSigner = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(keyPair.getPrivate());
-        final X500Name x500Name = new X500Name("CN=graylog.test");
-        final X509v3CertificateBuilder certificateBuilder =
-                new JcaX509v3CertificateBuilder(x500Name,
-                        BigInteger.valueOf(now.getMillis()),
-                        notBefore,
-                        notAfter,
-                        x500Name,
-                        keyPair.getPublic());
-
-        return new JcaX509CertificateConverter()
-                .setProvider(new BouncyCastleProvider()).getCertificate(certificateBuilder.build(contentSigner));
+    private Date notAfter(final DateTime now, final int subtractMinutes, final int addMinutes) {
+        return now.plusMinutes(addMinutes).minusMinutes(subtractMinutes).toDate();
     }
 
     @Test
-    public void testCertRenewalCalculation() throws CertificateException, NoSuchAlgorithmException, OperatorCreationException {
+    public void testCertRenewalCalculationDuration() throws CertificateException, NoSuchAlgorithmException, OperatorCreationException {
         final var now = DateTime.now(DateTimeZone.UTC);
         final JobSchedulerClock clock = new JobSchedulerTestClock(now);
         final var nextRun = clock.nowUTC().plusMinutes(30);
-        final var service = new CertRenewalServiceImpl(clock);
+        final var service = new CertRenewalServiceImpl(null, null, null, null, clock, null);
         // 2 hours is our smalles interval in the FE, so I'm testing only small intervals and expect larger intervals to work accordingly
         // with a threshold of 10%, a cert should either be invalid if it's no longer valid in 12min (10% of 120min) or if it get's invalid until the next run of the cert checker
         final var policy = new RenewalPolicy(RenewalPolicy.Mode.MANUAL, "PT2H");
 
         // renewal check every 30min, so the following should be still valid
-        final var cert1 = generate(now, 0, 35);
+        final var cert1 = notAfter(now, 0, 35);
         assertFalse(service.needsRenewal(nextRun, policy, cert1));
 
         // renewal check every 30min, threshold also takes it, so the following should be no longer valid
-        final var cert2 = generate(now, 0, 5);
+        final var cert2 = notAfter(now, 0, 5);
         assertTrue(service.needsRenewal(nextRun, policy, cert2));
 
         // renewal check every 30min, threshold is smaller, but the following should be no longer valid
-        final var cert3 = generate(now, 0, 15);
+        final var cert3 = notAfter(now, 0, 15);
         assertTrue(service.needsRenewal(nextRun, policy, cert3));
 
         // renewal check every 30min, threshold is smaller, but the following should be no longer valid
-        final var cert4 = generate(now, 24*60, 25);
+        final var cert4 = notAfter(now, 24*60, 25);
         assertTrue(service.needsRenewal(nextRun, policy, cert4));
     }
+
+    @Test
+    public void testCertRenewalCalculationPeriod() throws CertificateException, NoSuchAlgorithmException, OperatorCreationException {
+        final var now = DateTime.now(DateTimeZone.UTC);
+        final JobSchedulerClock clock = new JobSchedulerTestClock(now);
+        final var nextRun = clock.nowUTC().plusMinutes(30);
+        final var service = new CertRenewalServiceImpl(null, null, null, null, clock, null);
+        // Using a date period should also work, so here's the test for that. 1 day is 1440 minutes, so it should need the renewal after 143 minutes
+        final var policy = new RenewalPolicy(RenewalPolicy.Mode.MANUAL, "P1D");
+
+        final var cert1 = notAfter(now, 0, 24 * 60);
+        assertFalse(service.needsRenewal(nextRun, policy, cert1));
+
+        final var cert2 = notAfter(now, 0, 144);
+        assertFalse(service.needsRenewal(nextRun, policy, cert2));
+
+        final var cert3 = notAfter(now, 0, 143);
+        assertTrue(service.needsRenewal(nextRun, policy, cert3));
+
+    }
+
+
 }

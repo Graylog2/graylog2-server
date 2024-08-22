@@ -25,20 +25,22 @@ import { MIGRATION_STATE } from '../Constants';
 
 jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() => ({
   data: {
-    opensearch_version: '2.10.0',
-    info: {
-      nodes: [{
-        indices: [{
-          index_id: 'prlnhUp_TvSof9U-K3FZ9A',
-          shards: [{ documents_count: 10, name: 'S0', primary: true, min_lucene_version: '9.7.0' }],
-          index_name: '.opendistro_security',
-          creation_date: '2023-11-17T09:57:36.511',
-          index_version_created: '2.10.0',
+    datanode1: {
+      opensearch_version: '2.10.0',
+      info: {
+        nodes: [{
+          indices: [{
+            index_id: 'prlnhUp_TvSof9U-K3FZ9A',
+            shards: [{ documents_count: 10, name: 'S0', primary: true, min_lucene_version: '9.7.0' }],
+            index_name: '.opendistro_security',
+            creation_date: '2023-11-17T09:57:36.511',
+            index_version_created: '2.10.0',
+          }],
         }],
-      }],
-      opensearch_data_location: '/home/tdvorak/bin/datanode/data',
+        opensearch_data_location: '/home/tdvorak/bin/datanode/data',
+      },
+      compatibility_errors: [],
     },
-    compatibility_errors: [],
   },
   isFetching: false,
   isInitialLoading: false,
@@ -48,7 +50,7 @@ jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() =>
 jest.mock('components/datanode/hooks/useDataNodes', () => jest.fn(() => ({
   data: {
     attributes: [],
-    elements: [{
+    list: [{
       cert_valid_until: '2053-11-02T13:20:58',
       error_msg: null,
       hostname: 'datanode1',
@@ -98,18 +100,10 @@ describe('InPlaceMigration', () => {
   });
 
   it('should render CompatibilityCheckStep step', async () => {
-    renderStep(MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key);
+    renderStep(MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key);
 
     await screen.findByRole('button', {
       name: /2. Directory compatibility check/i,
-    });
-  });
-
-  it('should render CertificatesProvisioning page step', async () => {
-    renderStep(MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key);
-
-    await screen.findByRole('button', {
-      name: /3. Certificate provisioning overview/i,
     });
   });
 
@@ -117,7 +111,7 @@ describe('InPlaceMigration', () => {
     renderStep(MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key);
 
     await screen.findByRole('button', {
-      name: /4. Provision the Data Node's certificate./i,
+      name: /3. Provision the Data Node's certificate./i,
     });
   });
 
@@ -125,7 +119,7 @@ describe('InPlaceMigration', () => {
     renderStep(MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key);
 
     await screen.findByRole('button', {
-      name: /5. Journal size downtime warning/i,
+      name: /4. Journal size downtime warning/i,
     });
 
     await screen.findByRole('heading', { name: /Journal downtime size warning/i });
@@ -135,7 +129,7 @@ describe('InPlaceMigration', () => {
     renderStep(MIGRATION_STATE.MESSAGE_PROCESSING_STOP.key);
 
     await screen.findByRole('button', {
-      name: /6. Stop message processing/i,
+      name: /5. Stop message processing/i,
     });
 
     await screen.findByRole('heading', { name: /Stop OpenSearch/i });
@@ -145,7 +139,7 @@ describe('InPlaceMigration', () => {
     renderStep(MIGRATION_STATE.RESTART_GRAYLOG.key);
 
     await screen.findByRole('button', {
-      name: /7. Update configuration file and restart Graylog/i,
+      name: /6. Update configuration file and restart Graylog/i,
     });
 
     await screen.findByText(/please restart Graylog to finish the migration./);

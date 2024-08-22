@@ -1,13 +1,31 @@
 #### Default
 
 ```tsx
-<SegmentedControl data={['Aloho', 'Mora', 'Lumos']}/>
+<SegmentedControl data={[
+  {
+    value: 'aloho',
+    label: 'Aloho',
+  },
+  {
+    value: 'lumos',
+    label: 'Lumos',
+  }
+]}/>
 ```
 
 #### Disabled
 
 ```tsx
-<SegmentedControl data={['Aloho', 'Mora', 'Lumos']} disabled/>
+<SegmentedControl data={[
+  {
+    value: 'aloho',
+    label: 'Aloho',
+  },
+  {
+    value: 'lumos',
+    label: 'Lumos',
+  }
+]} disabled />
 ```
 
 #### Single option disabled
@@ -27,6 +45,6 @@
     value: 'lumos',
     label: 'Lumos',
   }
-]}/>
+]} />
 ```
 

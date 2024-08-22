@@ -17,10 +17,11 @@
 
 import type { Sort } from 'stores/PaginationTypes';
 
-export const ENTITY_TABLE_ID = 'dashboards';
-export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'summary', 'favorite'],
-  columnsOrder: ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'],
-};
+export const DEFAULT_LAYOUT = (isEvidenceModal: boolean) => ({
+  entityTableId: 'dashboards',
+  defaultPageSize: 20,
+  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
+  defaultDisplayedAttributes: isEvidenceModal ? ['title', 'description', 'summary'] : ['title', 'description', 'summary', 'favorite'],
+});
+
+export const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'last_updated_at', 'favorite'];

@@ -50,6 +50,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -183,6 +184,19 @@ class FieldTypeMappingsServiceTest {
     }
 
     @Test
+    void testThrowsExceptionOnIndexThatCannotHaveFieldTypeChanged() {
+        IndexSetConfig illegalForFieldTypeChange = mock(IndexSetConfig.class);
+        doReturn(Optional.of(illegalForFieldTypeChange)).when(indexSetService).get("existing_index_set");
+
+        assertThrows(BadRequestException.class, () -> toTest.changeFieldType(newCustomMapping,
+                Set.of("existing_index_set"),
+                false));
+
+        verifyNoInteractions(mongoIndexSetService);
+    }
+
+
+    @Test
     void testThrowsExceptionWhenTryingToSetProfileWithReservedFields() {
         IndexFieldTypeProfile profile = new IndexFieldTypeProfile(
                 "000000000000000000000013",
@@ -288,9 +302,9 @@ class FieldTypeMappingsServiceTest {
                 .indexWildcard("ex*")
                 .shards(1)
                 .replicas(1)
-                .rotationStrategy(SizeBasedRotationStrategyConfig.create(42))
+                .rotationStrategyConfig(SizeBasedRotationStrategyConfig.create(42))
                 .indexPrefix("ex")
-                .retentionStrategy(NoopRetentionStrategyConfig.create(13))
+                .retentionStrategyConfig(NoopRetentionStrategyConfig.create(13))
                 .creationDate(ZonedDateTime.now())
                 .indexAnalyzer("korean")
                 .indexTemplateName("test_template")

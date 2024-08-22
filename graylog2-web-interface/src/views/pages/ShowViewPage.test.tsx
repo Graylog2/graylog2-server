@@ -26,8 +26,9 @@ import useFetchView from 'views/hooks/useFetchView';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { Stream } from 'logic/streams/types';
 
 import ShowViewPage from './ShowViewPage';
 
@@ -54,6 +55,7 @@ describe('ShowViewPage', () => {
     properties: List<any>(),
     state: {},
     created_at: '2022-01-01 00:00:00',
+    last_updated_at: '2022-01-01 00:00:00',
     owner: 'admin',
     requires: {},
     favorite: false,
@@ -61,14 +63,12 @@ describe('ShowViewPage', () => {
     .search(Search.create().toBuilder().parameters([]).build())
     .build();
   const SimpleShowViewPage = () => (
-    <StreamsContext.Provider value={[{ id: 'stream-id-1', title: 'Stream 1' }]}>
+    <StreamsContext.Provider value={[{ id: 'stream-id-1', title: 'Stream 1' } as Stream]}>
       <ShowViewPage />
     </StreamsContext.Provider>
   );
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({});

@@ -75,9 +75,6 @@ public @interface ContainerMatrixTestsConfiguration {
      */
     MongodbServer[] mongoVersions() default {MongodbServer.MONGO5};
 
-    // additional Parameter, gets concatenated for all tests below the above rules
-    int[] extraPorts() default {};
-
     // are run after the initialization of mongoDb, gets concatenated for all tests below the above rules
     String[] mongoDBFixtures() default {};
 

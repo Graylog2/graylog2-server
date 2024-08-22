@@ -18,6 +18,7 @@ package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.util.Duration;
 import org.assertj.core.api.Assertions;
+import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioner;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -39,6 +40,8 @@ import static org.mockito.Mockito.when;
 
 class IndexerDiscoveryProviderTest {
 
+    public static final GraylogCertificateProvisioner NOOP_CERT_PROVISIONER = () -> {};
+
     @Test
     void testAutomaticDiscovery() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
@@ -46,7 +49,8 @@ class IndexerDiscoveryProviderTest {
                 1,
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED),
-                nodes("http://localhost:9200", "http://other:9201")
+                nodes("http://localhost:9200", "http://other:9201"),
+                NOOP_CERT_PROVISIONER
         );
 
         Assertions.assertThat(provider.get())
@@ -57,13 +61,32 @@ class IndexerDiscoveryProviderTest {
 
 
     @Test
+    void testAutomaticDiscoveryOneUnconfigured() {
+        final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
+                Collections.emptyList(),
+                1,
+                Duration.seconds(1),
+                preflightConfig(PreflightConfigResult.FINISHED),
+                nodes("http://localhost:9200", ""), // the second node is not configured yet, has no transport address
+                NOOP_CERT_PROVISIONER
+        );
+
+        Assertions.assertThat(provider.get())
+                .hasSize(1)
+                .extracting(URI::toString)
+                .contains("http://localhost:9200");
+    }
+
+
+    @Test
     void testPreconfiguredIndexers() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 List.of(URI.create("http://my-host:9200")),
                 1,
                 Duration.seconds(1),
                 preflightConfig(null),
-                nodes()
+                nodes(),
+                NOOP_CERT_PROVISIONER
         );
 
         Assertions.assertThat(provider.get())
@@ -79,7 +102,8 @@ class IndexerDiscoveryProviderTest {
                 1,
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.SKIPPED),
-                nodes()
+                nodes(),
+                NOOP_CERT_PROVISIONER
         );
 
         Assertions.assertThat(provider.get())
@@ -95,12 +119,33 @@ class IndexerDiscoveryProviderTest {
                 1,
                 Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED), // preflight correctly finished
-                nodes() // but still no nodes discovered
+                nodes(), // but still no nodes discovered
+                NOOP_CERT_PROVISIONER
         );
 
         Assertions.assertThatThrownBy(provider::get)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Unable to retrieve Datanode connection");
+    }
+
+    @Test
+    void testProvisioningWillBeTriggered() {
+        final GraylogCertificateProvisioner provisioner = Mockito.mock(GraylogCertificateProvisioner.class);
+        final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
+                Collections.emptyList(),
+                10,
+                Duration.milliseconds(1),
+                preflightConfig(PreflightConfigResult.FINISHED),
+                nodes(),
+                provisioner
+        );
+
+        Assertions.assertThatThrownBy(provider::get)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Unable to retrieve Datanode connection");
+
+        Mockito.verify(provisioner, Mockito.times(10)).runProvisioning();
+
     }
 
     private NodeService<DataNodeDto> nodes(String... transportAddress) {

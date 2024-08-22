@@ -71,13 +71,10 @@ class JobSchedulerServiceIT {
     @Mock
     private ServerStatus serverStatus;
 
-    private NodeId nodeId = new SimpleNodeId("dummy-node");
+    private final NodeId nodeId = new SimpleNodeId("dummy-node");
 
     @Mock
     SchedulerCapabilitiesService schedulerCapabilitiesService;
-
-    @Mock
-    private GracefulShutdownService gracefulShutdownService;
 
     private DBJobTriggerService jobTriggerService;
     private DBCustomJobDefinitionService customJobDefinitionService;
@@ -108,9 +105,7 @@ class JobSchedulerServiceIT {
                         mongoDBTestService.mongoConnection()));
 
         jobTriggerService = new DBJobTriggerService(
-                mongoDBTestService.mongoConnection(),
                 new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongoDBTestService.mongoConnection()),
-                new MongoJackObjectMapperProvider(objectMapper),
                 nodeId,
                 clock,
                 schedulerCapabilitiesService,
@@ -149,12 +144,12 @@ class JobSchedulerServiceIT {
                 metricRegistry,
                 200);
 
-        final JobWorkerPool.Factory workerPoolFactory = (name, poolSize, shutdownCallback) ->
-                new JobWorkerPool(name, poolSize, shutdownCallback, gracefulShutdownService, metricRegistry);
+        final JobWorkerPool.Factory workerPoolFactory = (name, poolSize) ->
+                new JobWorkerPool(name, poolSize, metricRegistry);
 
         final Duration loopSleepDuration = Duration.milliseconds(200);
 
-        jobSchedulerService = new JobSchedulerService(engineFactory, workerPoolFactory, schedulerConfig, clock, eventBus, serverStatus, loopSleepDuration);
+        jobSchedulerService = new JobSchedulerService(engineFactory, workerPoolFactory, schedulerConfig, clock, eventBus, serverStatus, new GracefulShutdownService(), 30_000, loopSleepDuration);
     }
 
     @Test

@@ -25,7 +25,6 @@ import { GlobalThroughputStore } from 'stores/metrics/GlobalThroughputStore';
 
 const ThroughputNavItem = styled(NavItem)`
   > a {
-
     @media (width <= 991px) {
       height: auto;
       display: block;

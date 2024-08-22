@@ -1,0 +1,5 @@
+type = "f"
+message = "Stop index retention during remote reindex migration"
+
+pulls = ["20121"]
+issues = ["graylog-plugin-enterprise#8097"]

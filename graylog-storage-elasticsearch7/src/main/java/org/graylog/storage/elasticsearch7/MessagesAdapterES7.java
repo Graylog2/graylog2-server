@@ -18,9 +18,9 @@ package org.graylog.storage.elasticsearch7;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
+import jakarta.inject.Inject;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkItemResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkRequest;
@@ -42,11 +42,11 @@ import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.IndexingSuccess;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.messages.SerializationContext;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -70,13 +70,16 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     static final String ILLEGAL_ARGUMENT_EXCEPTION = "illegal_argument_exception";
     static final String NO_WRITE_INDEX_DEFINED_FOR_ALIAS = "no write index is defined for alias";
 
+    private final ResultMessageFactory resultMessageFactory;
     private final ElasticsearchClient client;
     private final Meter invalidTimestampMeter;
     private final ChunkedBulkIndexer chunkedBulkIndexer;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public MessagesAdapterES7(ElasticsearchClient elasticsearchClient, MetricRegistry metricRegistry, ChunkedBulkIndexer chunkedBulkIndexer, ObjectMapper objectMapper) {
+    public MessagesAdapterES7(ResultMessageFactory resultMessageFactory, ElasticsearchClient elasticsearchClient,
+                              MetricRegistry metricRegistry, ChunkedBulkIndexer chunkedBulkIndexer, ObjectMapper objectMapper) {
+        this.resultMessageFactory = resultMessageFactory;
         this.client = elasticsearchClient;
         this.invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
         this.chunkedBulkIndexer = chunkedBulkIndexer;
@@ -93,7 +96,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
             throw new DocumentNotFoundException(index, messageId);
         }
 
-        return ResultMessage.parseFromSource(messageId, index, result.getSource());
+        return resultMessageFactory.parseFromSource(messageId, index, result.getSource());
     }
 
     @Override
@@ -248,8 +251,8 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     private IndexRequest indexRequestFrom(IndexingRequest request) {
         final byte[] body;
         try {
-            body = this.objectMapper.writeValueAsBytes(request.message().toElasticSearchObject(objectMapper, this.invalidTimestampMeter));
-        } catch (JsonProcessingException e) {
+            body = request.message().serialize(SerializationContext.of(objectMapper, this.invalidTimestampMeter));
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return new IndexRequest(request.indexSet().getWriteIndexAlias())

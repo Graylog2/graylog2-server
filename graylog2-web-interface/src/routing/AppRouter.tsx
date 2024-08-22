@@ -59,6 +59,10 @@ import {
   IndexSetFieldTypeProfileEditPage,
   IndexSetFieldTypeProfileCreatePage,
   IndexSetFieldTypeProfilesPage,
+  IndexSetTemplatePage,
+  IndexSetTemplatesPage,
+  IndexSetTemplateCreatePage,
+  IndexSetTemplateEditPage,
   IndicesPage,
   InputsPage,
   KeyboardShortcutsPage,
@@ -95,6 +99,7 @@ import {
   StreamEditPage,
   StreamOutputsPage,
   StreamsPage,
+  StreamDetailsPage,
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
@@ -152,6 +157,8 @@ const AppRouter = () => {
     enableInputsRoute = AppConfig.isFeatureEnabled('cloud_inputs');
   }
 
+  const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
+
   const router = createBrowserRouter([
     ...pluginRoutesWithNullParent,
 
@@ -170,6 +177,7 @@ const AppRouter = () => {
             { path: RoutePaths.message_show(':index', ':messageId'), element: <ShowMessagePage /> },
             { path: RoutePaths.WELCOME, element: <WelcomePage /> },
             { path: RoutePaths.STREAMS, element: <StreamsPage /> },
+            { path: RoutePaths.stream_view(':streamId'), element: <StreamDetailsPage /> },
             { path: RoutePaths.stream_edit(':streamId'), element: <StreamEditPage /> },
             !isCloud && { path: RoutePaths.stream_outputs(':streamId'), element: <StreamOutputsPage /> },
 
@@ -254,7 +262,7 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterManagementPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CONFIGURATION, element: <DataNodesClusterConfigurationPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.MIGRATION, element: <DataNodesMigrationPage /> },
+            !isCloud && enableDataNodeMigration && { path: RoutePaths.SYSTEM.DATANODES.MIGRATION, element: <DataNodesMigrationPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.SHOW(':dataNodeId'), element: <DataNodePage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
@@ -314,6 +322,10 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW, element: <IndexSetFieldTypeProfilesPage /> },
             { path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(':profileId'), element: <IndexSetFieldTypeProfileEditPage /> },
             { path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE, element: <IndexSetFieldTypeProfileCreatePage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.INDICES.TEMPLATES.view(':templateId'), element: <IndexSetTemplatePage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.INDICES.TEMPLATES.OVERVIEW, element: <IndexSetTemplatesPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.INDICES.TEMPLATES.CREATE, element: <IndexSetTemplateCreatePage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.INDICES.TEMPLATES.edit(':templateId'), element: <IndexSetTemplateEditPage /> },
             ...standardPluginRoutes,
             { path: '*', element: <NotFoundPage displayPageLayout={false} /> },
           ].filter((route) => !!route),

@@ -16,9 +16,10 @@
  */
 package org.graylog.datanode.configuration;
 
+import jakarta.annotation.Nonnull;
+import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog2.plugin.system.NodeId;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,14 +44,12 @@ public class DatanodeDirectories {
     private final Path logsTargetDir;
     private final Path configurationSourceDir;
     private final Path configurationTargetDir;
-    private final Path opensearchPluginsDir;
 
-    public DatanodeDirectories(Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir, @Nullable Path opensearchPluginsDir) {
+    public DatanodeDirectories(Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir) {
         this.dataTargetDir = dataTargetDir;
         this.logsTargetDir = logsTargetDir;
         this.configurationSourceDir = configurationSourceDir;
         this.configurationTargetDir = configurationTargetDir;
-        this.opensearchPluginsDir = opensearchPluginsDir;
     }
 
     public static DatanodeDirectories fromConfiguration(Configuration configuration, NodeId nodeId) {
@@ -58,8 +57,7 @@ public class DatanodeDirectories {
                 backwardsCompatible(configuration.getOpensearchDataLocation(), nodeId, "opensearch_data_location"),
                 backwardsCompatible(configuration.getOpensearchLogsLocation(), nodeId, "opensearch_logs_location"),
                 configuration.getDatanodeConfigurationLocation(),
-                backwardsCompatible(configuration.getOpensearchConfigLocation(), nodeId, "opensearch_config_location"),
-                configuration.getOpensearchPluginsDir()
+                backwardsCompatible(configuration.getOpensearchConfigLocation(), nodeId, "opensearch_config_location")
         );
 
         LOG.info("Opensearch of the node {} uses following directories as its storage: {}", nodeId.getNodeId(), directories);
@@ -75,8 +73,8 @@ public class DatanodeDirectories {
      * TODO: Remove in 6.0 release
      */
     @Deprecated(forRemoval = true)
-    @NotNull
-    protected static Path backwardsCompatible(@NotNull Path path, NodeId nodeId, String configProperty) {
+    @Nonnull
+    protected static Path backwardsCompatible(@Nonnull Path path, NodeId nodeId, String configProperty) {
         final Path nodeIdSubdir = path.resolve(nodeId.getNodeId());
         if(Files.exists(nodeIdSubdir) && Files.isDirectory(nodeIdSubdir)) {
             LOG.warn("Caution, this datanode instance uses old format of directories. Please configure {} to point directly to {}", configProperty, nodeIdSubdir.toAbsolutePath());
@@ -93,12 +91,20 @@ public class DatanodeDirectories {
         return dataTargetDir.toAbsolutePath();
     }
 
+    public String getDataTargetDirSpace() {
+        return FileUtils.byteCountToDisplaySize(dataTargetDir.toFile().getFreeSpace());
+    }
+
     /**
      * This directory is used by the managed opensearch to store its logs in it.
      * Read-write permissions required.
      */
     public Path getLogsTargetDir() {
         return logsTargetDir.toAbsolutePath();
+    }
+
+    public String getLogsTargetDirSpace() {
+        return FileUtils.byteCountToDisplaySize(logsTargetDir.toFile().getFreeSpace());
     }
 
 
@@ -130,12 +136,16 @@ public class DatanodeDirectories {
         return configurationTargetDir.toAbsolutePath();
     }
 
+    public String getConfigurationTargetDirSpace() {
+        return FileUtils.byteCountToDisplaySize(configurationTargetDir.toFile().getFreeSpace());
+    }
+
     public Path createConfigurationFile(Path relativePath) throws IOException {
         final Path resolvedPath = getConfigurationTargetDir().resolve(relativePath);
         return createRestrictedAccessFile(resolvedPath);
     }
 
-    @NotNull
+    @Nonnull
     private static Path createRestrictedAccessFile(Path resolvedPath) throws IOException {
         Files.deleteIfExists(resolvedPath);
         final Set<PosixFilePermission> permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
@@ -164,10 +174,6 @@ public class DatanodeDirectories {
     public Path createOpensearchProcessConfigurationFile(Path relativePath) throws IOException {
         final Path resolvedPath = getOpensearchProcessConfigurationDir().resolve(relativePath);
         return createRestrictedAccessFile(resolvedPath);
-    }
-
-    public Optional<Path> getOpensearchPluginsDir() {
-        return Optional.ofNullable(opensearchPluginsDir);
     }
 
     @Override

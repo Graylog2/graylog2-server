@@ -20,7 +20,7 @@ import * as Immutable from 'immutable';
 import trim from 'lodash/trim';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import type { SearchExecution, RootState, GetState, SearchExecutionResult, ExtraArguments } from 'views/types';
+import type { SearchExecution, RootState, GetState, SearchExecutionResult, ExtraArguments, JobIdsState } from 'views/types';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
@@ -30,7 +30,7 @@ import { selectView, selectParameters, selectActiveQuery } from 'views/logic/sli
 import {
   selectGlobalOverride,
   selectWidgetsToSearch,
-  selectSearchExecutionState, selectParameterBindings,
+  selectSearchExecutionState, selectParameterBindings, selectJobIds,
 } from 'views/logic/slices/searchExecutionSelectors';
 import type { TimeRange } from 'views/logic/queries/Query';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
@@ -38,6 +38,7 @@ import type { ParameterMap } from 'views/logic/parameters/Parameter';
 import type Parameter from 'views/logic/parameters/Parameter';
 import { setParameters } from 'views/logic/slices/viewSlice';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { JobIds } from 'views/stores/SearchJobs';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
@@ -46,11 +47,16 @@ const searchExecutionSlice = createSlice({
     executionState: SearchExecutionState.empty(),
     isLoading: false,
     result: undefined,
+    jobIds: null,
   } as SearchExecution,
   reducers: {
     loading: (state) => ({
       ...state,
       isLoading: true,
+    }),
+    stopLoading: (state) => ({
+      ...state,
+      isLoading: false,
     }),
     finishedLoading: (state, action: PayloadAction<SearchExecution['result']>) => ({
       ...state,
@@ -94,29 +100,60 @@ const searchExecutionSlice = createSlice({
         executionState: state.executionState.toBuilder().parameterBindings(mergedParameterBindings).build(),
       };
     },
+    setJobIds: (state, action: PayloadAction<JobIdsState>) => ({
+      ...state,
+      jobIds: action.payload,
+    }),
   },
 });
 
-export const { loading, finishedLoading, updateGlobalOverride, setWidgetsToSearch, setParameterValues, setParameterBindings } = searchExecutionSlice.actions;
+export const { loading, stopLoading, finishedLoading, updateGlobalOverride, setWidgetsToSearch, setParameterValues, setParameterBindings, setJobIds } = searchExecutionSlice.actions;
 
 export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
 
 export type SearchExecutors = {
   parse: SearchParser,
-  execute: (view: View, widgetsToSearch: string[], executionStateParam: SearchExecutionState, keepQueries?: string[]) => Promise<SearchExecutionResult>,
   resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult,
+  startJob: (view: View, widgetsToSearch: string[], executionStateParam: SearchExecutionState, keepQueries?: string[]) => Promise<JobIds>,
+  executeJobResult: (jobIds: JobIds, view: View) => Promise<SearchExecutionResult>,
+  cancelJob: (jobIds: JobIds) => Promise<null>,
 };
+
+export const cancelExecutedJob = () => (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
+  const state = getState();
+  const jobIds = selectJobIds(state);
+
+  if (jobIds) {
+    dispatch(setJobIds(null));
+
+    searchExecutors.cancelJob(jobIds);
+  }
+};
+
 export const executeWithExecutionState = (view: View, widgetsToSearch: Array<string>, executionState: SearchExecutionState, searchExecutors: SearchExecutors) => (
   dispatch: AppDispatch,
   getState: GetState,
 ) => dispatch(parseSearch(view.search, searchExecutors.parse))
   .then(() => {
     dispatch(loading());
+    dispatch(cancelExecutedJob());
+
     const activeQuery = selectActiveQuery(getState());
 
-    return searchExecutors.execute(view, widgetsToSearch, executionState, [activeQuery])
+    return searchExecutors.startJob(view, widgetsToSearch, executionState, [activeQuery]);
+  })
+  .then((jobIds: JobIds) => {
+    dispatch(setJobIds(jobIds));
+
+    return searchExecutors.executeJobResult(jobIds, view)
       .then(searchExecutors.resultMapper)
-      .then((result) => dispatch(finishedLoading(result)));
+      .then((result) => {
+        dispatch(setJobIds(null));
+        const isCanceled = result?.result?.result?.execution?.cancelled;
+        if (isCanceled) return dispatch(stopLoading());
+
+        return dispatch(finishedLoading(result));
+      });
   });
 
 export const execute = () => (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {

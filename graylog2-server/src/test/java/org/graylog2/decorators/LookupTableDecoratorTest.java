@@ -22,6 +22,8 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.tuple.Pair;
 import org.graylog2.lookup.LookupTableService;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
@@ -38,6 +40,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class LookupTableDecoratorTest {
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     @Test
     public void decorate() throws Exception {
         final String sourceField = "source";
@@ -121,7 +125,7 @@ public class LookupTableDecoratorTest {
         when(lookupTableService.newBuilder()).thenReturn(builder);
         when(builder.build()).thenReturn(function);
 
-        final LookupTableDecorator lookupTableDecorator = new LookupTableDecorator(decorator, lookupTableService);
+        final LookupTableDecorator lookupTableDecorator = new LookupTableDecorator(decorator, lookupTableService, messageFactory);
 
         return Pair.of(lookupTableDecorator, function);
     }

@@ -28,6 +28,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { ModalButtonToolbar } from 'components/common';
 
 import type { RuleBuilderRule } from './types';
 
@@ -65,36 +66,38 @@ const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props)
         </pre>
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button"
-                bsStyle="success"
-                onClick={async () => {
-                  sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_NEW_RULE_FROM_CODE_CLICKED, {
-                    app_pathname: getPathnameWithoutId(pathname),
-                    app_section: 'convert-rule-builder-to-source-code-modal',
-                    app_action_value: 'create-new-rule-from-code-button',
-                  });
+        <ModalButtonToolbar>
+          <Button type="button"
+                  bsStyle="success"
+                  onClick={async () => {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_NEW_RULE_FROM_CODE_CLICKED, {
+                      app_pathname: getPathnameWithoutId(pathname),
+                      app_section: 'convert-rule-builder-to-source-code-modal',
+                      app_action_value: 'create-new-rule-from-code-button',
+                    });
 
-                  saveRuleSourceCode(rule.source || '');
-                  await onNavigateAway(rule);
-                  history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
-                }}>
-          Create new Rule from Code
-        </Button>
-        <Button type="button"
-                bsStyle="info"
-                onClick={() => {
-                  sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.COPY_CODE_AND_CLOSE_CLICKED, {
-                    app_pathname: getPathnameWithoutId(pathname),
-                    app_section: 'convert-rule-builder-to-source-code-modal',
-                    app_action_value: 'copy-rule-code-and-close-button',
-                  });
+                    saveRuleSourceCode(rule.source || '');
+                    await onNavigateAway(rule);
+                    history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
+                  }}>
+            Create new Rule from Code
+          </Button>
+          <Button type="button"
+                  bsStyle="info"
+                  onClick={() => {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.COPY_CODE_AND_CLOSE_CLICKED, {
+                      app_pathname: getPathnameWithoutId(pathname),
+                      app_section: 'convert-rule-builder-to-source-code-modal',
+                      app_action_value: 'copy-rule-code-and-close-button',
+                    });
 
-                  copyToClipboard(rule.source);
-                  UserNotification.success('Rule source code copied to clipboard!');
-                  onHide();
-                }}>
-          Copy & Close
-        </Button>
+                    copyToClipboard(rule.source);
+                    UserNotification.success('Rule source code copied to clipboard!');
+                    onHide();
+                  }}>
+            Copy & Close
+          </Button>
+        </ModalButtonToolbar>
       </Modal.Footer>
     </BootstrapModalWrapper>
   );

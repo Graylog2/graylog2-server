@@ -26,6 +26,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Strings;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import okhttp3.Credentials;
@@ -48,12 +49,14 @@ import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
+    private final VersionProbeListener loggingListener = new VersionProbeLogger(LOG);
     private final ObjectMapper objectMapper;
     private final OkHttpClient okHttpClient;
     private final int connectionAttempts;
@@ -78,6 +81,10 @@ public class VersionProbe {
     }
 
     public Optional<SearchVersion> probe(final Collection<URI> hosts) {
+        return probe(hosts, this.loggingListener);
+    }
+
+    public Optional<SearchVersion> probe(final Collection<URI> hosts, VersionProbeListener probeListener) {
         try {
             return RetryerBuilder.<Optional<SearchVersion>>newBuilder()
                     .retryIfResult(input -> !input.isPresent())
@@ -92,32 +99,36 @@ public class VersionProbe {
                                     return;
                                 }
                             }
-                            if (connectionAttempts == 0) {
-                                LOG.info("OpenSearch/Elasticsearch is not available. Retry #{}", attempt.getAttemptNumber());
-                            } else {
-                                LOG.info("OpenSearch/Elasticsearch is not available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
-                            }
+                            probeListener.onRetry(attempt.getAttemptNumber(), connectionAttempts, getAttemptException(attempt));
                         }
                     })
                     .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
                     .withStopStrategy((connectionAttempts == 0) ? StopStrategies.neverStop() : StopStrategies.stopAfterAttempt(connectionAttempts))
-                    .build().call(() -> this.probeAllHosts(hosts));
+                    .build().call(() -> this.probeAllHosts(hosts, probeListener));
         } catch (ExecutionException | RetryException e) {
-            LOG.error("Unable to retrieve version from OpenSearch/Elasticsearch node: ", e);
+            probeListener.onError("Unable to retrieve version from indexer node: ", e);
         }
         return Optional.empty();
     }
 
-    private Optional<SearchVersion> probeAllHosts(final Collection<URI> hosts) {
+    @Nullable
+    private static Throwable getAttemptException(Attempt attempt) {
+        return Optional.of(attempt)
+                .filter(Attempt::hasException)
+                .map(Attempt::getExceptionCause)
+                .orElse(null);
+    }
+
+    private Optional<SearchVersion> probeAllHosts(final Collection<URI> hosts, VersionProbeListener listener) {
         return hosts
                 .stream()
-                .map(this::probeSingleHost)
+                .map(host -> probeSingleHost(host, listener))
                 .filter(Optional::isPresent)
                 .findFirst()
                 .orElse(Optional.empty());
     }
 
-    private Optional<SearchVersion> probeSingleHost(URI host) {
+    private Optional<SearchVersion> probeSingleHost(URI host, VersionProbeListener listener) {
         final Retrofit retrofit;
         try {
             retrofit = new Retrofit.Builder()
@@ -126,7 +137,7 @@ public class VersionProbe {
                     .client(addAuthenticationIfPresent(host, okHttpClient))
                     .build();
         } catch (MalformedURLException e) {
-            LOG.error("Elasticsearch node URL is invalid: " + host.toString(), e);
+            listener.onError("Indexer node URL is invalid: " + host, e);
             return Optional.empty();
         }
 
@@ -136,16 +147,18 @@ public class VersionProbe {
         final Consumer<ResponseBody> errorLogger = (responseBody) -> {
             try {
                 final ErrorResponse errorResponse = errorResponseConverter.convert(responseBody);
-                LOG.error("Unable to retrieve version from OpenSearch/Elasticsearch node {}:{}: {}", host.getHost(), host.getPort(), errorResponse);
+                final String message = String.format(Locale.ROOT, "Unable to retrieve version from indexer node %s:%s: %s", host.getHost(), host.getPort(), errorResponse);
+                listener.onError(message, null);
             } catch (IOException e) {
-                LOG.error("Unable to retrieve version from OpenSearch/Elasticsearch node {}:{}: unknown error - an exception occurred while deserializing error response: {}", host.getHost(), host.getPort(), e);
+                final String message = String.format(Locale.ROOT, "Unable to retrieve version from indexer node %s:%s: unknown error - an exception occurred while deserializing error response: {}", host.getHost(), host.getPort());
+                listener.onError(message, e);
             }
         };
 
 
-        return rootResponse(root, errorLogger)
+        return rootResponse(root, errorLogger, listener)
                 .map(RootResponse::version)
-                .flatMap(this::parseVersion);
+                .flatMap(versionResponse -> parseVersion(versionResponse, listener));
     }
 
     private Optional<String> getAuthToken(final URI host) {
@@ -176,18 +189,18 @@ public class VersionProbe {
         return okHttpClient;
     }
 
-    private Optional<SearchVersion> parseVersion(VersionResponse versionResponse) {
+    private Optional<SearchVersion> parseVersion(VersionResponse versionResponse, VersionProbeListener probeListener) {
         try {
             String version1 = versionResponse.number();
             final com.github.zafarkhaja.semver.Version version = Version.parse(version1);
             return Optional.of(SearchVersion.create(versionResponse.distribution(), version));
         } catch (Exception e) {
-            LOG.error("Unable to parse version retrieved from Elasticsearch node: <{}>", versionResponse.number(), e);
+            probeListener.onError(String.format(Locale.ROOT, "Unable to parse version retrieved from indexer node: <%s>", versionResponse.number()), e);
             return Optional.empty();
         }
     }
 
-    private Optional<RootResponse> rootResponse(final RootRoute rootRoute, Consumer<ResponseBody> errorLogger) {
+    private Optional<RootResponse> rootResponse(final RootRoute rootRoute, Consumer<ResponseBody> errorLogger, VersionProbeListener listener) {
         try {
             final Response<RootResponse> response = rootRoute.root().execute();
             if (response.isSuccessful()) {
@@ -198,7 +211,8 @@ public class VersionProbe {
         } catch (IOException e) {
             final String error = ExceptionUtils.formatMessageCause(e);
             final String rootCause = ExceptionUtils.formatMessageCause(ExceptionUtils.getRootCause(e));
-            LOG.error("Unable to retrieve version from Elasticsearch node: {} - {}", error, rootCause);
+            final String message = String.format(Locale.ROOT, "Unable to retrieve version from indexer node: %s - %s", error, rootCause);
+            listener.onError(message, null);
             LOG.debug("Complete exception for version probe error: ", e);
         }
         return Optional.empty();

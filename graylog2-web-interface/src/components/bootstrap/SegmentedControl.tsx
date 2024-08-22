@@ -15,38 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Dispatch, SetStateAction } from 'react';
 import { SegmentedControl as MantineSegmentedControl } from '@mantine/core';
 import { useTheme } from 'styled-components';
-import type { SegmentedControlItem } from '@mantine/core';
+import type { MantineRadius, SegmentedControlItem } from '@mantine/core';
 
-type Props = {
-  data: Array<string> | Array<SegmentedControlItem>,
+type Props<OptionValue> = {
+  data: Array<SegmentedControlItem & { value: OptionValue }>,
   defaultValue?: string,
   disabled?: boolean,
-  handleChange?: (value: string) => void | Dispatch<SetStateAction<string>>,
-  value?: string,
+  onChange?: (value: OptionValue) => void,
+  value?: OptionValue,
+  className?: string,
+  radius?: MantineRadius,
 }
 
-const SegmentedControl = ({ data, defaultValue, disabled, handleChange, value }: Props) => {
+const SegmentedControl = <OptionValue extends string>({ className, data, defaultValue, disabled, onChange, value, radius }: Props<OptionValue>) => {
   const theme = useTheme();
 
   return (
     <MantineSegmentedControl color={theme.colors.variant.info}
+                             className={className}
                              data={data}
                              defaultValue={defaultValue}
+                             radius={radius}
                              disabled={disabled}
                              value={value}
-                             onChange={handleChange}
+                             onChange={onChange}
                              styles={{ label: { marginBottom: 0 } }} />
   );
 };
 
 SegmentedControl.defaultProps = {
+  className: undefined,
   defaultValue: undefined,
   disabled: false,
-  handleChange: undefined,
+  onChange: undefined,
   value: undefined,
+  radius: 'xs',
 };
 
 export default SegmentedControl;

@@ -31,6 +31,8 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -59,6 +61,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.messages.ImmutableMessage.wrap;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -71,6 +74,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     protected Messages messages;
 
     protected static final IndexSet indexSet = new MessagesTestIndexSet();
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     protected MessagesAdapter createMessagesAdapter() {
         return searchServer().adapters().messagesAdapter();
@@ -164,14 +168,14 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     @Test
     public void conflictingFieldTypesErrorAreReported() throws Exception {
         final String fieldName = "_ourcustomfield";
-        final Message message1 = new Message("One message", "loghost-a", now());
+        final Message message1 = messageFactory.createMessage("One message", "loghost-a", now());
         message1.addField(fieldName, 42);
-        final Message message2 = new Message("Another message", "loghost-b", now());
+        final Message message2 = messageFactory.createMessage("Another message", "loghost-b", now());
         message2.addField(fieldName, "fourty-two");
 
         final List<MessageWithIndex> messageBatch = List.of(
-                new MessageWithIndex(message1, indexSet),
-                new MessageWithIndex(message2, indexSet)
+                new MessageWithIndex(wrap(message1), indexSet),
+                new MessageWithIndex(wrap(message2), indexSet)
         );
 
         var results = this.messages.bulkIndex(messageBatch);
@@ -183,16 +187,16 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @Test
     public void messagesWithTheSameIdCanBeIngestedIntoMultipleIndices() {
-        final Message message1 = new Message(Map.of("_id", "1234", "message", "One message", "source", "loghost-a", "timestamp", now()));
-        final Message message2 = new Message(Map.of("_id", "1234", "message", "One message", "source", "loghost-a", "timestamp", now()));
+        final Message message1 = messageFactory.createMessage(Map.of("_id", "1234", "message", "One message", "source", "loghost-a", "timestamp", now()));
+        final Message message2 = messageFactory.createMessage(Map.of("_id", "1234", "message", "One message", "source", "loghost-a", "timestamp", now()));
 
         final TestIndexSet indexSet2 = new TestIndexSet(indexSet.getConfig().toBuilder().indexPrefix("message_it2").build());
         client().createIndex("message_it2_deflector");
         client().waitForGreenStatus("message_it2_deflector");
 
         final List<MessageWithIndex> messageBatch = List.of(
-                new MessageWithIndex(message1, indexSet),
-                new MessageWithIndex(message2, indexSet2)
+                new MessageWithIndex(wrap(message1), indexSet),
+                new MessageWithIndex(wrap(message2), indexSet2)
         );
         var results = this.messages.bulkIndex(messageBatch);
 
@@ -286,10 +290,10 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @Test
     public void properlySerializesCustomObjectsInMessageField() throws IOException {
-        final Message message = new Message("Some message", "somesource", now());
+        final Message message = messageFactory.createMessage("Some message", "somesource", now());
         message.addField("custom_object", new TextNode("foo"));
         final List<MessageWithIndex> messageBatch = List.of(
-                new MessageWithIndex(message, indexSet)
+                new MessageWithIndex(wrap(message), indexSet)
         );
 
         var results = this.messages.bulkIndex(messageBatch);
@@ -339,7 +343,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(new MessageWithIndex(new Message(i + message, "source", now()), indexSet));
+            messageList.add(new MessageWithIndex(wrap(messageFactory.createMessage(i + message, "source", now())), indexSet));
         }
         return messageList;
     }

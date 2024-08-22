@@ -132,7 +132,7 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
       value,
       label,
     })), [fieldTypes]);
-  const fields = useMemo(() => (isLoading ? [] : data.map(({ value: { name } }) => ({ value: name, label: name }))), [data, isLoading]);
+  const fields = useMemo(() => (isLoading ? [] : data.map(({ value: { name } }) => ({ value: name, label: name, disabled: isReservedField(name) }))), [data, isLoading]);
 
   const _onSubmit = (profile: IndexSetFieldTypeProfileForm) => {
     onSubmit(profile);

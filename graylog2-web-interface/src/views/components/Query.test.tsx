@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { createViewWithWidgets, createSearch } from 'fixtures/searches';
 
 import OriginalQuery from './Query';
@@ -36,9 +36,7 @@ const Query = (props: Partial<React.ComponentProps<typeof TestStoreProvider>>) =
 );
 
 describe('Query', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('renders dashboard widget creation explanation on the dashboard page, if no widget is defined', async () => {
     const dashboard = createSearch().toBuilder().type(View.Type.Dashboard).build();

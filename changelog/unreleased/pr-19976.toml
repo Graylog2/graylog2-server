@@ -1,0 +1,5 @@
+type = "a"
+message = "Indices not managed by Graylog are now marked and not selected by default in data node's remote reindex migration."
+
+pulls = ["19976"]
+issues = ["19974"]

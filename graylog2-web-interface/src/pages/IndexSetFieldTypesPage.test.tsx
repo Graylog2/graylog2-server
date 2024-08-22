@@ -21,11 +21,11 @@ import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { overriddenIndexField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
@@ -49,7 +49,7 @@ const renderIndexSetFieldTypesPage = () => render(
 );
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
-jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', () => jest.fn());
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
@@ -60,8 +60,8 @@ jest.mock('use-query-params', () => ({
 
 jest.mock('stores/indices/IndexSetsStore', () => ({
   IndexSetsActions: {
-    list: jest.fn(),
-    get: jest.fn(),
+    list: jest.fn(() => Promise.resolve()),
+    get: jest.fn(() => Promise.resolve()),
   },
   IndexSetsStore: MockStore(['getInitialState', () => ({
     indexSets: [
@@ -71,10 +71,8 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
   })]),
 }));
 
-describe('IndexSetFieldTypesList', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+describe('IndexSetFieldTypesPage', () => {
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({
@@ -103,11 +101,10 @@ describe('IndexSetFieldTypesList', () => {
   });
 
   it('Shows modal on edit click', async () => {
-    asMock(useIndexSetFieldTypes).mockReturnValue({
-      isLoading: false,
+    asMock(useFetchEntities).mockReturnValue({
+      isInitialLoading: false,
       refetch: () => {},
       data: getData([overriddenIndexField]),
-
     });
 
     renderIndexSetFieldTypesPage();
@@ -122,8 +119,8 @@ describe('IndexSetFieldTypesList', () => {
   });
 
   it('Shows modal on Change field type click', async () => {
-    asMock(useIndexSetFieldTypes).mockReturnValue({
-      isLoading: false,
+    asMock(useFetchEntities).mockReturnValue({
+      isInitialLoading: false,
       refetch: () => {},
       data: getData([overriddenIndexField]),
     });

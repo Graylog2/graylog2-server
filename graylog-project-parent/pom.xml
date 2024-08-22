@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>6.0.0-SNAPSHOT</version>
+        <version>6.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
@@ -149,6 +149,7 @@
                 <groupId>org.apache.directory.api</groupId>
                 <artifactId>api-all</artifactId>
                 <version>${apache-directory-version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -413,13 +414,6 @@
                         <groupId>commons-logging</groupId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <!-- Integrations plugin -->
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-csv</artifactId>
-                <version>${commons-csv.version}</version>
             </dependency>
 
             <!-- Test dependencies -->

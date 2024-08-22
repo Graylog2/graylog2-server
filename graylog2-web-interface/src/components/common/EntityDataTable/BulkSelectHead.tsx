@@ -22,6 +22,7 @@ import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { Th } from 'components/common/EntityDataTable/TableHead';
 
 type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
@@ -83,14 +84,14 @@ const BulkSelectHead = <Entity extends EntityBase>({
   };
 
   return (
-    <td style={{ width: `${BULK_SELECT_COLUMN_WIDTH}px` }}>
+    <Th $width={BULK_SELECT_COLUMN_WIDTH}>
       <RowCheckbox inputRef={(ref) => { checkboxRef.current = ref; }}
                    onChange={onBulkSelect}
                    checked={checkboxStatus === 'CHECKED'}
                    title={title}
                    disabled={!data?.length}
                    aria-label={title} />
-    </td>
+    </Th>
   );
 };
 

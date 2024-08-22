@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import URI from 'urijs';
 
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import { Col, Row } from 'components/bootstrap';
@@ -28,14 +29,21 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useHistory from 'routing/useHistory';
+import useQuery from 'routing/useQuery';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
 const EditEventDefinitionPage = () => {
   const params = useParams<{definitionId?: string}>();
+  const { step } = useQuery();
   const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = React.useState<EventDefinition>(undefined);
   const history = useHistory();
+  const navigate = useNavigate();
+
+  const goToOverview = useCallback(() => {
+    navigate(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [navigate]);
 
   React.useEffect(() => {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
@@ -71,6 +79,11 @@ const EditEventDefinitionPage = () => {
 
   const missingStreams = streamsWithMissingPermissions();
 
+  const updateURLStepQueryParam = (newStep: string) => {
+    const newUrl = new URI(window.location.href).removeSearch('step').addQuery('step', newStep);
+    history.replace(newUrl.resource());
+  };
+
   if (missingStreams.length > 0) {
     return <StreamPermissionErrorPage error={null} missingStreamIds={missingStreams} />;
   }
@@ -101,7 +114,12 @@ const EditEventDefinitionPage = () => {
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
+          <EventDefinitionFormContainer action="edit"
+                                        initialStep={step as string}
+                                        onChangeStep={updateURLStepQueryParam}
+                                        eventDefinition={eventDefinition}
+                                        onSubmit={goToOverview}
+                                        onCancel={goToOverview} />
         </Col>
       </Row>
     </DocumentTitle>

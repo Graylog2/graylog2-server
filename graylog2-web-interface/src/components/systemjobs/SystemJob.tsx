@@ -68,7 +68,7 @@ const JobWrap = styled.div`
 
 const AcknowledgeButton = styled(Button)(({ theme }) => css`
   && {
-    color: ${theme.colors.variant.light.default};
+    color: ${theme.colors.global.textDefault};
     
     &:hover {
       color: ${theme.colors.variant.default};
@@ -117,7 +117,7 @@ const SystemJob = ({ job }) => {
           : (<AcknowledgeButton type="button" bsStyle="link" onClick={_onAcknowledge()} bsSize="xs" className="pull-right" title="Acknowledge"><Icon name="close" /></AcknowledgeButton>)}
       </JobWrap>
 
-      {!jobIsOver && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
+      {!jobIsOver && job.provides_progress && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
     </div>
   );
 };

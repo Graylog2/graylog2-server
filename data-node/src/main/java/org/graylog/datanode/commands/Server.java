@@ -25,22 +25,21 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.PeriodicalBindings;
 import org.graylog.datanode.bindings.ServerBindings;
 import org.graylog.datanode.bootstrap.Main;
 import org.graylog.datanode.bootstrap.ServerBootstrap;
+import org.graylog.datanode.configuration.DatanodeProvisioningBindings;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
-import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog2.bindings.MongoDBModule;
-import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
@@ -52,8 +51,6 @@ import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -92,16 +89,15 @@ public class Server extends ServerBootstrap {
                 new MongoDBModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
                 new RestBindings(),
-                new DataNodeProvisioningBindings(),
+                new DatanodeProvisioningBindings(),
                 new PeriodicalBindings(),
-                new ObjectMapperModule(chainingClassLoader),
-                new PasswordAlgorithmBindings()
+                new ObjectMapperModule(chainingClassLoader)
         );
         return modules.build();
     }
 
     @Override
-    protected List<Object> getCommandConfigurationBeans() {
+    public List<Object> getCommandConfigurationBeans() {
         return Arrays.asList(configuration,
                 mongoDbConfiguration,
                 tlsConfiguration,
@@ -140,7 +136,6 @@ public class Server extends ServerBootstrap {
         // always set leader to "false" on startup and let the NodePingPeriodical take care of it later
         nodeService.registerServer(DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
-                .setLeader(false)
                 .setTransportAddress(configuration.getHttpPublishUri().toString())
                 .setHostname(Tools.getLocalCanonicalHostname())
                 .setDataNodeStatus(DataNodeStatus.STARTING)

@@ -18,29 +18,32 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { Button, ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { MoreActions } from 'components/common/EntityDataTable';
 
 import CopyConfigurationModal from './CopyConfigurationModal';
 import styles from './ConfigurationRow.css';
 
 class ConfigurationRow extends React.Component {
-  static propTypes = {
-    configuration: PropTypes.object.isRequired,
-    collector: PropTypes.object,
-    onCopy: PropTypes.func.isRequired,
-    validateConfiguration: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    sendTelemetry: PropTypes.func,
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showModal: false,
+    };
+  }
+
+  openModal = () => {
+    this.setState({ showModal: true });
   };
 
-  static defaultProps = {
-    collector: {},
-    sendTelemetry: () => {},
+  closeModal = () => {
+    this.setState({ showModal: false });
   };
 
   _handleDelete = async () => {
@@ -59,6 +62,7 @@ class ConfigurationRow extends React.Component {
 
   render() {
     const { collector, configuration, validateConfiguration, onCopy } = this.props;
+    const { showModal } = this.state;
 
     return (
       <tr>
@@ -73,21 +77,38 @@ class ConfigurationRow extends React.Component {
             <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}>
               <Button onClick={this.openModal} bsStyle="info" bsSize="xsmall">Edit</Button>
             </LinkContainer>
-            <DropdownButton id={`more-actions-${configuration.id}`}
-                            title="More actions"
-                            bsSize="xsmall"
-                            pullRight>
-              <CopyConfigurationModal configuration={configuration}
-                                      validateConfiguration={validateConfiguration}
-                                      copyConfiguration={onCopy} />
+            <MoreActions>
+              <MenuItem onSelect={() => this.openModal()}>Clone</MenuItem>
+
               <MenuItem divider />
               <MenuItem onSelect={this._handleDelete} variant="danger">Delete</MenuItem>
-            </DropdownButton>
+            </MoreActions>
+            {showModal && (
+            <CopyConfigurationModal configuration={configuration}
+                                    onClose={this.closeModal}
+                                    showModal={showModal}
+                                    validateConfiguration={validateConfiguration}
+                                    copyConfiguration={onCopy} />
+            )}
           </ButtonToolbar>
         </td>
       </tr>
     );
   }
 }
+
+ConfigurationRow.propTypes = {
+  configuration: PropTypes.object.isRequired,
+  collector: PropTypes.object,
+  onCopy: PropTypes.func.isRequired,
+  validateConfiguration: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  sendTelemetry: PropTypes.func,
+};
+
+ConfigurationRow.defaultProps = {
+  collector: {},
+  sendTelemetry: () => {},
+};
 
 export default withTelemetry(ConfigurationRow);

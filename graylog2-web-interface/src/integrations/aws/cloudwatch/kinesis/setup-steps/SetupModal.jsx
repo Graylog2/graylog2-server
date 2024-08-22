@@ -18,6 +18,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Alert, Button, Modal } from 'components/bootstrap';
+import { ModalSubmit } from 'components/common';
 
 import Agree from './Agree';
 import KinesisSetupSteps from './KinesisSetupSteps';
@@ -69,17 +70,10 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }) => {
             </Button>
           )
           : (
-            <>
-              <Button onClick={onCancel}
-                      type="button">
-                Cancel
-              </Button>
-              <Button onClick={() => (setAgreed(true))}
-                      type="button"
-                      bsStyle="success">
-                I Agree! Create these AWS resources now.
-              </Button>
-            </>
+            <ModalSubmit submitButtonText="I Agree! Create these AWS resources now."
+                         onSubmit={() => (setAgreed(true))}
+                         submitButtonType="button"
+                         onCancel={onCancel} />
           )}
       </Modal.Footer>
     </Modal>

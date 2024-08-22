@@ -23,7 +23,6 @@ import { Button, FormikInput, Space } from 'preflight/components/common';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
-import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
 type FormValues = {}
@@ -61,7 +60,6 @@ const CACreateForm = () => {
       <Formik initialValues={{ organization: 'Graylog CA' }} onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
         {({ isSubmitting, isValid }) => (
           <Form>
-            <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
             <FormikInput placeholder="Organization Name"
                          name="organization"
                          label="Organization Name"

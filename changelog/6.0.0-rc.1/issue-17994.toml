@@ -1,0 +1,5 @@
+type = "c"
+message = "Add ability to specify a TTL for null values in lookup table caches."
+
+pulls = ["17994"]
+issues=["16466"]

@@ -16,6 +16,7 @@
  */
 package org.graylog2.telemetry.rest;
 
+import com.google.common.base.Strings;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.joda.time.DateTime;
@@ -160,6 +161,9 @@ class TelemetryResponseFactory {
     }
 
     private String formatLicenseString(TelemetryLicenseStatus telemetryLicenseStatus) {
-        return telemetryLicenseStatus.subject().replace("/", "_").substring(1);
+        if (!Strings.isNullOrEmpty(telemetryLicenseStatus.subject())) {
+            return telemetryLicenseStatus.subject().replace("/", "_").substring(1);
+        }
+        return "";
     }
 }

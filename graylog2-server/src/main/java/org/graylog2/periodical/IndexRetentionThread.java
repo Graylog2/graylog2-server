@@ -21,6 +21,7 @@ import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -48,6 +49,8 @@ public class IndexRetentionThread extends Periodical {
     private final Map<String, Provider<RetentionStrategy>> retentionStrategyMap;
     private final DataTieringOrchestrator dataTieringOrchestrator;
 
+    private final RemoteReindexingMigrationAdapter migrationService;
+
     @Inject
     public IndexRetentionThread(ElasticsearchConfiguration configuration,
                                 IndexSetRegistry indexSetRegistry,
@@ -55,7 +58,7 @@ public class IndexRetentionThread extends Periodical {
                                 NodeId nodeId,
                                 NotificationService notificationService,
                                 Map<String, Provider<RetentionStrategy>> retentionStrategyMap,
-                                DataTieringOrchestrator dataTieringOrchestrator) {
+                                DataTieringOrchestrator dataTieringOrchestrator, RemoteReindexingMigrationAdapter migrationService) {
         this.configuration = configuration;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -63,6 +66,7 @@ public class IndexRetentionThread extends Periodical {
         this.notificationService = notificationService;
         this.retentionStrategyMap = retentionStrategyMap;
         this.dataTieringOrchestrator = dataTieringOrchestrator;
+        this.migrationService = migrationService;
     }
 
     @Override
@@ -81,8 +85,14 @@ public class IndexRetentionThread extends Periodical {
                 LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
                 continue;
             }
+
+            if(isCurrentlyMigrated(indexSet)) {
+                LOG.info("Index set <{}> is currently being migrated, skipping retention", indexSet.getConfig().title());
+                continue;
+            }
+
             final IndexSetConfig config = indexSet.getConfig();
-            if (config.dataTiering() != null) {
+            if (config.dataTieringConfig() != null) {
                 dataTieringOrchestrator.retain(indexSet);
             } else {
                 final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategyClass());
@@ -97,6 +107,10 @@ public class IndexRetentionThread extends Periodical {
                 retentionStrategyProvider.get().retain(indexSet);
             }
         }
+    }
+
+    private boolean isCurrentlyMigrated(IndexSet indexSet) {
+        return migrationService.isMigrationRunning(indexSet);
     }
 
     private void retentionProblemNotification(String title, String description) {

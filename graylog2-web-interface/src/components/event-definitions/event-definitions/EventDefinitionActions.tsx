@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
@@ -37,13 +38,18 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import MoreActions from 'components/common/EntityDataTable/MoreActions';
+import { MoreActions } from 'components/common/EntityDataTable';
+import usePluginEntities from 'hooks/usePluginEntities';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 import type { EventDefinition } from '../event-definitions-types';
 
+type SigmaEventDefinitionConfig = EventDefinition['config'] & {
+  sigma_rule_id: string,
+}
+
 type Props = {
   eventDefinition: EventDefinition,
-  refetchEventDefinitions: () => void,
 }
 
 const DIALOG_TYPES = {
@@ -72,21 +78,45 @@ const DIALOG_TEXT = {
   },
 };
 
-const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Props) => {
+const EventDefinitionActions = ({ eventDefinition }: Props) => {
+  const { refetch: refetchEventDefinitions } = useTableFetchContext();
   const { deselectEntity } = useSelectedEntities();
   const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
   const [currentDefinition, setCurrentDefinition] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
+  const [showSigmaModal, setShowSigmaModal] = useState(false);
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const navigate = useNavigate();
 
   const showActions = (): boolean => scopePermissions?.is_mutable;
 
   const isSystemEventDefinition = (): boolean => eventDefinition?.config?.type === 'system-notifications-v1';
 
   const isAggregationEventDefinition = (): boolean => eventDefinition?.config?.type === 'aggregation-v1';
+
+  const isSigmaEventDefinition = (): boolean => eventDefinition?.config?.type === 'sigma-v1';
+
+  const getDeleteActionTitle = () => {
+    if (isSystemEventDefinition()) {
+      return 'System Event Definition cannot be deleted';
+    }
+
+    if (isSigmaEventDefinition()) {
+      return 'Sigma Rules must be deleted from the Sigma Rules page';
+    }
+
+    return undefined;
+  };
+
+  const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal')
+    .find((entity: { key: string }) => entity.key === 'coreSigmaModal');
+
+  const CoreSigmaModal = pluggableSigmaModal
+    ? pluggableSigmaModal.component as React.FC<{ ruleId: string, onCancel: () => void, onConfirm: () => void }>
+    : null;
 
   const updateState = ({ show, type, definition }) => {
     setShowDialog(show);
@@ -201,6 +231,19 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
     }
   };
 
+  const onEditEventDefinition = () => {
+    if (isSigmaEventDefinition()) {
+      setShowSigmaModal(true);
+    } else {
+      navigate(Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id));
+    }
+  };
+
+  const onSigmaModalClose = () => {
+    refetchEventDefinitions();
+    setShowSigmaModal(false);
+  };
+
   const isEnabled = eventDefinition?.state === 'ENABLED';
 
   return (
@@ -212,13 +255,11 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
                      bsSize="xsmall" />
         <MoreActions>
           <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-              <MenuItem data-testid="edit-button">
-                Edit
-              </MenuItem>
-            </LinkContainer>
+            <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
+              Edit
+            </MenuItem>
           </IfPermitted>
-          {!isSystemEventDefinition() && (
+          {!isSystemEventDefinition() && !isSigmaEventDefinition() && (
             <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
           )}
           <MenuItem divider />
@@ -231,9 +272,9 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
-              <MenuItem disabled={isSystemEventDefinition()}
-                        title={isSystemEventDefinition() ? 'System Event Definition cannot be deleted' : undefined}
-                        onClick={isSystemEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
+              <MenuItem disabled={isSystemEventDefinition() || isSigmaEventDefinition()}
+                        title={getDeleteActionTitle()}
+                        onClick={isSystemEventDefinition() || isSigmaEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
                         data-testid="delete-button">Delete
               </MenuItem>
             </IfPermitted>
@@ -268,6 +309,11 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
                           entityTitle={eventDefinition.title}
                           description="Search for a User or Team to add as collaborator on this event definition."
                           onClose={() => setShowEntityShareModal(false)} />
+      )}
+      {showSigmaModal && CoreSigmaModal && (
+        <CoreSigmaModal ruleId={(eventDefinition.config as SigmaEventDefinitionConfig).sigma_rule_id}
+                        onCancel={onSigmaModalClose}
+                        onConfirm={onSigmaModalClose} />
       )}
     </>
   );

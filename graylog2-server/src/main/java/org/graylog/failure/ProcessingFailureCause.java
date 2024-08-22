@@ -22,6 +22,7 @@ public enum ProcessingFailureCause implements FailureCause {
     ExtractorException("ExtractorException"),
     MessageFilterException("MessageFilterException"),
     InvalidTimestampException("InvalidTimestampException"),
+    StreamMatchException("StreamMatchException"),
     UNKNOWN("UNKNOWN"),
     ;
 

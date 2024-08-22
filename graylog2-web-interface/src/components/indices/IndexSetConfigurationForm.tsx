@@ -14,19 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import AppConfig from 'util/AppConfig';
-import { FormikFormGroup, FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
-import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
+import { FormikInput, FormSubmit, Section, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col, Row, Input, SegmentedControl } from 'components/bootstrap';
+import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
@@ -44,6 +43,7 @@ import useHistory from 'routing/useHistory';
 import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConfiguration';
 import useFeature from 'hooks/useFeature';
 import useIndexSet from 'components/indices/hooks/useIndexSet';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 type Props = {
   cancelLink: string,
@@ -74,18 +74,20 @@ type Unit = 'seconds' | 'minutes';
 
 type RetentionConfigSegment = 'data_tiering' | 'legacy'
 
-const StyledFormSubmit = styled(FormSubmit)`
-  margin-left: 0;
-`;
-
-const ConfigSegmentsTitle = styled.h2(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
-
 const ConfigSegment = styled.div(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
   margin-top: ${theme.spacings.md};
 `);
+
+const FlexWrapper = styled.div(({ theme }) => css`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacings.md};
+`);
+
+const SubmitWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
 
 const _validateIndexPrefix = (value: string) => {
   let error: string;
@@ -121,6 +123,7 @@ const RotationStrategies = ({ rotationStrategies, indexSetRotationStrategy, inde
                                              name="rotation"
                                              description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
                                              selectPlaceholder="Select rotation strategy"
+                                             label="Rotation strategy"
                                              pluginExports={PluginStore.exports('indexRotationConfig')}
                                              strategies={rotationStrategies}
                                              activeConfig={{
@@ -139,6 +142,7 @@ const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, inde
                                              name="retention"
                                              description="Graylog uses a retention strategy to clean up old indices."
                                              selectPlaceholder="Select retention strategy"
+                                             label="Retention strategy"
                                              pluginExports={PluginStore.exports('indexRetentionConfig')}
                                              strategies={retentionStrategies}
                                              retentionStrategiesContext={retentionStrategiesContext}
@@ -160,17 +164,19 @@ const ReadOnlyConfig = () => {
 
   return (
     <span>
-      <FormikFormGroup type="text"
-                       label="Index prefix"
-                       name="index_prefix"
-                       help={indexPrefixHelp}
-                       validate={_validateIndexPrefix}
-                       required />
-      <FormikFormGroup type="text"
-                       label="Analyzer"
-                       name="index_analyzer"
-                       help="Elasticsearch analyzer for this index set."
-                       required />
+      <FormikInput type="text"
+                   id="index-prefix"
+                   label="Index prefix"
+                   name="index_prefix"
+                   help={indexPrefixHelp}
+                   validate={_validateIndexPrefix}
+                   required />
+      <FormikInput type="text"
+                   id="index-analyzer"
+                   label="Analyzer"
+                   name="index_analyzer"
+                   help="Elasticsearch analyzer for this index set."
+                   required />
     </span>
   );
 };
@@ -189,7 +195,7 @@ const IndexSetConfigurationForm = ({
   const history = useHistory();
 
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
-  const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
+  const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
   const [indexSet] = useIndexSet(initialIndexSet);
   const isCloud = AppConfig.isCloud();
   const enableDataTieringCloud = useFeature('data_tiering_cloud');
@@ -207,8 +213,16 @@ const IndexSetConfigurationForm = ({
 
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
+  useEffect(() => {
+    if (indexSet?.use_legacy_rotation) {
+      setSelectedRetentionSegment('legacy');
+    } else {
+      setSelectedRetentionSegment('data_tiering');
+    }
+  }, [indexSet]);
+
   const prepareRetentionConfigBeforeSubmit = useCallback((values: IndexSetFormValues) : IndexSet => {
-    const legacyConfig = { ...values, data_tiering: indexDefaultsConfig.data_tiering, use_legacy_rotation: true };
+    const legacyConfig = { ...values, data_tiering: indexSetTemplateDefaults.data_tiering, use_legacy_rotation: true };
 
     if (isCloud && !enableDataTieringCloud) {
       return legacyConfig;
@@ -218,19 +232,19 @@ const IndexSetConfigurationForm = ({
       return legacyConfig;
     }
 
-    const configWithDataTiering = prepareDataTieringConfig(values, PluginStore);
+    const configWithDataTiering = { ...values, data_tiering: prepareDataTieringConfig(values.data_tiering, PluginStore) };
 
-    if (loadingIndexDefaultsConfig || !indexDefaultsConfig) return { ...configWithDataTiering, use_legacy_rotation: false };
+    if (loadingIndexSetTemplateDefaults || !indexSetTemplateDefaults) return { ...configWithDataTiering, use_legacy_rotation: false };
 
-    const legacyDefaultConfig = {
-      rotation_strategy_class: indexDefaultsConfig.rotation_strategy_class,
-      rotation_strategy: indexDefaultsConfig.rotation_strategy_config as RotationStrategyConfig,
-      retention_strategy_class: indexDefaultsConfig.retention_strategy_class,
-      retention_strategy: indexDefaultsConfig.retention_strategy_config as RetentionStrategyConfig,
+    const legacyindexSetTemplateDefaults = {
+      rotation_strategy_class: indexSetTemplateDefaults.rotation_strategy_class,
+      rotation_strategy: indexSetTemplateDefaults.rotation_strategy as RotationStrategyConfig,
+      retention_strategy_class: indexSetTemplateDefaults.retention_strategy_class,
+      retention_strategy: indexSetTemplateDefaults.retention_strategy as RetentionStrategyConfig,
     };
 
-    return { ...configWithDataTiering, ...legacyDefaultConfig, use_legacy_rotation: false };
-  }, [loadingIndexDefaultsConfig, indexDefaultsConfig, selectedRetentionSegment, enableDataTieringCloud, isCloud]);
+    return { ...configWithDataTiering, ...legacyindexSetTemplateDefaults, use_legacy_rotation: false };
+  }, [loadingIndexSetTemplateDefaults, indexSetTemplateDefaults, selectedRetentionSegment, enableDataTieringCloud, isCloud]);
 
   const saveConfiguration = (values: IndexSetFormValues) => onUpdate(prepareRetentionConfigBeforeSubmit(values));
 
@@ -247,141 +261,142 @@ const IndexSetConfigurationForm = ({
 
   if (!indexSet) return null;
 
-  const {
-    rotation_strategy: indexSetRotationStrategy,
-    rotation_strategy_class: indexSetRotationStrategyClass,
-    retention_strategy: indexSetRetentionStrategy,
-    retention_strategy_class: IndexSetRetentionStrategyClass,
-  } = indexSet;
-
   const onCancel = () => history.push(cancelLink);
 
-  if (loadingIndexDefaultsConfig) return (<Spinner />);
+  if (loadingIndexSetTemplateDefaults) return (<Spinner />);
+
+  const prepareInitialValues = () => {
+    if (indexSet.data_tiering) {
+      return { ...indexSet, data_tiering: prepareDataTieringInitialValues(indexSet.data_tiering, PluginStore) };
+    }
+
+    return indexSet as unknown as IndexSetFormValues;
+  };
 
   return (
     <Row>
-      <Col md={8}>
+      <Col md={12}>
         <Formik onSubmit={saveConfiguration}
                 enableReinitialize
-                initialValues={prepareDataTieringInitialValues(indexSet)}>
+                initialValues={prepareInitialValues()}>
           {({ isValid, setFieldValue, isSubmitting, values }) => (
             <IndexRetentionProvider>
               <Form>
-                <Row>
-                  <Col md={12}>
-                    <FormikFormGroup type="text"
-                                     label="Title"
-                                     name="title"
-                                     help="Descriptive name of the index set."
-                                     required />
-                    <FormikFormGroup type="text"
-                                     label="Description"
-                                     name="description"
-                                     help="Add a description of this index set."
-                                     required />
+                <FlexWrapper>
+                  <Section title="Configuration Information">
+                    <FormikInput type="text"
+                                 label="Title"
+                                 id="title"
+                                 name="title"
+                                 help="Descriptive name of the index set."
+                                 required />
+                    <FormikInput type="text"
+                                 id="description"
+                                 label="Description"
+                                 name="description"
+                                 help="Add a description of this index set."
+                                 required />
+                  </Section>
+                  <Section title="Details">
                     {create && <ReadOnlyConfig />}
                     <HideOnCloud>
-                      <FormikFormGroup type="number"
-                                       label="Index shards"
-                                       name="shards"
-                                       help="Number of Elasticsearch shards used per index in this index set."
-                                       required />
-                      <FormikFormGroup type="number"
-                                       label="Index replicas"
-                                       name="replicas"
-                                       help="Number of Elasticsearch replicas used per index in this index set."
-                                       required />
-                      <FormikFormGroup type="number"
-                                       label="Max. number of segments"
-                                       name="index_optimization_max_num_segments"
-                                       minLength={1}
-                                       help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
-                                       required />
-                      <Input id="roles-selector-input"
-                             labelClassName="col-sm-3"
-                             wrapperClassName="col-sm-9"
-                             label="Index optimization after rotation">
-                        <FormikInput type="checkbox"
-                                     id="index_optimization_disabled"
-                                     label="Disable index optimization after rotation"
-                                     name="index_optimization_disabled"
-                                     help="Disable Elasticsearch index optimization (force merge) after rotation." />
-                      </Input>
+                      <FormikInput type="number"
+                                   id="shards"
+                                   label="Index shards"
+                                   name="shards"
+                                   help="Number of Elasticsearch shards used per index in this index set."
+                                   required />
+                      <FormikInput type="number"
+                                   id="replicas"
+                                   label="Index replicas"
+                                   name="replicas"
+                                   help="Number of Elasticsearch replicas used per index in this index set."
+                                   required />
+                      <FormikInput type="number"
+                                   id="max-number-segments"
+                                   label="Max. number of segments"
+                                   name="index_optimization_max_num_segments"
+                                   minLength={1}
+                                   help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
+                                   required />
+                      <FormikInput type="checkbox"
+                                   id="index-optimization-disabled"
+                                   label="Disable index optimization after rotation"
+                                   name="index_optimization_disabled"
+                                   help="Disable Elasticsearch index optimization (force merge) after rotation." />
                       <Field name="field_type_refresh_interval">
                         {({ field: { name, value, onChange } }) => (
-                          <Input id="roles-selector-input"
-                                 labelClassName="col-sm-3"
-                                 wrapperClassName="col-sm-9"
-                                 label="Field type refresh interval">
-                            <TimeUnitInput id="field-type-refresh-interval"
-                                           type="number"
-                                           help="How often the field type information for the active write index will be updated."
-                                           value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
-                                           unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
-                                           units={['SECONDS', 'MINUTES']}
-                                           required
-                                           update={(intervalValue: number, unit: Unit) => onFieldTypeRefreshIntervalChange(
-                                             intervalValue, unit, name, onChange, setFieldValue,
-                                           )} />
-                          </Input>
+                          <TimeUnitInput id="field-type-refresh-interval"
+                                         label="Field type refresh interval"
+                                         type="number"
+                                         help="How often the field type information for the active write index will be updated."
+                                         value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
+                                         unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
+                                         units={['SECONDS', 'MINUTES']}
+                                         required
+                                         update={(intervalValue: number, unit: Unit) => onFieldTypeRefreshIntervalChange(
+                                           intervalValue, unit, name, onChange, setFieldValue,
+                                         )} />
                         )}
                       </Field>
                     </HideOnCloud>
-                  </Col>
-                </Row>
-                {isCloud && !enableDataTieringCloud ? (
-                  <>
-                    {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
-                    {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
-                  </>
-                ) : (
-                  <>
-                    <ConfigSegmentsTitle>Rotation and Retention</ConfigSegmentsTitle>
-                    <SegmentedControl data={retentionConfigSegments}
-                                      value={selectedRetentionSegment}
-                                      handleChange={setSelectedRetentionSegment as Dispatch<SetStateAction<string>>} />
+                  </Section>
 
-                    {selectedRetentionSegment === 'data_tiering' ? (
-                      <ConfigSegment>
-                        <h3>Data Tiering Configuration</h3>
-                        <DataTieringVisualisation minDays={values.data_tiering?.index_lifetime_min}
-                                                  maxDays={values.data_tiering?.index_lifetime_max}
-                                                  minDaysInHot={values.data_tiering?.index_hot_lifetime_min}
-                                                  warmTierEnabled={values.data_tiering?.warm_tier_enabled}
-                                                  archiveData={values.data_tiering?.archive_before_deletion} />
-                        <DataTieringConfiguration />
-                      </ConfigSegment>
-                    )
-                      : (
-                        <ConfigSegment>
-                          {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
-                          {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
-                        </ConfigSegment>
+                  <Section title="Rotation & Retention">
+                    {isCloud && !enableDataTieringCloud ? (
+                      <>
+                        {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />}
+                        {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} IndexSetRetentionStrategyClass={values.retention_strategy_class} />}
+                      </>
+                    ) : (
+                      <>
+                        <SegmentedControl<RetentionConfigSegment> data={retentionConfigSegments}
+                                                                  value={selectedRetentionSegment}
+                                                                  onChange={setSelectedRetentionSegment} />
+
+                        {selectedRetentionSegment === 'data_tiering' ? (
+                          <>
+                            <DataTieringVisualisation minDays={values.data_tiering?.index_lifetime_min}
+                                                      maxDays={values.data_tiering?.index_lifetime_max}
+                                                      minDaysInHot={values.data_tiering?.index_hot_lifetime_min}
+                                                      warmTierEnabled={values.data_tiering?.warm_tier_enabled}
+                                                      archiveData={values.data_tiering?.archive_before_deletion} />
+                            <DataTieringConfiguration />
+                          </>
+                        )
+                          : (
+                            <ConfigSegment>
+                              {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />}
+                              {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} IndexSetRetentionStrategyClass={values.retention_strategy_class} />}
+                            </ConfigSegment>
+                          )}
+
+                      </>
+                    )}
+                  </Section>
+                  {isIndexFieldTypeChangeAllowed(indexSet) && (
+                  <Section title="Field Type Profile">
+                    <Field name="field_type_profile">
+                      {({ field: { name, value } }) => (
+                        <IndexSetProfileConfiguration value={value}
+                                                      onChange={(profileId) => {
+                                                        setFieldValue(name, profileId);
+                                                      }}
+                                                      name={name} />
                       )}
-
-                  </>
-                )}
-
-                <Field name="field_type_profile">
-                  {({ field: { name, value } }) => (
-                    <IndexSetProfileConfiguration value={value}
-                                                  onChange={(profileId) => {
-                                                    setFieldValue(name, profileId);
-                                                  }}
-                                                  name={name} />
+                    </Field>
+                  </Section>
                   )}
-                </Field>
-                <Row>
-                  <Col md={9} mdOffset={3}>
-                    <StyledFormSubmit disabledSubmit={!isValid}
-                                      submitButtonText={submitButtonText}
-                                      submitLoadingText={submitLoadingText}
-                                      isSubmitting={isSubmitting}
-                                      isAsyncSubmit
-                                      displayCancel
-                                      onCancel={onCancel} />
-                  </Col>
-                </Row>
+                  <SubmitWrapper>
+                    <FormSubmit disabledSubmit={!isValid}
+                                submitButtonText={submitButtonText}
+                                submitLoadingText={submitLoadingText}
+                                isSubmitting={isSubmitting}
+                                isAsyncSubmit
+                                displayCancel
+                                onCancel={onCancel} />
+                  </SubmitWrapper>
+                </FlexWrapper>
               </Form>
             </IndexRetentionProvider>
           )}

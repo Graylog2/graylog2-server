@@ -25,6 +25,7 @@ import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
 import org.graylog2.periodical.ClusterHealthCheckThread;
 import org.graylog2.periodical.ContentPackLoaderPeriodical;
+import org.graylog2.periodical.DataNodeHousekeepingPeriodical;
 import org.graylog2.periodical.ESVersionCheckPeriodical;
 import org.graylog2.periodical.IndexBlockCheck;
 import org.graylog2.periodical.IndexRangesCleanupPeriodical;
@@ -58,11 +59,12 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
         periodicalBinder.addBinding().to(IndexRangesCleanupPeriodical.class);
         periodicalBinder.addBinding().to(TrafficCounterCalculator.class);
-        periodicalBinder.addBinding().to(IndexFieldTypePollerPeriodical.class);
+        periodicalBinder.addBinding().to(IndexFieldTypePollerPeriodical.class).asEagerSingleton();
         periodicalBinder.addBinding().to(ScheduleTriggerCleanUp.class);
         periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
         periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
         periodicalBinder.addBinding().to(TelemetryClusterInfoPeriodical.class);
         periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
+        periodicalBinder.addBinding().to(DataNodeHousekeepingPeriodical.class);
     }
 }

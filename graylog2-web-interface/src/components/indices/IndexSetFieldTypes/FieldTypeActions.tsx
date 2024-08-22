@@ -24,14 +24,16 @@ import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/Chang
 import hasOverride from 'components/indices/helpers/hasOverride';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 type Props = {
   fieldType: IndexSetFieldType,
   indexSetId: string,
-  onSubmitCallback: (props: FieldTypePutResponse) => void,
+  onSubmitCallback: (props: FieldTypePutResponse, refetchFieldTypes: () => void) => void,
 }
 
 const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) => {
+  const { refetch: refetchFieldTypes } = useTableFetchContext();
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
@@ -47,12 +49,12 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) =>
               title={`Edit field type for ${fieldType.fieldName}`}
               tabIndex={0}>
         Edit {
-          fieldType.isReserved && (
-            <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
-              We use reserved fields internally and expect a certain structure from them. Changing the field type for
-              reserved fields might impact the stability of Graylog
-            </HoverForHelp>
-          )
+        fieldType.isReserved && (
+          <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
+            We use reserved fields internally and expect a certain structure from them. Changing the field type for
+            reserved fields might impact the stability of Graylog
+          </HoverForHelp>
+        )
       }
       </Button>
       {showResetButton && (
@@ -79,7 +81,7 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) =>
                               onClose={toggleEditModal}
                               show
                               showSelectionTable={false}
-                              onSubmitCallback={onSubmitCallback}
+                              onSubmitCallback={(newFieldType) => onSubmitCallback(newFieldType, refetchFieldTypes)}
                               showFieldSelect={false} />
       )}
     </>

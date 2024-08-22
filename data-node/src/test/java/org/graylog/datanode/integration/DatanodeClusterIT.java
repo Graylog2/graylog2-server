@@ -16,20 +16,18 @@
  */
 package org.graylog.datanode.integration;
 
-import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.configuration.variants.KeystoreInformation;
-import org.graylog.datanode.restoperations.DatanodeOpensearchWait;
-import org.graylog.datanode.restoperations.DatanodeRestApiWait;
-import org.graylog.datanode.restoperations.DatanodeStatusChangeOperation;
-import org.graylog.datanode.restoperations.OpensearchTestIndexCreation;
-import org.graylog.datanode.restoperations.RestOperationParameters;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
+import org.graylog.testing.restoperations.DatanodeOpensearchWait;
+import org.graylog.testing.restoperations.DatanodeRestApiWait;
+import org.graylog.testing.restoperations.DatanodeStatusChangeOperation;
+import org.graylog.testing.restoperations.OpensearchTestIndexCreation;
+import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
-import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,10 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
-import jakarta.validation.constraints.NotNull;
-
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -59,29 +54,25 @@ public class DatanodeClusterIT {
 
     private DatanodeContainerizedBackend nodeA;
     private DatanodeContainerizedBackend nodeB;
+    private DatanodeContainerizedBackend nodeC;
 
     @TempDir
     static Path tempDir;
     private String hostnameNodeA;
     private KeyStore trustStore;
-    private KeystoreInformation ca;
+    private FilesystemKeystoreInformation ca;
     private Network network;
     private MongoDBTestService mongoDBTestService;
-    private String restAdminUsername;
-
     @BeforeEach
     void setUp() throws GeneralSecurityException, IOException {
-
-        restAdminUsername = RandomStringUtils.randomAlphanumeric(10);
-
         // first generate a self-signed CA
         ca = DatanodeSecurityTestUtils.generateCa(tempDir);
 
         trustStore = DatanodeSecurityTestUtils.buildTruststore(ca);
 
         hostnameNodeA = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeA = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeA);
-        final KeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
+        final FilesystemKeystoreInformation transportNodeA = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeA);
+        final FilesystemKeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
 
         this.network = Network.newNetwork();
         this.mongoDBTestService = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, network);
@@ -97,8 +88,8 @@ public class DatanodeClusterIT {
 
 
         final String hostnameNodeB = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeB = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeB);
-        final KeystoreInformation httpNodeB = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeB);
+        final FilesystemKeystoreInformation transportNodeB = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeB);
+        final FilesystemKeystoreInformation httpNodeB = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeB);
 
         nodeB = createDatanodeContainer(
                 network,
@@ -119,6 +110,9 @@ public class DatanodeClusterIT {
         if (nodeA != null) {
             nodeA.stop();
         }
+        if (nodeC != null) {
+            nodeC.stop();
+        }
         mongoDBTestService.close();
         network.close();
     }
@@ -132,10 +126,10 @@ public class DatanodeClusterIT {
     void testAddingNodeToExistingCluster() throws ExecutionException, RetryException {
 
         final String hostnameNodeC = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
-        final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
+        final FilesystemKeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
+        final FilesystemKeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
 
-        final DatanodeContainerizedBackend nodeC = createDatanodeContainer(
+        nodeC = createDatanodeContainer(
                 network, mongoDBTestService,
                 hostnameNodeC,
                 transportNodeC,
@@ -152,10 +146,10 @@ public class DatanodeClusterIT {
     void testRemovingNodeReallocatesShards() throws ExecutionException, RetryException {
 
         final String hostnameNodeC = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
-        final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
+        final FilesystemKeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
+        final FilesystemKeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
 
-        final DatanodeContainerizedBackend nodeC = createDatanodeContainer(
+        nodeC = createDatanodeContainer(
                 network, mongoDBTestService,
                 hostnameNodeC,
                 transportNodeC,
@@ -165,11 +159,10 @@ public class DatanodeClusterIT {
         nodeC.start();
         waitForNodesCount(3);
 
-        String jwtToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(600));
         OpensearchTestIndexCreation osIndexClient = new OpensearchTestIndexCreation(RestOperationParameters.builder()
                 .port(nodeA.getOpensearchRestPort())
                 .truststore(trustStore)
-                .jwtToken(jwtToken)
+                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                 .build());
 
         // create index and get primary and replica shard node
@@ -187,8 +180,7 @@ public class DatanodeClusterIT {
         final RestOperationParameters datanodeRestParameters = RestOperationParameters.builder()
                 .port(primary.get().getDatanodeRestPort())
                 .truststore(trustStore)
-                .username(restAdminUsername)
-                .password(ContainerizedGraylogBackend.ROOT_PASSWORD_PLAINTEXT)
+                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                 .build();
         new DatanodeRestApiWait(datanodeRestParameters)
                 .waitForAvailableStatus();
@@ -198,11 +190,10 @@ public class DatanodeClusterIT {
 
         // check that primary shard node is gone and there are still a primary and a secondary
         waitForNodesCount(replica.get(), 2);
-        jwtToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(600));
         osIndexClient = new OpensearchTestIndexCreation(RestOperationParameters.builder()
                 .port(replica.get().getOpensearchRestPort())
                 .truststore(trustStore)
-                .jwtToken(jwtToken)
+                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                 .build());
         List<String> newShardNodes = osIndexClient.getShardNodes();
         Assertions.assertEquals(newShardNodes.size(), 2);
@@ -213,8 +204,8 @@ public class DatanodeClusterIT {
     private DatanodeContainerizedBackend createDatanodeContainer(Network network,
                                                                  MongoDBTestService mongodb,
                                                                  String hostname,
-                                                                 KeystoreInformation transportKeystore,
-                                                                 KeystoreInformation httpKeystore) {
+                                                                 FilesystemKeystoreInformation transportKeystore,
+                                                                 FilesystemKeystoreInformation httpKeystore) {
         return new DatanodeContainerizedBackend(
                 network,
                 mongodb,
@@ -246,9 +237,6 @@ public class DatanodeClusterIT {
                     datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName(hostname));
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", hostname);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_MONGODB_URI", mongodb.internalUri());
-
-                    datanodeContainer.withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", restAdminUsername);
-
                 });
     }
 
@@ -258,19 +246,20 @@ public class DatanodeClusterIT {
     }
 
     private void waitForNodesCount(DatanodeContainerizedBackend node, final int countOfNodes) throws ExecutionException, RetryException {
-        final String jwtToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
-
         try {
             new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(node.getOpensearchRestPort())
                     .truststore(trustStore)
-                    .jwtToken(jwtToken)
+                    .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                     .build())
                     .waitForNodesCount(countOfNodes);
 
         } catch (Exception retryException) {
-            LOG.error("DataNode Container logs from nodeA follow:\n" + nodeA.getLogs());
+            LOG.error("DataNode Container logs from node A follow:\n" + nodeA.getLogs());
             LOG.error("DataNode Container logs from node B follow:\n" + nodeB.getLogs());
+            if (nodeC != null) {
+                LOG.error("DataNode Container logs from node C follow:\n" + nodeC.getLogs());
+            }
             throw retryException;
         }
     }

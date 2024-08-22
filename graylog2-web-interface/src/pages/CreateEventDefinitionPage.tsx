@@ -26,11 +26,14 @@ import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useQuery from 'routing/useQuery';
 
 const CreateEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
   const navigate = useNavigate();
+
   const [eventDefinitionTitle, setEventDefinitionTitle] = useState();
+  const { step } = useQuery();
 
   const handleEventDefinitionChange = useCallback((eventDefinition) => {
     if (eventDefinition.title !== eventDefinitionTitle) {
@@ -39,6 +42,10 @@ const CreateEventDefinitionPage = () => {
   }, [eventDefinitionTitle]);
 
   const pageTitle = useMemo(() => (eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition'), [eventDefinitionTitle]);
+
+  const goToOverview = useCallback(() => {
+    navigate(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [navigate]);
 
   useEffect(() => {
     if (!isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
@@ -62,7 +69,11 @@ const CreateEventDefinitionPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <EventDefinitionFormContainer action="create" onEventDefinitionChange={handleEventDefinitionChange} />
+          <EventDefinitionFormContainer action="create"
+                                        onEventDefinitionChange={handleEventDefinitionChange}
+                                        initialStep={step as string}
+                                        onSubmit={goToOverview}
+                                        onCancel={goToOverview} />
         </Col>
       </Row>
 

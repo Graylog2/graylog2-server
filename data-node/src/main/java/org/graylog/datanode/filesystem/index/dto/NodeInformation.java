@@ -21,14 +21,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
 import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
+import javax.annotation.Nullable;
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public record NodeInformation(@JsonIgnore java.nio.file.Path nodePath, List<IndexInformation> indices,
-                              @JsonIgnore StateFile stateFile) {
+                              @JsonIgnore @Nullable StateFile stateFile) {
+    public static NodeInformation empty(Path nodePath) {
+        return new NodeInformation(nodePath, Collections.emptyList(), null);
+    }
+
+    public boolean isEmpty() {
+        return indices.isEmpty();
+    }
+
     @JsonProperty
     public String nodeVersion() {
-        return Optional.ofNullable((Integer)stateFile.document().get("node_version"))
+        return Optional.ofNullable(stateFile).map(sf -> (Integer) sf.document().get("node_version"))
                 .map(Version::fromId)
                 .map(Version::toString)
                 .orElseGet(this::parseFromIndices);

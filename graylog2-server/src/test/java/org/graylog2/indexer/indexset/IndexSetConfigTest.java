@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indexset;
 
+import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -25,9 +26,13 @@ import org.junit.Test;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class IndexSetConfigTest {
     @Test
@@ -38,9 +43,9 @@ public class IndexSetConfigTest {
                 .description("A test index-set.")
                 .indexPrefix("graylog1")
                 .indexWildcard("graylog1_*")
-                .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .retentionStrategy(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
+                .retentionStrategyConfig(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
                 .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
                 .shards(4)
                 .replicas(0)
@@ -57,9 +62,9 @@ public class IndexSetConfigTest {
                 .description("A test index-set.")
                 .indexPrefix("graylog2")
                 .indexWildcard("graylog2_*")
-                .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .retentionStrategy(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
+                .retentionStrategyConfig(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
                 .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
                 .shards(4)
                 .replicas(0)
@@ -277,5 +282,88 @@ public class IndexSetConfigTest {
 
         assertThat(config.isRegular()).isEmpty();
         assertThat(config.isRegularIndex()).isFalse();
+    }
+
+    @Test
+    public void testEventIndexWithChangedFieldMappingsIsIllegal() {
+        assertFalse(testIndexSetConfig(EVENT_TEMPLATE_TYPE,
+                new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
+                null).canHaveCustomFieldMappings());
+    }
+
+    @Test
+    public void testEventIndexWithProfileSetIsIllegal() {
+        assertFalse(testIndexSetConfig(EVENT_TEMPLATE_TYPE,
+                null,
+                "profile").canHaveProfile());
+    }
+
+    @Test
+    public void testFailureIndexWithProfileSetIsIllegal() {
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
+                null,
+                "profile").canHaveProfile());
+    }
+
+    @Test
+    public void testFailureIndexWithChangedFieldMappingsIsIllegal() {
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
+                new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
+                null).canHaveCustomFieldMappings());
+    }
+
+    @Test
+    public void testIlluminateIndexWithProfileSetIsIllegal() {
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE,
+                null,
+                "profile").canHaveProfile());
+    }
+
+    @Test
+    public void testIlluminateIndexWithChangedFieldMappingsIsIllegal() {
+        assertFalse(testIndexSetConfig(IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE,
+                new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
+                null).canHaveCustomFieldMappings());
+    }
+
+    @Test
+    public void testMessageIndexWithChangedFieldMappingsAndProfileIsLegal() {
+        final IndexSetConfig indexSetConfig = testIndexSetConfig(DEFAULT_INDEX_TEMPLATE_TYPE,
+                new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
+                "profile");
+        assertTrue(indexSetConfig.canHaveProfile());
+        assertTrue(indexSetConfig.canHaveCustomFieldMappings());
+    }
+
+
+    private IndexSetConfig testIndexSetConfig(final String templateType,
+                                              final CustomFieldMappings customFieldMappings,
+                                              final String fieldTypeProfile) {
+        return IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Index",
+                "Test Index",
+                true,
+                templateType == DEFAULT_INDEX_TEMPLATE_TYPE,
+                "graylog",
+                null,
+                "graylog_*",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "graylog42-template",
+                templateType,
+                1,
+                false,
+                null,
+                customFieldMappings,
+                fieldTypeProfile,
+                null);
+
     }
 }

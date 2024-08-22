@@ -15,9 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
+import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
+import type { QualifiedUrl } from 'routing/Routes';
+import type User from 'logic/users/User';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import type { Stream } from 'logic/streams/types';
 
 interface PluginRoute {
   path: string;
@@ -35,7 +41,7 @@ interface PluginNavigationDropdownItem {
 }
 
 type PluginNavigationLink = {
-  path: string;
+  path: QualifiedUrl<string>;
 }
 
 type PluginNavigationDropdown = {
@@ -48,6 +54,7 @@ type PluginNavigation = {
   perspective?: string;
   BadgeComponent?: React.ComponentType<{ text: string }>;
   position?: 'last' | undefined,
+  useIsValidLicense?: () => boolean,
 } & (PluginNavigationLink | PluginNavigationDropdown)
 
 interface PluginNavigationItems {
@@ -131,22 +138,82 @@ interface LogoutHook {
 
 type DataTiering = {
   type: string,
-  TiersConfigurationFields: React.ComponentType<{}>,
+  TiersConfigurationFields: React.ComponentType<{valuesPrefix?: string}>,
   TiersSummary: React.ComponentType<{
     config: DataTieringConfig
   }>,
+  WarmTierReadinessInfo: React.ComponentType,
+}
+
+type License = {
+  EnterpriseTrafficGraph: React.ComponentType,
+  LicenseGraphWithMetrics: React.ComponentType,
+  EnterpriseProductLink: React.ComponentType<{
+    children: React.ReactNode,
+    href: string,
+    clusterId: string,
+    licenseSubject?: string
+  }>,
+}
+
+type FieldValueProvider = {
+  type: string,
+  displayName: string,
+  formComponent: React.ComponentType,
+  summaryComponent: React.ComponentType<{
+    fieldName: string,
+    keys: Array<string>,
+    currentUser: User,
+    config: EventDefinition['field_spec'][number],
+  }>,
+  defaultConfig: {
+    template?: string,
+    table_name?: string,
+    key_field?: string,
+  },
+  requiredFields: {
+    template?: string,
+    table_name?: string,
+    key_field?: string,
+  },
+}
+
+interface PluginDataWarehouse {
+  DataWarehouseStatus: React.ComponentType<{
+    stream: {
+      enabled_status: boolean;
+    }
+  }>,
+  StreamDataWarehouse: React.ComponentType<{}>,
+  DataWarehouseJobs: React.ComponentType<{}>,
+  StreamIlluminateProcessingSection: React.ComponentType<{
+    stream: Stream,
+  }>,
+ StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
+  getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
+    attributeName: string,
+    attributes: Array<{ id: string, title: string }>,
+    columnRenderer: ColumnRenderers<Stream>,
+  } | undefined,
 }
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
+    dataWarehouse?: Array<PluginDataWarehouse>
     dataTiering?: Array<DataTiering>
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
-    globalNotifications?: Array<GlobalNotification>
+    globalNotifications?: Array<GlobalNotification>;
+    fieldValueProviders?:Array<FieldValueProvider>;
+    license?: Array<License>,
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
+    // Difference between page context providers and global context providers
+    // is that page context providers are rendered within the <App> giving it
+    // access to certain contexts like PerspectivesContext
+    pageContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
     routes?: Array<PluginRoute>;
     entityRoutes?: Array<(id: string, type: string) => string>
     pages?: PluginPages;

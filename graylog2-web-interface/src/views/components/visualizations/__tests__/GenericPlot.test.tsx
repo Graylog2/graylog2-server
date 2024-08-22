@@ -73,13 +73,13 @@ describe('GenericPlot', () => {
     });
 
     it('merges in passed layout property', () => {
-      const layout = { customProperty: 42 };
+      const layout = { height: 1000 };
       const wrapper = mount(<GenericPlot chartData={[]} layout={layout} />);
 
       const plot = wrapper.find('PlotlyComponent');
       const generatedLayout = plot.get(0).props.layout;
 
-      expect(generatedLayout.customProperty).toEqual(42);
+      expect(generatedLayout.height).toEqual(1000);
       expect(generatedLayout.autosize).toEqual(true);
     });
 

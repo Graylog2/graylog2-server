@@ -23,7 +23,7 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 
 import jakarta.inject.Inject;
 import org.graylog2.streams.StreamService;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -60,7 +60,7 @@ public class FieldTypesLookup {
         return indexFieldTypesService.findForIndexSets(indexSetIds);
     }
 
-    @NotNull
+    @Nonnull
     private Set<String> getIndexSetIds(Collection<String> streamIds) {
         return streamService.loadByIds(streamIds)
                 .stream()

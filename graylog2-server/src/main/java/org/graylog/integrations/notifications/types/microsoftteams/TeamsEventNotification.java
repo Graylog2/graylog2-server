@@ -18,6 +18,7 @@ package org.graylog.integrations.notifications.types.microsoftteams;
 
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationException;
@@ -38,8 +39,6 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +49,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
+@Deprecated
 public class TeamsEventNotification implements EventNotification {
 
     private static final Logger LOG = LoggerFactory.getLogger(TeamsEventNotification.class);
