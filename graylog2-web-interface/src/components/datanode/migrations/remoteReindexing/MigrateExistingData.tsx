@@ -132,6 +132,12 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   const filteredSelectedIndices = selectedIndices.filter((index) => filteredIndices.includes(index));
   const areAllIndicesSelected = filteredSelectedIndices.length === filteredIndices.length;
 
+  const adaptArgs = (args: RemoteReindexRequest): RemoteReindexRequest => ({
+    ...args,
+    hostname: args.hostname.endsWith('/') ? args.hostname.slice(0, -1) : args.hostname,
+    indices: filteredSelectedIndices.map((i) => i.name),
+  });
+
   return (
     <Formik enableReinitialize
             initialValues={initialValues}
@@ -256,10 +262,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
             <MigrationStepTriggerButtonToolbar hidden={hideActions}
                                                nextSteps={nextSteps || currentStep.next_steps}
                                                onTriggerStep={handleTriggerNextStep}
-                                               args={{
-                                                 ...values,
-                                                 indices: filteredSelectedIndices.map((i) => i.name),
-                                               } as RemoteReindexRequest} />
+                                               args={adaptArgs(values)} />
           )}
         </Form>
       )}
