@@ -34,11 +34,9 @@ public class VersionDeserializer extends StdDeserializer<Version> {
     public Version deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException {
         switch (p.currentTokenId()) {
             case JsonTokenId.ID_STRING:
-                final String str = p.getText().trim();
-                return Version.parse(str);
+                return Version.parse(p.getText().trim());
             case JsonTokenId.ID_NUMBER_INT:
-                int major = p.getIntValue();
-                return Version.of(major);
+                return Version.of(p.getIntValue());
         }
         throw ctxt.wrongTokenException(p, handledType(), JsonToken.VALUE_STRING, "expected String or Number");
     }

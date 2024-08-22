@@ -114,11 +114,10 @@ public class VersionCheckThread extends Periodical {
                 final VersionCheckResponse versionCheckResponse = objectMapper.readValue(response.body().byteStream(), VersionCheckResponse.class);
 
                 final VersionResponse version = versionCheckResponse.version;
-                final com.github.zafarkhaja.semver.Version reportedVersion = Version.of(version.major, version.minor, version.patch);
+                final Version reportedVersion = Version.of(version.major, version.minor, version.patch);
 
                 LOG.debug("Version check reports current version: " + versionCheckResponse);
-                Version other = ServerVersion.VERSION.getVersion();
-                if (reportedVersion.isHigherThan(other)) {
+                if (reportedVersion.isHigherThan(ServerVersion.VERSION.getVersion())) {
                     LOG.debug("Reported version is higher than ours ({}). Writing notification.", ServerVersion.VERSION);
 
                     Notification notification = notificationService.buildNow()

@@ -191,8 +191,7 @@ public class VersionProbe {
 
     private Optional<SearchVersion> parseVersion(VersionResponse versionResponse, VersionProbeListener probeListener) {
         try {
-            String version1 = versionResponse.number();
-            final com.github.zafarkhaja.semver.Version version = Version.parse(version1);
+            final com.github.zafarkhaja.semver.Version version = Version.parse(versionResponse.number());
             return Optional.of(SearchVersion.create(versionResponse.distribution(), version));
         } catch (Exception e) {
             probeListener.onError(String.format(Locale.ROOT, "Unable to parse version retrieved from indexer node: <%s>", versionResponse.number()), e);

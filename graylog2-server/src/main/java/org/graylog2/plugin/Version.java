@@ -198,8 +198,7 @@ public class Version implements Comparable<Version> {
             final Properties versionProperties = new Properties();
             versionProperties.load(resource.openStream());
 
-            String version1 = versionProperties.getProperty(propertyName);
-            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.parse(version1);
+            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.parse(versionProperties.getProperty(propertyName));
             final long major = version.majorVersion();
             final long minor = version.minorVersion();
             final long patch = version.patchVersion();
