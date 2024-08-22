@@ -61,7 +61,7 @@ class MongoEntitySuggestionServiceTest {
                 .when(entityPermissionsUtils)
                 .createPermissionCheck(subject, "dashboards");
 
-        final var result = toTest.suggest("dashboards", "title", "", 1, 10, subject);
+        final var result = toTest.suggest("dashboards", "title", "", 1, 10, subject, List.of());
 
         assertThat(result.pagination().count()).isEqualTo(2);
 
