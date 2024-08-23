@@ -64,6 +64,7 @@ public class CaKeystore {
     public synchronized CertificateChain signCertificateRequest(CertificateSigningRequest request, RenewalPolicy renewalPolicy) throws CaKeystoreException {
         final CaKeystoreWithPassword caKeystore = loadKeystore().orElseThrow(() -> new CaKeystoreException("Can't sign certificates, no CA configured!"));
         try {
+            LOG.info("Signing certificate for  node {}, subject: {}", request.nodeId(), request.request().getSubject());
             // TODO: better abstraction to protect the private key and password!
             var caPrivateKey = (PrivateKey) caKeystore.keyStore().getKey(CA_KEY_ALIAS, caKeystore.password().toCharArray());
             var caCertificate = (X509Certificate) caKeystore.keyStore().getCertificate(CA_KEY_ALIAS);

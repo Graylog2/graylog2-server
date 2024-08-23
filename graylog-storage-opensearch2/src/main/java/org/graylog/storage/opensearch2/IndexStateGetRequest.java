@@ -14,22 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
+package org.graylog.storage.opensearch2;
 
-interface EnterpriseTrafficGraph {
-  layout: string;
-  children: React.ReactNode;
-}
-
-interface LicensePlugin {
-  EnterpriseTrafficGraph?: React.ComponentType<EnterpriseTrafficGraph>;
-  hooks: {
-    useLicensesStatus: () => any
-  }
-}
-
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    license?: LicensePlugin;
-  }
+public record IndexStateGetRequest(String indexName, String host, String username, String password) {
 }

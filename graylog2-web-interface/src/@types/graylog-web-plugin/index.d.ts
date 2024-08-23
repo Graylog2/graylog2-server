@@ -145,6 +145,17 @@ type DataTiering = {
   WarmTierReadinessInfo: React.ComponentType,
 }
 
+type License = {
+  EnterpriseTrafficGraph: React.ComponentType,
+  LicenseGraphWithMetrics: React.ComponentType,
+  EnterpriseProductLink: React.ComponentType<{
+    children: React.ReactNode,
+    href: string,
+    clusterId: string,
+    licenseSubject?: string
+  }>,
+}
+
 type FieldValueProvider = {
   type: string,
   displayName: string,
@@ -175,6 +186,10 @@ interface PluginDataWarehouse {
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
   DataWarehouseJobs: React.ComponentType<{}>,
+  StreamIlluminateProcessingSection: React.ComponentType<{
+    stream: Stream,
+  }>,
+ StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
   getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
@@ -191,6 +206,7 @@ declare module 'graylog-web-plugin/plugin' {
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>;
     fieldValueProviders?:Array<FieldValueProvider>;
+    license?: Array<License>,
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
