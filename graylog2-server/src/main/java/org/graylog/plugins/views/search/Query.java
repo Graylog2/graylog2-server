@@ -269,7 +269,10 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
         }
         Set<Filter> mappedFilters = new HashSet<>();
         for (Filter f : filter.filters()) {
-            Filter mappedFilter = streamCategoryToStreamFilter(f, categoryMappingFunction, streamPermissions);
+            Filter mappedFilter = f;
+            if (f instanceof StreamCategoryFilter scf) {
+                mappedFilter = scf.toStreamFilter(categoryMappingFunction, streamPermissions);
+            }
             if (mappedFilter != null) {
                 mappedFilter = streamCategoryToStreamFiltersRecursively(mappedFilter, categoryMappingFunction, streamPermissions);
                 mappedFilters.add(mappedFilter);
@@ -279,27 +282,6 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
             return null;
         }
         return filter.toGenericBuilder().filters(mappedFilters.stream().filter(Objects::nonNull).collect(toSet())).build();
-    }
-
-    private Filter streamCategoryToStreamFilter(Filter filter,
-                                                Function<Collection<String>, Stream<String>> categoryMappingFunction,
-                                                StreamPermissions streamPermissions) {
-        if (filter instanceof StreamCategoryFilter scf) {
-            String[] mappedStreamIds = categoryMappingFunction.apply(List.of(scf.category()))
-                    .filter(streamPermissions::canReadStream)
-                    .toArray(String[]::new);
-            if (mappedStreamIds.length == 0) {
-                return null;
-            }
-            // Replace the category with an OrFilter of stream IDs and then add any filters form the original filter
-            Filter streamFilter = StreamFilter.anyIdOf(mappedStreamIds).toGenericBuilder().build();
-            if (filter.filters() != null) {
-                streamFilter = streamFilter.toGenericBuilder().filters(filter.filters()).build();
-            }
-            return streamFilter;
-        } else {
-            return filter;
-        }
     }
 
     private Filter addStreamsTo(Filter filter, Set<String> streamIds) {
