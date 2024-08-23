@@ -20,7 +20,7 @@ import { CountBadge } from 'components/common';
 
 const StreamCountBadge = styled(CountBadge)<{ $disabled: boolean }>(({ $disabled, theme }) => css`
   cursor: pointer;
-  background-color: ${$disabled && theme.colors.variant.default};
+  background-color: ${$disabled ? theme.colors.variant.default : theme.colors.variant.light.info};
 `);
 
 export default StreamCountBadge;
