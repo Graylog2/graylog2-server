@@ -29,6 +29,7 @@ const Container = styled.div(({ theme }) => css`
   border: 1px solid ${theme.colors.variant.lighter.default};
   background-color: ${theme.colors.variant.lightest.default};
   flex-direction: column;
+  position: relative;
 `);
 
 const ElementActions = styled.div`
@@ -38,6 +39,7 @@ const ElementActions = styled.div`
   align-items: center;
   position: absolute;
   right: 0;
+  top: 5px;
 `;
 
 const StyledIconButton = styled(IconButton)`
