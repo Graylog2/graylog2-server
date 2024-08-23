@@ -31,7 +31,7 @@ public record ExplainResults(String search_id, SearchResult search, Set<SearchEr
     public record QueryExplainResult(Map<String, ExplainResult> searchTypes) {
     }
 
-    public record ExplainResult(String queryString, Set<IndexRangeResult> searchedIndexRanges) {
+    public record ExplainResult(String queryString, Set<IndexRangeResult> searchedIndexRanges, Set<DataRoutedStream> dataRoutedStreams) {
     }
 
     public record IndexRangeResult(String indexName, long begin, long end, boolean isWarmTiered) {
@@ -43,4 +43,6 @@ public record ExplainResults(String search_id, SearchResult search, Set<SearchEr
             return new IndexRangeResult(indexRange.indexName(), indexRange.begin().getMillis(), indexRange.end().getMillis());
         }
     }
+
+    public record DataRoutedStream(String streamId, String streamName) {}
 }
