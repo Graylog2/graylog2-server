@@ -67,6 +67,6 @@ public class EntitySuggestionResource extends RestResource {
                                             @QueryParam("query") @DefaultValue("") String query,
                                             @ApiParam(name = "staticEntries") @QueryParam("staticEntries") @DefaultValue("") String staticEntries) {
 
-        return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject(), staticEntries == null ? List.of() : Arrays.asList(staticEntries.split(",")));
+        return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject(), staticEntries == null || staticEntries.isBlank() ? List.of() : Arrays.asList(staticEntries.split(",")));
     }
 }
