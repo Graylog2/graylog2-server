@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.views;
 
 import com.github.zafarkhaja.semver.Version;
-
 import jakarta.inject.Singleton;
 
 import java.net.URI;
@@ -47,7 +46,7 @@ public class EnterpriseMetadataSummary extends PluginMetadataSummary {
 
     @Override
     public Version version() {
-        return Version.valueOf("3.1.0");
+        return Version.parse("3.1.0");
     }
 
     @Override
@@ -57,9 +56,13 @@ public class EnterpriseMetadataSummary extends PluginMetadataSummary {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
+        if (this == obj) {
+            return true;
+        }
 
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
 
         final EnterpriseMetadataSummary that = (EnterpriseMetadataSummary) obj;
 
