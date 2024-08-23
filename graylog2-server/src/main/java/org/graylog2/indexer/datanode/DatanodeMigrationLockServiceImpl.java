@@ -23,6 +23,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
@@ -38,8 +39,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockService {
 
@@ -59,13 +60,29 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
     }
 
     private void startLocksExtendingThread(LockService lockService) {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("migration-locks-service-backend-%d").setDaemon(true).setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG)).build());
-        executorService.scheduleAtFixedRate(() -> {
-            final Set<Optional<Lock>> extendedLocks = activeLocks.stream().map(lockService::extendLock).collect(Collectors.toSet());
-            if (!extendedLocks.isEmpty()) {
-                LOG.info("Extended TTL of {} datanode migration locks", extendedLocks.size());
-            }
-        }, LOCK_EXTEND_PERIOD_SECONDS, LOCK_EXTEND_PERIOD_SECONDS, TimeUnit.SECONDS);
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("migration-locks-service-backend-%d")
+                .setDaemon(true)
+                .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG))
+                .build();
+
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(threadFactory);
+        executorService.scheduleAtFixedRate(
+                () -> extendActiveLocks(lockService),
+                LOCK_EXTEND_PERIOD_SECONDS,
+                LOCK_EXTEND_PERIOD_SECONDS,
+                TimeUnit.SECONDS
+        );
+    }
+
+    private synchronized void extendActiveLocks(LockService lockService) {
+        final long extendedLocks = activeLocks.stream()
+                .map(lockService::extendLock)
+                .filter(Optional::isPresent)
+                .count();
+        if (extendedLocks > 0) {
+            LOG.info("Extended TTL of {} datanode migration locks", extendedLocks);
+        }
     }
 
     @Override
@@ -89,7 +106,7 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
     }
 
     @Override
-    public void release(Lock lock) {
+    public synchronized void release(Lock lock) {
         activeLocks.remove(lock);
         lockService.unlock(lock);
     }
@@ -108,12 +125,7 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
     private Lock waitForLock(String resource, Class<?> caller, String context, IndexSet indexSet, DatanodeMigrationLockWaitConfig waitConfig) {
         try {
             return RetryerBuilder.<Optional<Lock>>newBuilder()
-                    .withRetryListener(new RetryListener() {
-                        @Override
-                        public <V> void onRetry(Attempt<V> attempt) {
-                            waitConfig.lockAcquireListerer().onRetry(indexSet, caller, attempt.getAttemptNumber());
-                        }
-                    })
+                    .withRetryListener(loggingRetryListener(caller, indexSet, waitConfig))
                     .withStopStrategy(StopStrategies.stopAfterDelay(waitConfig.lockAcquireTimeout().getSeconds(), TimeUnit.SECONDS))
                     .withWaitStrategy(WaitStrategies.fixedWait(waitConfig.delayBetweenAttempts().toMillis(), TimeUnit.MILLISECONDS))
                     .retryIfResult(Optional::isEmpty)
@@ -123,5 +135,15 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
         } catch (ExecutionException | RetryException e) {
             throw new DatanodeMigrationLockException("Failed to obtain index set " + indexSet.getConfig().title() + " lock", e);
         }
+    }
+
+    @Nonnull
+    private static RetryListener loggingRetryListener(Class<?> caller, IndexSet indexSet, DatanodeMigrationLockWaitConfig waitConfig) {
+        return new RetryListener() {
+            @Override
+            public <V> void onRetry(Attempt<V> attempt) {
+                waitConfig.lockAcquireListerer().onRetry(indexSet, caller, attempt.getAttemptNumber());
+            }
+        };
     }
 }
