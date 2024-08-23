@@ -1,4 +1,5 @@
 type="a"
-message="Added new Palo Alto version 11 input to ingest PAN OS 11 logs and parse via illuminate."
+message="Added new Palo Alto version 11 input to ingest PAN OS 11 logs."
 
 issues=["20223"]
+pulls=["20236"]

@@ -22,10 +22,8 @@ import jakarta.inject.Inject;
 import org.graylog2.inputs.transports.SyslogTcpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
@@ -51,11 +49,6 @@ public class PaloAlto11xInput extends MessageInput {
                 config,
                 descriptor,
                 serverStatus);
-    }
-
-    @Override
-    public void launch(InputBuffer buffer) throws MisfireException {
-        super.launch(buffer);
     }
 
     @FactoryClass
