@@ -54,6 +54,6 @@ class SearchVersionTest {
     }
 
     private Version ver(final String version) {
-        return com.github.zafarkhaja.semver.Version.valueOf(version);
+        return Version.parse(version);
     }
 }
