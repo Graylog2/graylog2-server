@@ -72,4 +72,48 @@ class MongoEntitySuggestionServiceTest {
         assertThat(suggestions.stream().map(EntitySuggestion::value).toList())
                 .containsExactlyInAnyOrder("Test", "Test 3");
     }
+
+    @Test
+    void checksPermissionsForEachDocumentWhenUserDoesNotHavePermissionForWholeCollectionWithStaticEntry() {
+        doReturn(false).when(entityPermissionsUtils).hasAllPermission(subject);
+        doReturn(false).when(entityPermissionsUtils).hasReadPermissionForWholeCollection(subject, "dashboards");
+
+        final Collection<String> permittedIds = List.of("5a82f5974b900a7a97caa1e5", "5a82f5974b900a7a97caa1e7");
+        doReturn((Predicate<Document>) document -> permittedIds.contains(document.getObjectId(EntityPermissionsUtils.ID_FIELD).toString()))
+                .when(entityPermissionsUtils)
+                .createPermissionCheck(subject, "dashboards");
+
+        final var result = toTest.suggest("dashboards", "title", "", 1, 10, subject, List.of("admin"));
+
+        assertThat(result.pagination().count()).isEqualTo(3);
+
+        final var suggestions = result.suggestions();
+        assertThat(suggestions).hasSize(3);
+        assertThat(suggestions.stream().map(EntitySuggestion::id).toList())
+                .containsExactlyInAnyOrder("admin", "5a82f5974b900a7a97caa1e5", "5a82f5974b900a7a97caa1e7");
+        assertThat(suggestions.stream().map(EntitySuggestion::value).toList())
+                .containsExactlyInAnyOrder("admin", "Test", "Test 3");
+    }
+
+    @Test
+    void checksPermissionsForEachDocumentWhenUserDoesNotHavePermissionForWholeCollectionWithStaticEntryPage2() {
+        doReturn(false).when(entityPermissionsUtils).hasAllPermission(subject);
+        doReturn(false).when(entityPermissionsUtils).hasReadPermissionForWholeCollection(subject, "dashboards");
+
+        final Collection<String> permittedIds = List.of("5a82f5974b900a7a97caa1e5", "5a82f5974b900a7a97caa1e7");
+        doReturn((Predicate<Document>) document -> permittedIds.contains(document.getObjectId(EntityPermissionsUtils.ID_FIELD).toString()))
+                .when(entityPermissionsUtils)
+                .createPermissionCheck(subject, "dashboards");
+
+        final var result = toTest.suggest("dashboards", "title", "", 2, 2, subject, List.of("admin"));
+
+        assertThat(result.pagination().count()).isEqualTo(1);
+
+        final var suggestions = result.suggestions();
+        assertThat(suggestions).hasSize(1);
+        assertThat(suggestions.stream().map(EntitySuggestion::id).toList())
+                .containsExactlyInAnyOrder("5a82f5974b900a7a97caa1e7");
+        assertThat(suggestions.stream().map(EntitySuggestion::value).toList())
+                .containsExactlyInAnyOrder("Test 3");
+    }
 }

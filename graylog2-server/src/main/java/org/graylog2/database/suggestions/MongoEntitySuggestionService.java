@@ -71,19 +71,17 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
         final var lengthStaticEntries = staticEntries.size();
         final var start = (page - 1) * perPage;
-
-        final var skip = start - lengthStaticEntries;
-        final var limit = skip < 0 ? perPage : perPage - skip;
-
-        final var checkPermission = permissionsUtils.createPermissionCheck(subject, collection);
-        final Stream<Document> documents = (skip < 0) ? Stream.of() : userCanReadAllEntities
-                ? mongoPaginate(resultWithoutPagination, limit, skip)
-                : paginateWithPermissionCheck(resultWithoutPagination, limit, skip, checkPermission);
-
         final var to = start + perPage;
         final List<EntitySuggestion> staticEntriesList = start < lengthStaticEntries ?
                 staticEntries.subList(start, Math.min(to, lengthStaticEntries)).stream().map(e -> new EntitySuggestion(e, e)).toList()
                 : List.of();
+        final var limit = perPage - staticEntriesList.size();
+        final var skip = Math.max(start - lengthStaticEntries, 0);
+
+        final var checkPermission = permissionsUtils.createPermissionCheck(subject, collection);
+        final Stream<Document> documents = (limit <= 0) ? Stream.of() : userCanReadAllEntities
+                ? mongoPaginate(resultWithoutPagination, limit, skip)
+                : paginateWithPermissionCheck(resultWithoutPagination, limit, skip, checkPermission);
 
         final List<EntitySuggestion> suggestionsFromMongo = documents
                 .map(doc ->
@@ -97,7 +95,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         final List<EntitySuggestion> suggestions = Stream.concat(staticEntriesList.stream(), suggestionsFromMongo.stream()).toList();
 
         final long total = (userCanReadAllEntities
-                ? mongoCollection.countDocuments(bsonFilter) + lengthStaticEntries
+                ? mongoCollection.countDocuments(bsonFilter)
                 : MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD))).filter(checkPermission).count()) + lengthStaticEntries;
 
         return new EntitySuggestionResponse(suggestions,
