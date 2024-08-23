@@ -19,6 +19,12 @@ package org.graylog2.rest.resources.system;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -27,14 +33,6 @@ import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.DisplayGettingStarted;
 import org.graylog2.shared.rest.resources.RestResource;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.Locale;
 
@@ -76,7 +74,7 @@ public class GettingStartedResource extends RestResource {
 
     private static String currentMinorVersionString() {
         return String.format(Locale.ENGLISH, "%d.%d",
-                Version.CURRENT_CLASSPATH.getVersion().getMajorVersion(),
-                Version.CURRENT_CLASSPATH.getVersion().getMinorVersion());
+                Version.CURRENT_CLASSPATH.getVersion().majorVersion(),
+                Version.CURRENT_CLASSPATH.getVersion().minorVersion());
     }
 }
