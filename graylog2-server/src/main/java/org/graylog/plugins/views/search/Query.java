@@ -54,6 +54,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -250,12 +251,37 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
         return toBuilder().filter(newFilter).build();
     }
 
-    public Query mapStreamCategoriesToIds(Function<Collection<String>, Stream<String>> categoryMappingFunction,
-                                          StreamPermissions streamPermissions) {
-        Set<String> streamIds = categoryMappingFunction.apply(usedStreamCategories())
-                .filter(streamPermissions::canReadStream)
-                .collect(toSet());
-        return addStreamsToFilter(streamIds);
+    public Query replaceStreamCategoryFilters(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                              StreamPermissions streamPermissions) {
+        if (filter() == null) {
+            return this;
+        }
+        return toBuilder()
+                .filter(streamCategoryToStreamFiltersRecursively(filter(), categoryMappingFunction, streamPermissions))
+                .build();
+    }
+
+    private Filter streamCategoryToStreamFiltersRecursively(Filter filter,
+                                                            Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                                            StreamPermissions streamPermissions) {
+        if (filter.filters() == null || filter.filters().isEmpty()) {
+            return filter;
+        }
+        Set<Filter> mappedFilters = new HashSet<>();
+        for (Filter f : filter.filters()) {
+            Filter mappedFilter = f;
+            if (f instanceof StreamCategoryFilter scf) {
+                mappedFilter = scf.toStreamFilter(categoryMappingFunction, streamPermissions);
+            }
+            if (mappedFilter != null) {
+                mappedFilter = streamCategoryToStreamFiltersRecursively(mappedFilter, categoryMappingFunction, streamPermissions);
+                mappedFilters.add(mappedFilter);
+            }
+        }
+        if (mappedFilters.isEmpty()) {
+            return null;
+        }
+        return filter.toGenericBuilder().filters(mappedFilters.stream().filter(Objects::nonNull).collect(toSet())).build();
     }
 
     private Filter addStreamsTo(Filter filter, Set<String> streamIds) {
