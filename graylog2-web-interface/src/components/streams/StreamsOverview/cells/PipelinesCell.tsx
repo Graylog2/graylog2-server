@@ -19,9 +19,9 @@ import { useRef } from 'react';
 import * as React from 'react';
 import styled from 'styled-components';
 
-import useStreamOutputs from 'hooks/useStreamOutputs';
 import type { Stream } from 'stores/streams/StreamsStore';
 import { CountBadge } from 'components/common';
+import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
 const StyledCountBadge = styled(CountBadge)`
   cursor: pointer;
@@ -33,15 +33,15 @@ type Props = {
 
 const PipelinesCell = ({ stream }: Props) => {
   const buttonRef = useRef();
-  const { data, isInitialLoading, isError } = useStreamOutputs(stream.id);
+  const { data, isInitialLoading } = usePipelinesConnectedStream(stream.id);
 
-  if (stream.is_default || !stream.is_editable || isInitialLoading || isError) {
+  if (stream.is_default || !stream.is_editable || isInitialLoading) {
     return null;
   }
 
   return (
     <StyledCountBadge ref={buttonRef} title="Connected pipelines">
-      {data.outputs.length}
+      {data.length || 0}
     </StyledCountBadge>
   );
 };
