@@ -20,7 +20,7 @@ import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import {Attribute} from 'stores/PaginationTypes';
+import type { Attribute } from 'stores/PaginationTypes';
 
 const DEFAULT_DATA = {
   pagination: {
@@ -65,7 +65,6 @@ const useFilterValueSuggestions = (
     throw Error(`Attribute meta data for attribute "${attribute.id}" is missing related collection.`);
   }
 
-  console.log({ attribute });
   const staticEntries = attribute.filter_options?.filter((value) => value.title === 'static').map((value) => value.value).join(',');
 
   const { data, isInitialLoading } = useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(attribute.related_collection, searchParams, staticEntries, attribute.related_property), {
