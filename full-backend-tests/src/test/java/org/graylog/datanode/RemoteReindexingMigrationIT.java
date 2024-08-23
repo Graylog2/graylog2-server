@@ -36,6 +36,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.elasticsearch.IndexState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
@@ -82,6 +83,8 @@ public class RemoteReindexingMigrationIT {
         closeSourceIndex(indexName);
 
         createTargetIndex(indexName, true);
+        Assertions.assertThat(getTargetIndexState(indexName))
+                .isEqualTo(IndexState.CLOSE);
 
         // flush the newly created document
         openSearchInstance.client().refreshNode();
@@ -104,10 +107,24 @@ public class RemoteReindexingMigrationIT {
         final String status = response.extract().body().jsonPath().get("status");
         Assertions.assertThat(status).isEqualTo("FINISHED");
 
+        Assertions.assertThat(getTargetIndexState(indexName))
+                        .isEqualTo(IndexState.CLOSE);
+
+
+        openTargetIndex(indexName);
+
         Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
         Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
 
 
+    }
+
+    private void openTargetIndex(String indexName) {
+        apis.backend().searchServerInstance().client().openIndex(indexName);
+    }
+
+    private IndexState getTargetIndexState(String indexName) {
+        return apis.backend().searchServerInstance().client().getStatus(indexName);
     }
 
     private void createTargetIndex(String indexName, boolean closed) {
