@@ -116,6 +116,16 @@ export const relativeDifferenceDays = (dateTime: DateTime) => {
 };
 
 /**
+ * Returns the time difference, relative to the provided date time, in seconds.
+ */
+export const relativeDifferenceSeconds = (dateTime: DateTime) => {
+  const eventDateObject = toDateObject(dateTime);
+  const todayDateObject = toDateObject(new Date());
+
+  return todayDateObject.diff(eventDateObject, 'seconds');
+};
+
+/**
  * Validate if the provided time has a supported format.
  */
 export const isValidDate = (dateTime: DateTime) => moment(dateTime, Object.values(DATE_TIME_FORMATS), true).isValid();
