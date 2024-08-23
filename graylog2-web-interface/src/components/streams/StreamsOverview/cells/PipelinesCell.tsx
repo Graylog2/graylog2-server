@@ -17,15 +17,10 @@
 
 import { useRef } from 'react';
 import * as React from 'react';
-import styled from 'styled-components';
 
+import StreamCountBadge from 'components/streams/StreamCountBadge';
 import type { Stream } from 'stores/streams/StreamsStore';
-import { CountBadge } from 'components/common';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
-
-const StyledCountBadge = styled(CountBadge)`
-  cursor: pointer;
-`;
 
 type Props = {
   stream: Stream
@@ -33,16 +28,18 @@ type Props = {
 
 const PipelinesCell = ({ stream }: Props) => {
   const buttonRef = useRef();
-  const { data, isInitialLoading } = usePipelinesConnectedStream(stream.id);
+  const { data } = usePipelinesConnectedStream(stream.id);
 
-  if (stream.is_default || !stream.is_editable || isInitialLoading) {
+  if (stream.is_default || !stream.is_editable) {
     return null;
   }
 
+  const pipelinesCount = data?.length || 0;
+
   return (
-    <StyledCountBadge ref={buttonRef} title="Connected pipelines">
-      {data.length || 0}
-    </StyledCountBadge>
+    <StreamCountBadge $disabled={pipelinesCount === 0} ref={buttonRef} title="Connected pipelines">
+      {pipelinesCount}
+    </StreamCountBadge>
   );
 };
 
