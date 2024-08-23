@@ -23,9 +23,14 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 @AutoValue
 @JsonTypeName(StreamCategoryFilter.NAME)
@@ -54,6 +59,23 @@ public abstract class StreamCategoryFilter implements Filter {
 
     public static StreamCategoryFilter ofCategory(String category) {
         return builder().category(category).build();
+    }
+
+    public Filter toStreamFilter(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                 StreamPermissions streamPermissions) {
+        String[] mappedStreamIds = categoryMappingFunction.apply(List.of(category()))
+                .filter(streamPermissions::canReadStream)
+                .toArray(String[]::new);
+        // If the streamPermissions do not allow for any of the streams to be read, nullify this filter.
+        if (mappedStreamIds.length == 0) {
+            return null;
+        }
+        // Replace this category with an OrFilter of stream IDs and then add filters if they exist.
+        Filter streamFilter = StreamFilter.anyIdOf(mappedStreamIds).toGenericBuilder().build();
+        if (filters() != null) {
+            streamFilter = streamFilter.toGenericBuilder().filters(filters()).build();
+        }
+        return streamFilter;
     }
 
     @Override
