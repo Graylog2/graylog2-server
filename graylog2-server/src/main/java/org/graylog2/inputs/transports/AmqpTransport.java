@@ -40,6 +40,7 @@ import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,7 @@ public class AmqpTransport extends ThrottleableTransport2 {
     private final Configuration configuration;
     private final EventBus eventBus;
     private final MetricRegistry localRegistry;
+    private final NodeId nodeId;
     private final EncryptedValueService encryptedValueService;
     private ScheduledExecutorService amqpScheduler;
 
@@ -88,11 +90,13 @@ public class AmqpTransport extends ThrottleableTransport2 {
     public AmqpTransport(@Assisted Configuration configuration,
                          EventBus eventBus,
                          LocalMetricRegistry localRegistry,
+                         NodeId nodeId,
                          EncryptedValueService encryptedValueService) {
         super(eventBus, configuration);
         this.configuration = configuration;
         this.eventBus = eventBus;
         this.localRegistry = localRegistry;
+        this.nodeId = nodeId;
         this.encryptedValueService = encryptedValueService;
 
         localRegistry.register("read_bytes_1sec", new Gauge<Long>() {
@@ -161,6 +165,7 @@ public class AmqpTransport extends ThrottleableTransport2 {
 
         consumer = new AmqpConsumer(
                 heartbeatTimeout,
+                nodeId,
                 input,
                 configuration,
                 inputFailureRecorder,

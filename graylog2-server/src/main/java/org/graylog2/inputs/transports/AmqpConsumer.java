@@ -37,6 +37,7 @@ import org.graylog2.plugin.MetricSets;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
@@ -85,6 +86,7 @@ public class AmqpConsumer {
     private final String routingKey;
     private final boolean requeueInvalid;
     private final int heartbeatTimeout;
+    private final NodeId nodeId;
     private final MessageInput sourceInput;
     private final int parallelQueues;
     private final boolean tls;
@@ -106,12 +108,14 @@ public class AmqpConsumer {
     private Channel channel;
 
     public AmqpConsumer(int heartbeatTimeout,
+                        NodeId nodeId,
                         MessageInput sourceInput,
                         Configuration configuration,
                         InputFailureRecorder inputFailureRecorder,
                         AmqpTransport amqpTransport,
                         EncryptedValueService encryptedValueService,
                         Duration connectionRecoveryInterval) {
+        this.nodeId = nodeId;
         this.hostname = configuration.getString(CK_HOSTNAME);
         this.port = configuration.getInt(CK_PORT);
         this.virtualHost = configuration.getString(CK_VHOST);
@@ -225,7 +229,7 @@ public class AmqpConsumer {
             factory.setUsername(username);
             factory.setPassword(encryptedValueService.decrypt(password));
         }
-        connection = factory.newConnection();
+        connection = factory.newConnection(f("graylog-node-%s-input%s", nodeId.getNodeId(), sourceInput.toIdentifier()));
         channel = connection.createChannel();
 
         if (null == channel) {
