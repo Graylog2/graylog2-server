@@ -16,6 +16,7 @@
  */
 package org.graylog.integrations.notifications.types.util;
 
+import jakarta.inject.Inject;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -25,8 +26,6 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 
@@ -42,8 +41,8 @@ public class RequestClient {
     }
 
     /**
-     * @param message
-     * @param webhookUrl
+     * @param message message string to send to the webhook
+     * @param webhookUrl webhook URL to send the message to
      * @throws TemporaryEventNotificationException - thrown for network or timeout type issues
      * @throws PermanentEventNotificationException - thrown with bad webhook url, authentication error type issues
      */
@@ -51,17 +50,16 @@ public class RequestClient {
 
         final Request request = new Request.Builder()
                 .url(webhookUrl)
-                .post(RequestBody.create(MediaType.parse(APPLICATION_JSON), message))
+                .post(RequestBody.create(message, MediaType.parse(APPLICATION_JSON)))
                 .build();
 
-        LOG.debug("Posting to webhook url <{}> the payload is <{}>",
-                webhookUrl,
-                message);
+        LOG.debug("Posting to webhook url <{}> the payload is <{}>", webhookUrl, message);
 
         try (final Response r = httpClient.newCall(request).execute()) {
             if (!r.isSuccessful()) {
+                final String errMsg = r.body() == null ? " Webhook URL: " + webhookUrl : " " + r.body().string();
                 throw new PermanentEventNotificationException(
-                        "Expected successful HTTP response [2xx] but got [" + r.code() + "]. " + webhookUrl);
+                        "Expected successful HTTP response [2xx] but got [" + r.code() + "]." + errMsg);
             }
         } catch (IOException e) {
             throw new TemporaryEventNotificationException("Unable to send the Message. " + e.getMessage());
