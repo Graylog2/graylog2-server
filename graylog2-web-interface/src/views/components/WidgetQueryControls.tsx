@@ -25,7 +25,7 @@ import { useIsFetching } from '@tanstack/react-query';
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import type { Stream } from 'views/stores/StreamsStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import connect from 'stores/connect';
+import connect, { useStore } from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
 import type { SearchBarFormValues } from 'views/Constants';
@@ -66,6 +66,8 @@ import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeT
 import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import { defaultCompare } from 'logic/DefaultCompare';
+import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
@@ -91,16 +93,17 @@ type Props = {
   availableStreams: Array<Stream>,
 };
 
-export const updateWidgetSearchControls = (widget, { timerange, streams, queryString }) => widget.toBuilder()
+export const updateWidgetSearchControls = (widget, { timerange, streams, streamCategories, queryString }) => widget.toBuilder()
   .timerange(timerange)
   .query(createElasticsearchQueryString(queryString))
   .streams(streams)
+  .streamCategories(streamCategories)
   .build();
 
 const onSubmit = async (dispatch: AppDispatch, values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, widget: Widget) => {
-  const { timerange, streams, queryString } = values;
+  const { timerange, streams, streamCategories, queryString } = values;
   const widgetWithPluginData = await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls, widget);
-  const newWidget = updateWidgetSearchControls(widgetWithPluginData, { timerange, streams, queryString });
+  const newWidget = updateWidgetSearchControls(widgetWithPluginData, { timerange, streams, streamCategories, queryString });
 
   if (!widget.equals(newWidget)) {
     return dispatch(updateWidget(widget.id, newWidget));
@@ -139,12 +142,12 @@ const useBindApplySearchControlsChanges = (formRef) => {
 };
 
 const useInitialFormValues = (widget: Widget) => {
-  const { streams } = widget;
+  const { streams, streamCategories } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
   const initialValuesFromPlugins = usePluggableInitialValues(widget);
 
-  return useMemo(() => ({ timerange, streams, queryString, ...initialValuesFromPlugins }), [timerange, streams, queryString, initialValuesFromPlugins]);
+  return useMemo(() => ({ timerange, streams, streamCategories, queryString, ...initialValuesFromPlugins }), [timerange, streams, streamCategories, queryString, initialValuesFromPlugins]);
 };
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
@@ -155,6 +158,7 @@ const _validateQueryString = (values: SearchBarFormValues, globalOverride: Globa
     timeRange: !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange,
     filter: globalOverride?.query ? globalOverride.query : undefined,
     streams: values?.streams,
+    streamCategories: values?.streamCategories,
     ...pluggableValidationPayload(values, context, pluggableSearchBarControls),
   };
 
@@ -187,6 +191,14 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
     key: stream.title,
     value: stream.id,
   }));
+  const availableStreamCategories = useStore(StreamsStore, ({ streams }) => streams.flatMap((stream) => {
+    if (stream.categories) {
+      return stream.categories.map((s) => ({ key: s, value: s }));
+    }
+
+    return [];
+  }).filter((element, index, self) => index === self.findIndex((e) => e.value === element.value),
+  ).sort((a, b) => defaultCompare(a.value, b.value)));
 
   useBindApplySearchControlsChanges(formRef);
 
@@ -222,6 +234,18 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                     <StreamsFilter value={value}
                                    streams={allStreams}
                                    onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                  )}
+                </Field>
+                <Field name="streamCategories">
+                  {({ field: { name, value, onChange } }) => (
+                    <StreamCategoryFilter value={value}
+                                          streamCategories={availableStreamCategories}
+                                          onChange={(newCategories) => onChange({
+                                            target: {
+                                              value: newCategories,
+                                              name,
+                                            },
+                                          })} />
                   )}
                 </Field>
               </TimeRangeRow>
