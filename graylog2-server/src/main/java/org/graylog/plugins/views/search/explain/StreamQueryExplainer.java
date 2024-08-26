@@ -18,6 +18,16 @@ package org.graylog.plugins.views.search.explain;
 
 import java.util.Set;
 
+/**
+ * An interface that provides information on whether other stream-based databases are affected by the executed query.
+ *
+ */
 public interface StreamQueryExplainer {
-    Set<DataRoutedStream> explain(StreamQueryInfo query);
+    /**
+     * Generate a backend-specific query out of the logical query structure.
+     *
+     * @param streamQueryInfo holds stream relevant query information
+     * @return a set of streams that were routed to another destination then es/os
+     */
+    Set<DataRoutedStream> explain(StreamQueryInfo streamQueryInfo);
 }
