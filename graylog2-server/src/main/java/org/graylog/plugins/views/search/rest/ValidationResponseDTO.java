@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.explain.DataRoutedStream;
 
 import java.util.List;
 import java.util.Set;
@@ -31,8 +32,9 @@ public abstract class ValidationResponseDTO {
 
     public static ValidationResponseDTO create(final ValidationStatusDTO status,
                                                final List<ValidationMessageDTO> explanations,
-                                               final Set<IndexRangeResult> searchedIndexRanges) {
-        return new AutoValue_ValidationResponseDTO(status, explanations, Context.create(searchedIndexRanges));
+                                               final Set<IndexRangeResult> searchedIndexRanges,
+                                               final Set<DataRoutedStream> dataRoutedStreams) {
+        return new AutoValue_ValidationResponseDTO(status, explanations, Context.create(searchedIndexRanges, dataRoutedStreams));
     }
 
     @JsonProperty
@@ -49,13 +51,18 @@ public abstract class ValidationResponseDTO {
     public static abstract class Context {
 
         public static final String SEARCHED_INDEX_RANGES = "searched_index_ranges";
+        public static final String DATA_ROUTED_STREAMS = "data_routed_streams";
 
         @JsonCreator
-        public static Context create(@JsonProperty(SEARCHED_INDEX_RANGES) Set<IndexRangeResult> searchedIndexRanges) {
-            return new AutoValue_ValidationResponseDTO_Context(searchedIndexRanges);
+        public static Context create(@JsonProperty(SEARCHED_INDEX_RANGES) Set<IndexRangeResult> searchedIndexRanges,
+                                     @JsonProperty(DATA_ROUTED_STREAMS) Set<DataRoutedStream> dataRoutedStreams) {
+            return new AutoValue_ValidationResponseDTO_Context(searchedIndexRanges, dataRoutedStreams);
         }
 
         @JsonProperty(SEARCHED_INDEX_RANGES)
         public abstract Set<IndexRangeResult> searchedIndexRanges();
+
+        @JsonProperty(DATA_ROUTED_STREAMS)
+        public abstract Set<DataRoutedStream> dataRoutedStreams();
     }
 }
