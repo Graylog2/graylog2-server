@@ -22,19 +22,23 @@ import type { VisualizationComponentProps } from 'views/components/aggregationbu
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
 import useChartData from 'views/components/visualizations/useChartData';
-import type { Generator } from 'views/components/visualizations/ChartData';
+import type { ChartDefinition, Generator } from 'views/components/visualizations/ChartData';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { keySeparator, humanSeparator } from 'views/Constants';
+import type {
+  PieChartDataSettingsWithCustomUnits,
+} from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
+import usePieChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 
 import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
 
 const maxItemsPerRow = 4;
 
-const _verticalDimensions = (idx: number, total: number) => {
+const _verticalDimensions = (idx: number, total: number): [number, number] => {
   const rows = Math.ceil(total / maxItemsPerRow);
   const position = Math.floor(idx / maxItemsPerRow);
 
@@ -44,7 +48,7 @@ const _verticalDimensions = (idx: number, total: number) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _horizontalDimensions = (idx: number, total: number) => {
+const _horizontalDimensions = (idx: number, total: number): [number, number] => {
   const position = idx % maxItemsPerRow;
 
   const sliceSize = 1 / Math.min(total, maxItemsPerRow);
@@ -53,7 +57,7 @@ const _horizontalDimensions = (idx: number, total: number) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _generateSeries = (mapKeys: KeyMapper): Generator => ({
+const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUnits: PieChartDataSettingsWithCustomUnits): Generator => ({
   type,
   name,
   labels,
@@ -62,10 +66,12 @@ const _generateSeries = (mapKeys: KeyMapper): Generator => ({
   total,
   originalName,
   config,
-}) => {
+  fullPath,
+}): ChartDefinition => {
   const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
+  const extendedSettings = getPieChartDataSettingsWithCustomUnits({ values, originalName, fullPath });
 
-  return {
+  const definition = {
     type,
     name,
     hole: 0.4,
@@ -77,7 +83,10 @@ const _generateSeries = (mapKeys: KeyMapper): Generator => ({
       y: _verticalDimensions(idx, total),
     },
     originalName,
+    ...extendedSettings,
   };
+
+  return definition;
 };
 
 const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
@@ -95,7 +104,8 @@ const rowPivotsToFields = (config: AggregationWidgetConfig) => config?.rowPivots
 const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const mapKeys = useMapKeys();
-  const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries(mapKeys) });
+  const getPieChartDataSettingsWithCustomUnits = usePieChartDataSettingsWithCustomUnits({ config });
+  const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries(mapKeys, getPieChartDataSettingsWithCustomUnits) });
 
   return (
     <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} labelFields={rowPivotsToFields} neverHide>

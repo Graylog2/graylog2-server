@@ -185,6 +185,9 @@ interface PluginDataWarehouse {
     }
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
+  DataWarehouseJobs: React.ComponentType<{
+    streamId: string,
+  }>,
   StreamIlluminateProcessingSection: React.ComponentType<{
     stream: Stream,
   }>,
