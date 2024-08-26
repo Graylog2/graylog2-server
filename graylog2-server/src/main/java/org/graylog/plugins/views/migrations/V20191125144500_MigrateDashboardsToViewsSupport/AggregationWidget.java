@@ -70,7 +70,8 @@ public abstract class AggregationWidget implements ViewWidget {
     public static Builder builder() {
         return new AutoValue_AggregationWidget.Builder()
                 .type(TYPE_AGGREGATION)
-                .streams(Collections.emptySet());
+                .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet());
     }
 
     public Set<SearchType> toSearchTypes(RandomUUIDProvider randomUUIDProvider) {
