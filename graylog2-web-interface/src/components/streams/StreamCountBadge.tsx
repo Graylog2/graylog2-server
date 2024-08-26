@@ -14,31 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import styled, { css } from 'styled-components';
 
-import { useRef } from 'react';
-import * as React from 'react';
+import { CountBadge } from 'components/common';
 
-import type { Stream } from 'stores/streams/StreamsStore';
-import StreamCountBadge from 'components/streams/StreamCountBadge';
+const StreamCountBadge = styled(CountBadge)<{ $disabled: boolean }>(({ $disabled, theme }) => css`
+  cursor: pointer;
+  background-color: ${$disabled ? theme.colors.variant.default : theme.colors.variant.light.info};
+`);
 
-type Props = {
-  stream: Stream
-}
-
-const OutputsCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-
-  if (stream.is_default || !stream.is_editable) {
-    return null;
-  }
-
-  const outputCount = stream.outputs?.length || 0;
-
-  return (
-    <StreamCountBadge $disabled={outputCount === 0} ref={buttonRef} title="Stream Outputs">
-      {outputCount}
-    </StreamCountBadge>
-  );
-};
-
-export default OutputsCell;
+export default StreamCountBadge;
