@@ -442,6 +442,10 @@ export interface WidgetCreator {
   icon: React.ComponentType<{}>,
 }
 
+export type FieldUnitType = 'size' | 'time' | 'percent';
+
+export type FieldUnitsFormValues = Record<string, {abbrev: string; unitType: FieldUnitType}>;
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
