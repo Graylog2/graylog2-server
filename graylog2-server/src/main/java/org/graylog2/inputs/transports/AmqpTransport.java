@@ -168,6 +168,7 @@ public class AmqpTransport extends ThrottleableTransport2 {
                 encryptedValueService,
                 connectionRecoveryInterval()
         );
+        localRegistry.registerAll(consumer.getMetricSet());
         if (amqpScheduler == null) {
             this.amqpScheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("amqp-input-" + input.getId() + "-executor-%d").build());
         }

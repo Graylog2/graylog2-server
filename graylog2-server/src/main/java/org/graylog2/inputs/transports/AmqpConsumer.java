@@ -16,8 +16,11 @@
  */
 package org.graylog2.inputs.transports;
 
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricSet;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.collect.ImmutableMap;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Command;
@@ -27,7 +30,10 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.TrafficListener;
 import com.rabbitmq.client.impl.DefaultExceptionHandler;
+import com.rabbitmq.client.impl.StandardMetricsCollector;
 import org.graylog2.plugin.InputFailureRecorder;
+import org.graylog2.plugin.LocalMetricRegistry;
+import org.graylog2.plugin.MetricSets;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
@@ -86,6 +92,7 @@ public class AmqpConsumer {
     private final AmqpTransport amqpTransport;
     private final EncryptedValueService encryptedValueService;
     private final Duration connectionRecoveryInterval;
+    private final StandardMetricsCollector metricsCollector;
 
     private final AtomicLong totalBytesRead = new AtomicLong(0);
     private final LoadingCache<String, AtomicLong> lastSecBytesCache = Caffeine.newBuilder()
@@ -124,6 +131,7 @@ public class AmqpConsumer {
         this.amqpTransport = amqpTransport;
         this.encryptedValueService = encryptedValueService;
         this.connectionRecoveryInterval = connectionRecoveryInterval;
+        this.metricsCollector = new StandardMetricsCollector(new LocalMetricRegistry(), "amqp");
     }
 
     public void run() throws IOException, TimeoutException {
@@ -201,6 +209,7 @@ public class AmqpConsumer {
         // explicitly setting this, to ensure it is true even if the default changes.
         factory.setAutomaticRecoveryEnabled(true);
         factory.setNetworkRecoveryInterval(connectionRecoveryInterval.toMillis());
+        factory.setMetricsCollector(metricsCollector);
 
         if (tls) {
             try {
@@ -271,5 +280,14 @@ public class AmqpConsumer {
 
     public AtomicLong getTotalBytesRead() {
         return totalBytesRead;
+    }
+
+    public MetricSet getMetricSet() {
+        // We are not interested in publish metrics.
+        final ImmutableMap<String, Metric> metrics = ImmutableMap.<String, Metric>builder()
+                .putAll(metricsCollector.getMetricRegistry().getCounters((name, metric) -> name.matches(".+\\.(?:connections|channels)$")))
+                .putAll(metricsCollector.getMetricRegistry().getMeters((name, metric) -> name.matches(".+\\.(?:consumed|acknowledged|rejected)$")))
+                .build();
+        return MetricSets.of(metrics);
     }
 }
