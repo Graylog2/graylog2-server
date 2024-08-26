@@ -18,6 +18,7 @@ package org.graylog.integrations.notifications.types.microsoftteams;
 
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
+import javax.inject.Inject;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationException;
@@ -25,7 +26,6 @@ import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
-import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.integrations.notifications.types.util.RequestClient;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.jackson.TypeReferences;
@@ -34,25 +34,22 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.net.URI;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
-@Deprecated
-public class TeamsEventNotification implements EventNotification {
+public class TeamsEventNotificationV2 implements EventNotification {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TeamsEventNotification.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TeamsEventNotificationV2.class);
     private final EventNotificationService notificationCallbackService;
     private final Engine templateEngine;
     private final NotificationService notificationService;
@@ -62,12 +59,12 @@ public class TeamsEventNotification implements EventNotification {
     private final URI httpExternalUri;
 
     @Inject
-    public TeamsEventNotification(EventNotificationService notificationCallbackService,
-                                  ObjectMapperProvider objectMapperProvider,
-                                  Engine templateEngine,
-                                  NotificationService notificationService,
-                                  NodeId nodeId, RequestClient requestClient,
-                                  HttpConfiguration httpConfiguration) {
+    public TeamsEventNotificationV2(EventNotificationService notificationCallbackService,
+                                    ObjectMapperProvider objectMapperProvider,
+                                    Engine templateEngine,
+                                    NotificationService notificationService,
+                                    NodeId nodeId, RequestClient requestClient,
+                                    HttpConfiguration httpConfiguration) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapperProvider = requireNonNull(objectMapperProvider);
         this.templateEngine = requireNonNull(templateEngine);
@@ -78,27 +75,29 @@ public class TeamsEventNotification implements EventNotification {
     }
 
     /**
-     * @param ctx
+     * Execute this notification with the provided context.
+     *
+     * @param ctx event notification context
      * @throws EventNotificationException is thrown when execute fails
      */
     @Override
     public void execute(EventNotificationContext ctx) throws EventNotificationException {
-        final TeamsEventNotificationConfig config = (TeamsEventNotificationConfig) ctx.notificationConfig();
-        LOG.debug("TeamsEventNotification backlog size in method execute is [{}]", config.backlogSize());
+        final TeamsEventNotificationConfigV2 config = (TeamsEventNotificationConfigV2) ctx.notificationConfig();
+        LOG.debug("TeamsEventNotificationV2 backlog size in method execute is [{}]", config.backlogSize());
 
         try {
-            TeamsMessage teamsMessage = createTeamsMessage(ctx, config);
-            requestClient.send(objectMapperProvider.getForTimeZone(config.timeZone()).writeValueAsString(teamsMessage), config.webhookUrl());
+            final String requestBody = generateBody(ctx, config);
+            requestClient.send(requestBody, config.webhookUrl());
         } catch (TemporaryEventNotificationException exp) {
-            //scheduler needs to retry a TemporaryEventNotificationException
+            // Scheduler needs to retry a TemporaryEventNotificationException
             throw exp;
         } catch (PermanentEventNotificationException exp) {
-            String errorMessage = String.format(Locale.ROOT, "Error sending the TeamsEventNotification :: %s", exp.getMessage());
+            String errorMessage = StringUtils.f("Error sending Teams Notification ID: %s. %s", ctx.notificationId(), exp.getMessage());
             final Notification systemNotification = notificationService.buildNow()
                     .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.URGENT)
-                    .addDetail("title", "TeamsEventNotification Failed")
+                    .addDetail("title", "TeamsEventNotificationV2 Failed")
                     .addDetail("description", errorMessage);
 
             notificationService.publishIfFirst(systemNotification);
@@ -110,53 +109,19 @@ public class TeamsEventNotification implements EventNotification {
     }
 
     /**
-     * @param ctx
-     * @param config
-     * @return
+     * Fills out the AdaptiveCard template with the event context and backlog (if configured).
+     *
+     * @param ctx    event notification context
+     * @param config notification configuration
+     * @return the filled out template for the Teams Adaptive Card
      * @throws PermanentEventNotificationException - throws this exception when the custom message template is invalid
      */
-    TeamsMessage createTeamsMessage(EventNotificationContext ctx, TeamsEventNotificationConfig config) throws PermanentEventNotificationException {
-        String messageTitle = buildDefaultMessage(ctx);
-        String description = buildMessageDescription(ctx);
-        String customMessage = null;
-        String template = config.customMessage();
-        String summary = ctx.eventDefinition().map(EventDefinitionDto::title).orElse("Graylog Event");
-        if (!isNullOrEmpty(template)) {
-            customMessage = buildCustomMessage(ctx, config, template);
-        }
-
-        TeamsMessage.Sections section = TeamsMessage.Sections.builder()
-                .activityImage(config.iconUrl())
-                .activitySubtitle(description)
-                .text(customMessage)
-                .build();
-
-        return TeamsMessage.builder()
-                .color(config.color())
-                .text(messageTitle)
-                .summary(summary)
-                .sections(Collections.singleton(section))
-                .build();
-    }
-
-    String buildDefaultMessage(EventNotificationContext ctx) {
-        String title = ctx.eventDefinition().map(EventDefinitionDto::title).orElse("Unnamed");
-
-        // Build Message title
-        return String.format(Locale.ROOT, "**Alert %s triggered:**\n", title);
-    }
-
-    private String buildMessageDescription(EventNotificationContext ctx) {
-        String description = ctx.eventDefinition().map(EventDefinitionDto::description).orElse("");
-        return "_" + description + "_";
-    }
-
-
-    String buildCustomMessage(EventNotificationContext ctx, TeamsEventNotificationConfig config, String template) throws PermanentEventNotificationException {
+    @VisibleForTesting
+    String generateBody(EventNotificationContext ctx, TeamsEventNotificationConfigV2 config) throws PermanentEventNotificationException {
         final List<MessageSummary> backlog = getMessageBacklog(ctx, config);
         Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog, config.timeZone());
         try {
-            return templateEngine.transform(template, model);
+            return templateEngine.transform(config.adaptiveCard(), model);
         } catch (Exception e) {
             String error = "Invalid Custom Message template.";
             LOG.error("{} [{}]", error, e.toString());
@@ -165,7 +130,7 @@ public class TeamsEventNotification implements EventNotification {
     }
 
     @VisibleForTesting
-    List<MessageSummary> getMessageBacklog(EventNotificationContext ctx, TeamsEventNotificationConfig config) {
+    List<MessageSummary> getMessageBacklog(EventNotificationContext ctx, TeamsEventNotificationConfigV2 config) {
         List<MessageSummary> backlog = notificationCallbackService.getBacklogForEvent(ctx);
         if (config.backlogSize() > 0 && backlog != null) {
             return backlog.stream().limit(config.backlogSize()).collect(Collectors.toList());
@@ -173,22 +138,29 @@ public class TeamsEventNotification implements EventNotification {
         return backlog;
     }
 
-
     @VisibleForTesting
     Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, String type, List<MessageSummary> backlog, DateTimeZone timeZone) {
-        EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
+        final EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
+        LOG.debug("Custom message model: {}", modelData);
 
-        LOG.debug("the custom message model data is {}", modelData);
-        Map<String, Object> objectMap = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
+        final Map<String, Object> objectMap = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
         objectMap.put("type", type);
         objectMap.put("http_external_uri", this.httpExternalUri);
+        final Map<String, Object> escapedModelMap = new HashMap<>();
+        objectMap.forEach((k, v) -> {
+            if (v instanceof String str) {
+                escapedModelMap.put(k, str.replace("\"", "\\\""));
+            } else {
+                escapedModelMap.put(k, v);
+            }
+        });
+        LOG.debug("Finalized model map: {}", escapedModelMap);
 
-        return objectMap;
+        return escapedModelMap;
     }
 
-    public interface Factory extends EventNotification.Factory<TeamsEventNotification> {
+    public interface Factory extends EventNotification.Factory<TeamsEventNotificationV2> {
         @Override
-        TeamsEventNotification create();
+        TeamsEventNotificationV2 create();
     }
-
 }
