@@ -87,14 +87,16 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     ) {
         ValidationRequest request = prepareRequest(validationRequest, searchUser);
         final ValidationResponse response = queryValidationService.validate(request);
-        Set<ExplainResults.IndexRangeResult> searchedIndexRanges = indexRanges(request);
-        Optional<Set<String>> requestedStreams = validationRequest.streams();
-        Set<String> readableStreams = request.streams();
+        final Set<ExplainResults.IndexRangeResult> searchedIndexRanges = indexRanges(request);
+        final Optional<Set<String>> requestedStreams = validationRequest.streams();
+        final Set<String> readableStreams = request.streams();
+        final Set<DataRoutedStream> dataRoutedStreams = checkForDataRoutedStreams(requestedStreams, readableStreams, request.timerange(), request.isEmptyQuery());
+        final boolean hasDataRoutedStreams = dataRoutedStreams != null && !dataRoutedStreams.isEmpty();
         return ValidationResponseDTO.create(
-                toStatus(response.status(), containsWarmIndices(searchedIndexRanges)),
+                toStatus(response.status(), containsWarmIndices(searchedIndexRanges), hasDataRoutedStreams),
                 toExplanations(response),
                 searchedIndexRanges,
-                checkForDataRoutedStreams(requestedStreams, readableStreams, request.timerange(), request.isEmptyQuery()));
+                dataRoutedStreams);
     }
 
     private boolean containsWarmIndices(Set<ExplainResults.IndexRangeResult> searchedIndexRanges) {
@@ -135,15 +137,17 @@ public class QueryValidationResource extends RestResource implements PluginRestR
                 .collect(toImmutableSet());
     }
 
-    private ValidationStatusDTO toStatus(final ValidationStatus status, boolean hasWarmIndices) {
+    private ValidationStatusDTO toStatus(final ValidationStatus status, boolean hasWarmIndices, boolean hasDataRoutedStreams) {
         ValidationStatusDTO validationStatusDTO = switch (status) {
             case WARNING -> ValidationStatusDTO.WARNING;
             case ERROR -> ValidationStatusDTO.ERROR;
             default -> ValidationStatusDTO.OK;
         };
-        if (validationStatusDTO == ValidationStatusDTO.OK) {
-            return hasWarmIndices ? ValidationStatusDTO.WARNING : ValidationStatusDTO.OK;
+
+        if (validationStatusDTO == ValidationStatusDTO.OK && (hasWarmIndices || hasDataRoutedStreams)) {
+            return ValidationStatusDTO.WARNING;
         }
+
         return validationStatusDTO;
     }
 
