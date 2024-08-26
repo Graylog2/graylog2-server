@@ -16,6 +16,8 @@
  */
 package org.graylog2.inputs.transports;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Command;
@@ -39,9 +41,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Locale;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -63,6 +62,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class AmqpConsumer {
     private static final Logger LOG = LoggerFactory.getLogger(AmqpConsumer.class);
+    private static final String LAST_SEC_BYTES_KEY = "last-sec-bytes";
 
     // Not threadsafe!
 
@@ -82,24 +82,25 @@ public class AmqpConsumer {
     private final MessageInput sourceInput;
     private final int parallelQueues;
     private final boolean tls;
-    private final ScheduledExecutorService scheduler;
     private final InputFailureRecorder inputFailureRecorder;
     private final AmqpTransport amqpTransport;
     private final EncryptedValueService encryptedValueService;
     private final Duration connectionRecoveryInterval;
 
     private final AtomicLong totalBytesRead = new AtomicLong(0);
-    private final AtomicLong lastSecBytesRead = new AtomicLong(0);
-    private final AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
+    private final LoadingCache<String, AtomicLong> lastSecBytesCache = Caffeine.newBuilder()
+            // Reset the value to zero after one second to get a bytes-per-second gauge.
+            .expireAfterWrite(Duration.ofSeconds(1))
+            .initialCapacity(1)
+            .maximumSize(1)
+            .build(key -> new AtomicLong(0));
 
     private Connection connection;
     private Channel channel;
-    private ScheduledFuture<?> scheduledFuture;
 
     public AmqpConsumer(int heartbeatTimeout,
                         MessageInput sourceInput,
                         Configuration configuration,
-                        ScheduledExecutorService scheduler,
                         InputFailureRecorder inputFailureRecorder,
                         AmqpTransport amqpTransport,
                         EncryptedValueService encryptedValueService,
@@ -119,7 +120,6 @@ public class AmqpConsumer {
         this.tls = configuration.getBoolean(CK_TLS);
         this.heartbeatTimeout = heartbeatTimeout;
         this.sourceInput = sourceInput;
-        this.scheduler = scheduler;
         this.inputFailureRecorder = inputFailureRecorder;
         this.amqpTransport = amqpTransport;
         this.encryptedValueService = encryptedValueService;
@@ -131,7 +131,6 @@ public class AmqpConsumer {
         if (!isConnected()) {
             connect();
         }
-        scheduledFuture = scheduler.scheduleAtFixedRate(() -> lastSecBytesRead.set(lastSecBytesReadTmp.getAndSet(0)), 1, 1, TimeUnit.SECONDS);
 
         for (int i = 0; i < parallelQueues; i++) {
             final String queueName = String.format(Locale.ENGLISH, queue, i);
@@ -145,7 +144,7 @@ public class AmqpConsumer {
                     long deliveryTag = envelope.getDeliveryTag();
                     try {
                         totalBytesRead.addAndGet(body.length);
-                        lastSecBytesReadTmp.addAndGet(body.length);
+                        lastSecBytesCache.get(LAST_SEC_BYTES_KEY).addAndGet(body.length);
 
                         final RawMessage rawMessage = new RawMessage(body);
 
@@ -257,9 +256,6 @@ public class AmqpConsumer {
         } else if (connection != null) {
             connection.abort();
         }
-        if (null != scheduledFuture) {
-            scheduledFuture.cancel(true);
-        }
     }
 
     public boolean isConnected() {
@@ -270,7 +266,7 @@ public class AmqpConsumer {
     }
 
     public AtomicLong getLastSecBytesRead() {
-        return lastSecBytesRead;
+        return lastSecBytesCache.get(LAST_SEC_BYTES_KEY);
     }
 
     public AtomicLong getTotalBytesRead() {

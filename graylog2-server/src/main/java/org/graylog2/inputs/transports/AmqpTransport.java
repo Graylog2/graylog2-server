@@ -24,7 +24,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.rabbitmq.client.ConnectionFactory;
-import jakarta.inject.Named;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -78,7 +77,6 @@ public class AmqpTransport extends ThrottleableTransport2 {
     private final EventBus eventBus;
     private final MetricRegistry localRegistry;
     private final EncryptedValueService encryptedValueService;
-    private final ScheduledExecutorService scheduler;
     private ScheduledExecutorService amqpScheduler;
 
     private AmqpConsumer consumer;
@@ -90,14 +88,12 @@ public class AmqpTransport extends ThrottleableTransport2 {
     public AmqpTransport(@Assisted Configuration configuration,
                          EventBus eventBus,
                          LocalMetricRegistry localRegistry,
-                         EncryptedValueService encryptedValueService,
-                         @Named("daemonScheduler") ScheduledExecutorService scheduler) {
+                         EncryptedValueService encryptedValueService) {
         super(eventBus, configuration);
         this.configuration = configuration;
         this.eventBus = eventBus;
         this.localRegistry = localRegistry;
         this.encryptedValueService = encryptedValueService;
-        this.scheduler = scheduler;
 
         localRegistry.register("read_bytes_1sec", new Gauge<Long>() {
             @Override
@@ -167,7 +163,6 @@ public class AmqpTransport extends ThrottleableTransport2 {
                 heartbeatTimeout,
                 input,
                 configuration,
-                scheduler,
                 inputFailureRecorder,
                 this,
                 encryptedValueService,
