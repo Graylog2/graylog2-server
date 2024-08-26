@@ -16,38 +16,17 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { ConfirmDialog } from 'components/common';
+import useStreamDataWarehouseHasData from 'components/streams/StreamsOverview/hooks/useStreamDataWarehouseHasData';
+import useIsStreamDataWarehouseEnabled from 'components/streams/StreamsOverview/hooks/useIsStreamDataWarehouseEnabled';
 
 type Props = {
   onDelete: () => void,
   streamId: string,
   streamTitle: string,
   onCancel: () => void,
-};
-
-const useStreamDataWarehouseHasData = (streamId: string, enabled: boolean) => {
-  const { fetchStreamDataWarehouse } = usePluginEntities('dataWarehouse')[0] ?? {};
-  const { data: dataWarehouse, isError, isLoading } = useQuery(['stream', 'data-warehouse', streamId],
-    () => fetchStreamDataWarehouse(streamId),
-    { enabled: fetchStreamDataWarehouse && enabled },
-  );
-
-  return (isLoading || isError) ? undefined : (
-    dataWarehouse?.message_count > 1 || dataWarehouse?.restore_history?.length > 0
-  );
-};
-
-const useIsStreamDataWarehouseEnabled = (streamId: string, enabled: boolean) => {
-  const { fetchStreamDataWarehouseStatus } = usePluginEntities('dataWarehouse')[0] ?? {};
-  const { data: status, isError, isLoading } = useQuery(['data-warehouse-config', streamId, 'enabled'],
-    () => fetchStreamDataWarehouseStatus(streamId),
-    { enabled: fetchStreamDataWarehouseStatus && enabled },
-  );
-
-  return (isLoading || isError) ? undefined : status?.enabled;
 };
 
 const StreamDeleteModal = ({ onDelete, streamId, streamTitle, onCancel }: Props) => {
