@@ -18,8 +18,7 @@ package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricSet;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BlockedListener;
@@ -51,6 +50,7 @@ import java.time.Duration;
 import java.util.Locale;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_EXCHANGE;
@@ -70,7 +70,6 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class AmqpConsumer {
     private static final Logger LOG = LoggerFactory.getLogger(AmqpConsumer.class);
-    private static final String LAST_SEC_BYTES_KEY = "last-sec-bytes";
 
     // Not threadsafe!
 
@@ -98,12 +97,10 @@ public class AmqpConsumer {
     private final StandardMetricsCollector metricsCollector;
 
     private final AtomicLong totalBytesRead = new AtomicLong(0);
-    private final LoadingCache<String, AtomicLong> lastSecBytesCache = Caffeine.newBuilder()
-            // Reset the value to zero after one second to get a bytes-per-second gauge.
-            .expireAfterWrite(Duration.ofSeconds(1))
-            .initialCapacity(1)
-            .maximumSize(1)
-            .build(key -> new AtomicLong(0));
+    private final Supplier<AtomicLong> lastSecBytesSupplier = Suppliers.memoizeWithExpiration(
+            () -> new AtomicLong(0),
+            Duration.ofSeconds(1)
+    );
 
     private Connection connection;
     private Channel channel;
@@ -157,7 +154,7 @@ public class AmqpConsumer {
                     long deliveryTag = envelope.getDeliveryTag();
                     try {
                         totalBytesRead.addAndGet(body.length);
-                        lastSecBytesCache.get(LAST_SEC_BYTES_KEY).addAndGet(body.length);
+                        lastSecBytesSupplier.get().addAndGet(body.length);
 
                         final RawMessage rawMessage = new RawMessage(body);
 
@@ -291,7 +288,7 @@ public class AmqpConsumer {
     }
 
     public AtomicLong getLastSecBytesRead() {
-        return lastSecBytesCache.get(LAST_SEC_BYTES_KEY);
+        return lastSecBytesSupplier.get();
     }
 
     public AtomicLong getTotalBytesRead() {
