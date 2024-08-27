@@ -148,4 +148,15 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
         }
         return builder.build();
     }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        streams().forEach(streamId -> {
+            final EntityDescriptor depStream = EntityDescriptor.builder()
+                    .id(ModelId.of(streamId))
+                    .type(ModelTypes.STREAM_REF_V1)
+                    .build();
+            mutableGraph.putEdge(entityDescriptor, depStream);
+        });
+    }
 }
