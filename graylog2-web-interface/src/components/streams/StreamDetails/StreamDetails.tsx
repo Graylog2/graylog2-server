@@ -165,7 +165,7 @@ const StreamDetails = ({ stream }: Props) => {
 
   return (
     <>
-      {DataWarehouseJobComponent && <DataWarehouseJobComponent />}
+      {DataWarehouseJobComponent && <DataWarehouseJobComponent streamId={stream.id} />}
       <Container>
         <Header>
           <LeftCol>
@@ -200,7 +200,7 @@ const StreamDetails = ({ stream }: Props) => {
         <SegmentContainer className="content">
           <FullHeightCol xs={12}>
             {currentSegment === INTAKE_SEGMENT && <StreamDataRoutingIntake stream={stream} />}
-            {currentSegment === PROCESSING_SEGMENT && <StreamDataRoutingProcessing />}
+            {currentSegment === PROCESSING_SEGMENT && <StreamDataRoutingProcessing stream={stream} />}
             {currentSegment === DESTINATIONS_SEGMENT && <StreamDataRoutingDestinations stream={stream} />}
           </FullHeightCol>
         </SegmentContainer>
