@@ -193,7 +193,7 @@ public class AmqpConsumer {
             @Override
             public void handleConnectionRecoveryException(Connection conn, Throwable exception) {
                 super.handleConnectionRecoveryException(conn, exception);
-                inputFailureRecorder.setFailing(getClass(), "Connection recovery error!", exception);
+                inputFailureRecorder.setFailing(AmqpConsumer.class, "Connection recovery error!", exception);
             }
         });
         factory.setTrafficListener(new TrafficListener() {
