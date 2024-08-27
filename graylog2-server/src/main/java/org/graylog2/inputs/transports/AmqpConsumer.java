@@ -22,6 +22,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.BlockedListener;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Command;
 import com.rabbitmq.client.Connection;
@@ -250,6 +251,17 @@ public class AmqpConsumer {
 
             inputFailureRecorder.setFailing(getClass(),
                     f("AMQP connection lost (reason: %s)! Reconnecting ...", cause.getReason().protocolMethodName()));
+        });
+        connection.addBlockedListener(new BlockedListener() {
+            @Override
+            public void handleBlocked(String reason) {
+                LOG.warn("AMQP input {} is blocked: {}", sourceInput.toIdentifier(), reason);
+            }
+
+            @Override
+            public void handleUnblocked() {
+                LOG.info("AMQP input {} is not blocked anymore", sourceInput.toIdentifier());
+            }
         });
     }
 
