@@ -20,6 +20,7 @@ import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricSet;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BlockedListener;
 import com.rabbitmq.client.Channel;
@@ -48,6 +49,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
@@ -104,6 +107,7 @@ public class AmqpConsumer {
 
     private Connection connection;
     private Channel channel;
+    private ExecutorService executorService;
 
     public AmqpConsumer(int heartbeatTimeout,
                         NodeId nodeId,
@@ -185,6 +189,11 @@ public class AmqpConsumer {
     }
 
     public void connect() throws IOException, TimeoutException {
+        this.executorService = Executors.newFixedThreadPool(parallelQueues, new ThreadFactoryBuilder()
+                .setNameFormat("amqp-consumer-%d " + sourceInput.toIdentifier())
+                .setDaemon(true)
+                .build());
+
         final ConnectionFactory factory = new ConnectionFactory();
         factory.setExceptionHandler(new DefaultExceptionHandler() {
             @Override
@@ -212,6 +221,7 @@ public class AmqpConsumer {
         factory.setAutomaticRecoveryEnabled(true);
         factory.setNetworkRecoveryInterval(connectionRecoveryInterval.toMillis());
         factory.setMetricsCollector(metricsCollector);
+        factory.setSharedExecutor(executorService);
 
         if (tls) {
             try {
@@ -277,6 +287,10 @@ public class AmqpConsumer {
             connection.close();
         } else if (connection != null) {
             connection.abort();
+        }
+
+        if (executorService != null) {
+            executorService.shutdown();
         }
     }
 
