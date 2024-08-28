@@ -49,6 +49,7 @@ type Props = {
   showSelectAllRest?: boolean,
   showDeSelectAll?: boolean,
   showListCollapseButton?: boolean
+  showUnit?: boolean,
 }
 
 const FieldsConfiguration = ({
@@ -63,6 +64,7 @@ const FieldsConfiguration = ({
   showSelectAllRest,
   showDeSelectAll,
   showListCollapseButton,
+  showUnit,
 }: Props) => {
   const [showSelectedList, setShowSelectedList] = useState(true);
   const onAddField = useCallback((newField: string) => (
@@ -101,7 +103,8 @@ const FieldsConfiguration = ({
                           selectedFields={selectedFields}
                           selectSize={selectSize}
                           displayOverlayInPortal={displaySortableListOverlayInPortal}
-                          onChange={onChange} />
+                          onChange={onChange}
+                          showUnit={showUnit} />
       )}
       <FieldSelect id="field-create-select"
                    onChange={onAddField}
@@ -133,6 +136,7 @@ FieldsConfiguration.defaultProps = {
   showSelectAllRest: false,
   showDeSelectAll: false,
   showListCollapseButton: false,
+  showUnit: false,
 };
 
 export default FieldsConfiguration;
