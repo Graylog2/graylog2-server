@@ -3439,9 +3439,9 @@
     "@types/geojson" "*"
 
 "@types/lodash@^4.14.165":
-  version "4.17.6"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.6.tgz#193ced6a40c8006cfc1ca3f4553444fb38f0e543"
-  integrity sha512-OpXEVoCKSS3lQqjx9GGGOapBeuW5eUboYHRlHP9urXPX25IKZ6AnP5ZRxtVf63iieUbsHxLn8NQ5Nlftc6yzAA==
+  version "4.17.7"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.7.tgz#2f776bcb53adc9e13b2c0dfd493dfcbd7de43612"
+  integrity sha512-8wTvZawATi/lsmNu10/j2hk1KEP0IvjubqPE3cu1Xz7xfXXt5oCq3SNUz4fMIP4XGF9Ky+Ue2tBA3hcS7LSBlA==
 
 "@types/md5@^2.3.0":
   version "2.3.5"
@@ -4112,10 +4112,10 @@ accepts@~1.3.4, accepts@~1.3.5, accepts@~1.3.8:
     mime-types "~2.1.34"
     negotiator "0.6.3"
 
-ace-builds@1.35.5, ace-builds@^1.32.8:
-  version "1.35.5"
-  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.35.5.tgz#6cddd56de260295473a24f3acc0efdb8bf8157e1"
-  integrity sha512-yh3V5BLHlN6gwbmk5sV00WRRvdEggJGJ3AIHhOOGHlgDWNWCSvOnHPO7Chb+AqaxxHuvpxOdXd7ZQesaiuJQZQ==
+ace-builds@1.36.0, ace-builds@^1.32.8:
+  version "1.36.0"
+  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.36.0.tgz#6f776eb162a1e98e865fdd0fdfc5dbd61c30d00c"
+  integrity sha512-7to4F86V5N13EY4M9LWaGo2Wmr9iWe5CrYpc28F+/OyYCf7yd+xBV5x9v/GB73EBGGoYd89m6JjeIUjkL6Yw+w==
 
 acorn-globals@^4.1.0:
   version "4.3.4"

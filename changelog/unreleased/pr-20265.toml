@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix issue where content pack stream dependencies were not properly resolved when a dashboard was imported and immediately exported."
+
+pulls = ["20265"]
