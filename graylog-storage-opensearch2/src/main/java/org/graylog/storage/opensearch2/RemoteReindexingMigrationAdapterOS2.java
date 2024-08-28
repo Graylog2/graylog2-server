@@ -188,8 +188,12 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
+    /**
+     * Obtain and hold a lock for each index set that's going to be migrated. These locks will be automatically
+     * extended as long as they are not explicitly released. If this node crashes, locks will expire automatically
+     * @return locks that should be released after the migration.
+     */
     private Set<Lock> lockIndexSets(MigrationConfiguration migration) {
-
         final DatanodeMigrationLockWaitConfig lockWaitConfig = new DatanodeMigrationLockWaitConfig(
                 java.time.Duration.ofSeconds(5),
                 java.time.Duration.ofMinutes(30),
@@ -484,10 +488,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private IndexState getIndexState(URI uri, String username, String password, String indexName) {
-        final IndexState indexState = datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, resource -> resource.readState(new IndexStateGetRequest(
+        return datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, resource -> resource.readState(new IndexStateGetRequest(
                 indexName, uri.toString(), username, password
         ))).values().iterator().next();
-        return indexState;
     }
 
 

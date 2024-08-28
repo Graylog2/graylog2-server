@@ -18,5 +18,12 @@ package org.graylog2.indexer.datanode;
 
 import java.time.Duration;
 
+/**
+ * Configuration of active wait for index set locks.
+ * @param delayBetweenAttempts How long should we wait between each lock acquire attempt
+ * @param lockAcquireTimeout Overall timeout when we give up and fail
+ * @param lockAcquireListerer Triggered during each acquire attempt, gives caller a chance to log or propagate
+ *                            this information.
+ */
 public record DatanodeMigrationLockWaitConfig(Duration delayBetweenAttempts, Duration lockAcquireTimeout, DatanodeMigrationLockListener lockAcquireListerer) {
 }

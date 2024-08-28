@@ -21,7 +21,8 @@ import org.graylog2.indexer.IndexSet;
 
 public interface DatanodeMigrationLockService {
     /**
-     * This is a blocking method. It will try to acquire a lock indefinitely.
+     * This is a blocking method. It will try to acquire a lock and repeat the process until the general timeout
+     * defined in the {@link DatanodeMigrationLockWaitConfig#lockAcquireTimeout()} is reached.
      */
     Lock acquireLock(IndexSet indexSet, Class<?> caller, String context, DatanodeMigrationLockWaitConfig config);
 
@@ -31,5 +32,9 @@ public interface DatanodeMigrationLockService {
      */
     void tryRun(IndexSet indexSet, Class<?> caller, Runnable runnable);
 
+    /**
+     * Each lock needs to be explicitly released, otherwise the implementation may extend it as long as the
+     * node is running.
+     */
     void release(Lock lock);
 }

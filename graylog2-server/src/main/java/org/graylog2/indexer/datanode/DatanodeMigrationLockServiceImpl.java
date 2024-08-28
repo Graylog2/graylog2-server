@@ -59,6 +59,10 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
         startLocksExtendingThread(lockService);
     }
 
+    /**
+     * Locks that are acquired are automatically added to the {@link #activeLocks} collection. These locks
+     * will be periodically extended unless explicitly released.
+     */
     private void startLocksExtendingThread(LockService lockService) {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setNameFormat("migration-locks-service-backend-%d")
@@ -75,6 +79,12 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
         );
     }
 
+    /**
+     * Extend active locks. The returned value from {@link LockService#extendLock(Lock)} is ignored and not needed.
+     * This simplifies the release process, as the original acquired lock is enough for extension and enough for
+     * release. If we would update the {@link #activeLocks} collection every time, we'd need to use a smarter
+     * strategy to detect which lock should be actually deleted during the release process.
+     */
     private synchronized void extendActiveLocks(LockService lockService) {
         final long extendedLocks = activeLocks.stream()
                 .map(lockService::extendLock)
@@ -94,15 +104,14 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
 
     @Override
     public void tryRun(IndexSet indexSet, Class<?> caller, Runnable runnable) {
-        final Optional<Lock> lock = tryLock(indexSet, caller);
-        // here we have to keep the lock refreshed every now and then
-        lock.ifPresentOrElse(l -> {
-            try {
-                runnable.run();
-            } finally {
-                release(l);
-            }
-        }, () -> LOG.info("Couldn't enquire a lock of index set {}({}) for {}, skipping execution", indexSet.getConfig().title(), indexSet.getConfig().id(), caller.getName()));
+        tryLock(indexSet, caller)
+                .ifPresentOrElse(lock -> {
+                    try {
+                        runnable.run();
+                    } finally {
+                        release(lock);
+                    }
+                }, () -> LOG.info("Couldn't enquire a lock of index set {}({}) for {}, skipping execution", indexSet.getConfig().title(), indexSet.getConfig().id(), caller.getName()));
     }
 
     @Override
