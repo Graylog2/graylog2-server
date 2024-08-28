@@ -17,15 +17,10 @@
 
 import { useRef, useCallback } from 'react';
 import * as React from 'react';
-import styled from 'styled-components';
 
+import StreamCountBadge from 'components/streams/StreamCountBadge';
 import type { Stream } from 'stores/streams/StreamsStore';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import { CountBadge } from 'components/common';
-
-const StyledCountBadge = styled(CountBadge)`
-  cursor: pointer;
-`;
 
 type Props = {
   stream: Stream
@@ -44,9 +39,12 @@ const StreamRulesCell = ({ stream }: Props) => {
   const streamRulesSectionIsOpen = expandedSections?.[stream.id]?.includes('rules');
 
   return (
-    <StyledCountBadge onClick={toggleRulesSection} ref={buttonRef} title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}>
+    <StreamCountBadge $disabled={stream.rules.length === 0}
+                      onClick={toggleRulesSection}
+                      ref={buttonRef}
+                      title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}>
       {stream.rules.length}
-    </StyledCountBadge>
+    </StreamCountBadge>
   );
 };
 

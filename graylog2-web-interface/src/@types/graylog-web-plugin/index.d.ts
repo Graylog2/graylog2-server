@@ -185,13 +185,37 @@ interface PluginDataWarehouse {
     }
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
+  DataWarehouseJobs: React.ComponentType<{
+    streamId: string,
+  }>,
+  StreamIlluminateProcessingSection: React.ComponentType<{
+    stream: Stream,
+  }>,
   DataWarehouseJobs: React.ComponentType<{}>,
   StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
+  fetchStreamDataWarehouseStatus: (streamId: string) => Promise<{
+    id: string,
+    archive_name: string,
+    enabled: boolean,
+    stream_id: string,
+    retention_time: number,
+  }>,
+  fetchStreamDataWarehouse: (streamId: string) => Promise<{
+    id: string,
+    archive_config_id: string,
+    message_count: number,
+    archive_name: string,
+    timestamp_from: string,
+    timestamp_to: string,
+    restore_history: Array<{id:string}>,
+
+  }>;
   getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
     columnRenderer: ColumnRenderers<Stream>,
   } | undefined,
+  DataWarehouseStreamDeleteWarning: React.ComponentType<{}>,
 }
 
 declare module 'graylog-web-plugin/plugin' {

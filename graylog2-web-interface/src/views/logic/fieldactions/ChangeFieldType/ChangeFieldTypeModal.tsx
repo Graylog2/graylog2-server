@@ -185,8 +185,7 @@ const ChangeFieldTypeModal = ({
                         inputProps={{ 'aria-label': 'Select Field Type For Field' }}
                         required />
         </Input>
-        {
-          showSelectionTable && (
+        {showSelectionTable && (
           <>
             <StyledLabel>Select Targeted Index Sets</StyledLabel>
             <p>
@@ -194,8 +193,7 @@ const ChangeFieldTypeModal = ({
             </p>
             <IndexSetsTable field={fieldName} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelectedIndexSets} />
           </>
-          )
-        }
+        )}
         <StyledLabel>Select Rotation Strategy</StyledLabel>
         <p>
           To see and use the {type ? <b>{type}</b> : 'selected field type'} as a field type{fieldName ? <> for <b>{fieldName}</b></> : ''}, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
