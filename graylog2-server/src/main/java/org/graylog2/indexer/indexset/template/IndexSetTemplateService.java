@@ -112,7 +112,11 @@ public class IndexSetTemplateService {
                                                            final String sortField,
                                                            final String order) {
 
-        final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
+        final Bson excludeOpen = Filters.or(
+                Filters.ne(BUILT_IN_FIELD_NAME, true),
+                Filters.ne("index_set_config.data_tiering.type", "hot_only")
+        );
+        final Bson dbQuery = Filters.and(dbQueryCreator.createDbQuery(filters, query), excludeOpen);
         final Bson dbSort = "desc".equalsIgnoreCase(order) ? Sorts.descending(sortField) : Sorts.ascending(sortField);
 
         final long total = collection.countDocuments(dbQuery);
