@@ -27,6 +27,8 @@ import type { GroupByError } from 'views/components/aggregationwizard/grouping/G
 import { onGroupingFieldsChange } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
+import useFeature from 'hooks/useFeature';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
 const placeholder = (grouping: GroupByFormValues) => {
   if (!grouping.fields?.length) {
@@ -47,6 +49,8 @@ type Props = {
 const FieldComponent = ({ groupingIndex }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { setFieldValue, values, errors } = useFormikContext<WidgetConfigFormValues>();
+  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
+  const showFieldUnit = unitFeatureEnabled && values?.visualization?.type === 'table';
   const grouping = values.groupBy.groupings[groupingIndex];
   const activeQueryId = useActiveQueryId();
   const createSelectPlaceholder = placeholder(grouping);
@@ -83,7 +87,8 @@ const FieldComponent = ({ groupingIndex }: Props) => {
                            menuPortalTarget={document.body}
                            createSelectPlaceholder={createSelectPlaceholder}
                            isFieldQualified={isFieldQualified}
-                           testPrefix={`grouping-${groupingIndex}`} />
+                           testPrefix={`grouping-${groupingIndex}`}
+                           showUnit={showFieldUnit} />
     </Input>
   );
 };
