@@ -50,10 +50,13 @@ import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuild
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.RemoteInfo;
 import org.graylog.shaded.opensearch2.org.opensearch.tasks.Task;
+import org.graylog2.cluster.lock.Lock;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
+import org.graylog2.indexer.datanode.DatanodeMigrationLockWaitConfig;
 import org.graylog2.indexer.datanode.IndexMigrationConfiguration;
 import org.graylog2.indexer.datanode.MigrationConfiguration;
 import org.graylog2.indexer.datanode.RemoteReindexMigrationService;
@@ -121,6 +124,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final DatanodeRestApiProxy datanodeRestApiProxy;
     private final NotificationService notificationService;
 
+    private final DatanodeMigrationLockService migrationLockService;
+
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
                                                final Indices indices,
@@ -129,7 +134,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                final ObjectMapper objectMapper,
                                                RemoteReindexMigrationService reindexMigrationService,
                                                DatanodeRestApiProxy datanodeRestApiProxy,
-                                               NotificationService notificationService) {
+                                               NotificationService notificationService,
+                                               DatanodeMigrationLockService migrationLockService) {
         this.client = client;
         this.indices = indices;
         this.indexSetRegistry = indexSetRegistry;
@@ -138,6 +144,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.reindexMigrationService = reindexMigrationService;
         this.datanodeRestApiProxy = datanodeRestApiProxy;
         this.notificationService = notificationService;
+        this.migrationLockService = migrationLockService;
     }
 
     @Override
@@ -175,14 +182,37 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         try {
             new Thread(() -> {
                 prepareCluster(request, migration);
+                final Set<Lock> locks = lockIndexSets(migration);
                 createIndicesInNewCluster(migration);
-                startAsyncTasks(migration, request);
+                startAsyncTasks(migration, request, locks);
                 createSystemNotification(Status.RUNNING);
             }).start();
         } catch (Exception e) {
             LOG.error("Failed to start remote reindex migration", e);
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Obtain and hold a lock for each index set that's going to be migrated. These locks will be automatically
+     * extended as long as they are not explicitly released. If this node crashes, locks will expire automatically
+     * @return locks that should be released after the migration.
+     */
+    private Set<Lock> lockIndexSets(MigrationConfiguration migration) {
+        final DatanodeMigrationLockWaitConfig lockWaitConfig = new DatanodeMigrationLockWaitConfig(
+                java.time.Duration.ofSeconds(5),
+                java.time.Duration.ofMinutes(30),
+                (indexSet, caller, attemptNumber) -> logInfo(migration, "Awaiting lock of index set " + indexSet.getConfig().title() + ", attempt #" + attemptNumber)
+        );
+
+        return migration.indices().stream()
+                .map(IndexMigrationConfiguration::indexName)
+                .map(indexSetRegistry::getForIndex)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .distinct()
+                .map(indexSet -> migrationLockService.acquireLock(indexSet, RemoteReindexingMigrationAdapterOS2.class, migration.id(), lockWaitConfig))
+                .collect(Collectors.toSet());
     }
 
     private void createIndicesInNewCluster(MigrationConfiguration migration) {
@@ -388,7 +418,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    private void startAsyncTasks(MigrationConfiguration migration, RemoteReindexRequest request) {
+    private void startAsyncTasks(MigrationConfiguration migration, RemoteReindexRequest request, Set<Lock> locks) {
         final int threadsCount = Math.max(1, Math.min(request.threadsCount(), migration.indices().size()));
 
         final ExecutorService executorService = Executors.newFixedThreadPool(threadsCount, new ThreadFactoryBuilder()
@@ -398,12 +428,18 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 .build());
 
         migration.indices()
-                .forEach(index -> executorService.submit(() -> executeReindexAsync(migration, request.uri(), request.username(), request.password(), index)));
+                .forEach(index -> executorService.submit(() -> executeReindexAsync(
+                        migration,
+                        request.uri(),
+                        request.username(),
+                        request.password(),
+                        index,
+                        locks
+                )));
     }
 
-    private void executeReindexAsync(MigrationConfiguration migration, URI uri, String username, String password, IndexMigrationConfiguration index) {
+    private void executeReindexAsync(MigrationConfiguration migration, URI uri, String username, String password, IndexMigrationConfiguration index, Set<Lock> locks) {
         final String indexName = index.indexName();
-
         try (XContentBuilder builder = JsonXContent.contentBuilder().prettyPrint()) {
 
             List<Runnable> postMigrationActions = new ArrayList<>();
@@ -433,7 +469,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 return c.submitReindexTask(createReindexRequest(indexName, query, uri, username, password, migration), withHeader);
             });
             reindexMigrationService.assignTask(migration.id(), indexName, task.getTask());
-            waitForTaskCompleted(migration, indexName, task.getTask());
+            waitForTaskCompleted(migration, indexName, task.getTask(), locks);
 
             postMigrationActions.forEach(Runnable::run);
 
@@ -447,6 +483,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         logInfo(migration, "Target index " + indexName + " is being closed after index migration");
         client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().close(new CloseIndexRequest(indexName), requestOptions));
     }
+
 
     private void openLocalIndex(MigrationConfiguration migration, String indexName) {
         logInfo(migration, "Target index " + indexName + " is closed, reopening for the migration");
@@ -498,11 +535,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         reindexMigrationService.appendLogEntry(migration.id(), new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.ERROR, message));
     }
 
-    private void waitForTaskCompleted(MigrationConfiguration migration, String indexName, String taskID) {
+    private void waitForTaskCompleted(MigrationConfiguration migration, String indexName, String taskID, Set<Lock> locks) {
         while (taskIsStillRunning(taskID)) {
             sleep();
         }
-        onTaskFinished(migration, indexName, taskID);
+        onTaskFinished(migration, indexName, taskID, locks);
     }
 
     private boolean taskIsStillRunning(String taskID) {
@@ -543,7 +580,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    private void onTaskFinished(MigrationConfiguration migration, String index, String taskID) {
+    private void onTaskFinished(MigrationConfiguration migration, String index, String taskID, Set<Lock> locks) {
         final Optional<GetTaskResponse> task = getTask(taskID);
         task.ifPresent(t -> {
             final Duration duration = getDuration(t);
@@ -556,12 +593,13 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         });
         Status status = getMigrationStatus(migration);
         if (status == Status.FINISHED || status == Status.ERROR) {
-            onMigrationFinished(status);
+            onMigrationFinished(status, locks);
         }
     }
 
-    private void onMigrationFinished(Status status) {
+    private void onMigrationFinished(Status status, Set<Lock> locks) {
         createSystemNotification(status);
+        locks.forEach(migrationLockService::release);
     }
 
     private Status getMigrationStatus(MigrationConfiguration migration) {
