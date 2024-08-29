@@ -20,13 +20,13 @@ import { useStore } from 'stores/connect';
 import type { Stream } from 'views/stores/StreamsStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/useCurrentStream';
-import type { IndexSet, IndexSetsStoreState } from 'stores/indices/IndexSetsStore';
-import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 
 const streamsMapper = ({ streams }) => streams.map((stream: Stream) => ({ indexSet: stream.index_set_id, id: stream.id }));
 
-const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string, IndexSet> => {
+const indexSetsMapper = (indexSets: Array<IndexSet>): Record<string, IndexSet> => {
   if (!indexSets) return null;
 
   return Object.fromEntries(indexSets.map((indexSet) => ([indexSet.id, indexSet])));
@@ -34,8 +34,10 @@ const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string
 
 const useInitialSelection = () => {
   const currentStreams = useCurrentStream();
-  const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
+
   const availableStreams: Array<{ indexSet: string, id: string }> = useStore(StreamsStore, streamsMapper);
+  const { data } = useIndexSetsList();
+  const indexSets = useMemo(() => indexSetsMapper(data.indexSets), [data.indexSets]);
 
   return useMemo(() => {
     const currentStreamSet = new Set(currentStreams);
