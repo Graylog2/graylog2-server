@@ -193,9 +193,10 @@ public class MongoUtils<T extends MongoEntity> {
      *
      * @param entity the entity to
      * @return the existing or newly created entity
-     * @throws NullPointerException when the entity ID is null
+     * @throws NullPointerException when the entity or entity ID is null
      */
     public T getOrCreate(T entity) {
+        requireNonNull(entity, "entity cannot be null");
         final var entityId = new ObjectId(requireNonNull(entity.id(), "entity ID cannot be null"));
 
         final var codec = collection.getCodecRegistry().get(collection.getDocumentClass());

@@ -153,8 +153,16 @@ class MongoUtilsTest {
     }
 
     @Test
+    void testGetOrCreateWithNullEntity() {
+        assertThatThrownBy(() -> utils.getOrCreate(null))
+                .hasMessageContaining("entity cannot be null")
+                .isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
     void testGetOrCreateWithNullEntityID() {
         assertThatThrownBy(() -> utils.getOrCreate(new DTO(null, "test")))
+                .hasMessageContaining("entity ID cannot be null")
                 .isInstanceOf(NullPointerException.class);
     }
 }
