@@ -11481,9 +11481,9 @@ material-colors@^1.2.1:
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
 material-symbols@^0.22.0:
-  version "0.22.1"
-  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.22.1.tgz#a7254674a0ee4d4ad6667f5702d5fdbf9761dc8a"
-  integrity sha512-MWZB/53EMWzL3RYpr7plQRAWuqW73C/21PhvSwh/dptEGUk7SpG8h45eCqe37wfQoq6YZvuYfwLEYGfK2dgUqQ==
+  version "0.22.2"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.22.2.tgz#a51f82aa4c3b8a0483bef186abb51f0707fd5fae"
+  integrity sha512-guN2+CzAwxUfdXiuVHcdogDmvhzvRYxMakKd39WmYuyTPaN73UuNC5cH4d4/JVNaLT1EMM8W/4PqHqVBye3ZiA==
 
 math-log2@^1.0.1:
   version "1.0.1"
