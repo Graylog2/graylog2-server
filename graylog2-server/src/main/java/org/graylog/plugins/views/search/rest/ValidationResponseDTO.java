@@ -21,8 +21,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.explain.DataRoutedStream;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.graylog.plugins.views.search.ExplainResults.IndexRangeResult;
@@ -33,8 +35,9 @@ public abstract class ValidationResponseDTO {
     public static ValidationResponseDTO create(final ValidationStatusDTO status,
                                                final List<ValidationMessageDTO> explanations,
                                                final Set<IndexRangeResult> searchedIndexRanges,
-                                               final Set<DataRoutedStream> dataRoutedStreams) {
-        return new AutoValue_ValidationResponseDTO(status, explanations, Context.create(searchedIndexRanges, dataRoutedStreams));
+                                               final Set<DataRoutedStream> dataRoutedStreams,
+                                               final Optional<TimeRange> timeRange) {
+        return new AutoValue_ValidationResponseDTO(status, explanations, Context.create(searchedIndexRanges, dataRoutedStreams), timeRange);
     }
 
     @JsonProperty
@@ -46,6 +49,9 @@ public abstract class ValidationResponseDTO {
 
     @JsonProperty
     public abstract Context context();
+
+    @JsonProperty
+    public abstract Optional<TimeRange> timeRange();
 
     @AutoValue
     public static abstract class Context {

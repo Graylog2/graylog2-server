@@ -58,6 +58,7 @@ import java.util.concurrent.TimeUnit;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_DELETE;
 import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
+import static org.graylog2.indexer.ranges.IndexRange.FIELD_STREAM_IDS;
 
 @Singleton
 public class MongoIndexRangeService implements IndexRangeService {
@@ -133,6 +134,13 @@ public class MongoIndexRangeService implements IndexRangeService {
     @Override
     public SortedSet<IndexRange> findAll() {
         try (DBCursor<MongoIndexRange> cursor = collection.find(DBQuery.notExists("start"))) {
+            return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) cursor);
+        }
+    }
+
+    @Override
+    public SortedSet<IndexRange> find(String streamId) {
+        try (DBCursor<MongoIndexRange> cursor = collection.find(DBQuery.in(FIELD_STREAM_IDS, streamId))) {
             return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) cursor);
         }
     }

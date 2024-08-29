@@ -41,6 +41,7 @@ import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -92,11 +93,13 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         final Set<String> readableStreams = request.streams();
         final Set<DataRoutedStream> dataRoutedStreams = checkForDataRoutedStreams(requestedStreams, readableStreams, request.timerange(), request.isEmptyQuery());
         final boolean hasDataRoutedStreams = dataRoutedStreams != null && !dataRoutedStreams.isEmpty();
+        final Optional<TimeRange> requestedRangeAsAbsolut = validationRequest.timerange().map(timeRange -> AbsoluteRange.create(timeRange.getFrom(), timeRange.getTo()));
         return ValidationResponseDTO.create(
                 toStatus(response.status(), containsWarmIndices(searchedIndexRanges), hasDataRoutedStreams),
                 toExplanations(response),
                 searchedIndexRanges,
-                dataRoutedStreams);
+                dataRoutedStreams,
+                requestedRangeAsAbsolut);
     }
 
     private boolean containsWarmIndices(Set<ExplainResults.IndexRangeResult> searchedIndexRanges) {

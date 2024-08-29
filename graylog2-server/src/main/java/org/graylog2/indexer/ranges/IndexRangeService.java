@@ -30,6 +30,8 @@ public interface IndexRangeService {
 
     SortedSet<IndexRange> findAll();
 
+    SortedSet<IndexRange> find(String streamId);
+
     WriteResult<MongoIndexRange, ObjectId> save(IndexRange indexRange);
 
     boolean renameIndex(String from, String to);
