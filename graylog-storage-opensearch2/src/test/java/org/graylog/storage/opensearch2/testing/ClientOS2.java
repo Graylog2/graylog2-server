@@ -23,6 +23,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.Streams;
+import org.apache.commons.io.IOUtils;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
@@ -30,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settin
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest.AliasActions;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
@@ -63,15 +65,19 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
+import org.graylog.testing.elasticsearch.IndexState;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -461,5 +467,22 @@ public class ClientOS2 implements Client {
     @Override
     public void putFieldMapping(String index, String field, String type) {
         updateMapping(index, Collections.singletonMap("properties", Collections.singletonMap(field, Collections.singletonMap("type", type))));
+    }
+
+    @Override
+    public IndexState getStatus(String indexName) {
+        return client.execute((restHighLevelClient, requestOptions) -> {
+            final Response statusResponse = restHighLevelClient.getLowLevelClient().performRequest(new Request("GET", "_cat/indices/" + indexName + "/?h=status"));
+            try (final InputStream is = statusResponse.getEntity().getContent()) {
+                String result = IOUtils.toString(is, StandardCharsets.UTF_8);
+                return IndexState.valueOf(result.trim().toUpperCase(Locale.ROOT));
+            }
+        });
+    }
+
+    @Override
+    public void openIndex(String indexName) {
+        final OpenIndexRequest openIndexRequest = new OpenIndexRequest(indexName);
+        client.execute((c, requestOptions) -> c.indices().open(openIndexRequest, requestOptions));
     }
 }
