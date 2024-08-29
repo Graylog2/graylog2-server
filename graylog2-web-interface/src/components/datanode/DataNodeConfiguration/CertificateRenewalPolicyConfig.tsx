@@ -31,7 +31,6 @@ import { ConfigurationType } from 'components/configurations/ConfigurationTypes'
 import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import Select from 'components/common/Select';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 
