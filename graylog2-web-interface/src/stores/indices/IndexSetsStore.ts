@@ -73,7 +73,11 @@ export type IndexSetConfig = {
   use_legacy_rotation?: boolean
 }
 
-export type IndexSet = IndexSetConfig & { data_tiering?: DataTieringConfig };
+export type IndexSet = IndexSetConfig & {
+  data_tiering?: DataTieringConfig,
+  has_failed_snapshot?: boolean,
+  failed_snapshot_name?: string,
+};
 
 export type IndexSetFormValues = IndexSetConfig & { data_tiering?: DataTieringFormValues };
 

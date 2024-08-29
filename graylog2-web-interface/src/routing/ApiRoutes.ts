@@ -171,6 +171,7 @@ const ApiRoutes = {
     searchPaginated: (searchTerm, skip, limit, stats) => ({ url: `/system/indices/index_sets/search?searchTitle=${searchTerm}&skip=${skip}&limit=${limit}&stats=${stats}` }),
     setDefault: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}/default` }),
     stats: () => ({ url: '/system/indices/index_sets/stats' }),
+    deleteFailedSnapshot: (id: string) => ({ url: `/system/indices/index_sets/${id}/failed_snapshot` }),
   },
   IndicesApiController: {
     close: (indexName: string) => ({ url: `/system/indexer/indices/${indexName}/close` }),
