@@ -91,7 +91,7 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
                 .filter(Optional::isPresent)
                 .count();
         if (extendedLocks > 0) {
-            LOG.info("Extended TTL of {} datanode migration locks", extendedLocks);
+            LOG.trace("Extended TTL of {} datanode migration locks", extendedLocks);
         }
     }
 
