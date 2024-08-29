@@ -84,7 +84,7 @@ public class GrokPatternRegistry {
     }
 
     public boolean grokPatternExists(String patternName) {
-        return patterns.get().stream().anyMatch(pattern -> pattern.name().contains(patternName));
+        return patterns.get().stream().anyMatch(pattern -> pattern.name().equals(patternName));
     }
 
     public Grok cachedGrokForPattern(String pattern) {
