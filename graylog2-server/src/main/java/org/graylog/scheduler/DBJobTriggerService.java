@@ -227,6 +227,18 @@ public class DBJobTriggerService {
     }
 
     /**
+     * Creates the given {@link JobTriggerDto} as new entry or returns an existing one. The ID of the given trigger
+     * must not be null!
+     *
+     * @param trigger the trigger to get or create
+     * @return the trigger from the database
+     * @throws NullPointerException when the trigger or trigger ID is null
+     */
+    public JobTriggerDto getOrCreate(JobTriggerDto trigger) {
+        return mongoUtils.getOrCreate(requireNonNull(trigger, "trigger cannot be null"));
+    }
+
+    /**
      * Creates a new record in the database. The given {@link JobTriggerDto} object <b>must not</b> have an ID to make
      * sure a new record is created.
      *
