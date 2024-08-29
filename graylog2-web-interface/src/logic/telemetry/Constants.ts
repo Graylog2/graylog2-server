@@ -349,7 +349,6 @@ export const TELEMETRY_EVENT_TYPE = {
     SELECT_CLOSED: 'Index Set Template Selected Cancelled',
   },
   DATANODE_MIGRATION: {
-    DOCUMENTATION_LINK_CLICKED: 'Datanode Migration Documentation Link Clicked',
     RESET_MIGRATION_CLICKED: 'Datanode Migration Reset Migration Clicked',
     RESET_MIGRATION_CONFIRM_CLICKED: 'Datanode Migration Reset Migration Confirm Clicked',
     WELCOME_GO_TO_MIGRATION_STEPS_CLICKED: 'Datanode Migration Welcome Go To Migration Steps Clicked',
