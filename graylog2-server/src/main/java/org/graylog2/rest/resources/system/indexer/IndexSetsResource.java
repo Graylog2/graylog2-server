@@ -57,6 +57,7 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.system.indices.SnapshotService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
@@ -93,6 +94,7 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetStatsCreator indexSetStatsCreator;
     private final ClusterConfigService clusterConfigService;
     private final SystemJobManager systemJobManager;
+    private final SnapshotService snapshotService;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -102,7 +104,8 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
-                             final SystemJobManager systemJobManager) {
+                             final SystemJobManager systemJobManager,
+                             final SnapshotService snapshotService) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -111,6 +114,7 @@ public class IndexSetsResource extends RestResource {
         this.indexSetStatsCreator = indexSetStatsCreator;
         this.clusterConfigService = clusterConfigService;
         this.systemJobManager = systemJobManager;
+        this.snapshotService = snapshotService;
     }
 
     @GET
@@ -208,7 +212,7 @@ public class IndexSetsResource extends RestResource {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         return indexSetService.get(id)
-                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
+                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet), snapshotService.getFailedSnapshot(id)))
                 .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
     }
 

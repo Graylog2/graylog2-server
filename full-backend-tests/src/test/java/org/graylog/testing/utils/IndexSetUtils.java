@@ -85,7 +85,9 @@ public class IndexSetUtils {
                 null,
                 null,
                 null,
-                true
+                true,
+                false,
+                null
         );
 
         return createIndexSet(spec, indexSetSummary);

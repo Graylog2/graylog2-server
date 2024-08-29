@@ -73,6 +73,8 @@ import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.QueryParsingExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
+import org.graylog2.rest.models.system.indices.SnapshotService;
+import org.graylog2.rest.models.system.indices.SnapshotServiceNoop;
 import org.graylog2.rest.resources.entities.preferences.listeners.EntityListPreferencesCleanerOnUserDeletion;
 import org.graylog2.security.realm.AuthenticatingRealmModule;
 import org.graylog2.security.realm.AuthorizationOnlyRealmModule;
@@ -208,6 +210,8 @@ public class ServerBindings extends Graylog2Module {
 
         bind(CSPService.class).to(CSPServiceImpl.class).asEagerSingleton();
         bind(CSPEventListener.class).asEagerSingleton();
+
+        bind(SnapshotService.class).to(SnapshotServiceNoop.class).asEagerSingleton();
 
         OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
     }

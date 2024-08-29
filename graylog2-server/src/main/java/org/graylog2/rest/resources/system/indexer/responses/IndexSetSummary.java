@@ -44,6 +44,8 @@ import java.util.Optional;
 public abstract class IndexSetSummary implements SimpleIndexSetConfig {
     public static final String FIELD_DEFAULT = "default";
     public static final String FIELD_CAN_BE_DEFAULT = "can_be_default";
+    public static final String FIELD_HAS_FAILED_SNAPSHOT = "has_failed_snapshot";
+    public static final String FIELD_FAILED_SNAPSHOT_NAME = "failed_snapshot_name";
 
     @JsonCreator
     public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
@@ -67,17 +69,24 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
                                          @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE) @Nullable String templateType,
                                          @JsonProperty(FIELD_PROFILE_ID) @Nullable String fieldTypeProfile,
                                          @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
-                                         @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) {
+                                         @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation,
+                                         @JsonProperty(FIELD_HAS_FAILED_SNAPSHOT) Boolean hasFailedSnapshot,
+                                         @JsonProperty(FIELD_FAILED_SNAPSHOT_NAME) @Nullable String failedSnapshotName) {
         if (Objects.isNull(creationDate)) {
             creationDate = ZonedDateTime.now();
         }
         return new AutoValue_IndexSetSummary(shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass,
                 retentionStrategy, dataTiering, id, title, description, isDefault, canBeDefault, isWritable, indexPrefix,
                 creationDate, indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
-                Optional.ofNullable(templateType), fieldTypeProfile, Objects.isNull(useLegacyRotation) || useLegacyRotation);
+                Optional.ofNullable(templateType), fieldTypeProfile, Objects.isNull(useLegacyRotation) || useLegacyRotation,
+                hasFailedSnapshot, failedSnapshotName);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
+        return fromIndexSetConfig(indexSet, isDefault, Optional.empty());
+    }
+
+    public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault, Optional<String> failedSnapshot) {
         return create(
                 indexSet.id(),
                 indexSet.title(),
@@ -100,8 +109,9 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
                 indexSet.indexTemplateType().orElse(null),
                 indexSet.fieldTypeProfile(),
                 indexSet.dataTieringConfig(),
-                indexSet.dataTieringConfig() == null);
-
+                indexSet.dataTieringConfig() == null,
+                failedSnapshot.isPresent(),
+                failedSnapshot.orElse(null));
     }
 
     @JsonProperty("id")
@@ -158,6 +168,13 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
     @Nullable
     @JsonProperty(FIELD_USE_LEGACY_ROTATION)
     public abstract Boolean useLegacyRotation();
+
+    @JsonProperty(FIELD_HAS_FAILED_SNAPSHOT)
+    public abstract Boolean hasFailedSnapshot();
+
+    @Nullable
+    @JsonProperty(FIELD_FAILED_SNAPSHOT_NAME)
+    public abstract String failedSnapshotName();
 
     public IndexSetConfig toIndexSetConfig(boolean isRegular) {
         final IndexSetConfig.Builder builder = IndexSetConfig.builder()
