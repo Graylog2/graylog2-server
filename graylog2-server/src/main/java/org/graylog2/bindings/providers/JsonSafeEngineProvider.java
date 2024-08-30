@@ -21,6 +21,7 @@ import com.floreysoft.jmte.Renderer;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.Locale;
 import java.util.Map;
@@ -32,18 +33,23 @@ public class JsonSafeEngineProvider implements Provider<Engine> {
     @Inject
     public JsonSafeEngineProvider() {
         engine = Engine.createEngine();
-        engine.registerRenderer(String.class, new EscapedQuoteStringRenderer());
+        engine.registerRenderer(String.class, new JsonSafeRenderer());
     }
     @Override
     public Engine get() {
         return engine;
     }
 
-    private static class EscapedQuoteStringRenderer implements Renderer<String> {
+    private static class JsonSafeRenderer implements Renderer<String> {
 
         @Override
         public String render(String s, Locale locale, Map<String, Object> map) {
-            return s.replace("\"", "\\\"");
+            // Current version of Apache Commons does not have native support for escapeJson. However,
+            // https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/StringEscapeUtils.html#escapeJson(java.lang.String)
+            // current Apache Commons docs states:
+            // 'The only difference between Java strings and Json strings is that in Json, forward-slash (/) is escaped.'
+            // So we use escapeJava and tack on an extra String.replace() call to escape forward slashes.
+            return StringEscapeUtils.escapeJava(s).replace("/", "\\/");
         }
     }
 }
