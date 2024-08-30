@@ -43,7 +43,7 @@ type Props = {
 
 export const StyledSwitch = styled(Switch)`
   > label {
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
 `;
 
@@ -110,7 +110,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
             <td>
               <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
             </td>
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+            {}
             <td>
               <ActionButtonsWrap>
                 <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>

@@ -118,7 +118,7 @@ const FilterRulesFields = ({ type }: Props) => {
       <Panel.Collapse>
         <StyledPanelBody>
           {values.rule?.[`${type}s`]?.map((item, index) => (
-            // eslint-disable-next-line react/no-array-index-key
+
             <RuleBuilderBlock key={item.id}
                               blockDict={conditions || []}
                               block={item}
