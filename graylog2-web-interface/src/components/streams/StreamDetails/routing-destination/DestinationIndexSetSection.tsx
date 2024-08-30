@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import NumberUtils from 'util/NumberUtils';
+
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -33,7 +35,6 @@ import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destina
 import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
 import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
 import useIndexSetStats from 'hooks/useIndexSetStats';
-import NumberUtils from 'util/NumberUtils';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 
 type Props = {
@@ -73,6 +74,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
   return (
     <Section title="Index Set"
              collapsible
+             defaultClosed
              headerLeftSection={(
                <>
                  <StyledSwitch aria-label="Toggle index set"
