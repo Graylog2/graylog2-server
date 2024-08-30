@@ -18,6 +18,7 @@ package org.graylog.events.notifications.types;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.floreysoft.jmte.Engine;
+import com.google.common.collect.ImmutableList;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.notifications.EventNotificationService;
 import org.graylog2.bindings.providers.JsonSafeEngineProvider;
@@ -36,7 +37,6 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
