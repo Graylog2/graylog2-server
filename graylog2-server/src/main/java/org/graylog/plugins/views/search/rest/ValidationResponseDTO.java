@@ -36,8 +36,8 @@ public abstract class ValidationResponseDTO {
                                                final List<ValidationMessageDTO> explanations,
                                                final Set<IndexRangeResult> searchedIndexRanges,
                                                final Set<DataRoutedStream> dataRoutedStreams,
-                                               final Optional<TimeRange> timeRange) {
-        return new AutoValue_ValidationResponseDTO(status, explanations, Context.create(searchedIndexRanges, dataRoutedStreams), timeRange);
+                                               final Optional<TimeRange> searchedTimeRange) {
+        return new AutoValue_ValidationResponseDTO(status, explanations, Context.create(searchedTimeRange, searchedIndexRanges, dataRoutedStreams));
     }
 
     @JsonProperty
@@ -50,20 +50,22 @@ public abstract class ValidationResponseDTO {
     @JsonProperty
     public abstract Context context();
 
-    @JsonProperty
-    public abstract Optional<TimeRange> timeRange();
-
     @AutoValue
     public static abstract class Context {
 
         public static final String SEARCHED_INDEX_RANGES = "searched_index_ranges";
         public static final String DATA_ROUTED_STREAMS = "data_routed_streams";
+        public static final String SEARCHED_TIME_RANGE = "searched_time_range";
 
         @JsonCreator
-        public static Context create(@JsonProperty(SEARCHED_INDEX_RANGES) Set<IndexRangeResult> searchedIndexRanges,
+        public static Context create(@JsonProperty(SEARCHED_TIME_RANGE) Optional<TimeRange> searchedTimeRange,
+                                     @JsonProperty(SEARCHED_INDEX_RANGES) Set<IndexRangeResult> searchedIndexRanges,
                                      @JsonProperty(DATA_ROUTED_STREAMS) Set<DataRoutedStream> dataRoutedStreams) {
-            return new AutoValue_ValidationResponseDTO_Context(searchedIndexRanges, dataRoutedStreams);
+            return new AutoValue_ValidationResponseDTO_Context(searchedTimeRange, searchedIndexRanges, dataRoutedStreams);
         }
+
+        @JsonProperty
+        public abstract Optional<TimeRange> searchedTimeRange();
 
         @JsonProperty(SEARCHED_INDEX_RANGES)
         public abstract Set<IndexRangeResult> searchedIndexRanges();
