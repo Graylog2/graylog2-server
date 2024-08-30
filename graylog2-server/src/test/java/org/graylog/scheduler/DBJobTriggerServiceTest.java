@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.bson.types.ObjectId;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestJobTriggerData;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
@@ -275,6 +276,28 @@ public class DBJobTriggerServiceTest {
         assertThatCode(() -> dbJobTriggerService.getForJobs(Collections.singleton("54e3deadbeefdeadbeefaff3")))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("54e3deadbeefdeadbeefaff3");
+    }
+
+    @Test
+    public void getOrCreateTrigger() {
+        final String id = new ObjectId().toHexString();
+        final JobTriggerDto trigger = dbJobTriggerService.getOrCreate(JobTriggerDto.Builder.create(clock)
+                .id(id)
+                .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
+                .build());
+
+        assertThat(trigger.id()).isEqualTo(id);
+        assertThat(trigger.status()).isEqualTo(JobTriggerStatus.RUNNABLE);
+        assertThat(trigger.lock()).isEqualTo(JobTriggerLock.empty());
+
+        assertThatCode(() -> dbJobTriggerService.create(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("trigger cannot be null");
     }
 
     @Test
