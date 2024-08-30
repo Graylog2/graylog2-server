@@ -22,8 +22,8 @@ import type { DataTieringConfig } from 'components/indices/data-tiering';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Stream } from 'logic/streams/types';
+import type { ColumnRenderer } from 'components/common/EntityDataTable/types';
 
 interface PluginRoute {
   path: string;
@@ -179,19 +179,13 @@ type FieldValueProvider = {
 }
 
 interface PluginDataWarehouse {
-  DataWarehouseStatus: React.ComponentType<{
-    stream: {
-      enabled_status: boolean;
-    }
-  }>,
-  StreamDataWarehouse: React.ComponentType<{}>,
+  StreamDataWarehouse: React.ComponentType,
   DataWarehouseJobs: React.ComponentType<{
     streamId: string,
   }>,
   StreamIlluminateProcessingSection: React.ComponentType<{
     stream: Stream,
   }>,
-  DataWarehouseJobs: React.ComponentType<{}>,
   StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
   fetchStreamDataWarehouseStatus: (streamId: string) => Promise<{
     id: string,
@@ -213,9 +207,9 @@ interface PluginDataWarehouse {
   getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
-    columnRenderer: ColumnRenderers<Stream>,
-  } | undefined,
-  DataWarehouseStreamDeleteWarning: React.ComponentType<{}>,
+    columnRenderer: { datawarehouse: ColumnRenderer<Stream> },
+  },
+  DataWarehouseStreamDeleteWarning: React.ComponentType,
 }
 
 declare module 'graylog-web-plugin/plugin' {

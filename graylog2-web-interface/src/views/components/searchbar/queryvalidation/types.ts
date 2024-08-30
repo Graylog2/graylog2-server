@@ -44,5 +44,10 @@ export type QueryValidationState = {
   context: {
     searched_index_ranges: Array<IndexRange>,
     data_routed_streams?: Array<StreamDataRouting>,
+    searched_time_range?: {
+      from: string,
+      to: string,
+      type: 'absolute',
+    },
   }
 };
