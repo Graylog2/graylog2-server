@@ -21,12 +21,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.graph.MutableGraph;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
@@ -147,5 +151,16 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
             builder.timerange(this.timerange().get());
         }
         return builder.build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        streams().forEach(streamId -> {
+            final EntityDescriptor depStream = EntityDescriptor.builder()
+                    .id(ModelId.of(streamId))
+                    .type(ModelTypes.STREAM_REF_V1)
+                    .build();
+            mutableGraph.putEdge(entityDescriptor, depStream);
+        });
     }
 }
