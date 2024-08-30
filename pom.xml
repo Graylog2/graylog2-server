@@ -202,8 +202,8 @@
         <testcontainers.opensearch.version>2.1.0</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v18.18.0</nodejs.version>
-        <yarn.version>v1.22.19</yarn.version>
+        <nodejs.version>v20.17.0</nodejs.version>
+        <yarn.version>v1.22.22</yarn.version>
 
         <!-- Plugin versions -->
         <license-maven.version>4.5</license-maven.version>
