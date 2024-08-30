@@ -20,6 +20,9 @@ import styled, { css } from 'styled-components';
 import type { MigrationActions, OnTriggerStepFunction, StepArgs } from 'components/datanode/Types';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { MIGRATION_ACTIONS } from 'components/datanode/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 
 const StyledButtonToolbar = styled(ButtonToolbar)(({ theme }) => css`
   margin-top: ${theme.spacings.md};
@@ -45,14 +48,25 @@ type Props = {
     children?: React.ReactNode,
 }
 
+const handleTelemetry = (sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) => void) => {
+  // use state and step to trigger the right event
+};
+
 const MigrationStepTriggerButtonToolbar = ({ nextSteps, disabled, onTriggerStep, args, hidden, children }: Props) => {
+  const sendTelemetry = useSendTelemetry();
+
   if (hidden) {
     return null;
   }
 
+  const handleButtonClick = (step: MigrationActions) => {
+    handleTelemetry(sendTelemetry);
+    onTriggerStep(step, args);
+  };
+
   return (
     <StyledButtonToolbar>
-      {getSortedNextSteps(nextSteps).map((step, index) => <Button key={step} bsStyle={index ? 'default' : 'success'} bsSize="small" disabled={disabled} onClick={() => onTriggerStep(step, args)}>{MIGRATION_ACTIONS[step]?.label || 'Next'}</Button>)}
+      {getSortedNextSteps(nextSteps).map((step, index) => <Button key={step} bsStyle={index ? 'default' : 'success'} bsSize="small" disabled={disabled} onClick={() => handleButtonClick(step)}>{MIGRATION_ACTIONS[step]?.label || 'Next'}</Button>)}
       {children}
     </StyledButtonToolbar>
   );
