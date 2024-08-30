@@ -25,6 +25,9 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
@@ -48,9 +51,6 @@ import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
@@ -58,7 +58,6 @@ import java.util.concurrent.TimeUnit;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_DELETE;
 import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
-import static org.graylog2.indexer.ranges.IndexRange.FIELD_STREAM_IDS;
 
 @Singleton
 public class MongoIndexRangeService implements IndexRangeService {
@@ -139,8 +138,8 @@ public class MongoIndexRangeService implements IndexRangeService {
     }
 
     @Override
-    public SortedSet<IndexRange> find(String streamId) {
-        try (DBCursor<MongoIndexRange> cursor = collection.find(DBQuery.in(FIELD_STREAM_IDS, streamId))) {
+    public SortedSet<IndexRange> find(Bson query) {
+        try (DBCursor<MongoIndexRange> cursor = collection.find(query)) {
             return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) cursor);
         }
     }
