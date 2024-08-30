@@ -266,7 +266,7 @@ export const generateMappersForYAxis = (
   });
 };
 
-const joinValues = (values: Array<Array<number>>, barmode: BarMode): Array<number> => {
+const joinValues = (values: Array<Array<number>> = [], barmode: BarMode): Array<number> => {
   if (barmode === 'stack' || barmode === 'relative') {
     return zipWith(...values, (...iterateValues) => sum(iterateValues));
   }
