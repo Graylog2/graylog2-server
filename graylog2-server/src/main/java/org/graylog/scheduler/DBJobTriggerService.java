@@ -430,6 +430,8 @@ public class DBJobTriggerService {
 
         final List<Bson> updates = new ArrayList<>();
         updates.add(unset(FIELD_LOCK_OWNER));
+        // Reset the cancellation status on release to make sure we start uncancelled on the next trigger execution
+        updates.add(set(FIELD_IS_CANCELLED, false));
 
         if (triggerUpdate.concurrencyReschedule()) {
             updates.add(inc(FIELD_CONCURRENCY_RESCHEDULE_COUNT, 1));
@@ -478,6 +480,8 @@ public class DBJobTriggerService {
         );
         final var update = combine(
                 unset(FIELD_LOCK_OWNER),
+                // Reset the cancellation status on force-release to make sure we start uncancelled on the next trigger execution
+                set(FIELD_IS_CANCELLED, false),
                 set(FIELD_STATUS, JobTriggerStatus.RUNNABLE));
 
         return Ints.saturatedCast(collection.updateMany(filter, update).getModifiedCount());
