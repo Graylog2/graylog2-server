@@ -31,6 +31,7 @@ public record BlockResponse(@JsonProperty("blocks") Blocks blocks) {
      * we just ignore it and skip directly into the content.
      * @param indices
      */
+    @JsonIgnoreProperties(ignoreUnknown = true)
     record Blocks(@JsonProperty("indices") Map<String, Map<Integer, IndexBlock>> indices) {
         public Optional<IndexBlock> forIndex(String indexName) {
             return Optional.ofNullable(indices())
@@ -42,6 +43,7 @@ public record BlockResponse(@JsonProperty("blocks") Blocks blocks) {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     record IndexBlock(String description, boolean retryable, List<BlockLevel> levels) {}
 
     enum BlockLevel {
