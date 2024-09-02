@@ -161,9 +161,11 @@ const StreamActions = ({
 
   return (
     <ButtonToolbar>
-      <LinkContainer to={Routes.stream_view(stream.id)}>
-        <Button disabled={isNotEditable} bsStyle="primary" bsSize="xsmall">View details</Button>
-      </LinkContainer>
+      <IfPermitted permissions={`streams:edit:${stream.id}`}>
+        <LinkContainer to={Routes.stream_view(stream.id)}>
+          <Button disabled={isNotEditable} bsStyle="primary" bsSize="xsmall">Data Routing</Button>
+        </LinkContainer>
+      </IfPermitted>
       <ShareButton entityId={stream.id}
                    entityType="stream"
                    onClick={toggleEntityShareModal}
