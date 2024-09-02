@@ -211,7 +211,7 @@ public class ServerBindings extends Graylog2Module {
         bind(CSPService.class).to(CSPServiceImpl.class).asEagerSingleton();
         bind(CSPEventListener.class).asEagerSingleton();
 
-        bind(SnapshotService.class).to(SnapshotServiceNoop.class).asEagerSingleton();
+        OptionalBinder.newOptionalBinder(binder(), SnapshotService.class).setDefault().to(SnapshotServiceNoop.class);
 
         OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
     }

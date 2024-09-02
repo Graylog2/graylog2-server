@@ -210,9 +210,12 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary get(@ApiParam(name = "id", required = true)
                                @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
+        final IndexSet indexSet = indexSetRegistry.get(id).orElseThrow(() -> new NotFoundException("Couldn't find index set with ID <" + id + ">"));
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         return indexSetService.get(id)
-                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet), snapshotService.getFailedSnapshot(id)))
+                .map(config -> IndexSetSummary.fromIndexSetConfig(
+                        config, config.equals(defaultIndexSet),
+                        snapshotService.getFailedSnapshotName(indexSet, config)))
                 .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
     }
 
@@ -365,5 +368,24 @@ public class IndexSetsResource extends RestResource {
                 }
             }
         }
+    }
+
+    @DELETE
+    @Path("{id}/failed_snapshot")
+    @Timed
+    @ApiOperation(value = "Delete failed snapshots for index set")
+    @AuditEvent(type = AuditEventTypes.INDEX_SET_DELETE_FAILED_SNAPSHOT)
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Index set not found"),
+    })
+    public void delete(@ApiParam(name = "id", required = true)
+                       @PathParam("id") String id) {
+        checkPermission(RestPermissions.INDEXSETS_EDIT, id);
+
+        snapshotService.deleteSnapshot(
+                indexSetRegistry.get(id).orElseThrow(() -> new NotFoundException("Failed to get index set <" + id + ">")),
+                indexSetService.get(id).orElseThrow(() -> new NotFoundException("Failed to get config for index set <" + id + ">"))
+        );
     }
 }
