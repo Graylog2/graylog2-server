@@ -30,5 +30,5 @@ public interface SnapshotService {
      */
     Optional<String> getFailedSnapshotName(IndexSet indexSet, IndexSetConfig indexSetConfig);
 
-    void deleteSnapshot(IndexSet indexSet, IndexSetConfig indexSetConfig);
+    void deleteFailedSnapshot(IndexSet indexSet, IndexSetConfig indexSetConfig);
 }

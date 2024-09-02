@@ -383,7 +383,7 @@ public class IndexSetsResource extends RestResource {
                        @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_EDIT, id);
 
-        snapshotService.deleteSnapshot(
+        snapshotService.deleteFailedSnapshot(
                 indexSetRegistry.get(id).orElseThrow(() -> new NotFoundException("Failed to get index set <" + id + ">")),
                 indexSetService.get(id).orElseThrow(() -> new NotFoundException("Failed to get config for index set <" + id + ">"))
         );

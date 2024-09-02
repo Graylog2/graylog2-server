@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.models.system.indices;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 
@@ -29,8 +30,8 @@ public class SnapshotServiceNoop implements SnapshotService {
     }
 
     @Override
-    public void deleteSnapshot(IndexSet indexSet, IndexSetConfig indexSetConfig) {
-        // never called
+    public void deleteFailedSnapshot(IndexSet indexSet, IndexSetConfig indexSetConfig) {
+        throw new NotImplementedException();
     }
 
 }
