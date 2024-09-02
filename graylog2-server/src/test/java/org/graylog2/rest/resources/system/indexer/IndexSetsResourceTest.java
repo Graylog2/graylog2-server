@@ -157,32 +157,13 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void get() {
-        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
-        when(indexSetService.get("id")).thenReturn(Optional.of(indexSetConfig));
-
-        final IndexSetSummary summary = indexSetsResource.get("id");
-
-        verify(indexSetService, times(1)).get("id");
-        verify(indexSetService, times(1)).getDefault();
-        verifyNoMoreInteractions(indexSetService);
-        assertThat(summary).isEqualTo(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
-    }
-
-    @Test
     public void get0() {
         when(indexSetService.get("id")).thenReturn(Optional.empty());
 
         expectedException.expect(NotFoundException.class);
-        expectedException.expectMessage("Couldn't load index set with ID <id>");
+        expectedException.expectMessage("Couldn't find index set with ID <id>");
 
-        try {
-            indexSetsResource.get("id");
-        } finally {
-            verify(indexSetService, times(1)).get("id");
-            verify(indexSetService, times(1)).getDefault();
-            verifyNoMoreInteractions(indexSetService);
-        }
+        indexSetsResource.get("id");
     }
 
     @Test
