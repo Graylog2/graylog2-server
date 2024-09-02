@@ -83,11 +83,11 @@ export type IndexSetStats = {
   size: number,
 }
 
-type IndexSetsStats = {
+export type IndexSetsStats = {
   [key: string]: IndexSetStats
 }
 
-type IndexSetsResponseType = {
+export type IndexSetsResponseType = {
   total: number,
   index_sets: Array<IndexSet>,
   stats: IndexSetsStats,

@@ -145,6 +145,17 @@ type DataTiering = {
   WarmTierReadinessInfo: React.ComponentType,
 }
 
+type License = {
+  EnterpriseTrafficGraph: React.ComponentType,
+  LicenseGraphWithMetrics: React.ComponentType,
+  EnterpriseProductLink: React.ComponentType<{
+    children: React.ReactNode,
+    href: string,
+    clusterId: string,
+    licenseSubject?: string
+  }>,
+}
+
 type FieldValueProvider = {
   type: string,
   displayName: string,
@@ -174,12 +185,37 @@ interface PluginDataWarehouse {
     }
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
+  DataWarehouseJobs: React.ComponentType<{
+    streamId: string,
+  }>,
+  StreamIlluminateProcessingSection: React.ComponentType<{
+    stream: Stream,
+  }>,
   DataWarehouseJobs: React.ComponentType<{}>,
+  StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
+  fetchStreamDataWarehouseStatus: (streamId: string) => Promise<{
+    id: string,
+    archive_name: string,
+    enabled: boolean,
+    stream_id: string,
+    retention_time: number,
+  }>,
+  fetchStreamDataWarehouse: (streamId: string) => Promise<{
+    id: string,
+    archive_config_id: string,
+    message_count: number,
+    archive_name: string,
+    timestamp_from: string,
+    timestamp_to: string,
+    restore_history: Array<{id:string}>,
+
+  }>;
   getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
     columnRenderer: ColumnRenderers<Stream>,
   } | undefined,
+  DataWarehouseStreamDeleteWarning: React.ComponentType<{}>,
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -191,6 +227,7 @@ declare module 'graylog-web-plugin/plugin' {
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>;
     fieldValueProviders?:Array<FieldValueProvider>;
+    license?: Array<License>,
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,

@@ -68,7 +68,6 @@ public final class Streams implements GraylogRestApi {
         return waitForStreamRouterRefresh(() -> createStream(title, indexSetId, true, defaultStreamMatches, streamRules));
     }
 
-
     public String createStream(String title, String indexSetId, boolean started, DefaultStreamMatches defaultStreamMatches, StreamRule... streamRules) {
         final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId, defaultStreamMatches == DefaultStreamMatches.REMOVE);
         final String streamId = given()
@@ -93,6 +92,16 @@ public final class Streams implements GraylogRestApi {
         }
 
         return streamId;
+    }
+
+    public void deleteStream(String streamId) {
+        waitForStreamRouterRefresh(() -> given()
+                .spec(api.requestSpecification())
+                .when()
+                .delete("/streams/" + streamId)
+                .then()
+                .log().ifError()
+                .statusCode(204));
     }
 
     public ValidatableResponse getStream(String streamId) {

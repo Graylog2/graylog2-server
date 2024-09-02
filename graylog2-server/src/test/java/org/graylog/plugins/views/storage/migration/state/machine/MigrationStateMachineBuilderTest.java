@@ -248,6 +248,7 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_STOP_PROCESSING_PAGE);
         verify(migrationActions, times(1)).provisionDataNodes();
+        verify(migrationActions, times(1)).stopDatanodes();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -308,6 +309,7 @@ public class MigrationStateMachineBuilderTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
         when(migrationActions.isOldClusterStopped()).thenReturn(true);
         stateMachine.fire(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED);
+        verify(migrationActions, times(1)).finishRemoteReindexMigration();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
 

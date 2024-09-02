@@ -93,7 +93,7 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::isRemoteReindexingFinished);
 
         config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
-                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.FINISHED, migrationActions::isOldClusterStopped);
+                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.FINISHED, migrationActions::isOldClusterStopped, migrationActions::finishRemoteReindexMigration);
 
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
@@ -110,6 +110,7 @@ public class MigrationStateMachineBuilder {
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
                 .onEntry(migrationActions::calculateTrafficEstimate)
+                .onEntry(migrationActions::stopDatanodes) // they should not run by design, but it may still happen. Let's stop those running)
                 .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP, migrationActions::stopMessageProcessing);
 
         config.configure(MigrationState.MESSAGE_PROCESSING_STOP)

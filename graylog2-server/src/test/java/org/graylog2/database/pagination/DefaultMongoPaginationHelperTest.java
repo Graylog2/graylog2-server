@@ -21,6 +21,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationCaseFirst;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -111,6 +113,34 @@ class DefaultMongoPaginationHelperTest {
                 .isEqualTo(paginationHelper.sort(SortOrder.DESCENDING.toBsonSort("name")).page(1))
                 .isEqualTo(paginationHelper.sort(SortOrder.DESCENDING.toBsonSort("name")).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(Lists.reverse(DTOs));
+    }
+
+    @Test
+    void testProjection() {
+        final Bson filter = Filters.in("name", "A", "B", "C");
+        PaginatedList<DTO> page = paginationHelper.filter(filter)
+                .projection(Projections.excludeId())
+                .sort(ascending("name"))
+                .perPage(5)
+                .page(1);
+
+        assertThat(page)
+                .hasSize(3)
+                .containsExactly(
+                        new DTO(null, "A"),
+                        new DTO(null, "B"),
+                        new DTO(null, "C")
+                );
+
+        page = paginationHelper.filter(filter)
+                .projection(Projections.exclude("name"))
+                .sort(ascending("name"))
+                .perPage(5)
+                .page(1);
+
+        assertThat(page)
+                .hasSize(3)
+                .allSatisfy((Consumer<DTO>) dto -> assertThat(dto.name()).isNull());
     }
 
     @Test
