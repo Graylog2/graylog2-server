@@ -32,7 +32,6 @@ export type Output = {
   },
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export const OutputsStore = singletonStore(
   'core.Outputs',
   () => Reflux.createStore({

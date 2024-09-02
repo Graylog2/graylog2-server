@@ -1,4 +1,4 @@
 type = "f"
-message = "Fix issue where content pack stream dependencies were not properly resolved when a dashboard was imported and immediately exported."
+message = "Fix issue where content pack stream dependencies were not properly resolved for some dashboards."
 
-pulls = ["20265"]
+pulls = ["20265", "20288"]
