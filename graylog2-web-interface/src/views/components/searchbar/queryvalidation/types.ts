@@ -21,7 +21,13 @@ export type IndexRange = {
   end: number,
   is_warm_tiered: boolean
 }
-
+export type StreamDataRouting = {
+  stream_name: string,
+  stream_id: string,
+  destination: string,
+  from: string,
+  to: string,
+}
 export type QueryValidationState = {
   status: 'OK' | 'ERROR' | 'WARNING',
   explanations: Array<{
@@ -36,6 +42,12 @@ export type QueryValidationState = {
     relatedProperty?: string,
   }>,
   context: {
-    searched_index_ranges: Array<IndexRange>
+    searched_index_ranges: Array<IndexRange>,
+    data_routed_streams?: Array<StreamDataRouting>,
+    searched_time_range?: {
+      from: string,
+      to: string,
+      type: 'absolute',
+    },
   }
 };
