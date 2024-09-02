@@ -34,6 +34,7 @@ import org.graylog2.search.SearchQueryParser;
 import org.mongojack.Id;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -66,13 +67,17 @@ public class StreamDestinationFilterService {
     private final MongoPaginationHelper<StreamDestinationFilterRuleDTO> paginationHelper;
     private final MongoUtils<StreamDestinationFilterRuleDTO> utils;
     private final ClusterEventBus clusterEventBus;
+    private final Map<String, DestinationFilterActionGuard> destinationFilterLicenseCheckMap;
 
     @Inject
-    public StreamDestinationFilterService(MongoCollections mongoCollections, ClusterEventBus clusterEventBus) {
+    public StreamDestinationFilterService(MongoCollections mongoCollections,
+                                          ClusterEventBus clusterEventBus,
+                                          Map<String, DestinationFilterActionGuard> destinationFilterLicenseCheckMap) {
         this.collection = mongoCollections.collection(COLLECTION, StreamDestinationFilterRuleDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.utils = mongoCollections.utils(collection);
         this.clusterEventBus = clusterEventBus;
+        this.destinationFilterLicenseCheckMap = destinationFilterLicenseCheckMap;
 
         collection.createIndex(Indexes.ascending(FIELD_STREAM_ID));
         collection.createIndex(Indexes.ascending(FIELD_DESTINATION_TYPE));
@@ -125,6 +130,15 @@ public class StreamDestinationFilterService {
     public StreamDestinationFilterRuleDTO createForStream(String streamId, StreamDestinationFilterRuleDTO dto) {
         if (!isBlank(dto.id())) {
             throw new IllegalArgumentException("id must be blank");
+        }
+
+        final DestinationFilterActionGuard destinationFilterActionGuard = destinationFilterLicenseCheckMap.get(dto.destinationType());
+        if (destinationFilterActionGuard != null) {
+            try {
+                destinationFilterActionGuard.checkAction();
+            } catch (DestinationFilterActionException e) {
+                throw new IllegalStateException("Can't create new filter rule. " + e.getMessage());
+            }
         }
 
         // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
