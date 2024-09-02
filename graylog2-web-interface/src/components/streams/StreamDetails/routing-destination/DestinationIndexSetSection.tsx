@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -27,13 +26,13 @@ import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
 import type { Stream } from 'stores/streams/StreamsStore';
+import NumberUtils from 'util/NumberUtils';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
 import IndexSetArchivingCell from 'components/streams/StreamDetails/routing-destination/IndexSetArchivingCell';
 import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
 import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
 import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
 import useIndexSetStats from 'hooks/useIndexSetStats';
-import NumberUtils from 'util/NumberUtils';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 
 type Props = {
@@ -73,6 +72,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
   return (
     <Section title="Index Set"
              collapsible
+             defaultClosed
              headerLeftSection={(
                <>
                  <StyledSwitch aria-label="Toggle index set"
