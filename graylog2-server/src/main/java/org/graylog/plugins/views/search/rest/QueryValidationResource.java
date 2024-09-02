@@ -147,8 +147,14 @@ public class QueryValidationResource extends RestResource implements PluginRestR
             default -> ValidationStatusDTO.OK;
         };
 
-        if (validationStatusDTO == ValidationStatusDTO.OK && (hasWarmIndices || hasDataRoutedStreams)) {
+        boolean isOk = validationStatusDTO == ValidationStatusDTO.OK;
+
+        if (isOk && hasWarmIndices) {
             return ValidationStatusDTO.WARNING;
+        }
+
+        if (isOk && hasDataRoutedStreams) {
+            return ValidationStatusDTO.Info;
         }
 
         return validationStatusDTO;
