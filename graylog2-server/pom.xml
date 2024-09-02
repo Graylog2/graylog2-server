@@ -477,10 +477,12 @@
         <dependency>
             <groupId>org.apache.directory.server</groupId>
             <artifactId>apacheds-test-framework</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.directory.server</groupId>
             <artifactId>ldap-client-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.unboundid</groupId>
@@ -930,7 +932,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.4.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>

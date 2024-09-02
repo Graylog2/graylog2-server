@@ -62,6 +62,14 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public void stopDatanodes() {
+    }
+
+    @Override
+    public void finishRemoteReindexMigration() {
+    }
+
+    @Override
     public void runDirectoryCompatibilityCheck() {
     }
 

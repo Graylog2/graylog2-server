@@ -36,4 +36,8 @@ public record Task(
         @JsonProperty("cancelled") boolean cancelled,
         @JsonProperty("headers") Map<String, String> headers
 ) {
+
+    public String taskID() {
+        return node + ":" + id;
+    }
 }

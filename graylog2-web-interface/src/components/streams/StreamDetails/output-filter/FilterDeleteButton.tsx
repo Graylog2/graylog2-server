@@ -43,7 +43,7 @@ const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
 
   return (
     <>
-      <Button bsStyle="link"
+      <Button bsStyle="danger"
               bsSize="xsmall"
               onClick={() => setShowDialog(true)}
               title="View">

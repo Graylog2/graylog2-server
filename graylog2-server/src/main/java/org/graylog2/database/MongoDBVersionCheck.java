@@ -32,7 +32,7 @@ import java.util.ArrayList;
 
 public class MongoDBVersionCheck {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBVersionCheck.class);
-    private static final Version MINIMUM_MONGODB_VERSION = Version.forIntegers(5, 0);
+    private static final Version MINIMUM_MONGODB_VERSION = Version.of(5, 0);
 
     public static Version getVersion(MongoClient mongoClient) {
         final MongoDatabase adminDb = mongoClient.getDatabase("admin");
@@ -56,7 +56,7 @@ public class MongoDBVersionCheck {
                 final int majorVersion = (int) versionArray.get(0);
                 final int minorVersion = (int) versionArray.get(1);
                 final int patchVersion = (int) versionArray.get(2);
-                return Version.forIntegers(majorVersion, minorVersion, patchVersion);
+                return Version.of(majorVersion, minorVersion, patchVersion);
             } else {
                 LOG.warn("Couldn't retrieve MongoDB buildInfo");
                 return null;
@@ -68,7 +68,7 @@ public class MongoDBVersionCheck {
     }
 
     public static void assertCompatibleVersion(Version mongoVersion) {
-        if (mongoVersion != null && mongoVersion.lessThan(MINIMUM_MONGODB_VERSION)) {
+        if (mongoVersion != null && mongoVersion.isLowerThan(MINIMUM_MONGODB_VERSION)) {
             throw new PreflightCheckException(
                     StringUtils.f("You're running MongoDB %s but Graylog requires at least MongoDB %s. Please upgrade.",
                             mongoVersion, MINIMUM_MONGODB_VERSION));
