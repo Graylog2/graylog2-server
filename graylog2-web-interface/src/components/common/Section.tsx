@@ -39,6 +39,7 @@ const Header = styled.div<{ $collapsible: boolean, $opened: boolean}>(({ $collap
   border-radius: 10px;
   padding: ${($collapsible && !$opened) ? theme.spacings.md : 0};
   flex-wrap: wrap;
+
     &:hover {
     background-color: ${($collapsible && !$opened) ? theme.colors.table.row.backgroundHover : 'initial'};
   }
