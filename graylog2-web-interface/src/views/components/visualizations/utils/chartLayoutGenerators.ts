@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import transform from 'lodash/transform';
 import zipWith from 'lodash/zipWith';
 import sum from 'lodash/sum';
 import flattenDeep from 'lodash/flattenDeep';
@@ -266,7 +265,8 @@ export const generateMappersForYAxis = (
   });
 };
 
-const joinValues = (values: Array<Array<number>>, barmode: BarMode): Array<number> => {
+// eslint-disable-next-line default-param-last
+const joinValues = (values: Array<Array<number>> = [], barmode: BarMode): Array<number> => {
   if (barmode === 'stack' || barmode === 'relative') {
     return zipWith(...values, (...iterateValues) => sum(iterateValues));
   }
@@ -285,7 +285,7 @@ export type GenerateLayoutsParams = {
 
 export const generateLayouts = (
   { unitTypeMapper, chartData, barmode, widgetUnits, config, theme }: GenerateLayoutsParams,
-): Record<string, unknown> => {
+) => {
   const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaultAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
     const traceName = value.fullPath;
     const fieldName = getFieldNameFromTrace({ series: config.series, fullPath: traceName });
@@ -301,10 +301,11 @@ export const generateLayouts = (
     return res;
   }, {});
 
-  return transform(unitTypeMapper, (res, { axisKeyName, axisCount }, unitTypeKey: FieldUnitType | DefaultAxisKey) => {
+  return Object.fromEntries(Object.entries(unitTypeMapper).map(([unitTypeKey, { axisKeyName, axisCount }]) => {
     const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
-    res[axisKeyName] = getUnitLayoutWithData(unitTypeKey, axisCount, unitValues, theme);
-  });
+
+    return [axisKeyName, getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme)];
+  }));
 };
 
 const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>,
