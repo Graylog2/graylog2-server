@@ -480,9 +480,21 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             postMigrationActions.forEach(Runnable::run);
 
         } catch (Exception e) {
-            final String message = "Could not reindex index: " + indexName + " - " + e.getMessage();
+            final String message = "Could not reindex index: " + indexName + " - " + formatErrorMessage(e);
             logError(migration, message, e);
         }
+    }
+
+    private static String formatErrorMessage(Exception e) {
+        StringBuilder message = new StringBuilder();
+        if (e.getMessage() != null) {
+            message.append(e.getMessage());
+        }
+
+        if (e.getCause() != null && e.getCause().getMessage() != null) {
+            message.append(" ").append(e.getCause().getMessage());
+        }
+        return message.toString();
     }
 
     private void removeLocalBlock(MigrationConfiguration migration, String indexName, BlockResponse.IndexBlock block) {
@@ -490,7 +502,10 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         final AcknowledgedResponse acknowledgedResponse = client.execute((restHighLevelClient, requestOptions) -> {
             final UpdateSettingsRequest settingsRequest = new UpdateSettingsRequest();
             settingsRequest.indices(indexName);
-            settingsRequest.settings(Map.of("blocks.write", false));
+            settingsRequest.settings(Map.of(
+                    "index.blocks.write", false,
+                    "index.blocks.read_only_allow_delete", false
+            ));
             return restHighLevelClient.indices().putSettings(settingsRequest, requestOptions);
         });
     }

@@ -47,6 +47,6 @@ public record BlockResponse(@JsonProperty("blocks") Blocks blocks) {
     record IndexBlock(String description, boolean retryable, List<BlockLevel> levels) {}
 
     enum BlockLevel {
-        read, write
+        read, write, metadata_write
     }
 }
