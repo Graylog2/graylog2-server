@@ -18,6 +18,8 @@ package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.Meter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import jakarta.annotation.Nonnull;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
@@ -30,7 +32,6 @@ import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.time.Duration;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Wraps a {@link Message} by making it immutable and caching the result of {@link #serialize(SerializationContext)}
@@ -150,13 +151,13 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     }
 
     @Override
-    public Set<IndexSet> getIndexSets() {
-        return delegate.getIndexSets();
+    public ImmutableSet<IndexSet> getIndexSets() {
+        return ImmutableSet.copyOf(delegate.getIndexSets());
     }
 
     @Override
-    public Map<String, Object> getFields() {
-        return delegate.getFields();
+    public ImmutableMap<String, Object> getFields() {
+        return ImmutableMap.copyOf(delegate.getFields());
     }
 
     @Override
@@ -175,8 +176,8 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     }
 
     @Override
-    public Set<String> getStreamIds() {
-        return delegate.getStreamIds();
+    public ImmutableSet<String> getStreamIds() {
+        return ImmutableSet.copyOf(delegate.getStreamIds());
     }
 
     @Override

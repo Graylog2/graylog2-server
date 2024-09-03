@@ -48,6 +48,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -102,7 +103,7 @@ public class PipelineFacadeTest {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
 
-        pipelineService = new MongoDbPipelineService(mongoConnection, mapperProvider, clusterEventBus);
+        pipelineService = new MongoDbPipelineService(new MongoCollections(mapperProvider, mongoConnection), clusterEventBus);
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoConnection, mapperProvider, clusterEventBus);
 
         facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService, streamService);
