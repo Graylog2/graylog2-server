@@ -59,7 +59,6 @@ public class PermittedStreamsTest {
         assertThat(result).containsExactly("i'm ok");
     }
 
-
     @Test
     public void findsStreamsFromCategories() {
         final PermittedStreams sut = new PermittedStreams(Stream::of, this::categoryMapping);
