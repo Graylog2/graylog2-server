@@ -41,4 +41,6 @@ export type Event = {
 export type EventDefinitionContext = {
   id: string,
   title: string,
+  remediation_steps?: string,
+  description?: string,
 };
