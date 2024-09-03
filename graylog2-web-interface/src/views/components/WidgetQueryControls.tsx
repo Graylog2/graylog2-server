@@ -25,7 +25,7 @@ import { useIsFetching } from '@tanstack/react-query';
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import type { Stream } from 'views/stores/StreamsStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import connect, { useStore } from 'stores/connect';
+import connect from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
 import type { SearchBarFormValues } from 'views/Constants';
@@ -191,14 +191,13 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
     key: stream.title,
     value: stream.id,
   }));
-  const availableStreamCategories = useStore(StreamsStore, ({ streams }) => streams.flatMap((stream) => {
-    if (stream.categories) {
-      return stream.categories.map((s) => ({ key: s, value: s }));
-    }
+  const availableStreamCategories = availableStreams.reduce((acc, stream: Stream) => {
+    stream.categories?.forEach((category: string) => {
+      if (!acc.includes({ key: category, value: category })) acc.push({ key: category, value: category });
+    });
 
-    return [];
-  }).filter((element, index, self) => index === self.findIndex((e) => e.value === element.value),
-  ).sort((a, b) => defaultCompare(a.value, b.value)));
+    return acc;
+  }, []).sort((a, b) => defaultCompare(a.value, b.value));
 
   useBindApplySearchControlsChanges(formRef);
 

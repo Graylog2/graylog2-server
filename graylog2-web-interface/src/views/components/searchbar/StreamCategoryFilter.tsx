@@ -42,6 +42,8 @@ const StreamCategoryFilter = ({ disabled, value, streamCategories, onChange }: P
     onChange(selected === '' ? [] : selected.split(','));
   };
 
+  if (!streamCategories || streamCategories.length < 1) return null;
+
   return (
     <Container data-testid="stream-category-filter" title={placeholder}>
       <Select placeholder={placeholder}
