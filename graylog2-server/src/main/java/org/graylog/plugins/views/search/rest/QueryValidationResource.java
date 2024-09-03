@@ -154,7 +154,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
         }
 
         if (isOk && hasDataRoutedStreams) {
-            return ValidationStatusDTO.Info;
+            return ValidationStatusDTO.INFO;
         }
 
         return validationStatusDTO;
