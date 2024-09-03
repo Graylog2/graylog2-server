@@ -132,8 +132,8 @@ public abstract class PluginModule extends Graylog2Module {
         filteredOutputsMapBinder().addBinding(name).to(filteredMessageOutputClass);
     }
 
-    protected void addDestinationFilterLicenseCheckMapBinder(String name, Class<? extends DestinationFilterActionGuard> destinationFilterLicenseCheckClass) {
-        destinationFilterLicenseCheckMapBinder().addBinding(name).to(destinationFilterLicenseCheckClass);
+    protected void addDestinationFilterActionGuard(String name, Class<? extends DestinationFilterActionGuard> destinationFilterLicenseCheckClass) {
+        destinationFilterActionGuardMapBinder().addBinding(name).to(destinationFilterLicenseCheckClass);
     }
 
     // This should only be used by plugins that have been built before Graylog 3.0.1.

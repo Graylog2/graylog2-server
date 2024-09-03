@@ -58,6 +58,7 @@ public class MessageOutputBindings extends Graylog2Module {
         install(new OutputFilterModule());
 
         filteredOutputsMapBinder(); // Ensure initialization of the multi-binder for filtered outputs
+        destinationFilterActionGuardMapBinder(); //Ensure initialization of the multi-binder for destination filter action guards
 
         bind(ElasticSearchOutput.class).in(Scopes.SINGLETON);
         filteredOutputsMapBinder().addBinding(ElasticSearchOutput.FILTER_KEY).to(ElasticSearchOutput.class);

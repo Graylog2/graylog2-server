@@ -303,7 +303,7 @@ public abstract class Graylog2Module extends AbstractModule {
         return MapBinder.newMapBinder(binder(), String.class, FilteredMessageOutput.class);
     }
 
-    protected MapBinder<String, DestinationFilterActionGuard> destinationFilterLicenseCheckMapBinder() {
+    protected MapBinder<String, DestinationFilterActionGuard> destinationFilterActionGuardMapBinder() {
         return MapBinder.newMapBinder(binder(), String.class, DestinationFilterActionGuard.class);
     }
 
