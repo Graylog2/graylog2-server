@@ -13451,9 +13451,9 @@ react-grid-layout@^1.3.0:
     resize-observer-polyfill "^1.5.1"
 
 react-hotkeys-hook@^4.4.1:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-4.5.0.tgz#807b389b15256daf6a813a1ec09e6698064fe97f"
-  integrity sha512-Samb85GSgAWFQNvVt3PS90LPPGSf9mkH/r4au81ZP1yOIFayLC3QAvqTgGtJ8YEDMXtPmaVBs6NgipHO6h4Mug==
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-4.5.1.tgz#990260ecc7e5a431414148a93b02a2f1a9707897"
+  integrity sha512-scAEJOh3Irm0g95NIn6+tQVf/OICCjsQsC9NBHfQws/Vxw4sfq1tDQut5fhTEvPraXhu/sHxRd9lOtxzyYuNAg==
 
 react-immutable-proptypes@^2.1.0:
   version "2.2.0"
