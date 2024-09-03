@@ -49,6 +49,7 @@ import org.graylog.events.processor.DefaultEventResolver;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorExecutionMetrics;
+import org.graylog.events.processor.EventProcessorSearchUser;
 import org.graylog.events.processor.EventResolver;
 import org.graylog.events.processor.aggregation.AggregationEventProcessor;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
@@ -186,6 +187,8 @@ public class EventsModule extends PluginModule {
         addMigration(V20230629140000_RenameFieldTypeOfEventDefinitionSeries.class);
 
         serviceBinder().addBinding().to(NotificationSystemEventPublisher.class).in(Scopes.SINGLETON);
+
+        install(new FactoryModuleBuilder().build(EventProcessorSearchUser.Factory.class));
 
         eventModifierBinder(); // Initialize event modifier binding to avoid errors when no modifiers are bound.
         eventQuerySearchTypeSupplierBinder(); // Initialize binder to avoid errors when no suppliers are bound.

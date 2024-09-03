@@ -54,6 +54,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     private static final String FIELD_QUERY = "query";
     private static final String FIELD_FILTERS = "filters";
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_STREAM_CATEGORIES = "stream_categories";
     private static final String FIELD_GROUP_BY = "group_by";
     private static final String FIELD_SERIES = "series";
     private static final String FIELD_CONDITIONS = "conditions";
@@ -72,6 +73,9 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
 
     @JsonProperty(FIELD_STREAMS)
     public abstract ImmutableSet<String> streams();
+
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    public abstract ImmutableSet<String> streamCategories();
 
     @JsonProperty(FIELD_GROUP_BY)
     public abstract List<String> groupBy();
@@ -115,7 +119,8 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                     .type(TYPE_NAME)
                     .filters(Collections.emptyList())
                     .useCronScheduling(false)
-                    .eventLimit(0);
+                    .eventLimit(0)
+                    .streamCategories(ImmutableSet.of());
         }
 
         @JsonProperty(FIELD_QUERY)
@@ -126,6 +131,9 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(ImmutableSet<String> streams);
+
+        @JsonProperty(FIELD_STREAM_CATEGORIES)
+        public abstract Builder streamCategories(ImmutableSet<String> streamCategories);
 
         @JsonProperty(FIELD_GROUP_BY)
         public abstract Builder groupBy(List<String> groupBy);
@@ -189,6 +197,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                 .cronExpression(cronExpression().orElse(null))
                 .cronTimezone(cronTimezone().orElse(null))
                 .eventLimit(eventLimit())
+                .streamCategories(streamCategories())
                 .build();
     }
 

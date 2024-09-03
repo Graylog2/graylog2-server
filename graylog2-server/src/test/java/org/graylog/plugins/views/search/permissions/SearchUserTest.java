@@ -48,7 +48,7 @@ class SearchUserTest {
     }
 
     private SearchUser searchUser() {
-        return new SearchUser(mockUser(), (perm) -> true, (perm, id) -> true, new PermittedStreams(Stream::of),
+        return new SearchUser(mockUser(), (perm) -> true, (perm, id) -> true, new PermittedStreams(Stream::of, (categories) -> Stream.of()),
                 new HashMap<>());
     }
 
@@ -111,7 +111,7 @@ class SearchUserTest {
         return new SearchUser(mockUser(),
                 (perm) -> perm.equals(permission),
                 (perm, pId) -> perm.equals(permission) && id.equals(pId),
-                new PermittedStreams(Stream::of),
+                new PermittedStreams(Stream::of, (categories) -> Stream.of()),
                 viewResolvers);
     }
 
@@ -140,7 +140,7 @@ class SearchUserTest {
         return new SearchUser(mockUser(),
                 (perm) -> perm.equals("allowed-permission"),
                 (perm, pId) -> perm.equals("allowed-permission") && "resolved-id".equals(pId),
-                new PermittedStreams(Stream::of),
+                new PermittedStreams(Stream::of, (categories) -> Stream.of()),
                 viewResolvers);
     }
 
@@ -182,7 +182,7 @@ class SearchUserTest {
         return new SearchUser(mockUser(),
                 (perm) -> perm.equals("allowed-permission"),
                 (perm, pId) -> perm.equals("allowed-permission") && "resolved-id".equals(pId),
-                new PermittedStreams(Stream::of),
+                new PermittedStreams(Stream::of, (categories) -> Stream.of()),
                 viewResolvers);
     }
 
