@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button } from 'components/bootstrap';
@@ -31,6 +32,7 @@ import RestApiOverview from './RestApiOverview';
 import PluginsDataTable from './PluginsDataTable';
 import InputTypesDataTable from './InputTypesDataTable';
 
+const  DataWareHouseJournal =  PluginStore.exports('dataWarehouse')?.[0]?.DataWarehouseJournal;
 class NodeOverview extends React.Component {
   static propTypes = {
     node: PropTypes.object.isRequired,
@@ -40,6 +42,9 @@ class NodeOverview extends React.Component {
     inputDescriptions: PropTypes.object,
     inputStates: PropTypes.array,
   };
+
+
+
 
   render() {
     const { node } = this.props;
@@ -108,7 +113,7 @@ class NodeOverview extends React.Component {
             <JournalDetails nodeId={node.node_id} />
           </Col>
         </Row>
-
+        {DataWareHouseJournal && <DataWareHouseJournal nodeId={node.node_id} />}
         <Row className="content">
           <Col md={6}>
             <h2>System</h2>
