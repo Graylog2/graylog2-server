@@ -19,9 +19,11 @@ package org.graylog.events.notifications.types;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -54,7 +56,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -97,6 +98,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
     private final EventsConfigurationProvider configurationProvider;
     private final ParameterizedHttpClientProvider parameterizedHttpClientProvider;
     private final Engine templateEngine;
+    private final Engine jsonTemplateEngine;
     private final NotificationService notificationService;
     private final NodeId nodeId;
 
@@ -107,6 +109,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
                                    EncryptedValueService encryptedValueService,
                                    EventsConfigurationProvider configurationProvider,
                                    Engine templateEngine,
+                                   @Named("JsonSafe") Engine jsonTemplateEngine,
                                    NotificationService notificationService,
                                    NodeId nodeId,
                                    final ParameterizedHttpClientProvider parameterizedHttpClientProvider) {
@@ -116,6 +119,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         this.configurationProvider = configurationProvider;
         this.parameterizedHttpClientProvider = parameterizedHttpClientProvider;
         this.templateEngine = templateEngine;
+        this.jsonTemplateEngine = jsonTemplateEngine;
         this.notificationService = notificationService;
         this.nodeId = nodeId;
     }
@@ -215,28 +219,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         final ObjectMapper objectMapper = objectMapperProvider.getForTimeZone(config.timeZone());
         final Map<String, Object> modelMap = objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
         if (!Strings.isNullOrEmpty(bodyTemplate)) {
-            if (config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
-                final String[] parts = bodyTemplate.split("&");
-                body = Arrays.stream(parts)
-                        .map(part -> {
-                            final int equalsIndex = part.indexOf("=");
-                            final String encodedKey = urlEncode(part.substring(0, equalsIndex));
-                            final String encodedValue = equalsIndex < part.length() - 1 ?
-                                    urlEncode(templateEngine.transform(part.substring(equalsIndex + 1), modelMap)) : "";
-                            return encodedKey + "=" + encodedValue;
-                        })
-                        .collect(Collectors.joining("&"));
-            } else {
-                Map<String, Object> escapedModelMap = new HashMap<>();
-                modelMap.forEach((k, v) -> {
-                    if (v instanceof String str) {
-                        escapedModelMap.put(k, str.replace("\"", "\\\""));
-                    } else {
-                        escapedModelMap.put(k, v);
-                    }
-                });
-                body = templateEngine.transform(bodyTemplate, escapedModelMap);
-            }
+            body = transformBody(bodyTemplate, config.contentType(), modelMap);
         } else {
             if (config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
                 final Map<String, Object> eventMap = objectMapper.convertValue(modelData.event(), TypeReferences.MAP_STRING_OBJECT);
@@ -245,6 +228,29 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
                 body = objectMapper.writeValueAsString(modelData);
             }
         }
+        return body;
+    }
+
+    @VisibleForTesting
+    String transformBody(String bodyTemplate, HTTPEventNotificationConfigV2.ContentType contentType, Map<String, Object> modelMap) {
+        final String body;
+        if (contentType.equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
+            final String[] parts = bodyTemplate.split("&");
+            body = Arrays.stream(parts)
+                    .map(part -> {
+                        final int equalsIndex = part.indexOf("=");
+                        final String encodedKey = urlEncode(part.substring(0, equalsIndex));
+                        final String encodedValue = equalsIndex < part.length() - 1 ?
+                                urlEncode(templateEngine.transform(part.substring(equalsIndex + 1), modelMap)) : "";
+                        return encodedKey + "=" + encodedValue;
+                    })
+                    .collect(Collectors.joining("&"));
+        } else if (contentType.equals(HTTPEventNotificationConfigV2.ContentType.JSON)) {
+            body = jsonTemplateEngine.transform(bodyTemplate, modelMap);
+        } else {
+            body = templateEngine.transform(bodyTemplate, modelMap);
+        }
+
         return body;
     }
 
