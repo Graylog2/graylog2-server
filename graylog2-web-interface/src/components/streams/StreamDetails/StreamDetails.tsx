@@ -121,9 +121,11 @@ const StyledSectionGrid = styled.div(({ theme }) => css`
 const StyledSegmentedControl = styled(SegmentedControl)(({ theme }) => css`
   background-color: ${theme.colors.section.filled.background};
   border: 1px solid ${theme.colors.section.filled.border};
+
   .mantine-SegmentedControl-innerLabel {
     vertical-align: middle;
   }
+
   .mantine-SegmentedControl-indicator {
     height: 70% !important;
   }

@@ -19,6 +19,7 @@ import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled, { css } from 'styled-components';
 
+import { IfPermitted } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import DestinationOutputs from 'components/streams/StreamDetails/routing-destination/DestinationOutputs';
@@ -43,7 +44,9 @@ const StreamDataRoutingDestinations = ({ stream }: Props) => {
     <Container>
       {isSuccess && <DestinationIndexSetSection indexSet={indexSet} stream={stream} />}
       {StreamDataWarehouseComponent && <StreamDataWarehouseComponent />}
-      <DestinationOutputs stream={stream} />
+      <IfPermitted permissions="outputs:edit">
+        <DestinationOutputs stream={stream} />
+      </IfPermitted>
     </Container>
   );
 };
