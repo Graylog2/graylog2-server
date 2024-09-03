@@ -28,8 +28,12 @@ public interface DestinationFilterActionGuard {
      * or authorization. If the action is not allowed, an DestinationFilterActionException should be thrown to
      * prevent further execution.
      *
+     * @param actionType action to verify
      * @throws DestinationFilterActionException if the action is not permitted or fails validation
      */
-    void checkAction() throws DestinationFilterActionException;
+    void checkAction(ActionType actionType) throws DestinationFilterActionException;
 
+    enum ActionType {
+        CREATE
+    }
 }

@@ -135,7 +135,7 @@ class StreamDestinationFilterServiceTest {
 
     @Test
     void createForStreamThrowsExceptionWhenLicenseCheckFails() throws DestinationFilterActionException {
-        doThrow(new DestinationFilterActionException("Invalid action!")).when(mockedFilterLicenseCheck).checkAction();
+        doThrow(new DestinationFilterActionException("Invalid action!")).when(mockedFilterLicenseCheck).checkAction(DestinationFilterActionGuard.ActionType.CREATE);
         StreamDestinationFilterRuleDTO filterDto = StreamDestinationFilterRuleDTO.builder()
                 .title("Test")
                 .description("A Test")

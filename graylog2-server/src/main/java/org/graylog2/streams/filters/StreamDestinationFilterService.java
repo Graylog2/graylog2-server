@@ -135,7 +135,7 @@ public class StreamDestinationFilterService {
         final DestinationFilterActionGuard destinationFilterActionGuard = destinationFilterLicenseCheckMap.get(dto.destinationType());
         if (destinationFilterActionGuard != null) {
             try {
-                destinationFilterActionGuard.checkAction();
+                destinationFilterActionGuard.checkAction(DestinationFilterActionGuard.ActionType.CREATE);
             } catch (DestinationFilterActionException e) {
                 throw new IllegalStateException("Can't create new filter rule. " + e.getMessage());
             }
