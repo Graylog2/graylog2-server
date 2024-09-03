@@ -29,7 +29,7 @@ export type StreamDataRouting = {
   to: string,
 }
 export type QueryValidationState = {
-  status: 'OK' | 'ERROR' | 'WARNING',
+  status: 'OK' | 'ERROR' | 'WARNING' | 'INFO',
   explanations: Array<{
     id: string,
     errorType: string,
