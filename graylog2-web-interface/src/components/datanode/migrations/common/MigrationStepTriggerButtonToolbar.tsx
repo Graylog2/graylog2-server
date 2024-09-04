@@ -95,19 +95,21 @@ const getTelemetryEvent = (state: MigrationStateItem, step: MigrationActions): T
 
 const MigrationStepTriggerButtonToolbar = ({ nextSteps, disabled, onTriggerStep, args, hidden, children }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const { currentStep: { state } } = useMigrationState();
+  const { currentStep } = useMigrationState();
 
   if (hidden) {
     return null;
   }
 
   const handleButtonClick = (step: MigrationActions) => {
-    const eventType = getTelemetryEvent(state, step);
+    const eventType = getTelemetryEvent(currentStep?.state, step);
 
-    sendTelemetry(eventType, {
-      app_pathname: 'datanode',
-      app_section: 'migration',
-    });
+    if (eventType) {
+      sendTelemetry(eventType, {
+        app_pathname: 'datanode',
+        app_section: 'migration',
+      });
+    }
 
     onTriggerStep(step, args);
   };
