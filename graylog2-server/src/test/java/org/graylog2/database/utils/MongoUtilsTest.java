@@ -46,7 +46,7 @@ class MongoUtilsTest {
 
     private record DTO(@Id @org.mongojack.ObjectId String id, String name) implements MongoEntity {}
 
-    private record DTORef(@Id @org.mongojack.ObjectId String id, @org.mongojack.ObjectId ObjectId refId,
+    private record DTORef(@Id @org.mongojack.ObjectId String id, ObjectId refId,
                           String name) implements MongoEntity {}
 
     private MongoCollections mongoCollections;
