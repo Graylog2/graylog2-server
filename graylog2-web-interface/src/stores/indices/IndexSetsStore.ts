@@ -75,8 +75,10 @@ export type IndexSetConfig = {
 
 export type IndexSet = IndexSetConfig & {
   data_tiering?: DataTieringConfig,
-  has_failed_snapshot?: boolean,
-  failed_snapshot_name?: string,
+  data_tiering_status?: {
+    has_failed_snapshot: boolean,
+    failed_snapshot_name: string | null,
+  }
 };
 
 export type IndexSetFormValues = IndexSetConfig & { data_tiering?: DataTieringFormValues };
