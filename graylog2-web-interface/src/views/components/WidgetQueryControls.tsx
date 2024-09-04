@@ -193,7 +193,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   }));
   const availableStreamCategories = availableStreams.reduce((acc, stream: Stream) => {
     stream.categories?.forEach((category: string) => {
-      if (!acc.includes({ key: category, value: category })) acc.push({ key: category, value: category });
+      if (!acc.find((option: { value: string }) => option.value === category)) acc.push({ key: category, value: category });
     });
 
     return acc;
