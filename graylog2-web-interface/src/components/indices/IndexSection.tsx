@@ -110,7 +110,7 @@ const StatList = styled.dl`
 `;
 
 const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId }: Props) => {
-  const size = indices.map((index) => index.size?.bytes).reduce((partialSum, a) => partialSum + a, 0) || 0;
+  const size = indices.map((index) => index.size?.bytes || 0).reduce((partialSum, a) => partialSum + a, 0) || 0;
   const shards = indices.map((index) => index.shard_count).reduce((partialSum, a) => partialSum + a, 0) || 0;
 
   return (
