@@ -345,7 +345,7 @@ const SearchesConfig = () => {
                                 duration={formConfig.query_time_range_limit}
                                 update={onUpdate('query_time_range_limit')}
                                 label="Query time range limit (ISO8601 Duration)"
-                                help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
+                                help='The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'
                                 validator={queryTimeRangeLimitValidator}
                                 required />
             )}

@@ -64,6 +64,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -521,6 +522,11 @@ public class PivotAggregationSearch implements AggregationSearch {
     private Set<String> getStreams(AggregationEventProcessorParameters parameters) {
         // Streams in parameters should override the ones in the config
         Set<String> streamIds = parameters.streams().isEmpty() ? config.streams() : parameters.streams();
+        if (parameters.streams().isEmpty() && !config.streamCategories().isEmpty()) {
+            streamIds = new HashSet<>(streamIds);
+            // TODO: How to take into consideration StreamPermissions here???
+            streamIds.addAll(permittedStreams.loadWithCategories(config.streamCategories(), (streamId) -> true));
+        }
         final Set<String> existingStreams = moreSearch.loadStreams(streamIds).stream()
                 .map(Stream::getId)
                 .collect(toSet());
