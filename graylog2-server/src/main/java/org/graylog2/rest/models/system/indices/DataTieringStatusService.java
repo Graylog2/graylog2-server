@@ -16,22 +16,26 @@
  */
 package org.graylog2.rest.models.system.indices;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.rest.resources.system.indexer.responses.DataTieringStatus;
 
 import java.util.Optional;
 
-public class SnapshotServiceNoop implements SnapshotService {
+/**
+ * Provides access to data-tiering features, but only when called in an environment that support it
+ * (i.e. an Enterprise installation).
+ * This allows callers to be agnostic, simplifying the code.
+ */
+public interface DataTieringStatusService {
+    /**
+     * Return data-tiering status, if available in the caller's environment
+     */
+    Optional<DataTieringStatus> getStatus(IndexSet indexSet, IndexSetConfig indexSetConfig);
 
-    @Override
-    public Optional<String> getFailedSnapshotName(IndexSet indexSet, IndexSetConfig indexSetConfig) {
-        return Optional.empty();
-    }
-
-    @Override
-    public void deleteFailedSnapshot(IndexSet indexSet, IndexSetConfig indexSetConfig) {
-        throw new NotImplementedException();
-    }
-
+    /**
+     * Delete failed snapshot index, if any exists for the specified index set.
+     * Returns true if a corrupted snapshot was deleted, or there is no such snapshot.
+     */
+    boolean deleteFailedSnapshot(IndexSet indexSet, IndexSetConfig indexSetConfig);
 }

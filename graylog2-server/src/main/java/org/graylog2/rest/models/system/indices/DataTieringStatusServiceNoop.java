@@ -16,19 +16,23 @@
  */
 package org.graylog2.rest.models.system.indices;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.rest.resources.system.indexer.responses.DataTieringStatus;
 
 import java.util.Optional;
 
-public interface SnapshotService {
-    /**
-     * Optionally return name of failed snapshot index
-     *
-     * @param indexSetId ID of an index set
-     * @return index name or empty
-     */
-    Optional<String> getFailedSnapshotName(IndexSet indexSet, IndexSetConfig indexSetConfig);
+public class DataTieringStatusServiceNoop implements DataTieringStatusService {
 
-    void deleteFailedSnapshot(IndexSet indexSet, IndexSetConfig indexSetConfig);
+    @Override
+    public Optional<DataTieringStatus> getStatus(IndexSet indexSet, IndexSetConfig indexSetConfig) {
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean deleteFailedSnapshot(IndexSet indexSet, IndexSetConfig indexSetConfig) {
+        throw new NotImplementedException();
+    }
+
 }

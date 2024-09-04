@@ -57,7 +57,7 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.rest.models.system.indices.SnapshotService;
+import org.graylog2.rest.models.system.indices.DataTieringStatusService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
@@ -94,7 +94,7 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetStatsCreator indexSetStatsCreator;
     private final ClusterConfigService clusterConfigService;
     private final SystemJobManager systemJobManager;
-    private final SnapshotService snapshotService;
+    private final DataTieringStatusService tieringStatusService;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -105,7 +105,7 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
                              final SystemJobManager systemJobManager,
-                             final SnapshotService snapshotService) {
+                             final DataTieringStatusService tieringStatusService) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -114,7 +114,7 @@ public class IndexSetsResource extends RestResource {
         this.indexSetStatsCreator = indexSetStatsCreator;
         this.clusterConfigService = clusterConfigService;
         this.systemJobManager = systemJobManager;
-        this.snapshotService = snapshotService;
+        this.tieringStatusService = tieringStatusService;
     }
 
     @GET
@@ -215,7 +215,7 @@ public class IndexSetsResource extends RestResource {
         return indexSetService.get(id)
                 .map(config -> IndexSetSummary.fromIndexSetConfig(
                         config, config.equals(defaultIndexSet),
-                        snapshotService.getFailedSnapshotName(indexSet, config)))
+                        tieringStatusService.getStatus(indexSet, config)))
                 .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
     }
 
@@ -383,7 +383,7 @@ public class IndexSetsResource extends RestResource {
                        @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_EDIT, id);
 
-        snapshotService.deleteFailedSnapshot(
+        tieringStatusService.deleteFailedSnapshot(
                 indexSetRegistry.get(id).orElseThrow(() -> new NotFoundException("Failed to get index set <" + id + ">")),
                 indexSetService.get(id).orElseThrow(() -> new NotFoundException("Failed to get config for index set <" + id + ">"))
         );

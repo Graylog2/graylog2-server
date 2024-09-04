@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.Min;
@@ -44,8 +45,7 @@ import java.util.Optional;
 public abstract class IndexSetSummary implements SimpleIndexSetConfig {
     public static final String FIELD_DEFAULT = "default";
     public static final String FIELD_CAN_BE_DEFAULT = "can_be_default";
-    public static final String FIELD_HAS_FAILED_SNAPSHOT = "has_failed_snapshot";
-    public static final String FIELD_FAILED_SNAPSHOT_NAME = "failed_snapshot_name";
+    public static final String FIELD_DATA_TIERING_STATUS = "data_tiering_status";
 
     @JsonCreator
     public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
@@ -70,8 +70,7 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
                                          @JsonProperty(FIELD_PROFILE_ID) @Nullable String fieldTypeProfile,
                                          @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
                                          @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation,
-                                         @JsonProperty(FIELD_HAS_FAILED_SNAPSHOT) Boolean hasFailedSnapshot,
-                                         @JsonProperty(FIELD_FAILED_SNAPSHOT_NAME) @Nullable String failedSnapshotName) {
+                                         @JsonProperty(FIELD_DATA_TIERING_STATUS) @Nullable DataTieringStatus dataTieringStatus) {
         if (Objects.isNull(creationDate)) {
             creationDate = ZonedDateTime.now();
         }
@@ -79,14 +78,14 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
                 retentionStrategy, dataTiering, id, title, description, isDefault, canBeDefault, isWritable, indexPrefix,
                 creationDate, indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
                 Optional.ofNullable(templateType), fieldTypeProfile, Objects.isNull(useLegacyRotation) || useLegacyRotation,
-                hasFailedSnapshot, failedSnapshotName);
+                dataTieringStatus);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
         return fromIndexSetConfig(indexSet, isDefault, Optional.empty());
     }
 
-    public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault, Optional<String> failedSnapshot) {
+    public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault, Optional<DataTieringStatus> dataTieringStatus) {
         return create(
                 indexSet.id(),
                 indexSet.title(),
@@ -110,8 +109,8 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
                 indexSet.fieldTypeProfile(),
                 indexSet.dataTieringConfig(),
                 indexSet.dataTieringConfig() == null,
-                failedSnapshot.isPresent(),
-                failedSnapshot.orElse(null));
+                dataTieringStatus.orElse(null)
+        );
     }
 
     @JsonProperty("id")
@@ -169,12 +168,10 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
     @JsonProperty(FIELD_USE_LEGACY_ROTATION)
     public abstract Boolean useLegacyRotation();
 
-    @JsonProperty(FIELD_HAS_FAILED_SNAPSHOT)
-    public abstract Boolean hasFailedSnapshot();
-
     @Nullable
-    @JsonProperty(FIELD_FAILED_SNAPSHOT_NAME)
-    public abstract String failedSnapshotName();
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(FIELD_DATA_TIERING_STATUS)
+    public abstract DataTieringStatus dataTieringStatus();
 
     public IndexSetConfig toIndexSetConfig(boolean isRegular) {
         final IndexSetConfig.Builder builder = IndexSetConfig.builder()

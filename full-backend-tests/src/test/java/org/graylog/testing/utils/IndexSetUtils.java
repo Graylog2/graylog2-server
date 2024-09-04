@@ -86,7 +86,6 @@ public class IndexSetUtils {
                 null,
                 null,
                 true,
-                false,
                 null
         );
 
