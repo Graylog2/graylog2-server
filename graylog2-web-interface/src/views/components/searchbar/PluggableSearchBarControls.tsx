@@ -105,14 +105,14 @@ const PluggableSearchBarControls = ({ showLeftControls, showRightControls }: Pro
 
   return (
     <Container>
-      <Container>
+      <div>
         {showLeftControls && (
           <>
             {renderControls(leftControls)}
             {leftColFallback}
           </>
         )}
-      </Container>
+      </div>
       <div>{showRightControls && renderControls(rightControls)}</div>
     </Container>
   );
