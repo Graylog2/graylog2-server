@@ -49,7 +49,7 @@ export type IndexSummary = {
   is_closed: boolean,
   is_reopened: boolean,
   shard_count: number,
-  tier: 'warm' | 'hot'
+  tier: 'WARM' | 'HOT'
 };
 
 export type IndexerOverview = {

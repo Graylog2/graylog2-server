@@ -57,8 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.graylog2.rest.models.system.indexer.responses.IndexSummary.HOT_TIER;
-import static org.graylog2.rest.models.system.indexer.responses.IndexSummary.WARM_TIER;
+import static org.graylog2.rest.models.system.indexer.responses.IndexSummary.TierType.HOT;
+import static org.graylog2.rest.models.system.indexer.responses.IndexSummary.TierType.WARM;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -187,8 +187,8 @@ public class IndexerOverviewResource extends RestResource {
                 shardCount);
     }
 
-    private String getTierType(String indexName) {
-        return indicesAdapter.getWarmIndexInfo(indexName).isPresent() ? WARM_TIER : HOT_TIER;
+    private IndexSummary.TierType getTierType(String indexName) {
+        return indicesAdapter.getWarmIndexInfo(indexName).isPresent() ? WARM : HOT;
     }
 
     private IndexSummary buildClosedIndexSummary(String indexName, List<IndexRangeSummary> indexRanges, DeflectorSummary deflectorSummary) {
