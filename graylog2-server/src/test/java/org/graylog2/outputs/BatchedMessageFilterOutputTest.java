@@ -88,7 +88,7 @@ class BatchedMessageFilterOutputTest {
     void setUp(MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
         this.objectMapper = new ObjectMapperProvider().get();
-        when(indexSet.getWriteIndexAlias()).thenReturn("graylog_deflector");
+        lenient().when(indexSet.getWriteIndexAlias()).thenReturn("graylog_deflector");
         lenient().when(defaultStream.getIndexSet()).thenReturn(indexSet);
     }
 
