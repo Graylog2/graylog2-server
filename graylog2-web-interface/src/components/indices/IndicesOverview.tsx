@@ -17,50 +17,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Row } from 'components/bootstrap';
-import { ClosedIndexDetails, IndexDetails, IndexSummary } from 'components/indices';
+import type { IndexSummary } from 'stores/indexers/IndexerOverviewStore';
+import { IndexSection } from 'components/indices';
 import type { IndexInfo } from 'stores/indices/IndicesStore';
-
-const Index = ({ index, indexDetails, indexSetId }: { index: IndexSummary, indexDetails: Array<IndexInfo>, indexSetId: string }) => {
-  const indexRange = index && index.range ? index.range : null;
-  const details = indexDetails.find(({ index_name }) => index_name === index.index_name);
-
-  return (
-    <Row className="content index-description">
-      <Col md={12}>
-        <IndexSummary index={index}
-                      name={index.index_name}
-                      count={index.size}
-                      indexRange={indexRange}
-                      isDeflector={index.is_deflector}>
-          <span>
-            <IndexDetails index={details}
-                          indexName={index.index_name}
-                          indexRange={indexRange}
-                          indexSetId={indexSetId}
-                          isDeflector={index.is_deflector} />
-          </span>
-        </IndexSummary>
-      </Col>
-    </Row>
-  );
-};
-
-const ClosedIndex = ({ index }: { index: IndexSummary }) => {
-  const indexRange = index.range;
-
-  return (
-    <Row className="content index-description">
-      <Col md={12}>
-        <IndexSummary index={index} name={index.index_name} indexRange={indexRange} isDeflector={index.is_deflector}>
-          <span>
-            <ClosedIndexDetails indexName={index.index_name} indexRange={indexRange} />
-          </span>
-        </IndexSummary>
-      </Col>
-    </Row>
-  );
-};
 
 type Props = {
   indexDetails: Array<IndexInfo>,
@@ -68,14 +27,32 @@ type Props = {
   indexSetId: string,
 }
 
-const IndicesOverview = ({ indexDetails, indices, indexSetId }: Props) => (
-  <span>
-    {indices.map((index) => (!index.is_closed
-      ? <Index index={index} indexDetails={indexDetails} indexSetId={indexSetId} key={`index-summary-${index.index_name}`} />
-      : <ClosedIndex index={index} key={`index-summary-${index.index_name}`} />),
-    )}
-  </span>
-);
+const IndicesOverview = ({ indexDetails, indices, indexSetId }: Props) => {
+  const indicesFilteredByTier = (indicesList: Array<IndexSummary>, tier: 'warm' | 'hot' | undefined): Array<IndexSummary> => (
+    indicesList.filter((index) => index.tier === tier)
+  );
+
+  const warmTierIndices = indicesFilteredByTier(indices, 'warm');
+  const hotTierIndices = indicesFilteredByTier(indices, 'hot');
+  const hotTierList = hotTierIndices.length > 0 ? hotTierIndices : indicesFilteredByTier(indices, undefined);
+
+  return (
+    <>
+      <IndexSection headline="Hot Tier"
+                    subheading="Hot Tier subheading TODO"
+                    indices={hotTierList}
+                    indexDetails={indexDetails}
+                    indexSetId={indexSetId} />
+      {warmTierIndices.length > 0 && (
+        <IndexSection headline="Warm Tier"
+                      subheading="Warm Tier subheading TODO"
+                      indices={warmTierIndices}
+                      indexDetails={indexDetails}
+                      indexSetId={indexSetId} />
+      )}
+    </>
+  );
+};
 
 IndicesOverview.propTypes = {
   indexDetails: PropTypes.array.isRequired,
