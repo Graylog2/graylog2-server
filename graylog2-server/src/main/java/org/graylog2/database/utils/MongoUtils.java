@@ -110,6 +110,28 @@ public class MongoUtils<T extends MongoEntity> {
     }
 
     /**
+     * Create a query constraint to match a field against an {@link ObjectId}.
+     *
+     * @param fieldName the field to check
+     * @param id        the String value of the ObjectId
+     * @return the filter
+     */
+    public static Bson objectIdEq(@Nonnull String fieldName, @Nonnull String id) {
+        return objectIdEq(fieldName, new ObjectId(id));
+    }
+
+    /**
+     * Create a query constraint to match a field against an {@link ObjectId}.
+     *
+     * @param fieldName the field to check
+     * @param objectId  the ObjectId
+     * @return the filter
+     */
+    public static Bson objectIdEq(@Nonnull String fieldName, @Nonnull ObjectId objectId) {
+        return Filters.eq(fieldName, objectId);
+    }
+
+    /**
      * Create a query constraint to match a document's ID against the given list of Hex strings.
      *
      * @param ids Collection of hex string representations of an {@link ObjectId}
