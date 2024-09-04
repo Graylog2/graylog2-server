@@ -51,12 +51,10 @@ public abstract class IndexSummary {
     public abstract boolean isReopened();
 
     @JsonProperty("tier")
-    @Nullable
     public abstract TierType tier();
 
     @JsonProperty("shard_count")
-    @Nullable
-    public abstract Long shardCount();
+    public abstract long shardCount();
 
     @JsonCreator
     public static IndexSummary create(@JsonProperty("index_name") String indexName,
@@ -65,8 +63,8 @@ public abstract class IndexSummary {
                                       @JsonProperty("is_deflector") boolean isDeflector,
                                       @JsonProperty("is_closed") boolean isClosed,
                                       @JsonProperty("is_reopened") boolean isReopened,
-                                      @JsonProperty("tier") @Nullable TierType tier,
-                                      @JsonProperty("shard_count") @Nullable Long shardCount) {
+                                      @JsonProperty("tier") TierType tier,
+                                      @JsonProperty("shard_count") long shardCount) {
         return new AutoValue_IndexSummary(indexName, size, range, isDeflector, isClosed, isReopened, tier, shardCount);
     }
 }
