@@ -46,14 +46,19 @@ class MongoUtilsTest {
 
     private record DTO(@Id @org.mongojack.ObjectId String id, String name) implements MongoEntity {}
 
+    private record DTORef(@Id @org.mongojack.ObjectId String id, ObjectId refId,
+                          String name) implements MongoEntity {}
+
     private MongoCollections mongoCollections;
     private MongoCollection<DTO> collection;
+    private MongoCollection<DTORef> collectionRef;
     private MongoUtils<DTO> utils;
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
         mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
         collection = mongoCollections.collection("test", DTO.class);
+        collectionRef = mongoCollections.collection("test1", DTORef.class);
         utils = mongoCollections.utils(collection);
     }
 
@@ -94,6 +99,16 @@ class MongoUtilsTest {
         assertThat(collection.find(idEq(new ObjectId(a.id()))).first()).isEqualTo(a);
         assertThat(collection.find(idEq(b.id())).first()).isEqualTo(b);
         assertThat(collection.find(idEq(new ObjectId(b.id()))).first()).isEqualTo(b);
+    }
+
+    @Test
+    void testObjectIdEq() {
+        final var a = new DTORef("6627add0ee216425dd6df37c", new ObjectId("6627add0ee216425dd6df37d"), "a");
+        final var b = new DTORef("6627add0ee216425dd6df37d", new ObjectId("6627add0ee216425dd6df37c"), "b");
+        collectionRef.insertMany(List.of(a, b));
+
+        assertThat(collectionRef.find(MongoUtils.objectIdEq("ref_id", a.id())).first()).isEqualTo(b);
+        assertThat(collectionRef.find(MongoUtils.objectIdEq("ref_id", new ObjectId("6627add0ee216425dd6df37d"))).first()).isEqualTo(a);
     }
 
     @Test
