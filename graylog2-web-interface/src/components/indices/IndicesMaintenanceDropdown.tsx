@@ -61,14 +61,14 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
         <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
           <MenuItem eventKey="1" onClick={onRecalculateIndexRange}>Recalculate index ranges</MenuItem>
           {cycleButton}
-          {indexSet?.data_tiering_status.has_failed_snapshot && (<MenuItem eventKey="3" onClick={onDeleteSnapshot}>Delete snapshot</MenuItem>)}
+          {indexSet?.data_tiering_status?.has_failed_snapshot && (<MenuItem eventKey="3" onClick={onDeleteSnapshot}>Delete snapshot</MenuItem>)}
         </DropdownButton>
       </ButtonGroup>
       {showConfirmDelete && (
       <ConfirmDialog show={showConfirmDelete}
                      onConfirm={onConfirmDelete}
                      onCancel={() => setShowConfirmDelete(false)}
-                     title={`Delete snapshot${indexSet?.data_tiering_status.failed_snapshot_name !== null ? ` ${indexSet?.data_tiering_status.failed_snapshot_name}` : ''}`}
+                     title={`Delete snapshot${indexSet?.data_tiering_status?.failed_snapshot_name !== null ? ` ${indexSet?.data_tiering_status?.failed_snapshot_name}` : ''}`}
                      btnConfirmText="Delete">
         Are you sure?<br />
         Deleting this snapshot will cause the rollover to warm tier (if enabled) to be retried - if it fails again, check logs for underlying cause.
