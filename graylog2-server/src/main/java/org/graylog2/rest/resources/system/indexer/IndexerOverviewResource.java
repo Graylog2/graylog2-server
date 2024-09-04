@@ -192,16 +192,15 @@ public class IndexerOverviewResource extends RestResource {
     }
 
     private IndexSummary buildClosedIndexSummary(String indexName, List<IndexRangeSummary> indexRanges, DeflectorSummary deflectorSummary) {
-        final long shardCount = indicesAdapter.getShardsInfo(indexName).size();
         return IndexSummary.create(
                 indexName,
                 null,
-                indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexName)).findFirst().orElse(null),
+                indexRanges.stream().filter(indexRangeSummary -> indexRangeSummary.indexName().equals(indexName)).findFirst().orElse(null),
                 indexName.equals(deflectorSummary.currentTarget()),
                 true,
                 false,
                 getTierType(indexName),
-                shardCount);
+                0L);
     }
 
 }
