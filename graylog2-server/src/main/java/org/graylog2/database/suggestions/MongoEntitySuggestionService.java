@@ -72,14 +72,16 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 .projection(Projections.include(valueColumn))
                 .sort(Sorts.ascending(valueColumn));
 
+        final var addAddminCheck = addAdminToSuggestions && page == 1;
+
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
-        final var skip = (page - 1) * perPage + (addAdminToSuggestions ? 1 : 0);
+        final var skip = Math.max(0, (page - 1) * perPage - (addAdminToSuggestions ? 1 : 0));
         final var checkPermission = permissionsUtils.createPermissionCheck(subject, collection);
         final var documents = userCanReadAllEntities
-                ? mongoPaginate(resultWithoutPagination, perPage - (addAdminToSuggestions ? 1 : 0), skip)
-                : paginateWithPermissionCheck(resultWithoutPagination, perPage - (addAdminToSuggestions ? 1 : 0), skip, checkPermission);
+                ? mongoPaginate(resultWithoutPagination, perPage - (addAddminCheck ? 1 : 0), skip)
+                : paginateWithPermissionCheck(resultWithoutPagination, perPage - (addAddminCheck ? 1 : 0), skip, checkPermission);
 
-        final List<EntitySuggestion> staticEntry = addAdminToSuggestions ? List.of(new EntitySuggestion("admin", "admin")) : List.of();
+        final List<EntitySuggestion> staticEntry = addAddminCheck ? List.of(new EntitySuggestion("admin", "admin")) : List.of();
 
         final Stream<EntitySuggestion> suggestionsFromDB = documents
                 .map(doc ->
