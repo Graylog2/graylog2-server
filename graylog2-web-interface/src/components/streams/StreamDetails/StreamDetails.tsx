@@ -44,13 +44,18 @@ import StreamDataRoutingProcessing from './StreamDataRoutingProcessing';
 import StreamDataRoutingDestinations from './StreamDataRoutingDestinations';
 
 import StreamModal from '../StreamModal';
+import ThroughputCell from '../StreamsOverview/cells/ThroughputCell';
 
 type Props = {
   stream: Stream,
 };
+
 const INTAKE_SEGMENT = 'intake';
 const PROCESSING_SEGMENT = 'processing';
 const DESTINATIONS_SEGMENT = 'destinations';
+const INTAKE_DESCRIPTION = 'Stream Rules may be used to collect a filtered subset of messages directly from Inputs to this Stream. Note that Stream Rules are now a legacy feature, the recommended device to manage stream routing is now Pipeline Rules.';
+const PROCESSING_DESCRIPTION = 'Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules are evaluated and applied. Messages can go through one or more stages.';
+const DESTINATION_DESCRIPTION = 'The Destinations page lets you define where messages in this stream should be routed. A stream may have multiple destinations. Note that messages routed to only Data Warehouse will not count towards License usage, unless subsequently retrieved. On a per-destination basis, filters may be applied to limit the subset of messages that destination receives.';
 
 const SEGMENTS_DETAILS = [
   {
@@ -130,6 +135,21 @@ const StyledSegmentedControl = styled(SegmentedControl)(({ theme }) => css`
     height: 70% !important;
   }
 `);
+const ThroughputCol = styled(Col)`
+  display: flex;
+  align-items: center;
+  height: 100%;
+  flex-flow: column wrap;
+  place-content: flex-end space-evenly;
+`;
+
+const getPageDescription = (segment: DetailsSegment) => (
+  <span>
+    {segment === INTAKE_SEGMENT && INTAKE_DESCRIPTION}
+    {segment === PROCESSING_SEGMENT && PROCESSING_DESCRIPTION}
+    {segment === DESTINATIONS_SEGMENT && DESTINATION_DESCRIPTION}
+  </span>
+);
 
 const StreamDetails = ({ stream }: Props) => {
   const navigate = useNavigate();
@@ -187,7 +207,7 @@ const StreamDetails = ({ stream }: Props) => {
         </Header>
 
         <Row className="content no-bm">
-          <Col xs={12}>
+          <Col xs={10}>
             <StyledSectionGrid>
               <h3>Data Routing</h3>
               <MainDetailsRow>
@@ -197,7 +217,12 @@ const StreamDetails = ({ stream }: Props) => {
                                                         onChange={onSegmentChange} />
               </MainDetailsRow>
             </StyledSectionGrid>
+            <p className="description">{getPageDescription(currentSegment)}</p>
           </Col>
+          <ThroughputCol xs={2}>
+            <strong>Throughput</strong>
+            <ThroughputCell stream={stream} />
+          </ThroughputCol>
         </Row>
         <SegmentContainer className="content">
           <FullHeightCol xs={12}>

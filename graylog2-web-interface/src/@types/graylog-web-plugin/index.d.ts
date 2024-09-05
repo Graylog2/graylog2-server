@@ -185,6 +185,9 @@ interface PluginDataWarehouse {
     }
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
+  DataWarehouseJournal: React.ComponentType<{
+    nodeId: string,
+  }>,
   DataWarehouseJobs: React.ComponentType<{
     streamId: string,
   }>,

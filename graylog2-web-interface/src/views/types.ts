@@ -343,6 +343,7 @@ interface MessageRowOverrideProps {
 export interface CombinedSearchBarFormValues {
   timerange?: TimeRange | NoTimeRangeOverride,
   streams?: Array<string>,
+  streamCategories?: Array<string>,
   queryString?: string,
 }
 
