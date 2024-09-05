@@ -110,4 +110,11 @@ public class GrokPatternRegistryTest {
     public void patterns() {
         assertThat(grokPatternRegistry.patterns()).isEqualTo(GROK_PATTERNS);
     }
+
+    @Test
+    public void patternExists() {
+        assertThat(grokPatternRegistry.grokPatternExists("TEST")).isFalse();
+        assertThat(grokPatternRegistry.grokPatternExists("NUM")).isFalse();
+        assertThat(grokPatternRegistry.grokPatternExists("TESTNUM")).isTrue();
+    }
 }

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useDisclosure } from '@mantine/hooks';
@@ -24,21 +23,26 @@ import Icon from './Icon';
 
 import { Button } from '../bootstrap';
 
-const Container = styled.div(({ theme }) => css`
+const Container = styled.div<{ $collapsible: boolean, $opened: boolean}>(({ $collapsible, $opened, theme }) => css`
   background-color: ${theme.colors.section.filled.background};
   border: 1px solid ${theme.colors.section.filled.border};
   border-radius: 10px;
-  padding: 15px;
+  padding: ${($collapsible && !$opened) ? 0 : theme.spacings.md};
   margin-bottom: ${theme.spacings.xxs};
 `);
 
-const Header = styled.div(({ theme }) => css`
+const Header = styled.div<{ $collapsible: boolean, $opened: boolean}>(({ $collapsible, $opened, theme }) => css`
   display: flex;
   justify-content: space-between;
   gap: ${theme.spacings.xs};
   align-items: center;
-  margin-bottom: ${theme.spacings.xs};
+  border-radius: 10px;
+  padding: ${($collapsible && !$opened) ? theme.spacings.md : 0};
   flex-wrap: wrap;
+
+    &:hover {
+    background-color: ${($collapsible && !$opened) ? theme.colors.table.row.backgroundHover : 'initial'};
+  }
 `);
 
 const FlexWrapper = styled.div(({ theme }) => css`
@@ -62,10 +66,11 @@ type Props = React.PropsWithChildren<{
  */
 const Section = ({ title, actions, headerLeftSection, collapsible, defaultClosed, disableCollapseButton, children }: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
+  const onHeaderClick = () => (!disableCollapseButton && toggle());
 
   return (
-    <Container>
-      <Header>
+    <Container $opened={opened} $collapsible={collapsible}>
+      <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
         <FlexWrapper>
           <h2>{title}</h2>
           {headerLeftSection && <FlexWrapper>{headerLeftSection}</FlexWrapper>}
@@ -73,13 +78,13 @@ const Section = ({ title, actions, headerLeftSection, collapsible, defaultClosed
         <FlexWrapper>
           {actions && <div>{actions}</div>}
           {collapsible && (
-            <Button bsSize="sm"
-                    bsStyle={opened ? 'primary' : 'default'}
-                    onClick={toggle}
-                    data-testid="collapseButton"
-                    disabled={disableCollapseButton}>
-              <Icon size="sm" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-            </Button>
+          <Button bsSize="sm"
+                  bsStyle={opened ? 'primary' : 'default'}
+                  onClick={toggle}
+                  data-testid="collapseButton"
+                  disabled={disableCollapseButton}>
+            <Icon size="sm" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+          </Button>
           )}
         </FlexWrapper>
       </Header>
