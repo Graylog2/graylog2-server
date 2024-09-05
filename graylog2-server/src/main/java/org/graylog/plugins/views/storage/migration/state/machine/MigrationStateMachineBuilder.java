@@ -67,12 +67,13 @@ public class MigrationStateMachineBuilder {
         // remote reindexing branch of the migration
         config.configure(MigrationState.REMOTE_REINDEX_WELCOME_PAGE)
                 .onEntry(migrationActions::reindexUpgradeSelected)
-                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.dataNodeStartupFinished() && migrationActions.compatibleDatanodesRunning(), migrationActions::provisionAndStartDataNodes)
-                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
+                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.allDatanodesAvailable() && migrationActions.compatibleDatanodesRunning(), migrationActions::provisionAndStartDataNodes)
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::allDatanodesAvailable)
+                .onExit(migrationActions::setPreflightFinished);
 
         // This page should contain the "Please restart Graylog to continue with data migration"
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
-                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::allDatanodesAvailable);
 
         config.configure(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE)
                 .permit(MigrationStep.SHOW_MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_EXISTING_DATA, migrationActions::getElasticsearchHosts)
@@ -118,7 +119,8 @@ public class MigrationStateMachineBuilder {
 
         // shows the "remove connection string, restart graylog"
         config.configure(MigrationState.RESTART_GRAYLOG)
-                .permitIf(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED, MigrationState.FINISHED, migrationActions::dataNodeStartupFinished);
+                .onEntry(migrationActions::setPreflightFinished)
+                .permitIf(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED, MigrationState.FINISHED, migrationActions::allDatanodesAvailable);
 
         return config;
     }
