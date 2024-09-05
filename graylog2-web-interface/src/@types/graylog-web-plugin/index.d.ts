@@ -143,6 +143,10 @@ type DataTiering = {
     config: DataTieringConfig
   }>,
   WarmTierReadinessInfo: React.ComponentType,
+  DeleteFailedSnapshotMenuItem: React.ComponentType<{
+    eventKey: string,
+    indexSetId: string
+  }>,
 }
 
 type License = {

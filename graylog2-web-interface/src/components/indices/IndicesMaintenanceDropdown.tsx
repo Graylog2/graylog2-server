@@ -16,14 +16,14 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
-import { ConfirmDialog } from 'components/common';
 import { DeflectorActions } from 'stores/indices/DeflectorStore';
 import { IndexRangesActions } from 'stores/indices/IndexRangesStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import useDeleteFailedSnapshotMutation from 'components/indices/hooks/useDeleteFailedSnapshotMutation';
 
 const _onRecalculateIndexRange = (indexSetId: string) => {
   // eslint-disable-next-line no-alert
@@ -47,34 +47,22 @@ type Props = {
 };
 
 const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const { deleteFailedSnapshot } = useDeleteFailedSnapshotMutation(indexSetId);
-  const onDeleteSnapshot = () => { setShowConfirmDelete(true); };
-  const onConfirmDelete = () => { deleteFailedSnapshot(); setShowConfirmDelete(false); };
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
+
   const onCycleDeflector = useCallback(() => _onCycleDeflector(indexSetId), [indexSetId]);
   const onRecalculateIndexRange = useCallback(() => _onRecalculateIndexRange(indexSetId), [indexSetId]);
   const cycleButton = useMemo(() => (indexSet?.writable ? <MenuItem eventKey="2" onClick={onCycleDeflector}>Rotate active write index</MenuItem> : null), [indexSet?.writable, onCycleDeflector]);
 
   return (
-    <>
-      <ButtonGroup>
-        <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
-          <MenuItem eventKey="1" onClick={onRecalculateIndexRange}>Recalculate index ranges</MenuItem>
-          {cycleButton}
-          {indexSet?.data_tiering_status?.has_failed_snapshot && (<MenuItem eventKey="3" onClick={onDeleteSnapshot}>Delete snapshot</MenuItem>)}
-        </DropdownButton>
-      </ButtonGroup>
-      {showConfirmDelete && (
-      <ConfirmDialog show={showConfirmDelete}
-                     onConfirm={onConfirmDelete}
-                     onCancel={() => setShowConfirmDelete(false)}
-                     title={`Delete snapshot${indexSet?.data_tiering_status?.failed_snapshot_name ? ` ${indexSet?.data_tiering_status?.failed_snapshot_name}` : ''}`}
-                     btnConfirmText="Delete">
-        Are you sure?<br />
-        Deleting this snapshot will cause the rollover to warm tier (if enabled) to be retried - if it fails again, check logs for underlying cause.
-      </ConfirmDialog>
-      )}
-    </>
+    <ButtonGroup>
+      <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
+        <MenuItem eventKey="1" onClick={onRecalculateIndexRange}>Recalculate index ranges</MenuItem>
+        {cycleButton}
+        {indexSet?.data_tiering_status?.has_failed_snapshot && dataTieringPlugin && (
+          <dataTieringPlugin.DeleteFailedSnapshotMenuItem eventKey="3" indexSetId={indexSetId} />
+        )}
+      </DropdownButton>
+    </ButtonGroup>
   );
 };
 
