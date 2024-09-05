@@ -139,10 +139,8 @@ const ThroughputCol = styled(Col)`
   display: flex;
   align-items: center;
   height: 100%;
-  flex-direction: column;
-  align-content: flex-end;
-  justify-content: space-evenly;
-  flex-wrap: wrap;
+  flex-flow: column wrap;
+  place-content: flex-end space-evenly;
 `;
 
 const getPageDescription = (segment: DetailsSegment) => (
