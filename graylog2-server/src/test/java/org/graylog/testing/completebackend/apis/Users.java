@@ -48,7 +48,6 @@ public class Users implements GraylogRestApi {
 
     public static final User LOCAL_ADMIN = new User("admin", "admin", "Admin", "Admin", "admin@graylog", false, 30_0000, "UTC", List.of(), List.of());
     public static final User JOHN_DOE = new User("john.doe", "asdfgh", "John", "Doe", "john@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
-    public static final User REPORT_MANAGER = new User("don.glow", "hrblfrsch", "Don", "Glow", "don@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
     public static final User ANOTHER_SIMPLE_USER = new User("pow.poe", "grbldrbl", "Pow", "poe", "pow@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
 
     public JsonPath createUser(User user) {
