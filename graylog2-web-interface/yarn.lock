@@ -11611,9 +11611,9 @@ maplibre-gl@^4.5.2:
     vt-pbf "^3.1.3"
 
 marked@^14.0.0:
-  version "14.1.0"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-14.1.0.tgz#736ae774ff06ddf03e55a071f9322fe240cb89cb"
-  integrity sha512-P93GikH/Pde0hM5TAXEd8I4JAYi8IB03n8qzW8Bh1BIEFpEyBoYxi/XWZA53LSpTeLBiMQOoSMj0u5E/tiVYTA==
+  version "14.1.1"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-14.1.1.tgz#83a8da67de6b236420e9cfb30e6f774cfb40255f"
+  integrity sha512-eS59oxof5eBVDCKTs+mJbvB/6Vq137GbimF9wkTIlto2/B2ppY5nigUUQgKVmA3bI2mPTIshUyDj5j612ZxlQQ==
 
 material-colors@^1.2.1:
   version "1.2.6"
