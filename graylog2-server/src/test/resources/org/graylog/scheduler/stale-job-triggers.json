@@ -37,6 +37,7 @@
       },
       "job_definition_id": "54e3deadbeefdeadbeefaff3",
       "job_definition_type": "event-processor-execution-v1",
+      "is_cancelled": true,
       "start_time": {
         "$date": "2019-01-01T00:00:00.000Z"
       },

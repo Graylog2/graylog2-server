@@ -201,7 +201,7 @@ class EmailNotificationForm extends React.Component {
                  validationState={validation.errors.recipients ? 'error' : null}><ControlLabel>Email recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
         <MultiSelect id="notification-email-recipients"
                      value={Array.isArray(config.email_recipients) ? config.email_recipients.join(',') : ''}
-                     addLabelText={'Add email "{label}"?'}
+                     addLabelText='Add email "{label}"?'
                      placeholder="Type email address"
                      options={[]}
                      onChange={this.handleRecipientsChange('email_recipients')}
