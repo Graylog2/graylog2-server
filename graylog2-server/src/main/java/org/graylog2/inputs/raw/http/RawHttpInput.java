@@ -21,7 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import jakarta.inject.Inject;
 import org.graylog2.inputs.codecs.RawCodec;
-import org.graylog2.inputs.transports.HttpTransport;
+import org.graylog2.inputs.transports.RawHttpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -34,7 +34,7 @@ public class RawHttpInput extends MessageInput {
     @AssistedInject
     public RawHttpInput(MetricRegistry metricRegistry,
                         @Assisted Configuration configuration,
-                        HttpTransport.Factory httpTransportFactory,
+                        RawHttpTransport.Factory httpTransportFactory,
                         RawCodec.Factory rawCodecFactory, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry, configuration, httpTransportFactory.create(configuration),
                 localRegistry,
@@ -61,7 +61,7 @@ public class RawHttpInput extends MessageInput {
 
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(HttpTransport.Factory transport, RawCodec.Factory codec) {
+        public Config(RawHttpTransport.Factory transport, RawCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }

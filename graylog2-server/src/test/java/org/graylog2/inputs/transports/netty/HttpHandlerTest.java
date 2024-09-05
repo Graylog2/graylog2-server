@@ -41,7 +41,7 @@ public class HttpHandlerTest {
 
     @Before
     public void setUp() {
-        channel = new EmbeddedChannel(new HttpHandler(true));
+        channel = new EmbeddedChannel(new HttpHandler(true, "/gelf"));
     }
 
     @Test
