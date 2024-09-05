@@ -24,6 +24,7 @@ import org.graylog.datanode.bootstrap.preflight.OpenSearchPreconditionsCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchBinPreflightCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync;
 import org.graylog.datanode.bootstrap.preflight.OpensearchDataDirCompatibilityCheck;
+import org.graylog.datanode.bootstrap.preflight.OpensearchNodeLockFileCheck;
 import org.graylog.datanode.opensearch.CsrRequester;
 import org.graylog.datanode.opensearch.CsrRequesterImpl;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
@@ -42,6 +43,7 @@ public class PreflightChecksBindings extends AbstractModule {
 
         addPreflightCheck(OpensearchConfigSync.class);
         addPreflightCheck(OpensearchBinPreflightCheck.class);
+        addPreflightCheck(OpensearchNodeLockFileCheck.class);
         addPreflightCheck(DatanodeDirectoriesLockfileCheck.class);
         addPreflightCheck(OpenSearchPreconditionsCheck.class);
         addPreflightCheck(OpensearchDataDirCompatibilityCheck.class);
