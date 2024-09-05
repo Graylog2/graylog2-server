@@ -31,11 +31,13 @@ const StyledAlert = styled(Alert)`
 
 const TAB_KEYS = ['create', 'upload'];
 
+const UploadCA = 'Upload CA';
+
 const CAConfiguration = () => {
   const sendTelemetry = useSendTelemetry();
 
   const handleTabSwitch = (e) => {
-    sendTelemetry((e?.target?.innerText === 'Upload CA')
+    sendTelemetry((e?.target?.innerText === UploadCA)
       ? TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_UPLOAD_TAB_CLICKED
       : TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_CREATE_TAB_CLICKED, {
       app_pathname: 'datanode',
@@ -60,7 +62,7 @@ const CAConfiguration = () => {
         <Tab eventKey={TAB_KEYS[0]} title="Create new CA">
           <CACreateForm />
         </Tab>
-        <Tab eventKey={TAB_KEYS[1]} title="Upload CA">
+        <Tab eventKey={TAB_KEYS[1]} title={UploadCA}>
           <CAUpload />
         </Tab>
       </Tabs>

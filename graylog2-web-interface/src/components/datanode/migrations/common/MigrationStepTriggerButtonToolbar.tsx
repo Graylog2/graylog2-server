@@ -20,11 +20,10 @@ import styled, { css } from 'styled-components';
 import type { MigrationActions, MigrationStateItem, OnTriggerStepFunction, StepArgs } from 'components/datanode/Types';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { MIGRATION_ACTIONS } from 'components/datanode/Constants';
+import useMigrationState from 'components/datanode/hooks/useMigrationState';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
-
-import useMigrationState from '../../hooks/useMigrationState';
 
 const StyledButtonToolbar = styled(ButtonToolbar)(({ theme }) => css`
   margin-top: ${theme.spacings.md};
