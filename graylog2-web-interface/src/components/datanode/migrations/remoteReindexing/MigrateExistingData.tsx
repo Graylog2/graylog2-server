@@ -110,7 +110,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
       value = (value || 0) < 1 ? DEFAULT_THREADS_COUNT : value;
     }
 
-    await callback(e.target.name, value);
+    await callback(e.target.name, value, true);
 
     resetConnectionCheck();
   };
@@ -138,12 +138,24 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
     indices: filteredSelectedIndices.map((i) => i.name),
   });
 
+  const validate = (values: RemoteReindexRequest) => {
+    let errors = {};
+
+    if (!values.hostname) {
+      errors = { ...errors, hostname: 'Hostname is required.' };
+    }
+
+    return errors;
+  };
+
   return (
     <Formik enableReinitialize
             initialValues={initialValues}
+            validate={validate}
             onSubmit={() => {}}>
       {({
         values,
+        errors,
         setFieldValue,
       }) => (
         <Form role="form">
@@ -156,6 +168,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
                  disabled={isLoading}
                  value={values.hostname}
                  onChange={(e) => handleChange(e, setFieldValue)}
+                 error={errors?.hostname}
                  required />
           <Row>
             <Col md={6}>
@@ -260,6 +273,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
             <Spinner />
           ) : (
             <MigrationStepTriggerButtonToolbar hidden={hideActions}
+                                               disabled={Object.values(errors).length > 0}
                                                nextSteps={nextSteps || currentStep.next_steps}
                                                onTriggerStep={handleTriggerNextStep}
                                                args={adaptArgs(values)} />
