@@ -16,23 +16,14 @@
  */
 package org.graylog2.rest.models.system.indices;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.rest.resources.system.indexer.responses.DataTieringStatus;
 
-import java.util.Optional;
-
-public class DataTieringStatusServiceNoop implements DataTieringStatusService {
+public class DefaultDataTieringStatusService implements DataTieringStatusService {
 
     @Override
-    public Optional<DataTieringStatus> getStatus(IndexSet indexSet, IndexSetConfig indexSetConfig) {
-        return Optional.empty();
+    public DataTieringStatus getStatus(IndexSet indexSet, IndexSetConfig indexSetConfig) {
+        return null;
     }
-
-    @Override
-    public boolean deleteFailedSnapshot(IndexSet indexSet, IndexSetConfig indexSetConfig) {
-        throw new NotImplementedException();
-    }
-
 }

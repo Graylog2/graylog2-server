@@ -17,9 +17,14 @@
 package org.graylog2.rest.resources.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-public record DataTieringStatus(
-        @JsonProperty("has_failed_snapshot") boolean hasFailedSnapshot,
-        @JsonProperty("failed_snapshot_name") String failedSnapshotName
-) {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+
+public abstract class DataTieringStatus {
+    protected static final String FIELD_TYPE = "type";
+
+    // Every subclass needs to implement type!
+    @JsonProperty(FIELD_TYPE)
+    public abstract String type();
 }

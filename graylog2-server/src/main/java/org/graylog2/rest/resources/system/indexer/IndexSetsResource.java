@@ -369,23 +369,4 @@ public class IndexSetsResource extends RestResource {
             }
         }
     }
-
-    @DELETE
-    @Path("{id}/failed_snapshot")
-    @Timed
-    @ApiOperation(value = "Delete failed snapshots for index set")
-    @AuditEvent(type = AuditEventTypes.INDEX_SET_DELETE_FAILED_SNAPSHOT)
-    @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Index set not found"),
-    })
-    public void delete(@ApiParam(name = "id", required = true)
-                       @PathParam("id") String id) {
-        checkPermission(RestPermissions.INDEXSETS_EDIT, id);
-
-        tieringStatusService.deleteFailedSnapshot(
-                indexSetRegistry.get(id).orElseThrow(() -> new NotFoundException("Failed to get index set <" + id + ">")),
-                indexSetService.get(id).orElseThrow(() -> new NotFoundException("Failed to get config for index set <" + id + ">"))
-        );
-    }
 }

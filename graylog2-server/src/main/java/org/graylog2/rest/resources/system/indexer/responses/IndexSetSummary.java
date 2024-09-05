@@ -82,10 +82,10 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
-        return fromIndexSetConfig(indexSet, isDefault, Optional.empty());
+        return fromIndexSetConfig(indexSet, isDefault, null);
     }
 
-    public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault, Optional<DataTieringStatus> dataTieringStatus) {
+    public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault, DataTieringStatus dataTieringStatus) {
         return create(
                 indexSet.id(),
                 indexSet.title(),
@@ -109,7 +109,7 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
                 indexSet.fieldTypeProfile(),
                 indexSet.dataTieringConfig(),
                 indexSet.dataTieringConfig() == null,
-                dataTieringStatus.orElse(null)
+                dataTieringStatus
         );
     }
 

@@ -20,8 +20,6 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.rest.resources.system.indexer.responses.DataTieringStatus;
 
-import java.util.Optional;
-
 /**
  * Provides access to data-tiering features, but only when called in an environment that support it
  * (i.e. an Enterprise installation).
@@ -31,11 +29,5 @@ public interface DataTieringStatusService {
     /**
      * Return data-tiering status, if available in the caller's environment
      */
-    Optional<DataTieringStatus> getStatus(IndexSet indexSet, IndexSetConfig indexSetConfig);
-
-    /**
-     * Delete failed snapshot index, if any exists for the specified index set.
-     * Returns true if a corrupted snapshot was deleted, or there is no such snapshot.
-     */
-    boolean deleteFailedSnapshot(IndexSet indexSet, IndexSetConfig indexSetConfig);
+    DataTieringStatus getStatus(IndexSet indexSet, IndexSetConfig indexSetConfig);
 }
