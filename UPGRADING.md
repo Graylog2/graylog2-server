@@ -47,7 +47,7 @@ The following REST API changes have been made.
 | `GET licenses/metrics`                           | Get the stats for consumed and remaining provisioned traffic                                                                    |
 | `GET licenses/traffic-threshold`                 | Get info about license traffic threshold warning                                                                                |
 | `PUT licenses/traffic-threshold/acknowledgement` | Acknowledge current traffic threshold warning                                                                                   |
-| `DELETE system/indices/index_sets/{id}/failed_snapshot` | Delete any FAILED or PARTIAL snapshots for this index set | 
+| `DELETE /datatiering/repositories/index_sets/{id}/failed_snapshot` | Delete any FAILED or PARTIAL snapshots for this index set | 
 
 ## Deprecated Inputs
 
