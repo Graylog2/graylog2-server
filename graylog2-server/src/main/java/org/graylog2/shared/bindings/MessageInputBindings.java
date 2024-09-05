@@ -21,7 +21,7 @@ import org.graylog.plugins.beats.BeatsInputPluginModule;
 import org.graylog2.inputs.beats.kafka.BeatsKafkaInput;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.inputs.gelf.amqp.GELFAMQPInput;
-import org.graylog2.inputs.raw.http.GELFHttpInput;
+import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.kafka.GELFKafkaInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
