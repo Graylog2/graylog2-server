@@ -49,6 +49,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -117,10 +118,19 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     }
 
     private ValidationRequest prepareRequest(ValidationRequestDTO validationRequest, SearchUser searchUser) {
+        // Combine stream IDs mapped from streamCategories and stream IDs from the validationRequest before calling
+        // readableOrAllIfEmpty to ensure all possible requested streams are added first.
+        final Set<String> streamsAndMappedCategories = validationRequest.streams().orElse(new HashSet<>());
+        if (validationRequest.streamCategories().isPresent()) {
+            streamsAndMappedCategories.addAll(searchUser.streams().loadStreamsWithCategories(validationRequest.streamCategories().get()));
+        }
+        ImmutableSet.Builder<String> allRequestedStreams = ImmutableSet.<String>builder()
+                .addAll(searchUser.streams().readableOrAllIfEmpty(streamsAndMappedCategories));
+
         final ValidationRequest.Builder q = ValidationRequest.Builder.builder()
                 .query(validationRequest.query())
                 .timerange(validationRequest.timerange().orElse(defaultTimeRange()))
-                .streams(searchUser.streams().readableOrAllIfEmpty(validationRequest.streams()))
+                .streams(allRequestedStreams.build())
                 .parameters(resolveParameters(validationRequest))
                 .validationMode(validationRequest.validationMode().toInternalRepresentation());
 
