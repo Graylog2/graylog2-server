@@ -32,6 +32,7 @@ export const IndexerOverviewActions = singletonActions(
 );
 
 export type IndexSummary = {
+  index_name: string,
   size: {
     events: number,
     deleted: number,
@@ -43,10 +44,12 @@ export type IndexSummary = {
     end: string,
     calculated_at: string,
     took_ms: number,
-  },
+  } | null,
   is_deflector: boolean,
   is_closed: boolean,
   is_reopened: boolean,
+  shard_count: number,
+  tier: 'WARM' | 'HOT'
 };
 
 export type IndexerOverview = {
