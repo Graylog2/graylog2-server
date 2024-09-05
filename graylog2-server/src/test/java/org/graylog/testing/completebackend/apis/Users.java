@@ -18,9 +18,10 @@ package org.graylog.testing.completebackend.apis;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.restassured.path.json.JsonPath;
-import io.restassured.specification.RequestSpecification;
+import org.graylog2.rest.models.users.requests.PermissionEditRequest;
 
 import java.util.List;
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 
@@ -47,8 +48,8 @@ public class Users implements GraylogRestApi {
 
     public static final User LOCAL_ADMIN = new User("admin", "admin", "Admin", "Admin", "admin@graylog", false, 30_0000, "UTC", List.of(), List.of());
     public static final User JOHN_DOE = new User("john.doe", "asdfgh", "John", "Doe", "john@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
-    public static final User DON_GLOW = new User("don.glow", "hrblfrsch", "Don", "Glow", "don@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
-    public static final User POW_POE = new User("pow.poe", "grbldrbl", "Pow", "poe", "pow@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
+    public static final User REPORT_MANAGER = new User("don.glow", "hrblfrsch", "Don", "Glow", "don@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
+    public static final User ANOTHER_SIMPLE_USER = new User("pow.poe", "grbldrbl", "Pow", "poe", "pow@graylog", false, 30_0000, "Europe/Vienna", List.of(), List.of());
 
     public JsonPath createUser(User user) {
         given()
@@ -68,6 +69,19 @@ public class Users implements GraylogRestApi {
                 .spec(api.requestSpecification())
                 .when()
                 .put("/roles/" + role + "/members/" + user.username)
+                .then()
+                .log().ifError()
+                .statusCode(204);
+
+        return getUserInfo(user.username);
+    }
+
+    public JsonPath setPermissions(User user, Set<String> permissions) {
+        given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(PermissionEditRequest.create(permissions.stream().toList()))
+                .put("/users/" + user.username + "/permissions")
                 .then()
                 .log().ifError()
                 .statusCode(204);
