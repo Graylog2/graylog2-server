@@ -29,6 +29,7 @@ import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.HttpHandler;
 import org.graylog2.inputs.transports.netty.LenientDelimiterBasedFrameDecoder;
+import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -37,13 +38,19 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     private static final int DEFAULT_MAX_INITIAL_LINE_LENGTH = 4096;
@@ -57,6 +64,8 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
     static final String CK_AUTHORIZATION_HEADER_NAME = "authorization_header_name";
     static final String CK_AUTHORIZATION_HEADER_VALUE = "authorization_header_value";
+    private static final String AUTHORIZATION_HEADER_NAME_LABEL = "Authorization Header Name";
+    private static final String AUTHORIZATION_HEADER_VALUE_LABEL = "Authorization Header Value";
 
     protected final boolean enableBulkReceiving;
     protected final boolean enableCors;
@@ -120,6 +129,20 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         return handlers;
     }
 
+    @Override
+    public void launch(MessageInput input, @Nullable InputFailureRecorder inputFailureRecorder) throws MisfireException {
+        if (isNotBlank(authorizationHeader) && isBlank(authorizationHeaderValue)) {
+            checkForConfigFieldDependencies(AUTHORIZATION_HEADER_NAME_LABEL, AUTHORIZATION_HEADER_VALUE_LABEL);
+        } else if (isNotBlank(authorizationHeaderValue) && isBlank(authorizationHeader)) {
+            checkForConfigFieldDependencies(AUTHORIZATION_HEADER_VALUE_LABEL, AUTHORIZATION_HEADER_NAME_LABEL);
+        }
+        super.launch(input, inputFailureRecorder);
+    }
+
+    private void checkForConfigFieldDependencies(String configParam1, String configParam2) throws MisfireException {
+        throw new MisfireException(f("The [%s] configuration parameter cannot be used without also specifying a value for [%s].",
+                configParam1, configParam2));
+    }
 
     @ConfigClass
     public static class Config extends AbstractTcpTransport.Config {
@@ -147,15 +170,15 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                     NumberField.Attribute.ONLY_POSITIVE));
             r.addField(new TextField(
                     CK_AUTHORIZATION_HEADER_NAME,
-                    "Authorization Header Name",
+                    AUTHORIZATION_HEADER_NAME_LABEL,
                     "",
                     "The name for the authorization header to use. If specified, all requests must contain this header with the correct value to authenticate successfully.",
                     ConfigurationField.Optional.OPTIONAL));
             r.addField(new TextField(
                     CK_AUTHORIZATION_HEADER_VALUE,
-                    "Authorization Header Value",
+                    AUTHORIZATION_HEADER_VALUE_LABEL,
                     "",
-                    "The secret authorization header value which all request must have in order to authenticate successfully. e.g. Bearer: <api-token>",
+                    "The secret authorization header value which all request must have in order to authenticate successfully. e.g. Bearer: <api-token>N",
                     ConfigurationField.Optional.OPTIONAL,
                     TextField.Attribute.IS_PASSWORD));
             return r;
