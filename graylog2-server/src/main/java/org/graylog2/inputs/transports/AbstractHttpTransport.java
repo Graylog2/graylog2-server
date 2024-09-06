@@ -73,7 +73,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     private final int idleWriterTimeout;
     private final String authorizationHeader;
     private final String authorizationHeaderValue;
-    private String path;
+    private final String path;
 
     public AbstractHttpTransport(Configuration configuration,
                                  EventLoopGroup eventLoopGroup,
