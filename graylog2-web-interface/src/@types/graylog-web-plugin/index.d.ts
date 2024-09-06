@@ -143,6 +143,10 @@ type DataTiering = {
     config: DataTieringConfig
   }>,
   WarmTierReadinessInfo: React.ComponentType,
+  DeleteFailedSnapshotMenuItem: React.ComponentType<{
+    eventKey: string,
+    indexSetId: string
+  }>,
 }
 
 type License = {
@@ -185,6 +189,9 @@ interface PluginDataWarehouse {
     }
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
+  DataWarehouseJournal: React.ComponentType<{
+    nodeId: string,
+  }>,
   DataWarehouseJobs: React.ComponentType<{
     streamId: string,
   }>,

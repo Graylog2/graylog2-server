@@ -140,7 +140,6 @@ describe('<Widget />', () => {
     <TestStoreProvider>
       <SearchExplainContext.Provider value={searchExplainContext(searchedIndices)}>
         <FieldTypesContext.Provider value={fieldTypes}>
-          {}
           <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
             <WidgetContext.Provider value={propsWidget}>
               <Widget widget={propsWidget}
@@ -262,8 +261,8 @@ describe('<Widget />', () => {
       .config({})
       .build();
     const UnknownWidget = (props: Partial<React.ComponentProps<typeof Widget>>) => (
-      <FieldTypesContext.Provider value={fieldTypes}>
-        <TestStoreProvider>
+      <TestStoreProvider>
+        <FieldTypesContext.Provider value={fieldTypes}>
           <WidgetContext.Provider value={unknownWidget}>
             <Widget widget={unknownWidget}
                     editing
@@ -273,8 +272,8 @@ describe('<Widget />', () => {
                     position={new WidgetPosition(1, 1, 1, 1)}
                     {...props} />
           </WidgetContext.Provider>
-        </TestStoreProvider>
-      </FieldTypesContext.Provider>
+        </FieldTypesContext.Provider>
+      </TestStoreProvider>
     );
 
     render(

@@ -36,6 +36,7 @@ public abstract class MessagesWidget implements ViewWidget {
     private static final String FIELD_TIMERANGE = "timerange";
     private static final String FIELD_QUERY = "query";
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_STREAM_CATEGORIES = "stream_categories";
     private static final String FIELD_CONFIG = "config";
 
     @JsonProperty(FIELD_ID)
@@ -60,6 +61,11 @@ public abstract class MessagesWidget implements ViewWidget {
 
     @JsonProperty(FIELD_STREAMS)
     Set<String> streams() {
+        return Collections.emptySet();
+    }
+
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    Set<String> streamCategories() {
         return Collections.emptySet();
     }
 

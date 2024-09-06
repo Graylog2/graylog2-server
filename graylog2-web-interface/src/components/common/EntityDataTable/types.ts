@@ -70,4 +70,5 @@ export type ExpandedSectionRenderer<Entity> = {
   title: string,
   content: (entity: Entity) => React.ReactNode,
   actions?: (entity: Entity) => React.ReactNode,
+  disableHeader?: boolean,
 }

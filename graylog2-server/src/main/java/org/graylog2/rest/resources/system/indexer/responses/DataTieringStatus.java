@@ -14,29 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
+package org.graylog2.rest.resources.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import java.util.Optional;
-import java.util.Set;
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 
-public interface SearchType {
-    @JsonProperty
-    String id();
+public abstract class DataTieringStatus {
+    protected static final String FIELD_TYPE = "type";
 
-    @JsonProperty
-    Optional<TimeRange> timerange();
-
-    @JsonProperty
-    Optional<ElasticsearchQueryString> query();
-
-    @JsonProperty
-    Set<String> streams();
-
-    @JsonProperty
-    Set<String> streamCategories();
-
-    @JsonProperty
-    Optional<String> name();
+    // Every subclass needs to implement type!
+    @JsonProperty(FIELD_TYPE)
+    public abstract String type();
 }

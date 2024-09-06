@@ -14,29 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
+package org.graylog2.rest.models.system.indices;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.rest.resources.system.indexer.responses.DataTieringStatus;
 
-import java.util.Optional;
-import java.util.Set;
-
-public interface SearchType {
-    @JsonProperty
-    String id();
-
-    @JsonProperty
-    Optional<TimeRange> timerange();
-
-    @JsonProperty
-    Optional<ElasticsearchQueryString> query();
-
-    @JsonProperty
-    Set<String> streams();
-
-    @JsonProperty
-    Set<String> streamCategories();
-
-    @JsonProperty
-    Optional<String> name();
+/**
+ * Provides access to data-tiering features, but only when called in an environment that support it
+ * (i.e. an Enterprise installation).
+ * This allows callers to be agnostic, simplifying the code.
+ */
+public interface DataTieringStatusService {
+    /**
+     * Return data-tiering status, if available in the caller's environment
+     */
+    DataTieringStatus getStatus(IndexSet indexSet, IndexSetConfig indexSetConfig);
 }

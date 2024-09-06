@@ -85,6 +85,10 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
     @JsonProperty
     Set<String> streams();
 
+    @Nullable
+    @JsonProperty
+    Set<String> streamCategories();
+
     SearchType applyExecutionContext(SearchTypeExecutionState executionState);
 
     default SearchType withQuery(BackendQuery query) {
@@ -108,6 +112,10 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
                 .map(tr -> tr.withReferenceDate(now))
                 .map(tr -> toBuilder().timerange(tr).build())
                 .orElse(this);
+    }
+
+    default boolean hasStreamCategories() {
+        return streamCategories() != null && !streamCategories().isEmpty();
     }
 
     SearchTypeBuilder toBuilder();
@@ -164,6 +172,10 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         @JsonProperty
         private Set<String> streams;
 
+        @Nullable
+        @JsonProperty
+        private Set<String> streamCategories;
+
         @Override
         public String type() {
             return type;
@@ -202,6 +214,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         @Override
         public Set<String> streams() {
             return this.streams == null ? Collections.emptySet() : this.streams;
+        }
+
+        @Override
+        public Set<String> streamCategories() {
+            return this.streamCategories == null ? Collections.emptySet() : this.streamCategories;
         }
 
         @Override
@@ -282,6 +299,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
                 @Override
                 public SearchTypeBuilder filter(@Nullable Filter filter) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder streams(Set<String> streams) {
                     return this;
                 }
             };
