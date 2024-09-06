@@ -32,6 +32,7 @@ import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -70,7 +71,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
         final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn);
         final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
-        final boolean filterMatchesInSpecialCollection = isSpecialCollection && !filterIsEmpty && LOCAL_ADMIN_ID.contains(query.toLowerCase());
+        final boolean filterMatchesInSpecialCollection = isSpecialCollection && !filterIsEmpty && LOCAL_ADMIN_ID.contains(query.toLowerCase(Locale.getDefault()));
 
         final var bsonFilter = !filterIsEmpty
                 ? Filters.regex(valueColumn, query, "i")
