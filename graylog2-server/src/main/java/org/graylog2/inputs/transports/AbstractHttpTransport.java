@@ -35,6 +35,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
@@ -54,11 +55,15 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     static final String CK_ENABLE_CORS = "enable_cors";
     static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
     static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
+    static final String CK_AUTHORIZATION_HEADER_NAME = "authorization_header_name";
+    static final String CK_AUTHORIZATION_HEADER_VALUE = "authorization_header_value";
 
     protected final boolean enableBulkReceiving;
     protected final boolean enableCors;
     protected final int maxChunkSize;
     private final int idleWriterTimeout;
+    private final String authorizationHeader;
+    private final String authorizationHeaderValue;
     private String path;
 
     public AbstractHttpTransport(Configuration configuration,
@@ -79,6 +84,8 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         this.enableCors = configuration.getBoolean(CK_ENABLE_CORS);
         this.maxChunkSize = parseMaxChunkSize(configuration);
         this.idleWriterTimeout = configuration.intIsSet(CK_IDLE_WRITER_TIMEOUT) ? configuration.getInt(CK_IDLE_WRITER_TIMEOUT, DEFAULT_IDLE_WRITER_TIMEOUT) : DEFAULT_IDLE_WRITER_TIMEOUT;
+        this.authorizationHeader = configuration.getString(CK_AUTHORIZATION_HEADER_NAME);
+        this.authorizationHeaderValue = configuration.getString(CK_AUTHORIZATION_HEADER_VALUE);
         this.path = path;
     }
 
@@ -104,7 +111,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         handlers.put("decompressor", HttpContentDecompressor::new);
         handlers.put("encoder", HttpResponseEncoder::new);
         handlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
-        handlers.put("http-handler", () -> new HttpHandler(enableCors, path));
+        handlers.put("http-handler", () -> new HttpHandler(enableCors, authorizationHeader, authorizationHeaderValue, path));
         if (enableBulkReceiving) {
             handlers.put("http-bulk-newline-decoder",
                     () -> new LenientDelimiterBasedFrameDecoder(maxChunkSize, Delimiters.lineDelimiter()));
@@ -138,6 +145,19 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                     "The server closes the connection after the given time in seconds after the last client write request. (use 0 to disable)",
                     ConfigurationField.Optional.OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE));
+            r.addField(new TextField(
+                    CK_AUTHORIZATION_HEADER_NAME,
+                    "Authorization Header Name",
+                    "",
+                    "The name for the authorization header to use. If specified, all requests must contain this header with the correct value to authenticate successfully.",
+                    ConfigurationField.Optional.OPTIONAL));
+            r.addField(new TextField(
+                    CK_AUTHORIZATION_HEADER_VALUE,
+                    "Authorization Header Value",
+                    "",
+                    "The secret authorization header value which all request must have in order to authenticate successfully. e.g. Bearer: <api-token>",
+                    ConfigurationField.Optional.OPTIONAL,
+                    TextField.Attribute.IS_PASSWORD));
             return r;
         }
     }
