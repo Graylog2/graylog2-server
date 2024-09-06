@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageBase;
 import org.graylog.integrations.inputs.paloalto.PaloAltoParser;
 import org.graylog.schema.EventFields;
+import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
@@ -76,7 +77,7 @@ public class PaloAlto11xCodec implements Codec {
         }
         Message message = messageFactory.createMessage(p.payload(), p.source(), p.timestamp());
         message.addField(EventFields.EVENT_SOURCE_PRODUCT, "PAN");
-        message.addField(EventFields.EVENT_LOG_NAME, p.panType());
+        message.addField(VendorFields.VENDOR_SUBTYPE, p.panType());
         // Store full message if configured.
         if (configuration.getBoolean(CK_STORE_FULL_MESSAGE)) {
             message.addField(Message.FIELD_FULL_MESSAGE, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
