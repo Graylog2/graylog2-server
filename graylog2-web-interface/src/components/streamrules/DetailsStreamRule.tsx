@@ -109,7 +109,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
 
   return (
     <tr key={streamRule.id}>
-      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+      {}
       <td>
         <HumanReadableStreamRule streamRule={streamRule} inputs={inputs} />
         {description}
