@@ -35,4 +35,7 @@ public interface SearchType {
 
     @JsonProperty
     Set<String> streams();
+
+    @JsonProperty
+    Set<String> streamCategories();
 }

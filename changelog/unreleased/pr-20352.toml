@@ -1,0 +1,5 @@
+type = "a"
+message = "Display index overview by tier type."
+
+pulls = ["20352"]
+issues=["Graylog2/graylog-plugin-enterprise#8400"]

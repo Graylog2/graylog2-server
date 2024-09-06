@@ -1,0 +1,5 @@
+type="f"
+message="Reopen target index for remote reindex migration if this is closed."
+
+issues=["20208"]
+pulls=["20220"]

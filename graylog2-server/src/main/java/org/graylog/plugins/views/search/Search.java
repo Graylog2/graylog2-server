@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.graph.MutableGraph;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
@@ -43,13 +44,17 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.Collectors.toSet;
@@ -146,8 +151,72 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         return toBuilder().queries(newQueries).build();
     }
 
+    public Search addStreamsToQueriesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                                    StreamPermissions streamPermissions) {
+        if (!hasQueriesWithStreamCategories()) {
+            return this;
+        }
+        final Set<Query> withStreamCategories = queries().stream().filter(q -> !q.usedStreamCategories().isEmpty()).collect(toSet());
+        final Set<Query> withoutStreamCategories = Sets.difference(queries(), withStreamCategories);
+        final Set<Query> withMappedStreamCategories = new HashSet<>();
+
+        for (Query query : withStreamCategories) {
+            final Set<String> mappedStreamIds = categoryMappingFunction.apply(query.usedStreamCategories())
+                    .filter(streamPermissions::canReadStream)
+                    .collect(toSet());
+            withMappedStreamCategories.add(query.addStreamsToFilter(mappedStreamIds));
+        }
+
+        final ImmutableSet<Query> newQueries = Sets.union(withMappedStreamCategories, withoutStreamCategories).immutableCopy();
+
+        return toBuilder().queries(newQueries).build();
+    }
+
+    public Search addStreamsToSearchTypesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                                        StreamPermissions streamPermissions) {
+        if (!hasQuerySearchTypesWithStreamCategories()) {
+            return this;
+        }
+        final Set<Query> withStreamCategories = queries().stream()
+                .filter(q -> q.searchTypes().stream()
+                        .anyMatch(SearchType::hasStreamCategories))
+                .collect(toSet());
+        final Set<Query> withoutStreamCategories = Sets.difference(queries(), withStreamCategories);
+        final Set<Query> withMappedStreamCategories = new HashSet<>();
+
+        for (Query query : withStreamCategories) {
+            final Set<SearchType> mappedSearchTypes = new HashSet<>();
+            for (SearchType st : query.searchTypes()) {
+                if (!st.hasStreamCategories()) {
+                    mappedSearchTypes.add(st);
+                } else {
+                    final Set<String> mappedStreamIds = categoryMappingFunction.apply(st.streamCategories())
+                            .filter(streamPermissions::canReadStream)
+                            .collect(toSet());
+                    mappedStreamIds.addAll(st.streams());
+                    mappedSearchTypes.add(st.toBuilder().streams(mappedStreamIds).build());
+                }
+            }
+            withMappedStreamCategories.add(query.toBuilder().searchTypes(mappedSearchTypes).build());
+        }
+
+        final ImmutableSet<Query> newQueries = Sets.union(withMappedStreamCategories, withoutStreamCategories).immutableCopy();
+
+        return toBuilder().queries(newQueries).build();
+    }
+
     private boolean hasQueriesWithoutStreams() {
         return !queries().stream().allMatch(Query::hasStreams);
+    }
+
+    private boolean hasQueriesWithStreamCategories() {
+        return queries().stream().anyMatch(q -> !q.usedStreamCategories().isEmpty());
+    }
+
+    private boolean hasQuerySearchTypesWithStreamCategories() {
+        return queries().stream()
+                .flatMap(q -> q.searchTypes().stream())
+                .anyMatch(SearchType::hasStreamCategories);
     }
 
     public abstract Builder toBuilder();

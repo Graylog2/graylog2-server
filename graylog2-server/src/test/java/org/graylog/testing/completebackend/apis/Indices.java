@@ -94,7 +94,8 @@ public class Indices implements GraylogRestApi {
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
 
         return createIndexSet(indexSetSummary);

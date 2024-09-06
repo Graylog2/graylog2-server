@@ -37,6 +37,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * version.
  * TODO: Remove once DBJobDefinitionService is migrated to the new mongojack version.
  */
+@Deprecated(since = "6.1.0")
 public class DBCustomJobDefinitionService {
     private final MongoCollection<JobDefinitionDto> db;
 
@@ -45,6 +46,7 @@ public class DBCustomJobDefinitionService {
         this.db = collections.collection(DBJobDefinitionService.COLLECTION_NAME, JobDefinitionDto.class);
     }
 
+    @Deprecated(since = "6.1.0")
     public JobDefinitionDto findOrCreate(JobDefinitionDto dto) {
         var jobDefinitionId = new ObjectId(requireNonNull(dto.id(), "Job definition ID cannot be null"));
 

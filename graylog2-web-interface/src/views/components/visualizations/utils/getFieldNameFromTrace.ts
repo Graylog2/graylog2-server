@@ -14,18 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import ExpandedCustomFieldTypes from 'components/indices/IndexSetFieldTypeProfiles/ExpandedCustomFieldTypes';
+import type Series from 'views/logic/aggregationbuilder/Series';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
-const useExpandedSectionsRenderer = () => ({
-  customFieldMapping: {
-    title: 'Custom Field Mappings',
-    content: ({ customFieldMappings }: IndexSetFieldTypeProfile) => (
-      <ExpandedCustomFieldTypes customFieldMappings={customFieldMappings} />
-    ),
-  },
-});
+const getFieldNameFromTrace = ({ series, fullPath }: { series: Array<Series>, fullPath: string }) => {
+  const desireSeries = series.find((s) => {
+    const nameToFInd = s.config.name ?? s.function;
 
-export default useExpandedSectionsRenderer;
+    return fullPath.endsWith(nameToFInd);
+  });
+
+  if (!desireSeries) return null;
+
+  return parseSeries(desireSeries.function).field;
+};
+
+export default getFieldNameFromTrace;
