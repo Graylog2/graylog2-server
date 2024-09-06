@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageBase;
 import org.graylog.integrations.inputs.paloalto.PaloAltoParser;
 import org.graylog.schema.EventFields;
+import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
@@ -113,7 +114,7 @@ public class PaloAlto11xCodecTest {
     private void thenOutputMessageContainsExpectedFields(boolean shouldContainFullMessage) {
         assertNotNull(out);
         assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
-        assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("SYSTEM"));
+        assertThat(out.getField(VendorFields.VENDOR_SUBTYPE), is("SYSTEM"));
 
         if (shouldContainFullMessage) {
             assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(TEST_RAW_MESSAGE));
