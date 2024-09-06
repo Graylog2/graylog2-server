@@ -131,8 +131,7 @@ public class StreamDestinationFilterService {
             throw new IllegalArgumentException("id must be blank");
         }
 
-        optionalDestinationFilterCreationValidator.ifPresent(destinationFilterActionGuard ->
-                destinationFilterActionGuard.validate(dto));
+        optionalDestinationFilterCreationValidator.ifPresent(validator -> validator.validate(dto));
 
         // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
         final var dtoId = insertedId(collection.insertOne(dto.withStream(streamId)));

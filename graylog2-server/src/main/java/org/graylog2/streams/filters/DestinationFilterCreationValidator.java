@@ -27,7 +27,7 @@ public interface DestinationFilterCreationValidator {
      * If the creation is not allowed, an appropriate exception is thrown.
      *
      * @param destinationFilterRuleDTO dto that should be verified
-     * @throws IllegalStateException if the action is not permitted or fails validation
+     * @throws IllegalStateException if the creating filter is not permitted
      */
     void validate(StreamDestinationFilterRuleDTO destinationFilterRuleDTO) throws IllegalStateException;
 }
