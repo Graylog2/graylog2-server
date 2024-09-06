@@ -156,6 +156,8 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
       {({
         values,
         errors,
+        isValid,
+        isValidating,
         setFieldValue,
       }) => (
         <Form role="form">
@@ -273,7 +275,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
             <Spinner />
           ) : (
             <MigrationStepTriggerButtonToolbar hidden={hideActions}
-                                               disabled={Object.values(errors).length > 0}
+                                               disabled={!isValid || isValidating}
                                                nextSteps={nextSteps || currentStep.next_steps}
                                                onTriggerStep={handleTriggerNextStep}
                                                args={adaptArgs(values)} />
