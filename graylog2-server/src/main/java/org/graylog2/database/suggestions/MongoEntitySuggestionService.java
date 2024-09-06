@@ -36,6 +36,9 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+import static org.graylog2.users.UserImpl.COLLECTION_NAME;
+import static org.graylog2.users.UserImpl.LocalAdminUser.LOCAL_ADMIN_ID;
+import static org.graylog2.users.UserImpl.USERNAME;
 
 public class MongoEntitySuggestionService implements EntitySuggestionService {
 
@@ -50,7 +53,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
     }
 
     private boolean addAdminToSuggestions(final String collection, final String valueColumn) {
-        return "users".equals(collection) && "username".equals(valueColumn);
+        return COLLECTION_NAME.equals(collection) && USERNAME.equals(valueColumn);
     }
 
     private int fixSkipAndPagination(final boolean isSpecialCollection, final int page) {
@@ -85,7 +88,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 ? mongoPaginate(resultWithoutPagination, perPage - fixSkipAndPagination(isSpecialCollection, page), skip)
                 : paginateWithPermissionCheck(resultWithoutPagination, perPage - fixSkipAndPagination(isSpecialCollection, page), skip, checkPermission);
 
-        final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion("admin", "admin")) : List.of();
+        final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, "admin")) : List.of();
 
         final Stream<EntitySuggestion> suggestionsFromDB = documents
                 .map(doc ->
