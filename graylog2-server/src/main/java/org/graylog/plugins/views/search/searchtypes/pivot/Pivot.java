@@ -192,6 +192,7 @@ public abstract class Pivot implements SearchType {
         PivotEntity.Builder builder = PivotEntity.builder()
                 .sort(sort())
                 .streams(mappedStreams(entityDescriptorIds))
+                .streamCategories(streamCategories())
                 .timerange(timerange().orElse(null))
                 .columnGroups(columnGroups())
                 .rowGroups(rowGroups())
