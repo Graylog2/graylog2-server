@@ -108,7 +108,7 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     }
 
     Set<DataRoutedStream> checkForDataRoutedStreams(Optional<Set<String>> requestedStreams, Set<String> readableStreams, TimeRange timeRange, boolean isEmptyQuery) {
-        if (optionalStreamQueryExplainer.isPresent()) {
+        return optionalStreamQueryExplainer.ifPresent(explainer -> { ... }).orElse(Set.of());
             Instant from = timeRange.getFrom().toInstant().toDate().toInstant();
             Instant to = timeRange.getTo().toInstant().toDate().toInstant();
             StreamQueryInfo query = new StreamQueryInfo(requestedStreams, readableStreams, from, to, isEmptyQuery);
