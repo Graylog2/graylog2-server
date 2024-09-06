@@ -366,6 +366,9 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                                     final StreamFilter streamFilter = (StreamFilter) filter;
                                     final String streamId = getStreamEntityIdOrThrow(streamFilter.streamId(), entityDescriptorIds);
                                     return streamFilter.toBuilder().streamId(streamId).build();
+                                } else if (filter.type().equals(StreamCategoryFilter.NAME)) {
+                                    final StreamCategoryFilter streamFilter = (StreamCategoryFilter) filter;
+                                    return streamFilter.toBuilder().category(streamFilter.category()).build();
                                 }
                                 return filter;
                             }).collect(toSet());

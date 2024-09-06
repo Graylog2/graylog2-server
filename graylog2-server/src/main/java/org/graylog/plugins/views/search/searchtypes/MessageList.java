@@ -266,6 +266,7 @@ public abstract class MessageList implements SearchType {
         return MessageListEntity.builder()
                 .decorators(decorators())
                 .streams(mappedStreams(entityDescriptorIds))
+                .streamCategories(streamCategories())
                 .timerange(timerange().orElse(null))
                 .limit(limit())
                 .offset(offset())

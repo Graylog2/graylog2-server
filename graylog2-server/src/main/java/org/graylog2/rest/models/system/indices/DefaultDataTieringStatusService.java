@@ -14,18 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog2.rest.models.system.indices;
 
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import ExpandedCustomFieldTypes from 'components/indices/IndexSetFieldTypeProfiles/ExpandedCustomFieldTypes';
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.rest.resources.system.indexer.responses.DataTieringStatus;
 
-const useExpandedSectionsRenderer = () => ({
-  customFieldMapping: {
-    title: 'Custom Field Mappings',
-    content: ({ customFieldMappings }: IndexSetFieldTypeProfile) => (
-      <ExpandedCustomFieldTypes customFieldMappings={customFieldMappings} />
-    ),
-  },
-});
+public class DefaultDataTieringStatusService implements DataTieringStatusService {
 
-export default useExpandedSectionsRenderer;
+    @Override
+    public DataTieringStatus getStatus(IndexSet indexSet, IndexSetConfig indexSetConfig) {
+        return null;
+    }
+}

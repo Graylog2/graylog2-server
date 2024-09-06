@@ -91,6 +91,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String INDEX_SET_CREATE = PREFIX + "index_set:create";
     public static final String INDEX_SET_DELETE = PREFIX + "index_set:delete";
     public static final String INDEX_SET_UPDATE = PREFIX + "index_set:update";
+    public static final String INDEX_SET_DELETE_FAILED_SNAPSHOT = PREFIX + "index_set:delete_failed_snapshot";
     public static final String INDEX_SET_TEMPLATE_CREATE = PREFIX + "index_set_template:create";
     public static final String INDEX_SET_TEMPLATE_DELETE = PREFIX + "index_set_template:delete";
     public static final String INDEX_SET_TEMPLATE_UPDATE = PREFIX + "index_set_template:update";
@@ -242,6 +243,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(INDEX_SET_CREATE)
             .add(INDEX_SET_DELETE)
             .add(INDEX_SET_UPDATE)
+            .add(INDEX_SET_DELETE_FAILED_SNAPSHOT)
             .add(INDEX_SET_TEMPLATE_CREATE)
             .add(INDEX_SET_TEMPLATE_DELETE)
             .add(INDEX_SET_TEMPLATE_UPDATE)
