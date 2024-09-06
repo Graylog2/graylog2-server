@@ -57,10 +57,6 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         return COLLECTION_NAME.equals(collection) && USERNAME.equals(valueColumn) && (filterIsEmpty || LOCAL_ADMIN_ID.contains(query.toLowerCase(Locale.ENGLISH)));
     }
 
-    private int fixSkipAndPagination(final boolean isSpecialCollection, final int page) {
-        return isSpecialCollection && page == 1 ? 1 : 0;
-    }
-
     @Override
     public EntitySuggestionResponse suggest(final String collection,
                                             final String valueColumn,
@@ -71,6 +67,8 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
         final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
         final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn, filterIsEmpty, query);
+        final var isFirstPageAndSpecialCollection = isSpecialCollection && page == 1;
+        final var fixNumberOfItemsToReadFromDB = isFirstPageAndSpecialCollection ? 1 : 0;
 
         final var bsonFilter = !filterIsEmpty
                 ? Filters.regex(valueColumn, query, "i")
@@ -82,13 +80,11 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 .sort(Sorts.ascending(valueColumn));
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
-        final var skip = Math.max(0, (page - 1) * perPage - fixSkipAndPagination(isSpecialCollection, page));
+        final var skip = Math.max(0, (page - 1) * perPage - fixNumberOfItemsToReadFromDB);
         final var checkPermission = permissionsUtils.createPermissionCheck(subject, collection);
         final var documents = userCanReadAllEntities
-                ? mongoPaginate(resultWithoutPagination, perPage - fixSkipAndPagination(isSpecialCollection, page), skip)
-                : paginateWithPermissionCheck(resultWithoutPagination, perPage - fixSkipAndPagination(isSpecialCollection, page), skip, checkPermission);
-
-        final var isFirstPageAndSpecialCollection = isSpecialCollection && page == 1;
+                ? mongoPaginate(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip)
+                : paginateWithPermissionCheck(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip, checkPermission);
 
         final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, "admin")) : List.of();
 
