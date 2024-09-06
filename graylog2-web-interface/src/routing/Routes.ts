@@ -42,6 +42,7 @@ type SearchQueryParams = {
   to?: string,
   keyword?: string,
   streams?: string,
+  stream_categories?: string,
 }
 
 const Routes = {
@@ -213,7 +214,7 @@ const Routes = {
   },
   EXTENDEDSEARCH: extendedSearchPath,
   KEYBOARD_SHORTCUTS: '/keyboard-shortcuts',
-  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange, streams?: string[]) => {
+  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange, streams?: string[], streamCategories?: string[]) => {
     const route = new URI(Routes.SEARCH);
     const queryParams: SearchQueryParams = {
       q: query,
@@ -240,6 +241,10 @@ const Routes = {
 
     if (streams) {
       queryParams.streams = streams.join(',');
+    }
+
+    if (streamCategories) {
+      queryParams.stream_categories = streamCategories.join(',');
     }
 
     route.query(queryParams);
