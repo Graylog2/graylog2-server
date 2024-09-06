@@ -271,6 +271,7 @@ public abstract class EventList implements SearchType, HasAttributeFilter {
     public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         return EventListEntity.builder()
                 .streams(mappedStreams(entityDescriptorIds))
+                .streamCategories(streamCategories())
                 .filter(filter())
                 .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .id(id())
