@@ -212,7 +212,7 @@ const QueryValidation = () => {
                                 $clickable
                                 tabIndex={0}
                                 type="button">
-              <ErrorIcon $status={status} name={isInfo ? "database" : "error"} />
+              <ErrorIcon $status={status} name={isInfo ? 'database' : 'error'} />
               {!isInfo && <ErrorIcon $status={status} name="error" />}
             </ExplanationTrigger>
           ) : (
