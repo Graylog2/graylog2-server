@@ -71,7 +71,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
         final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn);
         final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
-        final boolean filterMatchesInSpecialCollection = isSpecialCollection && !filterIsEmpty && LOCAL_ADMIN_ID.contains(query.toLowerCase(Locale.getDefault()));
+        final boolean filterMatchesInSpecialCollection = isSpecialCollection && !filterIsEmpty && LOCAL_ADMIN_ID.contains(query.toLowerCase(Locale.ENGLISH));
 
         final var bsonFilter = !filterIsEmpty
                 ? Filters.regex(valueColumn, query, "i")
