@@ -185,9 +185,7 @@ type FieldValueProvider = {
 interface PluginDataWarehouse {
   StreamDataWarehouse: React.ComponentType,
   DataWarehouseStatus: React.ComponentType<{
-    stream: {
-      enabled_status: boolean;
-    }
+    datawareHouseEnabled: boolean;
   }>,
   DataWarehouseJournal: React.ComponentType<{
     nodeId: string,
