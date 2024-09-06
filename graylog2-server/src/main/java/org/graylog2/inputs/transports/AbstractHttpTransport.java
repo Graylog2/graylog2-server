@@ -132,19 +132,15 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     @Override
     public void launch(MessageInput input, @Nullable InputFailureRecorder inputFailureRecorder) throws MisfireException {
         if (isNotBlank(authorizationHeader) && isBlank(authorizationHeaderValue)) {
-            checkForConfigFieldDependencies(inputFailureRecorder, AUTHORIZATION_HEADER_NAME_LABEL, AUTHORIZATION_HEADER_VALUE_LABEL);
+            checkForConfigFieldDependencies(AUTHORIZATION_HEADER_NAME_LABEL, AUTHORIZATION_HEADER_VALUE_LABEL);
         } else if (isNotBlank(authorizationHeaderValue) && isBlank(authorizationHeader)) {
-            checkForConfigFieldDependencies(inputFailureRecorder, AUTHORIZATION_HEADER_VALUE_LABEL, AUTHORIZATION_HEADER_NAME_LABEL);
+            checkForConfigFieldDependencies(AUTHORIZATION_HEADER_VALUE_LABEL, AUTHORIZATION_HEADER_NAME_LABEL);
         }
         super.launch(input, inputFailureRecorder);
     }
 
-    private void checkForConfigFieldDependencies(@Nullable InputFailureRecorder inputFailureRecorder, String configParam1, String configParam2) throws MisfireException {
-        final String errorMessage = "The [%s] configuration parameter cannot be used without also specifying a value for [%s].";
-        if (inputFailureRecorder != null) {
-            inputFailureRecorder.setFailing(this.getClass(), errorMessage);
-        }
-        throw new MisfireException(f(errorMessage, configParam1, configParam2));
+    private void checkForConfigFieldDependencies(String configParam1, String configParam2) throws MisfireException {
+        throw new MisfireException(f("The [%s] configuration parameter cannot be used without also specifying a value for [%s].", configParam1, configParam2));
     }
 
     @ConfigClass
