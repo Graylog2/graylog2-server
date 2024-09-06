@@ -69,8 +69,10 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
         final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn);
+        final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
+        final boolean filterMatchesInSpecialCollection = isSpecialCollection && !filterIsEmpty && LOCAL_ADMIN_ID.contains(query.toLowerCase());
 
-        final var bsonFilter = !Strings.isNullOrEmpty(query)
+        final var bsonFilter = !filterIsEmpty
                 ? Filters.regex(valueColumn, query, "i")
                 : Filters.empty();
 
@@ -88,7 +90,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 ? mongoPaginate(resultWithoutPagination, perPage - fixSkipAndPagination(isSpecialCollection, page), skip)
                 : paginateWithPermissionCheck(resultWithoutPagination, perPage - fixSkipAndPagination(isSpecialCollection, page), skip, checkPermission);
 
-        final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, "admin")) : List.of();
+        final List<EntitySuggestion> staticEntry = (isFirstPageAndSpecialCollection && filterIsEmpty) || (isSpecialCollection && filterMatchesInSpecialCollection) ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, "admin")) : List.of();
 
         final Stream<EntitySuggestion> suggestionsFromDB = documents
                 .map(doc ->
