@@ -16,8 +16,18 @@
  */
 package org.graylog2.streams.filters;
 
-public class DestinationFilterActionException extends Exception {
-    public DestinationFilterActionException(String message) {
-        super(message);
-    }
+/**
+ * An interface for validating whether the creation of a new destination filter should be allowed; otherwise, it throws an {@link IllegalStateException}
+ *
+ */
+public interface DestinationFilterCreationValidator {
+
+    /**
+     * This method checks if the specified criteria for creating a new destination filter are met.
+     * If the creation is not allowed, an appropriate exception is thrown.
+     *
+     * @param destinationFilterRuleDTO dto that should be verified
+     * @throws IllegalStateException if the action is not permitted or fails validation
+     */
+    void validate(StreamDestinationFilterRuleDTO destinationFilterRuleDTO) throws IllegalStateException;
 }

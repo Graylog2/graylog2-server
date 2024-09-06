@@ -61,7 +61,6 @@ import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
 import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.graylog2.streams.StreamDeletionGuard;
-import org.graylog2.streams.filters.DestinationFilterActionGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -301,10 +300,6 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<String, FilteredMessageOutput> filteredOutputsMapBinder() {
         return MapBinder.newMapBinder(binder(), String.class, FilteredMessageOutput.class);
-    }
-
-    protected MapBinder<String, DestinationFilterActionGuard> destinationFilterActionGuardMapBinder() {
-        return MapBinder.newMapBinder(binder(), String.class, DestinationFilterActionGuard.class);
     }
 
     protected Multibinder<PluginPermissions> permissionsBinder() {

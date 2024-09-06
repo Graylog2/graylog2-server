@@ -33,6 +33,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -44,12 +45,12 @@ import static org.mockito.Mockito.doThrow;
 class StreamDestinationFilterServiceTest {
 
     @Mock
-    private DestinationFilterActionGuard mockedFilterLicenseCheck;
+    private DestinationFilterCreationValidator mockedFilterLicenseCheck;
     private StreamDestinationFilterService service;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()), Map.of("checked-destination", mockedFilterLicenseCheck));
+        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()), Optional.of(mockedFilterLicenseCheck));
     }
 
     @Test
@@ -134,8 +135,7 @@ class StreamDestinationFilterServiceTest {
     }
 
     @Test
-    void createForStreamThrowsExceptionWhenLicenseCheckFails() throws DestinationFilterActionException {
-        doThrow(new DestinationFilterActionException("Invalid action!")).when(mockedFilterLicenseCheck).checkAction(DestinationFilterActionGuard.ActionType.CREATE);
+    void createForStreamThrowsExceptionWhenLicenseCheckFails() throws IllegalStateException {
         StreamDestinationFilterRuleDTO filterDto = StreamDestinationFilterRuleDTO.builder()
                 .title("Test")
                 .description("A Test")
@@ -152,6 +152,7 @@ class StreamDestinationFilterServiceTest {
                         ))
                         .build())
                 .build();
+        doThrow(new IllegalStateException("Invalid action!")).when(mockedFilterLicenseCheck).validate(filterDto);
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> service.createForStream("stream-1", filterDto));
         assertThat(exception.getMessage()).contains("Invalid action!");

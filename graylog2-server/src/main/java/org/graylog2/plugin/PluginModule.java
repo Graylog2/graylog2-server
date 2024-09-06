@@ -73,7 +73,6 @@ import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.graylog2.streams.StreamDeletionGuard;
-import org.graylog2.streams.filters.DestinationFilterActionGuard;
 import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 import org.graylog2.web.PluginUISettingsProvider;
 
@@ -130,10 +129,6 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addFilteredMessageOutput(String name, Class<? extends FilteredMessageOutput> filteredMessageOutputClass) {
         filteredOutputsMapBinder().addBinding(name).to(filteredMessageOutputClass);
-    }
-
-    protected void addDestinationFilterActionGuard(String name, Class<? extends DestinationFilterActionGuard> destinationFilterLicenseCheckClass) {
-        destinationFilterActionGuardMapBinder().addBinding(name).to(destinationFilterLicenseCheckClass);
     }
 
     // This should only be used by plugins that have been built before Graylog 3.0.1.
