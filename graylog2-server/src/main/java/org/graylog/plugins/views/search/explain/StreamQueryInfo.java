@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.views.search.explain;
 
-public enum ValidationStatusDTO {
-    OK,
-    INFO,
-    WARNING,
-    ERROR
-}
+import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
+
+public record StreamQueryInfo(Optional<Set<String>> requestedStreams, Set<String> readableStreams, Instant from, Instant to, boolean isEmptyQuery) {}

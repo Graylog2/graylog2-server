@@ -14,11 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog2.rest.resources.system.indexer.responses;
 
-public enum ValidationStatusDTO {
-    OK,
-    INFO,
-    WARNING,
-    ERROR
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+
+public abstract class DataTieringStatus {
+    protected static final String FIELD_TYPE = "type";
+
+    // Every subclass needs to implement type!
+    @JsonProperty(FIELD_TYPE)
+    public abstract String type();
 }

@@ -14,11 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog2.rest.models.system.indices;
 
-public enum ValidationStatusDTO {
-    OK,
-    INFO,
-    WARNING,
-    ERROR
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.rest.resources.system.indexer.responses.DataTieringStatus;
+
+/**
+ * Provides access to data-tiering features, but only when called in an environment that support it
+ * (i.e. an Enterprise installation).
+ * This allows callers to be agnostic, simplifying the code.
+ */
+public interface DataTieringStatusService {
+    /**
+     * Return data-tiering status, if available in the caller's environment
+     */
+    DataTieringStatus getStatus(IndexSet indexSet, IndexSetConfig indexSetConfig);
 }

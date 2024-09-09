@@ -28,28 +28,32 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 
-public class HttpTransport extends AbstractHttpTransport {
-    private static final String PATH = "/gelf";
+/**
+ * Raw version of the HttpTransport which uses the `/raw` path instead of the `/gelf` path.
+ */
+public class RawHttpTransport extends AbstractHttpTransport {
+    private static final String PATH = "/raw";
 
     @AssistedInject
-    public HttpTransport(@Assisted Configuration configuration,
-                         EventLoopGroup eventLoopGroup,
-                         EventLoopGroupFactory eventLoopGroupFactory,
-                         NettyTransportConfiguration nettyTransportConfiguration,
-                         ThroughputCounter throughputCounter,
-                         LocalMetricRegistry localRegistry,
-                         TLSProtocolsConfiguration tlsConfiguration) {
-        super(configuration, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, throughputCounter,
-                localRegistry, tlsConfiguration, PATH);
+    public RawHttpTransport(@Assisted Configuration configuration,
+                            EventLoopGroup eventLoopGroup,
+                            EventLoopGroupFactory eventLoopGroupFactory,
+                            NettyTransportConfiguration nettyTransportConfiguration,
+                            ThroughputCounter throughputCounter,
+                            LocalMetricRegistry localRegistry,
+                            TLSProtocolsConfiguration tlsConfiguration) {
+        super(configuration, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration,
+                throughputCounter, localRegistry, tlsConfiguration, PATH);
+
     }
 
     @FactoryClass
-    public interface Factory extends Transport.Factory<HttpTransport> {
+    public interface Factory extends Transport.Factory<RawHttpTransport> {
         @Override
-        HttpTransport create(Configuration configuration);
+        RawHttpTransport create(Configuration configuration);
 
         @Override
-        HttpTransport.Config getConfig();
+        Config getConfig();
     }
 
     @ConfigClass

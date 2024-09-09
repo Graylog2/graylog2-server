@@ -53,7 +53,7 @@ import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_
 import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_TITLE;
 
 public class StreamDestinationFilterService {
-    static final String COLLECTION = "stream_destination_filters";
+    public static final String COLLECTION = "stream_destination_filters";
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(FIELD_TITLE, SearchQueryField.create(FIELD_TITLE))

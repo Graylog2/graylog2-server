@@ -14,11 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog2.rest.models.system.indices;
 
-public enum ValidationStatusDTO {
-    OK,
-    INFO,
-    WARNING,
-    ERROR
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.rest.resources.system.indexer.responses.DataTieringStatus;
+
+public class DefaultDataTieringStatusService implements DataTieringStatusService {
+
+    @Override
+    public DataTieringStatus getStatus(IndexSet indexSet, IndexSetConfig indexSetConfig) {
+        return null;
+    }
 }
