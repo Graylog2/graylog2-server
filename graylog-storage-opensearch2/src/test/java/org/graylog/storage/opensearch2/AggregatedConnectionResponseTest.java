@@ -36,13 +36,17 @@ class AggregatedConnectionResponseTest {
     @Test
     void testAggregateIndices() {
         final AggregatedConnectionResponse aggregatedResponse = new AggregatedConnectionResponse(Map.of(
-                "node-one", new ConnectionCheckResponse(List.of("graylog_0", "graylog_1", "graylog_2"), Collections.emptyList(), null),
-                "node-two", new ConnectionCheckResponse(List.of("graylog_0", "graylog_1", "graylog_2"), Collections.emptyList(), null),
-                "node-three", new ConnectionCheckResponse(List.of("graylog_0", "graylog_1", "graylog_2"), Collections.emptyList(), null)
+                "node-one", new ConnectionCheckResponse(List.of(i("graylog_0"), i("graylog_1"), i("graylog_2")), Collections.emptyList(), null),
+                "node-two", new ConnectionCheckResponse(List.of(i("graylog_0"), i("graylog_1"), i("graylog_2")), Collections.emptyList(), null),
+                "node-three", new ConnectionCheckResponse(List.of(i("graylog_0"), i("graylog_1"), i("graylog_2")), Collections.emptyList(), null)
         ));
         Assertions.assertThat(aggregatedResponse.indices())
                 .hasSize(3)
-                .contains("graylog_0", "graylog_1", "graylog_2");
+                .contains(i("graylog_0"), i("graylog_1"), i("graylog_2"));
+    }
+
+    private ConnectionCheckIndex i(String indexName) {
+        return new ConnectionCheckIndex(indexName, false);
     }
 
     @Test
@@ -75,9 +79,9 @@ class AggregatedConnectionResponseTest {
 
 
         final AggregatedConnectionResponse aggregatedResponse = new AggregatedConnectionResponse(Map.of(
-                "node-one", new ConnectionCheckResponse(List.of("graylog_0", "graylog_1", "graylog_2"), Collections.singletonList(pemCert), null),
-                "node-two", new ConnectionCheckResponse(List.of("graylog_0", "graylog_1", "graylog_2"), Collections.singletonList(pemCert), null),
-                "node-three", new ConnectionCheckResponse(List.of("graylog_0", "graylog_1", "graylog_2"), Collections.singletonList(pemCert), null)
+                "node-one", new ConnectionCheckResponse(List.of(i("graylog_0"), i("graylog_1"), i("graylog_2")), Collections.singletonList(pemCert), null),
+                "node-two", new ConnectionCheckResponse(List.of(i("graylog_0"), i("graylog_1"), i("graylog_2")), Collections.singletonList(pemCert), null),
+                "node-three", new ConnectionCheckResponse(List.of(i("graylog_0"), i("graylog_1"), i("graylog_2")), Collections.singletonList(pemCert), null)
         ));
 
         Assertions.assertThat(aggregatedResponse.certificates())
@@ -94,9 +98,9 @@ class AggregatedConnectionResponseTest {
 
 
         final AggregatedConnectionResponse aggregatedResponse = new AggregatedConnectionResponse(Map.of(
-                "node-one", new ConnectionCheckResponse(List.of("graylog_0", "graylog_1", "graylog_2"), Collections.singletonList(pemCert), "Unknown cert"),
-                "node-two", new ConnectionCheckResponse(List.of("graylog_0", "graylog_1", "graylog_2"), Collections.singletonList(pemCert), "Unknown cert"),
-                "node-three", new ConnectionCheckResponse(List.of("graylog_0", "graylog_1", "graylog_2"), Collections.singletonList(pemCert), "Unknown cert")
+                "node-one", new ConnectionCheckResponse(List.of(i("graylog_0"), i("graylog_1"), i("graylog_2")), Collections.singletonList(pemCert), "Unknown cert"),
+                "node-two", new ConnectionCheckResponse(List.of(i("graylog_0"), i("graylog_1"), i("graylog_2")), Collections.singletonList(pemCert), "Unknown cert"),
+                "node-three", new ConnectionCheckResponse(List.of(i("graylog_0"), i("graylog_1"), i("graylog_2")), Collections.singletonList(pemCert), "Unknown cert")
         ));
 
         Assertions.assertThat(aggregatedResponse.error())

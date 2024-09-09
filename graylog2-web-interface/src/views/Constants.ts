@@ -24,6 +24,7 @@ import type { AutoTimeConfig } from 'views/logic/aggregationbuilder/Pivot';
 export type SearchBarFormValues = {
   timerange: TimeRange,
   streams: Array<string>,
+  streamCategories: Array<string>,
   queryString: string,
 };
 

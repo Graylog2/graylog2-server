@@ -23,6 +23,7 @@ import styled from 'styled-components';
 import { Alert, Input, Row, Col } from 'components/bootstrap';
 import { SearchForm, Spinner, Icon } from 'components/common';
 import { getValueFromInput } from 'util/FormsUtils';
+import { compare as naturalSort } from 'logic/DefaultCompare';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
@@ -43,6 +44,7 @@ const SearchContainer = styled.div`
 type RemoteIndex = {
   name: string,
   managed: boolean,
+  closed: boolean,
 }
 
 type RemoteReindexCheckConnection = {
@@ -58,14 +60,14 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   const [selectedIndices, setSelectedIndices] = useState<RemoteIndex[]>([]);
   const [queryIndex, setQueryIndex] = useState<string>('');
 
-  const { initialValues, saveFormValues } = useSaveRemoteReindexMigrationFormValues(!hideActions);
+  const { initialValues, saveFormValues } = useSaveRemoteReindexMigrationFormValues();
 
   const handleConnectionCheck = (step: MigrationActions, data: MigrationState, args?: StepArgs) => {
     if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
       const checkConnectionResult = data?.response as RemoteReindexCheckConnection;
 
       if (checkConnectionResult?.indices?.length) {
-        setAvailableIndices(checkConnectionResult.indices);
+        setAvailableIndices(checkConnectionResult.indices.sort((a, b) => naturalSort({ numeric: true, sensitivity: 'base' })(a.name, b.name)));
         setSelectedIndices(checkConnectionResult.indices.filter((i) => i.managed));
         setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
         saveFormValues(args as RemoteReindexRequest);
@@ -108,7 +110,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
       value = (value || 0) < 1 ? DEFAULT_THREADS_COUNT : value;
     }
 
-    await callback(e.target.name, value);
+    await callback(e.target.name, value, true);
 
     resetConnectionCheck();
   };
@@ -130,12 +132,32 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   const filteredSelectedIndices = selectedIndices.filter((index) => filteredIndices.includes(index));
   const areAllIndicesSelected = filteredSelectedIndices.length === filteredIndices.length;
 
+  const adaptArgs = (args: RemoteReindexRequest): RemoteReindexRequest => ({
+    ...args,
+    hostname: args.hostname.endsWith('/') ? args.hostname.slice(0, -1) : args.hostname,
+    indices: filteredSelectedIndices.map((i) => i.name),
+  });
+
+  const validate = (values: RemoteReindexRequest) => {
+    let errors = {};
+
+    if (!values.hostname) {
+      errors = { ...errors, hostname: 'Hostname is required.' };
+    }
+
+    return errors;
+  };
+
   return (
     <Formik enableReinitialize
             initialValues={initialValues}
+            validate={validate}
             onSubmit={() => {}}>
       {({
         values,
+        errors,
+        isValid,
+        isValidating,
         setFieldValue,
       }) => (
         <Form role="form">
@@ -148,6 +170,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
                  disabled={isLoading}
                  value={values.hostname}
                  onChange={(e) => handleChange(e, setFieldValue)}
+                 error={errors?.hostname}
                  required />
           <Row>
             <Col md={6}>
@@ -228,9 +251,13 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
                          label={(
                            <>
                              <span>{index.name} </span>
-                             {!index.managed && (
+                             {!index.managed && !index.closed && (
                                <Icon name="warning"
                                      title="This is an index not managed by Graylog. If you import it, you will not be able to query it in Graylog." />
+                             )}
+                             {index.closed && (
+                               <Icon name="warning"
+                                     title="This index is closed, will be reopened and closed again during the migration." />
                              )}
                            </>
                          )}
@@ -248,12 +275,10 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
             <Spinner />
           ) : (
             <MigrationStepTriggerButtonToolbar hidden={hideActions}
+                                               disabled={!isValid || isValidating}
                                                nextSteps={nextSteps || currentStep.next_steps}
                                                onTriggerStep={handleTriggerNextStep}
-                                               args={{
-                                                 ...values,
-                                                 indices: filteredSelectedIndices.map((i) => i.name),
-                                               } as RemoteReindexRequest} />
+                                               args={adaptArgs(values)} />
           )}
         </Form>
       )}

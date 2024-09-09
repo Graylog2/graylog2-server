@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
 
-interface EnterpriseTrafficGraph {
-  layout: string;
-  children: React.ReactNode;
-}
+import type Series from 'views/logic/aggregationbuilder/Series';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
-interface LicensePlugin {
-  EnterpriseTrafficGraph?: React.ComponentType<EnterpriseTrafficGraph>;
-}
+const getFieldNameFromTrace = ({ series, fullPath }: { series: Array<Series>, fullPath: string }) => {
+  const desireSeries = series.find((s) => {
+    const nameToFInd = s.config.name ?? s.function;
 
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    license?: LicensePlugin;
-  }
-}
+    return fullPath.endsWith(nameToFInd);
+  });
+
+  if (!desireSeries) return null;
+
+  return parseSeries(desireSeries.function).field;
+};
+
+export default getFieldNameFromTrace;

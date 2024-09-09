@@ -25,7 +25,7 @@ import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { RetentionStrategyConfig, RotationStrategyConfig } from 'components/indices/Types';
 import { RetentionStrategyConfigPropType, RotationStrategyConfigPropType } from 'components/indices/Types';
-import type { DataTieringConfig, DataTieringFormValues } from 'components/indices/data-tiering';
+import type { DataTieringConfig, DataTieringFormValues, DataTieringStatus } from 'components/indices/data-tiering';
 
 export const IndexSetPropType = PropTypes.shape({
   can_be_default: PropTypes.bool,
@@ -73,7 +73,10 @@ export type IndexSetConfig = {
   use_legacy_rotation?: boolean
 }
 
-export type IndexSet = IndexSetConfig & { data_tiering?: DataTieringConfig };
+export type IndexSet = IndexSetConfig & {
+  data_tiering?: DataTieringConfig,
+  data_tiering_status?: DataTieringStatus
+};
 
 export type IndexSetFormValues = IndexSetConfig & { data_tiering?: DataTieringFormValues };
 
@@ -83,11 +86,11 @@ export type IndexSetStats = {
   size: number,
 }
 
-type IndexSetsStats = {
+export type IndexSetsStats = {
   [key: string]: IndexSetStats
 }
 
-type IndexSetsResponseType = {
+export type IndexSetsResponseType = {
   total: number,
   index_sets: Array<IndexSet>,
   stats: IndexSetsStats,
