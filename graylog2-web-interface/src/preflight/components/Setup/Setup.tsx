@@ -17,7 +17,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-
 import DocsHelper from 'util/DocsHelper';
 import Section from 'preflight/components/common/Section';
 import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
