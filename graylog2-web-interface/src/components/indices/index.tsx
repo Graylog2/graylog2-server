@@ -19,6 +19,7 @@ export { default as CreateIndexSet } from './CreateIndexSet';
 export { default as IndexDetails } from './IndexDetails';
 export { default as IndexRangeSummary } from './IndexRangeSummary';
 export { default as IndicesConfigurationDropdown } from './IndicesConfigurationDropdown';
+export { default as IndexSection } from './IndexSection';
 export { default as IndexSetConfigurationForm } from './IndexSetConfigurationForm';
 export { default as IndexSetDeletionForm } from './IndexSetDeletionForm';
 export { default as IndexSetDetails } from './IndexSetDetails';
