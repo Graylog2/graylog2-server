@@ -14,11 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.views.search.explain;
 
-public enum ValidationStatusDTO {
-    OK,
-    INFO,
-    WARNING,
-    ERROR
+import java.util.Set;
+
+/**
+ * An interface that provides information on whether other stream-based databases are affected by the executed query.
+ *
+ */
+public interface StreamQueryExplainer {
+    /**
+     * Generate a backend-specific query out of the logical query structure.
+     *
+     * @param streamQueryInfo holds stream relevant query information
+     * @return a set of streams that were routed to another destination then es/os
+     */
+    Set<DataRoutedStream> explain(StreamQueryInfo streamQueryInfo);
 }
