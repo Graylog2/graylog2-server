@@ -24,8 +24,6 @@ import { IndexerClusterHealth } from 'components/indexers';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
 
-import Alert from '../components/bootstrap/Alert';
-
 const DataNodesPage = () => (
   <DocumentTitle title="Data Nodes">
     <DataNodesPageNavigation />
