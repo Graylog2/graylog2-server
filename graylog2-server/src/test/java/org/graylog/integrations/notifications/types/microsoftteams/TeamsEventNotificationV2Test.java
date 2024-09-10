@@ -65,7 +65,6 @@ public class TeamsEventNotificationV2Test {
     TeamsEventNotificationV2 teamsEventNotification;
 
     private final NodeId nodeId = new SimpleNodeId("12345");
-    private final MessageFactory messageFactory = new TestMessageFactory();
     private final String defaultTemplate = """
             {  "type": "message",
               "attachments": [
