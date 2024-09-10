@@ -51,9 +51,9 @@ public abstract class StreamDestinationFilterRuleDTO implements MongoEntity {
     private static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     static final String FIELD_DESCRIPTION = "description";
-    static final String FIELD_STREAM_ID = "stream_id";
-    static final String FIELD_DESTINATION_TYPE = "destination_type";
-    static final String FIELD_STATUS = "status";
+    public static final String FIELD_STREAM_ID = "stream_id";
+    public static final String FIELD_DESTINATION_TYPE = "destination_type";
+    public static final String FIELD_STATUS = "status";
     private static final String FIELD_RULE = "rule";
 
     @JsonProperty(FIELD_TITLE)

@@ -30,6 +30,9 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.explain.DataRoutedStream;
+import org.graylog.plugins.views.search.explain.StreamQueryExplainer;
+import org.graylog.plugins.views.search.explain.StreamQueryInfo;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
@@ -38,13 +41,17 @@ import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,13 +66,16 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class QueryValidationResource extends RestResource implements PluginRestResource {
 
     private final QueryValidationService queryValidationService;
+    private final Optional<StreamQueryExplainer> optionalStreamQueryExplainer;
 
     private final IndexLookup indexLookup;
 
     @Inject
     public QueryValidationResource(final QueryValidationService queryValidationService,
+                                   final Optional<StreamQueryExplainer> optionalStreamQueryExplainer,
                                    final IndexLookup indexLookup) {
         this.queryValidationService = queryValidationService;
+        this.optionalStreamQueryExplainer = optionalStreamQueryExplainer;
         this.indexLookup = indexLookup;
     }
 
@@ -79,15 +89,31 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     ) {
         ValidationRequest request = prepareRequest(validationRequest, searchUser);
         final ValidationResponse response = queryValidationService.validate(request);
-        Set<ExplainResults.IndexRangeResult> searchedIndexRanges = indexRanges(request);
+        final Set<ExplainResults.IndexRangeResult> searchedIndexRanges = indexRanges(request);
+        final Optional<Set<String>> requestedStreams = validationRequest.streams();
+        final Set<String> readableStreams = request.streams();
+        final Set<DataRoutedStream> dataRoutedStreams = checkForDataRoutedStreams(requestedStreams, readableStreams, request.timerange(), request.isEmptyQuery());
+        final boolean hasDataRoutedStreams = dataRoutedStreams != null && !dataRoutedStreams.isEmpty();
+        final Optional<TimeRange> requestedRangeAsAbsolut = validationRequest.timerange().map(timeRange -> AbsoluteRange.create(timeRange.getFrom(), timeRange.getTo()));
         return ValidationResponseDTO.create(
-                toStatus(response.status(), containsWarmIndices(searchedIndexRanges)),
+                toStatus(response.status(), containsWarmIndices(searchedIndexRanges), hasDataRoutedStreams),
                 toExplanations(response),
-                searchedIndexRanges);
+                searchedIndexRanges,
+                dataRoutedStreams,
+                requestedRangeAsAbsolut);
     }
 
     private boolean containsWarmIndices(Set<ExplainResults.IndexRangeResult> searchedIndexRanges) {
         return searchedIndexRanges.stream().anyMatch(ExplainResults.IndexRangeResult::isWarmTiered);
+    }
+
+    Set<DataRoutedStream> checkForDataRoutedStreams(Optional<Set<String>> requestedStreams, Set<String> readableStreams, TimeRange timeRange, boolean isEmptyQuery) {
+        return optionalStreamQueryExplainer.map(streamQueryExplainer -> {
+            Instant from = timeRange.getFrom().toInstant().toDate().toInstant();
+            Instant to = timeRange.getTo().toInstant().toDate().toInstant();
+            StreamQueryInfo query = new StreamQueryInfo(requestedStreams, readableStreams, from, to, isEmptyQuery);
+            return optionalStreamQueryExplainer.get().explain(query);
+        }).orElse(Set.of());
     }
 
     private ValidationRequest prepareRequest(ValidationRequestDTO validationRequest, SearchUser searchUser) {
@@ -123,15 +149,23 @@ public class QueryValidationResource extends RestResource implements PluginRestR
                 .collect(toImmutableSet());
     }
 
-    private ValidationStatusDTO toStatus(final ValidationStatus status, boolean hasWarmIndices) {
+    private ValidationStatusDTO toStatus(final ValidationStatus status, boolean hasWarmIndices, boolean hasDataRoutedStreams) {
         ValidationStatusDTO validationStatusDTO = switch (status) {
             case WARNING -> ValidationStatusDTO.WARNING;
             case ERROR -> ValidationStatusDTO.ERROR;
             default -> ValidationStatusDTO.OK;
         };
-        if (validationStatusDTO == ValidationStatusDTO.OK) {
-            return hasWarmIndices ? ValidationStatusDTO.WARNING : ValidationStatusDTO.OK;
+
+        boolean isOk = validationStatusDTO == ValidationStatusDTO.OK;
+
+        if (isOk && hasWarmIndices) {
+            return ValidationStatusDTO.WARNING;
         }
+
+        if (isOk && hasDataRoutedStreams) {
+            return ValidationStatusDTO.INFO;
+        }
+
         return validationStatusDTO;
     }
 
