@@ -37,11 +37,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.BDDMockito.given;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -80,11 +82,11 @@ public class PaloAlto11xCodecTest {
     }
 
     @Test
-    public void decode_returnsNull_whenRawPaloParseFails() {
+    public void decode_returnsDefaults_whenRawPaloParseFails() {
         givenGoodInputRawMessage();
         givenRawParserReturnsNull();
         whenDecodeIsCalled();
-        thenOutputMessageIsNull();
+        thenOutputMessageIsDefaults();
     }
 
     // GIVENs
@@ -113,7 +115,7 @@ public class PaloAlto11xCodecTest {
 
     private void thenOutputMessageContainsExpectedFields(boolean shouldContainFullMessage) {
         assertNotNull(out);
-        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
+        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is(PaloAlto11xCodec.EVENT_SOURCE_PRODUCT_NAME));
         assertThat(out.getField(VendorFields.VENDOR_SUBTYPE), is("SYSTEM"));
 
         if (shouldContainFullMessage) {
@@ -123,7 +125,11 @@ public class PaloAlto11xCodecTest {
         }
     }
 
-    private void thenOutputMessageIsNull() {
-        assertThat(out, nullValue());
+    private void thenOutputMessageIsDefaults() {
+        assertNotNull(out);
+        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is(PaloAlto11xCodec.EVENT_SOURCE_PRODUCT_NAME));
+        assertThat(out.getField(VendorFields.VENDOR_SUBTYPE), is(PaloAlto11xCodec.UNKNOWN));
+        assertThat(out.getField(Message.FIELD_MESSAGE), is(TEST_RAW_MESSAGE));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), notNullValue());
     }
 }
