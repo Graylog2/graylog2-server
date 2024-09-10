@@ -24,6 +24,7 @@ import org.graylog.schema.EventFields;
 import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
@@ -34,13 +35,17 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class PaloAlto11xCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(PaloAlto11xCodec.class);
@@ -48,6 +53,9 @@ public class PaloAlto11xCodec implements Codec {
     static final String CK_TIMEZONE = "timezone";
 
     public static final String NAME = "PaloAlto11x";
+    public static final String EVENT_SOURCE_PRODUCT_NAME = "PAN";
+    public static final String UNKNOWN = "unknown";
+
     private final Configuration configuration;
     private final MessageFactory messageFactory;
     private final PaloAltoParser rawMessageParser;
@@ -70,20 +78,46 @@ public class PaloAlto11xCodec implements Codec {
     public Message decode(@Nonnull RawMessage rawMessage) {
         String s = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
         LOG.trace("Received raw message: {}", s);
-        PaloAltoMessageBase p = rawMessageParser.parse(s, timezone);
-        // Return when error occurs parsing syslog header.
-        if (p == null) {
-            return null;
+
+        PaloAltoMessageBase p = null;
+        try {
+            p = rawMessageParser.parse(s, timezone);
+        } catch (Exception e) {
+            LOG.warn("Cannot parse malformed Palo Alto 11x Message. Leaving message unparsed: {}", s);
         }
-        Message message = messageFactory.createMessage(p.payload(), p.source(), p.timestamp());
-        message.addField(EventFields.EVENT_SOURCE_PRODUCT, "PAN");
-        message.addField(VendorFields.VENDOR_SUBTYPE, p.panType());
+
+        String payload = s;
+        String source = getRawMessageSource(rawMessage);
+        DateTime timestamp = DateTime.now(DateTimeZone.UTC);
+        String panType = UNKNOWN;
+        if (p != null) {
+            payload = firstNonNull(p.payload(), payload);
+            source = firstNonNull(p.source(), source);
+            timestamp = firstNonNull(p.timestamp(), DateTime.now(DateTimeZone.UTC));
+            panType = firstNonNull(p.panType(), UNKNOWN);
+        }
+
+        Message message = messageFactory.createMessage(payload, source, timestamp);
+        message.addField(EventFields.EVENT_SOURCE_PRODUCT, EVENT_SOURCE_PRODUCT_NAME);
+        message.addField(VendorFields.VENDOR_SUBTYPE, panType);
         // Store full message if configured.
         if (configuration.getBoolean(CK_STORE_FULL_MESSAGE)) {
             message.addField(Message.FIELD_FULL_MESSAGE, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
         }
-        LOG.trace("Successfully processed [{}] message with [{}] fields.", p.panType(), message.getFieldCount());
+        LOG.trace("Successfully processed [{}] message with [{}] fields.", panType, message.getFieldCount());
         return message;
+    }
+
+    private String getRawMessageSource(RawMessage rawMessage) {
+        final ResolvableInetSocketAddress address = rawMessage.getRemoteAddress();
+        final InetSocketAddress remoteAddress;
+        if (address == null) {
+            remoteAddress = null;
+        } else {
+            remoteAddress = address.getInetSocketAddress();
+        }
+
+        return remoteAddress == null ? UNKNOWN: remoteAddress.getAddress().toString();
     }
 
     @Override
