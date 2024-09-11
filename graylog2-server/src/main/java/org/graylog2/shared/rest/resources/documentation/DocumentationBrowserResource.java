@@ -83,7 +83,7 @@ public class DocumentationBrowserResource extends RestResource {
         final URL templateUrl = this.getClass().getResource("/swagger/index.html.template");
         final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
         final Map<String, Object> model = ImmutableMap.of(
-                "baseUri", httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API).toString(),
+                "baseUri", httpConfiguration.getHttpExternalUri().resolve(HttpConfiguration.PATH_API).toString(),
                 "globalModePath", "",
                 "globalUriMarker", "",
                 "showWarning", "");
