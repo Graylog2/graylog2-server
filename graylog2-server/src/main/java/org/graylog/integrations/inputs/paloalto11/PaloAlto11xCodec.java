@@ -45,8 +45,6 @@ import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-
 public class PaloAlto11xCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(PaloAlto11xCodec.class);
     static final String CK_STORE_FULL_MESSAGE = "store_full_message";
@@ -76,25 +74,33 @@ public class PaloAlto11xCodec implements Codec {
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
-        String s = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
-        LOG.trace("Received raw message: {}", s);
+        String rawMessageString = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
+        LOG.trace("Received raw message: {}", rawMessageString);
 
         PaloAltoMessageBase p = null;
         try {
-            p = rawMessageParser.parse(s, timezone);
+            p = rawMessageParser.parse(rawMessageString, timezone);
         } catch (Exception e) {
-            LOG.warn("Cannot parse malformed Palo Alto 11x Message. Leaving message unparsed: {}", s);
+            LOG.warn("Cannot parse malformed Palo Alto 11x Message. Leaving message unparsed: {}", rawMessageString);
         }
 
-        String payload = s;
+        String payload = rawMessageString;
         String source = getRawMessageSource(rawMessage);
         DateTime timestamp = DateTime.now(DateTimeZone.UTC);
         String panType = UNKNOWN;
         if (p != null) {
-            payload = firstNonNull(p.payload(), payload);
-            source = firstNonNull(p.source(), source);
-            timestamp = firstNonNull(p.timestamp(), DateTime.now(DateTimeZone.UTC));
-            panType = firstNonNull(p.panType(), UNKNOWN);
+            if (p.payload() != null) {
+                payload = p.payload();
+            }
+            if (p.source() != null) {
+                source = p.source();
+            }
+            if (p.timestamp() != null) {
+                timestamp = p.timestamp();
+            }
+            if (p.panType() != null) {
+                panType = p.panType();
+            }
         }
 
         Message message = messageFactory.createMessage(payload, source, timestamp);
@@ -117,7 +123,7 @@ public class PaloAlto11xCodec implements Codec {
             remoteAddress = address.getInetSocketAddress();
         }
 
-        return remoteAddress == null ? UNKNOWN: remoteAddress.getAddress().toString();
+        return remoteAddress == null ? UNKNOWN : remoteAddress.getAddress().toString();
     }
 
     @Override
