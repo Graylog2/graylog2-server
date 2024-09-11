@@ -199,6 +199,7 @@ export interface SystemConfigurationComponentProps {
 }
 
 export interface SystemConfiguration {
+  isNotClusterConfig?: boolean,
   configType: string;
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
