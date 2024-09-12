@@ -178,10 +178,14 @@ const TableCell = ({ value, fieldTypes, activeQuery, labelFields }: TableCellPro
   );
 };
 
-const InteractiveLegend = ({ config, labelFields, labels }: Pick<Props, 'config' | 'labelFields'> & { labels: Array<string> }) => {
+type LegendComponentProps = Pick<Props, 'config' | 'labelFields'> & {
+  activeQuery: string,
+  fieldTypes: FieldTypes,
+  labels: Array<string>,
+};
+
+const InteractiveLegend = ({ activeQuery, config, fieldTypes, labelFields, labels }: LegendComponentProps) => {
   const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
-  const fieldTypes = useContext(FieldTypesContext);
-  const activeQuery = useActiveQueryId();
   const tableCells = labels.sort(stringLenSort).map((value) => (
     <TableCell key={value}
                value={value}
@@ -210,10 +214,8 @@ const FlexLegendContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const NoninteractiveLegend = ({ config, labels, labelFields }: Pick<Props, 'config' | 'labelFields'> & { labels: Array<string> }) => {
+const NoninteractiveLegend = ({ activeQuery, config, fieldTypes, labels, labelFields }: LegendComponentProps) => {
   const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
-  const fieldTypes = useContext(FieldTypesContext);
-  const activeQuery = useActiveQueryId();
 
   return (
     <FlexLegendContainer>
@@ -243,20 +245,20 @@ const PlotLegend = ({
   const { focusedWidget } = useContext(WidgetFocusContext);
   const interactive = useContext(InteractiveContext);
   const labels: Array<string> = labelMapper(chartData);
+  const fieldTypes = useContext(FieldTypesContext);
+  const activeQuery = useActiveQueryId();
 
   if (!neverHide && (!focusedWidget || !focusedWidget.editing) && series.length <= 1 && columnPivots.length <= 0) {
     // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{children}</>;
   }
 
-  const legend = interactive
-    ? <InteractiveLegend config={config} labelFields={labelFields} labels={labels} />
-    : <NoninteractiveLegend config={config} labelFields={labelFields} labels={labels} />;
+  const LegendComponent = interactive ? InteractiveLegend : NoninteractiveLegend;
 
   return (
     <Container>
       {children}
-      {legend}
+      <LegendComponent activeQuery={activeQuery} config={config} fieldTypes={fieldTypes} labelFields={labelFields} labels={labels} />
     </Container>
   );
 };
