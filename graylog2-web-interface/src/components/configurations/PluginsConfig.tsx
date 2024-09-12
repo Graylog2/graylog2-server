@@ -60,7 +60,7 @@ const PluginsConfig = () => {
 
   useEffect(() => {
     const pluginPromises = pluginSystemConfigs
-      .filter((systemConfig) => !systemConfig?.isNotClusterConfig)
+      .filter((systemConfig) => !systemConfig?.skipClusterConfigRequest)
       .map((systemConfig) => ConfigurationsActions.list(systemConfig.configType));
 
     Promise.allSettled(pluginPromises).then(() => {
