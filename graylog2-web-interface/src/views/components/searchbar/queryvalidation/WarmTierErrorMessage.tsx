@@ -34,7 +34,11 @@ const WarmTierErrorMessage = ({ warmTierIndices } : Props) => {
 
     warmTierIndices.forEach((index) => {
       index.stream_names.forEach((streamName) => {
-        streamTimestampsList[streamName] = [...streamTimestampsList[streamName], index.begin];
+        if (!streamTimestampsList[streamName]) {
+          streamTimestampsList[streamName] = [index.begin];
+        } else {
+          streamTimestampsList[streamName].push(index.begin);
+        }
       });
     });
 
@@ -50,9 +54,9 @@ const WarmTierErrorMessage = ({ warmTierIndices } : Props) => {
 
   return (
     <span>
-      The selected time range includes data stored in the Warm Tier, which can be slow to retrieve. Data older than the listed timestamp falls within the Warm tier for that stream:
+      The selected time range includes data stored in the Warm Tier, which can be slow to retrieve. Data older than the listed timestamp falls within the Warm Tier for that stream:<br />
       {streamsWithTimestamp().map((streamWithTimestamp) => (
-        <><strong>{streamWithTimestamp.name}:</strong> {formatTimestamp(streamWithTimestamp.timestamp)}</>
+        <><strong>{streamWithTimestamp.name}:</strong> {formatTimestamp(streamWithTimestamp.timestamp)}<br /></>
       ))}
     </span>
   );
