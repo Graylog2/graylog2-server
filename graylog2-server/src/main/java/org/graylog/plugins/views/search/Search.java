@@ -172,12 +172,51 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         return toBuilder().queries(newQueries).build();
     }
 
+    public Search addStreamsToSearchTypesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                                        StreamPermissions streamPermissions) {
+        if (!hasQuerySearchTypesWithStreamCategories()) {
+            return this;
+        }
+        final Set<Query> withStreamCategories = queries().stream()
+                .filter(q -> q.searchTypes().stream()
+                        .anyMatch(SearchType::hasStreamCategories))
+                .collect(toSet());
+        final Set<Query> withoutStreamCategories = Sets.difference(queries(), withStreamCategories);
+        final Set<Query> withMappedStreamCategories = new HashSet<>();
+
+        for (Query query : withStreamCategories) {
+            final Set<SearchType> mappedSearchTypes = new HashSet<>();
+            for (SearchType st : query.searchTypes()) {
+                if (!st.hasStreamCategories()) {
+                    mappedSearchTypes.add(st);
+                } else {
+                    final Set<String> mappedStreamIds = categoryMappingFunction.apply(st.streamCategories())
+                            .filter(streamPermissions::canReadStream)
+                            .collect(toSet());
+                    mappedStreamIds.addAll(st.streams());
+                    mappedSearchTypes.add(st.toBuilder().streams(mappedStreamIds).build());
+                }
+            }
+            withMappedStreamCategories.add(query.toBuilder().searchTypes(mappedSearchTypes).build());
+        }
+
+        final ImmutableSet<Query> newQueries = Sets.union(withMappedStreamCategories, withoutStreamCategories).immutableCopy();
+
+        return toBuilder().queries(newQueries).build();
+    }
+
     private boolean hasQueriesWithoutStreams() {
         return !queries().stream().allMatch(Query::hasStreams);
     }
 
     private boolean hasQueriesWithStreamCategories() {
         return queries().stream().anyMatch(q -> !q.usedStreamCategories().isEmpty());
+    }
+
+    private boolean hasQuerySearchTypesWithStreamCategories() {
+        return queries().stream()
+                .flatMap(q -> q.searchTypes().stream())
+                .anyMatch(SearchType::hasStreamCategories);
     }
 
     public abstract Builder toBuilder();
