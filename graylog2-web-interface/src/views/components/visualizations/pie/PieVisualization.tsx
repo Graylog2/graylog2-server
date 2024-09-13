@@ -78,6 +78,8 @@ const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUn
     labels: labels.map((label) => label.split(keySeparator).map((l, i) => mapKeys(l, rowPivots[i])).join(humanSeparator)),
     originalLabels: labels,
     values,
+    automargin: true,
+    rotation: 70,
     domain: {
       x: _horizontalDimensions(idx, total),
       y: _verticalDimensions(idx, total),

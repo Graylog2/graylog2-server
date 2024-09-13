@@ -108,7 +108,7 @@ const BarVisualization = makeVisualization(({
       opacity,
       originalName,
       ...getBarChartDataSettingsWithCustomUnits({ originalName, name, fullPath, values, idx, total, xAxisItemsLength: mappedKeys.length }),
-    }) as ChartDefinition;
+    });
   },
   [visualizationConfig?.opacity, _mapKeys, getBarChartDataSettingsWithCustomUnits]);
 
