@@ -14,18 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog.plugins.views.search.explain;
 
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import ExpandedCustomFieldTypes from 'components/indices/IndexSetFieldTypeProfiles/ExpandedCustomFieldTypes';
+import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
 
-const useExpandedSectionsRenderer = () => ({
-  customFieldMapping: {
-    title: 'Custom Field Mappings',
-    content: ({ customFieldMappings }: IndexSetFieldTypeProfile) => (
-      <ExpandedCustomFieldTypes customFieldMappings={customFieldMappings} />
-    ),
-  },
-});
-
-export default useExpandedSectionsRenderer;
+public record StreamQueryInfo(Optional<Set<String>> requestedStreams, Set<String> readableStreams, Instant from, Instant to, boolean isEmptyQuery) {}

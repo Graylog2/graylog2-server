@@ -63,6 +63,7 @@ import type { Stream } from 'views/stores/StreamsStore';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
 import type { FiltersType } from 'views/types';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -129,6 +130,15 @@ const FilterForm = ({
     () => isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS),
     [currentUser.permissions],
   );
+
+  const streamCategoryOptions = React.useMemo(() => (
+    streams.reduce((acc:{label: string, value: string}[], stream: Stream) => {
+      stream.categories?.forEach((category: string) => {
+        if (!acc.find((option: { value: string }) => option.value === category)) acc.push({ label: category, value: category });
+      });
+
+      return acc;
+    }, []).sort((a, b) => defaultCompare(a.value, b.value))), [streams]);
 
   const [cronDescription, setCronDescription] = useState<string>(currentConfig.cron_expression ? describeExpression(currentConfig.cron_expression) : '');
 
@@ -255,6 +265,7 @@ const FilterForm = ({
         query: undefined,
         timerange: undefined,
         streams: undefined,
+        stream_categories: undefined,
         sort: [],
         decorators: [],
       }]);
@@ -439,6 +450,22 @@ const FilterForm = ({
     );
   };
 
+  const streamCategorySelector = () => {
+    if (!streamCategoryOptions || streamCategoryOptions.length === 0) return null;
+
+    return (
+      <FormGroup controlId="filter-stream-categories">
+        <ControlLabel>Stream Categories <small className="text-muted">(Optional)</small></ControlLabel>
+        <MultiSelect id="filter-stream-categories"
+                     matchProp="label"
+                     onChange={(selected) => propagateChange(getUpdatedConfig('stream_categories', selected === '' ? [] : selected.split(',')))}
+                     options={streamCategoryOptions}
+                     value={defaultTo(eventDefinition.config.stream_categories, []).join(',')} />
+        <HelpBlock>Select stream categories the search should include.</HelpBlock>
+      </FormGroup>
+    );
+  };
+
   const warmTierTimeStamp = () => {
     const latestWarmTierRangeEnd = warmTierRanges.map((range) => range.end).sort((a, b) => b - a)[0];
 
@@ -494,7 +521,7 @@ const FilterForm = ({
                        value={defaultTo(eventDefinition.config.streams, []).join(',')} />
           <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
         </FormGroup>
-
+        {streamCategorySelector()}
         {isSearchingWarmTier(warmTierRanges) && (
         <Alert bsStyle="danger" title="Warm Tier Warning">
           The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve data from the Warm Tier may cause performance problems.

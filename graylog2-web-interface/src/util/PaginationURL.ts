@@ -44,7 +44,7 @@ export default (destUrl: string, page: number, perPage: number, query?: string, 
   }
 
   if (query) {
-    uri.addSearch('query', encodeURIComponent(query));
+    uri.addSearch('query', query);
   }
 
   return uri.toString();

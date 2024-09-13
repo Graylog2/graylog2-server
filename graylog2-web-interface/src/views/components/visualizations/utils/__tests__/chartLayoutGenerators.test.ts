@@ -174,6 +174,12 @@ describe('Chart Layout Generators', () => {
 
       expect(result).toEqual(layoutsFor4axis);
     });
+
+    it('does not throw exception when chart data is `undefined` in stack mode', () => {
+      const result = generateLayouts({ ...params, chartData: [], barmode: 'stack' });
+
+      expect(result).toBeDefined();
+    });
   });
 
   describe('getHoverTemplateSettings', () => {
