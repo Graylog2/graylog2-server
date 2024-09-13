@@ -41,11 +41,13 @@ import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.streams.StreamService;
 
 import java.time.Instant;
 import java.util.Comparator;
@@ -58,6 +60,7 @@ import java.util.stream.Collectors;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
+import static org.graylog.plugins.views.search.ExplainResults.IndexRangeResult.fromIndexRange;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -67,16 +70,18 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
     private final QueryValidationService queryValidationService;
     private final Optional<StreamQueryExplainer> optionalStreamQueryExplainer;
-
     private final IndexLookup indexLookup;
+    private final StreamService streamService;
 
     @Inject
     public QueryValidationResource(final QueryValidationService queryValidationService,
                                    final Optional<StreamQueryExplainer> optionalStreamQueryExplainer,
-                                   final IndexLookup indexLookup) {
+                                   final IndexLookup indexLookup,
+                                   final StreamService streamService) {
         this.queryValidationService = queryValidationService;
         this.optionalStreamQueryExplainer = optionalStreamQueryExplainer;
         this.indexLookup = indexLookup;
+        this.streamService = streamService;
     }
 
     @POST
@@ -138,8 +143,18 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     }
 
     private Set<ExplainResults.IndexRangeResult> indexRanges(ValidationRequest request) {
+        final Set<String> streamTitles = request.streams().stream()
+                .map(streamId -> {
+                    try {
+                        return streamService.load(streamId).getTitle();
+                    } catch (NotFoundException e) {
+                        return null;
+                    }
+                })
+                .collect(Collectors.toSet());
+
         return indexLookup.indexRangesForStreamsInTimeRange(request.streams(), request.timerange()).stream()
-                .map(ExplainResults.IndexRangeResult::fromIndexRange)
+                .map(indexRange -> fromIndexRange(indexRange, streamTitles))
                 .collect(Collectors.toSet());
     }
 
