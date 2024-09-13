@@ -248,7 +248,7 @@ const PlotLegend = ({
   const fieldTypes = useContext(FieldTypesContext);
   const activeQuery = useActiveQueryId();
 
-  if (!neverHide && (!focusedWidget || !focusedWidget.editing) && series.length <= 1 && columnPivots.length <= 0) {
+  if (!neverHide && !focusedWidget?.editing && series.length <= 1 && columnPivots.length <= 0) {
     return <>{children}</>;
   }
 
