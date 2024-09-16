@@ -114,7 +114,7 @@ const fieldType = (fieldName, { decoration_stats: decorationStats }: {
 
 const Strong = ({ children, strong = false }: React.PropsWithChildren<{ strong: boolean }>) => (strong
   ? <strong>{children}</strong>
-  // eslint-disable-next-line react/jsx-no-useless-fragment
+
   : <>{children}</>);
 
 const MessageTableEntry = ({

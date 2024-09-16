@@ -188,7 +188,6 @@ const PlotLegend = ({
   const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
 
   if (!neverHide && (!focusedWidget || !focusedWidget.editing) && series.length <= 1 && columnPivots.length <= 0) {
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{children}</>;
   }
 
