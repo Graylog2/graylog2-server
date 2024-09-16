@@ -1,9 +1,0 @@
-rule "set_fields"
-when true
-then
-  let newValue = to_map(parse_json(to_string($message.json_field_map)));
-  set_fields(fields: newValue);
-
-  let cleanFieldValue = to_map(parse_json(to_string($message.json_clean_field_map)));
-  set_fields(fields: cleanFieldValue, clean_fields: true);
-end

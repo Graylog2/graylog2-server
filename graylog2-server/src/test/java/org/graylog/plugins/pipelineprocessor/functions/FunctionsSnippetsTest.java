@@ -1134,7 +1134,82 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     void keyValue() {
-        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final var r = """
+                rule "kv"
+                when true
+                then
+                    set_fields(key_value(
+                            value: "a='1' <b>=2  \\n 'c'=3 [d]=44 a=4 \\"e\\"=4 [f=1][[g]:3] 'h'=3=:3 i=",
+                            delimiters: " \\t\\n\\r[",
+                            kv_delimiters: "=:",
+                            ignore_empty_values: true,
+                            trim_key_chars: "\\"[]<>'",
+                            trim_value_chars: "']",
+                            allow_dup_keys: true, // the default
+                            handle_dup_keys: ","  // meaning concat, default "take_first"
+                    ));
+
+                    set_fields(key_value(
+                        value: "dup_first=1 dup_first=2",
+                        handle_dup_keys: "take_first"
+                    ));
+                    set_fields(key_value(
+                        value: "dup_last=1 dup_last=2",
+                        handle_dup_keys: "take_last"
+                    ));
+
+                    set_fields(key_value(
+                        value: "spacequote1=\\"a space quote\\""
+                    ));
+                    set_fields(key_value(
+                        value: "spacequote2=\\"a space quote\\"",
+                        trim_value_chars: "\\""
+                    ));
+                    set_fields(key_value(
+                        value: "spacequote3='a space quote'"
+                    ));
+                    set_fields(key_value(
+                        value: "spacequote4='a space quote'",
+                        trim_value_chars: "'"
+                    ));
+                    set_fields(key_value(
+                        value: "spacequote5=\\"a space 'quote'\\"",
+                        trim_value_chars: "\\""
+                    ));
+                    set_fields(key_value(
+                        value: "spacequote6='a space \\"quote\\"'",
+                        trim_value_chars: "'"
+                    ));
+                    set_fields(key_value(
+                        value: "spacequote7=\\"it's a space 'quote'\\"",
+                        trim_value_chars: "\\""
+                    ));
+                    set_fields(key_value(
+                        value: "sq1=\\" a \\" sq2=\\" b\\" sq3=' c  ' sq4=\\" ' d ' \\" sq5=' \\" e\\" ' sq6='it\\"s a space'",
+                        trim_value_chars: "\\"'"
+                    ));
+                    set_fields(key_value(
+                        value: "dup-spacequote=\\"it's a space 'quote'\\" dup-spacequote=another",
+                        trim_value_chars: "\\"",
+                        handle_dup_keys: "|"
+                    ));
+
+                    set_fields(key_value(
+                        value: "sq7=\\"a, b\\"|sq8=\\"c|d\\"|sq9='e| \\"f, g\\" | h'|sq10=\\" ' i,j ' \\",sq11=' \\" k|\\" ',sq12='l\\"m n, o'",
+                        delimiters: ",|",
+                        trim_value_chars: "\\"'"
+                    ));
+
+                    set_fields(key_value(
+                        value: "\\"sq@1\\"='space quote'@\\"sq@2\\"=hello",
+                        delimiters: "@",
+                        trim_key_chars: "\\"",
+                        trim_value_chars: "'"
+                    ));
+                end
+                """;
+
+        final Rule rule = parser.parseRule(r, true);
 
         final EvaluationContext context = contextForRuleEval(rule, messageFactory.createMessage("", "", Tools.nowUTC()));
 
@@ -1651,39 +1726,73 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     void setField() {
-        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final var r = """
+                rule "set_field"
+                when true
+                then
+                  set_field(field: "f1", value: "v1");
+                  set_field(field: "f_2", value: "v_2");
+                  set_field(field: "f 3", value: "f 3");
+                  set_field(field: "f/4", value: "f/4");
+                  set_field(field: "f%5", value: "will be skipped");
+                  set_field(field: "f%6", value: "will be added with clean field param", clean_field: true);
+                end
+                """;
+
+        final Rule rule = parser.parseRule(r, true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
 
         assertThat(message.getField("f1")).isEqualTo("v1");
         assertThat(message.getField("f_2")).isEqualTo("v_2");
-        assertThat(message.getField("f 3")).isNull();
-        assertThat(message.getField("f_3")).isNull();
-        assertThat(message.getField("f_4")).isEqualTo("will be added with clean field param");
+        assertThat(message.getField("f 3")).isEqualTo("f 3");
+        assertThat(message.getField("f/4")).isEqualTo("f/4");
+        assertThat(message.getField("f%5")).isNull();
+        assertThat(message.getField("f_6")).isEqualTo("will be added with clean field param");
     }
 
     @Test
     void setFields() {
-        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final var r = """
+                rule "set_fields"
+                when true
+                then
+                  let newValue = to_map(parse_json(to_string($message.json_field_map)));
+                  set_fields(fields: newValue);
+
+                  let cleanFieldValue = to_map(parse_json(to_string($message.json_clean_field_map)));
+                  set_fields(fields: cleanFieldValue, clean_fields: true);
+                end
+                """;
+
+        final Rule rule = parser.parseRule(r, true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
-        message.addField("json_field_map", "{ " +
-                "  \"k1\": \"v1\", " +
-                "  \"k_2\": \"v_2\", " +
-                "  \"k 3\": \"will be skipped\" " +
-                "}");
-        message.addField("json_clean_field_map", "{ " +
-                "  \"k4\": \"v4\", " +
-                "  \"k_5\": \"v_5\", " +
-                "  \"k 6\": \"will be added with clean_fields param\" " +
-                "}");
+        message.addField("json_field_map", """
+             {
+               "k1": "v1",
+               "k_2": "v_2",
+               "k 3": "v 3",
+               "k%4": "will be skipped"
+             }
+             """);
+        message.addField("json_clean_field_map", """
+                {
+                  "k4": "v4",
+                  "k_5": "v_5",
+                  "k 7": "v 7",
+                  "k%6": "will be added with clean_fields param"
+                }
+                """);
         evaluateRule(rule, message);
 
         assertThat(message.getField("k1")).isEqualTo("v1");
         assertThat(message.getField("k_2")).isEqualTo("v_2");
-        assertThat(message.getField("k 3")).isNull();
-        assertThat(message.getField("k_3")).isNull();
+        assertThat(message.getField("k 3")).isEqualTo("v 3");
+        assertThat(message.getField("k%4")).isNull();
+        assertThat(message.getField("k_4")).isNull();
         assertThat(message.getField("k4")).isEqualTo("v4");
         assertThat(message.getField("k_5")).isEqualTo("v_5");
+        assertThat(message.getField("k 7")).isEqualTo("v 7");
         assertThat(message.getField("k_6")).isEqualTo("will be added with clean_fields param");
     }
 

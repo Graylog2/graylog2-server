@@ -339,53 +339,55 @@ public class MessageTest {
     }
 
     @Test
-    public void testGetMessage() throws Exception {
+    public void testGetMessage() {
         assertEquals("foo", message.getMessage());
     }
 
     @Test
-    public void testGetSource() throws Exception {
+    public void testGetSource() {
         assertEquals("bar", message.getSource());
     }
 
     @Test
-    public void testValidKeys() throws Exception {
+    public void testValidKeys() {
+        assertTrue(Message.validKey("a"));
         assertTrue(Message.validKey("foo123"));
         assertTrue(Message.validKey("foo-bar123"));
         assertTrue(Message.validKey("foo_bar123"));
         assertTrue(Message.validKey("foo.bar123"));
         assertTrue(Message.validKey("foo@bar"));
         assertTrue(Message.validKey("123"));
-        assertTrue(Message.validKey(""));
+        assertTrue(Message.validKey("foo bar"));
+        assertTrue(Message.validKey("foo/bar"));
 
-        assertFalse(Message.validKey("foo bar"));
         assertFalse(Message.validKey("foo+bar"));
         assertFalse(Message.validKey("foo$bar"));
         assertFalse(Message.validKey(" "));
+        assertFalse(Message.validKey(""));
     }
 
     @Test
-    public void testCleanKey() throws Exception {
+    public void testCleanKey() {
         // Valid keys
         assertEquals("foo123", Message.cleanKey("foo123"));
         assertEquals("foo-bar123", Message.cleanKey("foo-bar123"));
         assertEquals("foo_bar123", Message.cleanKey("foo_bar123"));
         assertEquals("foo.bar123", Message.cleanKey("foo.bar123"));
+        assertEquals("foo bar", Message.cleanKey("foo bar"));
+        assertEquals("foo/bar", Message.cleanKey("foo/bar"));
         assertEquals("foo@bar", Message.cleanKey("foo@bar"));
         assertEquals("123", Message.cleanKey("123"));
-        assertEquals("", Message.cleanKey(""));
+        assertEquals(" ", Message.cleanKey(" "));
 
-        assertEquals("foo_bar", Message.cleanKey("foo bar"));
         assertEquals("foo_bar", Message.cleanKey("foo+bar"));
         assertEquals("foo_bar", Message.cleanKey("foo$bar"));
         assertEquals("foo_bar", Message.cleanKey("foo{bar"));
         assertEquals("foo_bar", Message.cleanKey("foo,bar"));
         assertEquals("foo_bar", Message.cleanKey("foo?bar"));
-        assertEquals("_", Message.cleanKey(" "));
     }
 
     @Test
-    public void testToElasticSearchObject() throws Exception {
+    public void testToElasticSearchObject() {
         message.addField("field1", "wat");
         message.addField("field2", "that");
         message.addField(Message.FIELD_STREAMS, Collections.singletonList("test-stream"));
@@ -404,7 +406,7 @@ public class MessageTest {
     }
 
     @Test
-    public void testToElasticSearchObjectWithInvalidKey() throws Exception {
+    public void testToElasticSearchObjectWithInvalidKey() {
         message.addField("field.3", "dot");
 
         final Map<String, Object> object = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
@@ -423,7 +425,7 @@ public class MessageTest {
     }
 
     @Test
-    public void testToElasticSearchObjectWithoutDateTimeTimestamp() throws Exception {
+    public void testToElasticSearchObjectWithoutDateTimeTimestamp() {
         message.addField("timestamp", "time!");
 
         final Meter errorMeter = metricRegistry.meter("test-meter");
@@ -434,7 +436,7 @@ public class MessageTest {
     }
 
     @Test
-    public void testToElasticSearchObjectWithStreams() throws Exception {
+    public void testToElasticSearchObjectWithStreams() {
         final Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("stream-id");
         when(stream.getIndexSet()).thenReturn(mock(IndexSet.class));

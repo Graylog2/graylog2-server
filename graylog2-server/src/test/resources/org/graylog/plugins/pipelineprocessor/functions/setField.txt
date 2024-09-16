@@ -1,8 +1,0 @@
-rule "set_field"
-when true
-then
-  set_field(field: "f1", value: "v1");
-  set_field(field: "f_2", value: "v_2");
-  set_field(field: "f 3", value: "will be skipped");
-  set_field(field: "f 4", value: "will be added with clean field param", clean_field: true);
-end
