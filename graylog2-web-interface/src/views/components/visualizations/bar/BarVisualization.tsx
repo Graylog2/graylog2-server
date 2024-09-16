@@ -100,7 +100,7 @@ const BarVisualization = makeVisualization(({
     const opacity = visualizationConfig?.opacity ?? 1.0;
     const mappedKeys = _mapKeys(labels);
 
-    return ({
+    const charttD = ({
       type,
       name,
       x: mappedKeys,
@@ -109,6 +109,10 @@ const BarVisualization = makeVisualization(({
       originalName,
       ...getBarChartDataSettingsWithCustomUnits({ originalName, name, fullPath, values, idx, total, xAxisItemsLength: mappedKeys.length }),
     }) as ChartDefinition;
+
+    console.log({ charttD });
+
+    return charttD;
   },
   [visualizationConfig?.opacity, _mapKeys, getBarChartDataSettingsWithCustomUnits]);
 
