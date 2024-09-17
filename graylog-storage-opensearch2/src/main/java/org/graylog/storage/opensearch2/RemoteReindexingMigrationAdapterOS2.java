@@ -36,6 +36,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
@@ -460,6 +462,10 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 postMigrationActions.add(() -> closeLocalIndex(migration, indexName));
             }
 
+            retrieveIndexBlock(indexName)
+                    .ifPresent(block -> removeLocalBlock(migration, indexName, block));
+
+
             final BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
             logInfo(migration, "Executing async reindex for " + indexName);
             final TaskSubmissionResponse task = client.execute((c, requestOptions) -> {
@@ -474,9 +480,45 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             postMigrationActions.forEach(Runnable::run);
 
         } catch (Exception e) {
-            final String message = "Could not reindex index: " + indexName + " - " + e.getMessage();
+            final String message = "Could not reindex index: " + indexName + " - " + formatErrorMessage(e);
             logError(migration, message, e);
         }
+    }
+
+    private static String formatErrorMessage(Exception e) {
+        StringBuilder message = new StringBuilder();
+        if (e.getMessage() != null) {
+            message.append(e.getMessage());
+        }
+
+        if (e.getCause() != null && e.getCause().getMessage() != null) {
+            message.append(" ").append(e.getCause().getMessage());
+        }
+        return message.toString();
+    }
+
+    private void removeLocalBlock(MigrationConfiguration migration, String indexName, BlockResponse.IndexBlock block) {
+        logInfo(migration, "Index " + indexName + " is blocked: " + block.description() + ". Removing the block now.");
+        final AcknowledgedResponse acknowledgedResponse = client.execute((restHighLevelClient, requestOptions) -> {
+            final UpdateSettingsRequest settingsRequest = new UpdateSettingsRequest();
+            settingsRequest.indices(indexName);
+            settingsRequest.settings(Map.of(
+                    "index.blocks.write", false,
+                    "index.blocks.read_only_allow_delete", false
+            ));
+            return restHighLevelClient.indices().putSettings(settingsRequest, requestOptions);
+        });
+    }
+
+    private Optional<BlockResponse.IndexBlock> retrieveIndexBlock(String indexName) {
+        return client.execute((restHighLevelClient, requestOptions) -> {
+            final Response blocksResponse = restHighLevelClient.getLowLevelClient().performRequest(new Request("GET", "_cluster/state/blocks/"));
+            try (final InputStream is = blocksResponse.getEntity().getContent()) {
+                final BlockResponse indexBlocks = objectMapper.readValue(is, BlockResponse.class);
+                return indexBlocks.blocks().forIndex(indexName)
+                        .filter(b -> b.levels().contains(BlockResponse.BlockLevel.write));
+            }
+        });
     }
 
     private void closeLocalIndex(MigrationConfiguration migration, String indexName) {

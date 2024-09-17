@@ -119,6 +119,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @NoAuditEvent("Creating audit event manually in method body.")
     public TabularResponse executeQuery(@ApiParam(name = "query") @QueryParam("query") String query,
                                         @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
+                                        @ApiParam(name = "stream_categories") @QueryParam("stream_categories") Set<String> streamCategories,
                                         @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
                                         @ApiParam(name = "fields") @QueryParam("fields") List<String> fields,
                                         @ApiParam(name = "sort") @QueryParam("sort") String sort,
@@ -130,6 +131,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
         try {
             MessagesRequestSpec messagesRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query,
                     splitByComma(streams),
+                    splitByComma(streamCategories),
                     timerangeKeyword,
                     splitByComma(fields),
                     sort,
@@ -171,6 +173,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @NoAuditEvent("Creating audit event manually in method body.")
     public TabularResponse executeQuery(@ApiParam(name = "query") @QueryParam("query") String query,
                                         @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
+                                        @ApiParam(name = "stream_categories") @QueryParam("stream_categories") Set<String> streamCategories,
                                         @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
                                         @ApiParam(name = "groups") @QueryParam("groups") List<String> groups,
                                         @ApiParam(name = "metrics") @QueryParam("metrics") List<String> metrics,
@@ -179,6 +182,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
             AggregationRequestSpec aggregationRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(
                     query,
                     StringUtils.splitByComma(streams),
+                    StringUtils.splitByComma(streamCategories),
                     timerangeKeyword,
                     splitByComma(groups),
                     splitByComma(metrics)

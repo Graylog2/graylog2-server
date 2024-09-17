@@ -39,7 +39,8 @@ import type Query from 'views/logic/queries/Query';
 import {
   createElasticsearchQueryString,
   filtersToStreamSet,
-  filtersToStreamCategorySet, newFiltersForQuery,
+  filtersToStreamCategorySet,
+  newFiltersForQuery,
 } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
