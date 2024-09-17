@@ -50,12 +50,14 @@ const WarmTierErrorMessage = ({ warmTierIndices } : Props) => {
     });
   };
 
-  if (streamsWithTimestamp()?.length <= 0) return null;
+  const streamsWithTimestampMap = streamsWithTimestamp();
+
+  if (streamsWithTimestampMap?.length <= 0) return null;
 
   return (
     <span>
       The selected time range includes data stored in the Warm Tier, which can be slow to retrieve. Data older than the listed timestamp falls within the Warm Tier for that stream:<br />
-      {streamsWithTimestamp().map((streamWithTimestamp) => (
+      {streamsWithTimestampMap.map((streamWithTimestamp) => (
         <><strong>{streamWithTimestamp.name}:</strong> {formatTimestamp(streamWithTimestamp.timestamp)}<br /></>
       ))}
     </span>
