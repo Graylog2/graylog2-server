@@ -103,6 +103,7 @@ exports[`copyWidgetToDashboard should copy a widget to a dashboard 1`] = `
             "query_string": "",
             "type": "elasticsearch",
           },
+          "stream_categories": undefined,
           "streams": [],
           "timerange": null,
           "type": "aggregation",
@@ -130,6 +131,7 @@ exports[`copyWidgetToDashboard should copy a widget to a dashboard 1`] = `
             "query_string": "",
             "type": "elasticsearch",
           },
+          "stream_categories": undefined,
           "streams": [],
           "timerange": {
             "range": 300,

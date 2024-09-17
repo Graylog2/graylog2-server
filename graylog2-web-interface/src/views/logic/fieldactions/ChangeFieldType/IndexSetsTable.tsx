@@ -32,6 +32,9 @@ import type { FieldTypeUsage, FieldTypes } from 'views/logic/fieldactions/Change
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/useCurrentStream';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 const Container = styled.div`
   margin-top: 20px;
@@ -44,8 +47,16 @@ type Props = {
   initialSelection: Array<string>
 }
 
+const mapper = (indexSets: Array<IndexSet>): Record<string, IndexSet> => {
+  if (!indexSets) return null;
+
+  return Object.fromEntries(indexSets.map((indexSet) => ([indexSet.id, indexSet])));
+};
+
 const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelection }: Props) => {
   const [activePage, setActivePage] = useState(1);
+  const { data, isSuccess } = useIndexSetsList();
+  const mappedIndexSets = useMemo(() => mapper(data?.indexSets), [data?.indexSets]);
 
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
@@ -96,7 +107,13 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
     setIndexSetSelection(newSelection);
   }, [setIndexSetSelection]);
 
-  if (isLoadingLayoutPreferences || isLoading) {
+  const isEntitySelectable = useCallback((entity) => {
+    const indexSetId = entity.id;
+
+    return isIndexFieldTypeChangeAllowed(mappedIndexSets[indexSetId]);
+  }, [mappedIndexSets]);
+
+  if (isLoadingLayoutPreferences || isLoading || !isSuccess) {
     return <Spinner />;
   }
 
@@ -119,6 +136,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
                                              onChangeSelection,
                                              initialSelection,
                                              actions: <BulkActionsDropdown />,
+                                             isEntitySelectable,
                                            }}
                                            columnDefinitions={attributes}
                                            columnRenderers={columnRenderers}

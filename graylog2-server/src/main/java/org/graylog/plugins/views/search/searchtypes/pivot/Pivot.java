@@ -99,6 +99,7 @@ public abstract class Pivot implements SearchType {
                 .columnGroups(of())
                 .sort(of())
                 .filters(of())
+                .streamCategories(Collections.emptySet())
                 .streams(Collections.emptySet());
     }
 
@@ -109,6 +110,7 @@ public abstract class Pivot implements SearchType {
             return builder()
                     .sort(Collections.emptyList())
                     .filters(Collections.emptyList())
+                    .streamCategories(Collections.emptySet())
                     .streams(Collections.emptySet());
         }
 
@@ -172,6 +174,9 @@ public abstract class Pivot implements SearchType {
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
 
+        @JsonProperty
+        public abstract Builder streamCategories(@Nullable Set<String> streamCategories);
+
         abstract Pivot autoBuild();
 
         public Pivot build() {
@@ -187,6 +192,7 @@ public abstract class Pivot implements SearchType {
         PivotEntity.Builder builder = PivotEntity.builder()
                 .sort(sort())
                 .streams(mappedStreams(entityDescriptorIds))
+                .streamCategories(streamCategories())
                 .timerange(timerange().orElse(null))
                 .columnGroups(columnGroups())
                 .rowGroups(rowGroups())
