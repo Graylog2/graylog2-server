@@ -79,7 +79,8 @@ const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUn
     originalLabels: labels,
     values,
     automargin: true,
-    rotation: 70,
+    outsidetextfont: { color: 'transparent' },
+    textposition: 'inside',
     domain: {
       x: _horizontalDimensions(idx, total),
       y: _verticalDimensions(idx, total),
