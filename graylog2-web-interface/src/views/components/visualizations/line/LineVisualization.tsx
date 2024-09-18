@@ -58,7 +58,7 @@ const LineVisualization = makeVisualization(({
     y: values,
     originalName,
     line: { shape: toPlotly(interpolation) },
-    ...getChartDataSettingsWithCustomUnits({ originalName, fullPath, values }),
+    ...getChartDataSettingsWithCustomUnits({ name, fullPath, values }),
   }), [_mapKeys, getChartDataSettingsWithCustomUnits, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);

@@ -320,29 +320,29 @@ const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>,
   return `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`;
 });
 
-export const getHoverTemplateSettings = ({ convertedValues, unit, originalName }: {
+export const getHoverTemplateSettings = ({ convertedValues, unit, name }: {
   convertedValues: Array<any>,
   unit: FieldUnit,
-  originalName: string,
+  name: string,
 }): { text: Array<string>, hovertemplate: string, meta: string } | {} => {
   if (unit?.unitType === 'time' || unit?.unitType === 'size') {
     return ({
       text: getHoverTexts({ convertedValues, unit }),
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',
-      meta: originalName,
+      meta: name,
     });
   }
 
   return ({});
 };
 
-export const getPieHoverTemplateSettings = ({ convertedValues, unit, originalName }: {
+export const getPieHoverTemplateSettings = ({ convertedValues, unit, name }: {
   convertedValues: Array<any>,
   unit: FieldUnit,
-  originalName: string,
+  name: string,
 }): PieHoverTemplateSettings | {} => ({
   text: getHoverTexts({ convertedValues, unit }),
   hovertemplate: '<b>%{label}</b><br>%{text}<br>%{percent}',
-  meta: originalName,
+  meta: name,
   textinfo: 'percent',
 });

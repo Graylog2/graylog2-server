@@ -69,7 +69,7 @@ const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUn
   fullPath,
 }): ChartDefinition => {
   const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
-  const extendedSettings = getPieChartDataSettingsWithCustomUnits({ values, originalName, fullPath });
+  const extendedSettings = getPieChartDataSettingsWithCustomUnits({ values, name, fullPath });
 
   const definition = {
     type,
