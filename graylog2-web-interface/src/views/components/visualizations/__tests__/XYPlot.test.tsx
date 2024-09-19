@@ -68,6 +68,8 @@ describe('XYPlot', () => {
         <XYPlot chartData={chartData}
                 config={config}
                 setChartColor={setChartColor}
+                height={480}
+                width={640}
                 {...props} />
       </TestStoreProvider>
     );
