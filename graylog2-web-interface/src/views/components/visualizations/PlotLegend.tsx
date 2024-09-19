@@ -35,6 +35,7 @@ import type { ChartDefinition } from 'views/components/visualizations/ChartData'
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import WidgetRenderingContext from 'views/components/widgets/WidgetRenderingContext';
 
 const ColorHint = styled.div(({ color }) => css`
   cursor: pointer;
@@ -44,12 +45,22 @@ const ColorHint = styled.div(({ color }) => css`
   height: 12px;
 `);
 
-const Container = styled.div`
+const FixedContainer = styled.div<{ $height: number, $width: number }>`
   display: grid;
   grid-template: 4fr auto / 1fr;
   grid-template-areas: '.' '.';
   height: 100%;
 `;
+
+const VariableContainer = styled.div<{ $height: number, $width: number }>(({ $height, $width }) => css`
+  display: grid;
+  width: ${$width}px;
+  grid-template-columns: ${$width}px;
+  grid-template-rows: ${$height}px auto;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  justify-content: center;
+`);
 
 const LegendContainer = styled.div`
   padding: 5px;
@@ -88,6 +99,8 @@ type Props = {
   labelFields?: (config: Props['config']) => Array<string>,
   labelMapper?: (data: Array<any>) => Array<string> | undefined | null,
   neverHide?: boolean,
+  height: number,
+  width: number,
 };
 
 const defaultLabelMapper = (data: Array<Pick<ChartDefinition, 'name' | 'originalName'>>) => data.map(({
@@ -240,22 +253,27 @@ const PlotLegend = ({
   labelMapper = defaultLabelMapper,
   labelFields = columnPivotsToFields,
   neverHide,
+  height,
+  width,
 }: Props) => {
   const { columnPivots, series } = config;
   const { focusedWidget } = useContext(WidgetFocusContext);
   const interactive = useContext(InteractiveContext);
-  const labels: Array<string> = labelMapper(chartData);
   const fieldTypes = useContext(FieldTypesContext);
+  const { limitHeight } = useContext(WidgetRenderingContext);
+
+  const labels = labelMapper(chartData);
   const activeQuery = useActiveQueryId();
+  const Container = limitHeight ? FixedContainer : VariableContainer;
 
   if (!neverHide && !focusedWidget?.editing && series.length <= 1 && columnPivots.length <= 0) {
-    return <>{children}</>;
+    return <Container $height={height} $width={width}>{children}</Container>;
   }
 
   const LegendComponent = interactive ? InteractiveLegend : NoninteractiveLegend;
 
   return (
-    <Container>
+    <Container $height={height} $width={width}>
       {children}
       <LegendComponent activeQuery={activeQuery} config={config} fieldTypes={fieldTypes} labelFields={labelFields} labels={labels} />
     </Container>
