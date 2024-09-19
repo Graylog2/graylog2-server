@@ -104,14 +104,14 @@ const labelMapper = (data: Array<{ labels: Array<string>, originalLabels?: Array
 
 const rowPivotsToFields = (config: AggregationWidgetConfig) => config?.rowPivots?.flatMap((pivot) => pivot.fields);
 
-const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+const PieVisualization = makeVisualization(({ config, data, height, width }: VisualizationComponentProps) => {
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const mapKeys = useMapKeys();
   const getPieChartDataSettingsWithCustomUnits = usePieChartDataSettingsWithCustomUnits({ config });
   const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries(mapKeys, getPieChartDataSettingsWithCustomUnits) });
 
   return (
-    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} labelFields={rowPivotsToFields} neverHide>
+    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} labelFields={rowPivotsToFields} neverHide height={height} width={width}>
       <GenericPlot chartData={transformedData}
                    setChartColor={setChartColor} />
     </PlotLegend>

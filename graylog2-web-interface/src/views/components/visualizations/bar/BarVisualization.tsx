@@ -81,6 +81,7 @@ const BarVisualization = makeVisualization(({
   data,
   effectiveTimerange,
   height,
+  width,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
 
@@ -149,6 +150,7 @@ const BarVisualization = makeVisualization(({
             effectiveTimerange={effectiveTimerange}
             setChartColor={setChartColor}
             height={height}
+            width={width}
             plotLayout={layout} />
   );
 }, 'bar');
