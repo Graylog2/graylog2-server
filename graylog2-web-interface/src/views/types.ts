@@ -116,7 +116,6 @@ export interface WidgetExport {
   searchResultTransformer?: (data: Array<unknown>) => unknown;
   searchTypes: (widget: Widget) => Array<any>;
   titleGenerator?: (widget: { config: Widget['config'] }) => string;
-  reportStyle?: () => { width: React.CSSProperties['width'] };
   exportComponent?: React.ComponentType<{ widget: Widget }>;
 }
 
