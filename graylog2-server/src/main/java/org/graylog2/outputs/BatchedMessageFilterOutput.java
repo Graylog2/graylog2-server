@@ -45,6 +45,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -74,6 +75,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
     private final Timer processTime;
     private ScheduledFuture<?> flushTask;
     private final IndexSetAwareMessageOutputBuffer buffer;
+    private AtomicBoolean isRunning =  new AtomicBoolean(false);
 
     @Inject
     public BatchedMessageFilterOutput(Map<String, FilteredMessageOutput> outputs,
@@ -119,6 +121,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
                 LOG.error("Caught exception while trying to flush outputs", e);
             }
         }, outputFlushInterval.toMillis(), outputFlushInterval.toMillis(), TimeUnit.MILLISECONDS);
+        isRunning.set(true);
     }
 
     @VisibleForTesting
@@ -174,7 +177,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
 
     @Override
     public boolean isRunning() {
-        return true;
+        return isRunning.get();
     }
 
     @Override
@@ -228,6 +231,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
                 LOG.warn("Timed out flushing current batch to outputs while stopping.");
             } finally {
                 executorService.shutdownNow();
+                isRunning.set(false);
             }
         }
     }
