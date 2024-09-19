@@ -21,26 +21,23 @@ import org.graylog.datanode.Configuration;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.shared.SuppressForbidden;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class DatanodeDnsPreflightCheck implements PreflightCheck {
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeDnsPreflightCheck.class);
-    private final String hostname;
+    private final String configuredHostname;
 
     @Inject
     public DatanodeDnsPreflightCheck(Configuration datanodeConfiguration) {
-        hostname = datanodeConfiguration.getHostname();
+        configuredHostname = datanodeConfiguration.getHostname();
     }
 
     @Override
     public void runCheck() throws PreflightCheckException {
-        if (determineAltNames().noneMatch(v -> Objects.equals(v, hostname))) {
-            throw new PreflightCheckException("Reverse lookup of the localhost IP failed. DNS is not configured properly for the hostname " + hostname);
+        if (determineAltNames().noneMatch(v -> Objects.equals(v, configuredHostname))) {
+            throw new PreflightCheckException("Reverse lookup of the localhost IP failed. DNS is not configured properly for the hostname " + configuredHostname);
         }
     }
 
