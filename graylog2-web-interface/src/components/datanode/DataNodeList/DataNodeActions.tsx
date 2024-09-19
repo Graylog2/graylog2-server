@@ -22,6 +22,8 @@ import { ConfirmDialog } from 'components/common';
 import { Button, MenuItem } from 'components/bootstrap';
 import type { DataNode } from 'preflight/types';
 import { MoreActions } from 'components/common/EntityDataTable';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import sleep from 'logic/sleep';
 
 import DataNodeLogsDialog from './DataNodeLogsDialog';
 
@@ -68,6 +70,17 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
+  const { refetch } = useTableFetchContext();
+
+  const refetchDatanodes = async () => {
+    await sleep(1000);
+    await refetch();
+  };
+
+  const handleStartDatanode = async () => {
+    await startDataNode(dataNode.node_id);
+    await refetchDatanodes();
+  };
 
   const updateState = ({ show, type }) => {
     setShowConfirmDialog(show);
@@ -93,8 +106,9 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
     }
   };
 
-  const handleClearState = () => {
+  const handleClearState = async () => {
     updateState({ show: false, type: null });
+    await refetchDatanodes();
   };
 
   const handleConfirm = () => {
@@ -131,7 +145,7 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
       {displayAs === 'dropdown' && (
         <MoreActions>
           <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
-          {!isDatanodeRunning && <MenuItem onSelect={() => startDataNode(dataNode.node_id)}>Start</MenuItem>}
+          {!isDatanodeRunning && <MenuItem onSelect={handleStartDatanode}>Start</MenuItem>}
           {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
           {isDatanodeRemoved && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>}
           {(!isDatanodeRemoved || isRemovingDatanode) && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>}
@@ -140,7 +154,7 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
       )}
       {displayAs === 'buttons' && (
         <>
-          {!isDatanodeRunning && <ActionButton onClick={() => startDataNode(dataNode.node_id)} bsSize="small">Start</ActionButton>}
+          {!isDatanodeRunning && <ActionButton onClick={handleStartDatanode} bsSize="small">Start</ActionButton>}
           {isDatanodeRunning && <ActionButton onClick={() => handleAction(DIALOG_TYPES.STOP)} bsSize="small">Stop</ActionButton>}
           {isDatanodeRemoved && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REJOIN)} bsSize="small">Rejoin</ActionButton>}
           {(!isDatanodeRemoved || isRemovingDatanode) && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REMOVE)} bsSize="small">Remove</ActionButton>}
