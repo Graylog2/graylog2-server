@@ -97,6 +97,7 @@ describe('XYPlot', () => {
       yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: 'linear' },
       xaxis: { fixedrange: true },
       hovermode: 'x',
+      legend: { y: -0.14 },
     });
 
     expect(genericPlot).toHaveProp('chartData', chartData);
