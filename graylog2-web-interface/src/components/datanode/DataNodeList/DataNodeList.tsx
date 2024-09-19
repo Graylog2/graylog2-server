@@ -81,6 +81,7 @@ const DataNodeList = () => (
                                   entityActions={entityActions}
                                   tableLayout={DEFAULT_LAYOUT}
                                   fetchEntities={fetchDataNodes}
+                                  fetchOptions={{ refetchInterval: 5000 }}
                                   keyFn={keyFn}
                                   entityAttributesAreCamelCase={false}
                                   columnRenderers={columnRenderers} />
