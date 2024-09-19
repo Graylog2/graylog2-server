@@ -71,7 +71,7 @@ const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUn
   const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
   const extendedSettings = getPieChartDataSettingsWithCustomUnits({ values, name, fullPath });
 
-  const definition = {
+  return {
     type,
     name,
     hole: 0.4,
@@ -79,7 +79,6 @@ const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUn
     originalLabels: labels,
     values,
     automargin: true,
-    outsidetextfont: { color: 'transparent' },
     textposition: 'inside',
     domain: {
       x: _horizontalDimensions(idx, total),
@@ -88,8 +87,6 @@ const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUn
     originalName,
     ...extendedSettings,
   };
-
-  return definition;
 };
 
 const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
