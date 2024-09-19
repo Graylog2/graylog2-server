@@ -26,6 +26,7 @@ import Routes from 'routing/Routes';
 
 import DataNodeActions from './DataNodeActions';
 import DataNodeStatusCell from './DataNodeStatusCell';
+import DataNodeBulkActions from './DataNodeBulkActions';
 
 import { fetchDataNodes, keyFn } from '../hooks/useDataNodes';
 
@@ -76,6 +77,7 @@ const DataNodeList = () => (
                                                    </p>
                                             )} />
                              )}
+                                  bulkSelection={{ actions: <DataNodeBulkActions /> }}
                                   entityActions={entityActions}
                                   tableLayout={DEFAULT_LAYOUT}
                                   fetchEntities={fetchDataNodes}
