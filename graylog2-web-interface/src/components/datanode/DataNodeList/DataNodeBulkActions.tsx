@@ -21,28 +21,43 @@ import MenuItem from 'components/bootstrap/MenuItem';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import ConfirmDialog from 'components/common/ConfirmDialog';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import sleep from 'logic/sleep';
 
 import { bulkRemoveDataNode, bulkStartDataNode, bulkStopDataNode } from '../hooks/useDataNodes';
 
 const DataNodeBulkActions = () => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const [showDialogType, setShowDialogType] = useState<'REMOVE'|'STOP'|null>(null);
+  const { refetch } = useTableFetchContext();
+
+  const refetchDatanodes = async () => {
+    await sleep(1000);
+    await refetch();
+  };
+
+  const handleBulkStartDatanode = async () => {
+    await bulkStartDataNode(selectedEntities, setSelectedEntities);
+    await refetchDatanodes();
+  };
 
   const CONFIRM_DIALOG = {
     REMOVE: {
       dialogTitle: 'Remove Data Nodes',
       dialogBody: `Are you sure you want to remove the selected ${selectedEntities.length > 1 ? `${selectedEntities.length} Data Nodes` : 'Data Node'}?`,
-      handleConfirm: () => {
+      handleConfirm: async () => {
         bulkRemoveDataNode(selectedEntities, setSelectedEntities);
         setShowDialogType(null);
+        await refetchDatanodes();
       },
     },
     STOP: {
       dialogTitle: 'Stop Data Nodes',
       dialogBody: `Are you sure you want to stop the selected ${selectedEntities.length > 1 ? `${selectedEntities.length} Data Nodes` : 'Data Node'}?`,
-      handleConfirm: () => {
+      handleConfirm: async () => {
         bulkStopDataNode(selectedEntities, setSelectedEntities);
         setShowDialogType(null);
+        await refetchDatanodes();
       },
     },
   };
@@ -50,7 +65,7 @@ const DataNodeBulkActions = () => {
   return (
     <>
       <BulkActionsDropdown>
-        <MenuItem onSelect={() => bulkStartDataNode(selectedEntities, setSelectedEntities)}>Start</MenuItem>
+        <MenuItem onSelect={handleBulkStartDatanode}>Start</MenuItem>
         <MenuItem onSelect={() => setShowDialogType('STOP')}>Stop</MenuItem>
         <MenuItem onSelect={() => setShowDialogType('REMOVE')}>Remove</MenuItem>
       </BulkActionsDropdown>
