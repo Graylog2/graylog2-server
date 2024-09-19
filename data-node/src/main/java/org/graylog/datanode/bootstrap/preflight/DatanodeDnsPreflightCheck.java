@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
@@ -24,6 +25,8 @@ import org.graylog2.shared.SuppressForbidden;
 
 import java.net.InetAddress;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DatanodeDnsPreflightCheck implements PreflightCheck {
@@ -36,16 +39,18 @@ public class DatanodeDnsPreflightCheck implements PreflightCheck {
 
     @Override
     public void runCheck() throws PreflightCheckException {
-        if (determineAltNames().noneMatch(v -> Objects.equals(v, configuredHostname))) {
-            throw new PreflightCheckException("Reverse lookup of the localhost IP failed. DNS is not configured properly for the hostname " + configuredHostname);
+        final Set<String> altNames = determineAltNames();
+        if (!determineAltNames().contains(configuredHostname)) {
+            throw new PreflightCheckException("Reverse lookup of the localhost IP failed. DNS is not configured properly for the hostname " + configuredHostname + ". Resolved hostnames: " + altNames);
         }
     }
 
 
-    private Stream<String> determineAltNames() {
+    private Set<String> determineAltNames() {
         return Stream.of("127.0.0.1", "::1")
                 .map(this::reverseLookup)
-                .filter(Objects::nonNull);
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
     @SuppressForbidden("Deliberate use of InetAddress#getHostName")
