@@ -1,0 +1,5 @@
+type="f"
+message="Fix validation issue for sidecar configuration setting `Update interval`."
+
+issues=["19240", "16829"]
+pulls=[""]
