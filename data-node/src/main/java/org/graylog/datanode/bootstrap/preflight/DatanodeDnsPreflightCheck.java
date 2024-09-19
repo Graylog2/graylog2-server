@@ -16,20 +16,22 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
-import org.graylog2.shared.SuppressForbidden;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.net.UnknownHostException;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class DatanodeDnsPreflightCheck implements PreflightCheck {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeDnsPreflightCheck.class);
+
     private final String configuredHostname;
 
     @Inject
@@ -39,28 +41,12 @@ public class DatanodeDnsPreflightCheck implements PreflightCheck {
 
     @Override
     public void runCheck() throws PreflightCheckException {
-        final Set<String> altNames = determineAltNames();
-        if (!determineAltNames().contains(configuredHostname)) {
-            throw new PreflightCheckException("Reverse lookup of the localhost IP failed. DNS is not configured properly for the hostname " + configuredHostname + ". Resolved hostnames: " + altNames);
-        }
-    }
-
-
-    private Set<String> determineAltNames() {
-        return Stream.of("127.0.0.1", "::1")
-                .map(this::reverseLookup)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-    }
-
-    @SuppressForbidden("Deliberate use of InetAddress#getHostName")
-    private String reverseLookup(String ipAddress) {
         try {
-            final var inetAddress = InetAddress.getByName(ipAddress);
-            final var reverseLookup = inetAddress.getHostName();
-            return reverseLookup.equals(ipAddress) ? null : reverseLookup;
-        } catch (Exception e) {
-            return null;
+            final InetAddress[] addresses = InetAddress.getAllByName(configuredHostname);
+            final List<String> ips = Stream.of(addresses).map(InetAddress::getHostAddress).toList();
+            LOG.debug("Datanode host " + configuredHostname + " is available on " + ips + " addresses");
+        } catch (UnknownHostException e) {
+            throw new PreflightCheckException("Configured hostname " + configuredHostname + " is not bound to any address! Please configure your DNS so the hostname points to this machine");
         }
     }
 }
