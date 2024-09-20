@@ -41,7 +41,6 @@ import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -53,6 +52,7 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -144,13 +144,8 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
     private Set<ExplainResults.IndexRangeResult> indexRanges(ValidationRequest request) {
         final Set<String> streamTitles = request.streams().stream()
-                .map(streamId -> {
-                    try {
-                        return streamService.load(streamId).getTitle();
-                    } catch (NotFoundException e) {
-                        return null;
-                    }
-                })
+                .map(streamService::streamTitleFromCache)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         return indexLookup.indexRangesForStreamsInTimeRange(request.streams(), request.timerange()).stream()

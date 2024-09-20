@@ -139,14 +139,15 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
         final ImmutableMap.Builder<String, ExplainResults.ExplainResult> builder = ImmutableMap.builder();
 
         query.searchTypes().forEach(s -> {
-            final Set<String> streamNames = query.effectiveStreams(s);
-            final Set<String> streamTitles = streamNames.stream()
+            final Set<String> streamIds = query.effectiveStreams(s);
+            final Set<String> streamTitles = streamIds.stream()
                     .map(this::streamTitle)
                     .flatMap(Optional::stream)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
 
             final Set<ExplainResults.IndexRangeResult> indicesForQuery =
-                    indexRangesForStreamsInTimeRange(streamNames, query.effectiveTimeRange(s)).stream()
+                    indexRangesForStreamsInTimeRange(streamIds, query.effectiveTimeRange(s)).stream()
                             .map(indexRange -> fromIndexRange(indexRange, streamTitles))
                             .collect(Collectors.toSet());
             queryContext.getSearchTypeQueryString(s.id())
