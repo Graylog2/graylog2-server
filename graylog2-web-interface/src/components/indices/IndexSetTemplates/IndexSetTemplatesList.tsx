@@ -46,7 +46,7 @@ const IndexSetTemplatesList = () => {
                                             tableLayout={DEFAULT_LAYOUT}
                                             fetchEntities={fetchIndexSetTemplates}
                                             keyFn={keyFn}
-                                            entityAttributesAreCamelCase
+                                            entityAttributesAreCamelCase={false}
                                             columnRenderers={customColumnRenderers}
                                             searchPlaceholder="Search for index set template" />
   );

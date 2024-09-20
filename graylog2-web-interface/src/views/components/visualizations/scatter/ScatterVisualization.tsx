@@ -56,7 +56,7 @@ const ScatterVisualization = makeVisualization(({
     y: values,
     mode: 'markers',
     originalName,
-    ...getChartDataSettingsWithCustomUnits({ originalName, fullPath: fullPath, values }),
+    ...getChartDataSettingsWithCustomUnits({ name, fullPath: fullPath, values }),
   }), [_mapKeys, getChartDataSettingsWithCustomUnits]);
   const _chartDataResult = useChartData(rows, {
     widgetConfig: config,

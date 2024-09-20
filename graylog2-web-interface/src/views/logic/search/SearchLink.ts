@@ -27,6 +27,7 @@ type InternalState = {
   timerange: TimeRange,
   query: QueryString,
   streams: Array<string>,
+  streamCategories: Array<string>,
   highlightedMessage: string,
   filterFields: { [key: string]: unknown },
 };
@@ -44,6 +45,7 @@ export default class SearchLink {
     timerange: InternalState['timerange'],
     query: InternalState['query'],
     streams: InternalState['streams'],
+    streamCategories: InternalState['streamCategories'],
     highlightedMessage: InternalState['highlightedMessage'],
     filterFields: InternalState['filterFields'],
   ) {
@@ -52,6 +54,7 @@ export default class SearchLink {
       timerange,
       query,
       streams,
+      streamCategories,
       highlightedMessage,
       filterFields,
     };
@@ -73,6 +76,10 @@ export default class SearchLink {
     return this._value.streams;
   }
 
+  get streamCategories() {
+    return this._value.streamCategories;
+  }
+
   get highlightedMessage() {
     return this._value.highlightedMessage;
   }
@@ -87,7 +94,7 @@ export default class SearchLink {
   }
 
   toURL() {
-    const { id, query, highlightedMessage, streams, filterFields, timerange } = this._value;
+    const { id, query, highlightedMessage, streams, streamCategories, filterFields, timerange } = this._value;
     const queryWithFilterFields = _mergeFilterFieldsToQuery(query, filterFields);
 
     const searchTimerange = timerange ? timeRangeToQueryParameter(timerange) : {};
@@ -102,10 +109,14 @@ export default class SearchLink {
       ? { ...params, streams: streams.join(',') }
       : params;
 
+    const paramsWithStreamsAndCategories = streamCategories && streamCategories.length > 0
+      ? { ...params, stream_categories: streamCategories.join(',') }
+      : paramsWithStreams;
+
     const urlPrefix = id ? `${Routes.SEARCH}/${id}` : Routes.SEARCH;
 
     const uri = new URI(urlPrefix)
-      .setSearch(paramsWithStreams);
+      .setSearch(paramsWithStreamsAndCategories);
 
     return uri.toString();
   }
@@ -136,6 +147,10 @@ class Builder {
     return new Builder(this.value.set('streams', value));
   }
 
+  streamCategories(value: InternalState['streamCategories']) {
+    return new Builder(this.value.set('streamCategories', value));
+  }
+
   highlightedMessage(value: InternalState['highlightedMessage']) {
     return new Builder(this.value.set('highlightedMessage', value));
   }
@@ -150,10 +165,11 @@ class Builder {
       timerange,
       query,
       streams,
+      streamCategories,
       highlightedMessage,
       filterFields,
     } = this.value.toObject();
 
-    return new SearchLink(id, timerange, query, streams, highlightedMessage, filterFields);
+    return new SearchLink(id, timerange, query, streams, streamCategories, highlightedMessage, filterFields);
   }
 }

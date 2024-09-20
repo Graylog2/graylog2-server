@@ -83,6 +83,9 @@ public class RemoteReindexingMigrationIT {
         closeSourceIndex(indexName);
 
         createTargetIndex(indexName, true);
+        createTargetIndex(indexName2, false);
+        blockTargetIndex(indexName2);
+
         Assertions.assertThat(getTargetIndexState(indexName))
                 .isEqualTo(IndexState.CLOSE);
 
@@ -117,6 +120,10 @@ public class RemoteReindexingMigrationIT {
         Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
 
 
+    }
+
+    private void blockTargetIndex(String indexName) {
+        apis.backend().searchServerInstance().client().setIndexBlock(indexName);
     }
 
     private void openTargetIndex(String indexName) {

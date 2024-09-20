@@ -31,6 +31,8 @@ public interface SearchRequestSpec {
 
     Set<String> streams();
 
+    Set<String> streamCategories();
+
     TimeRange timerange();
 
 }

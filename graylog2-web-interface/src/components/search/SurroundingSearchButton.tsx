@@ -44,9 +44,10 @@ const buildFilterFields = (messageFields: {
 
 const buildSearchLink = (id: string, from: string, to: string, filterFields: {
   [key: string]: unknown;
-}, streams: string[]) => SearchLink.builder()
+}, streams: string[], streamCategories: string[]) => SearchLink.builder()
   .timerange({ type: 'absolute', from, to })
   .streams(streams)
+  .streamCategories(streamCategories)
   .filterFields(filterFields)
   .highlightedMessage(id)
   .build()
@@ -54,12 +55,12 @@ const buildSearchLink = (id: string, from: string, to: string, filterFields: {
 
 const searchLink = (range: string, timestamp: moment.MomentInput, id: string, messageFields: {
   [key: string]: unknown;
-}, searchConfig: Pick<SearchesConfig, 'surrounding_filter_fields'>, streams: string[]) => {
+}, searchConfig: Pick<SearchesConfig, 'surrounding_filter_fields'>, streams: string[], streamCategories: string[]) => {
   const fromTime = moment(timestamp).subtract(Number(range), 'seconds').toISOString();
   const toTime = moment(timestamp).add(Number(range), 'seconds').toISOString();
   const filterFields = buildFilterFields(messageFields, searchConfig);
 
-  return buildSearchLink(id, fromTime, toTime, filterFields, streams);
+  return buildSearchLink(id, fromTime, toTime, filterFields, streams, streamCategories);
 };
 
 type Props = {
@@ -70,7 +71,7 @@ type Props = {
 };
 
 const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }: Props) => {
-  const { streams } = useContext(DrilldownContext);
+  const { streams, streamCategories } = useContext(DrilldownContext);
   const timeRangeOptions = buildTimeRangeOptions(searchConfig);
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -91,7 +92,7 @@ const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }:
     .map((range) => (
       <MenuItem key={range}
                 onClick={() => sendEvent(range)}
-                href={searchLink(range, timestamp, id, messageFields, searchConfig, streams)}
+                href={searchLink(range, timestamp, id, messageFields, searchConfig, streams, streamCategories)}
                 target="_blank"
                 rel="noopener noreferrer">
         {timeRangeOptions[range]}
