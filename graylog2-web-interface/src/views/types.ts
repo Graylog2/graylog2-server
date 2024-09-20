@@ -102,8 +102,8 @@ export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig
   toggleEdit: () => void;
   type: string;
   id: string;
-  height: number;
-  width: number;
+  height?: number;
+  width?: number;
 }
 
 export interface WidgetExport {
