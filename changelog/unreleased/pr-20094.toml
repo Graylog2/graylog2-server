@@ -1,0 +1,5 @@
+type = "f"
+message = "fixed check for missing required int in legacy search api"
+
+pulls = ["20094"]
+issues = ["7395"]
