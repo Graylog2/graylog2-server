@@ -25,13 +25,11 @@ import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import Routes from 'routing/Routes';
-import AppConfig from 'util/AppConfig';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Stream } from 'views/stores/StreamsStore';
 import type { Input } from 'components/messageloaders/Types';
-import { NodesStore } from 'stores/nodes/NodesStore';
-import { useStore } from 'stores/connect';
+import NodeName from 'views/components/messagelist/NodeName';
 
 const Span = styled.span`
   word-break: break-word;
@@ -49,34 +47,6 @@ const InputName = ({ inputs, inputId }: { inputs: Immutable.Map<string, Input> |
   const input = inputs?.get(inputId);
 
   return input ? <Span>{input.title}</Span> : <>deleted input</>;
-};
-
-const NodeName = ({ nodeId }: { nodeId: string }) => {
-  const nodesStore = useStore(NodesStore);
-  const nodes = Immutable.Map(nodesStore.nodes);
-  const node = nodes?.get(nodeId);
-  let nodeInformation;
-
-  if (node) {
-    const nodeURL = Routes.node(nodeId);
-
-    const nodeContent = (
-      <>
-        <Icon name="fork_right" />
-        &nbsp;
-        <Span>{node.short_node_id}</Span>&nbsp;/&nbsp;
-        <Span>{node.hostname}</Span>
-      </>
-    );
-
-    nodeInformation = AppConfig.isCloud()
-      ? nodeContent
-      : <a href={nodeURL}>{nodeContent}</a>;
-  } else {
-    nodeInformation = <Span>stopped node</Span>;
-  }
-
-  return nodeInformation;
 };
 
 const StreamLinks = ({ messageStreams, streamIds, streams }: {
