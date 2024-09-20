@@ -863,6 +863,7 @@
                             org.bouncycastle.util.Strings
                             org.junit.jupiter.params.shadow.**
                             org.apache.http.util.**
+                            io.trino.hadoop.$internal.**
 
                             @defaultMessage Use jakarta.inject.
                             com.google.inject.Inject
