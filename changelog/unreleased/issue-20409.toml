@@ -2,6 +2,6 @@ type = "fixed"
 message = "Fix search bar query validation error showing double icons."
 
 issues = ["20409"]
-pulls = [""]
+pulls = ["20502"]
 
 contributors = [""]
