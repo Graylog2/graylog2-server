@@ -53,7 +53,7 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
       direction: 'asc',
     },
   });
-  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards } = useDashboards(searchParams, { permissions: { canUpdate: true } });
+  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards } = useDashboards(searchParams, 'update');
 
   useEffect(() => {
     setSelectedDashboard(null);

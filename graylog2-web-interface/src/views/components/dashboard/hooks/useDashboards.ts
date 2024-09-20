@@ -40,23 +40,17 @@ type PaginatedDashboardsResponse = PaginatedListJSON & {
   attributes: Array<Attribute>,
 };
 
-type Permissions = {
-  canUpdate: boolean;
-}
-
 type Options = {
   enabled?: boolean,
-  permissions?: Permissions,
 }
 
-export const fetchDashboards = (searchParams: SearchParams, permissions: Permissions = { canUpdate: false }) => {
-  const baseUrl = permissions.canUpdate ? `${dashboardsUrl}/canUpdate` : dashboardsUrl;
+export const fetchDashboards = (searchParams: SearchParams, scope: string = 'read') => {
   const url = PaginationURL(
-    baseUrl,
+    dashboardsUrl,
     searchParams.page,
     searchParams.pageSize,
     searchParams.query,
-    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction, scope: scope });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
     ({ elements, total, count, page, per_page: perPage, attributes }) => ({
@@ -67,7 +61,7 @@ export const fetchDashboards = (searchParams: SearchParams, permissions: Permiss
   );
 };
 
-const useDashboards = (searchParams: SearchParams, { enabled, permissions }: Options = { enabled: true, permissions: { canUpdate: false } }): {
+const useDashboards = (searchParams: SearchParams, scope: string = 'read', { enabled }: Options = { enabled: true }): {
   data: {
     list: Readonly<Array<View>>,
     pagination: { total: number },
@@ -78,7 +72,7 @@ const useDashboards = (searchParams: SearchParams, { enabled, permissions }: Opt
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     keyFn(searchParams),
-    () => fetchDashboards(searchParams, permissions),
+    () => fetchDashboards(searchParams, scope),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,

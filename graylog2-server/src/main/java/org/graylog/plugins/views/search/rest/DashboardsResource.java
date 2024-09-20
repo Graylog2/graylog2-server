@@ -57,9 +57,25 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
+    public enum Scope {
+        READ("read"),
+        UPDATE("update");
+
+        private final String scope;
+
+        Scope(String scope) {
+            this.scope = scope;
+        }
+
+        public String scope() {
+            return this.scope;
+        }
+    }
+
     private final ViewService dbService;
 
     private static final String DEFAULT_SORT_FIELD = ViewDTO.FIELD_TITLE;
+    private static final String DEFAULT_SCOPE = "read";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("_id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
@@ -84,9 +100,9 @@ public class DashboardsResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Get a list of all dashboards a user can read")
+    @ApiOperation("Get a list of all dashboards")
     @Timed
-    public PageListResponse<ViewSummaryDTO> viewsTheUserCanRead(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PageListResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                   @ApiParam(name = "sort",
                                                             value = "The field to sort the result on",
@@ -95,35 +111,16 @@ public class DashboardsResource extends RestResource {
                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
                                                   @ApiParam(name = "query") @QueryParam("query") String query,
                                                   @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                  @Context SearchUser searchUser) {
-        return views(page, perPage, sortField, order, query, searchUser::canReadView, filters, searchUser);
-    }
-
-    @GET
-    @ApiOperation("Get a list of all dashboards a user can change")
-    @Path("/canUpdate")
-    @Timed
-    public PageListResponse<ViewSummaryDTO> viewsTheUserCanChange(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                  @ApiParam(name = "sort",
+                                                  @ApiParam(name = "scope",
                                                             value = "The field to sort the result on",
                                                             required = true,
-                                                            allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
-                                                  @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
-                                                  @ApiParam(name = "query") @QueryParam("query") String query,
-                                                  @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+                                                            allowableValues = "read,update") @DefaultValue(DEFAULT_SCOPE) @QueryParam("scope") Scope scope,
                                                   @Context SearchUser searchUser) {
-        return views(page, perPage, sortField, order, query, searchUser::canUpdateView, filters, searchUser);
-    }
 
-    private PageListResponse<ViewSummaryDTO> views(final int page,
-                                                  final int perPage,
-                                                  String sortField,
-                                                  final SortOrder order,
-                                                  final String query,
-                                                  final Predicate<ViewSummaryDTO> predicate,
-                                                  final List<String> filters,
-                                                  final SearchUser searchUser) {
+        final Predicate<ViewSummaryDTO> predicate = switch (scope) {
+            case READ -> searchUser::canReadView;
+            case UPDATE -> searchUser::canUpdateView;
+        };
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
