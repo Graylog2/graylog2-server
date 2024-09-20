@@ -20,6 +20,7 @@ import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.ranges.IndexRange;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,13 +35,14 @@ public record ExplainResults(String search_id, SearchResult search, Set<SearchEr
     public record ExplainResult(String queryString, Set<IndexRangeResult> searchedIndexRanges) {
     }
 
-    public record IndexRangeResult(String indexName, long begin, long end, boolean isWarmTiered) {
-        public IndexRangeResult(String indexName, long begin, long end) {
-            this(indexName, begin, end, MongoIndexSet.indexHasWarmInfix(indexName));
+    public record IndexRangeResult(String indexName, long begin, long end, boolean isWarmTiered,
+                                   Collection<String> streamNames) {
+        public IndexRangeResult(String indexName, long begin, long end, Collection<String> streamNames) {
+            this(indexName, begin, end, MongoIndexSet.indexHasWarmInfix(indexName), streamNames);
         }
 
-        public static IndexRangeResult fromIndexRange(IndexRange indexRange) {
-            return new IndexRangeResult(indexRange.indexName(), indexRange.begin().getMillis(), indexRange.end().getMillis());
+        public static IndexRangeResult fromIndexRange(IndexRange indexRange, Collection<String> streamNames) {
+            return new IndexRangeResult(indexRange.indexName(), indexRange.begin().getMillis(), indexRange.end().getMillis(), streamNames);
         }
     }
 }
