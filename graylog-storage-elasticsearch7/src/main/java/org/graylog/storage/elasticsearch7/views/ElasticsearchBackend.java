@@ -54,7 +54,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.Search
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -232,11 +231,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
     @Override
     public Optional<String> streamTitle(String streamId) {
-        try {
-            return Optional.of(streamService.load(streamId).getTitle());
-        } catch (NotFoundException e) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(streamService.streamTitleFromCache(streamId));
     }
 
     @WithSpan

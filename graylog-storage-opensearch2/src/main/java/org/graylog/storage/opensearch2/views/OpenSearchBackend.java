@@ -55,7 +55,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -235,11 +234,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
     @Override
     public Optional<String> streamTitle(String streamId) {
-        try {
-            return Optional.of(streamService.load(streamId).getTitle());
-        } catch (NotFoundException e) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(streamService.streamTitleFromCache(streamId));
     }
 
     @Override
