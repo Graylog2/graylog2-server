@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import styled from 'styled-components';
 
 import { ConfirmDialog } from 'components/common';
@@ -71,9 +71,18 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const { refetch } = useTableFetchContext();
+  const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
+
+  const sleepAndClearTimer = async () => {
+    if (statusTimeout.current) {
+      clearTimeout(statusTimeout.current);
+    }
+
+    statusTimeout.current = await sleep(1000);
+  };
 
   const refetchDatanodes = async () => {
-    await sleep(1000);
+    await sleepAndClearTimer();
     await refetch();
   };
 
