@@ -212,8 +212,7 @@ const QueryValidation = () => {
                                 $clickable
                                 tabIndex={0}
                                 type="button">
-              {isInfo && <ErrorIcon $status={status} name={isInfo ? 'database' : 'error'} />}
-              {!isInfo && <ErrorIcon $status={status} name="error" />}
+              <ErrorIcon $status={status} name={isInfo ? 'database' : 'error'} />
             </ExplanationTrigger>
           ) : (
             <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
