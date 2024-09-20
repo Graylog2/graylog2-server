@@ -30,6 +30,8 @@ import MessagePermalinkButton from 'views/components/common/MessagePermalinkButt
 import type { Message } from 'views/components/messagelist/Types';
 import type { Stream } from 'views/stores/StreamsStore';
 import type { Input } from 'components/messageloaders/Types';
+import { NodesStore } from 'stores/nodes/NodesStore';
+import { useStore } from 'stores/connect';
 
 const Span = styled.span`
   word-break: break-word;
@@ -49,7 +51,9 @@ const InputName = ({ inputs, inputId }: { inputs: Immutable.Map<string, Input> |
   return input ? <Span>{input.title}</Span> : <>deleted input</>;
 };
 
-const NodeName = ({ nodes, nodeId }: { nodes: Immutable.Map<string, { short_node_id: string, hostname: string }> | undefined, nodeId: string }) => {
+const NodeName = ({ nodeId }: { nodeId: string }) => {
+  const nodesStore = useStore(NodesStore);
+  const nodes = Immutable.Map(nodesStore.nodes);
   const node = nodes?.get(nodeId);
   let nodeInformation;
 
@@ -100,13 +104,12 @@ const StreamLinks = ({ messageStreams, streamIds, streams }: {
 type Props = {
   message: Message & { streams?: Array<Stream> },
   inputs?: Immutable.Map<string, Input>,
-  nodes?: Immutable.Map<string, { short_node_id: string, hostname: string }>,
   streams?: Immutable.Map<string, Stream>,
   renderForDisplay: (fieldName: string) => React.ReactNode,
   customFieldActions?: React.ReactNode
 }
 
-const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, customFieldActions }: Props) => {
+const MessageDetail = ({ renderForDisplay, inputs, streams, message, customFieldActions }: Props) => {
   const streamIds = Immutable.Set(message.stream_ids);
   const rawTimestamp = message.fields.timestamp;
   const timestamp = [
@@ -136,12 +139,12 @@ const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, cust
         <Col md={3}>
           <MessageDetailsDefinitionList>
             {timestamp}
-            {(message.source_input_id && message.source_node_id && nodes) && (
+            {(message.source_input_id && message.source_node_id) && (
               <div>
                 <dt>Received by</dt>
                 <dd>
                   <em><InputName inputs={inputs} inputId={message.source_input_id} /></em>{' '}
-                  on <NodeName nodes={nodes} nodeId={message.source_node_id} />
+                  on <NodeName nodeId={message.source_node_id} />
 
                   {/* Legacy */}
                   {message.source_radio_id && (
@@ -149,7 +152,7 @@ const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, cust
                       <br />
                       <span>
                         via <em><InputName inputs={inputs} inputId={message.source_radio_input_id} /></em> on
-                        radio <NodeName nodes={nodes} nodeId={message.source_radio_id} />
+                        radio <NodeName nodeId={message.source_radio_id} />
                       </span>
                     </>
                   )}
@@ -186,7 +189,6 @@ const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, cust
 
 MessageDetail.defaultProps = {
   inputs: undefined,
-  nodes: undefined,
   streams: undefined,
   customFieldActions: undefined,
 };
