@@ -236,7 +236,8 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean allDatanodesAvailable() {
-        return nodeService.allActive().values()
+        final Map<String, DataNodeDto> activeNodes = nodeService.allActive();
+        return !activeNodes.isEmpty() && activeNodes.values()
                 .stream()
                 .allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
     }
