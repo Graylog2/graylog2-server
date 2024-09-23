@@ -36,8 +36,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-import static io.restassured.RestAssured.given;
-
 public abstract class WaitingRestOperation extends RestOperation {
 
     private String lastRecordedResponse;
@@ -106,6 +104,8 @@ public abstract class WaitingRestOperation extends RestOperation {
     private void logShardsExplanation() {
         final RequestSpecification req = RestAssured.given()
                 .accept(ContentType.JSON);
+        Optional.ofNullable(parameters.truststore()).ifPresent(ts -> req.trustStore(parameters.truststore()));
+        parameters.addAuthorizationHeaders(req);
         final String shardsAllocation = req.get(formatUrl(parameters, "/_cluster/allocation/explain?pretty")).then().extract().body().asString();
         LOG.warn("Shards allocation explanation: {}", shardsAllocation);
     }
