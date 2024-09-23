@@ -1,0 +1,4 @@
+type = "a"
+message = "Added new Raw HTTP input. Also added support for custom authorization config option for HTTP Gelf and new HTTP Raw inputs."
+
+pulls = ["20370"]

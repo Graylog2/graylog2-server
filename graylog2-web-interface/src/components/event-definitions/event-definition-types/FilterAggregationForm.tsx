@@ -40,6 +40,7 @@ const initialFilterConfig = {
   query: '',
   query_parameters: [],
   streams: [],
+  stream_categories: [],
   filters: [],
   search_within_ms: 5 * 60 * 1000,
   execute_every_ms: 5 * 60 * 1000,

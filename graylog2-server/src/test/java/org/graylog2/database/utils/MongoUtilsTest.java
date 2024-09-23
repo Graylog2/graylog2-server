@@ -28,6 +28,7 @@ import org.graylog2.database.MongoEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mongojack.Id;
 
 import java.util.List;
 import java.util.Set;
@@ -43,16 +44,21 @@ import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 @ExtendWith(MongoJackExtension.class)
 class MongoUtilsTest {
 
-    private record DTO(String id, String name) implements MongoEntity {}
+    private record DTO(@Id @org.mongojack.ObjectId String id, String name) implements MongoEntity {}
+
+    private record DTORef(@Id @org.mongojack.ObjectId String id, ObjectId refId,
+                          String name) implements MongoEntity {}
 
     private MongoCollections mongoCollections;
     private MongoCollection<DTO> collection;
+    private MongoCollection<DTORef> collectionRef;
     private MongoUtils<DTO> utils;
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
         mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
         collection = mongoCollections.collection("test", DTO.class);
+        collectionRef = mongoCollections.collection("test1", DTORef.class);
         utils = mongoCollections.utils(collection);
     }
 
@@ -96,6 +102,16 @@ class MongoUtilsTest {
     }
 
     @Test
+    void testObjectIdEq() {
+        final var a = new DTORef("6627add0ee216425dd6df37c", new ObjectId("6627add0ee216425dd6df37d"), "a");
+        final var b = new DTORef("6627add0ee216425dd6df37d", new ObjectId("6627add0ee216425dd6df37c"), "b");
+        collectionRef.insertMany(List.of(a, b));
+
+        assertThat(collectionRef.find(MongoUtils.objectIdEq("ref_id", a.id())).first()).isEqualTo(b);
+        assertThat(collectionRef.find(MongoUtils.objectIdEq("ref_id", new ObjectId("6627add0ee216425dd6df37d"))).first()).isEqualTo(a);
+    }
+
+    @Test
     void testIdsIn() {
         final String missingId1 = "6627add0ee216425dd6df36a";
         final String missingId2 = "6627add0ee216425dd6df36b";
@@ -122,5 +138,46 @@ class MongoUtilsTest {
         assertThat(collection.find(stringIdsIn(Set.of(idA, idB, idC, idD, idE, idF)))).contains(a, b, c, d, e, f);
         assertThat(collection.find(stringIdsIn(Set.of(idA, idB, idC, idD, idE, idF, missingId1, missingId2)))).hasSize(6);
         assertThat(collection.find(stringIdsIn(Set.of(idA, idB, idC, idD, idE, idF, missingId1, missingId2)))).contains(a, b, c, d, e, f);
+    }
+
+    @Test
+    void testGetOrCreate() {
+        final var id = new ObjectId().toHexString();
+        final var dto = new DTO(id, "test");
+
+        assertThat(utils.getById(id)).isEmpty();
+
+        assertThat(utils.getOrCreate(dto)).satisfies(result -> {
+            assertThat(result.id()).isEqualTo(id);
+            assertThat(result.name()).isEqualTo("test");
+            assertThat(result).isEqualTo(dto);
+        });
+
+        assertThat(utils.getById(id)).isPresent().get().satisfies(result -> {
+            assertThat(result.id()).isEqualTo(id);
+            assertThat(result.name()).isEqualTo("test");
+            assertThat(result).isEqualTo(dto);
+        });
+
+        // Using a different name in the DTO doesn't update the existing entry in the collection
+        assertThat(utils.getOrCreate(new DTO(id, "another"))).satisfies(result -> {
+            assertThat(result.id()).isEqualTo(id);
+            assertThat(result.name()).isEqualTo("test");
+            assertThat(result).isEqualTo(dto);
+        });
+    }
+
+    @Test
+    void testGetOrCreateWithNullEntity() {
+        assertThatThrownBy(() -> utils.getOrCreate(null))
+                .hasMessageContaining("entity cannot be null")
+                .isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    void testGetOrCreateWithNullEntityID() {
+        assertThatThrownBy(() -> utils.getOrCreate(new DTO(null, "test")))
+                .hasMessageContaining("entity ID cannot be null")
+                .isInstanceOf(NullPointerException.class);
     }
 }

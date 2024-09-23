@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.Identified;
 import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.Revisioned;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.database.MongoConnection;
@@ -136,7 +137,7 @@ public class ContentPackPersistenceService {
 
         cpv1.entities()
                 .stream()
-                .filter(entity -> "stream".equals(entity.type().name()) && "1".equals(entity.type().version()))
+                .filter(entity -> ModelTypes.STREAM_V1.equals(entity.type()) || ModelTypes.STREAM_REF_V1.equals(entity.type()))
                 .map(entity -> new Tuple2<String, JsonNode>(entity.id().id(), ((EntityV1) entity).data().findValue("title")))
                 .forEach(tuple2 -> {
                     JsonNode title = tuple2.v2().findValue("@value");

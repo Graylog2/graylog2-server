@@ -29,6 +29,8 @@ import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog.integrations.dataadapters.GreyNoiseQuickIPDataAdapter;
 import org.graylog.integrations.inputs.paloalto.PaloAltoCodec;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTCPInput;
+import org.graylog.integrations.inputs.paloalto11.PaloAlto11xCodec;
+import org.graylog.integrations.inputs.paloalto11.PaloAlto11xInput;
 import org.graylog.integrations.inputs.paloalto9.PaloAlto9xCodec;
 import org.graylog.integrations.inputs.paloalto9.PaloAlto9xInput;
 import org.graylog.integrations.ipfix.codecs.IpfixCodec;
@@ -170,6 +172,11 @@ public class IntegrationsModule extends PluginModule {
         LOG.debug("Registering message input: {}", PaloAlto9xInput.NAME);
         addMessageInput(PaloAlto9xInput.class);
         addCodec(PaloAlto9xCodec.NAME, PaloAlto9xCodec.class);
+
+        // Palo Alto Networks 11x
+        LOG.debug("Registering message input: {}", PaloAlto11xInput.NAME);
+        addMessageInput(PaloAlto11xInput.class);
+        addCodec(PaloAlto11xCodec.NAME, PaloAlto11xCodec.class);
 
         // AWS
         addCodec(AWSCodec.NAME, AWSCodec.class);

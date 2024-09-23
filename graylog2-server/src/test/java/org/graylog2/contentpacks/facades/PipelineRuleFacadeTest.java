@@ -37,6 +37,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.shared.SuppressForbidden;
@@ -67,8 +68,7 @@ public class PipelineRuleFacadeTest {
     public void setUp() throws Exception {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         ruleService = new MongoDbRuleService(
-                mongodb.mongoConnection(),
-                new MongoJackObjectMapperProvider(objectMapper),
+                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection()),
                 clusterEventBus);
 
         facade = new PipelineRuleFacade(objectMapper, ruleService);

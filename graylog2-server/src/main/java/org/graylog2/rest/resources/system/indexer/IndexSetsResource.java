@@ -57,6 +57,7 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.system.indices.DataTieringStatusService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
@@ -93,6 +94,7 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetStatsCreator indexSetStatsCreator;
     private final ClusterConfigService clusterConfigService;
     private final SystemJobManager systemJobManager;
+    private final DataTieringStatusService tieringStatusService;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -102,7 +104,8 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
-                             final SystemJobManager systemJobManager) {
+                             final SystemJobManager systemJobManager,
+                             final DataTieringStatusService tieringStatusService) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -111,6 +114,7 @@ public class IndexSetsResource extends RestResource {
         this.indexSetStatsCreator = indexSetStatsCreator;
         this.clusterConfigService = clusterConfigService;
         this.systemJobManager = systemJobManager;
+        this.tieringStatusService = tieringStatusService;
     }
 
     @GET
@@ -206,9 +210,12 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary get(@ApiParam(name = "id", required = true)
                                @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
+        final IndexSet indexSet = indexSetRegistry.get(id).orElseThrow(() -> new NotFoundException("Couldn't find index set with ID <" + id + ">"));
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         return indexSetService.get(id)
-                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
+                .map(config -> IndexSetSummary.fromIndexSetConfig(
+                        config, config.equals(defaultIndexSet),
+                        tieringStatusService.getStatus(indexSet, config)))
                 .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
     }
 

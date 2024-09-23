@@ -53,7 +53,7 @@ import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_
 import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_TITLE;
 
 public class StreamDestinationFilterService {
-    static final String COLLECTION = "stream_destination_filters";
+    public static final String COLLECTION = "stream_destination_filters";
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(FIELD_TITLE, SearchQueryField.create(FIELD_TITLE))
@@ -66,13 +66,17 @@ public class StreamDestinationFilterService {
     private final MongoPaginationHelper<StreamDestinationFilterRuleDTO> paginationHelper;
     private final MongoUtils<StreamDestinationFilterRuleDTO> utils;
     private final ClusterEventBus clusterEventBus;
+    private final Optional<DestinationFilterCreationValidator> optionalDestinationFilterCreationValidator;
 
     @Inject
-    public StreamDestinationFilterService(MongoCollections mongoCollections, ClusterEventBus clusterEventBus) {
+    public StreamDestinationFilterService(MongoCollections mongoCollections,
+                                          ClusterEventBus clusterEventBus,
+                                          Optional<DestinationFilterCreationValidator> optionalDestinationFilterCreationValidator) {
         this.collection = mongoCollections.collection(COLLECTION, StreamDestinationFilterRuleDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.utils = mongoCollections.utils(collection);
         this.clusterEventBus = clusterEventBus;
+        this.optionalDestinationFilterCreationValidator = optionalDestinationFilterCreationValidator;
 
         collection.createIndex(Indexes.ascending(FIELD_STREAM_ID));
         collection.createIndex(Indexes.ascending(FIELD_DESTINATION_TYPE));
@@ -126,6 +130,8 @@ public class StreamDestinationFilterService {
         if (!isBlank(dto.id())) {
             throw new IllegalArgumentException("id must be blank");
         }
+
+        optionalDestinationFilterCreationValidator.ifPresent(validator -> validator.validate(dto));
 
         // We don't want to allow the creation of a filter rule for a different stream, so we enforce the stream ID.
         final var dtoId = insertedId(collection.insertOne(dto.withStream(streamId)));

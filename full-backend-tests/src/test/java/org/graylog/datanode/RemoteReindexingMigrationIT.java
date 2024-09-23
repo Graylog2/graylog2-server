@@ -36,6 +36,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.elasticsearch.IndexState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
@@ -73,13 +74,20 @@ public class RemoteReindexingMigrationIT {
     @ContainerMatrixTest
     void testRemoteAsyncReindexing() throws ExecutionException, RetryException {
 
-        final String indexName = createRandomIndex();
-        final String indexName2 = createRandomIndex();
+        final String indexName = createRandomSourceIndex();
+        final String indexName2 = createRandomSourceIndex();
 
         final String messageContent = ingestRandomMessage(indexName);
         final String messageContent2 = ingestRandomMessage(indexName2);
 
-        closeIndex(indexName);
+        closeSourceIndex(indexName);
+
+        createTargetIndex(indexName, true);
+        createTargetIndex(indexName2, false);
+        blockTargetIndex(indexName2);
+
+        Assertions.assertThat(getTargetIndexState(indexName))
+                .isEqualTo(IndexState.CLOSE);
 
         // flush the newly created document
         openSearchInstance.client().refreshNode();
@@ -102,18 +110,45 @@ public class RemoteReindexingMigrationIT {
         final String status = response.extract().body().jsonPath().get("status");
         Assertions.assertThat(status).isEqualTo("FINISHED");
 
+        Assertions.assertThat(getTargetIndexState(indexName))
+                        .isEqualTo(IndexState.CLOSE);
+
+
+        openTargetIndex(indexName);
+
+        Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
         Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
+
 
     }
 
-    private void closeIndex(String indexName) {
+    private void blockTargetIndex(String indexName) {
+        apis.backend().searchServerInstance().client().setIndexBlock(indexName);
+    }
+
+    private void openTargetIndex(String indexName) {
+        apis.backend().searchServerInstance().client().openIndex(indexName);
+    }
+
+    private IndexState getTargetIndexState(String indexName) {
+        return apis.backend().searchServerInstance().client().getStatus(indexName);
+    }
+
+    private void createTargetIndex(String indexName, boolean closed) {
+        apis.backend().searchServerInstance().client().createIndex(indexName);
+        if (closed) {
+            apis.backend().searchServerInstance().client().closeIndex(indexName);
+        }
+    }
+
+    private void closeSourceIndex(String indexName) {
         openSearchInstance.openSearchClient().execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().close(new CloseIndexRequest(indexName), requestOptions));
     }
 
     /**
      * @return name of the newly created index
      */
-    private String createRandomIndex() {
+    private String createRandomSourceIndex() {
         String indexName = RandomStringUtils.randomAlphanumeric(15).toLowerCase(Locale.ROOT);
         final CreateIndexResponse response = openSearchInstance.openSearchClient().execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().create(new CreateIndexRequest(indexName), requestOptions));
         return response.index();

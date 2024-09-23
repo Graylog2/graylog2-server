@@ -199,6 +199,7 @@ export interface SystemConfigurationComponentProps {
 }
 
 export interface SystemConfiguration {
+  skipClusterConfigRequest?: boolean,
   configType: string;
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
@@ -343,6 +344,7 @@ interface MessageRowOverrideProps {
 export interface CombinedSearchBarFormValues {
   timerange?: TimeRange | NoTimeRangeOverride,
   streams?: Array<string>,
+  streamCategories?: Array<string>,
   queryString?: string,
 }
 
