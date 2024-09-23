@@ -97,6 +97,13 @@ public class StreamServiceImplTest {
     }
 
     @Test
+    @MongoDBFixtures("someStreamsWithAlertConditions.json")
+    public void streamTitleFromCache() {
+        assertThat(streamService.streamTitleFromCache("565f02223b0c25a537197af2")).isEqualTo("Logins");
+        assertThat(streamService.streamTitleFromCache("5628f4503b00deadbeef0002")).isNull();
+    }
+
+    @Test
     @MongoDBFixtures("someStreamsWithoutAlertConditions.json")
     public void addOutputs() throws NotFoundException {
         final ObjectId streamId = new ObjectId("5628f4503b0c5756a8eebc4d");

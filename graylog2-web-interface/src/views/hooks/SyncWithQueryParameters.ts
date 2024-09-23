@@ -22,7 +22,7 @@ import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
-import { filtersToStreamSet } from 'views/logic/queries/Query';
+import { filtersToStreamSet, filtersToStreamCategorySet } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import useViewType from 'views/hooks/useViewType';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
@@ -70,9 +70,14 @@ export const syncWithQueryParameters = (viewType: ViewType, query: string, searc
     const uriWithTimerange = extractTimerangeParams(timerange)
       .reduce((prev, [key, value]) => prev.setSearch(key, String(value)), baseUri);
     const currentStreams = filtersToStreamSet(filter);
-    const uri = currentStreams.isEmpty()
-      ? uriWithTimerange.removeSearch('streams').toString()
-      : uriWithTimerange.setSearch('streams', currentStreams.join(',')).toString();
+    const currentStreamCategories = filtersToStreamCategorySet(filter);
+    const uriWithStreams = currentStreams.isEmpty()
+      ? uriWithTimerange.removeSearch('streams')
+      : uriWithTimerange.setSearch('streams', currentStreams.join(','));
+
+    const uri = currentStreamCategories.isEmpty()
+      ? uriWithStreams.removeSearch('stream_categories').toString()
+      : uriWithStreams.setSearch('stream_categories', currentStreamCategories.join(',')).toString();
 
     if (query !== uri) {
       action(uri);

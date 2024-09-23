@@ -84,7 +84,8 @@ const tableCss = css(({ theme }) => css`
     > tfoot > tr {
       > th,
       > td {
-        border-top-color: ${theme.colors.table.row.backgroundStriped};
+        border-top-color: ${theme.colors.table.row.divider};
+        border-width: 1px;
       }
     }
 
@@ -92,6 +93,7 @@ const tableCss = css(({ theme }) => css`
       background: ${theme.colors.table.head.background};
       white-space: nowrap;
       border-bottom-color: ${theme.colors.table.row.divider};
+      border-width: 1px;
     }
 
     > tbody > tr {
@@ -100,7 +102,8 @@ const tableCss = css(({ theme }) => css`
     }
 
     > tbody + tbody {
-      border-top-color: ${theme.colors.table.row.backgroundStriped};
+      border-top-color: ${theme.colors.table.row.divider};
+      border-width: 1px;
     }
 
     .table {
@@ -109,14 +112,14 @@ const tableCss = css(({ theme }) => css`
   }
 
   &.table-bordered {
-    border-color: ${theme.colors.table.row.backgroundStriped};
+    border-color: ${theme.colors.table.row.divider};
 
     > thead > tr,
     > tfoot > tr,
     > tbody > tr {
       > td,
       > th {
-        border-color: ${theme.colors.table.row.backgroundStriped};
+        border-color: ${theme.colors.table.row.divider};
       }
     }
   }

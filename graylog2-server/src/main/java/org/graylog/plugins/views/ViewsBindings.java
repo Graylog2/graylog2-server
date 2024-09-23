@@ -56,6 +56,7 @@ import org.graylog.plugins.views.search.export.SimpleMessageChunkCsvWriter;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
+import org.graylog.plugins.views.search.filter.StreamCategoryFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService;
 import org.graylog.plugins.views.search.querystrings.MongoLastUsedQueryStringsService;
@@ -177,6 +178,7 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(AndFilter.class);
         registerJacksonSubtype(OrFilter.class);
         registerJacksonSubtype(StreamFilter.class);
+        registerJacksonSubtype(StreamCategoryFilter.class);
         registerJacksonSubtype(QueryStringFilter.class);
 
         // query backends for jackson

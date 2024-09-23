@@ -48,8 +48,13 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
-const ErrorIcon = styled(Icon)<{ $status: string }>(({ theme, $status }) => css`
-  color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
+const ErrorIcon = styled(Icon)<{ $status: string }>(({ $status }) => css`
+  color: ${({ theme }) => {
+    if ($status === 'ERROR') return theme.colors.variant.danger;
+    if ($status === 'INFO') return theme.colors.variant.info;
+
+    return theme.colors.variant.warning;
+  }};
   font-size: 22px;
 `);
 
@@ -190,24 +195,24 @@ const QueryValidation = () => {
   const explanationTriggerRef = useRef(undefined);
   const { errors: { queryString: queryStringErrors } } = useFormikContext<QueryForm>();
   const { warnings } = useContext(FormWarningsContext);
-
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
 
   const { status, explanations = [] } = validationState ?? { explanations: [] };
   const deduplicatedExplanations = useMemo(() => [...deduplicateExplanations(explanations)], [explanations]);
   const hasExplanations = validationState && (validationState?.status !== 'OK');
+  const isInfo = validationState && (validationState.status === 'INFO');
 
   return (
     <Popover opened={hasExplanations && showExplanation} position="bottom" width={500} withArrow>
       <Popover.Target>
         <Container ref={explanationTriggerRef}>
           {hasExplanations ? (
-            <ExplanationTrigger title="Toggle validation error explanation"
+            <ExplanationTrigger title={`Toggle validation ${isInfo ? 'information' : 'error explanation'}`}
                                 onClick={toggleShow}
                                 $clickable
                                 tabIndex={0}
                                 type="button">
-              <ErrorIcon $status={status} name="error" />
+              <ErrorIcon $status={status} name={isInfo ? 'database' : 'error'} />
             </ExplanationTrigger>
           ) : (
             <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}

@@ -343,6 +343,7 @@ interface MessageRowOverrideProps {
 export interface CombinedSearchBarFormValues {
   timerange?: TimeRange | NoTimeRangeOverride,
   streams?: Array<string>,
+  streamCategories?: Array<string>,
   queryString?: string,
 }
 
@@ -441,6 +442,10 @@ export interface WidgetCreator {
   func: (args: WidgetCreatorArgs) => Widget;
   icon: React.ComponentType<{}>,
 }
+
+export type FieldUnitType = 'size' | 'time' | 'percent';
+
+export type FieldUnitsFormValues = Record<string, {abbrev: string; unitType: FieldUnitType}>;
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {

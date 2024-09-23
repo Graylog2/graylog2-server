@@ -19,8 +19,11 @@ package org.graylog2.telemetry.rest;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.hash.HashCode;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.database.users.User;
@@ -39,9 +42,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -69,6 +69,7 @@ public class TelemetryService {
     private final TelemetryClusterService telemetryClusterService;
     private final String installationSource;
     private final NodeService<DataNodeDto> nodeService;
+    private final boolean runsWithDatanode;
 
     @Inject
     public TelemetryService(
@@ -84,7 +85,8 @@ public class TelemetryService {
             EventBus eventBus,
             TelemetryClusterService telemetryClusterService,
             @Named("installation_source") String installationSource,
-            NodeService<DataNodeDto> nodeService) {
+            NodeService<DataNodeDto> nodeService,
+            @RunsWithDataNode boolean runsWithDatanode) {
         this.isTelemetryEnabled = isTelemetryEnabled;
         this.trafficCounterService = trafficCounterService;
         this.enterpriseDataProvider = enterpriseDataProvider;
@@ -97,6 +99,7 @@ public class TelemetryService {
         this.telemetryClusterService = telemetryClusterService;
         this.installationSource = installationSource;
         this.nodeService = nodeService;
+        this.runsWithDatanode = runsWithDatanode;
         eventBus.register(this);
     }
 
@@ -207,9 +210,16 @@ public class TelemetryService {
 
     private Map<String, Object> getSearchClusterInfo() {
         Map<String, NodeInfo> nodesInfo = elasticClusterAdapter.nodesInfo();
+        String version = elasticsearchVersion.toString();
+        if (runsWithDatanode) {
+            version = "DataNode:" + nodeService.allActive().values().stream()
+                    .findFirst()
+                    .map(DataNodeDto::getDatanodeVersion)
+                    .orElse("unknown");
+        }
         return telemetryResponseFactory.createSearchClusterInfo(
                 nodesInfo.size(),
-                elasticsearchVersion.toString(),
+                version,
                 nodesInfo);
     }
 

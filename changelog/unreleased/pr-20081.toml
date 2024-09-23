@@ -1,0 +1,5 @@
+type = "f"
+message = "Add support for remote-reindex migration of closed indices"
+
+pulls = ["20081"]
+issues = ["20068"]
