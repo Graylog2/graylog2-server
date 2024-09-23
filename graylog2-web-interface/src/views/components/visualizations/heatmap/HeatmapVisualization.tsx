@@ -21,7 +21,7 @@ import fill from 'lodash/fill';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
 import type { DefaultTheme } from 'styled-components';
-import { useTheme } from 'styled-components';
+import styled, { useTheme, css } from 'styled-components';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -33,6 +33,10 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
 import GenericPlot from '../GenericPlot';
+
+const Container = styled.div<{ $height: number }>(({ $height }) => css`
+  height: ${$height ? `${$height}px` : '100%'};
+`);
 
 const _generateSeriesTitles = (config, x, y) => {
   const seriesTitles = config.series.map((s) => s.function);
@@ -152,7 +156,7 @@ const _chartLayout = (heatmapData: ChartDefinition[]) => {
 
 const _leafSourceMatcher = ({ source }: { source: string }) => source.endsWith('leaf') && source !== 'row-leaf';
 
-const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+const HeatmapVisualization = makeVisualization(({ config, data, height }: VisualizationComponentProps) => {
   const theme = useTheme();
   const visualizationConfig = (config.visualizationConfig ?? HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = retrieveChartData(data);
@@ -167,7 +171,9 @@ const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationC
   const layout = _chartLayout(heatmapData);
 
   return (
-    <GenericPlot chartData={heatmapData} layout={layout} />
+    <Container $height={height}>
+      <GenericPlot chartData={heatmapData} layout={layout} />
+    </Container>
   );
 }, 'heatmap');
 
