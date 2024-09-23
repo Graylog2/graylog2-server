@@ -68,7 +68,6 @@ public class DashboardsResource extends RestResource {
     private final ViewService dbService;
 
     private static final String DEFAULT_SORT_FIELD = ViewDTO.FIELD_TITLE;
-    private static final String DEFAULT_SCOPE = "read";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("_id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
@@ -107,10 +106,10 @@ public class DashboardsResource extends RestResource {
                                                   @ApiParam(name = "scope",
                                                             value = "The field to sort the result on",
                                                             required = true,
-                                                            allowableValues = "read,update") @DefaultValue(DEFAULT_SCOPE) @QueryParam("scope") Scope scope,
+                                                            allowableValues = "read,update") @QueryParam("scope") Scope scope,
                                                   @Context SearchUser searchUser) {
 
-        final Predicate<ViewSummaryDTO> predicate = switch (scope) {
+        final Predicate<ViewSummaryDTO> predicate = scope == null ? searchUser::canReadView : switch (scope) {
             case READ -> searchUser::canReadView;
             case UPDATE -> searchUser::canUpdateView;
         };
