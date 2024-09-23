@@ -19,6 +19,8 @@ package org.graylog.datanode.rest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.plugins.views.storage.migration.state.actions.OpensearchLockCheckResult;
 import org.graylog.plugins.views.storage.migration.state.actions.OpensearchNodeLock;
@@ -36,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Path("/lock-check")
+@Produces(MediaType.APPLICATION_JSON)
 public class OpensearchLockCheckController {
 
     private final java.nio.file.Path dataTargetDir;

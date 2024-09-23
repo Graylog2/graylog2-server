@@ -119,7 +119,14 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public boolean isOldClusterStopped() {
         final Map<String, OpensearchLockCheckResult> results = datanodeProxy.remoteInterface(DatanodeResolver.ALL_NODES_KEYWORD, DatanodeOpensearchClusterCheckResource.class, DatanodeOpensearchClusterCheckResource::checkLocks);
-        return results.values().stream().allMatch(v -> v.locks().stream().noneMatch(OpensearchNodeLock::locked));
+        final boolean anyLocked = results.values().stream().anyMatch(v -> v.locks().stream().anyMatch(OpensearchNodeLock::locked));
+
+        if (anyLocked) {
+            results.forEach((key, value) -> value.locks().stream()
+                    .filter(OpensearchNodeLock::locked)
+                    .forEach(v -> LOG.info("Data directory of datanode {} is still locked by another Opensearch process. Lock file: {}", key, v.path().toAbsolutePath())));
+        }
+        return !anyLocked;
     }
 
     @Override
