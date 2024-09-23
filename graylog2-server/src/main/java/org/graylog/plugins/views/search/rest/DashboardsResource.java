@@ -59,10 +59,8 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
     public enum Scope {
-        @JsonProperty("read")
-        READ,
-        @JsonProperty("update")
-        UPDATE
+        read,
+        update
     }
 
     private final ViewService dbService;
@@ -104,14 +102,14 @@ public class DashboardsResource extends RestResource {
                                                   @ApiParam(name = "query") @QueryParam("query") String query,
                                                   @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
                                                   @ApiParam(name = "scope",
-                                                            value = "The field to sort the result on",
+                                                            value = "The scope of the permissions",
                                                             required = true,
-                                                            allowableValues = "read,update") @QueryParam("scope") Scope scope,
+                                                            allowableValues = "read,update") @DefaultValue("read") @QueryParam("scope") Scope scope,
                                                   @Context SearchUser searchUser) {
 
-        final Predicate<ViewSummaryDTO> predicate = scope == null ? searchUser::canReadView : switch (scope) {
-            case READ -> searchUser::canReadView;
-            case UPDATE -> searchUser::canUpdateView;
+        final Predicate<ViewSummaryDTO> predicate = switch (scope) {
+            case read -> searchUser::canReadView;
+            case update -> searchUser::canUpdateView;
         };
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
