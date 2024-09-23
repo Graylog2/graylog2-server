@@ -166,6 +166,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
     private final LogRetentionCleaner logRetentionCleaner;
     private final long maxSegmentSize;
     private final int maxMessageSize;
+    private final long maxRetentionSize;
     private final String metricPrefix;
 
     private long nextReadOffset = 0L;
@@ -225,6 +226,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         this.maxSegmentSize = segmentSize.toBytes();
         // Max message size should not be bigger than max segment size.
         this.maxMessageSize = Ints.saturatedCast(maxSegmentSize);
+        this.maxRetentionSize = retentionSize.toBytes();
         this.metricPrefix = metricPrefix;
         this.metricRegistry = metricRegistry;
 
@@ -376,6 +378,10 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         if (LocalKafkaJournal.class.getName().equals(metricPrefix)) {
             registerLegacyMetrics();
         }
+    }
+
+    public double getJournalUtilization() {
+        return maxRetentionSize > 0 ? (double) (kafkaLog.size() * 100) / maxRetentionSize : 0.0;
     }
 
     @Override
