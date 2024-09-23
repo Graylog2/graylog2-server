@@ -58,6 +58,7 @@ public class DataStreamServiceImpl implements DataStreamService {
     public void createDataStream(String dataStreamName, String timestampField, Map<String, Map<String, String>> mappings,
                                  Policy ismPolicy) {
         updateDataStreamTemplate(dataStreamName, timestampField, mappings);
+        dataStreamAdapter.setNumberOfReplicasTemplates(replicas);
         dataStreamAdapter.createDataStream(dataStreamName);
         dataStreamAdapter.applyIsmPolicy(dataStreamName, ismPolicy);
         dataStreamAdapter.setNumberOfReplicas(dataStreamName, replicas);
