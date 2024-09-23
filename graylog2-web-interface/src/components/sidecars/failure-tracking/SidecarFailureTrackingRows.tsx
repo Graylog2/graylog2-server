@@ -61,7 +61,7 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
   const getCollectorInformation = (collectorId: string) => collectors.find((collector) => collector.id === collectorId);
 
   return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
+
     <>
       {collectorStatusList?.filter((collector) => collector.status === SidecarStatusEnum.FAILING).map((collector) => {
         const collectorData = getCollectorInformation(collector.collector_id);

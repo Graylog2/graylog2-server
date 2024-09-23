@@ -84,6 +84,10 @@ export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | u
     return Immutable.Set([filter.get('id')]);
   }
 
+  if (type === 'stream_category') {
+    return Immutable.Set();
+  }
+
   const filters = filter.get('filters', Immutable.List());
 
   return filters.map(filtersToStreamSet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());

@@ -54,6 +54,7 @@ import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -101,6 +102,7 @@ public class OpenSearchBackendTest {
                 ViewsUtils.createTestContextFactory(),
                 usedSearchFiltersToQueryStringsMapper,
                 new NoOpStatsCollector<>(),
+                mock(StreamService.class),
                 false);
     }
 
