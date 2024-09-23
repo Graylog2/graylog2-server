@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -58,18 +59,10 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
     public enum Scope {
-        READ("read"),
-        UPDATE("update");
-
-        private final String scope;
-
-        Scope(String scope) {
-            this.scope = scope;
-        }
-
-        public String scope() {
-            return this.scope;
-        }
+        @JsonProperty("read")
+        READ,
+        @JsonProperty("update")
+        UPDATE
     }
 
     private final ViewService dbService;
