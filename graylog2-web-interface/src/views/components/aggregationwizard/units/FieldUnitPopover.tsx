@@ -88,7 +88,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
   }, [field, predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType]);
 
   const onClear = useCallback(() => {
-    setFieldValue(`units.${field}`, { unitType: undefined, abbrev: undefined });
+    setFieldValue(`units.${field}`, undefined);
     toggleShow();
   }, [field, setFieldValue]);
 

@@ -206,7 +206,6 @@ const ColumnPivotFieldsHeaders = ({ fields, pivots, values, series, offset = 1, 
     );
   });
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{headerRows}</>;
 };
 

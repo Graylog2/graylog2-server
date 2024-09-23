@@ -83,7 +83,6 @@ const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition, handle
     }
   }
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{action.title}</>;
 };
 

@@ -38,6 +38,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
@@ -57,6 +58,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.elasticsearch7.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -92,6 +94,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchMo
                 ViewsUtils.createTestContextFactory(),
                 usedSearchFilters -> Collections.emptySet(),
                 new NoOpStatsCollector<>(),
+                mock(StreamService.class),
                 false);
     }
 

@@ -14,19 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+const sleep = async (milliseconds: number): Promise<ReturnType<typeof setTimeout>> => new Promise((resolve) => {
+  const timerID = setTimeout(() => resolve(timerID), milliseconds);
+});
 
-import View from 'views/logic/views/View';
-import useViewType from 'views/hooks/useViewType';
-
-type Props = {
-  children: React.ReactNode,
-};
-
-const IfSearch = ({ children }: Props) => {
-  const viewType = useViewType();
-
-  return viewType === View.Type.Search ? <>{children}</> : null;
-};
-
-export default IfSearch;
+export default sleep;

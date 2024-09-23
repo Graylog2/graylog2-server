@@ -58,7 +58,7 @@ const AreaVisualization = makeVisualization(({
     fill: 'tozeroy',
     line: { shape: toPlotly(interpolation) },
     originalName,
-    ...getChartDataSettingsWithCustomUnits({ originalName, fullPath, values }),
+    ...getChartDataSettingsWithCustomUnits({ name, fullPath, values }),
   }), [_mapKeys, getChartDataSettingsWithCustomUnits, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
