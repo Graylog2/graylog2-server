@@ -88,7 +88,7 @@ const LegendEntryContainer = styled.div`
 `;
 
 const ValueContainer = styled.div`
-  margin-left: 8px;
+  margin-left: 5px;
   line-height: 1;
 `;
 
@@ -223,7 +223,7 @@ const InteractiveLegend = ({ activeQuery, config, fieldTypes, labelFields, label
 
 const FlexLegendContainer = styled.div`
   display: flex;
-  gap: 5px;
+  gap: 8px;
   flex-wrap: wrap;
 `;
 
