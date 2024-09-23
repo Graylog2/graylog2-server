@@ -44,13 +44,17 @@ type Options = {
   enabled?: boolean,
 }
 
-export const fetchDashboards = (searchParams: SearchParams, scope: string = 'read') => {
+type SearchParamsForDashboards = SearchParams & {
+  scope: 'read' | 'update',
+}
+
+export const fetchDashboards = (searchParams: SearchParamsForDashboards) => {
   const url = PaginationURL(
     dashboardsUrl,
     searchParams.page,
     searchParams.pageSize,
     searchParams.query,
-    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction, scope: scope });
+    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction, scope: searchParams.scope });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
     ({ elements, total, count, page, per_page: perPage, attributes }) => ({
@@ -61,7 +65,7 @@ export const fetchDashboards = (searchParams: SearchParams, scope: string = 'rea
   );
 };
 
-const useDashboards = (searchParams: SearchParams, scope: string = 'read', { enabled }: Options = { enabled: true }): {
+const useDashboards = (searchParams: SearchParamsForDashboards, { enabled }: Options = { enabled: true }): {
   data: {
     list: Readonly<Array<View>>,
     pagination: { total: number },
@@ -72,7 +76,7 @@ const useDashboards = (searchParams: SearchParams, scope: string = 'read', { ena
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     keyFn(searchParams),
-    () => fetchDashboards(searchParams, scope),
+    () => fetchDashboards(searchParams),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,
