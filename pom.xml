@@ -119,7 +119,7 @@
         <error-prone.version>2.31.0</error-prone.version>
         <freemarker.version>2.3.33</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
-        <geoip2.version>4.2.0</geoip2.version>
+        <geoip2.version>4.2.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.65.1</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
