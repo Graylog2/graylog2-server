@@ -118,8 +118,8 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean isOldClusterStopped() {
-        // TODO: add real test
-        return true;
+        final Map<String, OpensearchLockCheckResult> results = datanodeProxy.remoteInterface(DatanodeResolver.ALL_NODES_KEYWORD, DatanodeOpensearchClusterCheckResource.class, DatanodeOpensearchClusterCheckResource::checkLocks);
+        return results.values().stream().allMatch(v -> v.locks().stream().noneMatch(OpensearchNodeLock::locked));
     }
 
     @Override
