@@ -28,6 +28,8 @@ export const bulkRemoveDataNode = async (entity_ids: string[], selectBackFailedE
   try {
     const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_remove'), { entity_ids });
 
+    selectBackFailedEntities([]);
+
     if (failures?.length) {
       selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
     }
@@ -48,6 +50,8 @@ export const bulkStartDataNode = async (entity_ids: string[], selectBackFailedEn
   try {
     const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_start'), { entity_ids });
 
+    selectBackFailedEntities([]);
+
     if (failures?.length) {
       selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
     }
@@ -67,6 +71,8 @@ export const bulkStartDataNode = async (entity_ids: string[], selectBackFailedEn
 export const bulkStopDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
   try {
     const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_stop'), { entity_ids });
+
+    selectBackFailedEntities([]);
 
     if (failures?.length) {
       selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
