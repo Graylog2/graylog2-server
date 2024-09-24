@@ -42,12 +42,12 @@ const useBarChartDataSettingsWithCustomUnits = ({ config, barmode, effectiveTime
   const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
 
   return useCallback(({
-    originalName, values, idx, total, xAxisItemsLength, fullPath,
+    values, idx, total, xAxisItemsLength, fullPath, name,
   }: { xAxisItemsLength: number, originalName: string, name: string, values: Array<any>, idx: number, total: number, fullPath: string }):Partial<ChartDefinition> => {
     if (!unitFeatureEnabled) return ({});
 
     const fieldNameKey = getFieldNameFromTrace({ fullPath, series: config.series }) ?? NO_FIELD_NAME_SERIES;
-    const { y: convertedValues, yaxis, ...hoverTemplateSettings } = getChartDataSettingsWithCustomUnits({ originalName, fullPath, values });
+    const { y: convertedValues, yaxis, ...hoverTemplateSettings } = getChartDataSettingsWithCustomUnits({ name, fullPath, values });
     const axisNumber = fieldNameToAxisCountMapper?.[fieldNameKey];
     const totalAxis = Object.keys(unitTypeMapper).length;
 

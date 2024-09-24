@@ -36,7 +36,6 @@ import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.GlobalMetricNames;
-import org.graylog2.plugin.Version;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
@@ -77,7 +76,6 @@ public class MigrationActionsImpl implements MigrationActions {
     private final ElasticsearchVersionProvider searchVersionProvider;
     private final List<URI> elasticsearchHosts;
 
-    private final Version graylogVersion = Version.CURRENT_CLASSPATH;
     private final NotificationService notificationService;
 
     @Inject
@@ -184,8 +182,7 @@ public class MigrationActionsImpl implements MigrationActions {
     public boolean compatibleDatanodesRunning() {
         Map<String, DataNodeDto> nodes = nodeService.allActive();
         return !nodes.isEmpty() && nodes.values().stream()
-                .allMatch(node -> node.getDatanodeVersion() != null &&
-                        graylogVersion.compareTo(new Version(com.github.zafarkhaja.semver.Version.valueOf(node.getDatanodeVersion()))) == 0);
+                .allMatch(DataNodeDto::isCompatibleWithVersion);
     }
 
     @Override
