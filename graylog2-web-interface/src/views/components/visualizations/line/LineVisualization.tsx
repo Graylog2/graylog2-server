@@ -39,6 +39,7 @@ const LineVisualization = makeVisualization(({
   data,
   effectiveTimerange,
   height,
+  width,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
@@ -58,7 +59,7 @@ const LineVisualization = makeVisualization(({
     y: values,
     originalName,
     line: { shape: toPlotly(interpolation) },
-    ...getChartDataSettingsWithCustomUnits({ originalName, fullPath, values }),
+    ...getChartDataSettingsWithCustomUnits({ name, fullPath, values }),
   }), [_mapKeys, getChartDataSettingsWithCustomUnits, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
@@ -84,6 +85,7 @@ const LineVisualization = makeVisualization(({
             axisType={axisType}
             effectiveTimerange={effectiveTimerange}
             height={height}
+            width={width}
             chartData={chartDataResult} />
   );
 }, 'line');

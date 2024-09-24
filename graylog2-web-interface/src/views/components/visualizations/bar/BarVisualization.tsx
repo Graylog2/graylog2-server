@@ -81,6 +81,7 @@ const BarVisualization = makeVisualization(({
   data,
   effectiveTimerange,
   height,
+  width,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
 
@@ -108,7 +109,7 @@ const BarVisualization = makeVisualization(({
       opacity,
       originalName,
       ...getBarChartDataSettingsWithCustomUnits({ originalName, name, fullPath, values, idx, total, xAxisItemsLength: mappedKeys.length }),
-    }) as ChartDefinition;
+    });
   },
   [visualizationConfig?.opacity, _mapKeys, getBarChartDataSettingsWithCustomUnits]);
 
@@ -149,6 +150,7 @@ const BarVisualization = makeVisualization(({
             effectiveTimerange={effectiveTimerange}
             setChartColor={setChartColor}
             height={height}
+            width={width}
             plotLayout={layout} />
   );
 }, 'bar');

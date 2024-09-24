@@ -38,6 +38,7 @@ const ScatterVisualization = makeVisualization(({
   data,
   effectiveTimerange,
   height,
+  width,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
   const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
@@ -56,7 +57,7 @@ const ScatterVisualization = makeVisualization(({
     y: values,
     mode: 'markers',
     originalName,
-    ...getChartDataSettingsWithCustomUnits({ originalName, fullPath: fullPath, values }),
+    ...getChartDataSettingsWithCustomUnits({ name, fullPath: fullPath, values }),
   }), [_mapKeys, getChartDataSettingsWithCustomUnits]);
   const _chartDataResult = useChartData(rows, {
     widgetConfig: config,
@@ -78,6 +79,7 @@ const ScatterVisualization = makeVisualization(({
             chartData={chartDataResult}
             plotLayout={layout}
             height={height}
+            width={width}
             effectiveTimerange={effectiveTimerange} />
   );
 }, 'scatter');

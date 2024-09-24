@@ -23,12 +23,14 @@ import { DEFAULT_TIMERANGE } from 'views/Constants';
 export type Drilldown = {
   query: QueryString,
   streams: Array<string>,
+  streamCategories: Array<string>,
   timerange: TimeRange,
 };
 
 const defaultValue: Drilldown = {
   query: createElasticsearchQueryString(''),
   streams: [],
+  streamCategories: [],
   timerange: DEFAULT_TIMERANGE,
 };
 
