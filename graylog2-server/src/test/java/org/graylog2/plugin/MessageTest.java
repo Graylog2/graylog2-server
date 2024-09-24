@@ -381,6 +381,7 @@ public class MessageTest {
         assertEquals("foo_bar", Message.cleanKey("foo{bar"));
         assertEquals("foo_bar", Message.cleanKey("foo,bar"));
         assertEquals("foo_bar", Message.cleanKey("foo?bar"));
+        assertEquals("foo___bar", Message.cleanKey("foo +?bar"));
         assertEquals("_", Message.cleanKey(" "));
     }
 
