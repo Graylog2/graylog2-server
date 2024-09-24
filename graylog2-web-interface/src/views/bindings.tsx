@@ -169,7 +169,6 @@ const exports: PluginExports = {
       type: 'MESSAGES',
       displayName: 'Message List',
       defaultHeight: 5,
-      reportStyle: () => ({ width: 800 }),
       defaultWidth: 6,
       // TODO: Subtyping needs to be taken into account
       visualizationComponent: MessageList as unknown as React.ComponentType<WidgetComponentProps>,
@@ -185,7 +184,6 @@ const exports: PluginExports = {
       displayName: 'Results',
       defaultHeight: 4,
       defaultWidth: 4,
-      reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
       editComponent: AggregationWizard,
       hasEditSubmitButton: true,

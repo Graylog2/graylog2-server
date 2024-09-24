@@ -68,6 +68,8 @@ describe('XYPlot', () => {
         <XYPlot chartData={chartData}
                 config={config}
                 setChartColor={setChartColor}
+                height={480}
+                width={640}
                 {...props} />
       </TestStoreProvider>
     );
@@ -95,6 +97,7 @@ describe('XYPlot', () => {
       yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: 'linear' },
       xaxis: { fixedrange: true },
       hovermode: 'x',
+      legend: { y: -0.14 },
     });
 
     expect(genericPlot).toHaveProp('chartData', chartData);
