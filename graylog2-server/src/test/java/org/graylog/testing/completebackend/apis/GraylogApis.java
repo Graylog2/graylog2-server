@@ -72,6 +72,10 @@ public class GraylogApis implements GraylogRestApi {
     }
 
     public RequestSpecification requestSpecification() {
+        return requestSpecification("admin", "admin");
+    }
+
+    public RequestSpecification requestSpecification(final String user, final String password) {
         return new RequestSpecBuilder().build()
                 .baseUri(backend.uri())
                 .port(backend.apiPort())
@@ -79,7 +83,7 @@ public class GraylogApis implements GraylogRestApi {
                 .accept(JSON)
                 .contentType(JSON)
                 .header("X-Requested-By", "peterchen")
-                .auth().basic("admin", "admin");
+                .auth().basic(user, password);
     }
 
     public Supplier<RequestSpecification> requestSpecificationSupplier() {

@@ -83,4 +83,11 @@ public class Users implements GraylogRestApi {
                 .statusCode(200)
                 .extract().jsonPath();
     }
+
+    public boolean userExists(String username) {
+        return given()
+                .spec(api.requestSpecification())
+                .when()
+                .get("/users/" + username).statusCode() == 200;
+    }
 }
