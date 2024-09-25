@@ -23,6 +23,7 @@ import fetch from 'logic/rest/FetchProvider';
 import type { Attribute, SearchParams, PaginatedResponseType } from 'stores/PaginationTypes';
 import type FetchError from 'logic/errors/FetchError';
 import type { DataNodes } from 'components/datanode/Types';
+import type { DataNodeStatus } from 'preflight/types';
 
 export const bulkRemoveDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
   try {
@@ -150,6 +151,19 @@ export const fetchDataNodes = async (params: SearchParams) => {
     list: elements,
     pagination,
   }));
+};
+
+export const getInformativeStatus = (status: DataNodeStatus) => {
+  switch (status) {
+    case 'STARTUP_PREPARED':
+      return 'PROVISIONED';
+    case 'STARTUP_TRIGGER':
+      return status;
+    case 'STARTUP_REQUESTED':
+      return status;
+    default:
+      return status;
+  }
 };
 
 export const keyFn = (searchParams: SearchParams) => ['datanodes', searchParams];
