@@ -1,7 +1,7 @@
 [
   {
     "title": "7 Days Hot, 90 Days Total",
-    "description": "Use case: minimum historical searches. This configuration minimises memory and storage usage. Logs will be searchable for a minimum of 90 days.",
+    "description": "Use case: minimal need for historical searches. This configuration has low memory and storage usage. Logs will be searchable for a minimum of 90 days.",
     "built_in": true,
     "index_set_config": {
       "index_analyzer": "standard",
@@ -24,7 +24,7 @@
   },
   {
     "title": "14 Days Hot, 90 Days Total.",
-    "description": "Use case: some historical searches. This configuration sets a 14 day hot tier for faster historical searches. Logs will be searchable for a minimum of 90 days.",
+    "description": "Use case: regular need for historical searches. Logs will be searchable for a minimum of 90 days.",
     "built_in": true,
     "index_set_config": {
       "index_analyzer": "standard",
@@ -47,7 +47,8 @@
   },
   {
     "title": "30 days Hot, 90 Days Total",
-    "description": "Use case: frequent historical searches. This configuration sets a 30 day hot tier for fast historical search performance, but will require significant memory and storage. Logs will be searchable for a minimum of 90 days.",  "built_in": true,
+    "description": "Use case: need for frequent and deep historical searches. This configuration has high memory and storage usage. Logs will be searchable for a minimum of 90 days.",
+    "built_in": true,
     "index_set_config": {
       "index_analyzer": "standard",
       "shards": 1,
