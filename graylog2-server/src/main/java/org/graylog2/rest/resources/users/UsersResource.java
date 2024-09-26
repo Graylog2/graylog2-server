@@ -239,24 +239,18 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "include_permissions") @QueryParam("include_permissions") @DefaultValue("true") boolean includePermissions,
             @ApiParam(name = "include_sessions") @QueryParam("include_sessions") @DefaultValue("true") boolean includeSessions,
             @Context SearchUser searchUser) {
+        final Optional<AllUserSessions> optSessions = includeSessions ? Optional.of(AllUserSessions.create(sessionService)) : Optional.empty();
         return searchUser.isPermitted(RestPermissions.USERS_LIST) ?
-                listUsersSelective(includePermissions, includeSessions) :
-                listForLoggedInUser(searchUser, includePermissions, includeSessions);
+                listUsersSelective(includePermissions, optSessions) :
+                listForLoggedInUser(searchUser, includePermissions, optSessions);
     }
 
-    private UserList listForLoggedInUser(final SearchUser searchUser, final boolean includePermissions, final boolean includeSessions) {
-        final var user = userManagementService.load(searchUser.username());
-        final Optional<AllUserSessions> optSessions = includeSessions ? Optional.of(AllUserSessions.create(sessionService)) : Optional.empty();
-        if(user != null) {
-            return UserList.create(List.of(toUserResponse(user, includePermissions, optSessions)));
-        } else {
-            return UserList.create(List.of());
-        }
+    private UserList listForLoggedInUser(final SearchUser searchUser, final boolean includePermissions, Optional<AllUserSessions> optSessions) {
+        return UserList.create(List.of(toUserResponse(searchUser.getUser(), includePermissions, optSessions)));
     }
 
-    private UserList listUsersSelective(final boolean includePermissions, final boolean includeSessions) {
+    private UserList listUsersSelective(final boolean includePermissions, final Optional<AllUserSessions> optSessions) {
         final List<User> users = userManagementService.loadAll();
-        final Optional<AllUserSessions> optSessions = includeSessions ? Optional.of(AllUserSessions.create(sessionService)) : Optional.empty();
 
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
         userManagementService.getRootUser().ifPresent(adminUser ->
