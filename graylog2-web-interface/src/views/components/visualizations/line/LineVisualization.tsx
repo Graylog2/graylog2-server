@@ -39,6 +39,7 @@ const LineVisualization = makeVisualization(({
   data,
   effectiveTimerange,
   height,
+  width,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
@@ -84,6 +85,7 @@ const LineVisualization = makeVisualization(({
             axisType={axisType}
             effectiveTimerange={effectiveTimerange}
             height={height}
+            width={width}
             chartData={chartDataResult} />
   );
 }, 'line');

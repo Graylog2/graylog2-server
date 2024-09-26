@@ -54,7 +54,11 @@ const SUT = ({ chartDataProp = chartData, plotConfig = config, neverHide = false
   }}>
 
     <ChartColorContext.Provider value={{ colors, setColor }}>
-      <PlotLegend config={plotConfig} chartData={chartDataProp} neverHide={neverHide}>
+      <PlotLegend config={plotConfig}
+                  chartData={chartDataProp}
+                  height={480}
+                  width={640}
+                  neverHide={neverHide}>
         <div>Plot</div>
       </PlotLegend>
     </ChartColorContext.Provider>
