@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Fix documentation link target for search query errors. "
+message = "Fix link target for search query error documentation links."
 
 issues = ["13822"]
 pulls = ["20563"]
