@@ -146,21 +146,6 @@ const useTriggerIfErrorsPersist = (trigger: () => void) => {
   return [showExplanation, toggleShow] as const;
 };
 
-const getErrorDocumentationLink = (errorType: string) => {
-  switch (errorType) {
-    case 'UNKNOWN_FIELD':
-      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.UNKNOWN_FIELD;
-    case 'QUERY_PARSING_ERROR':
-      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.QUERY_PARSING_ERROR;
-    case 'INVALID_OPERATOR':
-      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.INVALID_OPERATOR;
-    case 'UNDECLARED_PARAMETER':
-      return DocsHelper.PAGES.SEARCH_QUERY_ERRORS.UNDECLARED_PARAMETER;
-    default:
-      return DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE;
-  }
-};
-
 type QueryForm = {
   queryString: QueryValidationState,
 };
@@ -230,9 +215,9 @@ const QueryValidation = () => {
               <Explanation key={id}>
                 <span><b>{errorTitle}</b>: {errorMessage}</span>
                 {errorType && (
-                <DocumentationLink page={getErrorDocumentationLink(errorType)}
-                                   title={`${errorTitle} documentation`}
-                                   text={<DocumentationIcon name="lightbulb_circle" />} />
+                  <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_ERRORS}
+                                     title="Query error documentation"
+                                     text={<DocumentationIcon name="lightbulb_circle" />} />
                 )}
               </Explanation>
             ))}
