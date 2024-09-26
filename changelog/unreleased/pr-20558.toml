@@ -1,0 +1,5 @@
+type = "c" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "UserResource.list() now works for every authenticated user. In case the calling user lacks the 'RestPermissions.USERS_LIST' permission, only the calling user is returned."
+
+issues = []
+pulls = ["20558"]
