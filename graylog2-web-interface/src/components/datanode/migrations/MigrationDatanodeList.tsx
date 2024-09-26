@@ -20,7 +20,9 @@ import styled from 'styled-components';
 import { Icon, Spinner } from 'components/common';
 import { Alert, Table } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
-import useDataNodes, { getInformativeStatus } from 'components/datanode/hooks/useDataNodes';
+import useDataNodes from 'components/datanode/hooks/useDataNodes';
+
+import { getInformativeStatus } from '../Helpers';
 
 type Props = {
   showProvisioningState?: boolean
