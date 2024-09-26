@@ -64,17 +64,20 @@ const getYAxisSide = (axisCount: number) => {
   return 'left';
 };
 
+const getTicklabelPositionSettings = (axisCount: number) => {
+  switch (axisCount) {
+    case 4:
+      return ({ ticklabelposition: 'inside' });
+    default:
+      return ({});
+  }
+};
+
 const getYAxisPositioningSettings = (axisCount: number) => ({
   position: getYAxisPosition(axisCount),
   side: getYAxisSide(axisCount),
   overlaying: axisCount > 1 ? 'y' : undefined,
-  // ticklabelposition: 'outside left',
-  /*
-  standoff: 20,
-  tickson: 'boundaries',
-  tickangle: -45,
-
-   */
+  ...getTicklabelPositionSettings(axisCount),
 });
 
 const defaultSettings = {
