@@ -27,6 +27,7 @@ import type { Unit } from 'views/components/visualizations/utils/unitConverters'
 import { mappedUnitsFromJSON as units } from 'views/components/visualizations/utils/unitConverters';
 import type { FieldUnitsFormValues } from 'views/types';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
 
 const Container = styled.div`
   display: flex;
@@ -76,7 +77,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
   const badgeLabel = useMemo(() => {
     const curUnit = values?.units?.[field]?.abbrev;
 
-    return curUnit || '...';
+    return getUnitTextLabel(curUnit) || '...';
   }, [field, values?.units]);
 
   const predefinedInfo = useMemo(() => {
