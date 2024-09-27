@@ -480,6 +480,7 @@ export const layoutsFor4axis = {
       size: 16,
     },
     tickformat: ',~r',
+    ticklabelposition: 'inside',
     title: {
       font: {
         color: '#fff',
