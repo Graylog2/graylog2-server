@@ -43,6 +43,7 @@ import type {
   PieHoverTemplateSettings,
 } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
+import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
 type DefaultAxisKey = 'withoutUnit';
 
@@ -93,7 +94,7 @@ const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: Fiel
   const timeBaseUnit = getBaseUnit(fieldType);
   const prettyValues = tickvals.map((value) => getPrettifiedValue(value, { abbrev: timeBaseUnit.abbrev, unitType: timeBaseUnit.unitType }));
 
-  const ticktext = prettyValues.map((prettified) => `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`);
+  const ticktext = prettyValues.map((prettified) => formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev));
 
   return ({
     tickvals,
@@ -317,7 +318,7 @@ const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>,
 
   if (!prettified) return value;
 
-  return `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`;
+  return formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev);
 });
 
 export const getHoverTemplateSettings = ({ convertedValues, unit, name }: {
