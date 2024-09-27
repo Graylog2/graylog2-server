@@ -19,7 +19,6 @@ import { useMemo } from 'react';
 import type { QueryClientConfig } from '@tanstack/react-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import merge from 'lodash/merge';
-import isNumber from 'lodash/isNumber';
 
 type Props = {
   children: React.ReactNode,
@@ -32,7 +31,7 @@ const defaultOptions = {
       refetchOnWindowFocus: false,
       networkMode: 'always' as const,
       retry: (failureCount, error) => {
-        if (isNumber(error?.status) && (error.status >= 400) && (error.status <= 417)) return false;
+        if (error.status >= 400 && error.status < 500) return false;
 
         return failureCount < 4;
       },
