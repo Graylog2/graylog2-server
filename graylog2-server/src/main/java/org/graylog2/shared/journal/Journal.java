@@ -31,6 +31,10 @@ public interface Journal {
 
     void flush();
 
+    default double getJournalUtilization() {
+        return 0L;
+    }
+
     class Entry {
         private final byte[] idBytes;
         private final byte[] messageBytes;

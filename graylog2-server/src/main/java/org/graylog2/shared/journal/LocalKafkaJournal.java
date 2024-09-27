@@ -796,10 +796,26 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         return nextReadOffset;
     }
 
+    /**
+     * Returns the current utilization of the journal as a percentage of the maximum retention size.
+     * This method calculates how much of the maximum retention size is currently being utilized
+     * based on the size of the Kafka log.
+     *
+     * @return the journal utilization as a percentage, or 0.0 if the max retention size is zero.
+     */
     public double getJournalUtilization() {
         return calculateUtilization(maxRetentionSize, kafkaLog.size());
     }
 
+    /**
+     * Calculates the percentage utilization of the journal.
+     * This method computes the utilization as a percentage by dividing the Kafka log size by the
+     * maximum retention size and multiplying by 100.
+     *
+     * @param maxRetentionSize the maximum retention size of the journal
+     * @param kafkaLogSize     the current size of the Kafka log
+     * @return the utilization percentage, or 0.0 if maxRetentionSize is zero.
+     */
     private double calculateUtilization(long maxRetentionSize, long kafkaLogSize) {
         return maxRetentionSize > 0 ? (double) (kafkaLogSize * 100) / maxRetentionSize : 0.0;
     }
