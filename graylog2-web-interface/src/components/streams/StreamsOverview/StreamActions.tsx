@@ -14,6 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import UserNotification from 'util/UserNotification';
+
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 
@@ -33,8 +36,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { LinkContainer } from 'components/common/router';
-import HideOnCloud from 'util/conditional/HideOnCloud';
-import UserNotification from 'util/UserNotification';
 
 import StreamDeleteModal from './StreamDeleteModal';
 
@@ -163,7 +164,15 @@ const StreamActions = ({
     <ButtonToolbar>
       <IfPermitted permissions={`streams:edit:${stream.id}`}>
         <LinkContainer to={Routes.stream_view(stream.id)}>
-          <Button disabled={isNotEditable} bsStyle="primary" bsSize="xsmall">Data Routing</Button>
+          <Button disabled={isNotEditable}
+                  bsStyle="primary"
+                  bsSize="xsmall"
+                  onClick={() => {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_CLICKED, {
+                      app_pathname: 'stream',
+                    });
+                  }}>Data Routing
+          </Button>
         </LinkContainer>
       </IfPermitted>
       <ShareButton entityId={stream.id}
