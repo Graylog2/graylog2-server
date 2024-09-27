@@ -577,4 +577,35 @@ public class LocalKafkaJournalTest {
                 }
         );
     }
+
+    @Test
+    public void testJournalUtilizationSize() {
+        Size retentionSize = Size.kilobytes(10L);
+        Size segmentSize = Size.kilobytes(1l);
+        final LocalKafkaJournal journal = new LocalKafkaJournal(journalDirectory.toPath(),
+                scheduler,
+                segmentSize,
+                Duration.standardHours(1),
+                retentionSize,
+                Duration.standardDays(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                LocalKafkaJournal.THRESHOLD_THROTTLING_DISABLED,
+                new MetricRegistry(),
+                serverStatus);
+
+        //No message in the journal utilization should be zero
+        assertThat(journal.getJournalUtilization()).isZero();
+
+        //After writing messages utilization should be positive
+        final int bulkSize = createBulkChunks(journal, segmentSize, 3);
+        double utilizationAfterBulk = journal.getJournalUtilization();
+        assertThat(utilizationAfterBulk).isPositive();
+
+        //Utilization should decrease again when clean up kicked in
+        journal.markJournalOffsetCommitted(bulkSize);
+        final int cleanedLogs = journal.cleanupLogs();
+        assertEquals(1, cleanedLogs);
+        assertThat(journal.getJournalUtilization()).isLessThan(utilizationAfterBulk);
+    }
 }
