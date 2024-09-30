@@ -90,6 +90,7 @@ describe('NewSearchPage', () => {
         parameters: undefined,
         queryString: undefined,
         streamId: [],
+        streamCategory: [],
         timeRange: undefined,
       }));
     });

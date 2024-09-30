@@ -58,7 +58,8 @@ export const createElasticsearchQueryString = (query = ''): ElasticsearchQuerySt
   query_string: query,
 });
 
-const _streamFilters = (selectedStreams: Array<string>) => Immutable.List(selectedStreams.map((stream) => Immutable.Map({ type: 'stream', id: stream })));
+const _streamFilters = (selectedStreams: Array<string>) => Immutable.List(selectedStreams?.map((stream) => Immutable.Map({ type: 'stream', id: stream })));
+const _streamCategoryFilters = (selectedCategories: Array<string>) => Immutable.List(selectedCategories?.map((category) => Immutable.Map({ type: 'stream_category', category: category })));
 
 export const filtersForQuery = (streams: Array<string> | null | undefined): FilterType | null | undefined => {
   if (!streams || streams.length === 0) {
@@ -72,28 +73,6 @@ export const filtersForQuery = (streams: Array<string> | null | undefined): Filt
     filters: streamFilters,
   });
 };
-
-export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {
-  if (!filter) {
-    return Immutable.Set();
-  }
-
-  const type = filter.get('type');
-
-  if (type === 'stream') {
-    return Immutable.Set([filter.get('id')]);
-  }
-
-  if (type === 'stream_category') {
-    return Immutable.Set();
-  }
-
-  const filters = filter.get('filters', Immutable.List());
-
-  return filters.map(filtersToStreamSet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
-};
-
-const _streamCategoryFilters = (selectedCategories: Array<string>) => Immutable.List(selectedCategories.map((category) => Immutable.Map({ type: 'stream_category', category: category })));
 
 export const categoryFiltersForQuery = (categories: Array<string> | null | undefined): FilterType | null | undefined => {
   if (!categories || categories.length === 0) {
@@ -109,19 +88,33 @@ export const categoryFiltersForQuery = (categories: Array<string> | null | undef
 };
 
 export const newFiltersForQuery = (streams: Array<string> | null | undefined, categories: Array<string> | null | undefined): FilterType | null | undefined => {
-  const streamFilter: FilterType = filtersForQuery(streams);
-  const categoryFilter: FilterType = categoryFiltersForQuery(categories);
+  const streamFilter: Immutable.List<FilterType> = _streamFilters(streams);
+  const categoryFilter: Immutable.List<FilterType> = _streamCategoryFilters(categories);
 
-  if (streamFilter && categoryFilter) {
-    const combinedFilter = Immutable.List.of(streamFilter, categoryFilter);
-
+  if (streamFilter.size > 0 && categoryFilter.size > 0) {
     return Immutable.Map({
       type: 'or',
-      filters: combinedFilter,
+      filters: Immutable.List([...streamFilter.toArray(), ...categoryFilter.toArray()].map((filter: FilterType) => filter)),
     });
   }
 
-  return streamFilter || categoryFilter;
+  return filtersForQuery(streams) || categoryFiltersForQuery(categories);
+};
+
+export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {
+  if (!filter) {
+    return Immutable.Set();
+  }
+
+  const type = filter.get('type');
+
+  if (type === 'stream') {
+    return Immutable.Set([filter.get('id')]);
+  }
+
+  const filters = filter.get('filters', Immutable.List());
+
+  return filters.map(filtersToStreamSet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
 };
 
 export const filtersToStreamCategorySet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {
