@@ -79,6 +79,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
                                name="toggle-indexset"
                                checked
                                label={title}
+                               disabled
                                onChange={() => {}} />
                  <SectionCountLabel>FILTERS {data?.pagination?.total || 0}</SectionCountLabel>
                </>

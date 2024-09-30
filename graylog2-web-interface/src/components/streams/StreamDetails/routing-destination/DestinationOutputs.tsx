@@ -73,6 +73,7 @@ const DestinationOutputs = ({ stream }: Props) => {
                  <StyledSwitch aria-label="Toggle Output"
                                name="toggle-indexset"
                                checked={hasAssignedOutput}
+                               disabled
                                onChange={(e) => e.preventDefault()}
                                label={title} />
                  <SectionCountLabel>OUTPUTS {data.outputs.length}</SectionCountLabel>
