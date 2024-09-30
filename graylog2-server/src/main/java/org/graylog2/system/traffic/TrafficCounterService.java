@@ -18,6 +18,7 @@ package org.graylog2.system.traffic;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
@@ -40,10 +41,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class TrafficCounterService implements TrafficUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(TrafficCounterService.class);
     private static final String BUCKET = "bucket";
+    private static final String FIELD_DATA_WAREHOUSE_OUTPUT = "data_warehouse_output";
+    private static final String FIELD_DECODED = "decoded";
+    private static final String FIELD_OUTPUT = "output";
+    private static final String FIELD_INPUT = "input";
 
     private final JacksonDBCollection<TrafficDto, ObjectId> db;
 
@@ -58,7 +64,12 @@ public class TrafficCounterService implements TrafficUpdater {
     }
 
     @Override
-    public void updateTraffic(DateTime observationTime, NodeId nodeId, long inLastMinute, long outLastMinute, long decodedLastMinute) {
+    public void updateTraffic(DateTime observationTime,
+                              NodeId nodeId,
+                              long inLastMinute,
+                              long outLastMinute,
+                              long decodedLastMinute,
+                              long dataWarehouseOutLastMinute) {
         // we bucket traffic data by the hour and aggregate it to a day bucket for reporting
         final DateTime dayBucket = TrafficUpdater.getHourBucketStart(observationTime);
 
@@ -71,12 +82,14 @@ public class TrafficCounterService implements TrafficUpdater {
         final WriteResult<TrafficDto, ObjectId> update = db.update(DBQuery.is(BUCKET, dayBucket),
                 // sigh DBUpdate.inc only takes integers, but we have a long.
                 new DBUpdate.Builder()
-                        .addOperation("$inc", "input." + escapedNodeId,
+                        .addOperation("$inc", "%s.%s".formatted(FIELD_INPUT, escapedNodeId),
                                 new SingleUpdateOperationValue(false, false, inLastMinute))
-                        .addOperation("$inc", "output." + escapedNodeId,
+                        .addOperation("$inc", "%s.%s".formatted(FIELD_OUTPUT, escapedNodeId),
                                 new SingleUpdateOperationValue(false, false, outLastMinute))
-                        .addOperation("$inc", "decoded." + escapedNodeId,
-                                new SingleUpdateOperationValue(false, false, decodedLastMinute)),
+                        .addOperation("$inc", "%s.%s".formatted(FIELD_DECODED, escapedNodeId),
+                                new SingleUpdateOperationValue(false, false, decodedLastMinute))
+                        .addOperation("$inc", "%s.%s".formatted(FIELD_DATA_WAREHOUSE_OUTPUT, escapedNodeId),
+                                new SingleUpdateOperationValue(false, false, dataWarehouseOutLastMinute)),
                 true, false);
         if (update.getN() == 0) {
             LOG.warn("Unable to update traffic of node {}: {}", nodeId, update);
@@ -105,6 +118,7 @@ public class TrafficCounterService implements TrafficUpdater {
         final ImmutableMap.Builder<DateTime, Long> inputBuilder = ImmutableMap.builder();
         final ImmutableMap.Builder<DateTime, Long> outputBuilder = ImmutableMap.builder();
         final ImmutableMap.Builder<DateTime, Long> decodedBuilder = ImmutableMap.builder();
+        final ImmutableMap.Builder<DateTime, Long> dataWarehouseOutputBuilder = ImmutableMap.builder();
 
         final DateTime now = Tools.nowUTC();
 
@@ -124,18 +138,23 @@ public class TrafficCounterService implements TrafficUpdater {
                 inputBuilder.put(trafficDto.bucket(), trafficDto.input().values().stream().mapToLong(Long::valueOf).sum());
                 outputBuilder.put(trafficDto.bucket(), trafficDto.output().values().stream().mapToLong(Long::valueOf).sum());
                 decodedBuilder.put(trafficDto.bucket(), trafficDto.decoded().values().stream().mapToLong(Long::valueOf).sum());
+                dataWarehouseOutputBuilder.put(trafficDto.bucket(), Optional.ofNullable(trafficDto.dataWarehouseOutput())
+                        .map(stringLongMap -> stringLongMap.values().stream().mapToLong(Long::valueOf).sum())
+                        .orElse(0L));
             });
             Map<DateTime, Long> inputHistogram = inputBuilder.build();
             Map<DateTime, Long> outputHistogram = outputBuilder.build();
             Map<DateTime, Long> decodedHistogram = decodedBuilder.build();
+            Map<DateTime, Long> dataWarehouseOutputHistogram = decodedBuilder.build();
 
             // we might need to aggregate the hourly database values to their UTC daily buckets
             if (interval == Interval.DAILY) {
                 inputHistogram = TrafficUpdater.aggregateToDaily(inputHistogram);
                 outputHistogram = TrafficUpdater.aggregateToDaily(outputHistogram);
                 decodedHistogram = TrafficUpdater.aggregateToDaily(decodedHistogram);
+                dataWarehouseOutputHistogram = TrafficUpdater.aggregateToDaily(dataWarehouseOutputHistogram);
             }
-            return TrafficHistogram.create(from, to, inputHistogram, outputHistogram, decodedHistogram);
+            return TrafficHistogram.create(from, to, inputHistogram, outputHistogram, decodedHistogram, dataWarehouseOutputHistogram);
         }
     }
 
@@ -149,10 +168,11 @@ public class TrafficCounterService implements TrafficUpdater {
         @JsonCreator
         public static TrafficHistogram create(@JsonProperty("from") DateTime from,
                                               @JsonProperty("to") DateTime to,
-                                              @JsonProperty("input") Map<DateTime, Long> input,
-                                              @JsonProperty("output") Map<DateTime, Long> output,
-                                              @JsonProperty("decoded") Map<DateTime, Long> decoded) {
-            return new AutoValue_TrafficCounterService_TrafficHistogram(from, to, input, output, decoded);
+                                              @JsonProperty(FIELD_INPUT) Map<DateTime, Long> input,
+                                              @JsonProperty(FIELD_OUTPUT) Map<DateTime, Long> output,
+                                              @JsonProperty(FIELD_DECODED) Map<DateTime, Long> decoded,
+                                              @JsonProperty(FIELD_DATA_WAREHOUSE_OUTPUT) Map<DateTime, Long> dataWarehouseOutput) {
+            return new AutoValue_TrafficCounterService_TrafficHistogram(from, to, input, output, decoded, dataWarehouseOutput);
         }
 
         @JsonProperty
@@ -169,5 +189,8 @@ public class TrafficCounterService implements TrafficUpdater {
 
         @JsonProperty
         public abstract Map<DateTime, Long> decoded();
+
+        @JsonIgnore
+        public abstract Map<DateTime, Long> dataWarehouseOutput();
     }
 }
