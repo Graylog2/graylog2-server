@@ -357,7 +357,8 @@ public class MessageTest {
         assertTrue(Message.validKey("foo@bar"));
         assertTrue(Message.validKey("123"));
         assertTrue(Message.validKey(""));
-
+        assertFalse(Message.validKey(" foo123"));
+        assertFalse(Message.validKey("foo123 "));
         assertFalse(Message.validKey("foo bar"));
         assertFalse(Message.validKey("foo+bar"));
         assertFalse(Message.validKey("foo$bar"));
