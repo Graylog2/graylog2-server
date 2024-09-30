@@ -595,17 +595,17 @@ public class LocalKafkaJournalTest {
                 serverStatus);
 
         //No message in the journal utilization should be zero
-        assertThat(journal.getJournalUtilization()).isZero();
+        assertThat(journal.getJournalUtilization().get()).isZero();
 
         //After writing messages utilization should be positive
         final int bulkSize = createBulkChunks(journal, segmentSize, 3);
-        double utilizationAfterBulk = journal.getJournalUtilization();
+        double utilizationAfterBulk = journal.getJournalUtilization().get();
         assertThat(utilizationAfterBulk).isPositive();
 
         //Utilization should decrease again when clean up kicked in
         journal.markJournalOffsetCommitted(bulkSize);
         final int cleanedLogs = journal.runRetention();
         assertEquals(1, cleanedLogs);
-        assertThat(journal.getJournalUtilization()).isLessThan(utilizationAfterBulk);
+        assertThat(journal.getJournalUtilization().get()).isLessThan(utilizationAfterBulk);
     }
 }
