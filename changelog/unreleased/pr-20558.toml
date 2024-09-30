@@ -1,0 +1,5 @@
+type = "c" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "API endpoint for listing users will not return an error anymore when user is lacking permission, but return current user only instead."
+
+issues = []
+pulls = ["20558"]

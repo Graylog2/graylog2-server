@@ -37,6 +37,7 @@ import commonStyles from '../common/commonStyles.css';
 type EventDefinitionConfig = {
   group_by: Array<string>,
   streams: Array<string>,
+  stream_categories?: Array<string>,
 };
 
 type EventDefinition = {

@@ -34,8 +34,9 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
 import GenericPlot from '../GenericPlot';
 
-const Container = styled.div<{ $height: number }>(({ $height }) => css`
+const Container = styled.div<{ $height: number, $width: number }>(({ $height, $width }) => css`
   height: ${$height ? `${$height}px` : '100%'};
+  width: ${$width ? `${$width}px` : '100%'};
 `);
 
 const _generateSeriesTitles = (config, x, y) => {
@@ -156,7 +157,7 @@ const _chartLayout = (heatmapData: ChartDefinition[]) => {
 
 const _leafSourceMatcher = ({ source }: { source: string }) => source.endsWith('leaf') && source !== 'row-leaf';
 
-const HeatmapVisualization = makeVisualization(({ config, data, height }: VisualizationComponentProps) => {
+const HeatmapVisualization = makeVisualization(({ config, data, height, width }: VisualizationComponentProps) => {
   const theme = useTheme();
   const visualizationConfig = (config.visualizationConfig ?? HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = retrieveChartData(data);
@@ -171,7 +172,7 @@ const HeatmapVisualization = makeVisualization(({ config, data, height }: Visual
   const layout = _chartLayout(heatmapData);
 
   return (
-    <Container $height={height}>
+    <Container $height={height} $width={width}>
       <GenericPlot chartData={heatmapData} layout={layout} />
     </Container>
   );
