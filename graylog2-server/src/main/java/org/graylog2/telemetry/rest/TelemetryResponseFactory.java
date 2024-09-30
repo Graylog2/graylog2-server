@@ -18,6 +18,7 @@ package org.graylog2.telemetry.rest;
 
 import com.google.common.base.Strings;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
+import org.graylog2.system.traffic.TrafficCounterService.TrafficHistogram;
 import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.joda.time.DateTime;
 
@@ -86,7 +87,7 @@ class TelemetryResponseFactory {
     Map<String, Object> createClusterInfo(String clusterId,
                                           DateTime clusterCreationDate,
                                           Map<String, Map<String, Object>> nodes,
-                                          long averageLastMonthTraffic,
+                                          TrafficHistogram trafficLastMonth,
                                           long usersCount,
                                           int licenseCount,
                                           String installationSource
@@ -95,14 +96,19 @@ class TelemetryResponseFactory {
         clusterInfo.put("cluster_id", clusterId);
         clusterInfo.put("cluster_creation_date", clusterCreationDate);
         clusterInfo.put("nodes_count", nodes.size());
-        clusterInfo.put("traffic_last_month", averageLastMonthTraffic);
+        clusterInfo.put("traffic_last_month", sumTraffic(trafficLastMonth.output()));
+        clusterInfo.put("data_warehouse_output_traffic_last_month", sumTraffic(trafficLastMonth.dataWarehouseOutput()));
+        clusterInfo.put("input_traffic_last_month", sumTraffic(trafficLastMonth.input()));
         clusterInfo.put("users_count", usersCount);
         clusterInfo.put("license_count", licenseCount);
         clusterInfo.put("node_leader_app_version", leaderNodeVersion(nodes));
         clusterInfo.put("installation_source", installationSource);
         clusterInfo.put("nodes", nodes);
         return clusterInfo;
+    }
 
+    private static long sumTraffic(Map<DateTime, Long> traffic) {
+        return traffic.values().stream().mapToLong(Long::longValue).sum();
     }
 
     private Object leaderNodeVersion(Map<String, Map<String, Object>> nodes) {

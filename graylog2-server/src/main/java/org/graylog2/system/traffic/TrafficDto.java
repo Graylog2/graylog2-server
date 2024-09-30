@@ -50,6 +50,10 @@ public abstract class TrafficDto implements MongoEntity {
     @JsonProperty
     public abstract Map<String, Long> decoded();
 
+    @Nullable
+    @JsonProperty
+    public abstract Map<String, Long> dataWarehouseOutput();
+
     public abstract Builder toBuilder();
 
     public static Builder builder() {
@@ -75,6 +79,9 @@ public abstract class TrafficDto implements MongoEntity {
 
         @JsonProperty
         public abstract Builder decoded(Map<String, Long> decodedTraffic);
+
+        @JsonProperty
+        public abstract Builder dataWarehouseOutput(Map<String, Long> dataWarehouseOutputTraffic);
 
         public abstract TrafficDto build();
     }
