@@ -40,6 +40,7 @@ import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore'
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useQuery from 'routing/useQuery';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import StreamDataRoutingIntake from './StreamDataRoutingIntake';
 import StreamDataRoutingProcessing from './StreamDataRoutingProcessing';
@@ -47,7 +48,6 @@ import StreamDataRoutingDestinations from './StreamDataRoutingDestinations';
 
 import StreamModal from '../StreamModal';
 import ThroughputCell from '../StreamsOverview/cells/ThroughputCell';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
   stream: Stream,
@@ -174,6 +174,7 @@ const StreamDetails = ({ stream }: Props) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS[`STREAM_ITEM_DATA_ROUTING_${upperCase(nextSegment)}_OPENED`], {
       app_pathname: 'streams',
     });
+
     setCurrentSegment(nextSegment);
     updateURLStepQueryParam(nextSegment);
   };
@@ -184,6 +185,7 @@ const StreamDetails = ({ stream }: Props) => {
 
   const toggleUpdateModal = useCallback(() => {
     setShowUpdateModal((cur) => !cur);
+
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_UPDATE_CLICKED, {
       app_pathname: 'streams',
     });

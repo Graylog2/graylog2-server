@@ -93,12 +93,15 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
         onCancel();
       });
   };
+
   const onShowAddOutput = () => {
     setShowAddOutput(true);
+
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_DESTINATIONS_OUTPUT_ASSIGN_OPENED, {
       app_pathname: 'stream',
     });
-  }
+  };
+
   return (
     <>
       <Button bsStyle="default"

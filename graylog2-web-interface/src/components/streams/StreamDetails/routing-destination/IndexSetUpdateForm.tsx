@@ -69,6 +69,7 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
 
   const onCloseModal = () => {
     setShowModal(false);
+
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_STREAM_INDEXSET_UPDATE_OPENED, {
       app_pathname: 'streams',
     });
@@ -79,6 +80,7 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
       UserNotification.success(`IndexSet of stream'${stream.title}' was updated successfully.`, 'Success');
       setShowModal(false);
       queryClient.invalidateQueries(['stream', stream.id]);
+
       return response;
     });
   };

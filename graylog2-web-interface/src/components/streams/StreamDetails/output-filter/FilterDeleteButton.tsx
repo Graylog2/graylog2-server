@@ -43,12 +43,15 @@ const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
 
     setShowDialog(false);
   };
+
   const onDelete = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_FILTER_DELETE_OPENED, {
       app_pathname: 'streams',
     });
+
     setShowDialog(true);
-  }
+  };
+
   return (
     <>
       <Button bsStyle="danger"

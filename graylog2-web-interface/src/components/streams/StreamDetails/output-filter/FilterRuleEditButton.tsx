@@ -49,7 +49,8 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
 
   const onClick = () => {
     setShowForm(true);
-    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS[`STREAM_ITEM_DATA_ROUTING_${upperCase(camelCase(destinationType))}_FILTER_${isNew ? 'CREATE_OPENED': 'UPDATE_OPENED'}`], {
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS[`STREAM_ITEM_DATA_ROUTING_${upperCase(camelCase(destinationType))}_FILTER_${isNew ? 'CREATE_OPENED' : 'UPDATE_OPENED'}`], {
       app_pathname: 'streams',
     });
   };
