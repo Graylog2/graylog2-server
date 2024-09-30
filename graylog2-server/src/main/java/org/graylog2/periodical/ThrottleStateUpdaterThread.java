@@ -235,7 +235,7 @@ public class ThrottleStateUpdaterThread extends Periodical {
         eventBus.post(throttleState);
 
         // Abusing the current thread to send notifications from KafkaJournal in the graylog2-shared module
-        final double journalUtilizationPercentage = journal.getJournalUtilization();
+        final double journalUtilizationPercentage = journal.getJournalUtilization().orElse(0.0);
 
         if (journalUtilizationPercentage > LocalKafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
             Notification notification = notificationService.buildNow()

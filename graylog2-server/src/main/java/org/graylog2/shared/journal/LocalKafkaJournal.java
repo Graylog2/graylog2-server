@@ -82,6 +82,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
@@ -803,8 +804,9 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      *
      * @return the journal utilization as a percentage, or 0.0 if the max retention size is zero.
      */
-    public double getJournalUtilization() {
-        return calculateUtilization(maxRetentionSize, kafkaLog.size());
+    @Override
+    public Optional<Double> getJournalUtilization() {
+        return Optional.of(calculateUtilization(maxRetentionSize, kafkaLog.size()));
     }
 
     /**
@@ -814,7 +816,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      *
      * @param maxRetentionSize the maximum retention size of the journal
      * @param kafkaLogSize     the current size of the Kafka log
-     * @return the utilization percentage, or 0.0 if maxRetentionSize is zero.
+     * @return an {@code Optional<Double>} containing the journal utilization as a percentage.
      */
     private double calculateUtilization(long maxRetentionSize, long kafkaLogSize) {
         return maxRetentionSize > 0 ? (double) (kafkaLogSize * 100) / maxRetentionSize : 0.0;
@@ -869,7 +871,19 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         teardownLogMetrics();
     }
 
-    public int cleanupLogs() {
+    /**
+     * Executes the retention policy on the journal by invoking the {@code logRetentionCleaner}.
+     * This method handles the following tasks:
+     * <ul>
+     *   <li>Cleans up expired log segments that have exceeded the configured retention time.</li>
+     *   <li>Ensures that segment sizes are maintained within the maximum allowable limits.</li>
+     *   <li>Removes committed log segments that are no longer needed,</li>
+     * </ul>
+     *
+     * @return an integer representing the total amount of data deleted by the {@code logRetentionCleaner}
+     */
+    @Override
+    public int runRetention() {
         try {
             return logRetentionCleaner.call();
         } catch (Exception e) {
@@ -1000,7 +1014,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         }
 
         @Override
-        public Integer call() throws Exception {
+        public synchronized Integer call() throws Exception {
             loggerForCleaner.debug("Beginning log cleanup");
             int total = 0;
             final Timer.Context ctx = new Timer().time();
