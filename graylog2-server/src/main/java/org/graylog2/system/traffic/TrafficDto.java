@@ -81,7 +81,7 @@ public abstract class TrafficDto implements MongoEntity {
         public abstract Builder decoded(Map<String, Long> decodedTraffic);
 
         @JsonProperty
-        public abstract Builder dataWarehouseOutput(Map<String, Long> dataWarehouseOutputTraffic);
+        public abstract Builder dataWarehouseOutput(@Nullable Map<String, Long> dataWarehouseOutputTraffic);
 
         public abstract TrafficDto build();
     }
