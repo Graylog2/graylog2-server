@@ -116,7 +116,7 @@
         <commons-validator.version>1.9.0</commons-validator.version>
         <commons-io.version>2.17.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.32.0</error-prone.version>
+        <error-prone.version>2.33.0</error-prone.version>
         <freemarker.version>2.3.33</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.1</geoip2.version>
@@ -195,7 +195,7 @@
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.11.1</junit-jupiter.version>
-        <mockito.version>5.14.0</mockito.version>
+        <mockito.version>5.14.1</mockito.version>
         <restassured.version>5.5.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.20.1</testcontainers.version>
