@@ -189,7 +189,7 @@ const StreamDetails = ({ stream }: Props) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_UPDATE_CLICKED, {
       app_pathname: 'streams',
     });
-  }, []);
+  }, [sendTelemetry]);
   const onUpdate = useCallback((newStream: Stream) => StreamsStore.update(stream.id, newStream, (response) => {
     UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
     queryClient.invalidateQueries(['stream', stream.id]);

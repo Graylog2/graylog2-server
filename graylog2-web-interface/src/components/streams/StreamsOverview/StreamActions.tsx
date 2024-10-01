@@ -14,9 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import HideOnCloud from 'util/conditional/HideOnCloud';
-import UserNotification from 'util/UserNotification';
-
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 
@@ -36,10 +33,10 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { LinkContainer } from 'components/common/router';
-
-import StreamDeleteModal from './StreamDeleteModal';
-
-import StreamModal from '../StreamModal';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import UserNotification from 'util/UserNotification';
+import StreamDeleteModal from 'components/streams/StreamsOverview/StreamDeleteModal';
+import StreamModal from 'components/streams/StreamModal';
 
 const DefaultStreamHelp = () => (
   <HoverForHelp displayLeftMargin>Action not available for the default
