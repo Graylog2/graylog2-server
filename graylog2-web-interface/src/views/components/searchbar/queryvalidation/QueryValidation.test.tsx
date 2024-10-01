@@ -86,7 +86,7 @@ describe('QueryValidation', () => {
     await openExplanation();
 
     await screen.findByText('Parse Exception');
-    await screen.findByTitle('Parse Exception documentation');
+    await screen.findByTitle('Query error documentation');
   });
 
   it('renders pluggable validation explanation', async () => {
