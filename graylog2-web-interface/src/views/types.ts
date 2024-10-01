@@ -94,14 +94,16 @@ export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig
   data: Results;
   editing: boolean;
   fields: Immutable.List<FieldTypeMapping>;
-  filter: string;
+  filter?: string;
   queryId: string;
-  onConfigChange: (newConfig: Config) => Promise<void>;
+  onConfigChange?: (newConfig: Config) => Promise<void>;
   setLoadingState: (loading: boolean) => void;
-  title: string;
-  toggleEdit: () => void;
-  type: string;
+  title?: string;
+  toggleEdit?: () => void;
+  type?: string;
   id: string;
+  height: number;
+  width: number;
 }
 
 export interface WidgetExport {
@@ -116,7 +118,6 @@ export interface WidgetExport {
   searchResultTransformer?: (data: Array<unknown>) => unknown;
   searchTypes: (widget: Widget) => Array<any>;
   titleGenerator?: (widget: { config: Widget['config'] }) => string;
-  reportStyle?: () => { width: React.CSSProperties['width'] };
   exportComponent?: React.ComponentType<{ widget: Widget }>;
 }
 

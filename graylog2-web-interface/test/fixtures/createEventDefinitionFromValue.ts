@@ -122,7 +122,7 @@ export const negationSearchFilter: SearchFilter = {
   queryString: 'action: login',
   negation: true,
 };
-const query = QueryGenerator([], 'query-id', {
+const query = QueryGenerator([], [], 'query-id', {
   type: 'relative',
   from: 300,
 

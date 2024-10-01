@@ -51,8 +51,6 @@ class MessageShow extends React.Component {
     this.setState(getImmutableProps(nextProps));
   }
 
-  // eslint-disable-next-line class-methods-use-this
-
   renderForDisplay = (fieldName) => {
     // No highlighting for the message details view.
     const { message } = this.props;

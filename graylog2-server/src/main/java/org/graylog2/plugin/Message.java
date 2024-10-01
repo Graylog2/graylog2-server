@@ -19,6 +19,7 @@ package org.graylog2.plugin;
 import com.codahale.metrics.Meter;
 import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -64,9 +65,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.CharMatcher.anyOf;
+import static com.google.common.base.CharMatcher.inRange;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
@@ -216,10 +218,9 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public static final String FIELD_GL2_SOURCE_RADIO_INPUT = "gl2_source_radio_input";
 
     // Matches whole field names containing a-z, A-Z, 0-9, period char, -, or @.
-    private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-@]*$");
-    // Same as above, but matches only the invalid (non-indicated) characters.
-    // [^ ... ] around the pattern inverts the match.
-    private static final Pattern INVALID_KEY_CHARS = Pattern.compile("[^\\w\\.\\-@]");
+    private static final CharMatcher VALID_KEY_CHAR_MATCHER = inRange('a', 'z').or(inRange('A', 'Z')).or(inRange('0', '9')).or(anyOf(".@-_")).precomputed();
+    private static final CharMatcher INVALID_KEY_CHAR_MATCHER = VALID_KEY_CHAR_MATCHER.negate().precomputed();
+
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
@@ -652,11 +653,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     public static boolean validKey(final String key) {
-        return VALID_KEY_CHARS.matcher(key).matches();
+        return VALID_KEY_CHAR_MATCHER.matchesAllOf(key);
     }
 
     public static String cleanKey(final String key) {
-        return INVALID_KEY_CHARS.matcher(key).replaceAll(String.valueOf(KEY_REPLACEMENT_CHAR));
+        return INVALID_KEY_CHAR_MATCHER.replaceFrom(key, KEY_REPLACEMENT_CHAR);
     }
 
     public void addFields(final Map<String, Object> fields) {
