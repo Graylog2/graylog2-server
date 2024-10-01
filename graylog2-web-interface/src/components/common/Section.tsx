@@ -73,7 +73,7 @@ const Section = ({ title, actions, headerLeftSection, collapsible, defaultClosed
       <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
         <FlexWrapper>
           <h2>{title}</h2>
-          {headerLeftSection && <FlexWrapper>{headerLeftSection}</FlexWrapper>}
+          {headerLeftSection && <FlexWrapper onClick={(e) => { e.stopPropagation(); }}>{headerLeftSection}</FlexWrapper>}
         </FlexWrapper>
         <FlexWrapper>
           {actions && <div>{actions}</div>}
