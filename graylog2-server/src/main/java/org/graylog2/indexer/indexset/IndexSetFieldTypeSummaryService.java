@@ -124,8 +124,8 @@ public class IndexSetFieldTypeSummaryService {
 
     }
 
-    public List<IndexSetIdAndType> getIndexSetIdsAndTypes(final Set<String> streamIds,
-                                                          final Predicate<String> indexSetPermissionPredicate) {
+    public List<IndexSetIdAndType> getIdsAndTypesOfIndexSetsWhereFieldTypeChangeIsAllowed(final Set<String> streamIds,
+                                                                                          final Predicate<String> indexSetPermissionPredicate) {
         //There is a potential to improve performance by introducing a complicated aggregation pipeline joining multiple Mongo collections, especially if permission restrictions were simplified or sorting not necessary.
         //For now simpler solution has been used in the implementation.
         final Set<String> indexSetsIds = streamService.indexSetIdsByIds(streamIds);

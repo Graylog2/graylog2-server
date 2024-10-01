@@ -152,15 +152,15 @@ public class IndexSetsMappingResource extends RestResource {
         );
     }
 
-    @GET
-    @Path("/all_ids")
+    @POST
+    @Path("/all_index_sets_supporting_field_type_change")
     @Timed
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Get field type summaries for given index sets and field")
-    public List<IndexSetIdAndType> fieldTypeSummaries(@ApiParam("streams") @QueryParam("streams") Set<String> streamIds,
+    public List<IndexSetIdAndType> fieldTypeSummaries(@ApiParam(name = "Stream ids", required = true) Set<String> streamIds,
                                                       @Context SearchUser searchUser) {
         final Set<String> streamsIds = normalizeStreamIds(streamIds, searchUser);
-        return indexSetFieldTypeSummaryService.getIndexSetIdsAndTypes(streamsIds,
+        return indexSetFieldTypeSummaryService.getIdsAndTypesOfIndexSetsWhereFieldTypeChangeIsAllowed(streamsIds,
                 indexSetId -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetId));
     }
 
