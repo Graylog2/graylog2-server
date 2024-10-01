@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
+import upperCase from 'lodash/upperCase';
 
 import Routes from 'routing/Routes';
 import {
@@ -37,7 +38,9 @@ import { StreamsStore, type Stream } from 'stores/streams/StreamsStore';
 import { useStore } from 'stores/connect';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useQuery from 'routing/useQuery';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import StreamDataRoutingIntake from './StreamDataRoutingIntake';
 import StreamDataRoutingProcessing from './StreamDataRoutingProcessing';
@@ -160,6 +163,7 @@ const StreamDetails = ({ stream }: Props) => {
   const { indexSets } = useStore(IndexSetsStore);
   const queryClient = useQueryClient();
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
 
   const updateURLStepQueryParam = (nextSegment: DetailsSegment) => {
     const newUrl = new URI(window.location.href).removeSearch('segment').addQuery('segment', nextSegment);
@@ -167,6 +171,10 @@ const StreamDetails = ({ stream }: Props) => {
   };
 
   const onSegmentChange = (nextSegment: DetailsSegment) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS[`STREAM_ITEM_DATA_ROUTING_${upperCase(nextSegment)}_OPENED`], {
+      app_pathname: 'streams',
+    });
+
     setCurrentSegment(nextSegment);
     updateURLStepQueryParam(nextSegment);
   };
@@ -177,7 +185,11 @@ const StreamDetails = ({ stream }: Props) => {
 
   const toggleUpdateModal = useCallback(() => {
     setShowUpdateModal((cur) => !cur);
-  }, []);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_UPDATE_CLICKED, {
+      app_pathname: 'streams',
+    });
+  }, [sendTelemetry]);
   const onUpdate = useCallback((newStream: Stream) => StreamsStore.update(stream.id, newStream, (response) => {
     UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
     queryClient.invalidateQueries(['stream', stream.id]);
