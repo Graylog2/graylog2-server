@@ -55,7 +55,7 @@ const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, disabl
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_INTAKE_CREATE_RULE_OPENED, {
       app_pathname: 'streams',
     });
-    
+
     toggleCreateModal();
   };
 

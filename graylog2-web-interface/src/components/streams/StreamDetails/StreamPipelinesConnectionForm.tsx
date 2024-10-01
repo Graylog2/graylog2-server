@@ -61,7 +61,7 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
 
   const openModal = () => {
     setShowModal(true);
-    
+
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_PROCESSING_EDIT_PIPELINES_CONNECTION, {
       app_pathname: 'streams',
     });
