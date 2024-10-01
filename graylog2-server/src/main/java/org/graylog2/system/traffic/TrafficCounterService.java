@@ -145,7 +145,7 @@ public class TrafficCounterService implements TrafficUpdater {
             Map<DateTime, Long> inputHistogram = inputBuilder.build();
             Map<DateTime, Long> outputHistogram = outputBuilder.build();
             Map<DateTime, Long> decodedHistogram = decodedBuilder.build();
-            Map<DateTime, Long> dataWarehouseOutputHistogram = decodedBuilder.build();
+            Map<DateTime, Long> dataWarehouseOutputHistogram = dataWarehouseOutputBuilder.build();
 
             // we might need to aggregate the hourly database values to their UTC daily buckets
             if (interval == Interval.DAILY) {
