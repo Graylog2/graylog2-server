@@ -48,16 +48,6 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
-const ErrorIcon = styled(Icon)<{ $status: string }>(({ $status }) => css`
-  color: ${({ theme }) => {
-    if ($status === 'ERROR') return theme.colors.variant.danger;
-    if ($status === 'INFO') return theme.colors.variant.info;
-
-    return theme.colors.variant.warning;
-  }};
-  font-size: 22px;
-`);
-
 export const DocumentationIcon = styled(Icon)`
   margin-left: 5px;
 `;
@@ -104,6 +94,17 @@ type ExtraProps = {
 }
 const StyledPopoverDropdown = styled(Popover.Dropdown)<ExtraProps>(({ $shaking }) => css`
   animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
+`);
+const ErrorIcon = styled(Icon)<{ $status: string }>(({ $status }) => css`
+  color: ${({ theme }) => {
+    if ($status === 'ERROR') return theme.colors.variant.danger;
+    if ($status === 'INFO') return theme.colors.variant.info;
+
+    return theme.colors.variant.warning;
+  }};
+  font-size: 22px;
+  animation: ${$status === 'INFO' ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
+  animation-iteration-count: 2;
 `);
 
 const ExplanationTitle = ({ title }: { title: string }) => (
