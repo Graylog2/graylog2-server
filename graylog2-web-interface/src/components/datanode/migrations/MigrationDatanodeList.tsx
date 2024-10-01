@@ -22,8 +22,6 @@ import { Alert, Table } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
 
-import { getInformativeStatus } from '../Helpers';
-
 type Props = {
   showProvisioningState?: boolean
 }
@@ -74,7 +72,7 @@ const MigrationDatanodeList = ({ showProvisioningState }: Props) => {
                 <tr key={datanode.id}>
                   <td>{datanode.hostname}</td>
                   <td>{datanode.transport_address}</td>
-                  <td>{showProvisioningState ? getInformativeStatus(datanode.status) : datanode.data_node_status}</td>
+                  <td>{showProvisioningState ? datanode.status : datanode.data_node_status}</td>
                   <td>{datanode.cert_valid_until ? new Date(datanode.cert_valid_until).toLocaleString() : 'No certificate'}</td>
                   <td>
                     {!datanode.version_compatible && (
