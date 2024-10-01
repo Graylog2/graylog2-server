@@ -41,7 +41,7 @@ const useInitialSelection = () => {
 
   return useMemo(() => {
     const currentStreamSet = new Set(currentStreams);
-    const filterFn = currentStreamSet.size > 0 ? ({ id, indexSet }) => currentStreamSet.has(id) && isIndexFieldTypeChangeAllowed(indexSets[indexSet]) : () => true;
+    const filterFn = ({ id, indexSet }) => isIndexFieldTypeChangeAllowed(indexSets[indexSet]) && (currentStreamSet.size === 0 || currentStreamSet.has(id));
 
     return indexSets ? availableStreams.filter(filterFn).map(({ indexSet }) => indexSet) : [];
   }, [availableStreams, currentStreams, indexSets]);
