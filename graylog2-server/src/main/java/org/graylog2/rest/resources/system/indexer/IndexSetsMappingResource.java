@@ -43,6 +43,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.requests.FieldTypeSummaryRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldTypeSummary;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetIdAndType;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -149,6 +150,18 @@ public class IndexSetsMappingResource extends RestResource {
                 sort,
                 Sorting.Direction.valueOf(order.toUpperCase(Locale.ROOT))
         );
+    }
+
+    @GET
+    @Path("/all_ids")
+    @Timed
+    @NoAuditEvent("No change to the DB")
+    @ApiOperation(value = "Get field type summaries for given index sets and field")
+    public List<IndexSetIdAndType> fieldTypeSummaries(@ApiParam("streams") @QueryParam("streams") Set<String> streamIds,
+                                                      @Context SearchUser searchUser) {
+        final Set<String> streamsIds = normalizeStreamIds(streamIds, searchUser);
+        return indexSetFieldTypeSummaryService.getIndexSetIdsAndTypes(streamsIds,
+                indexSetId -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetId));
     }
 
     private Set<String> normalizeStreamIds(Set<String> streams, SearchUser searchUser) {
