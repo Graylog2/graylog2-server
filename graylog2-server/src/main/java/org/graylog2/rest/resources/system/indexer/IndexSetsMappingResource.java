@@ -153,7 +153,7 @@ public class IndexSetsMappingResource extends RestResource {
     }
 
     @POST
-    @Path("/all_index_sets_supporting_field_type_change")
+    @Path("/index_sets_with_field_type_change_support")
     @Timed
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Get field type summaries for given index sets and field")
