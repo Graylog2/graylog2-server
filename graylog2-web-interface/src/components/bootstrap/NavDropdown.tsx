@@ -26,6 +26,7 @@ import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
+import useHistory from 'routing/useHistory';
 
 import menuItemStyles from './styles/menuItem';
 
@@ -94,12 +95,13 @@ type Props = {
 
 const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret, children, hoverTitle }: React.PropsWithChildren<Props>) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
+  const history = useHistory();
 
   return (
-    <Menu>
+    <Menu trigger="click-hover">
       <NavItem>
         <Menu.Target>
-          <DropdownTrigger $active={isActive} title={hoverTitle}>
+          <DropdownTrigger $active={isActive} title={hoverTitle} onClick={() => history.push('/search')}>
             <NavItemStateIndicator>
               {Badge ? <Badge text={title} /> : title}
             </NavItemStateIndicator>

@@ -28,6 +28,9 @@ const navigationBindings: PluginExports = {
     {
       path: Routes.SEARCH,
       description: 'Search',
+      children: [
+        { path: '/search/data-warehouse', description: 'Data Warehouse' },
+      ],
     },
     {
       path: Routes.STREAMS,

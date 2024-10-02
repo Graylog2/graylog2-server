@@ -48,6 +48,7 @@ const Menu = ({
   width,
   withinPortal,
   zIndex,
+  trigger,
 }: Props) => (
   <MantineMenu closeOnItemClick={closeOnItemClick}
                onClose={onClose}
@@ -60,7 +61,8 @@ const Menu = ({
                withinPortal={withinPortal}
                keepMounted={keepMounted}
                offset={offset}
-               zIndex={zIndex}>
+               zIndex={zIndex}
+               trigger={trigger}>
     {children}
   </MantineMenu>
 );
