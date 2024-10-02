@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackEntityConfig from 'components/content-packs/ContentPackEntityConfig';
 
 describe('<ContentPackEntityConfig />', () => {
-  it('should render with a entity', () => {
+  it('should render with a entity', async () => {
     const entity = {
       data: {
         title: { '@type': 'string', '@value': 'franz' },
@@ -30,10 +30,11 @@ describe('<ContentPackEntityConfig />', () => {
     };
     const appliedParameter = [{ configKey: 'descr', paramName: 'descrParam' }];
     const parameter = [{ name: 'descrParam', title: 'A descr Parameter', type: 'string' }];
-    const wrapper = mount(<ContentPackEntityConfig entity={entity}
-                                                   appliedParameter={appliedParameter}
-                                                   parameters={parameter} />);
 
-    expect(wrapper).toExist();
+    render(<ContentPackEntityConfig entity={entity}
+                                    appliedParameter={appliedParameter}
+                                    parameters={parameter} />);
+
+    await screen.findByText(/franz/i);
   });
 });
