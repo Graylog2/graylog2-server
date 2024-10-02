@@ -26,6 +26,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.streams.events.StreamDeletedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +41,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -49,10 +49,12 @@ class StreamDestinationFilterServiceTest {
     @Mock
     private DestinationFilterCreationValidator mockedFilterLicenseCheck;
     private StreamDestinationFilterService service;
+    private EventBus eventBus;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()), mock(EventBus.class), Optional.of(mockedFilterLicenseCheck));
+        this.eventBus = new EventBus("stream-destination-filter-service");
+        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()), eventBus, Optional.of(mockedFilterLicenseCheck));
     }
 
     @Test
@@ -288,5 +290,15 @@ class StreamDestinationFilterServiceTest {
         assertThat(result.keySet()).containsExactlyInAnyOrder("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef2000");
         assertThat(result.get("54e3deadbeefdeadbeef1000")).containsExactlyInAnyOrder("Test Filter 1", "Test Filter 3");
         assertThat(result.get("54e3deadbeefdeadbeef2000")).containsExactlyInAnyOrder("Test Filter 4");
+    }
+
+    @Test
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
+    void streamDeletionEvent() {
+        final var optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
+        assertThat(optionalDto).isPresent();
+        eventBus.post(StreamDeletedEvent.create("54e3deadbeefdeadbeef1000"));
+        final var afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
+        assertThat(afterDeletionEvent).isNotPresent();
     }
 }

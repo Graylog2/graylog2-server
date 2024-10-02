@@ -69,7 +69,6 @@ public class StreamDestinationFilterService {
     private final MongoPaginationHelper<StreamDestinationFilterRuleDTO> paginationHelper;
     private final MongoUtils<StreamDestinationFilterRuleDTO> utils;
     private final ClusterEventBus clusterEventBus;
-    private final EventBus eventBus;
     private final Optional<DestinationFilterCreationValidator> optionalDestinationFilterCreationValidator;
 
     @Inject
@@ -82,13 +81,12 @@ public class StreamDestinationFilterService {
         this.utils = mongoCollections.utils(collection);
         this.clusterEventBus = clusterEventBus;
         this.optionalDestinationFilterCreationValidator = optionalDestinationFilterCreationValidator;
-        this.eventBus = eventBus;
-
-        eventBus.register(this);
 
         collection.createIndex(Indexes.ascending(FIELD_STREAM_ID));
         collection.createIndex(Indexes.ascending(FIELD_DESTINATION_TYPE));
         collection.createIndex(Indexes.ascending(FIELD_STATUS));
+
+        eventBus.register(this);
     }
 
     private Bson parseQuery(String queryString) {
@@ -187,9 +185,7 @@ public class StreamDestinationFilterService {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleStreamDeleted(StreamDeletedEvent streamDeletedEvent) {
-        collection.find(eq(FIELD_STREAM_ID, streamDeletedEvent.streamId())).forEach(
-                dto -> deleteFromStream(streamDeletedEvent.streamId(), dto.id())
-        );
+        collection.deleteOne(eq(FIELD_STREAM_ID, streamDeletedEvent.streamId()));
     }
 
 }
