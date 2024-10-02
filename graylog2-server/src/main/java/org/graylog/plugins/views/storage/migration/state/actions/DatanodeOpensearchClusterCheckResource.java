@@ -14,26 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration.state.machine;
+package org.graylog.plugins.views.storage.migration.state.actions;
 
-import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
+import retrofit2.Call;
+import retrofit2.http.GET;
 
-import java.util.List;
-import java.util.Map;
+public interface DatanodeOpensearchClusterCheckResource {
 
-public interface MigrationStateMachine {
+    @GET("/lock-check")
+    Call<OpensearchLockCheckResult> checkLocks();
 
-    CurrentStateInformation trigger(MigrationStep step, Map<String, Object> args);
-
-    MigrationState getState();
-
-    List<MigrationStep> nextSteps();
-
-    void saveContext();
-
-    MigrationStateMachineContext getContext();
-
-    String serialize();
-
-    void reset();
 }

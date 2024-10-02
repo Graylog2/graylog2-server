@@ -16,9 +16,14 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
+
+const StyledModal = styled(Modal)`
+  z-index: 1070;
+`;
 
 type Props = {
   show?: boolean,
@@ -48,7 +53,7 @@ const ConfirmDialog = ({
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
   return (
-    <Modal show={show} onHide={onHide}>
+    <StyledModal show={show} onHide={onHide}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -65,7 +70,7 @@ const ConfirmDialog = ({
                      submitButtonText={btnConfirmText}
                      displayCancel={!hideCancelButton as any} />
       </Modal.Footer>
-    </Modal>
+    </StyledModal>
   );
 };
 
