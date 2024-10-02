@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackPreview from 'components/content-packs/ContentPackPreview';
