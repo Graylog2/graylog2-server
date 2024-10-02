@@ -136,6 +136,7 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
+    'react/prop-types': ['off'],
     'react/static-property-placement': 'off',
 
     'react-hooks/rules-of-hooks': 'error',
