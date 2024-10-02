@@ -15,21 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackPreview from 'components/content-packs/ContentPackPreview';
 
 describe('<ContentPackPreview />', () => {
-  it('should render with empty content pack', () => {
+  it('should render with empty content pack', async () => {
     const contentPack = ContentPack.builder().id('dead-beef').build();
-    const wrapper = mount(<ContentPackPreview contentPack={contentPack} />);
+    render(<ContentPackPreview contentPack={contentPack} />);
 
-    expect(wrapper).toExist();
+    await screen.findByRole('button', { name: 'Create' });
   });
 
-  it('should render with filled content pack', () => {
+  it('should render with filled content pack', async () => {
     const contentPack = ContentPack.builder()
       .id('dead-beef')
       .name('name')
@@ -39,12 +39,12 @@ describe('<ContentPackPreview />', () => {
       .url('http://example.com')
       .build();
 
-    const wrapper = mount(<ContentPackPreview contentPack={contentPack} />);
+    render(<ContentPackPreview contentPack={contentPack} />);
 
-    expect(wrapper).toExist();
+    await screen.findByRole('button', { name: 'Create' });
   });
 
-  it('should call onSave when creating a content pack', () => {
+  it('should call onSave when creating a content pack', async () => {
     const contentPack = ContentPack.builder()
       .id('dead-beef')
       .name('name')
@@ -55,10 +55,12 @@ describe('<ContentPackPreview />', () => {
       .build();
 
     const onSave = jest.fn();
-    const wrapper = mount(<ContentPackPreview contentPack={contentPack} onSave={onSave} />);
+    render(<ContentPackPreview contentPack={contentPack} onSave={onSave} />);
 
-    wrapper.find('button#create').simulate('click');
+    fireEvent.click(await screen.findByRole('button', { name: 'Create' }));
 
-    expect(onSave.mock.calls.length).toBe(1);
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalled();
+    });
   });
 });
