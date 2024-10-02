@@ -965,6 +965,7 @@
                             -Xep:RobolectricShadowDirectlyOn:OFF
                             -Xep:StringCaseLocaleUsage:OFF
                             -Xep:SwigMemoryLeak:OFF
+                            -Xep:ArrayRecordComponent:ERROR
                             -Xep:DefaultCharset:ERROR
                             -Xep:DoubleCheckedLocking:ERROR
                             -Xep:InconsistentHashCode:ERROR
