@@ -18,7 +18,7 @@ package org.graylog2.indexer.datanode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.HashMap;
+import java.util.Map;
 
-public record CurrentWriteIndices(@JsonProperty("write_indices") HashMap<String, String> writeIndices) {
+public record CurrentWriteIndices(@JsonProperty("write_indices") Map<String, String> writeIndices) {
 }

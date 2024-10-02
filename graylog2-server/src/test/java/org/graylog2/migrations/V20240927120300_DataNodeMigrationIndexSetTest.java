@@ -30,7 +30,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -78,7 +77,7 @@ public class V20240927120300_DataNodeMigrationIndexSetTest {
     @Test
     public void testSkipIndexCreationWithIndexPresent() {
         MigrationStateMachineContext c = new MigrationStateMachineContext();
-        CurrentWriteIndices writeIndices = new CurrentWriteIndices(new HashMap<>(Map.of("id1", "graylog_11")));
+        CurrentWriteIndices writeIndices = new CurrentWriteIndices(Map.of("id1", "graylog_11"));
         c.addExtendedState(RemoteReindexingMigrationAdapter.EXISTING_INDEX_SET_WRITE_INDICES, writeIndices);
         when(migrationStateMachine.getContext()).thenReturn(c);
         IndexSet indexSet = mock(IndexSet.class);
@@ -92,7 +91,7 @@ public class V20240927120300_DataNodeMigrationIndexSetTest {
     @Test
     public void testIndexCreatedWhenNotPresent() {
         MigrationStateMachineContext c = new MigrationStateMachineContext();
-        CurrentWriteIndices writeIndices = new CurrentWriteIndices(new HashMap<>(Map.of("id1", "graylog_11")));
+        CurrentWriteIndices writeIndices = new CurrentWriteIndices(Map.of("id1", "graylog_11"));
         c.addExtendedState(RemoteReindexingMigrationAdapter.EXISTING_INDEX_SET_WRITE_INDICES, writeIndices);
         when(migrationStateMachine.getContext()).thenReturn(c);
         IndexSet indexSet = mock(IndexSet.class);

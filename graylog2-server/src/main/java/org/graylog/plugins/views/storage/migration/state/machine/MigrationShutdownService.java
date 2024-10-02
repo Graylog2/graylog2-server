@@ -34,29 +34,28 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 import jakarta.inject.Inject;
-import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.datanode.CurrentWriteIndices;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MigrationShutdownService extends AbstractIdleService {
 
     private final Logger log = LoggerFactory.getLogger(AbstractIdleService.class);
 
-    private final Boolean runsWithDataNode;
     private final MigrationStateMachine migrationStateMachine;
     private final IndexSetRegistry indexSetRegistry;
 
     @Inject
-    public MigrationShutdownService(@RunsWithDataNode Boolean runsWithDataNode,
-                                    MigrationStateMachine migrationStateMachine,
+    public MigrationShutdownService(MigrationStateMachine migrationStateMachine,
                                     IndexSetRegistry indexSetRegistry) {
-        this.runsWithDataNode = runsWithDataNode;
         this.migrationStateMachine = migrationStateMachine;
         this.indexSetRegistry = indexSetRegistry;
     }
@@ -71,12 +70,10 @@ public class MigrationShutdownService extends AbstractIdleService {
                 MigrationState.MIGRATE_EXISTING_DATA,
                 MigrationState.REMOTE_REINDEX_RUNNING).contains(migrationStateMachine.getState())) {
             log.info("Storing active write indices for data node migration");
-            HashMap<String, String> indices = new HashMap<>();
-            indexSetRegistry.getAll().stream()
-                    .filter(indexSet -> indexSet.isUp() && indexSet.getConfig().isWritable())
-                    .forEach(indexSet -> {
-                        indices.put(indexSet.getConfig().id(), indexSet.getActiveWriteIndex());
-                    });
+            Map<String, String> indices =
+                    indexSetRegistry.getAll().stream()
+                            .filter(indexSet -> indexSet.isUp() && indexSet.getConfig().isWritable() && Objects.nonNull(indexSet.getActiveWriteIndex()))
+                            .collect(Collectors.toMap(is -> is.getConfig().id(), IndexSet::getActiveWriteIndex));
             migrationStateMachine.getContext().addExtendedState(RemoteReindexingMigrationAdapter.EXISTING_INDEX_SET_WRITE_INDICES,
                     new CurrentWriteIndices(indices));
             migrationStateMachine.saveContext();
