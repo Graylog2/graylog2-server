@@ -24,9 +24,11 @@ import useAllIndexSetIds from 'views/logic/fieldactions/ChangeFieldType/hooks/us
 
 const useInitialSelection = () => {
   const currentStreams = useCurrentStream();
-  const { data: { list } } = useAllIndexSetIds(currentStreams);
+  const { data, isLoading } = useAllIndexSetIds(currentStreams);
 
-  return useMemo(() => list.filter(({ type }) => isTemplateTypeAllowsFieldTypeChang(type)).map(({ id }) => id), [list]);
+  const list = useMemo(() => data.filter(({ type }) => isTemplateTypeAllowsFieldTypeChang(type)).map(({ id }) => id), [data]);
+
+  return ({ list, isLoading });
 };
 
 export default useInitialSelection;

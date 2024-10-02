@@ -21,25 +21,19 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
 export type SimpleIndexSet = { id: string, type: string };
-type State = {
-  list: Array<SimpleIndexSet>,
-}
-const INITIAL_DATA: State = {
-  list: [],
-};
+type State = Array<SimpleIndexSet>;
+const INITIAL_DATA: State = [];
 
 const url = qualifyUrl('system/indices/index_sets/types/index_sets_with_field_type_change_support');
 
-const fetchAllIndexSetIds = async (streams: Array<string>): Promise<State> => fetch<Array<{index_set_id: string, type: string }>>('GET', url(streams)).then(
+const fetchAllIndexSetIds = async (streams: Array<string>): Promise<State> => fetch<Array<{index_set_id: string, type: string }>>('POST', url, streams?.length ? streams : undefined).then(
   (elements) => {
     const list: Array<SimpleIndexSet> = elements.map((element) => ({
       id: element.index_set_id,
       type: element.type,
     }));
 
-    return ({
-      list,
-    });
+    return list;
   },
 );
 
@@ -49,14 +43,13 @@ const useAllIndexSetIds = (streams: Array<string>): {
   refetch: () => void,
 } => {
   const { data, isLoading, refetch } = useQuery(
-    ['allIndexSetIds'],
+    ['allIndexSetIds', ...streams],
     () => fetchAllIndexSetIds(streams),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading all index set ids failed with status: ${errorThrown}`,
-          'Could not load all index set ids');
+        UserNotification.error(`Loading index sets with field type change support failed with status: ${errorThrown}`,
+          'Could not index sets with field type change support');
       },
-      keepPreviousData: true,
     },
   );
 
