@@ -44,6 +44,7 @@
         <Logger name="org.apache.iceberg.BaseMetastoreCatalog" level="warn"/>
         <Logger name="org.apache.iceberg.BaseMetastoreTableOperations" level="warn"/>
         <Logger name="org.apache.iceberg.CatalogUtil" level="warn"/>
+        <Logger name="org.apache.iceberg.IncrementalFileCleanup" level="warn"/>
         <Logger name="org.apache.iceberg.SnapshotProducer" level="warn"/>
         <Logger name="org.apache.iceberg.SnapshotScan" level="warn"/>
         <Logger name="org.apache.iceberg.metrics.LoggingMetricsReporter" level="warn"/>
