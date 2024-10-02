@@ -119,7 +119,7 @@ const TimeUnitInput = createReactClass({
     /** Label to use for the field. */
     label: PropTypes.string,
     /** Help message to use for the field. */
-    help: PropTypes.oneOfType([ PropTypes.string, PropTypes.node ]),
+    help: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** Specifies if this is a required field or not. */
     required: PropTypes.bool,
     /** Specifies if the input is enabled or disabled. */
