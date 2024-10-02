@@ -25,6 +25,7 @@ describe('NormalizeSearchURLQueryParams', () => {
     expect(result).toEqual({
       queryString: undefined,
       streamsFilter: null,
+      streamCategoriesFilter: null,
       timeRange: { type: 'relative', range: 600 },
     });
   });
@@ -35,6 +36,7 @@ describe('NormalizeSearchURLQueryParams', () => {
     expect(result).toEqual({
       queryString: undefined,
       streamsFilter: null,
+      streamCategoriesFilter: null,
       timeRange: { type: 'relative', from: 600 },
     });
   });
@@ -45,6 +47,7 @@ describe('NormalizeSearchURLQueryParams', () => {
     expect(result).toEqual({
       queryString: undefined,
       streamsFilter: null,
+      streamCategoriesFilter: null,
       timeRange: { type: 'relative', from: 600, to: 300 },
     });
   });
@@ -59,6 +62,7 @@ describe('NormalizeSearchURLQueryParams', () => {
     expect(result).toEqual({
       queryString: undefined,
       streamsFilter: null,
+      streamCategoriesFilter: null,
       timeRange: { type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' },
     });
   });
@@ -69,6 +73,7 @@ describe('NormalizeSearchURLQueryParams', () => {
     expect(result).toEqual({
       queryString: undefined,
       streamsFilter: null,
+      streamCategoriesFilter: null,
       timeRange: { type: 'keyword', keyword: 'yesterday' },
     });
   });
@@ -82,6 +87,7 @@ describe('NormalizeSearchURLQueryParams', () => {
         type: 'elasticsearch',
       },
       streamsFilter: null,
+      streamCategoriesFilter: null,
       timeRange: undefined,
     });
   });
@@ -101,6 +107,65 @@ describe('NormalizeSearchURLQueryParams', () => {
           Immutable.Map({
             type: 'stream',
             id: 'stream-id-2',
+          }),
+        ]),
+      }),
+      streamCategoriesFilter: null,
+      timeRange: undefined,
+    });
+  });
+
+  it('should normalize stream categories filter', async () => {
+    const result = normalizeSearchURLQueryParams({ stream_categories: 'firewall,graylog' });
+
+    expect(result).toEqual({
+      queryString: undefined,
+      streamsFilter: null,
+      streamCategoriesFilter: Immutable.Map({
+        type: 'or',
+        filters: Immutable.List([
+          Immutable.Map({
+            type: 'stream_category',
+            category: 'firewall',
+          }),
+          Immutable.Map({
+            type: 'stream_category',
+            category: 'graylog',
+          }),
+        ]),
+      }),
+      timeRange: undefined,
+    });
+  });
+
+  it('should normalize streams and stream categories filter', async () => {
+    const result = normalizeSearchURLQueryParams({ streams: 'stream-id-1,stream-id-2', stream_categories: 'firewall,graylog' });
+
+    expect(result).toEqual({
+      queryString: undefined,
+      streamsFilter: Immutable.Map({
+        type: 'or',
+        filters: Immutable.List([
+          Immutable.Map({
+            type: 'stream',
+            id: 'stream-id-1',
+          }),
+          Immutable.Map({
+            type: 'stream',
+            id: 'stream-id-2',
+          }),
+        ]),
+      }),
+      streamCategoriesFilter: Immutable.Map({
+        type: 'or',
+        filters: Immutable.List([
+          Immutable.Map({
+            type: 'stream_category',
+            category: 'firewall',
+          }),
+          Immutable.Map({
+            type: 'stream_category',
+            category: 'graylog',
           }),
         ]),
       }),

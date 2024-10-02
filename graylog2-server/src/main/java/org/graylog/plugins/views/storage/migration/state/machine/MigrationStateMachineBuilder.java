@@ -67,12 +67,13 @@ public class MigrationStateMachineBuilder {
         // remote reindexing branch of the migration
         config.configure(MigrationState.REMOTE_REINDEX_WELCOME_PAGE)
                 .onEntry(migrationActions::reindexUpgradeSelected)
-                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.dataNodeStartupFinished() && migrationActions.compatibleDatanodesRunning(), migrationActions::provisionAndStartDataNodes)
-                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
+                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.allDatanodesAvailable() && migrationActions.compatibleDatanodesRunning(), migrationActions::provisionAndStartDataNodes)
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::allDatanodesAvailable)
+                .onExit(migrationActions::setPreflightFinished);
 
         // This page should contain the "Please restart Graylog to continue with data migration"
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
-                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::allDatanodesAvailable);
 
         config.configure(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE)
                 .permit(MigrationStep.SHOW_MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_EXISTING_DATA, migrationActions::getElasticsearchHosts)
@@ -93,7 +94,7 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::isRemoteReindexingFinished);
 
         config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
-                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.FINISHED, migrationActions::isOldClusterStopped, migrationActions::finishRemoteReindexMigration);
+                .permit(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.FINISHED, migrationActions::finishRemoteReindexMigration);
 
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
@@ -114,11 +115,12 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP, migrationActions::stopMessageProcessing);
 
         config.configure(MigrationState.MESSAGE_PROCESSING_STOP)
-                .permit(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.RESTART_GRAYLOG, migrationActions::startDataNodes);
+                .permitIf(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.RESTART_GRAYLOG, migrationActions::isOldClusterStopped, migrationActions::startDataNodes);
 
         // shows the "remove connection string, restart graylog"
         config.configure(MigrationState.RESTART_GRAYLOG)
-                .permitIf(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED, MigrationState.FINISHED, migrationActions::dataNodeStartupFinished);
+                .onEntry(migrationActions::setPreflightFinished)
+                .permitIf(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED, MigrationState.FINISHED, migrationActions::allDatanodesAvailable);
 
         return config;
     }

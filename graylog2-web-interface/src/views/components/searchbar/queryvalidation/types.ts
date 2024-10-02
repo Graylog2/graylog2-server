@@ -19,8 +19,10 @@ export type IndexRange = {
   index_name: string,
   begin: number,
   end: number,
-  is_warm_tiered: boolean
+  is_warm_tiered: boolean,
+  stream_names: Array<string>
 }
+
 export type StreamDataRouting = {
   stream_name: string,
   stream_id: string,
@@ -28,6 +30,7 @@ export type StreamDataRouting = {
   from: string,
   to: string,
 }
+
 export type QueryValidationState = {
   status: 'OK' | 'ERROR' | 'WARNING' | 'INFO',
   explanations: Array<{

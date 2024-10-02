@@ -38,6 +38,7 @@ const AreaVisualization = makeVisualization(({
   data,
   effectiveTimerange,
   height,
+  width,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
   const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
@@ -85,6 +86,7 @@ const AreaVisualization = makeVisualization(({
             plotLayout={layout}
             effectiveTimerange={effectiveTimerange}
             height={height}
+            width={width}
             chartData={chartDataResult} />
   );
 }, 'area');

@@ -97,7 +97,7 @@ describe('useChartDataSettingsWithCustomUnits', () => {
       fullPath: 'Name2',
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',
       meta: 'Name2',
-      text: ['1.0 Mb', '2.0 Mb', '3.0 Mb'],
+      text: ['1.0 MB', '2.0 MB', '3.0 MB'],
       y: [1000000, 2000000, 3000000],
       yaxis: 'y2',
     });
