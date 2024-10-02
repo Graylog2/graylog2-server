@@ -17,6 +17,7 @@
 package org.graylog2.streams.filters;
 
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.mongodb.client.model.Sorts;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
@@ -39,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +52,7 @@ class StreamDestinationFilterServiceTest {
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()), Optional.of(mockedFilterLicenseCheck));
+        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()), mock(EventBus.class), Optional.of(mockedFilterLicenseCheck));
     }
 
     @Test
