@@ -14,26 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration.state.machine;
+import styled, { css } from 'styled-components';
 
-import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
+import { Switch } from 'components/common';
 
-import java.util.List;
-import java.util.Map;
+const DestinationSwitch = styled(Switch)(({ theme }) => css`
+  > label {
+    margin-bottom: 0;
+  }
 
-public interface MigrationStateMachine {
+  .mantine-Switch-input[disabled] + .mantine-Switch-track {
+    background: ${theme.colors.gray[90]};
 
-    CurrentStateInformation trigger(MigrationStep step, Map<String, Object> args);
+    .mantine-Switch-thumb {
+      background: ${theme.colors.gray[40]};
+      border-color: ${theme.colors.gray[40]};
+    }
+  }
 
-    MigrationState getState();
 
-    List<MigrationStep> nextSteps();
+  .mantine-Switch-label[data-disabled] { 
+    color: ${theme.colors.text.primary};
+  }
+`);
 
-    void saveContext();
-
-    MigrationStateMachineContext getContext();
-
-    String serialize();
-
-    void reset();
-}
+export default DestinationSwitch;

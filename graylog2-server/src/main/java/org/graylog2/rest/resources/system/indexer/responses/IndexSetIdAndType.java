@@ -14,26 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration.state.machine;
+package org.graylog2.rest.resources.system.indexer.responses;
 
-import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-import java.util.Map;
+public record IndexSetIdAndType(@JsonProperty(INDEX_SET_ID) String id,
+                                @JsonProperty(INDEX_SET_TYPE) String type) {
 
-public interface MigrationStateMachine {
-
-    CurrentStateInformation trigger(MigrationStep step, Map<String, Object> args);
-
-    MigrationState getState();
-
-    List<MigrationStep> nextSteps();
-
-    void saveContext();
-
-    MigrationStateMachineContext getContext();
-
-    String serialize();
-
-    void reset();
+    public static final String INDEX_SET_ID = "index_set_id";
+    public static final String INDEX_SET_TYPE = "type";
 }

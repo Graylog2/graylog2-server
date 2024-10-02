@@ -116,8 +116,15 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean isOldClusterStopped() {
-        // TODO: add real test
-        return true;
+        final Map<String, OpensearchLockCheckResult> results = datanodeProxy.remoteInterface(DatanodeResolver.ALL_NODES_KEYWORD, DatanodeOpensearchClusterCheckResource.class, DatanodeOpensearchClusterCheckResource::checkLocks);
+        final boolean anyLocked = results.values().stream().anyMatch(v -> v.locks().stream().anyMatch(OpensearchNodeLock::locked));
+
+        if (anyLocked) {
+            results.forEach((key, value) -> value.locks().stream()
+                    .filter(OpensearchNodeLock::locked)
+                    .forEach(v -> LOG.info("Data directory of datanode {} is still locked by another Opensearch process. Lock file: {}", key, v.path().toAbsolutePath())));
+        }
+        return !anyLocked;
     }
 
     @Override
@@ -232,15 +239,18 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public boolean dataNodeStartupFinished() {
-        boolean dataNodesAvailable = nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
-        if (dataNodesAvailable) { // set preflight config to FINISHED to be sure that a Graylog restart will connect to the data nodes
-            var preflight = preflightConfigService.getPreflightConfigResult();
-            if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
-                preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
-            }
+    public boolean allDatanodesAvailable() {
+        final Map<String, DataNodeDto> activeNodes = nodeService.allActive();
+        return !activeNodes.isEmpty() && activeNodes.values()
+                .stream()
+                .allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
+    }
+
+    public void setPreflightFinished() {
+        var preflight = preflightConfigService.getPreflightConfigResult();
+        if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
+            preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
         }
-        return dataNodesAvailable;
     }
 
     @Override
