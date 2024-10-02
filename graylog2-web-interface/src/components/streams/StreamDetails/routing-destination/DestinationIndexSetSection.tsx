@@ -19,7 +19,7 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
-import { Icon, Section, Spinner, Switch, Timestamp } from 'components/common';
+import { Icon, Section, Spinner, Timestamp } from 'components/common';
 import { IndexSetsStore, type IndexSet } from 'stores/indices/IndexSetsStore';
 import { Table, Button, Alert } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
@@ -31,6 +31,7 @@ import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilt
 import IndexSetArchivingCell from 'components/streams/StreamDetails/routing-destination/IndexSetArchivingCell';
 import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
 import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
+import DestinationSwitch from 'components/streams/StreamDetails/routing-destination/DestinationSwitch';
 import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
 import useIndexSetStats from 'hooks/useIndexSetStats';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
@@ -39,12 +40,6 @@ type Props = {
   indexSet: IndexSet,
   stream: Stream,
 };
-
-export const StyledSwitch = styled(Switch)`
-  > label {
-    margin-bottom: 0;
-  }
-`;
 
 const ActionButtonsWrap = styled.span(() => css`
   float: right;
@@ -75,11 +70,12 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
              defaultClosed
              headerLeftSection={(
                <>
-                 <StyledSwitch aria-label="Toggle index set"
-                               name="toggle-indexset"
-                               checked
-                               label={title}
-                               onChange={() => {}} />
+                 <DestinationSwitch aria-label="Toggle index set"
+                                    name="toggle-indexset"
+                                    checked
+                                    label={title}
+                                    disabled
+                                    onChange={() => {}} />
                  <SectionCountLabel>FILTERS {data?.pagination?.total || 0}</SectionCountLabel>
                </>
              )}

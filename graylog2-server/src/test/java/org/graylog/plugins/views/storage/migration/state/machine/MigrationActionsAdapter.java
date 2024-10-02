@@ -27,8 +27,13 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public boolean dataNodeStartupFinished() {
+    public boolean allDatanodesAvailable() {
         return false;
+    }
+
+    @Override
+    public void setPreflightFinished() {
+
     }
 
     @Override
