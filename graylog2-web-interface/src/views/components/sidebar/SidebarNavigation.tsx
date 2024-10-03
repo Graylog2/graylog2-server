@@ -93,18 +93,14 @@ const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, side
       {accessibleLinks?.length > 0 && (
         <>
           <SectionList>
-            {accessibleLinks.map(({ icon, title, link, key }) => {
-              const isSelected = link !== pathname;
-
-              return (
-                <NavItem isSelected={isSelected}
-                         ariaLabel={`Open ${title}`}
-                         icon={icon}
-                         key={key}
-                         linkTarget={link}
-                         title={title} />
-              );
-            })}
+            {accessibleLinks.map(({ icon, title, link, key }) => (
+              <NavItem isSelected={link === pathname}
+                       ariaLabel={`Open ${title}`}
+                       icon={icon}
+                       key={key}
+                       linkTarget={link}
+                       title={title} />
+            ))}
           </SectionList>
           <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
         </>
