@@ -32,7 +32,7 @@ export type SidebarPage = {
   link: string,
 };
 
-const Container = styled.div<{ $isOpen: boolean, $sidebarIsPinned: boolean }>(({ $isOpen, $sidebarIsPinned, theme }) => css`
+export const Container = styled.div<{ $isOpen?: boolean, $sidebarIsPinned?: boolean }>(({ $isOpen, $sidebarIsPinned, theme }) => css`
   background: ${theme.colors.global.navigationBackground};
   color: ${theme.utils.contrastingColor(theme.colors.global.navigationBackground, 'AA')};
   box-shadow: ${($sidebarIsPinned && $isOpen) ? 'none' : `3px 3px 3px ${theme.colors.global.navigationBoxShadow}`};
@@ -55,7 +55,7 @@ const Container = styled.div<{ $isOpen: boolean, $sidebarIsPinned: boolean }>(({
   }
 `);
 
-const SectionList = styled.div`
+export const Section = styled.div`
   > * {
     margin-bottom: 5px;
 
@@ -92,7 +92,7 @@ const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, side
     <Container $sidebarIsPinned={sidebarIsPinned} $isOpen={!!activeSection}>
       {accessibleLinks?.length > 0 && (
         <>
-          <SectionList>
+          <Section>
             {accessibleLinks.map(({ icon, title, link, key }) => (
               <NavItem isSelected={link === pathname}
                        ariaLabel={`Open ${title}`}
@@ -101,11 +101,11 @@ const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, side
                        linkTarget={link}
                        title={title} />
             ))}
-          </SectionList>
+          </Section>
           <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
         </>
       )}
-      <SectionList>
+      <Section>
         {sections.map(({ key, icon, title }) => {
           const isSelected = activeSectionKey === key;
 
@@ -119,13 +119,13 @@ const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, side
                      sidebarIsPinned={sidebarIsPinned} />
           );
         })}
-      </SectionList>
+      </Section>
       <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
-      <SectionList>
+      <Section>
         {actions.map(({ key, Component }) => (
           <Component key={key} sidebarIsPinned={sidebarIsPinned} />
         ))}
-      </SectionList>
+      </Section>
     </Container>
   );
 };
