@@ -134,9 +134,11 @@ public class MigrationStateMachineBuilderTest {
         verify(migrationActions).caAndRenewalPolicyExist();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATION_SELECTION_PAGE);
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         reset(migrationActions);
         when(migrationActions.isCompatibleInPlaceMigrationVersion()).thenReturn(true);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers())
                 .containsOnly(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         verify(migrationActions, times(1)).isCompatibleInPlaceMigrationVersion();
@@ -147,6 +149,7 @@ public class MigrationStateMachineBuilderTest {
     public void testRemoteReindexWelcomePage() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_SELECTION_PAGE);
         when(migrationActions.compatibleDatanodesRunning()).thenReturn(true);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         stateMachine.fire(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
         verify(migrationActions).reindexUpgradeSelected();
