@@ -18,16 +18,18 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import type { SidebarAction } from 'views/components/sidebar/sidebarActions';
+import type { IconName } from 'components/common/Icon';
+import usePluginEntities from 'hooks/usePluginEntities';
+import useLocation from 'routing/useLocation';
 
 import NavItem from './NavItem';
 import type { SidebarSection } from './sidebarSections';
 
-type Props = {
-  activeSection: SidebarSection | undefined | null,
-  sections: Array<SidebarSection>,
-  actions: Array<SidebarAction>,
-  selectSidebarSection: (sectionKey: string) => void,
-  sidebarIsPinned: boolean,
+export type SidebarPage = {
+  key: string,
+  title: string,
+  icon: IconName,
+  link: string,
 };
 
 const Container = styled.div<{ $isOpen: boolean, $sidebarIsPinned: boolean }>(({ $isOpen, $sidebarIsPinned, theme }) => css`
@@ -72,11 +74,40 @@ const HorizontalRuleWrapper = styled.div`
   }
 `;
 
+type Props = {
+  activeSection: SidebarSection | undefined | null,
+  sections: Array<SidebarSection>,
+  actions: Array<SidebarAction>,
+  selectSidebarSection: (sectionKey: string) => void,
+  sidebarIsPinned: boolean,
+};
+
 const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, sidebarIsPinned, actions }: Props) => {
   const activeSectionKey = activeSection?.key;
+  const { pathname } = useLocation();
+  const links = usePluginEntities('views.sidebar.links');
 
   return (
     <Container $sidebarIsPinned={sidebarIsPinned} $isOpen={!!activeSection}>
+      {links?.length > 0 && (
+        <>
+          <SectionList>
+            {links.map(({ icon, title, link, key }) => {
+              const isSelected = link !== pathname;
+
+              return (
+                <NavItem isSelected={isSelected}
+                         ariaLabel={`Open ${title}`}
+                         icon={icon}
+                         key={key}
+                         linkTarget={link}
+                         title={title} />
+              );
+            })}
+          </SectionList>
+          <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
+        </>
+      )}
       <SectionList>
         {sections.map(({ key, icon, title }) => {
           const isSelected = activeSectionKey === key;

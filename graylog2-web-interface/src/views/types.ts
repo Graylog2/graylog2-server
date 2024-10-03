@@ -18,6 +18,7 @@ import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
 import type { Reducer, AnyAction } from '@reduxjs/toolkit';
+import type { IconName } from 'src/components/common/Icon';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
@@ -449,6 +450,13 @@ export type FieldUnitType = 'size' | 'time' | 'percent';
 
 export type FieldUnitsFormValues = Record<string, {abbrev: string; unitType: FieldUnitType}>;
 
+export type SidebarLink = {
+  key: string,
+  title: string,
+  icon: IconName,
+  link: string,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -500,6 +508,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.copyPageToDashboard'?: Array<CopyParamsToView>;
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
+    'views.sidebar.links'?: Array<SidebarLink>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.widgets.exportAction'?: Array<{ action: WidgetActionType, useCondition: () => boolean }>;
     'views.reducers'?: Array<ViewsReducer>;
