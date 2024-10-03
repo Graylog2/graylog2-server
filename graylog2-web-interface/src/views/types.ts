@@ -455,6 +455,7 @@ export type SidebarLink = {
   title: string,
   icon: IconName,
   link: string,
+  useCondition: () => boolean,
 }
 
 declare module 'graylog-web-plugin/plugin' {

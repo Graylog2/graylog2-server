@@ -86,13 +86,14 @@ const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, side
   const activeSectionKey = activeSection?.key;
   const { pathname } = useLocation();
   const links = usePluginEntities('views.sidebar.links');
+  const accessibleLinks = links.filter((link) => (link.useCondition ? !!link.useCondition() : true));
 
   return (
     <Container $sidebarIsPinned={sidebarIsPinned} $isOpen={!!activeSection}>
-      {links?.length > 0 && (
+      {accessibleLinks?.length > 0 && (
         <>
           <SectionList>
-            {links.map(({ icon, title, link, key }) => {
+            {accessibleLinks.map(({ icon, title, link, key }) => {
               const isSelected = link !== pathname;
 
               return (
