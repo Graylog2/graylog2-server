@@ -55,7 +55,7 @@ public class MigrationStateMachineBuilder {
                     return !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist();
                 })
                 .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, () -> {
-                    if (!migrationActions.isRemoteReindexMigrationEnabled() && !migrationActions.isCompatibleInPlaceMigrationVersion()) {
+                    if (!migrationActions.isRemoteReindexMigrationEnabled()) {
                         return false;
                     }
                     return migrationActions.caAndRenewalPolicyExist() && migrationActions.isCompatibleInPlaceMigrationVersion();
