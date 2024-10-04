@@ -295,10 +295,24 @@ class StreamDestinationFilterServiceTest {
     @Test
     @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
     void streamDeletionEvent() {
-        final var optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
+        var optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
         assertThat(optionalDto).isPresent();
+
+        optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0001");
+        assertThat(optionalDto).isPresent();
+
+        optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0002");
+        assertThat(optionalDto).isPresent();
+
         eventBus.post(StreamDeletedEvent.create("54e3deadbeefdeadbeef1000"));
-        final var afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
+
+        var afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
+        assertThat(afterDeletionEvent).isNotPresent();
+
+        afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0001");
+        assertThat(afterDeletionEvent).isNotPresent();
+
+        afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0002");
         assertThat(afterDeletionEvent).isNotPresent();
     }
 }

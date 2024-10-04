@@ -185,7 +185,7 @@ public class StreamDestinationFilterService {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleStreamDeleted(StreamDeletedEvent streamDeletedEvent) {
-        collection.deleteOne(eq(FIELD_STREAM_ID, streamDeletedEvent.streamId()));
+        collection.deleteMany(eq(FIELD_STREAM_ID, streamDeletedEvent.streamId()));
     }
 
 }
