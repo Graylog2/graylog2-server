@@ -16,7 +16,8 @@
  */
 import { useContext } from 'react';
 
-import TableFetchContext, { ContextValue } from './TableFetchContext';
+import TableFetchContext from './TableFetchContext';
+import type { ContextValue } from './TableFetchContext';
 
 const useTableFetchContext = (skip: boolean = false) => {
   const tableFetchContext = useContext(TableFetchContext);

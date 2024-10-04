@@ -191,6 +191,7 @@ const DataNodeActions = ({ dataNode, refetch, displayAs }: Props) => {
 
 DataNodeActions.defaultProps = {
   displayAs: 'dropdown',
+  refetch: undefined,
 };
 
 export default DataNodeActions;
