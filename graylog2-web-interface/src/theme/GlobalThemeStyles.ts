@@ -557,6 +557,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 5px;
   }
 
+  .form-inline .typeahead-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    width: auto;
+  }
+
   .form-group-inline {
     display: inline-block;
     margin: 0;
