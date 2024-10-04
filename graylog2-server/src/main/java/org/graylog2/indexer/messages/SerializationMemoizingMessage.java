@@ -48,9 +48,29 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
 
     private volatile SoftReference<CacheEntry> lastSerializationResult;
 
-    private record CacheEntry(byte[] serializedBytes,
-                              ObjectMapper objectMapper,
-                              Meter invalidTimeStampMeter) {}
+    private static class CacheEntry {
+        private final byte[] serializedBytes;
+        private final ObjectMapper objectMapper;
+        private final Meter invalidTimeStampMeter;
+
+        CacheEntry(byte[] serializedBytes, ObjectMapper objectMapper, Meter invalidTimeStampMeter) {
+            this.serializedBytes = serializedBytes;
+            this.objectMapper = objectMapper;
+            this.invalidTimeStampMeter = invalidTimeStampMeter;
+        }
+
+        public byte[] serializedBytes() {
+            return serializedBytes;
+        }
+
+        public ObjectMapper objectMapper() {
+            return objectMapper;
+        }
+
+        public Meter invalidTimeStampMeter() {
+            return invalidTimeStampMeter;
+        }
+    }
 
     public SerializationMemoizingMessage(Message delegate) {
         this.delegate = delegate;
