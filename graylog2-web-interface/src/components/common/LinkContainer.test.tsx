@@ -154,4 +154,16 @@ describe('LinkContainer', () => {
 
     expect(hasHref(button) ? button.href : null).toBeNull();
   });
+
+  it('should add target to children', async () => {
+    render(
+      <LinkContainer to="/alerts" target="_blank">
+        <Button bsStyle="info" onClick={jest.fn()}>Alerts</Button>
+      </LinkContainer>,
+    );
+
+    const button = await screen.findByText('Alerts');
+
+    expect(hasHref(button) ? button.href : null).toBeNull();
+  });
 });
