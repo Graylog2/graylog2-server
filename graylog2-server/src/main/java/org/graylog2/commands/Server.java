@@ -84,6 +84,7 @@ import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
 import org.graylog2.datatiering.DataTieringModule;
 import org.graylog2.decorators.DecoratorBindings;
+import org.graylog2.entitygroups.EntityGroupModule;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.FieldTypeManagementModule;
 import org.graylog2.indexer.IndexerBindings;
@@ -215,7 +216,8 @@ public class Server extends ServerBootstrap {
                 new DataTieringModule(),
                 new DatanodeMigrationBindings(),
                 new CaModule(),
-                new TelemetryModule()
+                new TelemetryModule(),
+                new EntityGroupModule(featureFlags)
         );
 
         modules.add(new FieldTypeManagementModule());
