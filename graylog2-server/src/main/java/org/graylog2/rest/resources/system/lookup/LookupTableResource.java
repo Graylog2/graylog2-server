@@ -85,6 +85,7 @@ import org.graylog2.shared.security.RestPermissions;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -499,18 +500,26 @@ public class LookupTableResource extends RestResource {
                 final LookupTable table = lookupTableService.newBuilder().lookupTable(tableName).build().getTable();
                 if (table != null) {
                     errorStates.tables().put(tableName, table.error());
+                } else {
+                    errorStates.tables().put(tableName, "Lookup Table is not running.");
                 }
             }
         }
         if (request.dataAdapters() != null) {
+            final Set<String> unhandledAdapter = new HashSet<>(request.dataAdapters());
             lookupTableService.getDataAdapters(request.dataAdapters()).forEach(adapter -> {
                 errorStates.dataAdapters().put(adapter.name(), adapter.getError().map(Throwable::getMessage).orElse(null));
+                unhandledAdapter.remove(adapter.name());
             });
+            unhandledAdapter.forEach(adapter -> errorStates.dataAdapters().put(adapter, "Data Adapter is not running."));
         }
         if (request.caches() != null) {
+            final Set<String> unhandledCache = new HashSet<>(request.caches());
             lookupTableService.getCaches(request.caches()).forEach(cache -> {
                 errorStates.caches().put(cache.name(), cache.getError().map(Throwable::getMessage).orElse(null));
+                unhandledCache.remove(cache.name());
             });
+            unhandledCache.forEach(cache -> errorStates.caches().put(cache, "Cache is not running."));
         }
         return errorStates.build();
     }
