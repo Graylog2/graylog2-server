@@ -2655,9 +2655,9 @@
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
 "@mantine/core@^7.5.2":
-  version "7.13.1"
-  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-7.13.1.tgz#96c5e4801cb30771ae7ff4648eb8b3f24302b307"
-  integrity sha512-KH/WrcY/5pf3FxUUbtG77xyd7kfp6SRPAJFkxjFlg9kXroiQ7baljphY371CwPYPINERShUdvCQLpz4r4WMIHA==
+  version "7.13.2"
+  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-7.13.2.tgz#8fb8ee2857a40f237ffed370a6ad768fbb1b3be2"
+  integrity sha512-nD8oKIal+KdthqF074+ZG21035QBEAKso2zK9D6zWxRTLVCjLCNSc5JSXrXLrdBTnvPQGY26yunX4+MEPlmrHg==
   dependencies:
     "@floating-ui/react" "^0.26.9"
     clsx "^2.1.1"
@@ -2667,29 +2667,29 @@
     type-fest "^4.12.0"
 
 "@mantine/dropzone@^7.5.2":
-  version "7.13.1"
-  resolved "https://registry.yarnpkg.com/@mantine/dropzone/-/dropzone-7.13.1.tgz#e3e88c6c50f1aec79ade6e174ada9367a1062b1b"
-  integrity sha512-Zsec8oVBwmP/u84Vq3OB+uqzi9hqdtoS1IekCdvh6ofmDrSrpk126IxmL/oolRZ1dgSRAiXpKh160JyTYFbAiw==
+  version "7.13.2"
+  resolved "https://registry.yarnpkg.com/@mantine/dropzone/-/dropzone-7.13.2.tgz#6420d9ed7cfb4fe4f87ab427864aead6d35bdcb0"
+  integrity sha512-Sce2mkZ2Y2LNAIrHy6P2woRHlUiUx1tIN7yhtHt3Iils8sGH+cDERc+C53ZxKcVlEge6AlhfX0PhtancYxzDaQ==
   dependencies:
     react-dropzone-esm "15.0.1"
 
 "@mantine/hooks@^7.5.2":
-  version "7.13.1"
-  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-7.13.1.tgz#0fd9972c9ec0a840a2f3dfb02fcd8f1f4b8d868a"
-  integrity sha512-Hfd4v380pPJUKDbARk+egdAanx7bpGZmaOn8G3QBZjwDufVopxip0WPkifUKUIMeYY1CTboa+1go9l56ZWrrSg==
+  version "7.13.2"
+  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-7.13.2.tgz#ec6a17faee4c8f3c0fe06f7b66c0e4a12c9b1ad1"
+  integrity sha512-NKfGl2sKZw6zF//AfAFJrVDftjg7DKCn0h8rwJBIZCKi9axhwlV0Mvlqe2dep8QuM7O/uLLJSymSKIv1gaxIJg==
 
 "@mantine/notifications@^7.5.2":
-  version "7.13.1"
-  resolved "https://registry.yarnpkg.com/@mantine/notifications/-/notifications-7.13.1.tgz#e0823076c9367330ac6b78bd78f9418e1310f202"
-  integrity sha512-Lc66wRar/nqADoaSlLHntREWbMlDDVs/Sabla2ac/V8jftLOnQpVPMefMpFVGYNJdhT3mG/9bguZV5K7pkjSXQ==
+  version "7.13.2"
+  resolved "https://registry.yarnpkg.com/@mantine/notifications/-/notifications-7.13.2.tgz#0be074470b0a91a6dc7a6834e67c301d7ebea903"
+  integrity sha512-14vFJtR0wjO8Won96UMLxIGmKetR0ocBxcghtuGh6+wnXt6r/ezfQKsdGkkNj6w91I+0Nl9jspcxEekE5q2tBQ==
   dependencies:
-    "@mantine/store" "7.13.1"
+    "@mantine/store" "7.13.2"
     react-transition-group "4.4.5"
 
-"@mantine/store@7.13.1":
-  version "7.13.1"
-  resolved "https://registry.yarnpkg.com/@mantine/store/-/store-7.13.1.tgz#e05b186fc37eb0385973a41c64bf80362ffd4651"
-  integrity sha512-/ZiVU8oFMkzSNrXqAvxb9ZfHWgVg7E8apUEQCzBh9sxgxdVoM9Y1+2YqOoi885hxskmPpkmGP+VGOJnQ6OKJig==
+"@mantine/store@7.13.2":
+  version "7.13.2"
+  resolved "https://registry.yarnpkg.com/@mantine/store/-/store-7.13.2.tgz#aba23573bff42eda28716f422275929afde086c9"
+  integrity sha512-JcBGOqRynYiRWzw1rYdmViB/lfeYSec2EXVdSt4eJv+RPICsjjuqrIc3sNzfqJEGxcN4hGSlaeBriSh05K+vNQ==
 
 "@mapbox/geojson-rewind@^0.5.2":
   version "0.5.2"
@@ -3707,7 +3707,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@18.0.28", "@types/react@18.3.10", "@types/react@^16", "@types/react@^16.9.11", "@types/react@^16.9.9":
+"@types/react@*", "@types/react@18.0.28", "@types/react@18.3.11", "@types/react@^16", "@types/react@^16.9.11", "@types/react@^16.9.9":
   version "18.0.28"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.28.tgz#accaeb8b86f4908057ad629a26635fe641480065"
   integrity sha512-RD0ivG1kEztNBdoAK7lekI9M+azSnitIn85h4iOiaLjaTrMjzslhaqCGaI4IyCJ1RljWiLCEu4jyrLLgqxBTew==
@@ -9007,7 +9007,7 @@ graphemer@^1.4.0:
     "@tanstack/react-query" "4.36.1"
     "@types/create-react-class" "15.6.8"
     "@types/jquery" "3.5.31"
-    "@types/react" "18.3.10"
+    "@types/react" "18.3.11"
     babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
     eslint-config-graylog "file:packages/eslint-config-graylog"
