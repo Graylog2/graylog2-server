@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Add a note clarifying how making changes to index sets does not apply to existing indices"
+
+issues = ["18836"]
+pulls = ["20659"]
