@@ -94,7 +94,7 @@
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
-        <asm.version>9.7</asm.version>
+        <asm.version>9.7.1</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.0</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
@@ -106,7 +106,7 @@
         <byte-buddy.version>1.15.3</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.176</classgraph.version>
+        <classgraph.version>4.8.177</classgraph.version>
         <commons-codec.version>1.17.1</commons-codec.version>
         <commons-csv.version>1.12.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -149,8 +149,8 @@
         <kafka.version>3.8.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.24.1</log4j.version>
-        <lucene.version>9.11.1</lucene.version>
-        <metrics.version>4.2.27</metrics.version>
+        <lucene.version>9.12.0</lucene.version>
+        <metrics.version>4.2.28</metrics.version>
         <mongodb-driver.version>5.2.0</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
@@ -191,15 +191,15 @@
         <assertj-core.version>3.26.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.2</awaitility.version>
-        <equalsverifier.version>3.17</equalsverifier.version>
+        <equalsverifier.version>3.17.1</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
-        <junit-jupiter.version>5.11.1</junit-jupiter.version>
+        <junit-jupiter.version>5.11.2</junit-jupiter.version>
         <mockito.version>5.14.1</mockito.version>
         <restassured.version>5.5.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.20.2</testcontainers.version>
-        <testcontainers.opensearch.version>2.1.0</testcontainers.opensearch.version>
+        <testcontainers.opensearch.version>2.1.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v20.17.0</nodejs.version>
@@ -599,12 +599,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

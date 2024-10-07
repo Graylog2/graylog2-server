@@ -17,6 +17,7 @@
 package org.graylog2.streams.filters;
 
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.mongodb.client.model.Sorts;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
@@ -25,6 +26,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.streams.events.StreamDeletedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,10 +49,12 @@ class StreamDestinationFilterServiceTest {
     @Mock
     private DestinationFilterCreationValidator mockedFilterLicenseCheck;
     private StreamDestinationFilterService service;
+    private EventBus eventBus;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()), Optional.of(mockedFilterLicenseCheck));
+        this.eventBus = new EventBus("stream-destination-filter-service");
+        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()), eventBus, Optional.of(mockedFilterLicenseCheck));
     }
 
     @Test
@@ -286,5 +290,29 @@ class StreamDestinationFilterServiceTest {
         assertThat(result.keySet()).containsExactlyInAnyOrder("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef2000");
         assertThat(result.get("54e3deadbeefdeadbeef1000")).containsExactlyInAnyOrder("Test Filter 1", "Test Filter 3");
         assertThat(result.get("54e3deadbeefdeadbeef2000")).containsExactlyInAnyOrder("Test Filter 4");
+    }
+
+    @Test
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
+    void streamDeletionEvent() {
+        var optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
+        assertThat(optionalDto).isPresent();
+
+        optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0001");
+        assertThat(optionalDto).isPresent();
+
+        optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0002");
+        assertThat(optionalDto).isPresent();
+
+        eventBus.post(StreamDeletedEvent.create("54e3deadbeefdeadbeef1000"));
+
+        var afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
+        assertThat(afterDeletionEvent).isNotPresent();
+
+        afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0001");
+        assertThat(afterDeletionEvent).isNotPresent();
+
+        afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0002");
+        assertThat(afterDeletionEvent).isNotPresent();
     }
 }
