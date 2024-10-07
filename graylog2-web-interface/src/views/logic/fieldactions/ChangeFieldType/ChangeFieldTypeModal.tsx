@@ -63,7 +63,8 @@ type Props = {
   initialData?: {
     type?: string,
     fieldName?: string
-  }
+  },
+  initialSelectionDataLoaded?: boolean,
 }
 
 const FailureStreamLink = () => {
@@ -86,6 +87,7 @@ const ChangeFieldTypeModal = ({
   showSelectionTable,
   showFieldSelect,
   initialData,
+  initialSelectionDataLoaded,
 }: Props) => {
   const [{ fieldName, type }, setModalData] = useState<{ fieldName?: string, type?: string }>(initialData);
   const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypesForMappings();
@@ -185,7 +187,7 @@ const ChangeFieldTypeModal = ({
                         inputProps={{ 'aria-label': 'Select Field Type For Field' }}
                         required />
         </Input>
-        {showSelectionTable && (
+        {showSelectionTable && initialSelectionDataLoaded && (
           <>
             <StyledLabel>Select Targeted Index Sets</StyledLabel>
             <p>
@@ -214,6 +216,7 @@ ChangeFieldTypeModal.defaultProps = {
   onSubmitCallback: undefined,
   showFieldSelect: false,
   initialData: { fieldName: undefined, type: undefined },
+  initialSelectionDataLoaded: true,
 };
 
 export default ChangeFieldTypeModal;

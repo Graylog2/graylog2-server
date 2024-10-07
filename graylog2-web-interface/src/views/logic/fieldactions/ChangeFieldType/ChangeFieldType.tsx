@@ -34,13 +34,14 @@ const ChangeFieldType = ({
     onClose();
   }, [onClose]);
 
-  const initialSelection = useInitialSelection();
+  const { list, isLoading } = useInitialSelection();
 
   return show ? (
-    <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
+    <ChangeFieldTypeModal initialSelectedIndexSets={list}
                           onClose={handleOnClose}
                           initialData={{ fieldName: field }}
-                          show />
+                          show
+                          initialSelectionDataLoaded={!isLoading} />
   ) : null;
 };
 
