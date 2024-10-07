@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
 
 describe('<ContentPackUploadControls />', () => {
-  it('should render', () => {
-    const wrapper = mount(<ContentPackUploadControls />);
+  it('should render', async () => {
+    render(<ContentPackUploadControls />);
 
-    expect(wrapper).toExist();
+    await screen.findByRole('button', { name: /upload/i });
   });
 });
