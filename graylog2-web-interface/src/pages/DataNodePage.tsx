@@ -57,7 +57,7 @@ const ActionsCol = styled(Col)`
 
 const DataNodePage = () => {
   const { dataNodeId } = useParams();
-  const { data, isInitialLoading, error } = useDataNode(dataNodeId);
+  const { data, isInitialLoading, error, refetch } = useDataNode(dataNodeId);
 
   if (isInitialLoading) {
     return <Spinner />;
@@ -105,7 +105,7 @@ const DataNodePage = () => {
             </StyledHorizontalDl>
           </Col>
           <ActionsCol xs={3}>
-            <DataNodeActions dataNode={datanode} displayAs="buttons" />
+            <DataNodeActions dataNode={datanode} refetch={refetch} displayAs="buttons" />
           </ActionsCol>
         </Col>
       </Row>

@@ -18,6 +18,8 @@ package org.graylog2.streams.filters;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
@@ -31,6 +33,7 @@ import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.streams.events.StreamDeletedEvent;
 import org.mongojack.Id;
 
 import java.util.List;
@@ -71,6 +74,7 @@ public class StreamDestinationFilterService {
     @Inject
     public StreamDestinationFilterService(MongoCollections mongoCollections,
                                           ClusterEventBus clusterEventBus,
+                                          EventBus eventBus,
                                           Optional<DestinationFilterCreationValidator> optionalDestinationFilterCreationValidator) {
         this.collection = mongoCollections.collection(COLLECTION, StreamDestinationFilterRuleDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
@@ -81,6 +85,8 @@ public class StreamDestinationFilterService {
         collection.createIndex(Indexes.ascending(FIELD_STREAM_ID));
         collection.createIndex(Indexes.ascending(FIELD_DESTINATION_TYPE));
         collection.createIndex(Indexes.ascending(FIELD_STATUS));
+
+        eventBus.register(this);
     }
 
     private Bson parseQuery(String queryString) {
@@ -175,4 +181,11 @@ public class StreamDestinationFilterService {
                 ))
         ), GroupByStreamResult.class).forEach(consumer);
     }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleStreamDeleted(StreamDeletedEvent streamDeletedEvent) {
+        collection.deleteMany(eq(FIELD_STREAM_ID, streamDeletedEvent.streamId()));
+    }
+
 }
