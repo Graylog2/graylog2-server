@@ -16,17 +16,22 @@
  */
 package org.graylog2.database;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.mongojack.Id;
+
 /**
  * Interface that ensures that an entity can be converted to a Builder that allows setting the ID on it.
  *
  * @param <T> Type of the entity that provides a #toBuilder() method
  * @param <B> Type of the builder that allows setting the ID
  */
-public interface BuildableMongoEntity<T, B extends BuildableMongoEntity.Builder<T>> extends MongoEntity {
+public interface BuildableMongoEntity<T, B extends BuildableMongoEntity.Builder<T, B>> extends MongoEntity {
     B toBuilder();
 
-    interface Builder<T> {
-        Builder<T> id(String id);
+    interface Builder<T, B> {
+        @Id
+        @JsonProperty("id")
+        B id(String id);
 
         T build();
     }
