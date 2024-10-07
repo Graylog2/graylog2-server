@@ -50,10 +50,10 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.security.JwtSecret;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
 import org.slf4j.Logger;
@@ -231,7 +231,7 @@ public class JerseyService extends AbstractIdleService {
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
 
         if (isSecuredInstance) {
-            resourceConfig.register(new JwtTokenAuthFilter(configuration.getPasswordSecret()));
+            resourceConfig.register(new JwtTokenAuthFilter(new JwtSecret(configuration.getPasswordSecret())));
         }
         resourceConfig.register(new SecuredNodeAnnotationFilter(configuration.isInsecureStartup()));
 
