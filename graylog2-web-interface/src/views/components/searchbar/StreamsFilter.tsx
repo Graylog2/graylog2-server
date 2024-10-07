@@ -33,9 +33,10 @@ type Props = {
   value: Array<string>,
   streams: Array<{ key: string, value: string }>,
   onChange: (newStreamIds: Array<string>) => void,
+  multi?: boolean,
 };
 
-const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
+const StreamsFilter = ({ disabled, value, streams, onChange, multi }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
@@ -63,7 +64,7 @@ const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
               inputId="streams-filter"
               onChange={handleChange}
               options={options}
-              multi
+              multi={multi}
               value={selectedStreams} />
     </Container>
   );
@@ -83,6 +84,7 @@ StreamsFilter.propTypes = {
 
 StreamsFilter.defaultProps = {
   disabled: false,
+  multi: true,
   value: [],
 };
 
