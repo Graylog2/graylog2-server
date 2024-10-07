@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import ContentPackParameters from 'components/content-packs/ContentPackParameters';
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -24,17 +23,17 @@ import ContentPack from 'logic/content-packs/ContentPack';
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
 describe('<ContentPackParameters />', () => {
-  it('should render with empty parameters', () => {
+  it('should render with empty parameters', async () => {
     const contentPack = {
       parameters: [],
       entities: [],
     };
-    const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
+    render(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
 
-    expect(wrapper).toExist();
+    await screen.findByRole('heading', { name: /parameters list/i });
   });
 
-  it('should render a parameter', () => {
+  it('should render a parameter', async () => {
     const entity = {
       id: '111-beef',
       v: '1.0',
@@ -63,8 +62,8 @@ describe('<ContentPackParameters />', () => {
       )
       .entities([entity])
       .build();
-    const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
+    render(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
 
-    expect(wrapper).toExist();
+    await screen.findByRole('heading', { name: /parameters list/i });
   });
 });
