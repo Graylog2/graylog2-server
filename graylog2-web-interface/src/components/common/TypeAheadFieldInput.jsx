@@ -27,6 +27,8 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
+import { Container } from './TypeAheadInput';
+
 /**
  * Component that renders an input offering auto-completion for message fields.
  * Fields are loaded from the Graylog server in the background.
@@ -137,14 +139,16 @@ class TypeAheadFieldInput extends React.Component {
     const { id, label, valueLink, error, onBlur } = this.props;
 
     return (
-      <Input id={id}
-             ref={(fieldInput) => { this.fieldInput = fieldInput; }}
-             label={label}
-             onBlur={onBlur}
-             error={error}
-             wrapperClassName="typeahead-wrapper"
-             defaultValue={valueLink ? valueLink.value : null}
-             {...this._getFilteredProps()} />
+      <Container>
+        <Input id={id}
+               ref={(fieldInput) => { this.fieldInput = fieldInput; }}
+               label={label}
+               onBlur={onBlur}
+               error={error}
+               wrapperClassName="typeahead-wrapper"
+               defaultValue={valueLink ? valueLink.value : null}
+               {...this._getFilteredProps()} />
+      </Container>
     );
   }
 }
