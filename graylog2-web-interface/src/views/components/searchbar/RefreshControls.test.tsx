@@ -80,6 +80,8 @@ describe('RefreshControls', () => {
     refreshConfig: null,
     stopAutoRefresh: () => {},
     startAutoRefresh: () => {},
+    restartAutoRefresh: () => {},
+    animationId: 'animation-id',
   };
 
   beforeEach(() => {
