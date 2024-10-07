@@ -39,7 +39,8 @@ public class JwtSecretProvider implements Provider<JwtSecret> {
      */
     private String adaptPassword(String passwordSecret) {
         if (passwordSecret.length() < 64) {
-            return StringUtils.rightPad(passwordSecret, 64, 'X');
+            final String extended = passwordSecret + StringUtils.repeat(passwordSecret, 3);
+            return extended.substring(0, 64);
         } else {
             return passwordSecret;
         }
