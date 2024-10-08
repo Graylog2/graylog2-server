@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackInstallEntityList from './ContentPackInstallEntityList';
@@ -27,27 +27,33 @@ describe('<ContentPackInstallEntityList />', () => {
     { id: '5bdc4f4b3d27461ce46816d1', type: { name: 'lookup_adapter', version: '1' }, content_pack_entity_id: '5ac762873d274666e34eca87', title: 'Tor Exit Node' },
   ];
 
-  it('should render without entities', () => {
-    const wrapper = mount(<ContentPackInstallEntityList />);
+  it('should render without entities', async () => {
+    render(<ContentPackInstallEntityList />);
 
-    expect(wrapper).toExist();
+    await screen.findByText(/loading/i);
   });
 
-  it('should render with entities', () => {
-    const wrapper = mount(<ContentPackInstallEntityList entities={entities} />);
+  it('should render with entities', async () => {
+    render(<ContentPackInstallEntityList entities={entities} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText(/Installed Entities/i);
+    await screen.findByText('Threat Intel Uncached Adapters');
+    await screen.findByText('Tor Exit Node List');
+    await screen.findByText('Tor Exit Node');
   });
 
-  it('should render with empty entities', () => {
-    const wrapper = mount(<ContentPackInstallEntityList entities={[]} />);
+  it('should render with empty entities', async () => {
+    render(<ContentPackInstallEntityList entities={[]} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText(/Installed Entities/i);
   });
 
-  it('should render with uninstall and entities', () => {
-    const wrapper = mount(<ContentPackInstallEntityList uninstall entities={entities} />);
+  it('should render with uninstall and entities', async () => {
+    render(<ContentPackInstallEntityList uninstall entities={entities} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText(/Entites to be uninstalled/i);
+    await screen.findByText('Threat Intel Uncached Adapters');
+    await screen.findByText('Tor Exit Node List');
+    await screen.findByText('Tor Exit Node');
   });
 });

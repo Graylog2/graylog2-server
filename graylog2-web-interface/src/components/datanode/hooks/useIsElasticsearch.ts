@@ -14,23 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { useQuery } from '@tanstack/react-query';
 
-import EmptyAggregationContent from './EmptyAggregationContent';
+import { qualifyUrl } from 'util/URLUtils';
+import fetch from 'logic/rest/FetchProvider';
+import ApiRoutes from 'routing/ApiRoutes';
 
-import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+const fetchClusterName = async () => fetch('GET', qualifyUrl(ApiRoutes.IndexerClusterApiController.info().url));
 
-describe('EmptyAggregationContext', () => {
-  it('calls render completion callback after first render', () => {
-    const onRenderComplete = jest.fn();
+const useIsElasticsearch = (): boolean => {
+  const { data } = useQuery(
+    ['cluster-name'],
+    fetchClusterName,
+    {
+      refetchInterval: 5000,
+    },
+  );
 
-    render((
-      <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <EmptyAggregationContent toggleEdit={() => {}} editing={false} />
-      </RenderCompletionCallback.Provider>
-    ));
+  return data?.distribution === 'Elasticsearch';
+};
 
-    expect(onRenderComplete).toHaveBeenCalled();
-  });
-});
+export default useIsElasticsearch;
