@@ -14,23 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+package org.graylog2.rest.resources.system.indexer.responses;
 
-import EmptyAggregationContent from './EmptyAggregationContent';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+public record IndexSetIdAndType(@JsonProperty(INDEX_SET_ID) String id,
+                                @JsonProperty(INDEX_SET_TYPE) String type) {
 
-describe('EmptyAggregationContext', () => {
-  it('calls render completion callback after first render', () => {
-    const onRenderComplete = jest.fn();
-
-    render((
-      <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <EmptyAggregationContent toggleEdit={() => {}} editing={false} />
-      </RenderCompletionCallback.Provider>
-    ));
-
-    expect(onRenderComplete).toHaveBeenCalled();
-  });
-});
+    public static final String INDEX_SET_ID = "index_set_id";
+    public static final String INDEX_SET_TYPE = "type";
+}

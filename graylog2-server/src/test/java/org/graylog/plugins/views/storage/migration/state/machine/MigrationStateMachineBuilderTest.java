@@ -47,6 +47,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testWelcomePage() {
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_WELCOME_PAGE);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATION_WELCOME_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
@@ -65,6 +66,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testCaCreationPage() {
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_WELCOME_PAGE);
         when(migrationActions.caDoesNotExist()).thenReturn(true);
@@ -79,8 +81,9 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
         verify(migrationActions, times(1)).caDoesNotExist();
         verify(migrationActions, times(1)).renewalPolicyDoesNotExist();
-        verify(migrationActions, times(2)).caAndRenewalPolicyExist();
+        verify(migrationActions, times(3)).caAndRenewalPolicyExist();
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.caDoesNotExist()).thenReturn(false);
         when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(false);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
@@ -90,6 +93,7 @@ public class MigrationStateMachineBuilderTest {
         verify(migrationActions, times(1)).renewalPolicyDoesNotExist();
         verify(migrationActions, times(2)).caAndRenewalPolicyExist();
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.caDoesNotExist()).thenReturn(false);
         when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(false);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
@@ -104,6 +108,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testRenewalPolicyCreationPage() {
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.CA_CREATION_PAGE);
         stateMachine.fire(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
@@ -112,11 +117,13 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
         verify(migrationActions, times(2)).caAndRenewalPolicyExist();
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         verify(migrationActions, times(2)).caAndRenewalPolicyExist();
         verify(migrationActions, times(2)).isCompatibleInPlaceMigrationVersion();
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
         when(migrationActions.isCompatibleInPlaceMigrationVersion()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_MIGRATION_SELECTION);
@@ -127,6 +134,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testMigrationSelectionPage() {
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
         when(migrationActions.isCompatibleInPlaceMigrationVersion()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.CA_CREATION_PAGE);
@@ -134,9 +142,11 @@ public class MigrationStateMachineBuilderTest {
         verify(migrationActions).caAndRenewalPolicyExist();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATION_SELECTION_PAGE);
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         reset(migrationActions);
         when(migrationActions.isCompatibleInPlaceMigrationVersion()).thenReturn(true);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers())
                 .containsOnly(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         verify(migrationActions, times(1)).isCompatibleInPlaceMigrationVersion();
@@ -147,6 +157,7 @@ public class MigrationStateMachineBuilderTest {
     public void testRemoteReindexWelcomePage() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_SELECTION_PAGE);
         when(migrationActions.compatibleDatanodesRunning()).thenReturn(true);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         stateMachine.fire(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
         verify(migrationActions).reindexUpgradeSelected();

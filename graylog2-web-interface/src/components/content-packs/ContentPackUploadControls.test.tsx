@@ -14,23 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
+import 'helpers/mocking/react-dom_mock';
 
-import EmptyAggregationContent from './EmptyAggregationContent';
+import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
 
-import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+describe('<ContentPackUploadControls />', () => {
+  it('should render', async () => {
+    render(<ContentPackUploadControls />);
 
-describe('EmptyAggregationContext', () => {
-  it('calls render completion callback after first render', () => {
-    const onRenderComplete = jest.fn();
-
-    render((
-      <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <EmptyAggregationContent toggleEdit={() => {}} editing={false} />
-      </RenderCompletionCallback.Provider>
-    ));
-
-    expect(onRenderComplete).toHaveBeenCalled();
+    await screen.findByRole('button', { name: /upload/i });
   });
 });
