@@ -24,6 +24,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -102,6 +103,6 @@ class ContainerRuntimeDetectionTest {
     }
 
     AbstractBooleanAssert<?> assertIsRunningInContainer(List<String> cgroupV1Lines, List<String> cgroupV2Lines, Path canaryPath) {
-        return assertThat(ContainerRuntimeDetection.isRunningInsideContainer(cgroupV1Lines::stream, cgroupV2Lines::stream, canaryPath));
+        return assertThat(ContainerRuntimeDetection.isRunningInsideContainer(cgroupV1Lines::stream, cgroupV2Lines::stream, () -> Stream.of(canaryPath)));
     }
 }

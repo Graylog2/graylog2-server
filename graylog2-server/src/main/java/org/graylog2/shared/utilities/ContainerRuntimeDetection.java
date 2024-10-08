@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class ContainerRuntimeDetection {
@@ -30,14 +31,14 @@ public class ContainerRuntimeDetection {
         return isRunningInsideContainer(
                 () -> Files.lines(Paths.get("/proc/self/cgroup")),
                 () -> Files.lines(Paths.get("/proc/self/mountinfo")),
-                Path.of("/.dockerenv")
+                () -> Stream.of(Path.of("/.dockerenv"), Path.of("/run/.containerenv"))
         );
     }
 
     @VisibleForTesting
     static Boolean isRunningInsideContainer(Callable<Stream<String>> cgroupV1Lines,
                                             Callable<Stream<String>> cgroupV2Lines,
-                                            Path canaryPath) {
+                                            Supplier<Stream<Path>> canaryPaths) {
         try (Stream<String> stream = cgroupV1Lines.call()) {
             // only works with cgroup v1
             if (stream.anyMatch(line -> line.contains("/docker"))) {
@@ -59,6 +60,6 @@ public class ContainerRuntimeDetection {
         } catch (Exception ignored) {
         }
         // Last attempt to detect that we are running inside a container.
-        return Files.exists(canaryPath);
+        return canaryPaths.get().anyMatch(Files::exists);
     }
 }
