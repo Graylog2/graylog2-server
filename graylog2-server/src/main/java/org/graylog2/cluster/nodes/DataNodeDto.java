@@ -80,8 +80,8 @@ public abstract class DataNodeDto extends NodeDto {
     public CertRenewalService.ProvisioningInformation getProvisioningInformation() {
         DataNodeProvisioningConfig.State state = switch (getDataNodeStatus()) {
             case AVAILABLE -> DataNodeProvisioningConfig.State.CONNECTED;
-            case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
-            case PREPARED -> DataNodeProvisioningConfig.State.STARTUP_PREPARED;
+            case STARTING -> DataNodeProvisioningConfig.State.STARTING;
+            case PREPARED -> DataNodeProvisioningConfig.State.PROVISIONED;
             default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
         };
 

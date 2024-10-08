@@ -30,6 +30,11 @@ const defaultOptions = {
     queries: {
       refetchOnWindowFocus: false,
       networkMode: 'always' as const,
+      retry: (failureCount, error) => {
+        if (error.status >= 400 && error.status < 500) return false;
+
+        return failureCount < 4;
+      },
     },
   },
 };

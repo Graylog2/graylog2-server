@@ -14,16 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
+import styled, { css } from 'styled-components';
 
-import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
+import { Switch } from 'components/common';
 
-describe('<ContentPackUploadControls />', () => {
-  it('should render', () => {
-    const wrapper = mount(<ContentPackUploadControls />);
+const DestinationSwitch = styled(Switch)(({ theme }) => css`
+  > label {
+    margin-bottom: 0;
+  }
 
-    expect(wrapper).toExist();
-  });
-});
+  .mantine-Switch-input[disabled] + .mantine-Switch-track {
+    background: ${theme.colors.gray[90]};
+
+    .mantine-Switch-thumb {
+      background: ${theme.colors.gray[40]};
+      border-color: ${theme.colors.gray[40]};
+    }
+  }
+
+
+  .mantine-Switch-label[data-disabled] { 
+    color: ${theme.colors.text.primary};
+  }
+`);
+
+export default DestinationSwitch;
