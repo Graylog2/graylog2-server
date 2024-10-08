@@ -188,12 +188,25 @@ const QueryValidation = () => {
   const hasExplanations = validationState && (validationState?.status !== 'OK');
   const isInfo = validationState && (validationState.status === 'INFO');
 
+  const validationTitle = () => {
+    if (!validationState) return '';
+
+    switch (validationState.status) {
+      case 'WARNING':
+        return 'warning';
+      case 'INFO':
+        return 'information';
+      default:
+        return 'error explanation';
+    }
+  };
+
   return (
     <Popover opened={hasExplanations && showExplanation} position="bottom" width={500} withArrow>
       <Popover.Target>
         <Container ref={explanationTriggerRef}>
           {hasExplanations ? (
-            <ExplanationTrigger title={`Toggle validation ${isInfo ? 'information' : 'error explanation'}`}
+            <ExplanationTrigger title={`Toggle validation ${validationTitle()}`}
                                 onClick={toggleShow}
                                 $clickable
                                 tabIndex={0}
