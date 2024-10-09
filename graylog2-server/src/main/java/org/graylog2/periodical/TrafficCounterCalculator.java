@@ -38,9 +38,11 @@ public class TrafficCounterCalculator extends Periodical {
     private volatile long previousInputBytes = 0L;
     private volatile long previousOutputBytes = 0L;
     private volatile long previousDecodedBytes = 0L;
+    private volatile long previousDataWarehouseOutputBytes = 0L;
     private Counter inputCounter;
     private Counter outputCounter;
     private Counter decodedCounter;
+    private Counter dataWarehouseOutputCounter;
 
     @Inject
     public TrafficCounterCalculator(NodeId nodeId, TrafficUpdater trafficUpdater, MetricRegistry metricRegistry) {
@@ -54,6 +56,7 @@ public class TrafficCounterCalculator extends Periodical {
         inputCounter = metricRegistry.counter(GlobalMetricNames.INPUT_TRAFFIC);
         outputCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
         decodedCounter = metricRegistry.counter(GlobalMetricNames.DECODED_TRAFFIC);
+        dataWarehouseOutputCounter = metricRegistry.counter(GlobalMetricNames.DATA_WAREHOUSE_OUTPUT_TRAFFIC);
     }
 
     @Override
@@ -67,6 +70,7 @@ public class TrafficCounterCalculator extends Periodical {
             final long currentInputBytes = inputCounter.getCount();
             final long currentOutputBytes = outputCounter.getCount();
             final long currentDecodedBytes = decodedCounter.getCount();
+            final long currentDataWarehouseOutputBytes = dataWarehouseOutputCounter.getCount();
 
             final long inputLastMinute = currentInputBytes - previousInputBytes;
             previousInputBytes = currentInputBytes;
@@ -74,6 +78,8 @@ public class TrafficCounterCalculator extends Periodical {
             previousOutputBytes = currentOutputBytes;
             final long decodedBytesLastMinute = currentDecodedBytes - previousDecodedBytes;
             previousDecodedBytes = currentDecodedBytes;
+            final long dataWarehouseOutputBytesLastMinute = currentDataWarehouseOutputBytes - previousDataWarehouseOutputBytes;
+            previousDataWarehouseOutputBytes = currentDataWarehouseOutputBytes;
 
             if (LOG.isDebugEnabled()) {
                 final Size in = Size.bytes(inputLastMinute);
@@ -83,7 +89,12 @@ public class TrafficCounterCalculator extends Periodical {
                         in, in.toMegabytes(), out, out.toMegabytes(), decoded, decoded.toMegabytes());
             }
             final DateTime previousMinute = now.minusMinutes(1);
-            trafficUpdater.updateTraffic(previousMinute, nodeId, inputLastMinute, outputBytesLastMinute, decodedBytesLastMinute);
+            trafficUpdater.updateTraffic(previousMinute,
+                    nodeId,
+                    inputLastMinute,
+                    outputBytesLastMinute,
+                    decodedBytesLastMinute,
+                    dataWarehouseOutputBytesLastMinute);
         }
     }
 
