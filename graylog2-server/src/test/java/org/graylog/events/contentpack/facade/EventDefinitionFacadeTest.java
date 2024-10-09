@@ -344,6 +344,7 @@ public class EventDefinitionFacadeTest {
 
     @Test
     @MongoDBFixtures("EventDefinitionFacadeTest.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void delete() {
         long countBefore = eventDefinitionService.streamAll().count();
         assertThat(countBefore).isEqualTo(1);

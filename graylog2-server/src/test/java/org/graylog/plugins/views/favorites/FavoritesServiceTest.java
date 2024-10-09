@@ -99,6 +99,7 @@ public class FavoritesServiceTest {
     }
 
     @Test
+    @SuppressWarnings("MustBeClosedChecker")
     public void testRemoveOnUserDeletion() {
         var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
         var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");
@@ -115,6 +116,7 @@ public class FavoritesServiceTest {
     }
 
     @Test
+    @SuppressWarnings("MustBeClosedChecker")
     public void testRemoveOnEntityDeletion() {
         var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
         var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");

@@ -86,10 +86,13 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final Map<String, Set<String>> widgetIdMigrationMapping = new HashMap<>();
         final Consumer<Map<String, Set<String>>> recordMigratedWidgetIds = widgetIdMigrationMapping::putAll;
 
-        final Map<View, Search> newViews = this.dashboardsService.streamAll()
-                .sorted(Comparator.comparing(Dashboard::id))
-                .map(dashboard -> migrateDashboard(dashboard, recordMigratedDashboardIds, recordMigratedWidgetIds))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<View, Search> newViews;
+        try (var stream = this.dashboardsService.streamAll()) {
+            newViews = stream
+                    .sorted(Comparator.comparing(Dashboard::id))
+                    .map(dashboard -> migrateDashboard(dashboard, recordMigratedDashboardIds, recordMigratedWidgetIds))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
 
         writeViews(newViews);
 

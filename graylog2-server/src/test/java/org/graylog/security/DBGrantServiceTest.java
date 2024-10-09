@@ -58,6 +58,7 @@ public class DBGrantServiceTest {
 
     @Test
     @MongoDBFixtures("grants.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void test() {
         assertThat(dbService.streamAll().collect(Collectors.toSet()).size()).isEqualTo(6);
     }

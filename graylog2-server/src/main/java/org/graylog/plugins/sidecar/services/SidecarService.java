@@ -18,6 +18,7 @@ package org.graylog.plugins.sidecar.services;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.BasicDBObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.graylog.plugins.sidecar.rest.models.Collector;
@@ -302,6 +303,7 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                 .collect(Collectors.toList());
     }
 
+    @MustBeClosed
     public Stream<Sidecar> findByTagsAndOS(Collection<String> tags, String os) {
         return streamQuery(DBQuery.and(
                 DBQuery.in("node_details.tags", tags),

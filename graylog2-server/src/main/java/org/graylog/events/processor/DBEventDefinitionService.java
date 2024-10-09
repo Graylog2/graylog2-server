@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
@@ -184,7 +185,9 @@ public class DBEventDefinitionService {
         final String field = String.format(Locale.US, "%s.%s",
                 EventDefinitionDto.FIELD_NOTIFICATIONS,
                 EventNotificationConfig.FIELD_NOTIFICATION_ID);
-        return stream(collection.find(eq(field, notificationId))).toList();
+        try (var stream = stream(collection.find(eq(field, notificationId)))) {
+            return stream.toList();
+        }
     }
 
     /**
@@ -193,7 +196,10 @@ public class DBEventDefinitionService {
      * @return the matching event definitions
      */
     public List<EventDefinitionDto> getSystemEventDefinitions() {
-        return stream(collection.find(eq(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME))).toList();
+        final var query = eq(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME);
+        try (var stream = stream(collection.find(query))) {
+            return stream.toList();
+        }
     }
 
     /**
@@ -201,13 +207,16 @@ public class DBEventDefinitionService {
      */
     @NotNull
     public List<EventDefinitionDto> getByArrayValue(String arrayField, String field, String value) {
-        return stream(collection.find(elemMatch(arrayField, eq(field, value)))).toList();
+        try (var stream = stream(collection.find(elemMatch(arrayField, eq(field, value))))) {
+            return stream.toList();
+        }
     }
 
     public boolean isMutable(EventDefinitionDto eventDefinition) {
         return scopedEntityMongoUtils.isMutable(eventDefinition);
     }
 
+    @MustBeClosed
     public Stream<EventDefinitionDto> streamAll() {
         return stream(collection.find());
     }

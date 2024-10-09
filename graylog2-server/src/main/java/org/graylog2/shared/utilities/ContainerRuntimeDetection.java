@@ -17,6 +17,7 @@
 package org.graylog2.shared.utilities;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.errorprone.annotations.MustBeClosed;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,6 +28,12 @@ import java.util.stream.Stream;
 
 public class ContainerRuntimeDetection {
 
+    // Custom interface so we can put the MustBeClosed annotation on it to please the error-prone StreamResourceLeak check.
+    interface StreamSupplier<T> {
+        @MustBeClosed
+        Stream<T> get() throws Exception;
+    }
+
     public static Boolean isRunningInsideContainer() {
         return isRunningInsideContainer(
                 () -> Files.lines(Paths.get("/proc/self/cgroup")),
@@ -36,10 +43,10 @@ public class ContainerRuntimeDetection {
     }
 
     @VisibleForTesting
-    static Boolean isRunningInsideContainer(Callable<Stream<String>> cgroupV1Lines,
-                                            Callable<Stream<String>> cgroupV2Lines,
-                                            Supplier<Stream<Path>> canaryPaths) {
-        try (Stream<String> stream = cgroupV1Lines.call()) {
+    static Boolean isRunningInsideContainer(StreamSupplier<String> cgroupV1Lines,
+                                            StreamSupplier<String> cgroupV2Lines,
+                                            StreamSupplier<Path> canaryPaths) {
+        try (Stream<String> stream = cgroupV1Lines.get()) {
             // only works with cgroup v1
             if (stream.anyMatch(line -> line.contains("/docker"))) {
                 return true;
@@ -47,7 +54,7 @@ public class ContainerRuntimeDetection {
         } catch (Exception ignored) {
         }
         // this should work on cgroup v2
-        try (Stream<String> stream = cgroupV2Lines.call()) {
+        try (Stream<String> stream = cgroupV2Lines.get()) {
             // We expect that all container instances have /etc/hosts mounted with a container-runtime-specific
             // path in the "/proc/self/mountinfo" file.
             //
@@ -60,6 +67,10 @@ public class ContainerRuntimeDetection {
         } catch (Exception ignored) {
         }
         // Last attempt to detect that we are running inside a container.
-        return canaryPaths.get().anyMatch(Files::exists);
+        try (var pathsStream = canaryPaths.get()) {
+            return pathsStream.anyMatch(Files::exists);
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 }

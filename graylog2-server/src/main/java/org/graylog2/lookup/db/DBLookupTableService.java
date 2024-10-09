@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
@@ -95,7 +96,9 @@ public class DBLookupTableService {
     }
 
     public Collection<LookupTableDto> findAll() {
-        return stream(collection.find()).toList();
+        try (var stream = stream(collection.find())) {
+            return stream.toList();
+        }
     }
 
     public PaginatedList<LookupTableDto> findPaginated(Bson query, Bson sort, int page, int perPage) {
@@ -104,12 +107,16 @@ public class DBLookupTableService {
 
     public Collection<LookupTableDto> findByCacheIds(Collection<String> cacheIds) {
         Bson query = in("cache", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()));
-        return stream(collection.find(query)).toList();
+        try (var stream = stream(collection.find(query))) {
+            return stream.toList();
+        }
     }
 
     public Collection<LookupTableDto> findByDataAdapterIds(Collection<String> dataAdapterIds) {
         Bson query = in("data_adapter", dataAdapterIds.stream().map(ObjectId::new).collect(Collectors.toList()));
-        return stream(collection.find(query)).toList();
+        try (var stream = stream(collection.find(query))) {
+            return stream.toList();
+        }
     }
 
     public void deleteAndPostEvent(String idOrName) {
@@ -129,6 +136,8 @@ public class DBLookupTableService {
     }
 
     public void forEach(Consumer<? super LookupTableDto> action) {
-        stream(collection.find()).forEach(action);
+        try (var stream = stream(collection.find())) {
+            stream.forEach(action);
+        }
     }
 }

@@ -27,6 +27,7 @@ import org.graylog2.database.PaginatedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static org.graylog2.database.utils.MongoUtils.stream;
 
@@ -130,20 +131,22 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
 
     @Override
     public PaginatedList<T> page(int pageNumber, Predicate<T> selector) {
-        final int total = Ints.saturatedCast(stream(collection.find()
-                .filter(filter)
-                .sort(sort)).filter(selector).count());
+        final int total;
+        try (var stream = stream(collection.find().filter(filter).sort(sort))) {
+            total = Ints.saturatedCast(stream.filter(selector).count());
+        }
 
         final List<T> documents;
-        if (perPage > 0) {
-            documents = stream(getFindIterableBase())
-                    .filter(selector)
-                    .skip(perPage * Math.max(0L, pageNumber - 1))
-                    .limit(perPage)
-                    .toList();
-        } else {
-            documents = stream(getFindIterableBase())
-                    .filter(selector).toList();
+        try (var stream = stream(getFindIterableBase())) {
+            if (perPage > 0) {
+                documents = stream
+                        .filter(selector)
+                        .skip(perPage * Math.max(0L, pageNumber - 1))
+                        .limit(perPage)
+                        .toList();
+            } else {
+                documents = stream.filter(selector).toList();
+            }
         }
 
         if (includeGrandTotal) {

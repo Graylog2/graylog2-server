@@ -104,10 +104,12 @@ public class SearchesCleanUpJob extends Periodical {
 
     private Set<String> findReferencedSearchIds() {
         final HashSet<String> toKeepViewIds = new HashSet<>();
-        toKeepViewIds.addAll(viewSummaryService.streamAll().map(ViewSummaryDTO::searchId).collect(Collectors.toSet()));
-        toKeepViewIds.addAll(viewResolvers
-                .values().stream().flatMap(vr -> vr.getSearchIds().stream()).collect(Collectors.toSet()));
-        toKeepViewIds.addAll(staticReferencedSearches.stream().map(StaticReferencedSearch::id).toList());
-        return toKeepViewIds;
+        try (var stream = viewSummaryService.streamAll()) {
+            toKeepViewIds.addAll(stream.map(ViewSummaryDTO::searchId).collect(Collectors.toSet()));
+            toKeepViewIds.addAll(viewResolvers
+                    .values().stream().flatMap(vr -> vr.getSearchIds().stream()).collect(Collectors.toSet()));
+            toKeepViewIds.addAll(staticReferencedSearches.stream().map(StaticReferencedSearch::id).toList());
+            return toKeepViewIds;
+        }
     }
 }

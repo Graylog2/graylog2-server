@@ -150,7 +150,9 @@ public class DBJobTriggerService {
      * @return list of records
      */
     public List<JobTriggerDto> all() {
-        return stream(collection.find().sort(descending(FIELD_ID))).toList();
+        try (var stream = stream(collection.find().sort(descending(FIELD_ID)))) {
+            return stream.toList();
+        }
     }
 
     /**
@@ -188,7 +190,9 @@ public class DBJobTriggerService {
             throw new IllegalArgumentException("jobDefinitionId cannot be null or empty");
         }
 
-        return stream(collection.find(eq(FIELD_JOB_DEFINITION_ID, jobDefinitionId))).toList();
+        try (var stream = stream(collection.find(eq(FIELD_JOB_DEFINITION_ID, jobDefinitionId)))) {
+            return stream.toList();
+        }
     }
 
     /**
@@ -209,21 +213,24 @@ public class DBJobTriggerService {
                 .collect(Collectors.toSet());
 
         final var filter = in(FIELD_JOB_DEFINITION_ID, queryValues);
-        final Map<String, List<JobTriggerDto>> groupedTriggers = StreamEx.of(stream(collection.find(filter)))
-                .groupingBy(JobTriggerDto::jobDefinitionId);
 
-        // We are currently expecting only one trigger per job definition. This will most probably change in the
-        // future once we extend our scheduler usage.
-        // TODO: Don't throw exception when there is more than one trigger for a job definition.
-        //       To be able to do this, we need some kind of label system to make sure we can differentiate between
-        //       automatically created triggers (e.g. by event definition) and manually created ones.
-        for (Map.Entry<String, List<JobTriggerDto>> entry : groupedTriggers.entrySet()) {
-            if (entry.getValue().size() > 1) {
-                throw new IllegalStateException("More than one trigger for job definition <" + entry.getKey() + ">");
+        try (var stream = stream(collection.find(filter))) {
+            final Map<String, List<JobTriggerDto>> groupedTriggers = StreamEx.of(stream)
+                    .groupingBy(JobTriggerDto::jobDefinitionId);
+
+            // We are currently expecting only one trigger per job definition. This will most probably change in the
+            // future once we extend our scheduler usage.
+            // TODO: Don't throw exception when there is more than one trigger for a job definition.
+            //       To be able to do this, we need some kind of label system to make sure we can differentiate between
+            //       automatically created triggers (e.g. by event definition) and manually created ones.
+            for (Map.Entry<String, List<JobTriggerDto>> entry : groupedTriggers.entrySet()) {
+                if (entry.getValue().size() > 1) {
+                    throw new IllegalStateException("More than one trigger for job definition <" + entry.getKey() + ">");
+                }
             }
-        }
 
-        return groupedTriggers;
+            return groupedTriggers;
+        }
     }
 
     /**
@@ -559,7 +566,9 @@ public class DBJobTriggerService {
      * @return All found JobTriggers
      */
     public List<JobTriggerDto> findByQuery(Bson query) {
-        return stream(collection.find(query).sort(descending(FIELD_UPDATED_AT))).toList();
+        try (var stream = stream(collection.find(query).sort(descending(FIELD_UPDATED_AT)))) {
+            return stream.toList();
+        }
     }
 
     @Deprecated
@@ -599,6 +608,8 @@ public class DBJobTriggerService {
                 )
         ), OverdueTrigger.class);
 
-        return stream(result).collect(Collectors.toMap(OverdueTrigger::type, OverdueTrigger::count));
+        try (var stream = stream(result)) {
+            return stream.collect(Collectors.toMap(OverdueTrigger::type, OverdueTrigger::count));
+        }
     }
 }

@@ -195,9 +195,9 @@ public class ViewService implements ViewUtils<ViewDTO> {
     }
 
     public Collection<ViewDTO> forSearch(String searchId) {
-        return MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))
-                .map(this::requirementsForView)
-                .collect(Collectors.toSet());
+        try (var stream = MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))) {
+            return stream.map(this::requirementsForView).collect(Collectors.toSet());
+        }
     }
 
     public Optional<ViewDTO> get(String id) {
@@ -205,11 +205,15 @@ public class ViewService implements ViewUtils<ViewDTO> {
     }
 
     public Stream<ViewDTO> streamAll() {
-        return MongoUtils.stream(collection.find()).map(this::requirementsForView);
+        try (var stream = MongoUtils.stream(collection.find())) {
+            return stream.map(this::requirementsForView);
+        }
     }
 
     public Stream<ViewDTO> streamByIds(Set<String> idSet) {
-        return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(idSet))).map(this::requirementsForView);
+        try (var stream = MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(idSet)))) {
+            return stream.map(this::requirementsForView);
+        }
     }
 
     public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {

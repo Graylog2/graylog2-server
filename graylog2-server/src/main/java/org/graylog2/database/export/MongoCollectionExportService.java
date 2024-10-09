@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.export;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -34,7 +35,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A general service for exporting limited list of Documents (with a selection of fields) from a collection in MongoDB.
@@ -67,11 +67,10 @@ public class MongoCollectionExportService {
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collectionName);
         final var checkPermission = permissionsUtils.createPermissionCheck(subject, collectionName);
-        final var documents = userCanReadAllEntities
+
+        return userCanReadAllEntities
                 ? getFromMongo(resultsWithoutLimit, limit)
                 : getWithInMemoryPermissionCheck(resultsWithoutLimit, limit, checkPermission);
-
-        return documents.collect(Collectors.toList());
 
     }
 
@@ -82,13 +81,18 @@ public class MongoCollectionExportService {
                 .toList());
     }
 
-    private Stream<Document> getWithInMemoryPermissionCheck(FindIterable<Document> result, int limit, Predicate<Document> checkPermission) {
-        return MongoUtils.stream(result)
-                .filter(checkPermission)
-                .limit(limit);
+    private List<Document> getWithInMemoryPermissionCheck(FindIterable<Document> result, int limit, Predicate<Document> checkPermission) {
+        try (var stream = MongoUtils.stream(result)) {
+            return stream
+                    .filter(checkPermission)
+                    .limit(limit)
+                    .toList();
+        }
     }
 
-    private Stream<Document> getFromMongo(FindIterable<Document> result, int limit) {
-        return MongoUtils.stream(result.limit(limit));
+    private List<Document> getFromMongo(FindIterable<Document> result, int limit) {
+        try (var stream = MongoUtils.stream(result.limit(limit))) {
+            return stream.toList();
+        }
     }
 }
