@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import type Immutable from 'immutable';
 
 import type { Output } from 'stores/outputs/OutputsStore';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
@@ -31,9 +32,14 @@ import PipelinesCell from './cells/PipelinesCell';
 import OutputsCell from './cells/OutputsCell';
 import ArchivingsCell from './cells/ArchivingsCell';
 
-const streamDataWarehouseColumnRenderer = PluginStore.exports('dataWarehouse')?.[0]?.streamDataWarehouseTableElements.columnRenderer;
-
-const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
+const getStreamDataWarehouseTableElements = PluginStore.exports('dataWarehouse')?.[0]?.getStreamDataWarehouseTableElements;
+const pipelineRenderer = {
+  pipelines: {
+    renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
+    staticWidth: 100,
+  },
+};
+const customColumnRenderers = (indexSets: Array<IndexSet>, isPipelineColumnPermitted: boolean, permissions: Immutable.List<string>): ColumnRenderers<Stream> => ({
   attributes: {
     title: {
       renderCell: (_title: string, stream) => <TitleCell stream={stream} />,
@@ -55,10 +61,7 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
       staticWidth: 100,
     },
-    pipelines: {
-      renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
-      staticWidth: 100,
-    },
+    ...(isPipelineColumnPermitted ? pipelineRenderer : {}),
     outputs: {
       renderCell: (_outputs: Output[], stream) => <OutputsCell stream={stream} />,
       staticWidth: 100,
@@ -67,7 +70,7 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
       renderCell: (_archiving:boolean, stream) => <ArchivingsCell stream={stream} indexSets={indexSets} />,
       staticWidth: 100,
     },
-    ...(streamDataWarehouseColumnRenderer || {}),
+    ...(getStreamDataWarehouseTableElements?.(permissions)?.columnRenderer || {}),
   },
 });
 

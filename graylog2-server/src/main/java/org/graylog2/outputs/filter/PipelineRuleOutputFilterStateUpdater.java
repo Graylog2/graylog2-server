@@ -103,7 +103,7 @@ public class PipelineRuleOutputFilterStateUpdater {
 
     private synchronized void reload(AtomicReference<PipelineRuleOutputFilterState> activeState,
                                      ReloadTrigger reloadTrigger) {
-        LOG.info("Reloading filter rules: {}", reloadTrigger);
+        LOG.debug("Reloading filter rules: {}", reloadTrigger);
 
         final var streamPipelines = new HashMap<String, Pipeline>();
         final var allRules = new ArrayList<RuleDao>();
@@ -113,7 +113,7 @@ public class PipelineRuleOutputFilterStateUpdater {
 
         // TODO: Only load rules where the stream still exists and is active!
         filterService.forEachEnabledFilterGroupedByStream(streamGroup -> {
-            LOG.info("Processing stream group: {}", streamGroup);
+            LOG.debug("Processing stream group: {}", streamGroup);
 
             final var streamId = streamGroup.streamId();
             final var ruleList = streamGroup.filters()
@@ -140,9 +140,9 @@ public class PipelineRuleOutputFilterStateUpdater {
             activeStreams.add(streamId);
         });
 
-        LOG.info("Stream pipelines: {}", streamPipelines);
-        LOG.info("Rule list: {}", allRules);
-        LOG.info("Active streams: {}", activeStreams);
+        LOG.debug("Stream pipelines: {}", streamPipelines);
+        LOG.debug("Rule list: {}", allRules);
+        LOG.debug("Active streams: {}", activeStreams);
 
         final var resolver = resolverFactory.create(
                 PipelineResolverConfig.of(allRules::stream, java.util.stream.Stream::of),
@@ -158,11 +158,11 @@ public class PipelineRuleOutputFilterStateUpdater {
 
         // Cleanup metrics for old pipeline and rule IDs to avoid stale entries in the metric registry.
         reloadTrigger.deletedIds().forEach(ruleId -> {
-            LOG.info("Removing rule metrics for: {}", ruleId);
+            LOG.debug("Removing rule metrics for: {}", ruleId);
             pipelineMetricRegistry.removeRuleMetrics(ruleId);
         });
         Sets.difference(previouslyActiveStreams, activeStreams).forEach(pipelineId -> {
-            LOG.info("Removing pipeline metrics for: {}", pipelineId);
+            LOG.debug("Removing pipeline metrics for: {}", pipelineId);
             pipelineMetricRegistry.removePipelineMetrics(pipelineId);
         });
     }

@@ -17,14 +17,9 @@
 
 import { useRef } from 'react';
 import * as React from 'react';
-import styled from 'styled-components';
 
 import type { Stream } from 'stores/streams/StreamsStore';
-import { CountBadge } from 'components/common';
-
-const StyledCountBadge = styled(CountBadge)`
-  cursor: pointer;
-`;
+import StreamCountBadge from 'components/streams/StreamCountBadge';
 
 type Props = {
   stream: Stream
@@ -37,10 +32,12 @@ const OutputsCell = ({ stream }: Props) => {
     return null;
   }
 
+  const outputCount = stream.outputs?.length || 0;
+
   return (
-    <StyledCountBadge ref={buttonRef} title="Stream Outputs">
-      {stream.outputs?.length || 0}
-    </StyledCountBadge>
+    <StreamCountBadge $disabled={outputCount === 0} ref={buttonRef} title="Stream Outputs">
+      {outputCount}
+    </StreamCountBadge>
   );
 };
 

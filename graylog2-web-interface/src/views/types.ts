@@ -94,14 +94,16 @@ export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig
   data: Results;
   editing: boolean;
   fields: Immutable.List<FieldTypeMapping>;
-  filter: string;
+  filter?: string;
   queryId: string;
-  onConfigChange: (newConfig: Config) => Promise<void>;
+  onConfigChange?: (newConfig: Config) => Promise<void>;
   setLoadingState: (loading: boolean) => void;
-  title: string;
-  toggleEdit: () => void;
-  type: string;
+  title?: string;
+  toggleEdit?: () => void;
+  type?: string;
   id: string;
+  height: number;
+  width: number;
 }
 
 export interface WidgetExport {
@@ -116,7 +118,6 @@ export interface WidgetExport {
   searchResultTransformer?: (data: Array<unknown>) => unknown;
   searchTypes: (widget: Widget) => Array<any>;
   titleGenerator?: (widget: { config: Widget['config'] }) => string;
-  reportStyle?: () => { width: React.CSSProperties['width'] };
   exportComponent?: React.ComponentType<{ widget: Widget }>;
 }
 
@@ -184,6 +185,7 @@ interface SearchType<T, R> {
 }
 
 export interface ExportFormat {
+  order?: number;
   type: string;
   displayName: () => string;
   disabled?: () => boolean;
@@ -198,6 +200,7 @@ export interface SystemConfigurationComponentProps {
 }
 
 export interface SystemConfiguration {
+  skipClusterConfigRequest?: boolean,
   configType: string;
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
@@ -342,6 +345,7 @@ interface MessageRowOverrideProps {
 export interface CombinedSearchBarFormValues {
   timerange?: TimeRange | NoTimeRangeOverride,
   streams?: Array<string>,
+  streamCategories?: Array<string>,
   queryString?: string,
 }
 
@@ -440,6 +444,10 @@ export interface WidgetCreator {
   func: (args: WidgetCreatorArgs) => Widget;
   icon: React.ComponentType<{}>,
 }
+
+export type FieldUnitType = 'size' | 'time' | 'percent';
+
+export type FieldUnitsFormValues = Record<string, {abbrev: string; unitType: FieldUnitType}>;
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {

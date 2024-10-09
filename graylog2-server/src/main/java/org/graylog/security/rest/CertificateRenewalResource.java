@@ -34,7 +34,7 @@ import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-@Api(value = "Certificates")
+@Api(value = "Certificate Renewal")
 @Path("/certrenewal")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

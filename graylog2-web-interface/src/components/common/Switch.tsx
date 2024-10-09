@@ -29,6 +29,7 @@ const StyledSwitch = styled(MantineSwitch)(({ theme }) => css`
 type Props = {
   'aria-label'?: string,
   checked: boolean,
+  className?: string,
   disabled?: boolean,
   id?: string,
   label?: string
@@ -40,6 +41,7 @@ type Props = {
 const Switch = ({
   'aria-label': ariaLabel,
   checked,
+  className,
   disabled,
   id,
   label,
@@ -48,6 +50,7 @@ const Switch = ({
   style,
 }: Props) => (
   <StyledSwitch aria-label={ariaLabel}
+                className={className}
                 checked={checked}
                 disabled={disabled}
                 id={id}
@@ -59,6 +62,7 @@ const Switch = ({
 
 Switch.defaultProps = {
   'aria-label': undefined,
+  className: undefined,
   disabled: undefined,
   id: undefined,
   label: undefined,

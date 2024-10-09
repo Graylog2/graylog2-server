@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>6.1.0-SNAPSHOT</version>
+        <version>6.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
@@ -149,6 +149,7 @@
                 <groupId>org.apache.directory.api</groupId>
                 <artifactId>api-all</artifactId>
                 <version>${apache-directory-version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -613,7 +614,7 @@
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
                                     <artifactId>fb-contrib</artifactId>
-                                    <version>7.6.4</version>
+                                    <version>7.6.5</version>
                                 </plugin>
                             </plugins>
                         </configuration>

@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
+import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Stream } from 'logic/streams/types';
+import type { ColumnRenderer } from 'components/common/EntityDataTable/types';
 
 interface PluginRoute {
   path: string;
@@ -142,6 +143,21 @@ type DataTiering = {
     config: DataTieringConfig
   }>,
   WarmTierReadinessInfo: React.ComponentType,
+  DeleteFailedSnapshotMenuItem: React.ComponentType<{
+    eventKey: string,
+    indexSetId: string
+  }>,
+}
+
+type License = {
+  EnterpriseTrafficGraph: React.ComponentType,
+  LicenseGraphWithMetrics: React.ComponentType,
+  EnterpriseProductLink: React.ComponentType<{
+    children: React.ReactNode,
+    href: string,
+    clusterId: string,
+    licenseSubject?: string
+  }>,
 }
 
 type FieldValueProvider = {
@@ -167,18 +183,43 @@ type FieldValueProvider = {
 }
 
 interface PluginDataWarehouse {
+  StreamDataWarehouse: React.ComponentType,
   DataWarehouseStatus: React.ComponentType<{
-    stream: {
-      enabled_status: boolean;
-    }
+    datawareHouseEnabled: boolean;
   }>,
-  StreamDataWarehouse: React.ComponentType<{}>,
-  DataWarehouseJobs: React.ComponentType<{}>,
-  streamDataWarehouseTableElements: {
+  DataWarehouseJournal: React.ComponentType<{
+    nodeId: string,
+  }>,
+  DataWarehouseJobs: React.ComponentType<{
+    streamId: string,
+  }>,
+  StreamIlluminateProcessingSection: React.ComponentType<{
+    stream: Stream,
+  }>,
+  StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
+  fetchStreamDataWarehouseStatus: (streamId: string) => Promise<{
+    id: string,
+    archive_name: string,
+    enabled: boolean,
+    stream_id: string,
+    retention_time: number,
+  }>,
+  fetchStreamDataWarehouse: (streamId: string) => Promise<{
+    id: string,
+    archive_config_id: string,
+    message_count: number,
+    archive_name: string,
+    timestamp_from: string,
+    timestamp_to: string,
+    restore_history: Array<{id:string}>,
+
+  }>;
+  getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
-    columnRenderer: ColumnRenderers<Stream>,
-  }
+    columnRenderer: { datawarehouse: ColumnRenderer<Stream> },
+  },
+  DataWarehouseStreamDeleteWarning: React.ComponentType,
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -190,9 +231,14 @@ declare module 'graylog-web-plugin/plugin' {
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>;
     fieldValueProviders?:Array<FieldValueProvider>;
+    license?: Array<License>,
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
+    // Difference between page context providers and global context providers
+    // is that page context providers are rendered within the <App> giving it
+    // access to certain contexts like PerspectivesContext
+    pageContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
     routes?: Array<PluginRoute>;
     entityRoutes?: Array<(id: string, type: string) => string>
     pages?: PluginPages;

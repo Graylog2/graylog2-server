@@ -44,7 +44,7 @@ import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
 import org.graylog2.cluster.leader.LeaderElectionService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
+import org.graylog2.cluster.preflight.GraylogServerProvisioningBindings;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -186,7 +186,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
-        modules.add(new DataNodeProvisioningBindings());
+        modules.add(new GraylogServerProvisioningBindings());
         modules.add(new PreflightWebModule(configuration));
         modules.add(new SchedulerBindings());
 
@@ -290,6 +290,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
+                new GraylogServerProvisioningBindings(),
                 new IndexerDiscoveryModule(),
                 new ServerPreflightChecksModule(),
                 new CertificateAuthorityBindings(),
@@ -452,7 +453,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
         result.add(new IndexerDiscoveryModule());
         result.add(new CertificateRenewalBindings());
-        result.add(new DataNodeProvisioningBindings());
+        result.add(new GraylogServerProvisioningBindings());
         result.add(new CertificateAuthorityBindings());
         return result;
     }

@@ -32,6 +32,8 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.system.shutdown.GracefulShutdownHook;
+import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +56,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  * registered {@link FilteredMessageOutput} outputs.
  */
 @Singleton
-public class BatchedMessageFilterOutput implements MessageOutput {
+public class BatchedMessageFilterOutput implements MessageOutput, GracefulShutdownHook {
     private static final Logger LOG = LoggerFactory.getLogger(BatchedMessageFilterOutput.class);
 
     private final Map<String, FilteredMessageOutput> outputs;
@@ -72,8 +74,9 @@ public class BatchedMessageFilterOutput implements MessageOutput {
     private final MessageQueueAcknowledger acknowledger;
     private final Meter outputWriteFailures;
     private final Timer processTime;
-    private ScheduledFuture<?> flushTask;
+    private final GracefulShutdownService gracefulShutdownService;
     private final IndexSetAwareMessageOutputBuffer buffer;
+    private ScheduledFuture<?> flushTask;
 
     @Inject
     public BatchedMessageFilterOutput(Map<String, FilteredMessageOutput> outputs,
@@ -81,7 +84,8 @@ public class BatchedMessageFilterOutput implements MessageOutput {
                                       MetricRegistry metricRegistry,
                                       Cluster cluster,
                                       MessageQueueAcknowledger acknowledger,
-                                      @Named("output_batch_size") int outputBatchSize,
+                                      IndexSetAwareMessageOutputBuffer indexSetAwareMessageOutputBuffer,
+                                      GracefulShutdownService gracefulShutdownService,
                                       @Named("output_flush_interval") int outputFlushInterval,
                                       @Named("shutdown_timeout") int shutdownTimeoutMs,
                                       @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
@@ -97,6 +101,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
         this.outputFlushInterval = Duration.ofSeconds(outputFlushInterval);
         this.shutdownTimeout = Duration.ofMillis(shutdownTimeoutMs);
         this.daemonScheduler = daemonScheduler;
+        this.buffer = indexSetAwareMessageOutputBuffer;
 
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
         this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
@@ -104,8 +109,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
         this.bufferFlushesRequested = metricRegistry.meter(name(this.getClass(), "bufferFlushesRequested"));
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
         this.outputWriteFailures = metricRegistry.meter(name(this.getClass(), "outputWriteFailures"));
-
-        this.buffer = new IndexSetAwareMessageOutputBuffer(outputBatchSize);
+        this.gracefulShutdownService = gracefulShutdownService;
     }
 
     @Override
@@ -120,6 +124,7 @@ public class BatchedMessageFilterOutput implements MessageOutput {
                 LOG.error("Caught exception while trying to flush outputs", e);
             }
         }, outputFlushInterval.toMillis(), outputFlushInterval.toMillis(), TimeUnit.MILLISECONDS);
+        gracefulShutdownService.register(this);
     }
 
     @VisibleForTesting
@@ -212,6 +217,16 @@ public class BatchedMessageFilterOutput implements MessageOutput {
     @Override
     public void stop() {
         LOG.debug("Stopping output filter");
+        doGracefulShutdown();
+        try {
+            gracefulShutdownService.unregister(this);
+        } catch (IllegalStateException e) {
+            LOG.debug("Couldn't unregister from graceful shutdown service: {}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void doGracefulShutdown() {
         cancelFlushTask();
 
         if (cluster.isConnected() && cluster.isDeflectorHealthy()) {

@@ -34,6 +34,7 @@ export type Stream = {
   index_set_id: string,
   is_default: boolean,
   is_editable: boolean,
+  categories: string[],
 };
 
 export type StreamRule = {

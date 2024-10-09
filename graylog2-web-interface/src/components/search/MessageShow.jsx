@@ -23,6 +23,10 @@ import StringUtils from 'util/StringUtils';
 
 import MessageDetail from './MessageDetail';
 
+const getImmutableProps = (props) => ({
+  streams: props.streams ? Immutable.Map(props.streams) : props.streams,
+});
+
 class MessageShow extends React.Component {
   static propTypes = {
     message: PropTypes.object.isRequired,
@@ -40,18 +44,12 @@ class MessageShow extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = this._getImmutableProps(props);
+    this.state = getImmutableProps(props);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState(this._getImmutableProps(nextProps));
+    this.setState(getImmutableProps(nextProps));
   }
-
-  // eslint-disable-next-line class-methods-use-this
-  _getImmutableProps = (props) => ({
-    streams: props.streams ? Immutable.Map(props.streams) : props.streams,
-    nodes: props.nodes ? Immutable.Map(props.nodes) : props.nodes,
-  });
 
   renderForDisplay = (fieldName) => {
     // No highlighting for the message details view.
@@ -62,7 +60,7 @@ class MessageShow extends React.Component {
 
   render() {
     const { inputs, message } = this.props;
-    const { streams, nodes } = this.state;
+    const { streams } = this.state;
 
     return (
       <Row className="content">
@@ -71,7 +69,6 @@ class MessageShow extends React.Component {
                          message={message}
                          inputs={inputs}
                          streams={streams}
-                         nodes={nodes}
                          renderForDisplay={this.renderForDisplay}
                          showTimestamp />
         </Col>

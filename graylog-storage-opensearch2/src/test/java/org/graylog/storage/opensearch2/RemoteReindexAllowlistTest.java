@@ -25,13 +25,13 @@ class RemoteReindexAllowlistTest {
 
     @Test
     void testMultipleAllowlistValues() {
-        final RemoteReindexAllowlist allowlist = new RemoteReindexAllowlist(URI.create("http://10.0.1.28:9200"), "10.0.1.28:9200,10.0.1.49:9200,10.0.1.134:9200,10.0.1.148:9200");
+        final RemoteReindexAllowlist allowlist = new RemoteReindexAllowlist(URI.create("http://10.0.1.28:9200"), "10.0.1.28:9200, 10.0.1.49:9200,10.0.1.134:9200,10.0.1.148:9200");
         Assertions.assertThat(allowlist.value())
                 .hasSize(4)
                 .contains("10.0.1.28:9200", "10.0.1.49:9200", "10.0.1.134:9200", "10.0.1.148:9200");
 
         Assertions.assertThat(allowlist.isClusterSettingMatching("")).isFalse();
-        Assertions.assertThat(allowlist.isClusterSettingMatching("10.0.1.28:9200,10.0.1.49:9200,10.0.1.134:9200,10.0.1.148:9200")).isTrue();
+        Assertions.assertThat(allowlist.isClusterSettingMatching("10.0.1.28:9200, 10.0.1.49:9200, 10.0.1.134:9200, 10.0.1.148:9200")).isTrue();
     }
 
     @Test

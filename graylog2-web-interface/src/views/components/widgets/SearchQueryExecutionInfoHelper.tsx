@@ -131,7 +131,7 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
         {isEmpty(result) ? <i>No query executed yet.</i> : <HelpPopover widgetExecutionData={widgetExecutionData} />}
       </Popover.Dropdown>
     </Popover>
-  // eslint-disable-next-line react/jsx-no-useless-fragment
+
   ) : <>{children}</>;
 };
 

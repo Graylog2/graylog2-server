@@ -32,6 +32,7 @@ import org.graylog.plugins.pipelineprocessor.processors.PipelineMetricRegistry;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolverConfig;
 import org.graylog.testing.messages.MessagesExtension;
+import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.outputs.filter.functions.RemoveFromStreamDestination;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
@@ -80,7 +81,7 @@ class PipelineRuleOutputFilterTest {
 
         final var filteredMessage = filter.apply(message);
 
-        assertThat(filteredMessage.message()).isEqualTo(message);
+        assertThat(filteredMessage.message()).isEqualTo(ImmutableMessage.wrap(message));
         assertThat(filteredMessage.destinations().keySet()).containsExactlyInAnyOrder("indexer");
         assertThat(filteredMessage.destinations().get("indexer")).containsExactlyInAnyOrder(defaultStream);
     }
@@ -93,7 +94,7 @@ class PipelineRuleOutputFilterTest {
 
         final var filteredMessage = filter.apply(message);
 
-        assertThat(filteredMessage.message()).isEqualTo(message);
+        assertThat(filteredMessage.message()).isEqualTo(ImmutableMessage.wrap(message));
         assertThat(filteredMessage.destinations().keySet()).containsExactlyInAnyOrder("indexer", "other");
         assertThat(filteredMessage.destinations().get("indexer")).containsExactlyInAnyOrder(defaultStream);
         assertThat(filteredMessage.destinations().get("other")).containsExactlyInAnyOrder(defaultStream);
@@ -136,7 +137,7 @@ class PipelineRuleOutputFilterTest {
 
         final var filteredMessage = filter.apply(message);
 
-        assertThat(filteredMessage.message()).isEqualTo(message);
+        assertThat(filteredMessage.message()).isEqualTo(ImmutableMessage.wrap(message));
         // The filter rules removes the default stream from the indexer destination, so it shouldn't be in the
         // destinations after running the filter.
         assertThat(filteredMessage.destinations().keySet()).containsExactlyInAnyOrder("other");

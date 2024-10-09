@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix issue where content pack stream dependencies were not properly resolved for some dashboards."
+
+pulls = ["20265", "20288"]

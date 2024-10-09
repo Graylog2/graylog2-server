@@ -17,12 +17,17 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import styled, { css } from 'styled-components';
+import camelCase from 'lodash/camelCase';
+import upperCase from 'lodash/upperCase';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import FilterRuleForm from 'components/streams/StreamDetails/output-filter/FilterRuleForm';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import useStreamOutputRuleMutation from 'components/streams/hooks/useStreamOutputRuleMutation';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props ={
   filterRule: Partial<StreamOutputFilterRule>,
@@ -30,18 +35,28 @@ type Props ={
   destinationType: string,
 };
 
+const StyledButton = styled(Button)(({ theme }) => css`
+  margin: 0 ${theme.spacings.xxs};
+`);
+
 const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) => {
   const [showForm, setShowForm] = useState(false);
   const { createStreamOutputRule, updateStreamOutputRule } = useStreamOutputRuleMutation();
+  const sendTelemetry = useSendTelemetry();
 
   const queryClient = useQueryClient();
+  const isNew = !filterRule?.id;
 
   const onClick = () => {
     setShowForm(true);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS[`STREAM_ITEM_DATA_ROUTING_${upperCase(camelCase(destinationType))}_FILTER_${isNew ? 'CREATE_OPENED' : 'UPDATE_OPENED'}`], {
+      app_pathname: 'streams',
+    });
   };
 
   const handleSubmit = (filterOutputRule: Partial<StreamOutputFilterRule>) => {
-    const submitFilterHandler = filterOutputRule?.id ? updateStreamOutputRule : createStreamOutputRule;
+    const submitFilterHandler = isNew ? createStreamOutputRule : updateStreamOutputRule;
 
     submitFilterHandler({ streamId, filterOutputRule }).then(() => {
       queryClient.invalidateQueries(['streams']);
@@ -49,17 +64,16 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
     });
   };
 
-  const isNew = !filterRule?.id;
   const title = isNew ? 'Create Filter Rule' : 'Edit Filter Rule';
 
   return (
     <>
-      <Button bsStyle={isNew ? 'success' : 'link'}
-              bsSize={isNew ? 'md' : 'xsmall'}
-              onClick={onClick}
-              title="Edit">
-        {isNew ? (<>Create rule</>) : (<Icon name="edit_square" />)}
-      </Button>
+      <StyledButton bsStyle={isNew ? 'default' : 'default'}
+                    bsSize={isNew ? 'sm' : 'xs'}
+                    onClick={onClick}
+                    title="Edit">
+        {isNew ? (<><Icon name="add" size="sm" /> Create rule</>) : (<Icon name="edit_square" />)}
+      </StyledButton>
       {showForm && (
         <FilterRuleForm title={title}
                         filterRule={filterRule}

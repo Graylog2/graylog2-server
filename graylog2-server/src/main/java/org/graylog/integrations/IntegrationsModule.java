@@ -26,23 +26,26 @@ import org.graylog.integrations.aws.resources.AWSResource;
 import org.graylog.integrations.aws.resources.KinesisSetupResource;
 import org.graylog.integrations.aws.transports.AWSTransport;
 import org.graylog.integrations.aws.transports.KinesisTransport;
-import org.graylog.integrations.dataadapters.GreyNoiseCommunityIpLookupAdapter;
 import org.graylog.integrations.dataadapters.GreyNoiseQuickIPDataAdapter;
 import org.graylog.integrations.inputs.paloalto.PaloAltoCodec;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTCPInput;
+import org.graylog.integrations.inputs.paloalto11.PaloAlto11xCodec;
+import org.graylog.integrations.inputs.paloalto11.PaloAlto11xInput;
 import org.graylog.integrations.inputs.paloalto9.PaloAlto9xCodec;
 import org.graylog.integrations.inputs.paloalto9.PaloAlto9xInput;
 import org.graylog.integrations.ipfix.codecs.IpfixCodec;
 import org.graylog.integrations.ipfix.inputs.IpfixUdpInput;
 import org.graylog.integrations.ipfix.transports.IpfixUdpTransport;
 import org.graylog.integrations.migrations.V20220622071600_MigratePagerDutyV1;
-import org.graylog.integrations.migrations.V20230522201200_NotificationForDeprecatedGreyNoiseCommunityDataAdapters;
 import org.graylog.integrations.notifications.types.SlackEventNotification;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfig;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfigEntity;
 import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotification;
 import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfig;
 import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigEntity;
+import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2;
+import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2Entity;
+import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationV2;
 import org.graylog.integrations.pagerduty.PagerDutyNotification;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfig;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfigEntity;
@@ -113,13 +116,21 @@ public class IntegrationsModule extends PluginModule {
                     SlackEventNotificationConfigEntity.TYPE_NAME,
                     SlackEventNotificationConfigEntity.class);
 
-            // Teams Notification
+            // Teams Notification (deprecated with Microsoft's retiring connectors)
             addNotificationType(TeamsEventNotificationConfig.TYPE_NAME,
                     TeamsEventNotificationConfig.class,
                     TeamsEventNotification.class,
                     TeamsEventNotification.Factory.class,
                     TeamsEventNotificationConfigEntity.TYPE_NAME,
                     TeamsEventNotificationConfigEntity.class);
+
+            // Teams Notification V2
+            addNotificationType(TeamsEventNotificationConfigV2.TYPE_NAME,
+                    TeamsEventNotificationConfigV2.class,
+                    TeamsEventNotificationV2.class,
+                    TeamsEventNotificationV2.Factory.class,
+                    TeamsEventNotificationConfigV2Entity.TYPE_NAME,
+                    TeamsEventNotificationConfigV2Entity.class);
 
             // Pager Duty Notification
             addNotificationType(PagerDutyNotificationConfig.TYPE_NAME,
@@ -135,17 +146,8 @@ public class IntegrationsModule extends PluginModule {
                     GreyNoiseQuickIPDataAdapter.Factory.class,
                     GreyNoiseQuickIPDataAdapter.Config.class);
 
-            //Community GreyNoise IP Lookup Adapter
-            installLookupDataAdapter(GreyNoiseCommunityIpLookupAdapter.ADAPTER_NAME,
-                    GreyNoiseCommunityIpLookupAdapter.class,
-                    GreyNoiseCommunityIpLookupAdapter.Factory.class,
-                    GreyNoiseCommunityIpLookupAdapter.Config.class);
-
             // PagerDuty notification type fix
             addMigration(V20220622071600_MigratePagerDutyV1.class);
-
-            // Remove Community GreyNoise IP Lookup Adapters
-            addMigration(V20230522201200_NotificationForDeprecatedGreyNoiseCommunityDataAdapters.class);
         }
     }
 
@@ -170,6 +172,11 @@ public class IntegrationsModule extends PluginModule {
         LOG.debug("Registering message input: {}", PaloAlto9xInput.NAME);
         addMessageInput(PaloAlto9xInput.class);
         addCodec(PaloAlto9xCodec.NAME, PaloAlto9xCodec.class);
+
+        // Palo Alto Networks 11x
+        LOG.debug("Registering message input: {}", PaloAlto11xInput.NAME);
+        addMessageInput(PaloAlto11xInput.class);
+        addCodec(PaloAlto11xCodec.NAME, PaloAlto11xCodec.class);
 
         // AWS
         addCodec(AWSCodec.NAME, AWSCodec.class);

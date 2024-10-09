@@ -40,7 +40,7 @@ const ArchivingsCell = ({ stream, indexSets }: Props) => {
 
   const indexSet = indexSets.find((is) => is.id === stream.index_set_id);
 
-  const archivingEnabled = indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY || indexSet?.data_tiering?.archive_before_deletion;
+  const archivingEnabled = (indexSet?.use_legacy_rotation && indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY) || indexSet?.data_tiering?.archive_before_deletion;
 
   return (
     <Tooltip withArrow position="right" label={`Archiving is ${archivingEnabled ? 'enabled' : 'disabled'}`}>

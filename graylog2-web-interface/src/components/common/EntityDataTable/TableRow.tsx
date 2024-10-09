@@ -26,7 +26,6 @@ import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
 
 const ActionsCell = styled.td`
-  float: right;
   text-align: right;
 
   .btn-toolbar {
@@ -93,7 +92,7 @@ const TableRow = <Entity extends EntityBase>({
       })}
       {displayActions ? (
         <ActionsCell>
-          {index === 0 ? <ActionsRef ref={actionsRef}>{actionButtons}</ActionsRef> : actionButtons}
+          <ActionsRef ref={index === 0 ? actionsRef : undefined}>{actionButtons}</ActionsRef>
         </ActionsCell>
       ) : null}
     </tr>

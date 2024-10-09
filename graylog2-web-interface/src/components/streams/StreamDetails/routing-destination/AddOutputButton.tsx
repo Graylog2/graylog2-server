@@ -28,6 +28,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
 import type { AvailableOutputRequestedConfiguration, AvailableOutputTypes } from 'components/streams/useAvailableOutputTypes';
+import { Icon } from 'components/common';
 
 type Props = {
   stream: Stream
@@ -77,6 +78,7 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
       addStreamOutput({ streamId: stream.id, outputs: { outputs: [result.id] } })
         .then(() => {
           queryClient.invalidateQueries(['outputs', 'overview']);
+
           onCancel();
         });
 
@@ -92,12 +94,21 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
       });
   };
 
+  const onShowAddOutput = () => {
+    setShowAddOutput(true);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_DESTINATIONS_OUTPUT_ASSIGN_OPENED, {
+      app_pathname: 'stream',
+    });
+  };
+
   return (
     <>
-      <Button bsStyle="success"
-              onClick={() => setShowAddOutput(true)}
+      <Button bsStyle="default"
+              bsSize="sm"
+              onClick={onShowAddOutput}
               title="Edit Output">
-        Add Output
+        <Icon name="add" size="sm" /> Add Output
       </Button>
       {showAddOutput && (
       <BootstrapModalWrapper showModal

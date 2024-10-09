@@ -18,7 +18,7 @@
 import type { Sort, Attribute } from 'stores/PaginationTypes';
 
 export const DEFAULT_LAYOUT = {
-  entityTableId: 'streamOuputFilter',
+  entityTableId: 'streamOutputFilter',
   defaultPageSize: 20,
   defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
   defaultDisplayedAttributes: ['title', 'description', 'status'],

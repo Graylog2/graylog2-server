@@ -25,10 +25,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.common.regex.Regex;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RemoteReindexAllowlist {
 
@@ -98,7 +98,9 @@ public class RemoteReindexAllowlist {
                 .map(v -> StringUtils.removeStart(v, "["))
                 .map(v -> StringUtils.removeEnd(v, "]"))
                 .map(v -> v.split(","))
-                .map(v -> new HashSet<>(Arrays.asList(v)))
-                .orElseGet(HashSet::new);
+                .stream()
+                .flatMap(Arrays::stream)
+                .map(String::trim)
+                .collect(Collectors.toSet());
     }
 }

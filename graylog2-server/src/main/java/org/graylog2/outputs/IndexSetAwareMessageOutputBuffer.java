@@ -16,12 +16,22 @@
  */
 package org.graylog2.outputs;
 
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Size;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.ImmutableMessage;
+import org.graylog2.indexer.messages.SerializationContext;
 import org.graylog2.outputs.filter.FilteredMessage;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -37,9 +47,13 @@ import java.util.function.Consumer;
  * The trade-off is that outputs which don't create one message per index set will write smaller batches.
  */
 public class IndexSetAwareMessageOutputBuffer {
-    private final int maxBufferSize;
+    private final int maxBufferSizeCount;
+    private final long maxBufferSizeBytes;
+    private final ObjectMapper objectMapper;
+
     private volatile List<FilteredMessage> buffer;
-    private final AtomicInteger bufferLength = new AtomicInteger();
+    private volatile int bufferLength = 0;
+    private volatile long bufferSizeBytes = 0L;
     private final AtomicLong lastFlushTime = new AtomicLong();
 
     /**
@@ -47,9 +61,15 @@ public class IndexSetAwareMessageOutputBuffer {
      *
      * @param maxBufferSize the maximum buffer size
      */
-    public IndexSetAwareMessageOutputBuffer(int maxBufferSize) {
-        this.maxBufferSize = maxBufferSize;
-        this.buffer = new ArrayList<>(this.maxBufferSize);
+    @Inject
+    public IndexSetAwareMessageOutputBuffer(@Named("output_batch_size") BatchSizeConfig maxBufferSize,
+                                            ObjectMapper objectMapper) {
+
+        this.maxBufferSizeCount = maxBufferSize.getAsCount().orElse(0);
+        this.maxBufferSizeBytes = maxBufferSize.getAsBytes().map(Size::toBytes).orElse(0L);
+        this.buffer = new ArrayList<>(maxBufferSize.getAsCount().orElse(500));
+
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -81,12 +101,18 @@ public class IndexSetAwareMessageOutputBuffer {
         synchronized (this) {
             // See class the class documentation for the reasoning behind the bufferLength calculation.
             buffer.add(filteredMessage);
-            bufferLength.addAndGet(Math.max(filteredMessage.message().getIndexSets().size(), 1));
+            bufferLength += Math.max(filteredMessage.message().getIndexSets().size(), 1);
+            // for optimization, only calculate batch size in bytes, if we are actually restricting by size in bytes
+            if (maxBufferSizeBytes != 0L) {
+                bufferSizeBytes += estimateOsBulkRequestSize(filteredMessage.message(), objectMapper);
+            }
 
-            if (bufferLength.get() >= maxBufferSize) {
+            if ((maxBufferSizeBytes != 0L && bufferSizeBytes >= maxBufferSizeBytes) ||
+                    maxBufferSizeCount != 0 && bufferLength >= maxBufferSizeCount) {
                 flushBatch = buffer;
-                buffer = new ArrayList<>(maxBufferSize);
-                bufferLength.set(0);
+                buffer = new ArrayList<>(bufferLength);
+                bufferLength = 0;
+                bufferSizeBytes = 0L;
             }
         }
         // if the current thread found it had to flush any messages, it does so but blocks.
@@ -110,11 +136,39 @@ public class IndexSetAwareMessageOutputBuffer {
         final List<FilteredMessage> flushBatch;
         synchronized (this) {
             flushBatch = buffer;
-            buffer = new ArrayList<>(maxBufferSize);
+            buffer = new ArrayList<>(bufferLength);
+            bufferLength = 0;
+            bufferSizeBytes = 0L;
         }
         if (flushBatch != null) {
             lastFlushTime.set(System.nanoTime());
             flusher.accept(flushBatch);
         }
+    }
+
+    /**
+     * Get a ballpark figure for the size in bytes that the OpenSarch bulk request for a message will require.
+     */
+    @VisibleForTesting
+    static long estimateOsBulkRequestSize(ImmutableMessage message, ObjectMapper objectMapper) {
+        // Get size of the message by preemptively serializing it. The implementation of ImmutableMessage is expected
+        // to cache the result so that serialization won't be performed twice.
+        long msgSize;
+        try {
+            msgSize = message.serialize(SerializationContext.of(objectMapper, new Meter())).length + 1; // msg size plus newline
+        } catch (IOException e) {
+            msgSize = 0;
+        }
+
+        // An OpenSearch bulk index request will include an "index" instruction for each message and each index set.
+        // An instruction will look like this:
+        // {"index":{"_index":"graylog_deflector","_id":"70db7111-48fd-11ef-b7e8-5ae4251f926d"}}
+        // Take that into account as well.
+        final long indexInstructionsSize = message.getIndexSets().stream()
+                .map(IndexSet::getWriteIndexAlias)
+                .mapToLong(index -> 32L + MoreObjects.firstNonNull(index, "").length() + 36L + 1) // instruction size plus newline
+                .sum();
+
+        return indexInstructionsSize + msgSize * Math.max(message.getIndexSets().size(), 1);
     }
 }

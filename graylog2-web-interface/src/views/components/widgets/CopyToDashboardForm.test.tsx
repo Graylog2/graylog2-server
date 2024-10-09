@@ -180,6 +180,7 @@ describe('CopyToDashboardForm', () => {
         attributeId: 'title',
         direction: 'asc',
       },
+      scope: 'update',
     }));
   });
 });

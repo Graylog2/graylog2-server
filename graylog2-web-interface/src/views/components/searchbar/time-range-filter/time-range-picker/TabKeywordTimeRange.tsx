@@ -55,7 +55,6 @@ const debouncedTestNaturalDate = debounceWithPromise((
 
 const TimePreview = ({ dateTime, isLoading }: { dateTime: string, isLoading: boolean }) => {
   if (!dateTime || isLoading) {
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{EMPTY_RANGE}</>;
   }
 

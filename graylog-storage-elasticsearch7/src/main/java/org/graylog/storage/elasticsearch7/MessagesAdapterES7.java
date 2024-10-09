@@ -18,7 +18,6 @@ package org.graylog.storage.elasticsearch7;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import jakarta.inject.Inject;
@@ -43,6 +42,7 @@ import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.IndexingSuccess;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.messages.SerializationContext;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ResultMessageFactory;
 import org.slf4j.Logger;
@@ -251,8 +251,8 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     private IndexRequest indexRequestFrom(IndexingRequest request) {
         final byte[] body;
         try {
-            body = this.objectMapper.writeValueAsBytes(request.message().toElasticSearchObject(objectMapper, this.invalidTimestampMeter));
-        } catch (JsonProcessingException e) {
+            body = request.message().serialize(SerializationContext.of(objectMapper, this.invalidTimestampMeter));
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return new IndexRequest(request.indexSet().getWriteIndexAlias())
