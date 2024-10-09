@@ -16,10 +16,10 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import jakarta.annotation.Nonnull;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datastream.Policy;
 import org.graylog2.indexer.indices.Template;
-import jakarta.annotation.Nonnull;
 
 public class DataStreamAdapterES7 implements DataStreamAdapter {
     private static final String ERROR_MESSAGE = "Data Streams not supported in Elastic Search";
@@ -41,6 +41,11 @@ public class DataStreamAdapterES7 implements DataStreamAdapter {
 
     @Override
     public void setNumberOfReplicas(@Nonnull String dataStreamName, @Nonnull int replicas) {
+        throw new UnsupportedOperationException(ERROR_MESSAGE);
+    }
+
+    @Override
+    public void setNumberOfReplicasTemplates(int replicas) {
         throw new UnsupportedOperationException(ERROR_MESSAGE);
     }
 }

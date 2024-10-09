@@ -30,4 +30,5 @@ public interface DataStreamAdapter {
 
     void setNumberOfReplicas(@Nonnull String dataStreamName, @Nonnull int replicas);
 
+    void setNumberOfReplicasTemplates(int replicas);
 }
