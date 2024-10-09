@@ -100,7 +100,7 @@ public record OpensearchConfiguration(
 
         opensearchSecurityConfiguration.getTruststore().ifPresent(truststore -> {
             javaOpts.add("-Djavax.net.ssl.trustStore=" + truststore.location().toAbsolutePath());
-            javaOpts.add("-Djavax.net.ssl.trustStorePassword=" + truststore.passwordAsString());
+            javaOpts.add("-Djavax.net.ssl.trustStorePassword=" + new String(truststore.password()));
             javaOpts.add("-Djavax.net.ssl.trustStoreType=pkcs12");
         });
 

@@ -50,7 +50,6 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
@@ -268,7 +267,7 @@ public class JerseyService extends AbstractIdleService {
 
 
         final SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
-        final char[] password = firstNonNull(keystoreInformation.passwordAsString(), "").toCharArray();
+        final char[] password = firstNonNull(keystoreInformation.password(), new char[]{});
 
         final KeyStore keyStore = readKeystore(keystoreInformation);
 
