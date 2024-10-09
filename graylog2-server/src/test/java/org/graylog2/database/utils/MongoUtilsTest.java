@@ -20,7 +20,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoClientException;
+import com.mongodb.MongoWriteException;
+import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcernResult;
+import com.mongodb.WriteError;
 import com.mongodb.client.MongoCollection;
+import org.bson.BsonDocument;
+import org.bson.BsonString;
 import org.bson.RawBsonDocument;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -35,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mongojack.Id;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -184,6 +193,29 @@ class MongoUtilsTest {
         assertThatThrownBy(() -> utils.getOrCreate(new DTO(null, "test")))
                 .hasMessageContaining("entity ID cannot be null")
                 .isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    void testIsDuplicateKeyError() {
+        final var clientException = new MongoClientException("Something went wrong!");
+        final var madeUpServerException = new MongoWriteException(
+                new WriteError(12345,
+                        "E12345 some error that I just made up",
+                        new BsonDocument()),
+                new ServerAddress(), Collections.emptySet());
+        final var dupKeyException = new MongoWriteException(
+                new WriteError(11000,
+                        "E11000 duplicate key error collection: graylog.example index: action_id_1 dup key: { foo_id: \"bar\" }",
+                        new BsonDocument()),
+                new ServerAddress(), Collections.emptySet());
+        final var legacyDupKeyException = new DuplicateKeyException(
+                new BsonDocument("err", new BsonString("E11000 duplicate key error collection: graylog.example index: action_id_1 dup key: { foo_id: \"bar\" }")),
+                new ServerAddress(), WriteConcernResult.acknowledged(0, false, null));
+
+        assertThat(MongoUtils.isDuplicateKeyError(clientException)).isFalse();
+        assertThat(MongoUtils.isDuplicateKeyError(madeUpServerException)).isFalse();
+        assertThat(MongoUtils.isDuplicateKeyError(dupKeyException)).isTrue();
+        assertThat(MongoUtils.isDuplicateKeyError(legacyDupKeyException)).isTrue();
     }
 
     @AutoValue
