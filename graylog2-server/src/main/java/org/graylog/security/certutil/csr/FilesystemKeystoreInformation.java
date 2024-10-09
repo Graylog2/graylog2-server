@@ -23,6 +23,8 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
@@ -51,5 +53,18 @@ public class FilesystemKeystoreInformation implements KeystoreInformation {
 
     public Path location() {
         return location;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final FilesystemKeystoreInformation that = (FilesystemKeystoreInformation) o;
+        return Objects.equals(location, that.location) && Objects.deepEquals(password, that.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(location, Arrays.hashCode(password));
     }
 }

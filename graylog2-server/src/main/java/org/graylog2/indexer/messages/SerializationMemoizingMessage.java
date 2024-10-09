@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Wraps a {@link Message} by making it immutable and caching the result of {@link #serialize(SerializationContext)}
@@ -69,6 +71,21 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
 
         public Meter invalidTimeStampMeter() {
             return invalidTimeStampMeter;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final CacheEntry that = (CacheEntry) o;
+            return Objects.equals(objectMapper, that.objectMapper)
+                    && Objects.equals(invalidTimeStampMeter, that.invalidTimeStampMeter)
+                    && Objects.deepEquals(serializedBytes, that.serializedBytes);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(objectMapper, invalidTimeStampMeter, Arrays.hashCode(serializedBytes));
         }
     }
 
