@@ -16,14 +16,14 @@
  */
 import * as React from 'react';
 
-import Wizard from 'components/common/Wizard';
+import { Wizard } from 'components/common';
 import { INPUT_WIZARD_STEPS } from 'contexts/InputSetupWizardContext';
 import useInputSetupWizard from 'hooks/useInputSetupWizard';
 
 import CategoryStep from './CategoryStep';
 
 const InputSetupWizard = () => {
-  const { activeStep, setActiveStepKey } = useInputSetupWizard();
+  const { activeStep, setActiveStep } = useInputSetupWizard();
 
   const steps = [{
     key: INPUT_WIZARD_STEPS.SELECT_CATEGORY,
@@ -42,7 +42,7 @@ const InputSetupWizard = () => {
             hidePreviousNextButtons
             horizontal
             justified
-            onStepChange={setActiveStepKey}
+            onStepChange={setActiveStep}
             steps={steps} />
   );
 };

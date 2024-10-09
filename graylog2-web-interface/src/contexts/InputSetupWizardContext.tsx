@@ -41,7 +41,7 @@ export type WizardData = {
 type InputSetupWizardContextType = {
   activeStep: InputSetupWizardStep,
   setActiveStep: (InputSetupWizardStep) => void,
-  stepData: (stepName: InputSetupWizardStep) => object | undefined;
+  getStepData: (stepName: InputSetupWizardStep) => object | undefined;
   setStepData: (stepName: InputSetupWizardStep, data: object) => void,
   wizardData: WizardData,
   setWizardDataAttribute: (key: keyof WizardData, value: WizardData[typeof key]) => void,
