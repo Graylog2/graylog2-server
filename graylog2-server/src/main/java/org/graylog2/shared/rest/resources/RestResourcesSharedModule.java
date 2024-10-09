@@ -25,6 +25,7 @@ import org.graylog2.shared.rest.resources.system.SystemPluginResource;
 import org.graylog2.shared.rest.resources.system.SystemResource;
 import org.graylog2.shared.rest.resources.system.ThroughputResource;
 import org.graylog2.shared.rest.resources.system.codecs.CodecTypesResource;
+import org.graylog2.shared.rest.resources.system.inputs.InputCategoriesResource;
 import org.graylog2.shared.rest.resources.system.inputs.InputTypesResource;
 
 public class RestResourcesSharedModule extends Graylog2Module {
@@ -34,6 +35,7 @@ public class RestResourcesSharedModule extends Graylog2Module {
         addSystemRestResource(DocumentationResource.class);
         addSystemRestResource(CodecTypesResource.class);
         addSystemRestResource(InputTypesResource.class);
+        addSystemRestResource(InputCategoriesResource.class);
         addSystemRestResource(LoadBalancerStatusResource.class);
         addSystemRestResource(MetricsResource.class);
         addSystemRestResource(SystemPluginResource.class);
