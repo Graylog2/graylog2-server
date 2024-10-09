@@ -34,6 +34,7 @@ import HotkeysProvider from 'contexts/HotkeysProvider';
 import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import PageContextProviders from 'components/page/contexts/PageContextProviders';
+import { singleton } from 'logic/singleton';
 
 const AppLayout = styled.div`
   display: flex;
@@ -106,4 +107,4 @@ const App = () => (
   </QueryParamProvider>
 );
 
-export default App;
+export default singleton('components.App', () => App);
