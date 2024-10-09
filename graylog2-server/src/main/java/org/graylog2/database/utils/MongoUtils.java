@@ -22,6 +22,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
@@ -32,6 +33,7 @@ import org.bson.BsonValue;
 import org.bson.codecs.EncoderContext;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.mongojack.InitializationRequiredForTransformation;
@@ -233,6 +235,30 @@ public class MongoUtils<T extends MongoEntity> {
                             .returnDocument(ReturnDocument.AFTER)
                             .upsert(true)
             );
+        }
+    }
+
+    /**
+     * Saves an entity by either inserting or replacing the document.
+     * <p>
+     * This method exists to avoid the repeated implementation of this functionality during migration from the old
+     * Mongojack API.
+     * <p>
+     * <b> For new code, prefer implementing a separate "create" and "update" path instead.</b>
+     *
+     * @param entity Entity to be saved, with the #id() property optionally set.
+     * @return Saved entity with the #id() property guaranteed to be present.
+     */
+    public T save(BuildableMongoEntity<T, ?> entity) {
+        // going through the builder is a bit more work but avoids an unsafe cast to T
+        final var orig = entity.toBuilder().build();
+        final var id = orig.id();
+        if (id == null) {
+            final var insertedId = insertedIdAsString(collection.insertOne(orig));
+            return entity.toBuilder().id(insertedId).build();
+        } else {
+            collection.replaceOne(idEq(id), orig, new ReplaceOptions().upsert(true));
+            return orig;
         }
     }
 
