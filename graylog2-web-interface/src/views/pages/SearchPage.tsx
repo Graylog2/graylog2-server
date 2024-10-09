@@ -32,8 +32,8 @@ import useViewTitle from 'views/hooks/useViewTitle';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
-import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
 import type { SearchExecutionResult } from 'views/types';
+import SearchPageAutoRefreshProvider from 'views/components/contexts/SearchPageAutoRefreshProvider';
 
 type Props = React.PropsWithChildren<{
   isNew: boolean,
@@ -89,12 +89,12 @@ const SearchPage = ({
           <DashboardPageContextProvider>
             <NewViewLoaderContext.Provider value={loadNewView}>
               <ViewLoaderContext.Provider value={loadView}>
-                <AutoRefreshProvider>
+                <SearchPageAutoRefreshProvider>
                   {children}
                   <IfUserHasAccessToAnyStream>
                     <Search forceSideBarPinned={forceSideBarPinned} />
                   </IfUserHasAccessToAnyStream>
-                </AutoRefreshProvider>
+                </SearchPageAutoRefreshProvider>
               </ViewLoaderContext.Provider>
             </NewViewLoaderContext.Provider>
           </DashboardPageContextProvider>

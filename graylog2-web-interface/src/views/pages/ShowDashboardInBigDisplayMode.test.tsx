@@ -49,6 +49,8 @@ describe('ShowDashboardInBigDisplayMode', () => {
     refreshConfig: null,
     startAutoRefresh: () => {},
     stopAutoRefresh: () => {},
+    restartAutoRefresh: () => {},
+    animationId: 'animation-id',
   };
 
   useViewsPlugin();
@@ -60,11 +62,7 @@ describe('ShowDashboardInBigDisplayMode', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    asMock(useAutoRefresh).mockReturnValue({
-      refreshConfig: null,
-      startAutoRefresh: () => {},
-      stopAutoRefresh: () => {},
-    });
+    asMock(useAutoRefresh).mockReturnValue(autoRefreshContextValue);
   });
 
   it('set refresh interval correctly based on location query', async () => {
