@@ -19,7 +19,6 @@ package org.graylog.datanode.initializers;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.Keys;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -78,7 +77,7 @@ public class JwtTokenAuthFilter implements ContainerRequestFilter {
     }
 
     void verifyToken(String token) throws TokenVerificationException {
-        final SecretKey key = Keys.hmacShaKeyFor(this.jwtSecret.getBytes());
+        final SecretKey key = this.jwtSecret.getSigningKey();
         final JwtParser parser = Jwts.parser()
                 .verifyWith(key)
                 .requireSubject(REQUIRED_SUBJECT)
