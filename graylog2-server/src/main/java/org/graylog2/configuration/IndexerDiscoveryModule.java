@@ -25,6 +25,8 @@ import org.graylog2.cluster.nodes.DataNodeClusterService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.security.JwtSecret;
+import org.graylog2.security.JwtSecretProvider;
 
 import java.net.URI;
 import java.util.List;
@@ -37,5 +39,6 @@ public class IndexerDiscoveryModule extends AbstractModule {
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
+        bind(JwtSecret.class).toProvider(JwtSecretProvider.class).asEagerSingleton();
     }
 }
