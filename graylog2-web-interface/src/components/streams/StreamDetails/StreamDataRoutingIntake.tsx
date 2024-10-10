@@ -22,6 +22,7 @@ import { Alert, Table } from 'components/bootstrap';
 import DetailsStreamRule from 'components/streamrules/DetailsStreamRule';
 import { IfPermitted, Section } from 'components/common';
 import CreateStreamRuleButton from 'components/streamrules/CreateStreamRuleButton';
+import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 
 type Props = {
   stream: Stream,
@@ -52,6 +53,7 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
                                            streamId={stream.id} />
                  </IfPermitted>
              )}>
+        <MatchingTypeSwitcher stream={stream} onChange={() => {}} />
         <Table condensed striped hover>
           <thead>
             <tr>
