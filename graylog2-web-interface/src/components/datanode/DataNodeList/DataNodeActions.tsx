@@ -42,6 +42,7 @@ const ActionButton = styled(Button)`
 type Props = {
   dataNode: DataNode,
   displayAs?: 'dropdown'|'buttons',
+  refetch?: () => void,
 };
 
 const DIALOG_TYPES = {
@@ -66,11 +67,12 @@ const DIALOG_TEXT = {
   },
 };
 
-const DataNodeActions = ({ dataNode, displayAs }: Props) => {
+const DataNodeActions = ({ dataNode, refetch, displayAs }: Props) => {
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
-  const { refetch } = useTableFetchContext();
+  const context = useTableFetchContext(!!refetch);
+  const _refetch = refetch || context?.refetch || (() => {});
   const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
 
   const sleepAndClearTimer = async () => {
@@ -83,7 +85,7 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
 
   const refetchDatanodes = async () => {
     await sleepAndClearTimer();
-    await refetch();
+    await _refetch();
   };
 
   const handleStartDatanode = async () => {
@@ -189,6 +191,7 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
 
 DataNodeActions.defaultProps = {
   displayAs: 'dropdown',
+  refetch: undefined,
 };
 
 export default DataNodeActions;

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
@@ -119,7 +118,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @Inject
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager,
                           final Configuration configuration, final NodeService<DataNodeDto> nodeService,
-                          ObjectMapper objectMapper, OpensearchStateMachine processState, @Named("node_name") String nodeName, NodeId nodeId, EventBus eventBus) {
+                          ObjectMapper objectMapper, OpensearchStateMachine processState, NodeId nodeId, EventBus eventBus) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = processState;
         this.stdout = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
@@ -128,7 +127,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         this.nodeService = nodeService;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
-        this.nodeName = nodeName;
+        this.nodeName = configuration.getDatanodeNodeName();
         this.nodeId = nodeId;
         this.eventBus = eventBus;
     }

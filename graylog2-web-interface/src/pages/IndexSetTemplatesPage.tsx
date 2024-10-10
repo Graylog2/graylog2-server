@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import { Row, Col } from 'components/bootstrap';
+import { Alert, Row, Col } from 'components/bootstrap';
 import IndexSetTemplatesList from 'components/indices/IndexSetTemplates/IndexSetTemplatesList';
 import CreateIndexSetTemplateButton from 'components/indices/IndexSetTemplates/CreateIndexSetTemplateButton';
 import { IndicesPageNavigation } from 'components/indices';
@@ -34,6 +34,8 @@ const IndexSetTemplatesPage = () => (
 
     <Row className="content">
       <Col md={12}>
+        <Alert>Define a default template here in order to control the configuration of Index Sets created by Illuminate packs.</Alert>
+
         <IndexSetTemplatesList />
       </Col>
     </Row>

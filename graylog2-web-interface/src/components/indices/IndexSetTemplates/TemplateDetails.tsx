@@ -120,15 +120,15 @@ const TemplateDetails = ({
                 <dl>
                   <dt>Index Analyzer:</dt>
                   <dd>{template.index_set_config.index_analyzer}</dd>
-                  <dt>Shards:</dt>
+                  <dt>Index Shards:</dt>
                   <dd>{template.index_set_config.shards}</dd>
-                  <dt>Replicas:</dt>
+                  <dt>Index Replica:</dt>
                   <dd>{template.index_set_config.replicas}</dd>
-                  <dt>Max. number of segments:</dt>
+                  <dt>Maximum Number of Segments:</dt>
                   <dd>{template.index_set_config.index_optimization_max_num_segments}</dd>
-                  <dt>Index optimization after rotation:</dt>
+                  <dt>Index Optimization after Rotation:</dt>
                   <dd><Icon name={template.index_set_config.index_optimization_disabled ? 'cancel' : 'check_circle'} /></dd>
-                  <dt>Field type refresh interval:</dt>
+                  <dt>Field Type Refresh Interval:</dt>
                   <dd>{formatRefreshInterval(template.index_set_config.field_type_refresh_interval)}</dd>
                 </dl>
               </Section>
