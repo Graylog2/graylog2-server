@@ -15,30 +15,51 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 import { NodeOrGlobalSelect } from 'components/inputs';
 import { ConfigurationForm } from 'components/configurationforms';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import AppConfig from 'util/AppConfig';
 import type { Input } from 'components/messageloaders/Types';
+import type { ConfigurationField } from 'components/configurationforms';
 
 type FormValues = Input['attributes'];
 
 type Props = {
   globalValue?: boolean,
+  configFields: {
+    [key: string]: ConfigurationField,
+  },
   nodeValue?: string,
   titleValue?: string,
+  title: string,
+  includeTitleField: boolean,
   handleSubmit: (data: any) => void,
   values?: FormValues,
   setShowModal: (boolean) => void;
   submitButtonText: string,
 }
 
-const InputForm = ({ globalValue, nodeValue, titleValue, handleSubmit, values, setShowModal, submitButtonText } : Props) => {
+const InputForm = ({
+  globalValue,
+  configFields,
+  nodeValue,
+  titleValue,
+  title,
+  includeTitleField,
+  handleSubmit,
+  values,
+  setShowModal,
+  submitButtonText,
+} : Props) => {
   const [global, setGlobal] = useState<boolean>(globalValue ?? false);
   const [node, setNode] = useState<string | undefined>(nodeValue);
   const configFormRef = useRef(null);
+
+  useEffect(() => {
+    configFormRef.current?.open();
+  }, []);
 
   const handleChange = (type: 'node' | 'global', value: boolean | string | undefined | null) => {
     if (type === 'node') {
@@ -63,7 +84,7 @@ const InputForm = ({ globalValue, nodeValue, titleValue, handleSubmit, values, s
   };
 
   const onCancel = () => {
-    setShowModal(true);
+    setShowModal(false);
   };
 
   const getValues = () => {
@@ -95,7 +116,9 @@ const InputForm = ({ globalValue, nodeValue, titleValue, handleSubmit, values, s
 
   return (
     <ConfigurationForm<FormValues> ref={configFormRef}
-                                   title="TODO: something"
+                                   configFields={configFields}
+                                   includeTitleField={includeTitleField}
+                                   title={title}
                                    values={formValues}
                                    titleValue={formTitleValue}
                                    submitButtonText={submitButtonText}

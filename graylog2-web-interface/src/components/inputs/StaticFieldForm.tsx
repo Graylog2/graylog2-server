@@ -34,6 +34,18 @@ const StaticFieldForm = ({ input, setShowModal } : Props) => {
     InputStaticFieldsStore.create(input, fieldName, fieldValue).then(() => setShowModal(false));
   };
 
+  const handleFieldChange = (name: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+
+    if (name === 'name') {
+      setFieldName(value);
+    }
+
+    if (name === 'value') {
+      setFieldValue(value);
+    }
+  };
+
   return (
     <BootstrapModalForm show
                         title="Add static field"
@@ -46,7 +58,7 @@ const StaticFieldForm = ({ input, setShowModal } : Props) => {
       </p>
       <Input type="text"
              value={fieldName}
-             onChange={setFieldName}
+             onChange={(event) => { handleFieldChange('name', event); }}
              id="field-name"
              label="Field name"
              required
@@ -54,7 +66,7 @@ const StaticFieldForm = ({ input, setShowModal } : Props) => {
              title="Should consist only of alphanumeric characters and underscores."
              autoFocus />
       <Input value={fieldValue}
-             onChange={setFieldValue}
+             onChange={(event) => { handleFieldChange('value', event); }}
              type="text"
              id="field-value"
              label="Field value"
