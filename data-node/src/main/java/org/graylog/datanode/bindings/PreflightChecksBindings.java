@@ -19,6 +19,7 @@ package org.graylog.datanode.bindings;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
+import org.graylog.datanode.bootstrap.preflight.DatanodeDnsPreflightCheck;
 import org.graylog.datanode.bootstrap.preflight.DatanodeKeystoreCheck;
 import org.graylog.datanode.bootstrap.preflight.OpenSearchPreconditionsCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchBinPreflightCheck;
@@ -41,6 +42,7 @@ public class PreflightChecksBindings extends AbstractModule {
         bind(CertificateExchange.class).to(CertificateExchangeImpl.class);
 
         addPreflightCheck(OpensearchConfigSync.class);
+        addPreflightCheck(DatanodeDnsPreflightCheck.class);
         addPreflightCheck(OpensearchBinPreflightCheck.class);
         addPreflightCheck(DatanodeDirectoriesLockfileCheck.class);
         addPreflightCheck(OpenSearchPreconditionsCheck.class);
