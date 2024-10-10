@@ -16,7 +16,13 @@
  */
 package org.graylog2.inputs.transports;
 
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricSet;
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.BlockedListener;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Command;
 import com.rabbitmq.client.Connection;
@@ -25,10 +31,14 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.TrafficListener;
 import com.rabbitmq.client.impl.DefaultExceptionHandler;
+import com.rabbitmq.client.impl.StandardMetricsCollector;
 import org.graylog2.plugin.InputFailureRecorder;
+import org.graylog2.plugin.LocalMetricRegistry;
+import org.graylog2.plugin.MetricSets;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
@@ -39,11 +49,11 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Locale;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_EXCHANGE;
@@ -79,31 +89,35 @@ public class AmqpConsumer {
     private final String routingKey;
     private final boolean requeueInvalid;
     private final int heartbeatTimeout;
+    private final NodeId nodeId;
     private final MessageInput sourceInput;
     private final int parallelQueues;
     private final boolean tls;
-    private final ScheduledExecutorService scheduler;
     private final InputFailureRecorder inputFailureRecorder;
     private final AmqpTransport amqpTransport;
     private final EncryptedValueService encryptedValueService;
     private final Duration connectionRecoveryInterval;
+    private final StandardMetricsCollector metricsCollector;
 
     private final AtomicLong totalBytesRead = new AtomicLong(0);
-    private final AtomicLong lastSecBytesRead = new AtomicLong(0);
-    private final AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
+    private final Supplier<AtomicLong> lastSecBytesSupplier = Suppliers.memoizeWithExpiration(
+            () -> new AtomicLong(0),
+            Duration.ofSeconds(1)
+    );
 
     private Connection connection;
     private Channel channel;
-    private ScheduledFuture<?> scheduledFuture;
+    private ExecutorService executorService;
 
     public AmqpConsumer(int heartbeatTimeout,
+                        NodeId nodeId,
                         MessageInput sourceInput,
                         Configuration configuration,
-                        ScheduledExecutorService scheduler,
                         InputFailureRecorder inputFailureRecorder,
                         AmqpTransport amqpTransport,
                         EncryptedValueService encryptedValueService,
                         Duration connectionRecoveryInterval) {
+        this.nodeId = nodeId;
         this.hostname = configuration.getString(CK_HOSTNAME);
         this.port = configuration.getInt(CK_PORT);
         this.virtualHost = configuration.getString(CK_VHOST);
@@ -119,11 +133,11 @@ public class AmqpConsumer {
         this.tls = configuration.getBoolean(CK_TLS);
         this.heartbeatTimeout = heartbeatTimeout;
         this.sourceInput = sourceInput;
-        this.scheduler = scheduler;
         this.inputFailureRecorder = inputFailureRecorder;
         this.amqpTransport = amqpTransport;
         this.encryptedValueService = encryptedValueService;
         this.connectionRecoveryInterval = connectionRecoveryInterval;
+        this.metricsCollector = new StandardMetricsCollector(new LocalMetricRegistry(), "amqp");
     }
 
     public void run() throws IOException, TimeoutException {
@@ -131,7 +145,6 @@ public class AmqpConsumer {
         if (!isConnected()) {
             connect();
         }
-        scheduledFuture = scheduler.scheduleAtFixedRate(() -> lastSecBytesRead.set(lastSecBytesReadTmp.getAndSet(0)), 1, 1, TimeUnit.SECONDS);
 
         for (int i = 0; i < parallelQueues; i++) {
             final String queueName = String.format(Locale.ENGLISH, queue, i);
@@ -145,7 +158,7 @@ public class AmqpConsumer {
                     long deliveryTag = envelope.getDeliveryTag();
                     try {
                         totalBytesRead.addAndGet(body.length);
-                        lastSecBytesReadTmp.addAndGet(body.length);
+                        lastSecBytesSupplier.get().addAndGet(body.length);
 
                         final RawMessage rawMessage = new RawMessage(body);
 
@@ -176,12 +189,17 @@ public class AmqpConsumer {
     }
 
     public void connect() throws IOException, TimeoutException {
+        this.executorService = Executors.newFixedThreadPool(parallelQueues, new ThreadFactoryBuilder()
+                .setNameFormat("amqp-consumer-%d " + sourceInput.toIdentifier())
+                .setDaemon(true)
+                .build());
+
         final ConnectionFactory factory = new ConnectionFactory();
         factory.setExceptionHandler(new DefaultExceptionHandler() {
             @Override
             public void handleConnectionRecoveryException(Connection conn, Throwable exception) {
                 super.handleConnectionRecoveryException(conn, exception);
-                inputFailureRecorder.setFailing(getClass(), "Connection recovery error!", exception);
+                inputFailureRecorder.setFailing(AmqpConsumer.class, "Connection recovery error!", exception);
             }
         });
         factory.setTrafficListener(new TrafficListener() {
@@ -202,6 +220,8 @@ public class AmqpConsumer {
         // explicitly setting this, to ensure it is true even if the default changes.
         factory.setAutomaticRecoveryEnabled(true);
         factory.setNetworkRecoveryInterval(connectionRecoveryInterval.toMillis());
+        factory.setMetricsCollector(metricsCollector);
+        factory.setSharedExecutor(executorService);
 
         if (tls) {
             try {
@@ -217,7 +237,7 @@ public class AmqpConsumer {
             factory.setUsername(username);
             factory.setPassword(encryptedValueService.decrypt(password));
         }
-        connection = factory.newConnection();
+        connection = factory.newConnection(f("graylog-node-%s-input%s", nodeId.getNodeId(), sourceInput.toIdentifier()));
         channel = connection.createChannel();
 
         if (null == channel) {
@@ -239,6 +259,17 @@ public class AmqpConsumer {
             inputFailureRecorder.setFailing(getClass(),
                     f("AMQP connection lost (reason: %s)! Reconnecting ...", cause.getReason().protocolMethodName()));
         });
+        connection.addBlockedListener(new BlockedListener() {
+            @Override
+            public void handleBlocked(String reason) {
+                LOG.warn("AMQP input {} is blocked: {}", sourceInput.toIdentifier(), reason);
+            }
+
+            @Override
+            public void handleUnblocked() {
+                LOG.info("AMQP input {} is not blocked anymore", sourceInput.toIdentifier());
+            }
+        });
     }
 
 
@@ -257,8 +288,9 @@ public class AmqpConsumer {
         } else if (connection != null) {
             connection.abort();
         }
-        if (null != scheduledFuture) {
-            scheduledFuture.cancel(true);
+
+        if (executorService != null) {
+            executorService.shutdown();
         }
     }
 
@@ -270,10 +302,19 @@ public class AmqpConsumer {
     }
 
     public AtomicLong getLastSecBytesRead() {
-        return lastSecBytesRead;
+        return lastSecBytesSupplier.get();
     }
 
     public AtomicLong getTotalBytesRead() {
         return totalBytesRead;
+    }
+
+    public MetricSet getMetricSet() {
+        // We are not interested in publish metrics.
+        final ImmutableMap<String, Metric> metrics = ImmutableMap.<String, Metric>builder()
+                .putAll(metricsCollector.getMetricRegistry().getCounters((name, metric) -> name.matches(".+\\.(?:connections|channels)$")))
+                .putAll(metricsCollector.getMetricRegistry().getMeters((name, metric) -> name.matches(".+\\.(?:consumed|acknowledged|rejected)$")))
+                .build();
+        return MetricSets.of(metrics);
     }
 }
