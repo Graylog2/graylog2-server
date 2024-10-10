@@ -219,8 +219,6 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     shouldAutoFocus = false;
   }
 
-  console.log('===configFields');
-
   const sortedConfigFieldKeys = Object.keys(configFields).map((name, pos) => ({ name, pos })).sort(sortByPosOrOptionality);
 
   const renderedConfigFields = sortedConfigFieldKeys.map((key) => {

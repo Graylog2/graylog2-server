@@ -33,6 +33,7 @@ type Props = {
   },
   nodeValue?: string,
   titleValue?: string,
+  typeName: string,
   title: string,
   includeTitleField: boolean,
   handleSubmit: (data: any) => void,
@@ -47,6 +48,7 @@ const InputForm = ({
   nodeValue,
   titleValue,
   title,
+  typeName,
   includeTitleField,
   handleSubmit,
   values,
@@ -66,7 +68,9 @@ const InputForm = ({
       setNode(value as unknown as string | undefined);
     }
 
-    setGlobal(value as unknown as boolean);
+    if (type === 'global') {
+      setGlobal(value as unknown as boolean);
+    }
   };
 
   const onSubmit = (data: FormValues) => {
@@ -123,6 +127,7 @@ const InputForm = ({
                                    titleValue={formTitleValue}
                                    submitButtonText={submitButtonText}
                                    submitAction={onSubmit}
+                                   typeName={typeName}
                                    cancelAction={onCancel}>
       <HideOnCloud>
         <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />
