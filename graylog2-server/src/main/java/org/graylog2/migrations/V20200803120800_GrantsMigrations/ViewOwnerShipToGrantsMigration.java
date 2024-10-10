@@ -56,15 +56,17 @@ public class ViewOwnerShipToGrantsMigration {
     }
 
     public void upgrade() {
-        viewService.streamAll().forEach(view -> {
-            final Optional<User> user = view.owner().map(userService::load);
-            if (user.isPresent() && !user.get().isLocalAdmin()) {
-                final GRNType grnType = ViewDTO.Type.DASHBOARD.equals(view.type()) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
-                final GRN target = grnType.toGRN(view.id());
+        try (var stream = viewService.streamAll()) {
+            stream.forEach(view -> {
+                final Optional<User> user = view.owner().map(userService::load);
+                if (user.isPresent() && !user.get().isLocalAdmin()) {
+                    final GRNType grnType = ViewDTO.Type.DASHBOARD.equals(view.type()) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
+                    final GRN target = grnType.toGRN(view.id());
 
-                ensureGrant(user.get(), target);
-            }
-        });
+                    ensureGrant(user.get(), target);
+                }
+            });
+        }
     }
 
     private void ensureGrant(User user, GRN target) {
