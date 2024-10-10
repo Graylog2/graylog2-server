@@ -39,7 +39,7 @@ type NodeProps = {
 const isSecure = (address: string) => address?.toLocaleLowerCase().startsWith('https://');
 
 const colorByState = (status: DataNodeStatus, address: string) => {
-  if (status === 'CONNECTING') {
+  if (status === 'STARTING') {
     return 'yellow';
   }
 
@@ -55,7 +55,7 @@ const colorByState = (status: DataNodeStatus, address: string) => {
 };
 
 const lockIcon = (address: string) => (isSecure(address) ? 'lock' : 'lock_open');
-const isConnecting = (status: DataNodeStatus) => status === 'CONNECTING';
+const isConnecting = (status: DataNodeStatus) => status === 'STARTING';
 const ConnectingSpinner = () => <Spinner text="" />;
 
 const DataNodeBadge = ({ nodeId, transportAddress, status }: NodeProps) => (

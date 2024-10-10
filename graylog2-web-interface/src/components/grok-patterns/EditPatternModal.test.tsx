@@ -15,26 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
 
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 
 describe('<EditPatternModal />', () => {
-  it('should render a modal button with as edit', () => {
-    const wrapper = mount(<EditPatternModal savePattern={() => {}}
-                                            testPattern={() => {}}
-                                            validPatternName={() => {}} />);
+  it('should render a modal button with as edit', async () => {
+    render(<EditPatternModal savePattern={() => {}}
+                             testPattern={() => {}}
+                             validPatternName={() => {}} />);
 
-    expect(wrapper).toExist();
+    await screen.findByRole('button', { name: /edit/i });
   });
 
-  it('should render a modal button with as create', () => {
-    const wrapper = mount(<EditPatternModal create
-                                            savePattern={() => {}}
-                                            testPattern={() => {}}
-                                            validPatternName={() => {}} />);
+  it('should render a modal button with as create', async () => {
+    render(<EditPatternModal create
+                             savePattern={() => {}}
+                             testPattern={() => {}}
+                             validPatternName={() => {}} />);
 
-    expect(wrapper).toExist();
+    await screen.findByRole('button', { name: /create pattern/i });
   });
 });

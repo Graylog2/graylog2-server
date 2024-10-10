@@ -30,7 +30,7 @@ const NewExampleWell = styled(Well)(({ theme }) => css`
   word-wrap: break-word;
 `);
 
-const TeamsNotificationDetails: React.FC<TeamsNotificationSummaryV2Type> = ({ notification }) => (
+const TeamsNotificationDetails = ({ notification }: TeamsNotificationSummaryV2Type) => (
   <>
     <ReadOnlyFormGroup label="Webhook URL" value={notification.config.webhook_url} />
     <ReadOnlyFormGroup label="Adaptive Card Template"
@@ -38,7 +38,7 @@ const TeamsNotificationDetails: React.FC<TeamsNotificationSummaryV2Type> = ({ no
                          <NewExampleWell bsSize="small">
                            {notification.config.adaptive_card}
                          </NewExampleWell>
-                       )} />
+                     )} />
     <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
     <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />
   </>

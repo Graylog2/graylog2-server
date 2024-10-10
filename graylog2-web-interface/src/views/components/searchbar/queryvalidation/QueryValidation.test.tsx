@@ -37,7 +37,7 @@ type SUTProps = {
 }
 
 describe('QueryValidation', () => {
-  const validationErrorIconTitle = 'Toggle validation error explanation';
+  const validationErrorIconTitle = /Toggle validation/;
 
   const openExplanation = async () => {
     const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);

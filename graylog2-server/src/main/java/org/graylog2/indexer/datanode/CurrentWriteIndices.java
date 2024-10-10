@@ -14,16 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
+package org.graylog2.indexer.datanode;
 
-import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-describe('<ContentPackUploadControls />', () => {
-  it('should render', () => {
-    const wrapper = mount(<ContentPackUploadControls />);
+import java.util.Map;
 
-    expect(wrapper).toExist();
-  });
-});
+public record CurrentWriteIndices(@JsonProperty("write_indices") Map<String, String> writeIndices) {
+}

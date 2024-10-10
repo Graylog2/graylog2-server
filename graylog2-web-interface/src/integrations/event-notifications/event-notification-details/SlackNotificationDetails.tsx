@@ -29,7 +29,7 @@ const NewExampleWell = styled(Well)(({ theme }) => css`
   word-wrap: break-word;
 `);
 
-const SlackNotificationDetails: React.FC<SlackNotificationSummaryType> = ({ notification }) => (
+const SlackNotificationDetails = ({ notification }: SlackNotificationSummaryType) => (
   <>
     <ReadOnlyFormGroup label="Webhook URL" value={notification.config.webhook_url} />
     <ReadOnlyFormGroup label="Channel" value={notification.config.channel} />
@@ -38,7 +38,7 @@ const SlackNotificationDetails: React.FC<SlackNotificationSummaryType> = ({ noti
                          <NewExampleWell bsSize="small">
                            {notification.config.custom_message || <em>Empty body</em>}
                          </NewExampleWell>
-                       )} />
+                     )} />
     <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
     <ReadOnlyFormGroup label="User Name" value={notification.config.user_name} />
     <ReadOnlyFormGroup label="Include Title" value={notification.config.include_title} />

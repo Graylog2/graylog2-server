@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Icon, RelativeTime, Spinner } from 'components/common';
+import { Icon, Spinner, Timestamp } from 'components/common';
 import { Alert, Table } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
@@ -73,7 +73,7 @@ const MigrationDatanodeList = ({ showProvisioningState }: Props) => {
                   <td>{datanode.hostname}</td>
                   <td>{datanode.transport_address}</td>
                   <td>{showProvisioningState ? datanode.status : datanode.data_node_status}</td>
-                  <td>{datanode.cert_valid_until ? <RelativeTime dateTime={datanode.cert_valid_until} /> : 'No certificate'}</td>
+                  <td>{datanode.cert_valid_until ? <Timestamp dateTime={datanode.cert_valid_until} /> : 'No certificate'}</td>
                   <td>
                     {!datanode.version_compatible && (
                       <Icon name="warning"
