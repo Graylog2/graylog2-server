@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indexset.template;
 
 import com.google.common.primitives.Ints;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
@@ -137,6 +138,7 @@ public class IndexSetTemplateService {
                 DEFAULTS);
     }
 
+    @MustBeClosed
     public Stream<IndexSetTemplate> streamAll() {
         return stream(collection.find());
     }

@@ -125,8 +125,8 @@ public class NotificationFacade implements EntityFacade<NotificationDto> {
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return notificationService.streamAll()
-                .map(this::createExcerpt)
-                .collect(Collectors.toSet());
+        try (var stream = notificationService.streamAll()) {
+            return stream.map(this::createExcerpt).collect(Collectors.toSet());
+        }
     }
 }

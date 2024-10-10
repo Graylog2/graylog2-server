@@ -18,6 +18,7 @@ package org.graylog.plugins.views.favorites;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.MongoCollection;
@@ -118,9 +119,12 @@ public class FavoritesService {
     }
 
     Optional<FavoritesForUserDTO> findForUser(final String userId) {
-        return MongoUtils.stream(db.find(Filters.eq(FavoritesForUserDTO.FIELD_USER_ID, userId))).findAny();
+        try (var stream = MongoUtils.stream(db.find(Filters.eq(FavoritesForUserDTO.FIELD_USER_ID, userId)))) {
+            return stream.findAny();
+        }
     }
 
+    @MustBeClosed
     public Stream<FavoritesForUserDTO> streamAll() {
         return MongoUtils.stream(db.find());
     }

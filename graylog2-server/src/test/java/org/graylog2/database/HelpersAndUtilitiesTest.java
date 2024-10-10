@@ -196,6 +196,7 @@ class HelpersAndUtilitiesTest {
     }
 
     @Test
+    @SuppressWarnings("MustBeClosedChecker")
     public void streamAll() {
         collection.insertOne(newDto("hello1"));
         collection.insertOne(newDto("hello2"));

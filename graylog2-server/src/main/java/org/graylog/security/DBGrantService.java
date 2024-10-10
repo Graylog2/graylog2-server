@@ -72,32 +72,42 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     }
 
     public ImmutableSet<GrantDTO> getForGranteesOrGlobal(Set<GRN> grantees) {
-        return streamQuery(DBQuery.or(
+        final var query = DBQuery.or(
                 DBQuery.in(GrantDTO.FIELD_GRANTEE, grantees),
                 DBQuery.is(GrantDTO.FIELD_GRANTEE, GRNRegistry.GLOBAL_USER_GRN.toString())
-        )).collect(ImmutableSet.toImmutableSet());
+        );
+        try (var stream = streamQuery(query)) {
+            return stream.collect(ImmutableSet.toImmutableSet());
+        }
     }
 
     public ImmutableSet<GrantDTO> getForGrantee(GRN grantee) {
-        return streamQuery(DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee))
-                .collect(ImmutableSet.toImmutableSet());
+        try (var stream = streamQuery(DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee))) {
+            return stream.collect(ImmutableSet.toImmutableSet());
+        }
     }
 
     public ImmutableSet<GrantDTO> getForGranteeWithCapability(GRN grantee, Capability capability) {
-        return streamQuery(DBQuery.and(
+        final var query = DBQuery.and(
                 DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee),
                 DBQuery.is(GrantDTO.FIELD_CAPABILITY, capability)
-        )).collect(ImmutableSet.toImmutableSet());
+        );
+        try (var stream = streamQuery(query)) {
+            return stream.collect(ImmutableSet.toImmutableSet());
+        }
     }
 
     public ImmutableSet<GrantDTO> getForGranteesOrGlobalWithCapability(Set<GRN> grantees, Capability capability) {
-        return streamQuery(DBQuery.and(
+        final var query = DBQuery.and(
                 DBQuery.or(
                         DBQuery.in(GrantDTO.FIELD_GRANTEE, grantees),
                         DBQuery.is(GrantDTO.FIELD_GRANTEE, GRNRegistry.GLOBAL_USER_GRN.toString())
                 ),
                 DBQuery.is(GrantDTO.FIELD_CAPABILITY, capability)
-        )).collect(ImmutableSet.toImmutableSet());
+        );
+        try (var stream = streamQuery(query)) {
+            return stream.collect(ImmutableSet.toImmutableSet());
+        }
     }
 
     public List<GrantDTO> getForTargetAndGrantee(GRN target, GRN grantee) {
