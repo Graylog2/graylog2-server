@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -204,16 +205,14 @@ public class ViewService implements ViewUtils<ViewDTO> {
         return mongoUtils.getById(id).map(this::requirementsForView);
     }
 
+    @MustBeClosed
     public Stream<ViewDTO> streamAll() {
-        try (var stream = MongoUtils.stream(collection.find())) {
-            return stream.map(this::requirementsForView);
-        }
+        return MongoUtils.stream(collection.find()).map(this::requirementsForView);
     }
 
+    @MustBeClosed
     public Stream<ViewDTO> streamByIds(Set<String> idSet) {
-        try (var stream = MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(idSet)))) {
-            return stream.map(this::requirementsForView);
-        }
+        return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(idSet))).map(this::requirementsForView);
     }
 
     public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {
