@@ -387,10 +387,12 @@ const IndexSetConfigurationForm = ({
                     </Field>
                   </Section>
                   )}
-                  <Alert bsStyle="warning">
-                    These changes do not apply to any existing indices. They only apply to newly created indices.
-                    To apply this to the current index set immediately, rotate the index.
-                  </Alert>
+                  <Section title="Important Note">
+                    <Alert bsStyle="info">
+                      These changes do not apply to any existing indices. They only apply to newly created indices.
+                      To apply this to the current index set immediately, rotate the index.
+                    </Alert>
+                  </Section>
                   <SubmitWrapper>
                     <FormSubmit disabledSubmit={!isValid}
                                 submitButtonText={submitButtonText}
