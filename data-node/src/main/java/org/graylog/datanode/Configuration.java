@@ -158,7 +158,7 @@ public class Configuration {
     @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
 
-    @Documentation("You MUST set a secret to secure/pepper the stored user passwords here. Use at least 64 characters." +
+    @Documentation("You MUST set a secret to secure/pepper the stored user passwords here. Use at least 16 characters." +
             "Generate one by using for example: pwgen -N 1 -s 96 \n" +
             "ATTENTION: This value must be the same on all Graylog and Datanode nodes in the cluster. " +
             "Changing this value after installation will render all user sessions and encrypted values in the database invalid. (e.g. encrypted access tokens)")
@@ -370,8 +370,8 @@ public class Configuration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validatePasswordSecret() throws ValidationException {
-        if (passwordSecret == null || passwordSecret.length() < 64) {
-            throw new ValidationException("The minimum length for \"password_secret\" is 64 characters.");
+        if (passwordSecret == null || passwordSecret.length() < 16) {
+            throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
         }
     }
 
