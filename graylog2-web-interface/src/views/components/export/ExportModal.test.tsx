@@ -103,10 +103,10 @@ describe('ExportModal', () => {
     viewType?: ViewType,
   } & Partial<ExportModalProps>;
 
-  const SimpleExportModal = ({ viewType = View.Type.Search, ...props }: SimpleExportModalProps) => (
+  const SimpleExportModal = ({ viewType = View.Type.Search, closeModal, view, ...props }: SimpleExportModalProps) => (
     <TestStoreProvider>
       <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
-        <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
+        <ExportModal view={view ?? viewWithoutWidget(viewType)} closeModal={closeModal} {...props as ExportModalProps} />
       </FieldTypesContext.Provider>
     </TestStoreProvider>
   );
@@ -115,7 +115,6 @@ describe('ExportModal', () => {
     viewType: View.Type.Search,
     closeModal: () => {},
     directExportWidgetId: undefined,
-    fields: Immutable.List(),
     view: viewWithoutWidget(View.Type.Search),
   };
 

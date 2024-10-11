@@ -31,13 +31,13 @@ type Props = {
 /**
  * Color picker component that let the user select a color from a list of 95 colors grouped by hue.
  */
-const ColorPicker = ({ onChange, ...rest }: Props) => {
+const ColorPicker = ({ onChange, height, width, ...rest }: Props) => {
   const onColorChange = useCallback((color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(color.hex, event);
   }, [onChange]);
 
   return (
-    <SwatchesPicker {...rest} onChange={onColorChange} />
+    <SwatchesPicker height={height} width={width} {...rest} onChange={onColorChange} />
   );
 };
 

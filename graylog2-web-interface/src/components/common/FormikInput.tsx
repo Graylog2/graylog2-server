@@ -59,7 +59,7 @@ const checkboxProps = (value) => ({ checked: value ?? false });
 const inputProps = (value) => ({ value: value ?? '' });
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {
+const FormikInput = ({ children, disabled, required, autoFocus, name, type, help, validate, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {
   const { validateOnChange } = useFormikContext();
 
   return (
@@ -79,13 +79,18 @@ const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, 
 
         return (
           <Input {...rest}
+                 disabled={disabled}
+                 required={required}
+                 autoFocus={autoFocus}
                  {...typeSpecificProps}
                  onBlur={onBlur}
                  help={help}
                  id={name}
                  error={error}
                  onChange={_handleChange}
-                 type={type} />
+                 type={type}>
+            {children}
+          </Input>
         );
       }}
     </Field>

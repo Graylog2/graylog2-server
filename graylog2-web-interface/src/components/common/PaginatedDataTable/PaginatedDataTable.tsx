@@ -89,7 +89,7 @@ type DataTablePagination = {
  * Component that renders a paginated data table. Should only be used for lists which are not already paginated.
  * If you want to display a lists which gets paginated by the backend, wrap use the DataTable in combination with the PaginatedList.
  */
-const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKeys, filterLabel, displayKey, filterBy, id, ...rest }: Props) => {
+const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKeys, filterLabel, displayKey, filterBy, id, useResponsiveTable, ...rest }: Props) => {
   const [{ perPage, page }, setPagination] = useState<DataTablePagination>(initialPagination);
   const [filteredRows, setFilteredRows] = useState(rows);
   const paginatedRows = _paginatedRows(filteredRows, perPage, page);
@@ -115,6 +115,7 @@ const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKe
                    showPageSizeSelect
                    useQueryParameter={false}>
       <DataTable {...rest}
+                 useResponsiveTable={useResponsiveTable}
                  id={id}
                  customFilter={(
                    <Filter id={id}

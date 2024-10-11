@@ -48,14 +48,20 @@ type Props = {
 };
 
 /** Displays the FormikInput with a specific layout */
-const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChange, ...rest }: Props) => (
+const FormikFormGroup = ({ children, disabled, required, validate, autoFocus, labelClassName, wrapperClassName, label, name, onChange, ...rest }: Props) => (
   <FormikInput {...rest}
+               disabled={disabled}
+               required={required}
+               validate={validate}
+               autoFocus={autoFocus}
                label={label}
                id={name}
                onChange={onChange}
                name={name}
                labelClassName={labelClassName}
-               wrapperClassName={wrapperClassName} />
+               wrapperClassName={wrapperClassName}>
+    {children}
+  </FormikInput>
 );
 
 FormikFormGroup.defaultProps = {
