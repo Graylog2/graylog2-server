@@ -48,8 +48,8 @@ describe('HasOwnership', () => {
     hideChildren?: boolean,
   };
 
-  const SimpleHasOwnership = (props: Props) => (
-    <HasOwnership {...props}>
+  const SimpleHasOwnership = ({ hideChildren, id: _id, type: _type }: Props) => (
+    <HasOwnership hideChildren={hideChildren} id={_id} type={_type}>
       {({ disabled }) => (
         <DisabledComponent disabled={disabled} />
       )}

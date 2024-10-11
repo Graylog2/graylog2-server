@@ -127,7 +127,7 @@ describe('MessageList', () => {
     userEvent.click(nextPageButton);
   };
 
-  const SimpleMessageList = (props: Partial<React.ComponentProps<typeof MessageList>>) => (
+  const SimpleMessageList = ({ data: _data, config: _config, fields, ...props }: Partial<React.ComponentProps<typeof MessageList>>) => (
     <TestStoreProvider>
       <MessageList title="Message List"
                    editing={false}
@@ -137,9 +137,9 @@ describe('MessageList', () => {
                    queryId="deadbeef"
                    toggleEdit={() => {}}
                    setLoadingState={() => {}}
-                   data={props.data}
-                   config={props.config}
-                   fields={props.fields}
+                   data={_data}
+                   config={_config}
+                   fields={fields}
                    height={480}
                    width={640}
                    {...props} />

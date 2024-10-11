@@ -25,9 +25,7 @@ import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 // eslint-disable-next-line import/no-cycle
 import AggregationConditionExpression from '../AggregationConditionExpression';
 
-const ComparisonExpression = (props) => {
-  const { expression, level, onChildChange, onChange, renderLabel, validation } = props;
-
+const ComparisonExpression = ({ expression, level, onChildChange, onChange, renderLabel, validation, ...props }) => {
   const handleExpressionOperatorChange = (nextOperator) => {
     const nextExpression = cloneDeep(expression);
 
