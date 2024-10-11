@@ -29,11 +29,9 @@ import { layoutToPositions, positionsToLayout } from 'views/logic/widgets/normal
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
-const WidthProvidedGridLayout = (props: React.ComponentProps<typeof WidthAdjustedReactGridLayout> & { children: React.ReactNode }) => {
-  const { width } = props;
-
-  return width ? <Responsive {...props} /> : <WidthAdjustedReactGridLayout {...props} />;
-};
+const WidthProvidedGridLayout = ({ width, ...props }: React.ComponentProps<typeof WidthAdjustedReactGridLayout> & { children: React.ReactNode }) => (width
+  ? <Responsive width={width} {...props} />
+  : <WidthAdjustedReactGridLayout width={width} {...props} />);
 
 WidthProvidedGridLayout.propTypes = { width: PropTypes.number };
 WidthProvidedGridLayout.defaultProps = { width: undefined };
