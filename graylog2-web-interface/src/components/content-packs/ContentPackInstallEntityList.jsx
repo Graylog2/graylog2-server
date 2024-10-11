@@ -22,12 +22,12 @@ import { DataTable } from 'components/common';
 
 import 'components/content-packs/ContentPackDetails.css';
 
-const ContentPackInstallEntityList = (props) => {
+const ContentPackInstallEntityList = ({ entities, uninstall }) => {
   const rowFormatter = (entity) => (<tr><td>{entity.title}</td><td>{entity.type.name}</td></tr>);
   const headers = ['Title', 'Type'];
-  const headerTitle = props.uninstall ? 'Entites to be uninstalled' : 'Installed Entities';
+  const headerTitle = uninstall ? 'Entites to be uninstalled' : 'Installed Entities';
 
-  if (!props.entities) {
+  if (!entities) {
     return <Spinner />;
   }
 
@@ -38,7 +38,7 @@ const ContentPackInstallEntityList = (props) => {
                  headers={headers}
                  sortByKey="title"
                  dataRowFormatter={rowFormatter}
-                 rows={props.entities}
+                 rows={entities}
                  filterKeys={[]} />
     </div>
   );
