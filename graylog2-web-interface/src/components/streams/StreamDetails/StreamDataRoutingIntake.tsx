@@ -16,12 +16,14 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { type Stream } from 'stores/streams/StreamsStore';
 import { Alert, Table } from 'components/bootstrap';
 import DetailsStreamRule from 'components/streamrules/DetailsStreamRule';
 import { IfPermitted, Section } from 'components/common';
 import CreateStreamRuleButton from 'components/streamrules/CreateStreamRuleButton';
+import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 
 type Props = {
   stream: Stream,
@@ -33,9 +35,15 @@ export const Headline = styled.h2(({ theme }) => css`
 `);
 
 const StreamDataRoutingInstake = ({ stream }: Props) => {
+  const queryClient = useQueryClient();
+
   const hasStreamRules = !!stream.rules?.length;
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
+
+  const handleMatchingTypeSwitched = () => {
+    queryClient.invalidateQueries(['stream', stream.id]);
+  };
 
   return (
     <>
@@ -52,6 +60,7 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
                                            streamId={stream.id} />
                  </IfPermitted>
              )}>
+        <MatchingTypeSwitcher stream={stream} onChange={handleMatchingTypeSwitched} />
         <Table condensed striped hover>
           <thead>
             <tr>
