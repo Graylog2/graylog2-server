@@ -43,7 +43,7 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
 
   const handleMatchingTypeSwitched = () => {
     queryClient.invalidateQueries(['stream', stream.id]);
-  }
+  };
 
   return (
     <>

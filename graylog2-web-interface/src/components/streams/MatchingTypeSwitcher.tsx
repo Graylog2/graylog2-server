@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import StreamsStore, { type Stream } from 'stores/streams/StreamsStore';
+
 import ConfirmDialog from '../common/ConfirmDialog';
 
 const StreamRuleConnector = styled.div(({ theme }) => css`
@@ -89,6 +89,6 @@ const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
       )}
     </StreamRuleConnector>
   );
-}
+};
 
 export default MatchingTypeSwitcher;
