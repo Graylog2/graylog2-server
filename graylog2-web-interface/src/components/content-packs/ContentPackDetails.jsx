@@ -26,8 +26,7 @@ import 'components/content-packs/ContentPackDetails.css';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 import Markdown from 'components/common/Markdown';
 
-const ContentPackDetails = (props) => {
-  const { contentPack, offset, verbose, constraints, showConstraints } = props;
+const ContentPackDetails = ({ contentPack, offset, verbose, constraints, showConstraints }) => {
   let contentPackAnchor = contentPack.url;
 
   try {
