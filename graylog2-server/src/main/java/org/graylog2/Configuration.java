@@ -41,6 +41,7 @@ import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.BatchSizeConfig;
 import org.graylog2.plugin.Tools;
+import org.graylog2.security.hashing.PBKDF2PasswordAlgorithm;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
@@ -169,6 +170,9 @@ public class Configuration extends CaConfiguration {
 
     @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
+
+    @Parameter(value = "user_password_pbkdf2_iterations", validators = PositiveIntegerValidator.class)
+    private int userPasswordPbkdf2Iterations = PBKDF2PasswordAlgorithm.DEFAULT_ITERATIONS;
 
     @Parameter(value = "content_packs_loader_enabled")
     private boolean contentPacksLoaderEnabled = false;
