@@ -29,7 +29,7 @@ import { Select, Spinner, ErrorAlert } from 'components/common';
 
 type Props = {
   assignedRolesIds: Immutable.Set<string>,
-  identifier: (role: Role) => string,
+  identifier?: (role: Role) => string
   onSubmit: (role: Immutable.Set<Role>) => Promise<void>,
   submitOnSelect?: boolean,
 };
@@ -90,7 +90,7 @@ const _loadRoles = (setPaginatedRoles) => {
   AuthzRolesDomain.loadRolesPaginated(getUnlimited).then(setPaginatedRoles);
 };
 
-const RolesSelector = ({ assignedRolesIds, onSubmit, identifier, submitOnSelect }: Props) => {
+const RolesSelector = ({ assignedRolesIds, onSubmit, identifier = (role) => role.id, submitOnSelect = false }: Props) => {
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [selectedRoleNames, setselectedRoleNames] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -141,11 +141,6 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier, submitOnSelect 
       </ErrorAlert>
     </div>
   );
-};
-
-RolesSelector.defaultProps = {
-  identifier: (role) => role.id,
-  submitOnSelect: false,
 };
 
 RolesSelector.propTypes = {

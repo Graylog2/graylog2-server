@@ -60,17 +60,17 @@ type Props = {
 };
 
 const TimeRangeFilter = ({
-  disabled,
-  hasErrorOnMount,
-  noOverride,
+  disabled = false,
+  hasErrorOnMount = false,
+  noOverride = false,
   value = NO_TIMERANGE_OVERRIDE,
   onChange,
   validTypes,
-  position,
+  position = 'bottom-start',
   className,
   showPresetDropdown = true,
   limitDuration,
-  withinPortal,
+  withinPortal = true,
 }: Props) => {
   const containerRef = useRef();
   const { showDropdownButton } = useContext(TimeRangeFilterSettingsContext);
@@ -129,17 +129,6 @@ TimeRangeFilter.propTypes = {
   noOverride: PropTypes.bool,
   validTypes: PropTypes.arrayOf(PropTypes.string),
   withinPortal: PropTypes.bool,
-};
-
-TimeRangeFilter.defaultProps = {
-  className: undefined,
-  disabled: false,
-  hasErrorOnMount: false,
-  noOverride: false,
-  validTypes: undefined,
-  position: 'bottom-start',
-  showPresetDropdown: true,
-  withinPortal: true,
 };
 
 export default TimeRangeFilter;

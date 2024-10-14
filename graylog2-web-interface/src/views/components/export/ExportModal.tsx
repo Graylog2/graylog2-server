@@ -50,7 +50,7 @@ const Content = styled.div`
 `;
 
 export type Props = {
-  closeModal: () => void,
+  closeModal?: () => void
   directExportWidgetId?: string,
   view: View,
 };
@@ -77,7 +77,8 @@ type FormState = {
   format: string,
 };
 
-const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
+const ExportModal = ({ closeModal = () => {
+}, view, directExportWidgetId = null }: Props) => {
   const executionState = useSearchExecutionState();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -190,12 +191,6 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
 ExportModal.propTypes = {
   closeModal: PropTypes.func,
   directExportWidgetId: PropTypes.string,
-};
-
-ExportModal.defaultProps = {
-  closeModal: () => {
-  },
-  directExportWidgetId: null,
 };
 
 export default ExportModal;

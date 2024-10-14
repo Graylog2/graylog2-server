@@ -39,9 +39,4 @@ const ElementDimensions = ({ children, className, resizeDelay }: Props) => {
   );
 };
 
-ElementDimensions.defaultProps = {
-  className: undefined,
-  resizeDelay: undefined,
-};
-
 export default ElementDimensions;

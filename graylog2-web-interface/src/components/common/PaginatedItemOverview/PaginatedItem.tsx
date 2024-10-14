@@ -64,10 +64,6 @@ const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Prop
   );
 };
 
-PaginatedItem.defaultProps = {
-  onDeleteItem: undefined,
-};
-
 PaginatedItem.propTypes = {
   onDeleteItem: PropTypes.func,
 };

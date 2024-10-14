@@ -37,17 +37,17 @@ const ActionButtonsWrap = styled.span`
 `;
 
 type Props = {
-  matchData: {
+  matchData?: {
     matches: boolean,
     rules: { [id: string]: false },
-  },
+  }
   stream: Stream,
-  onDelete: (ruleId: string) => void,
-  onSubmit: (ruleId: string, data: unknown) => void,
+  onDelete?: (ruleId: string) => void
+  onSubmit?: (ruleId: string, data: unknown) => void
   streamRule: StreamRuleTypeDefinition
 }
 
-const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props) => {
+const StreamRule = ({ matchData = {}, stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
   const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const { inputs } = useStore(StreamRulesInputsStore);
@@ -133,12 +133,6 @@ StreamRule.propTypes = {
   onSubmit: PropTypes.func,
   stream: PropTypes.object.isRequired,
   streamRule: PropTypes.object.isRequired,
-};
-
-StreamRule.defaultProps = {
-  matchData: {},
-  onSubmit: () => {},
-  onDelete: () => {},
 };
 
 export default StreamRule;

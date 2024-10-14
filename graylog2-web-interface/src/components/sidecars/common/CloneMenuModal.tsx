@@ -50,8 +50,4 @@ CloneMenuModal.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-CloneMenuModal.defaultProps = {
-  error: undefined,
-};
-
 export default CloneMenuModal;

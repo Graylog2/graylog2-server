@@ -32,14 +32,14 @@ const Container = styled.div<{ margin: number }>(({ margin }) => `
 `);
 
 type Props = {
-  onClose: (msg?: string) => void,
-  children: React.ReactNode,
-  bsStyle: ColorVariant,
-  marginTopBottom: number,
-  runtimeError: boolean,
+  onClose?: (msg?: string) => void
+  children?: React.ReactNode
+  bsStyle?: ColorVariant
+  marginTopBottom?: number
+  runtimeError?: boolean
 };
 
-const ErrorAlert = ({ children, onClose, bsStyle = 'warning', marginTopBottom = 15, runtimeError }: Props) => {
+const ErrorAlert = ({ children = null, onClose = () => undefined, bsStyle = 'warning', marginTopBottom = 15, runtimeError = false }: Props) => {
   const finalBsStyle = runtimeError ? 'danger' : bsStyle;
 
   if (!children) {
@@ -75,14 +75,6 @@ ErrorAlert.propTypes = {
     PropTypes.string,
   ]),
   onClose: PropTypes.func,
-};
-
-ErrorAlert.defaultProps = {
-  bsStyle: 'warning',
-  runtimeError: false,
-  marginTopBottom: 15,
-  children: null,
-  onClose: () => undefined,
 };
 
 export default ErrorAlert;

@@ -52,14 +52,14 @@ const StyledLastAccess = styled.div`
 `;
 
 type Props = {
-  creatingToken: boolean,
+  creatingToken?: boolean
   deletingToken?: string,
-  onCreate: (tokenName: string) => Promise<Token>,
-  onDelete: (tokenId: string, tokenName: string) => void,
-  tokens: TokenSummary[],
+  onCreate?: (tokenName: string) => Promise<Token>
+  onDelete?: (tokenId: string, tokenName: string) => void
+  tokens?: TokenSummary[]
 };
 
-const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }: Props) => {
+const TokenList = ({ creatingToken = false, deletingToken, onCreate = () => {}, onDelete = () => {}, tokens = [] }: Props) => {
   const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
 
@@ -153,14 +153,6 @@ TokenList.propTypes = {
   onCreate: PropTypes.func,
   creatingToken: PropTypes.bool,
   deletingToken: PropTypes.string,
-};
-
-TokenList.defaultProps = {
-  tokens: [],
-  onDelete: () => {},
-  onCreate: () => {},
-  creatingToken: false,
-  deletingToken: undefined,
 };
 
 export default TokenList;

@@ -65,8 +65,8 @@ const PaginatedItemOverview = ({
   overrideList,
   onDeleteItem,
   queryHelper,
-  noDataText,
-  resultsWrapperComponent: ResultsWrapperComponent,
+  noDataText = 'No items found to display.',
+  resultsWrapperComponent: ResultsWrapperComponent = ({ children }) => <div>{children}</div>,
   overrideItemComponent: OverrideItemComponent,
 }: Props) => {
   const [paginatedList, setPaginatedList] = useState<PaginatedListType | undefined>();
@@ -120,15 +120,6 @@ const PaginatedItemOverview = ({
       </ResultsWrapperComponent>
     </PaginatedList>
   );
-};
-
-PaginatedItemOverview.defaultProps = {
-  onDeleteItem: undefined,
-  overrideList: undefined,
-  noDataText: 'No items found to display.',
-  queryHelper: undefined,
-  resultsWrapperComponent: ({ children }) => <div>{children}</div>,
-  overrideItemComponent: undefined,
 };
 
 export default PaginatedItemOverview;

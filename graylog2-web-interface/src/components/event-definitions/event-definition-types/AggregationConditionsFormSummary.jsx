@@ -32,7 +32,7 @@ const StyledButton = styled(Button)`
   vertical-align: baseline;
 `;
 
-const AggregationConditionsFormSummary = ({ conditions, series, expressionValidation, showInlineValidation, toggleShowValidation }) => (
+const AggregationConditionsFormSummary = ({ conditions, series, expressionValidation = { isValid: true }, showInlineValidation = false, toggleShowValidation }) => (
   <div>
     <StyledPanel header="Condition summary">
       {expressionValidation.isValid
@@ -56,11 +56,6 @@ AggregationConditionsFormSummary.propTypes = {
   expressionValidation: PropTypes.object,
   showInlineValidation: PropTypes.bool,
   toggleShowValidation: PropTypes.func.isRequired,
-};
-
-AggregationConditionsFormSummary.defaultProps = {
-  expressionValidation: { isValid: true },
-  showInlineValidation: false,
 };
 
 export default AggregationConditionsFormSummary;

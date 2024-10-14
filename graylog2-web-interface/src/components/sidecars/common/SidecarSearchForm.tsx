@@ -70,8 +70,4 @@ SidecarSearchForm.propTypes = {
   children: PropTypes.element,
 };
 
-SidecarSearchForm.defaultProps = {
-  children: undefined,
-};
-
 export default SidecarSearchForm;

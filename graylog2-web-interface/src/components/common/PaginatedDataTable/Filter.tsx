@@ -47,12 +47,4 @@ const Filter = ({ setFilteredRows, resetPagination, rows, ...filterProps }: Prop
   );
 };
 
-Filter.defaultProps = {
-  id: undefined,
-  filterKeys: undefined,
-  displayKey: undefined,
-  filterBy: undefined,
-  filterLabel: undefined,
-};
-
 export default Filter;

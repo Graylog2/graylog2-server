@@ -42,14 +42,10 @@ interface ReactRouterButtonProps {
 
 export type CustomButtonProps = { type?: 'submit' | 'button' | 'reset' } & (HTMLButtonProps | ReactRouterButtonProps | StyledMantineButtonProps);
 
-const Button = forwardRef<HTMLButtonElement, CustomButtonProps>(({ type, children, ...otherProps }: CustomButtonProps, ref) => (
+const Button = forwardRef<HTMLButtonElement, CustomButtonProps>(({ type = 'button', children, ...otherProps }: CustomButtonProps, ref) => (
   <StyledButton type={type} {...otherProps} ref={ref}>
     {children}
   </StyledButton>
 ));
-
-Button.defaultProps = {
-  type: 'button',
-};
 
 export default Button;

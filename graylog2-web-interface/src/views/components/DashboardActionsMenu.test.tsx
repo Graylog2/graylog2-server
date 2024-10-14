@@ -68,7 +68,7 @@ describe('DashboardActionsMenu', () => {
     .createdAt(new Date('2019-10-16T14:38:44.681Z'))
     .build();
 
-  const SUT = ({ providerOverrides, view }: { providerOverrides?: Partial<LayoutState>, view?: View }) => (
+  const SUT = ({ providerOverrides, view = mockView }: { providerOverrides?: Partial<LayoutState>, view?: View }) => (
     <TestStoreProvider view={view}>
       <HotkeysProvider>
         <SearchPageLayoutProvider value={providerOverrides}>
@@ -77,11 +77,6 @@ describe('DashboardActionsMenu', () => {
       </HotkeysProvider>
     </TestStoreProvider>
   );
-
-  SUT.defaultProps = {
-    providerOverrides: undefined,
-    view: mockView,
-  };
 
   useViewsPlugin();
 

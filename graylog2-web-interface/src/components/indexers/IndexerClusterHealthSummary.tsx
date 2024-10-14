@@ -77,10 +77,6 @@ const IndexerClusterHealthSummary = ({ health, name }: {
   );
 };
 
-IndexerClusterHealthSummary.defaultProps = {
-  name: undefined,
-};
-
 IndexerClusterHealthSummary.propTypes = {
   health: PropTypes.object.isRequired,
   name: PropTypes.object,

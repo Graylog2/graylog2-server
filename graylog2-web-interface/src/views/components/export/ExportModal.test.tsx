@@ -103,20 +103,13 @@ describe('ExportModal', () => {
     viewType?: ViewType,
   } & Partial<ExportModalProps>;
 
-  const SimpleExportModal = ({ viewType = View.Type.Search, closeModal, view, ...props }: SimpleExportModalProps) => (
+  const SimpleExportModal = ({ viewType = View.Type.Search, closeModal = () => {}, view = viewWithoutWidget(View.Type.Search), ...props }: SimpleExportModalProps) => (
     <TestStoreProvider>
       <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
         <ExportModal view={view ?? viewWithoutWidget(viewType)} closeModal={closeModal} {...props as ExportModalProps} />
       </FieldTypesContext.Provider>
     </TestStoreProvider>
   );
-
-  SimpleExportModal.defaultProps = {
-    viewType: View.Type.Search,
-    closeModal: () => {},
-    directExportWidgetId: undefined,
-    view: viewWithoutWidget(View.Type.Search),
-  };
 
   it('should provide current execution state on export', async () => {
     const parameterBindings = Immutable.Map({ mainSource: new ParameterBinding('value', 'example.org') });

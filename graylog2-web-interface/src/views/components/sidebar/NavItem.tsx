@@ -22,7 +22,7 @@ import Icon from 'components/common/Icon';
 import type { IconName } from 'components/common/Icon';
 
 export type NavItemProps = {
-  isSelected: boolean,
+  isSelected?: boolean
   title: string,
   icon: IconName,
   onClick: () => void,
@@ -148,7 +148,7 @@ const Title = styled.div(({ theme: { colors, fonts } }) => css`
   }
 `);
 
-const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned, disabled, ariaLabel }: NavItemProps) => (
+const NavItem = ({ isSelected = false, title, icon, onClick, showTitleOnHover = true, sidebarIsPinned, disabled = false, ariaLabel }: NavItemProps) => (
   <Container aria-label={ariaLabel}
              $isSelected={isSelected}
              onClick={!disabled ? onClick : undefined}
@@ -172,12 +172,6 @@ NavItem.propTypes = {
   sidebarIsPinned: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
-};
-
-NavItem.defaultProps = {
-  isSelected: false,
-  showTitleOnHover: true,
-  disabled: false,
 };
 
 export default NavItem;

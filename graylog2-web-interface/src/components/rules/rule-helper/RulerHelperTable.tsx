@@ -32,7 +32,7 @@ type Props = {
   onFunctionClick?: (functionName: string) => void
 }
 
-const RuleHelperTable = ({ entries, expanded, onFunctionClick } : Props) => {
+const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick } : Props) => {
   const parameters = (descriptor: BlockDict) => descriptor.params.map((p) => (
     <tr key={p.name}>
       <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
@@ -108,11 +108,6 @@ RuleHelperTable.propTypes = {
   entries: PropTypes.arrayOf(blockDictPropType).isRequired,
   expanded: PropTypes.objectOf(PropTypes.bool),
   onFunctionClick: PropTypes.func,
-};
-
-RuleHelperTable.defaultProps = {
-  expanded: {},
-  onFunctionClick: undefined,
 };
 
 export default RuleHelperTable;

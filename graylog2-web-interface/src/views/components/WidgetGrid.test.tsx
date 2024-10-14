@@ -46,10 +46,6 @@ const SimpleWidgetGrid = ({ view }: { view?: View }) => (
   </TestStoreProvider>
 );
 
-SimpleWidgetGrid.defaultProps = {
-  view: undefined,
-};
-
 describe('<WidgetGrid />', () => {
   useViewsPlugin();
 

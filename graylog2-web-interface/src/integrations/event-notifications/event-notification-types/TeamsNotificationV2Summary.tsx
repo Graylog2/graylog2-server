@@ -20,7 +20,7 @@ import CommonNotificationSummary from 'components/event-notifications/event-noti
 
 import type { TeamsNotificationSummaryV2Type } from '../types';
 
-function TeamsNotificationSummary({ notification, ...restProps }: TeamsNotificationSummaryV2Type) {
+function TeamsNotificationSummary({ notification = {}, ...restProps }: TeamsNotificationSummaryV2Type) {
   return (
     <CommonNotificationSummary {...restProps} notification={notification}>
       <tr>
@@ -43,9 +43,5 @@ function TeamsNotificationSummary({ notification, ...restProps }: TeamsNotificat
     </CommonNotificationSummary>
   );
 }
-
-TeamsNotificationSummary.defaultProps = {
-  notification: {},
-};
 
 export default TeamsNotificationSummary;

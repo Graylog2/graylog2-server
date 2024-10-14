@@ -58,7 +58,7 @@ type Props = {
 }
 const SortableMultiValue = SortableElement<{ innerProps: { title: string }}>(Components.MultiValue);
 
-const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, inputId, allowOptionCreation, options }: Props) => {
+const SortableSelect = ({ onChange, value, valueComponent, valueTransformer = _defaultValueTransformer, inputId, allowOptionCreation = false, options }: Props) => {
   const values = valueTransformer(value);
 
   const Item = useCallback((itemProps: { data: { value: string }}) => {
@@ -95,12 +95,6 @@ SortableSelect.propTypes = {
   value: PropTypes.any.isRequired,
   valueComponent: PropTypes.oneOfType([PropTypes.func, PropTypes.object]).isRequired,
   valueTransformer: PropTypes.func,
-};
-
-SortableSelect.defaultProps = {
-  valueTransformer: _defaultValueTransformer,
-  allowOptionCreation: false,
-  inputId: undefined,
 };
 
 export default SortableSelect;

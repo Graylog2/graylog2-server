@@ -76,10 +76,10 @@ type ClusterOverview = {
 
 type Props = {
   node: NodeInfo,
-  plugins: Array<Plugin>,
-  inputStates: Array<InputState>,
-  inputDescriptions: Array<InputDescription>,
-  jvmInformation: JvmInformation,
+  plugins?: Array<Plugin>
+  inputStates?: Array<InputState>
+  inputDescriptions?: Array<InputDescription>
+  jvmInformation?: JvmInformation
   systemOverview: ClusterOverview,
 }
 
@@ -183,13 +183,6 @@ NodeOverview.propTypes = {
   plugins: PropTypes.array,
   inputDescriptions: PropTypes.object,
   inputStates: PropTypes.array,
-};
-
-NodeOverview.defaultProps = {
-  jvmInformation: undefined,
-  plugins: undefined,
-  inputDescriptions: undefined,
-  inputStates: undefined,
 };
 
 export default NodeOverview;

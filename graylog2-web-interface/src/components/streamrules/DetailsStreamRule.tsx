@@ -48,12 +48,12 @@ type Props = {
     rules: { [id: string]: false },
   },
   stream: Stream,
-  onDelete: (ruleId: string) => void,
-  onSubmit: (ruleId: string, data: unknown) => void,
+  onDelete?: (ruleId: string) => void
+  onSubmit?: (ruleId: string, data: unknown) => void
   streamRule: StreamRuleTypeDefinition
 }
 
-const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) => {
+const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
   const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -145,12 +145,6 @@ DetailsStreamRule.propTypes = {
   onSubmit: PropTypes.func,
   stream: PropTypes.object.isRequired,
   streamRule: PropTypes.object.isRequired,
-};
-
-DetailsStreamRule.defaultProps = {
-  matchData: {},
-  onSubmit: () => {},
-  onDelete: () => {},
 };
 
 export default DetailsStreamRule;

@@ -32,7 +32,7 @@ const Group = styled.div`
   padding-left: 40px;
 `;
 
-const GroupExpression = ({ expression, level, onChange, onChildChange, validation, ...props }) => {
+const GroupExpression = ({ expression, level, onChange, onChildChange, validation = {}, ...props }) => {
   const handleOperatorChange = (nextOperator) => {
     const nextExpression = cloneDeep(expression);
 
@@ -63,10 +63,6 @@ GroupExpression.propTypes = {
   onChange: PropTypes.func.isRequired,
   onChildChange: PropTypes.func.isRequired,
   validation: PropTypes.object,
-};
-
-GroupExpression.defaultProps = {
-  validation: {},
 };
 
 export default GroupExpression;

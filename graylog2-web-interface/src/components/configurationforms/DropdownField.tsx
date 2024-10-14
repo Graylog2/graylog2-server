@@ -28,11 +28,11 @@ type Props = {
   onChange: (title: string, value: string, dirty?: boolean) => void,
   title: string,
   typeName: string,
-  value: string,
-  addPlaceholder: boolean,
+  value?: string
+  addPlaceholder?: boolean
 };
 
-const DropdownField = ({ autoFocus, field, onChange, title, typeName, value, addPlaceholder }: Props) => {
+const DropdownField = ({ autoFocus = false, field, onChange, title, typeName, value = '', addPlaceholder = false }: Props) => {
   const formatOption = (key, displayValue, disabled = false) => (
     <option key={`${typeName}-${title}-${key}`} value={key} id={key} disabled={disabled}>{displayValue}</option>
   );
@@ -72,12 +72,6 @@ DropdownField.propTypes = {
   typeName: PropTypes.string.isRequired,
   value: PropTypes.string,
   addPlaceholder: PropTypes.bool,
-};
-
-DropdownField.defaultProps = {
-  autoFocus: false,
-  addPlaceholder: false,
-  value: '',
 };
 
 export default DropdownField;

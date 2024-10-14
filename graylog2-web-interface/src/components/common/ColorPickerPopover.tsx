@@ -40,7 +40,7 @@ type Props = {
  * is left for that component. Please look at `ColorPicker`'s documentation for more
  * information.
  */
-const ColorPickerPopover = ({ id, placement, title, triggerNode, onChange, ...rest }: Props) => {
+const ColorPickerPopover = ({ id, placement = 'bottom', title = 'Pick a color', triggerNode, onChange, ...rest }: Props) => {
   const [show, setShow] = useState(false);
   const toggleTarget = useRef();
 
@@ -85,12 +85,6 @@ ColorPickerPopover.propTypes = {
      * overlay as third argument.
      */
   onChange: PropTypes.func.isRequired,
-};
-
-ColorPickerPopover.defaultProps = {
-  placement: 'bottom',
-  title: 'Pick a color',
-  colors: undefined, // Use default color palette.
 };
 
 export default ColorPickerPopover;

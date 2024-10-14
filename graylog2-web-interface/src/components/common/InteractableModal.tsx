@@ -100,26 +100,26 @@ type Props = {
   className?: string,
   minHeight?: number,
   minWidth?: number,
-  onClose: () => void,
-  onDrag: (newCoords: Coords) => void,
-  onResize: (newSize: Size) => void,
-  position: Coords,
-  size: Size,
-  title: string,
+  onClose?: () => void
+  onDrag?: (newCoords: Coords) => void
+  onResize?: (newSize: Size) => void
+  position?: Coords
+  size?: Size
+  title?: string
   wrapperClassName?: string,
 };
 
 const InteractableModal = ({
   children,
   className,
-  minHeight,
-  minWidth,
-  onClose,
-  onDrag,
-  onResize,
-  position,
-  size,
-  title,
+  minHeight = DEFAULT_SIZE.height,
+  minWidth = DEFAULT_SIZE.width,
+  onClose = () => {},
+  onDrag = () => {},
+  onResize = () => {},
+  position = DEFAULT_POSITION,
+  size = DEFAULT_SIZE,
+  title = '',
   wrapperClassName,
 }: React.PropsWithChildren<Props>) => {
   const dragHandleRef = useRef(null);
@@ -269,19 +269,6 @@ InteractableModal.propTypes = {
   title: PropTypes.string,
   /** Used to style wrapping component */
   wrapperClassName: PropTypes.string,
-};
-
-InteractableModal.defaultProps = {
-  className: undefined,
-  minHeight: DEFAULT_SIZE.height,
-  minWidth: DEFAULT_SIZE.width,
-  onClose: () => {},
-  onDrag: () => {},
-  onResize: () => {},
-  position: DEFAULT_POSITION,
-  size: DEFAULT_SIZE,
-  title: '',
-  wrapperClassName: undefined,
 };
 
 export default InteractableModal;

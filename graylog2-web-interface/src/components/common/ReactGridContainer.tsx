@@ -34,7 +34,6 @@ const WidthProvidedGridLayout = ({ width, ...props }: React.ComponentProps<typeo
   : <WidthAdjustedReactGridLayout width={width} {...props} />);
 
 WidthProvidedGridLayout.propTypes = { width: PropTypes.number };
-WidthProvidedGridLayout.defaultProps = { width: undefined };
 
 const StyledWidthProvidedGridLayout = styled(WidthProvidedGridLayout)(({ theme }) => css`
   &.locked {
@@ -157,15 +156,15 @@ const removeGaps = (_layout: Layout) => {
 const ReactGridContainer = ({
   children,
   className,
-  columns,
+  columns = COLUMNS,
   draggableHandle,
-  isResizable,
-  locked,
-  measureBeforeMount,
+  isResizable = true,
+  locked = false,
+  measureBeforeMount = false,
   onPositionsChange,
   onSyncLayout: _onSyncLayout,
   positions,
-  rowHeight,
+  rowHeight = ROW_HEIGHT,
   width,
 }: Props) => {
   const theme = useTheme();
@@ -292,18 +291,6 @@ ReactGridContainer.propTypes = {
    */
   measureBeforeMount: PropTypes.bool,
   width: PropTypes.number,
-};
-
-ReactGridContainer.defaultProps = {
-  className: undefined,
-  columns: COLUMNS,
-  isResizable: true,
-  locked: false,
-  measureBeforeMount: false,
-  rowHeight: ROW_HEIGHT,
-  draggableHandle: undefined,
-  width: undefined,
-  onSyncLayout: undefined,
 };
 
 export default ReactGridContainer;

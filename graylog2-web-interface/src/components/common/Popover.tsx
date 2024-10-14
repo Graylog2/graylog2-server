@@ -83,10 +83,6 @@ const Dropdown = ({ title, children, ...rest }: DropdownProps) => (
   </MantinePopover.Dropdown>
 );
 
-Dropdown.defaultProps = {
-  title: undefined,
-};
-
 Popover.Target = MantinePopover.Target;
 Popover.Dropdown = Dropdown;
 

@@ -49,15 +49,15 @@ type Props = {
 }
 
 const OverlayDropdown = ({
-  alwaysShowCaret,
+  alwaysShowCaret = false,
   children,
-  closeOnSelect,
+  closeOnSelect = true,
   dropdownZIndex,
-  menuContainer,
+  menuContainer = document.body,
   onToggle,
-  placement,
+  placement = 'bottom',
   show,
-  toggleChild,
+  toggleChild = 'Toggle',
 }: Props) => {
   const toggleTarget = useRef<HTMLButtonElement>();
 
@@ -94,15 +94,6 @@ OverlayDropdown.propTypes = {
   placement: PropTypes.string,
   show: PropTypes.bool.isRequired,
   toggleChild: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-};
-
-OverlayDropdown.defaultProps = {
-  alwaysShowCaret: false,
-  closeOnSelect: true,
-  dropdownZIndex: undefined,
-  menuContainer: document.body,
-  placement: 'bottom',
-  toggleChild: 'Toggle',
 };
 
 export default OverlayDropdown;

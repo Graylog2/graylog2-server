@@ -38,15 +38,22 @@ import ConfigurationTagsSelect from './ConfigurationTagsSelect';
 import type { Collector, Configuration, ConfigurationSidecarsResponse } from '../types';
 
 type Props = {
-  action: string,
-  configuration: Configuration,
-  configurationSidecars: ConfigurationSidecarsResponse,
+  action?: string
+  configuration?: Configuration
+  configurationSidecars?: ConfigurationSidecarsResponse
 };
 
 const ConfigurationForm = ({
-  action,
-  configuration,
-  configurationSidecars,
+  action = 'edit',
+  configuration = {
+    id: '',
+    name: '',
+    collector_id: '',
+    template: '',
+    color: '#FFFFFF',
+    tags: [],
+  },
+  configurationSidecars = {},
 }: Props) => {
   const initFormData = {
     id: configuration.id,
@@ -361,19 +368,6 @@ ConfigurationForm.propTypes = {
     tags: PropTypes.array.isRequired,
   }),
   configurationSidecars: PropTypes.object,
-};
-
-ConfigurationForm.defaultProps = {
-  action: 'edit',
-  configuration: {
-    id: '',
-    name: '',
-    collector_id: '',
-    template: '',
-    color: '#FFFFFF',
-    tags: [],
-  },
-  configurationSidecars: {},
 };
 
 export default ConfigurationForm;

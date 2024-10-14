@@ -73,7 +73,7 @@ describe('EventsList', () => {
     userEvent.click(nextPageButton);
   };
 
-  const SimpleEventsList = ({ data: _data, config: _config, fields, ...props }: Partial<React.ComponentProps<typeof EventsList>>) => (
+  const SimpleEventsList = ({ data: _data = data, config: _config = config, fields = Immutable.List([]), ...props }: Partial<React.ComponentProps<typeof EventsList>>) => (
     <TestStoreProvider>
       <EventsList title="Events List"
                   editing={false}
@@ -92,12 +92,6 @@ describe('EventsList', () => {
                   {...props} />
     </TestStoreProvider>
   );
-
-  SimpleEventsList.defaultProps = {
-    config: config,
-    data: data,
-    fields: Immutable.List([]),
-  };
 
   it('lists events', async () => {
     render(<SimpleEventsList data={data} />);

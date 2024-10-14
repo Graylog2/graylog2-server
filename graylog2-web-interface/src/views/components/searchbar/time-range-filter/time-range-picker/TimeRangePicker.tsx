@@ -144,14 +144,14 @@ type Props = React.PropsWithChildren<{
 const TimeRangePicker = ({
   children,
   show,
-  noOverride,
+  noOverride = false,
   toggleDropdownShow,
   currentTimeRange,
   setCurrentTimeRange,
   validTypes = allTimeRangeTypes,
   position,
   limitDuration: configLimitDuration,
-  withinPortal,
+  withinPortal = true,
 }: Props) => {
   const { ignoreLimitDurationInTimeRangeDropdown } = useContext(TimeRangeInputSettingsContext);
   const limitDuration = useMemo(() => (ignoreLimitDurationInTimeRangeDropdown ? 0 : configLimitDuration), [configLimitDuration, ignoreLimitDurationInTimeRangeDropdown]);
@@ -263,12 +263,6 @@ const TimeRangePicker = ({
       </Popover.Dropdown>
     </Popover>
   );
-};
-
-TimeRangePicker.defaultProps = {
-  noOverride: false,
-  validTypes: allTimeRangeTypes,
-  withinPortal: true,
 };
 
 export default TimeRangePicker;

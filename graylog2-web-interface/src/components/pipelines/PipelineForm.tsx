@@ -28,14 +28,19 @@ import { FormSubmit } from 'components/common';
 import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
 
 type Props = {
-  pipeline: PipelineType,
-  create: boolean,
-  modal: boolean,
+  pipeline?: PipelineType
+  create?: boolean
+  modal?: boolean
   save: (pipeline: PipelineType, callback: () => void) => void,
   onCancel?: () => void,
 };
 
-const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
+const PipelineForm = ({ pipeline = {
+  id: undefined,
+  title: '',
+  description: '',
+  stages: [{ stage: 0, rules: [] }],
+}, create = false, modal = true, save, onCancel = () => {} }: Props) => {
   const currentUser = useCurrentUser();
   const [nextPipeline, setNextPipeline] = useState<PipelineType>(cloneDeep(pipeline));
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -128,18 +133,6 @@ PipelineForm.propTypes = {
   modal: PropTypes.bool,
   save: PropTypes.func.isRequired,
   onCancel: PropTypes.func,
-};
-
-PipelineForm.defaultProps = {
-  modal: true,
-  create: false,
-  pipeline: {
-    id: undefined,
-    title: '',
-    description: '',
-    stages: [{ stage: 0, rules: [] }],
-  },
-  onCancel: () => {},
 };
 
 export default PipelineForm;

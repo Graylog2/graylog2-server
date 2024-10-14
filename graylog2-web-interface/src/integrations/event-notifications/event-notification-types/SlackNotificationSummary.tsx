@@ -19,7 +19,7 @@ import React from 'react';
 import CommonNotificationSummary from 'components/event-notifications/event-notification-types/CommonNotificationSummary';
 import type { SlackNotificationSummaryType } from 'integrations/event-notifications/types';
 
-function SlackNotificationSummary({ notification, ...restProps }: SlackNotificationSummaryType) {
+function SlackNotificationSummary({ notification = {}, ...restProps }: SlackNotificationSummaryType) {
   return (
     <CommonNotificationSummary {...restProps} notification={notification}>
       <tr>
@@ -73,9 +73,5 @@ function SlackNotificationSummary({ notification, ...restProps }: SlackNotificat
     </CommonNotificationSummary>
   );
 }
-
-SlackNotificationSummary.defaultProps = {
-  notification: {},
-};
 
 export default SlackNotificationSummary;

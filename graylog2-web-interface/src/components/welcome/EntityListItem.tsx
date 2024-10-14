@@ -68,8 +68,4 @@ const EntityItem = ({ title, grn, timestamp }: Props) => {
   );
 };
 
-EntityItem.defaultProps = {
-  timestamp: undefined,
-};
-
 export default EntityItem;

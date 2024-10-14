@@ -60,11 +60,15 @@ const savePipelineRule = (nextRule: RuleType, callback: (rule: RuleType) => void
 
 type Props = {
   children: React.ReactNode,
-  usedInPipelines: Array<string>,
-  rule: RuleType,
+  usedInPipelines?: Array<string>
+  rule?: RuleType
 }
 
-export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props) => {
+export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = {
+  description: '',
+  source: '',
+  simulator_message: '',
+} }: Props) => {
   const ruleSourceRef = useRef(undefined);
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule?.source);
@@ -194,13 +198,4 @@ PipelineRulesProvider.propTypes = {
     source: PropTypes.string,
     simulator_message: PropTypes.string,
   }),
-};
-
-PipelineRulesProvider.defaultProps = {
-  usedInPipelines: [],
-  rule: {
-    description: '',
-    source: '',
-    simulator_message: '',
-  },
 };

@@ -38,10 +38,10 @@ const ErrorsList = styled.ul(({ theme }) => `
 
 type Props = {
   errors: Array<string>,
-  message: string,
+  message?: string
 };
 
-const ConnectionErrors = ({ errors, message }: Props) => (
+const ConnectionErrors = ({ errors, message = 'There was an error' }: Props) => (
   <NotificationContainer bsStyle="danger" title={message}>
     <ErrorsList>
       {errors.map((error) => <li key={String(error)}>{String(error)}</li>)}
@@ -52,10 +52,6 @@ const ConnectionErrors = ({ errors, message }: Props) => (
 ConnectionErrors.propTypes = {
   errors: PropTypes.arrayOf(PropTypes.string).isRequired,
   message: PropTypes.string,
-};
-
-ConnectionErrors.defaultProps = {
-  message: 'There was an error',
 };
 
 export default ConnectionErrors;

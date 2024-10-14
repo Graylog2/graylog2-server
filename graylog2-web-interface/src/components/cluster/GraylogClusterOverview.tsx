@@ -59,11 +59,11 @@ const ClusterInfo = () => {
 
 type Props = {
   layout?: 'default' | 'compact',
-  children: React.ReactNode,
+  children?: React.ReactNode
   showLicenseGraph?: boolean,
 }
 
-const GraylogClusterOverview = ({ layout, children, showLicenseGraph }: Props) => {
+const GraylogClusterOverview = ({ layout = 'default', children = null, showLicenseGraph = false }: Props) => {
   const licensePlugin = PluginStore.exports('license');
   const currentUser = useCurrentUser();
 
@@ -117,12 +117,6 @@ GraylogClusterOverview.propTypes = {
   layout: PropTypes.oneOf(['default', 'compact']),
   children: PropTypes.node,
   showLicenseGraph: PropTypes.bool,
-};
-
-GraylogClusterOverview.defaultProps = {
-  layout: 'default',
-  children: null,
-  showLicenseGraph: false,
 };
 
 export default GraylogClusterOverview;

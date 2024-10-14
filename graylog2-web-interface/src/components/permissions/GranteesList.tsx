@@ -134,9 +134,4 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
   );
 };
 
-GranteesList.defaultProps = {
-  className: undefined,
-  entityTypeTitle: undefined,
-};
-
 export default GranteesList;

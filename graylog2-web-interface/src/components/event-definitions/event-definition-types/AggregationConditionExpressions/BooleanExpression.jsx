@@ -23,7 +23,7 @@ import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 // eslint-disable-next-line import/no-cycle
 import AggregationConditionExpression from '../AggregationConditionExpression';
 
-const BooleanExpression = ({ expression, level, onChildChange, validation, ...props }) => (
+const BooleanExpression = ({ expression, level, onChildChange, validation = {}, ...props }) => (
   <>
     <AggregationConditionExpression {...props}
                                     expression={expression.left}
@@ -49,11 +49,6 @@ BooleanExpression.propTypes = {
   onChange: PropTypes.func.isRequired,
   onChildChange: PropTypes.func.isRequired,
   validation: PropTypes.object,
-};
-
-BooleanExpression.defaultProps = {
-  parent: undefined,
-  validation: {},
 };
 
 export default BooleanExpression;

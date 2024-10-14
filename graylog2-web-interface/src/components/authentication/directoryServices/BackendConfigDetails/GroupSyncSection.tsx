@@ -56,8 +56,4 @@ const GroupSyncSection = ({ authenticationBackend, roles, excludedFields }: Prop
   );
 };
 
-GroupSyncSection.defaultProps = {
-  excludedFields: undefined,
-};
-
 export default GroupSyncSection;

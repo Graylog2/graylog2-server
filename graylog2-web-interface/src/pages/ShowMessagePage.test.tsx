@@ -59,16 +59,12 @@ type SimpleShowMessagePageProps = {
   streams?: Array<{ id: string }>,
 };
 
-const SimpleShowMessagePage = ({ index, messageId, streams }: SimpleShowMessagePageProps) => (
+const SimpleShowMessagePage = ({ index, messageId, streams = [] }: SimpleShowMessagePageProps) => (
   <StreamsContext.Provider value={streams as Array<Stream>}>
     {/* @ts-expect-error */}
     <ShowMessagePage params={{ index, messageId }} />
   </StreamsContext.Provider>
 );
-
-SimpleShowMessagePage.defaultProps = {
-  streams: [],
-};
 
 describe('ShowMessagePage', () => {
   const isLocalNode = jest.fn();

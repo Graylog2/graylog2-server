@@ -84,9 +84,9 @@ const ChangeFieldTypeModal = ({
   onSubmitCallback,
   initialSelectedIndexSets,
   onClose,
-  showSelectionTable,
-  showFieldSelect,
-  initialData,
+  showSelectionTable = true,
+  showFieldSelect = false,
+  initialData = { fieldName: undefined, type: undefined },
   initialSelectionDataLoaded,
 }: Props) => {
   const [{ fieldName, type }, setModalData] = useState<{ fieldName?: string, type?: string }>(initialData);
@@ -209,14 +209,6 @@ const ChangeFieldTypeModal = ({
       </div>
     </BootstrapModalForm>
   );
-};
-
-ChangeFieldTypeModal.defaultProps = {
-  showSelectionTable: true,
-  onSubmitCallback: undefined,
-  showFieldSelect: false,
-  initialData: { fieldName: undefined, type: undefined },
-  initialSelectionDataLoaded: true,
 };
 
 export default ChangeFieldTypeModal;

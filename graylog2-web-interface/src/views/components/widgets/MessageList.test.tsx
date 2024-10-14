@@ -127,7 +127,7 @@ describe('MessageList', () => {
     userEvent.click(nextPageButton);
   };
 
-  const SimpleMessageList = ({ data: _data, config: _config, fields, ...props }: Partial<React.ComponentProps<typeof MessageList>>) => (
+  const SimpleMessageList = ({ data: _data = data, config: _config = config, fields = Immutable.List([]), ...props }: Partial<React.ComponentProps<typeof MessageList>>) => (
     <TestStoreProvider>
       <MessageList title="Message List"
                    editing={false}
@@ -145,12 +145,6 @@ describe('MessageList', () => {
                    {...props} />
     </TestStoreProvider>
   );
-
-  SimpleMessageList.defaultProps = {
-    config: config,
-    data: data,
-    fields: Immutable.List([]),
-  };
 
   it('should render width widget fields', async () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];

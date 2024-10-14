@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 
 export const FormDataContext = createContext();
 
-export const FormDataProvider = ({ initialFormData, children }) => {
+export const FormDataProvider = ({ initialFormData = {}, children }) => {
   const [formData, updateState] = useState(initialFormData);
 
   const setFormData = (id, fieldData) => {
@@ -50,10 +50,6 @@ export const FormDataProvider = ({ initialFormData, children }) => {
 FormDataProvider.propTypes = {
   children: PropTypes.any.isRequired,
   initialFormData: PropTypes.object,
-};
-
-FormDataProvider.defaultProps = {
-  initialFormData: {},
 };
 
 export default FormDataProvider;

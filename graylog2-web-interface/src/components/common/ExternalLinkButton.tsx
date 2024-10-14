@@ -29,7 +29,7 @@ import ExternalLink from 'components/common/ExternalLink';
 type Props = React.ComponentProps<typeof Button> & {
   iconName: React.ComponentProps<typeof ExternalLink>['iconName']
 };
-const ExternalLinkButton = ({ bsStyle, target, className, disabled, iconName, children, ...props }: Props) => (
+const ExternalLinkButton = ({ bsStyle = 'default', target = '_blank', className = '', disabled = false, iconName = 'open_in_new', children, ...props }: Props) => (
   <Button bsStyle={bsStyle} target={target} className={className} disabled={disabled} {...props}>
     <ExternalLink iconName={iconName}>{children}</ExternalLink>
   </Button>
@@ -52,15 +52,6 @@ ExternalLinkButton.propTypes = {
   className: PropTypes.string,
   /** Render a disabled button if this is <code>true</code>. */
   disabled: PropTypes.bool,
-};
-
-ExternalLinkButton.defaultProps = {
-  bsStyle: 'default',
-  bsSize: undefined,
-  target: '_blank',
-  iconName: 'open_in_new',
-  className: '',
-  disabled: false,
 };
 
 export default ExternalLinkButton;

@@ -76,9 +76,9 @@ const INITIAL_DATA = {
  * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
  */
 const PaginatedEntityTable = <T extends EntityBase>({
-  actionsCellWidth, columnsOrder, entityActions, tableLayout, fetchEntities, keyFn,
+  actionsCellWidth = 160, columnsOrder, entityActions, tableLayout, fetchEntities, keyFn,
   humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
-  expandedSectionsRenderer, bulkSelection, additionalAttributes,
+  expandedSectionsRenderer, bulkSelection, additionalAttributes = [],
   entityAttributesAreCamelCase, topRightCol, searchPlaceholder, fetchOptions: reactQueryOptions,
 }: Props<T>) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
@@ -174,18 +174,6 @@ const PaginatedEntityTable = <T extends EntityBase>({
       </PaginatedList>
     </TableFetchContextProvider>
   );
-};
-
-PaginatedEntityTable.defaultProps = {
-  actionsCellWidth: 160,
-  additionalAttributes: [],
-  bulkSelection: undefined,
-  expandedSectionsRenderer: undefined,
-  filterValueRenderers: undefined,
-  queryHelpComponent: undefined,
-  topRightCol: undefined,
-  searchPlaceholder: undefined,
-  fetchOptions: undefined,
 };
 
 export default PaginatedEntityTable;

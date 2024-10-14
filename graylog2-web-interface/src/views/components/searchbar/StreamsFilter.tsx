@@ -29,13 +29,13 @@ const Container = styled.div`
 `;
 
 type Props = {
-  disabled: boolean,
-  value: Array<string>,
+  disabled?: boolean
+  value?: Array<string>
   streams: Array<{ key: string, value: string }>,
   onChange: (newStreamIds: Array<string>) => void,
 };
 
-const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
+const StreamsFilter = ({ disabled = false, value = [], streams, onChange }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
@@ -79,11 +79,6 @@ StreamsFilter.propTypes = {
     }),
   ).isRequired,
   onChange: PropTypes.func.isRequired,
-};
-
-StreamsFilter.defaultProps = {
-  disabled: false,
-  value: [],
 };
 
 export default StreamsFilter;

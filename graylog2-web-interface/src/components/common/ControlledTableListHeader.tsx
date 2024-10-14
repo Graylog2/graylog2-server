@@ -36,7 +36,7 @@ const HeaderWrapper = styled.div`
   min-height: 40px;
 `;
 
-const ControlledTableListHeader = ({ children }: { children: React.ReactNode }) => {
+const ControlledTableListHeader = ({ children = '' }: { children: React.ReactNode }) => {
   const wrapStringChildren = (text) => <HeaderWrapper>{text}</HeaderWrapper>;
 
   const header = typeof children === 'string' ? wrapStringChildren(children) : children;
@@ -46,10 +46,6 @@ const ControlledTableListHeader = ({ children }: { children: React.ReactNode }) 
 
 ControlledTableListHeader.propTypes = {
   children: PropTypes.node,
-};
-
-ControlledTableListHeader.defaultProps = {
-  children: '',
 };
 
 export default ControlledTableListHeader;

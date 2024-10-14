@@ -29,7 +29,7 @@ type Props = {
 /**
  * This component receives any date time and displays it in the browser time zone.
  */
-const BrowserTime = ({ dateTime: dateTimeProp, format }: Props) => {
+const BrowserTime = ({ dateTime: dateTimeProp, format = 'default' }: Props) => {
   const dateTime = dateTimeProp ?? new Date();
   const dateTimeString = adjustFormat(dateTime, 'internal');
   const timeInBrowserTimeZone = formatAsBrowserTime(dateTime, format);
@@ -52,11 +52,6 @@ BrowserTime.propTypes = {
    * Format to use to represent the date time.
    */
   format: PropTypes.string,
-};
-
-BrowserTime.defaultProps = {
-  format: 'default',
-  dateTime: undefined,
 };
 
 export default BrowserTime;

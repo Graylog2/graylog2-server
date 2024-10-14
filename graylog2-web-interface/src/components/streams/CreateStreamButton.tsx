@@ -35,7 +35,7 @@ type Props = {
   onCreate: (values: Partial<Stream>) => Promise<void>
 }
 
-const CreateStreamButton = ({ bsSize, bsStyle, buttonText, className, indexSets, onCreate }: Props) => {
+const CreateStreamButton = ({ bsSize, bsStyle, buttonText = 'Create stream', className, indexSets, onCreate }: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const sendTelemetry = useSendTelemetry();
 
@@ -74,13 +74,6 @@ CreateStreamButton.propTypes = {
   className: PropTypes.string,
   onCreate: PropTypes.func.isRequired,
   indexSets: PropTypes.array.isRequired,
-};
-
-CreateStreamButton.defaultProps = {
-  buttonText: 'Create stream',
-  bsSize: undefined,
-  bsStyle: undefined,
-  className: undefined,
 };
 
 export default CreateStreamButton;
