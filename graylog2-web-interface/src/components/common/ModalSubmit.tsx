@@ -60,13 +60,12 @@ type Props = {
 } & (WithCancelProps | WithoutCancelProps) & (WithAsyncSubmit | WithSyncSubmit);
 
 // @ts-expect-error
-const isWithCancelProps = (props: Props): props is WithCancelProps => props.displayCancel === true;
+const isWithCancelProps = (props: Props): props is WithCancelProps => props.displayCancel === undefined || props.displayCancel === true;
 // @ts-expect-error
 const isWithAsyncSubmit = (props: Props): props is WithAsyncSubmit => props.isAsyncSubmit === true;
 
 const ModalSubmit = (props: Props) => {
   const {
-    isAsyncSubmit = false,
     bsSize,
     className,
     disabledSubmit = false,
@@ -79,7 +78,7 @@ const ModalSubmit = (props: Props) => {
   } = props;
 
   const title = typeof submitButtonText === 'string' ? submitButtonText : undefined;
-  const submittingAsync = isAsyncSubmit && props.isSubmitting;
+  const submittingAsync = isWithAsyncSubmit(props) && props.isSubmitting;
 
   return (
     <ModalButtonToolbar className={className}>
@@ -102,8 +101,8 @@ const ModalSubmit = (props: Props) => {
               aria-label={title}
               type={submitButtonType}
               onClick={onSubmit}>
-        {(submitIcon && !(isWithAsyncSubmit(props) && props.isSubmitting)) && <><Icon name={submitIcon} /> </>}
-        {(isWithAsyncSubmit(props) && props.isSubmitting) ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
+        {(submitIcon && !submittingAsync) && <><Icon name={submitIcon} /> </>}
+        {submittingAsync ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
     </ModalButtonToolbar>
   );
