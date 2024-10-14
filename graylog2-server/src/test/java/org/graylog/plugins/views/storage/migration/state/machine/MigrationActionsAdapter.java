@@ -75,6 +75,11 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public boolean isRemoteReindexMigrationEnabled() {
+        return true;
+    }
+
+    @Override
     public void runDirectoryCompatibilityCheck() {
     }
 
