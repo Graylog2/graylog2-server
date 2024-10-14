@@ -61,42 +61,47 @@ type Props = {
   submitIcon?: IconName,
 } & (WithCancelProps | WithoutCancelProps) & (WithAsyncSubmit | WithSyncSubmit);
 
+// @ts-expect-error
+const isWithCancelProps = (props: Props): props is WithCancelProps => props.displayCancel === undefined || props.displayCancel === true;
+// @ts-expect-error
+const isWithAsyncSubmit = (props: Props): props is WithAsyncSubmit => props.isAsyncSubmit === true;
+
 const FormSubmit = (props: Props) => {
   const {
     bsSize,
     className,
     centerCol,
-    displayCancel,
-    disabledSubmit,
+    disabledSubmit = false,
     formId,
-    isAsyncSubmit,
     onSubmit,
     submitButtonText,
-    submitButtonType,
+    submitButtonType = 'submit',
     submitIcon,
   } = props;
+
+  const submittingAsync = isWithAsyncSubmit(props) && props.isSubmitting;
 
   return (
     <ButtonToolbar className={className}>
       <Button bsStyle="success"
               bsSize={bsSize}
-              disabled={disabledSubmit || (isAsyncSubmit && props.isSubmitting)}
+              disabled={disabledSubmit || submittingAsync}
               form={formId}
               title={submitButtonText}
               aria-label={submitButtonText}
               type={submitButtonType}
               onClick={onSubmit}>
-        {(submitIcon && !(isAsyncSubmit && props.isSubmitting)) && <StyledIcon name={submitIcon} />}
-        {(isAsyncSubmit && props.isSubmitting) ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
+        {(submitIcon && !submittingAsync) && <StyledIcon name={submitIcon} />}
+        {submittingAsync ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
       {centerCol}
-      {displayCancel === true && (
+      {isWithCancelProps(props) && (
         <Button type="button"
                 bsSize={bsSize}
                 onClick={props.onCancel}
                 title="Cancel"
                 aria-label="Cancel"
-                disabled={props.disabledCancel || (isAsyncSubmit && props.isSubmitting)}>
+                disabled={props.disabledCancel || submittingAsync}>
           Cancel
         </Button>
       )}
