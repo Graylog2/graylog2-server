@@ -87,7 +87,7 @@ const ChangeFieldTypeModal = ({
   showSelectionTable = true,
   showFieldSelect = false,
   initialData = { fieldName: undefined, type: undefined },
-  initialSelectionDataLoaded,
+  initialSelectionDataLoaded = true,
 }: Props) => {
   const [{ fieldName, type }, setModalData] = useState<{ fieldName?: string, type?: string }>(initialData);
   const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypesForMappings();
