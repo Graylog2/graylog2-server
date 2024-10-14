@@ -33,13 +33,16 @@ import { ExternalLinkButton, Select } from 'components/common';
 import { InputForm } from 'components/inputs';
 import type { Input } from 'components/messageloaders/Types';
 
-const NewInputRow = styled(Row)`
-  margin-bottom: 8px;
-`;
-
 const StyledForm = styled.form`
   display: flex;
   gap: 0.25em;
+`;
+
+const FormGroup = styled.div`
+  width: 300px;
+  display: inline-block;
+  margin-bottom: 0;
+  vertical-align: middle;
 `;
 
 const CreateInputControl = () => {
@@ -124,16 +127,16 @@ const CreateInputControl = () => {
   const CustomInputsConfiguration = customInputConfiguration ? customInputConfiguration.component : null;
 
   return (
-    <NewInputRow className="content">
+    <Row className="content">
       <Col md={12}>
         <StyledForm className="form-inline" onSubmit={handleInputTypeSubmit}>
-          <div className="form-group" style={{ width: 300 }}>
+          <FormGroup>
             <Select placeholder="Select input"
                     options={formatSelectOptions()}
                     matchProp="label"
                     onChange={onInputSelect}
                     value={selectedInput} />
-          </div>
+          </FormGroup>
             &nbsp;
           <Button bsStyle="success" type="submit" disabled={!selectedInput}>Launch new input</Button>
           <ExternalLinkButton href="https://marketplace.graylog.org/"
@@ -159,7 +162,7 @@ const CreateInputControl = () => {
           )
         )}
       </Col>
-    </NewInputRow>
+    </Row>
   );
 };
 
