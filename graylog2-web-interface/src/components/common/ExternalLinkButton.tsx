@@ -27,7 +27,7 @@ import ExternalLink from 'components/common/ExternalLink';
  */
 
 type Props = React.ComponentProps<typeof Button> & {
-  iconName: React.ComponentProps<typeof ExternalLink>['iconName']
+  iconName?: React.ComponentProps<typeof ExternalLink>['iconName']
 };
 const ExternalLinkButton = ({ bsStyle = 'default', target = '_blank', className = '', disabled = false, iconName = 'open_in_new', children, ...props }: Props) => (
   <Button bsStyle={bsStyle} target={target} className={className} disabled={disabled} {...props}>

@@ -194,7 +194,13 @@ const fieldUpdate = (value: string, toUserTimezone: (date: Date) => Moment) => {
   };
 };
 
-const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }) => {
+type Props = {
+  onChange?: (newTime: string) => void,
+  dateTime: string,
+  range: string,
+}
+
+const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
   const hourIcon = useRef<IconName>(TIME_ICON_MID);
   const { toUserTimezone } = useUserDateTime();
 

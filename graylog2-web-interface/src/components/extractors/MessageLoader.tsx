@@ -55,7 +55,7 @@ const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProp
 
 type Props = {
   hidden?: boolean
-  hideText?: string
+  hideText?: boolean
   onMessageLoaded: (data: any) => void,
   messageId?: string,
   index?: string,

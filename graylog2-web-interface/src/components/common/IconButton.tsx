@@ -47,7 +47,7 @@ type Props = {
   title: string,
   onClick?: () => void,
   className?: string,
-  name?: IconName
+  name: IconName
   iconType?: IconType,
   disabled?: boolean,
   rotation?: RotateProp,

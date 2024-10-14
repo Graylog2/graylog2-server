@@ -25,23 +25,23 @@ import Spinner from 'components/common/Spinner';
 import ModalButtonToolbar from 'components/common/ModalButtonToolbar';
 
 type WithCancelProps = {
-  displayCancel: true,
+  displayCancel?: true,
   disabledCancel?: boolean,
   onCancel: () => void,
 }
 
 type WithoutCancelProps = {
-  displayCancel: false
+  displayCancel?: false
 }
 
 type WithAsyncSubmit = {
-  isAsyncSubmit: true,
+  isAsyncSubmit?: true,
   submitLoadingText: string,
   isSubmitting: boolean,
 }
 
 type WithSyncSubmit = {
-  isAsyncSubmit: false,
+  isAsyncSubmit?: false,
 }
 
 type Props = {

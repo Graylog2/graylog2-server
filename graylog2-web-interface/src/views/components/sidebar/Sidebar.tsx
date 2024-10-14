@@ -80,7 +80,7 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
   setActiveSectionKey(sectionKey);
 };
 
-const Sidebar = ({ searchPageLayout, results = {}, children, sections = sidebarSections, actions = sidebarActions, forceSideBarPinned = false }: Props) => {
+const Sidebar = ({ searchPageLayout, results, children, sections = sidebarSections, actions = sidebarActions, forceSideBarPinned = false }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
   const queryId = useActiveQueryId();

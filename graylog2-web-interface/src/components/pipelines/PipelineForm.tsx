@@ -35,12 +35,19 @@ type Props = {
   onCancel?: () => void,
 };
 
-const PipelineForm = ({ pipeline = {
+const emptyPipeline: PipelineType = {
   id: undefined,
   title: '',
   description: '',
-  stages: [{ stage: 0, rules: [] }],
-}, create = false, modal = true, save, onCancel = () => {} }: Props) => {
+  stages: [{ stage: 0, rules: [], match: '' }],
+  source: '',
+  created_at: '',
+  modified_at: '',
+};
+
+const PipelineForm = ({
+  pipeline = emptyPipeline, create = false, modal = true, save, onCancel = () => {},
+}: Props) => {
   const currentUser = useCurrentUser();
   const [nextPipeline, setNextPipeline] = useState<PipelineType>(cloneDeep(pipeline));
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -49,7 +56,7 @@ const PipelineForm = ({ pipeline = {
     setShowModal(true);
   };
 
-  const _onChange = ({ target }) => {
+  const _onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setNextPipeline((currentPipeline) => ({ ...currentPipeline, [target.name]: getValueFromInput(target) }));
   };
 
@@ -65,7 +72,7 @@ const PipelineForm = ({ pipeline = {
     }
   };
 
-  const _handleSubmit = (event) => {
+  const _handleSubmit = (event: React.FormEvent) => {
     if (event) {
       event.preventDefault();
     }

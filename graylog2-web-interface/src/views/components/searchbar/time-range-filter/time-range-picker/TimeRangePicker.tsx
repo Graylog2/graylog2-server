@@ -134,7 +134,7 @@ type Props = React.PropsWithChildren<{
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
   limitDuration: number,
   noOverride?: boolean,
-  position: 'bottom' | 'right',
+  position: 'bottom' | 'bottom-start' | 'right',
   setCurrentTimeRange: (timeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
   validTypes?: Array<SupportedTimeRangeType>,

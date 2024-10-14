@@ -167,7 +167,7 @@ describe('connect()', () => {
 
   it('types props which have a default value (defaultProps) as optional', async () => {
     const BaseComponent = ({ exampleProp = 'hello!' }: {
-      exampleProp: string
+      exampleProp?: string
     }) => <span>{exampleProp}</span>;
 
     BaseComponent.propTypes = {

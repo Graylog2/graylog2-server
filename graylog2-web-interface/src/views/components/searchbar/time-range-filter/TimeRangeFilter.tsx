@@ -52,7 +52,7 @@ type Props = {
   limitDuration: number,
   noOverride?: boolean,
   onChange: (timeRange: TimeRange | NoTimeRangeOverride) => void,
-  position?: 'bottom' | 'right',
+  position?: 'bottom' | 'bottom-start' | 'right',
   showPresetDropdown?: boolean,
   validTypes?: Array<SupportedTimeRangeType>,
   value: TimeRange | NoTimeRangeOverride,

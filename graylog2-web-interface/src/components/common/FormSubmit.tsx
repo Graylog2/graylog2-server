@@ -28,23 +28,23 @@ const StyledIcon = styled(Icon)`
 `;
 
 type WithCancelProps = {
-  displayCancel: true,
+  displayCancel?: true,
   disabledCancel?: boolean,
   onCancel: () => void,
 }
 
 type WithoutCancelProps = {
-  displayCancel: false
+  displayCancel?: false
 }
 
 type WithAsyncSubmit = {
-  isAsyncSubmit: true,
+  isAsyncSubmit?: true,
   submitLoadingText: string,
   isSubmitting: boolean,
 }
 
 type WithSyncSubmit = {
-  isAsyncSubmit: false,
+  isAsyncSubmit?: false,
 }
 
 type Props = {
