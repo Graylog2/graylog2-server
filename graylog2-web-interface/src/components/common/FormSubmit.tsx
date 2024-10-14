@@ -109,17 +109,4 @@ const FormSubmit = (props: Props) => {
   );
 };
 
-FormSubmit.defaultProps = {
-  bsSize: undefined,
-  centerCol: undefined,
-  className: undefined,
-  disabledSubmit: false,
-  displayCancel: true,
-  formId: undefined,
-  isAsyncSubmit: false,
-  onSubmit: undefined,
-  submitButtonType: 'submit',
-  submitIcon: undefined,
-};
-
 export default FormSubmit;
