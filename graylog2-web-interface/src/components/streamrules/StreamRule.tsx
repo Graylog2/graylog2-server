@@ -47,7 +47,7 @@ type Props = {
   streamRule: StreamRuleTypeDefinition
 }
 
-const StreamRule = ({ matchData = {}, stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
+const StreamRule = ({ matchData, stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
   const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const { inputs } = useStore(StreamRulesInputsStore);
@@ -56,12 +56,12 @@ const StreamRule = ({ matchData = {}, stream, streamRule, onSubmit = () => {}, o
     StreamRulesInputsActions.list();
   }, []);
 
-  const _onEdit = (event) => {
+  const _onEdit = (event: React.MouseEvent) => {
     event.preventDefault();
     setShowStreamRuleForm(true);
   };
 
-  const _onDelete = (event) => {
+  const _onDelete = (event: React.MouseEvent) => {
     event.preventDefault();
 
     /* TODO: Replace with custom confirmation dialog */
@@ -77,7 +77,7 @@ const StreamRule = ({ matchData = {}, stream, streamRule, onSubmit = () => {}, o
     }
   };
 
-  const _onSubmit = (streamRuleId, data) => StreamRulesStore.update(stream.id, streamRuleId, data, () => {
+  const _onSubmit = (streamRuleId: string, data: StreamRuleTypeDefinition) => StreamRulesStore.update(stream.id, streamRuleId, data, () => {
     if (onSubmit) {
       onSubmit(streamRuleId, data);
     }

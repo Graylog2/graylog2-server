@@ -66,6 +66,7 @@ const EventDefinitionFormContainer = ({
     title: '',
     description: '',
     priority: EventDefinitionPriorityEnum.NORMAL,
+    // @ts-ignore
     config: {},
     field_spec: {},
     key_spec: [],

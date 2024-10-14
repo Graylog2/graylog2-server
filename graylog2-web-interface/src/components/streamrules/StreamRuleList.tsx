@@ -23,14 +23,14 @@ import { Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 type Props = {
-  matchData: MatchData
+  matchData?: MatchData
   onDelete?: (ruleId: string) => void
   onSubmit?: (ruleId: string, data: unknown) => void
   stream: Stream | undefined,
 }
 
 const StreamRuleList = ({
-  matchData = {},
+  matchData,
   onDelete = () => {},
   onSubmit = () => {},
   stream,
