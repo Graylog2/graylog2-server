@@ -54,6 +54,4 @@ const SupportSources = () => (
   </div>
 );
 
-SupportSources.propTypes = {};
-
 export default SupportSources;
