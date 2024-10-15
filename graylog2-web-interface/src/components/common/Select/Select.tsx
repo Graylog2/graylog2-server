@@ -43,11 +43,11 @@ const IndicatorSeparator = () => null;
 
 const DropdownIndicator = (props) => {
   const {
-    /* eslint-disable react/prop-types */
+
     children = <Icon name="arrow_drop_down" />,
     getStyles,
     innerProps: { ref, ...restInnerProps },
-    /* eslint-enable react/prop-types */
+
   } = props;
 
   return (
@@ -63,7 +63,6 @@ const Control = ({ children, ...props }: React.ComponentProps<typeof Components.
   <Components.Control {...props} className={CONTROL_CLASS}>{children}</Components.Control>
 );
 
-/* eslint-disable react/prop-types */
 const CustomOption = (optionRenderer: (option: Option, isSelected: boolean) => React.ReactElement) => (
   (props: React.ComponentProps<typeof Components.Option>): React.ReactElement => {
     const { data, isSelected } = props;
@@ -81,7 +80,6 @@ const CustomSingleValue = (valueRenderer: (option: Option) => React.ReactElement
 
   return <Components.SingleValue {...props}>{valueRenderer(data)}</Components.SingleValue>;
 };
-/* eslint-enable react/prop-types */
 
 const CustomInput = (inputProps: { [key: string]: any }) => (
   (props) => <Components.Input {...props} {...inputProps} />

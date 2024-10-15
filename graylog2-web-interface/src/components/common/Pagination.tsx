@@ -93,7 +93,7 @@ const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css
 const UltimatePagination = createUltimatePagination({
   WrapperComponent: StyledBootstrapPagination,
   itemTypeToComponent: {
-    /* eslint-disable react/prop-types */
+
     [ITEM_TYPES.PAGE]: ({ value, isActive, onClick }) => {
       const title = isActive ? 'Active page' : `Open page ${value}`;
 
@@ -171,7 +171,7 @@ const UltimatePagination = createUltimatePagination({
         </BootstrapPagination.Last>
       );
     },
-    /* eslint-enable react/prop-types */
+
   },
 });
 
