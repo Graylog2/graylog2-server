@@ -137,6 +137,7 @@ module.exports = {
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
     'react/static-property-placement': 'off',
+    'react/require-default-props': ['warn', { functions: 'defaultArguments' }],
 
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',
