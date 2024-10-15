@@ -30,6 +30,7 @@ import type { StoreState } from 'stores/StoreTypes';
 import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { Input } from 'components/messageloaders/Types';
 import InputSetupWizardProvider from 'contexts/InputSetupWizardProvider';
+import InputSetupWizard from 'components/inputs/InputSetupWizard';
 
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
@@ -118,6 +119,7 @@ const InputsList = ({ permissions, node }: Props) => {
 
   return (
     <InputSetupWizardProvider>
+      <InputSetupWizard />
       <div>
         {!node && (
         <IfPermitted permissions="inputs:create">

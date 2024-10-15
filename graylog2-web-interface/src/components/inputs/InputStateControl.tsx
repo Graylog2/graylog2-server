@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { InputStatesStore } from 'src/stores/inputs/InputStatesStore';
-import type { InputStates } from 'src/stores/inputs/InputStatesStore';
 
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import type { InputStates } from 'stores/inputs/InputStatesStore';
 import { useStore } from 'stores/connect';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -26,6 +26,7 @@ import type { Input } from 'components/messageloaders/Types';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
+import useInputSetupWizard from 'hooks/useInputSetupWizard';
 
 type Props = {
   input: Input
@@ -36,15 +37,20 @@ const InputStateControl = ({ input } : Props) => {
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+  const { openWizard } = useInputSetupWizard();
 
   const inputState = inputStates ? inputStates[input.id] : undefined;
 
-  const isInputRunning = () => {
+  const inputNodeIds = () => {
     if (!inputState) {
-      return false;
+      return [];
     }
 
-    const nodeIDs = Object.keys(inputState);
+    return Object.keys(inputState);
+  };
+
+  const isInputRunning = () => {
+    const nodeIDs = inputNodeIds();
 
     if (nodeIDs.length === 0) {
       return false;
@@ -54,6 +60,20 @@ const InputStateControl = ({ input } : Props) => {
       const nodeState = inputState[nodeID];
 
       return nodeState.state === 'RUNNING' || nodeState.state === 'STARTING' || nodeState.state === 'FAILING';
+    });
+  };
+
+  const isInputinSetupMode = () => {
+    const nodeIDs = inputNodeIds();
+
+    if (nodeIDs.length === 0) {
+      return false;
+    }
+
+    return nodeIDs.some((nodeID) => {
+      const nodeState = inputState[nodeID];
+
+      return nodeState.state === 'SETUP';
     });
   };
 
@@ -84,6 +104,23 @@ const InputStateControl = ({ input } : Props) => {
         setIsLoading(false);
       });
   };
+
+  const setupInput = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_action_value: 'setup-input',
+    });
+
+    openWizard(input.id);
+  };
+
+  if (isInputinSetupMode()) {
+    return (
+      <Button bsStyle="warning" onClick={setupInput}>
+        Setup Input
+      </Button>
+    );
+  }
 
   if (isInputRunning()) {
     return (

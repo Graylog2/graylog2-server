@@ -21,21 +21,26 @@ import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
+import type { Input } from 'components/messageloaders/Types';
 
-export type InputState = {
-  count: number,
-  state:
-    | 'RUNNING'
+export type InputState = | 'RUNNING'
     | 'FAILED'
     | 'STOPPED'
     | 'STARTING'
-}
+    | 'FAILING'
+    | 'SETUP'
 
 export type InputStates = {
-  [inputId: string]: InputState,
+  [inputId: string]: {
+    [nodeId: string]: {
+      state: InputState,
+      id: string,
+      detailed_message: string | null,
+      message_input: Input,
+    }
+  }
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export const InputStatesStore = singletonStore(
   'core.InputStates',
   () => Reflux.createStore({
@@ -128,3 +133,5 @@ export const InputStatesStore = singletonStore(
     },
   }),
 );
+
+export default InputStatesStore;
