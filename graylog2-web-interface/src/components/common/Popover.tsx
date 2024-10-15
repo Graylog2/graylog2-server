@@ -20,7 +20,7 @@ import styled, { css, useTheme } from 'styled-components';
 
 const Popover = (props: React.ComponentProps<typeof MantinePopover>) => {
   const theme = useTheme();
-  // eslint-disable-next-line react/prop-types
+
   const arrowBackground = (!props.position || props.position.startsWith('bottom'))
     ? theme.colors.variant.lightest.default
     : theme.colors.global.contentBackground;
