@@ -29,6 +29,4 @@ const CloudWatchApp = () => (
   </>
 );
 
-CloudWatchApp.propTypes = {};
-
 export default CloudWatchApp;
