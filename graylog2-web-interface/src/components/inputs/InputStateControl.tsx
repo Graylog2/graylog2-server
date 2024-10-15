@@ -1,0 +1,103 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import { useState } from 'react';
+import { InputStatesStore } from 'src/stores/inputs/InputStatesStore';
+import type { InputStates } from 'src/stores/inputs/InputStatesStore';
+
+import { useStore } from 'stores/connect';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import type { Input } from 'components/messageloaders/Types';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { Button } from 'components/bootstrap';
+
+type Props = {
+  input: Input
+}
+
+const InputStateControl = ({ input } : Props) => {
+  const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+
+  const inputState = inputStates ? inputStates[input.id] : undefined;
+
+  const isInputRunning = () => {
+    if (!inputState) {
+      return false;
+    }
+
+    const nodeIDs = Object.keys(inputState);
+
+    if (nodeIDs.length === 0) {
+      return false;
+    }
+
+    return nodeIDs.some((nodeID) => {
+      const nodeState = inputState[nodeID];
+
+      return nodeState.state === 'RUNNING' || nodeState.state === 'STARTING' || nodeState.state === 'FAILING';
+    });
+  };
+
+  const startInput = () => {
+    setIsLoading(true);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_START_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_action_value: 'start-input',
+    });
+
+    InputStatesStore.start(input)
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const stopInput = () => {
+    setIsLoading(true);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_STOP_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_action_value: 'stop-input',
+    });
+
+    InputStatesStore.stop(input)
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  if (isInputRunning()) {
+    return (
+      <Button bsStyle="primary" onClick={stopInput} disabled={isLoading}>
+        {isLoading ? 'Stopping...' : 'Stop input'}
+      </Button>
+    );
+  }
+
+  return (
+    <Button bsStyle="success" onClick={startInput} disabled={isLoading}>
+      {isLoading ? 'Starting...' : 'Start input'}
+    </Button>
+  );
+};
+
+export default InputStateControl;

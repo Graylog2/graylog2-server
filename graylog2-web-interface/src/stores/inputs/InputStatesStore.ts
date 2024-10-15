@@ -22,6 +22,19 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 
+export type InputState = {
+  count: number,
+  state:
+    | 'RUNNING'
+    | 'FAILED'
+    | 'STOPPED'
+    | 'STARTING'
+}
+
+export type InputStates = {
+  [inputId: string]: InputState,
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export const InputStatesStore = singletonStore(
   'core.InputStates',
