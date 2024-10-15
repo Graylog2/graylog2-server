@@ -112,6 +112,4 @@ const UsersSelectField = ({ value, onChange }: Props) => {
   );
 };
 
-UsersSelectField.propTypes = {};
-
 export default UsersSelectField;
