@@ -19,13 +19,14 @@ package org.graylog2.shared.rest.resources.system.inputs;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.inputs.InputCategories;
+import org.graylog2.inputs.categories.InputCategoryService;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Collection;
@@ -35,10 +36,17 @@ import java.util.Collection;
 @Path("/system/inputs/categories")
 @Produces(MediaType.APPLICATION_JSON)
 public class InputCategoriesResource extends RestResource {
+    private final InputCategoryService inputCategoryService;
+
+    @Inject
+    public InputCategoriesResource(InputCategoryService inputCategoryService) {
+        this.inputCategoryService = inputCategoryService;
+    }
+
     @GET
     @ApiOperation(value = "Get all available input categories")
     public CategoriesResponse categories() {
-        return new CategoriesResponse(InputCategories.allCategories());
+        return new CategoriesResponse(inputCategoryService.allCategories());
     }
 
     @GET
@@ -46,12 +54,12 @@ public class InputCategoriesResource extends RestResource {
     @ApiOperation(value = "Get all available subcategories for specified category")
     public SubCategoriesResponse subCategories(
             @ApiParam(name = "category", required = true)
-            @PathParam("category") InputCategories.InputCategory category
+            @PathParam("category") String category
     ) {
-        return new SubCategoriesResponse(InputCategories.subCategoryByCategory(category));
+        return new SubCategoriesResponse(inputCategoryService.subCategoryByCategory(category));
     }
 
-    public record CategoriesResponse(Collection<InputCategories.InputCategory> categories) {}
+    public record CategoriesResponse(Collection<String> categories) {}
 
-    public record SubCategoriesResponse(Collection<InputCategories.InputSubCategory> subCategories) {}
+    public record SubCategoriesResponse(Collection<String> subCategories) {}
 }

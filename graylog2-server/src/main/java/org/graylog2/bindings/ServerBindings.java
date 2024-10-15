@@ -59,6 +59,8 @@ import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.inputs.InputEventListener;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
+import org.graylog2.inputs.categories.InputCategoryService;
+import org.graylog2.inputs.categories.InputCategoryServiceImpl;
 import org.graylog2.lookup.LookupModule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
@@ -216,6 +218,8 @@ public class ServerBindings extends Graylog2Module {
         OptionalBinder.newOptionalBinder(binder(), DataTieringStatusService.class).setDefault().to(DefaultDataTieringStatusService.class);
 
         OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
+
+        bind(InputCategoryService.class).to(InputCategoryServiceImpl.class);
     }
 
     private void bindDynamicFeatures() {

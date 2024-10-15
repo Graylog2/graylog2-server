@@ -1,0 +1,4 @@
+category,subcategory,description,inputType,illuminatePack;dateAdded;version;licenseType
+Web Server,Apache Web Server,Apache Web Server,Beats,1.0,14-10-2024 10:07:59,1.0,enterprise
+Web Server,Apache Web Server,Apache Web Server,Syslog,1.0,14-10-2024 10:07:59,1.0,security
+Data Lake,Amazon Security Lake,Amazon Security Lake,API,,14-10-2024 10:07:59,1.0,open
