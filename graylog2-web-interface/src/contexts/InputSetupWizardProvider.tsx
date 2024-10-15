@@ -57,9 +57,11 @@ const InputSetupWizardProvider = ({ children }: React.PropsWithChildren<{}>) => 
     setWizardDataAttribute,
   ]);
 
+  return (
     <InputSetupWizardContext.Provider value={value}>
       {children}
-    </InputSetupWizardContext.Provider>;
+    </InputSetupWizardContext.Provider>
+  );
 };
 
 export default InputSetupWizardProvider;

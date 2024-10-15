@@ -29,6 +29,7 @@ import { useStore } from 'stores/connect';
 import type { StoreState } from 'stores/StoreTypes';
 import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { Input } from 'components/messageloaders/Types';
+import InputSetupWizardProvider from 'contexts/InputSetupWizardProvider';
 
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
@@ -116,53 +117,55 @@ const InputsList = ({ permissions, node }: Props) => {
   }
 
   return (
-    <div>
-      {!node && (
-      <IfPermitted permissions="inputs:create">
-        <CreateInputControl />
-      </IfPermitted>
-      )}
+    <InputSetupWizardProvider>
+      <div>
+        {!node && (
+        <IfPermitted permissions="inputs:create">
+          <CreateInputControl />
+        </IfPermitted>
+        )}
 
-      <InputListRow id="filter-input" className="content">
-        <Col md={12}>
-          <SearchForm onSearch={setFilter}
-                      topMargin={0}
-                      onReset={resetFilter}
-                      placeholder="Filter by title" />
-          <br />
-          <h2>
-            Global inputs
-            &nbsp;
-            <small>{globalInputs.length} configured{nodeAffix}</small>
-          </h2>
-          <EntityList bsNoItemsStyle="info"
-                      noItemsText={globalInputs.length <= 0 ? 'There are no global inputs.'
-                        : 'No global inputs match the filter'}
-                      items={filteredGlobalInputs.map((input) => (
-                        <InputListItem key={input.id}
-                                       input={input}
-                                       currentNode={currentNode}
-                                       permissions={permissions} />
-                      ))} />
-          <br />
-          <br />
-          <h2>
-            Local inputs
-            &nbsp;
-            <small>{localInputs.length} configured{nodeAffix}</small>
-          </h2>
-          <EntityList bsNoItemsStyle="info"
-                      noItemsText={localInputs.length <= 0 ? 'There are no local inputs.'
-                        : 'No local inputs match the filter'}
-                      items={filteredLocalInputs.map((input) => (
-                        <InputListItem key={input.id}
-                                       input={input}
-                                       currentNode={currentNode}
-                                       permissions={permissions} />
-                      ))} />
-        </Col>
-      </InputListRow>
-    </div>
+        <InputListRow id="filter-input" className="content">
+          <Col md={12}>
+            <SearchForm onSearch={setFilter}
+                        topMargin={0}
+                        onReset={resetFilter}
+                        placeholder="Filter by title" />
+            <br />
+            <h2>
+              Global inputs
+              &nbsp;
+              <small>{globalInputs.length} configured{nodeAffix}</small>
+            </h2>
+            <EntityList bsNoItemsStyle="info"
+                        noItemsText={globalInputs.length <= 0 ? 'There are no global inputs.'
+                          : 'No global inputs match the filter'}
+                        items={filteredGlobalInputs.map((input) => (
+                          <InputListItem key={input.id}
+                                         input={input}
+                                         currentNode={currentNode}
+                                         permissions={permissions} />
+                        ))} />
+            <br />
+            <br />
+            <h2>
+              Local inputs
+              &nbsp;
+              <small>{localInputs.length} configured{nodeAffix}</small>
+            </h2>
+            <EntityList bsNoItemsStyle="info"
+                        noItemsText={localInputs.length <= 0 ? 'There are no local inputs.'
+                          : 'No local inputs match the filter'}
+                        items={filteredLocalInputs.map((input) => (
+                          <InputListItem key={input.id}
+                                         input={input}
+                                         currentNode={currentNode}
+                                         permissions={permissions} />
+                        ))} />
+          </Col>
+        </InputListRow>
+      </div>
+    </InputSetupWizardProvider>
   );
 };
 
