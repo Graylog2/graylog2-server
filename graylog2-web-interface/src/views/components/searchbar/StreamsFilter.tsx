@@ -36,7 +36,7 @@ type Props = {
   multi?: boolean,
 };
 
-const StreamsFilter = ({ disabled = false, value = [], streams, onChange, multi = false }: Props) => {
+const StreamsFilter = ({ disabled = false, value = [], streams, onChange, multi = true }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
