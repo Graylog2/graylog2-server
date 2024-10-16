@@ -85,7 +85,7 @@ type Props = {
 const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, sidebarIsPinned, actions }: Props) => {
   const activeSectionKey = activeSection?.key;
   const { pathname } = useLocation();
-  const links = usePluginEntities('views.sidebar.links');
+  const links = usePluginEntities('views.searchDataSources');
   const accessibleLinks = links.filter((link) => (link.useCondition ? !!link.useCondition() : true));
 
   return (
