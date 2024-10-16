@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Add missing any/all option to stream rules in routing/intake page"
+
+issues = ["graylog-plugin-enterprise#8497"]
+pulls = ["20678"]
