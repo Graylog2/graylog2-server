@@ -79,7 +79,7 @@ class IndexerFailuresPage extends React.Component<IndexerFailuresPageProps, {
           </PageHeader>
           <Row className="content">
             <Col md={12}>
-              <PaginatedList totalItems={this.state.total} onChange={this._onChangePaginatedList} pageSize={this.defaultPageSize}>
+              <PaginatedList totalItems={this.state.total} onChange={this._onChangePaginatedList}>
                 <IndexerFailuresList failures={this.state.failures} />
               </PaginatedList>
             </Col>
