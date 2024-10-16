@@ -246,27 +246,6 @@ type Props = BaseProps & {
   view?: View
 };
 
-type QueryInputProps = {
-  className?: string;
-  completerFactory?: (...args: any[]) => void;
-  disableExecution?: boolean;
-  error?: any;
-  inputId?: string;
-  height?: number;
-  isValidating: boolean;
-  maxLines?: number;
-  onBlur?: (...args: any[]) => void;
-  onChange: (...args: any[]) => void;
-  onExecute: (...args: any[]) => void;
-  placeholder?: string;
-  streams?: any[];
-  timeRange?: any;
-  value?: string;
-  warning?: any;
-  wrapEnabled?: boolean;
-  validate: (...args: any[]) => void;
-};
-
 const QueryInput = React.forwardRef<Editor, Props>(({
   className = '',
   commands = [],
@@ -288,8 +267,8 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   warning,
   wrapEnabled,
   name,
-  view
-}: QueryInputProps, outerRef) => {
+  view,
+}, outerRef) => {
   const innerRef = useRef<Editor>(null);
   const inputElement = innerRef.current?.container;
   const { width: inputWidth } = useElementDimensions(inputElement);
