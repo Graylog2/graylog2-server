@@ -255,6 +255,8 @@ export const TELEMETRY_EVENT_TYPE = {
     INPUT_DELETED: 'Inputs Input Deleted',
     INPUT_EDIT_CLICKED: 'Inputs Input Edit Clicked',
     INPUT_UPDATED: 'Inputs Input Updated',
+    INPUT_SETUP_ENTERED: 'Inputs Input Setup Mode Entered',
+    INPUT_SETUP_EXITED: 'Inputs Input Setup Mode Exited',
     SHOW_RECEIVED_MESSAGES_CLICKED: 'Inputs Show Received Messages Clicked',
     MANAGE_EXTRACTORS_CLICKED: 'Inputs Manage Extractors Clicked',
     SHOW_METRICS_CLICKED: 'Inputs Show Metrics Clicked',
