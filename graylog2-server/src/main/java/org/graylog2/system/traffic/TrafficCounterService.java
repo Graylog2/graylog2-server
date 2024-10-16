@@ -27,6 +27,7 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollections;
@@ -162,15 +163,12 @@ public class TrafficCounterService implements TrafficUpdater {
         }
 
         public void add(String name, DateTime bucket, long value) {
-            getHistogram(name).put(bucket, value);
+            histograms.computeIfAbsent(name, k -> new HashMap<>()).put(bucket, value);
         }
 
+        @Nullable
         public Map<DateTime, Long> getHistogram(String name) {
-            Map<DateTime, Long> histogram = histograms.get(name);
-            if (histogram == null) {
-                histogram = new HashMap<>();
-            }
-            return histogram;
+            return histograms.get(name);
         }
 
         public long sumTraffic(String name) {
