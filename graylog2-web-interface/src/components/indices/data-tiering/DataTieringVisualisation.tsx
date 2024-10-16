@@ -118,7 +118,7 @@ const StyledTooltip = styled(Tooltip)(({ value }) => css`
   `}    
 `);
 
-const DataTieringVisualisation = ({ archiveData, minDays, maxDays, minDaysInHot, warmTierEnabled }: Props) => {
+const DataTieringVisualisation = ({ archiveData = false, minDays = 0, maxDays = 0, minDaysInHot = 0, warmTierEnabled = false }: Props) => {
   const [showMinDaysTooltip, setShowMinDaysTooltip] = useState<boolean>(false);
   const [showMinDaysInHotTooltip, setShowMinDaysInHotTooltip] = useState<boolean>(false);
   const theme = useTheme();
@@ -197,12 +197,4 @@ DataTieringVisualisation.propTypes = {
   minDaysInHot: PropTypes.number,
   warmTierEnabled: PropTypes.bool,
   archiveData: PropTypes.bool,
-};
-
-DataTieringVisualisation.defaultProps = {
-  minDays: 0,
-  maxDays: 0,
-  minDaysInHot: 0,
-  warmTierEnabled: false,
-  archiveData: false,
 };

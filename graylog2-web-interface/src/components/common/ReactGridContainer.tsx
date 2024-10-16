@@ -29,14 +29,11 @@ import { layoutToPositions, positionsToLayout } from 'views/logic/widgets/normal
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
-const WidthProvidedGridLayout = (props: React.ComponentProps<typeof WidthAdjustedReactGridLayout> & { children: React.ReactNode }) => {
-  const { width } = props;
-
-  return width ? <Responsive {...props} /> : <WidthAdjustedReactGridLayout {...props} />;
-};
+const WidthProvidedGridLayout = ({ width, ...props }: React.ComponentProps<typeof WidthAdjustedReactGridLayout> & { children: React.ReactNode }) => (width
+  ? <Responsive width={width} {...props} />
+  : <WidthAdjustedReactGridLayout width={width} {...props} />);
 
 WidthProvidedGridLayout.propTypes = { width: PropTypes.number };
-WidthProvidedGridLayout.defaultProps = { width: undefined };
 
 const StyledWidthProvidedGridLayout = styled(WidthProvidedGridLayout)(({ theme }) => css`
   &.locked {
@@ -159,15 +156,15 @@ const removeGaps = (_layout: Layout) => {
 const ReactGridContainer = ({
   children,
   className,
-  columns,
+  columns = COLUMNS,
   draggableHandle,
-  isResizable,
-  locked,
-  measureBeforeMount,
+  isResizable = true,
+  locked = false,
+  measureBeforeMount = false,
   onPositionsChange,
   onSyncLayout: _onSyncLayout,
   positions,
-  rowHeight,
+  rowHeight = ROW_HEIGHT,
   width,
 }: Props) => {
   const theme = useTheme();
@@ -294,18 +291,6 @@ ReactGridContainer.propTypes = {
    */
   measureBeforeMount: PropTypes.bool,
   width: PropTypes.number,
-};
-
-ReactGridContainer.defaultProps = {
-  className: undefined,
-  columns: COLUMNS,
-  isResizable: true,
-  locked: false,
-  measureBeforeMount: false,
-  rowHeight: ROW_HEIGHT,
-  draggableHandle: undefined,
-  width: undefined,
-  onSyncLayout: undefined,
 };
 
 export default ReactGridContainer;

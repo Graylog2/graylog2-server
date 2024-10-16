@@ -35,7 +35,7 @@ type Props = {
   getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration,
 };
 
-const EditOutputButton = ({ output, disabled, onUpdate, getTypeDefinition }: Props) => {
+const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinition }: Props) => {
   const currentUser = useCurrentUser();
   const [typeDefinition, setTypeDefinition] = useState<AvailableOutputRequestedConfiguration>(undefined);
   const configFormRef = useRef(null);
@@ -75,10 +75,6 @@ const EditOutputButton = ({ output, disabled, onUpdate, getTypeDefinition }: Pro
 
 EditOutputButton.propTypes = {
   disabled: PropTypes.bool,
-};
-
-EditOutputButton.defaultProps = {
-  disabled: false,
 };
 
 export default EditOutputButton;

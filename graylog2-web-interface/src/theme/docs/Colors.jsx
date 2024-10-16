@@ -63,7 +63,7 @@ const Swatch = styled.button(({ color, theme }) => css`
   }
 `);
 
-const ColorSwatch = ({ className, color, name, copyText }) => {
+const ColorSwatch = ({ className, color, name = '', copyText }) => {
   const [opened, setOpened] = useState(false);
 
   const copyCallback = useCallback(() => {
@@ -77,21 +77,19 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
   }, [copyText]);
 
   return (
-    (
-      <Wrapped className={className}>
-        <StyledTooltip placement="top"
-                       opened={opened}
-                       positionTop={-32}
-                       id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}>
-          Copied!
-        </StyledTooltip>
-        <Swatch color={color}
-                onClick={copyCallback}>
-          <Name>{name}</Name>
-          <Value>{color}</Value>
-        </Swatch>
-      </Wrapped>
-    )
+    (<Wrapped className={className}>
+      <StyledTooltip placement="top"
+                     opened={opened}
+                     positionTop={-32}
+                     id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}>
+        Copied!
+      </StyledTooltip>
+      <Swatch color={color}
+              onClick={copyCallback}>
+        <Name>{name}</Name>
+        <Value>{color}</Value>
+      </Swatch>
+    </Wrapped>)
   );
 };
 
@@ -100,12 +98,6 @@ ColorSwatch.propTypes = {
   color: PropTypes.string.isRequired,
   copyText: PropTypes.string,
   name: PropTypes.string,
-};
-
-ColorSwatch.defaultProps = {
-  className: undefined,
-  copyText: undefined,
-  name: '',
 };
 
 export default ColorSwatch;

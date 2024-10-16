@@ -29,13 +29,13 @@ type StyledBarProps = {
 };
 
 type ProgressBarProps = {
-  bars: Array<{
+  bars?: Array<{
     animated?: boolean,
     striped?: boolean,
     bsStyle?: ColorVariant,
     value: number,
     label?: string,
-  }>,
+  }>
   className?: string,
 };
 
@@ -115,7 +115,7 @@ const Bar = styled.div<StyledBarProps>(({ $animated, $striped, theme, value }) =
 `;
 });
 
-const ProgressBar = ({ bars, className }: ProgressBarProps) => (
+const ProgressBar = ({ bars = [DEFAULT_BAR], className }: ProgressBarProps) => (
   <ProgressWrap className={className}>
     {bars.map((bar, index) => {
       const { label, animated, bsStyle, striped, value } = { ...DEFAULT_BAR, ...bar };
@@ -147,11 +147,6 @@ ProgressBar.propTypes = {
     value: PropTypes.number,
   })),
   className: PropTypes.string,
-};
-
-ProgressBar.defaultProps = {
-  bars: [DEFAULT_BAR],
-  className: undefined,
 };
 
 export default ProgressBar;

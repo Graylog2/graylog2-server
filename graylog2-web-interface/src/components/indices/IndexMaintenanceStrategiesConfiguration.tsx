@@ -185,7 +185,9 @@ const IndexMaintenanceStrategiesConfiguration = ({
   label,
   pluginExports,
   strategies,
-  retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
+  retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod } = {
+    max_index_retention_period: undefined,
+  },
   activeConfig: { strategy, config },
   getState,
 } : Props) => {
@@ -367,13 +369,6 @@ IndexMaintenanceStrategiesConfiguration.propTypes = {
   }),
   activeConfig: PropTypes.object.isRequired,
   getState: PropTypes.func.isRequired,
-};
-
-IndexMaintenanceStrategiesConfiguration.defaultProps = {
-  description: undefined,
-  retentionStrategiesContext: {
-    max_index_retention_period: undefined,
-  },
 };
 
 export default IndexMaintenanceStrategiesConfiguration;

@@ -34,12 +34,13 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
 type Props = {
-  newUrlEntry: string,
-  onUpdate: () => void,
+  newUrlEntry?: string
+  onUpdate?: () => void
   urlType?: 'regex' | 'literal',
 };
 
-const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
+const URLWhiteListFormModal = ({ newUrlEntry = '', urlType, onUpdate = () => {
+} }: Props) => {
   const prevNewUrlEntry = useRef<string>();
   const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -151,13 +152,6 @@ URLWhiteListFormModal.propTypes = {
   newUrlEntry: PropTypes.string,
   onUpdate: PropTypes.func,
   urlType: PropTypes.oneOf(['regex', 'literal']),
-};
-
-URLWhiteListFormModal.defaultProps = {
-  newUrlEntry: '',
-  onUpdate: () => {
-  },
-  urlType: undefined,
 };
 
 export default URLWhiteListFormModal;

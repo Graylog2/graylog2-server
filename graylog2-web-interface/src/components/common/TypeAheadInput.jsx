@@ -49,7 +49,7 @@ export const Container = styled.div(({ theme }) => css`
   }
 
   .tt-query {
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 7.5%);
   }
 
   input[type="text"].tt-hint {
@@ -59,9 +59,9 @@ export const Container = styled.div(({ theme }) => css`
   .tt-menu {
     min-width: 160px;
     //background-color: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 1px solid rgb(0 0 0 / 20%);
     border-radius: 4px;
-    //box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    //box-shadow: 0 5px 10px rgb(0 0 0 / 20%);
     width: 100%;
     background-color: ${theme.colors.global.contentBackground};
     box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
@@ -88,10 +88,10 @@ export const Container = styled.div(({ theme }) => css`
 
   .tt-suggestion:hover,
   .tt-suggestion.tt-cursor {
-    color: #ffffff;
+    color: #fff;
     text-decoration: none;
     background-color: #0081c2;
-    background-image: linear-gradient(to bottom, #0088cc, #0077b3);
+    background-image: linear-gradient(to bottom, #08c, #0077b3);
     background-repeat: repeat-x;
     outline: 0;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);

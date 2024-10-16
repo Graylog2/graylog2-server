@@ -99,8 +99,8 @@ const MessageList = ({
   config,
   data: { id: searchTypeId, messages, total: totalMessages },
   fields,
-  onConfigChange,
-  pageSize,
+  onConfigChange = () => Promise.resolve(),
+  pageSize = Messages.DEFAULT_LIMIT,
   setLoadingState,
 }: Props) => {
   const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
@@ -175,11 +175,6 @@ const MessageList = ({
 MessageList.propTypes = {
   onConfigChange: PropTypes.func,
   pageSize: PropTypes.number,
-};
-
-MessageList.defaultProps = {
-  onConfigChange: () => Promise.resolve(),
-  pageSize: Messages.DEFAULT_LIMIT,
 };
 
 export default MessageList;

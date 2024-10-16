@@ -28,7 +28,7 @@ import { ruleBlockPropType, RuleBuilderTypes } from './types';
 import { useRuleBuilder } from './RuleBuilderContext';
 
 type Props = {
-  block: RuleBlock,
+  block?: RuleBlock
   negatable?: boolean,
   onDelete: () => void,
   onEdit: () => void,
@@ -90,7 +90,7 @@ const EditIconButton = styled(IconButton)(({ theme }) => css`
   margin-right: ${theme.spacings.xs};
 `);
 
-const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType, type } : Props) => {
+const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType, type } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
@@ -122,13 +122,12 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
       return part;
     });
 
-    return (
-      partsWithHighlight.map((item, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <React.Fragment key={index}>
-          {item}
-        </React.Fragment>
-      )));
+    return (partsWithHighlight.map((item, index) => (
+      // eslint-disable-next-line react/no-array-index-key
+      (<React.Fragment key={index}>
+        {item}
+      </React.Fragment>)
+    )));
   };
 
   const errorMessage = block?.errors?.join(', ');
@@ -208,12 +207,6 @@ RuleBlockDisplay.propTypes = {
   onEdit: PropTypes.func.isRequired,
   negatable: PropTypes.bool,
   onNegate: PropTypes.func.isRequired,
-};
-
-RuleBlockDisplay.defaultProps = {
-  block: undefined,
-  negatable: false,
-  returnType: undefined,
 };
 
 export default RuleBlockDisplay;

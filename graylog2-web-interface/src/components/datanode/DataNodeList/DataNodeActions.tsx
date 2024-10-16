@@ -67,7 +67,7 @@ const DIALOG_TEXT = {
   },
 };
 
-const DataNodeActions = ({ dataNode, refetch, displayAs }: Props) => {
+const DataNodeActions = ({ dataNode, refetch, displayAs = 'dropdown' }: Props) => {
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
@@ -187,11 +187,6 @@ const DataNodeActions = ({ dataNode, refetch, displayAs }: Props) => {
       )}
     </>
   );
-};
-
-DataNodeActions.defaultProps = {
-  displayAs: 'dropdown',
-  refetch: undefined,
 };
 
 export default DataNodeActions;

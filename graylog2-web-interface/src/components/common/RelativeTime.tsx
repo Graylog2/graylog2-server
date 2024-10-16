@@ -48,8 +48,4 @@ RelativeTime.propTypes = {
   dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]),
 };
 
-RelativeTime.defaultProps = {
-  dateTime: undefined,
-};
-
 export default RelativeTime;

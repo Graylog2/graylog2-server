@@ -27,11 +27,12 @@ import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 type Props = {
   contentPackId: string,
   revision: number,
-  show: boolean,
-  onHide: () => void,
+  show?: boolean
+  onHide?: () => void
 }
 
-const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }: Props) => {
+const ContentPackDownloadControl = ({ contentPackId, revision, show = false, onHide = () => {
+} }: Props) => {
   const [showDownloadModal, setShowDownloadModal] = useState(show);
 
   const getDownloadUrl = () => qualifyUrl(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url);
@@ -71,12 +72,6 @@ ContentPackDownloadControl.propTypes = {
   revision: PropTypes.number.isRequired,
   show: PropTypes.bool,
   onHide: PropTypes.func,
-};
-
-ContentPackDownloadControl.defaultProps = {
-  show: false,
-  onHide: () => {
-  },
 };
 
 export default ContentPackDownloadControl;

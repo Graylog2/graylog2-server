@@ -32,7 +32,7 @@ const _getEffectiveConfiguration = (configuration) => ExtractorUtils.getEffectiv
 type Configuration = { [key: string]: string };
 type Props = {
   configuration: Configuration,
-  exampleMessage: string,
+  exampleMessage?: string
   onChange: (newConfig: Configuration) => void,
   onExtractorPreviewLoad: (preview: React.ReactNode | string) => void,
 }
@@ -126,10 +126,6 @@ SplitAndIndexExtractorConfiguration.propTypes = {
   exampleMessage: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   onExtractorPreviewLoad: PropTypes.func.isRequired,
-};
-
-SplitAndIndexExtractorConfiguration.defaultProps = {
-  exampleMessage: undefined,
 };
 
 export default SplitAndIndexExtractorConfiguration;

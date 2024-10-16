@@ -41,7 +41,7 @@ type Props = {
   title?: string,
 };
 
-const UnauthorizedErrorPage = ({ error, errorDetails, title, description, location: { pathname } }: Props) => {
+const UnauthorizedErrorPage = ({ error, errorDetails, title = 'Missing Permissions', description, location: { pathname } }: Props) => {
   const errorMessage = error?.message ?? JSON.stringify(error);
   const pageDetails = `The permissions check for the following request failed,\nwhile trying to access ${pathname}.`;
   const defaultDescription = (
@@ -85,12 +85,6 @@ UnauthorizedErrorPage.propTypes = {
   description: PropTypes.element,
   errorDetails: PropTypes.string,
   title: PropTypes.string,
-};
-
-UnauthorizedErrorPage.defaultProps = {
-  description: undefined,
-  errorDetails: undefined,
-  title: 'Missing Permissions',
 };
 
 export default withLocation(UnauthorizedErrorPage);

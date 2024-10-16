@@ -47,7 +47,7 @@ type Props = {
   title: string,
 };
 
-const QueryTitle = ({ active, allowsClosing, id, onRemove, openEditModal, openCopyToDashboardModal, title }: Props) => {
+const QueryTitle = ({ active, allowsClosing = true, id, onRemove, openEditModal, openCopyToDashboardModal, title }: Props) => {
   const [titleValue, setTitleValue] = useState(title);
   const { setDashboardPage } = useContext(DashboardPageContext);
   const dispatch = useAppDispatch();
@@ -85,10 +85,6 @@ QueryTitle.propTypes = {
   onRemove: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   openEditModal: PropTypes.func.isRequired,
-};
-
-QueryTitle.defaultProps = {
-  allowsClosing: true,
 };
 
 export default QueryTitle;

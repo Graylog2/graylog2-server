@@ -67,8 +67,4 @@ AbsoluteCalendar.propTypes = {
   range: PropTypes.oneOf(['to', 'from']).isRequired,
 };
 
-AbsoluteCalendar.defaultProps = {
-  startDate: undefined,
-};
-
 export default AbsoluteCalendar;

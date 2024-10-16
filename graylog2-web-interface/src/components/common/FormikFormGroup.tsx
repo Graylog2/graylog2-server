@@ -48,38 +48,20 @@ type Props = {
 };
 
 /** Displays the FormikInput with a specific layout */
-const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChange, ...rest }: Props) => (
+const FormikFormGroup = ({ children = null, disabled = false, required = false, validate = () => undefined, autoFocus = false, labelClassName = 'col-sm-3', wrapperClassName = 'col-sm-9', label, name, onChange, ...rest }: Props) => (
   <FormikInput {...rest}
+               disabled={disabled}
+               required={required}
+               validate={validate}
+               autoFocus={autoFocus}
                label={label}
                id={name}
                onChange={onChange}
                name={name}
                labelClassName={labelClassName}
-               wrapperClassName={wrapperClassName} />
+               wrapperClassName={wrapperClassName}>
+    {children}
+  </FormikInput>
 );
-
-FormikFormGroup.defaultProps = {
-  autoComplete: undefined,
-  bsSize: undefined,
-  buttonAfter: undefined,
-  children: null,
-  disabled: false,
-  onChange: undefined,
-  labelClassName: 'col-sm-3',
-  wrapperClassName: 'col-sm-9',
-  formGroupClassName: undefined,
-  type: undefined,
-  error: undefined,
-  placeholder: undefined,
-  help: undefined,
-  min: undefined,
-  max: undefined,
-  minLength: undefined,
-  maxLength: undefined,
-  required: false,
-  validate: () => undefined,
-  rows: undefined,
-  autoFocus: false,
-};
 
 export default FormikFormGroup;

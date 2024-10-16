@@ -36,10 +36,10 @@ const HeaderIcon = styled(Icon)`
 
 type Props = {
   featureName: string,
-  wrapperClassName: string | null | undefined,
+  wrapperClassName?: string | null | undefined
 };
 
-const EnterprisePluginNotFound = ({ featureName, wrapperClassName }: Props) => (
+const EnterprisePluginNotFound = ({ featureName, wrapperClassName = 'no-bm' }: Props) => (
   <Panel bsStyle="info" className={wrapperClassName}>
     <Panel.Heading>
       <Header>
@@ -55,10 +55,6 @@ const EnterprisePluginNotFound = ({ featureName, wrapperClassName }: Props) => (
 EnterprisePluginNotFound.propTypes = {
   featureName: PropTypes.string.isRequired,
   wrapperClassName: PropTypes.string,
-};
-
-EnterprisePluginNotFound.defaultProps = {
-  wrapperClassName: 'no-bm',
 };
 
 export default EnterprisePluginNotFound;

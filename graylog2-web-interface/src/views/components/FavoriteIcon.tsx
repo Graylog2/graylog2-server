@@ -46,8 +46,4 @@ const FavoriteIcon = ({ isFavorite, grn, onChange, className }: Props) => {
   return <StyledIcon className={className} onClick={onClick} title={title} $isFavorite={isFavorite} name="star" type={isFavorite ? 'solid' : 'regular'} />;
 };
 
-FavoriteIcon.defaultProps = {
-  className: undefined,
-};
-
 export default FavoriteIcon;

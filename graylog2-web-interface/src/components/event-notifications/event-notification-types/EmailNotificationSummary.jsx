@@ -22,7 +22,7 @@ import { Well } from 'components/bootstrap';
 import CommonNotificationSummary from './CommonNotificationSummary';
 import styles from './EmailNotificationSummary.css';
 
-const EmailNotificationSummary = ({ notification, ...otherProps }) => (
+const EmailNotificationSummary = ({ notification = {}, ...otherProps }) => (
   <CommonNotificationSummary notification={notification} {...otherProps}>
     <>
       <tr>
@@ -126,10 +126,6 @@ EmailNotificationSummary.propTypes = {
   type: PropTypes.string.isRequired,
   notification: PropTypes.object,
   definitionNotification: PropTypes.object.isRequired,
-};
-
-EmailNotificationSummary.defaultProps = {
-  notification: {},
 };
 
 export default EmailNotificationSummary;

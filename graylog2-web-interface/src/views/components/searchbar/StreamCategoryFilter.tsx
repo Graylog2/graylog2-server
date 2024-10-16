@@ -27,13 +27,13 @@ const Container = styled.div`
 `;
 
 type Props = {
-  disabled: boolean,
-  value: Array<string>,
+  disabled?: boolean
+  value?: Array<string>
   streamCategories: Array<{ key: string, value: string }>,
   onChange: (newStreamCategories: Array<string>) => void,
 };
 
-const StreamCategoryFilter = ({ disabled, value, streamCategories, onChange }: Props) => {
+const StreamCategoryFilter = ({ disabled = false, value = [], streamCategories, onChange }: Props) => {
   const selectedCategories = value.join(',');
   const placeholder = 'Select stream categories the search should include.';
   const options = streamCategories.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
@@ -69,11 +69,6 @@ StreamCategoryFilter.propTypes = {
     }),
   ).isRequired,
   onChange: PropTypes.func.isRequired,
-};
-
-StreamCategoryFilter.defaultProps = {
-  disabled: false,
-  value: [],
 };
 
 export default StreamCategoryFilter;

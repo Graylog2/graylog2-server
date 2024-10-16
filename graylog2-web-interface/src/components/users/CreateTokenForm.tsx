@@ -34,12 +34,12 @@ const StyledForm = styled.form`
 `;
 
 type Props = {
-  creatingToken: boolean,
-  disableForm: boolean,
+  creatingToken?: boolean
+  disableForm?: boolean
   onCreate: (tokenName: string) => void,
 };
 
-const CreateTokenForm = ({ creatingToken, disableForm, onCreate }: Props) => {
+const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate }: Props) => {
   const [tokenName, setTokenName] = useState('');
 
   const createToken = (event: React.SyntheticEvent) => {
@@ -72,11 +72,6 @@ CreateTokenForm.propTypes = {
   creatingToken: PropTypes.bool,
   disableForm: PropTypes.bool,
   onCreate: PropTypes.func.isRequired,
-};
-
-CreateTokenForm.defaultProps = {
-  creatingToken: false,
-  disableForm: false,
 };
 
 export default CreateTokenForm;
