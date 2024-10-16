@@ -30,7 +30,6 @@ import type {
 } from 'components/indices/Types';
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import type { IndexSetTemplateFormValues, IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { FormikInput, FormSubmit, InputOptionalInfo, Section, Spinner, TimeUnitInput } from 'components/common';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';

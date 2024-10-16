@@ -1,9 +1,14 @@
 import React from 'react';
 import Immutable from 'immutable';
 import isEqual from 'lodash/isEqual';
+import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import TypeAheadInput from 'components/common/TypeAheadInput';
+
+const StyledButton = styled(Button)`
+  margin-left: 5;
+`;
 
 type TypeAheadDataFilterProps = {
   /** ID to use in the filter input field. */
@@ -81,6 +86,8 @@ class TypeAheadDataFilter extends React.Component<TypeAheadDataFilterProps, {
     searchInKeys: [],
   };
 
+  private typeAheadInput: TypeAheadInput;
+
   constructor(props) {
     super(props);
     const { filterBy } = this.props;
@@ -106,7 +113,7 @@ class TypeAheadDataFilter extends React.Component<TypeAheadDataFilterProps, {
     this.setState({ filterText: this.typeAheadInput.getValue() }, this.filterData);
   };
 
-  _onFilterAdded = (event, suggestion) => {
+  _onFilterAdded = (_event, suggestion) => {
     const { filters } = this.state;
     const { displayKey } = this.props;
 
@@ -223,13 +230,12 @@ class TypeAheadDataFilter extends React.Component<TypeAheadDataFilterProps, {
                           suggestions={suggestions}
                           label={label}
                           displayKey={displayKey} />
-          <Button type="submit" style={{ marginLeft: 5 }}>Filter</Button>
-          <Button type="button"
-                  style={{ marginLeft: 5 }}
-                  onClick={this._resetFilters}
-                  disabled={filters.count() === 0 && filterText === ''}>
+          <StyledButton type="submit">Filter</StyledButton>
+          <StyledButton type="button"
+                        onClick={this._resetFilters}
+                        disabled={filters.count() === 0 && filterText === ''}>
             Reset
-          </Button>
+          </StyledButton>
         </form>
         <ul className="pill-list">
           {filtersContent}

@@ -23,7 +23,6 @@ import { Section, Icon } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import { DataTieringSummary, DATA_TIERING_TYPE, prepareDataTieringInitialValues, DataTieringVisualisation } from 'components/indices/data-tiering';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 
 type Props = {
   template: IndexSetTemplate,

@@ -21,7 +21,6 @@ import styled, { css } from 'styled-components';
 import Spinner from 'components/common/Spinner';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { IconButton } from 'components/common';
-import { Position } from 'views/components/widgets/WidgetPropTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';

@@ -21,7 +21,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Button, Col, Row } from 'components/bootstrap';
 import { Card } from 'components/common';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 import { prepareDataTieringInitialValues, DataTieringVisualisation } from 'components/indices/data-tiering';
 
 type Props = {

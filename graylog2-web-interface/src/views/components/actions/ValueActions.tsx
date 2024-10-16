@@ -22,8 +22,6 @@ import type { QueryId } from 'views/logic/queries/Query';
 import Action from 'views/components/actions/Action';
 import { ActionContext } from 'views/logic/ActionContext';
 
-import CustomPropTypes from '../CustomPropTypes';
-
 type Props = {
   children: React.ReactNode,
   element: React.ReactNode,

@@ -19,12 +19,10 @@ import styled from 'styled-components';
 
 import {
   DataTable,
-  Icon,
   IfPermitted,
   PageHeader,
   PaginatedList,
   SearchForm,
-  OverlayTrigger,
 } from 'components/common';
 import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
@@ -35,8 +33,6 @@ import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import GrokPatternQueryHelper from './GrokPatternQueryHelper';
-
-import QueryHelper from '../common/QueryHelper';
 
 const GrokPatternsList = styled(DataTable)`
   th.name {

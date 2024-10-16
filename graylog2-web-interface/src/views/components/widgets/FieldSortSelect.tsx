@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import { defaultCompare } from 'logic/DefaultCompare';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';

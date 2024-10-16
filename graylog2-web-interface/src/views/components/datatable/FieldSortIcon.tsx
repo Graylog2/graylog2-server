@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import { OrderedMap } from 'immutable';
+import type { OrderedMap } from 'immutable';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import { SortIcon } from 'components/common';
 
 type Props = {

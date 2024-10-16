@@ -33,7 +33,6 @@ import { MISSING_BUCKET_NAME } from 'views/Constants';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
 import EmptyValue from './EmptyValue';
-import CustomPropTypes from './CustomPropTypes';
 import type { ValueRendererProps, ValueRenderer } from './messagelist/decoration/ValueRenderer';
 import DecoratorValue from './DecoratorValue';
 

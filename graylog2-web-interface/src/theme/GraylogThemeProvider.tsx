@@ -22,7 +22,6 @@ import { MantineProvider } from '@mantine/core';
 import useThemes from 'theme/hooks/useThemes';
 
 import ColorSchemeContext from './ColorSchemeContext';
-import { COLOR_SCHEMES } from './constants';
 
 import 'material-symbols/rounded.css';
 

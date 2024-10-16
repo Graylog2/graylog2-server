@@ -18,20 +18,18 @@
 import React, { useCallback } from 'react';
 import merge from 'lodash/merge';
 
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
 import useAppDispatch from 'stores/useAppDispatch';
 
 import GenericPlot from './GenericPlot';
 import type { ChartColor, ChartConfig, PlotLayout } from './GenericPlot';
 import OnZoom from './OnZoom';
-
-import CustomPropTypes from '../CustomPropTypes';
 
 export type Props = {
   axisType?: AxisType,

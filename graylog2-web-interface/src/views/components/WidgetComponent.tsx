@@ -30,7 +30,6 @@ import type WidgetType from 'views/logic/widgets/Widget';
 import useWidget from 'views/hooks/useWidget';
 import useActiveViewState from 'views/hooks/useActiveViewState';
 
-import { Position } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextProvider';

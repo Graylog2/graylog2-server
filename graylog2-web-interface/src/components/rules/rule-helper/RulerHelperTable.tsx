@@ -22,7 +22,6 @@ import { Icon } from 'components/common';
 import RuleHelperStyle from './RuleHelper.css';
 import { functionSignature, niceType } from './helpers';
 
-import { blockDictPropType } from '../rule-builder/types';
 import type { BlockDict } from '../rule-builder/types';
 
 type Props = {

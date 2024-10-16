@@ -18,7 +18,6 @@ import * as React from 'react';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 
-import CustomPropTypes from './CustomPropTypes';
 import FieldActions from './actions/FieldActions';
 import InteractiveContext from './contexts/InteractiveContext';
 

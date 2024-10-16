@@ -23,7 +23,7 @@ import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
 import type { BlockType, RuleBlock } from './types';
-import { ruleBlockPropType, RuleBuilderTypes } from './types';
+import { RuleBuilderTypes } from './types';
 import { useRuleBuilder } from './RuleBuilderContext';
 
 type Props = {
@@ -124,6 +124,7 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
     return (partsWithHighlight.map((item, index) => (
 
       (
+
         <React.Fragment key={index}>
           {item}
         </React.Fragment>

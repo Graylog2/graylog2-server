@@ -27,7 +27,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import Errors from './Errors';
-import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
+import { RuleBuilderTypes } from './types';
 import type { BlockType, RuleBlock, BlockDict, BlockFieldDict, OutputVariables } from './types';
 
 import RuleHelperTable from '../rule-helper/RulerHelperTable';

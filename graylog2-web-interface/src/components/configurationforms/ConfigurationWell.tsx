@@ -60,7 +60,7 @@ class ConfigurationWell extends React.Component<ConfigurationWellProps, {
     return (<li key={`${id}-${key}`}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
   };
 
-  _formatPasswordField = (value, key) => {
+  _formatPasswordField = (_value, key) => {
     const { id } = this.props;
 
     return (
@@ -71,7 +71,7 @@ class ConfigurationWell extends React.Component<ConfigurationWellProps, {
     );
   };
 
-  _formatConfiguration = (id, config, typeDefinition) => {
+  _formatConfiguration = (_id, config, typeDefinition) => {
     if (!config) {
       return ('');
     }

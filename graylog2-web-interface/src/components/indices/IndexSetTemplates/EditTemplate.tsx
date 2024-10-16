@@ -25,7 +25,6 @@ import TemplateForm from 'components/indices/IndexSetTemplates/TemplateForm';
 import type {
   IndexSetTemplate,
 } from 'components/indices/IndexSetTemplates/types';
-import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 import useTemplateMutation from 'components/indices/IndexSetTemplates/hooks/useTemplateMutation';
 import Routes from 'routing/Routes';
 

@@ -21,7 +21,6 @@ import get from 'lodash/get';
 import { Icon } from 'components/common';
 import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/bootstrap';
 import { emptyBooleanExpressionConfig, emptyGroupExpressionConfig, replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
-import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 import NumberExpression from './AggregationConditionExpressions/NumberExpression';
 import NumberRefExpression from './AggregationConditionExpressions/NumberRefExpression';

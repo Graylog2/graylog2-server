@@ -35,8 +35,6 @@ import sidebarSections from './sidebarSections';
 import type { SidebarAction } from './sidebarActions';
 import sidebarActions from './sidebarActions';
 
-import CustomPropTypes from '../CustomPropTypes';
-
 type Props = {
   children: React.ReactElement,
   results?: QueryResult

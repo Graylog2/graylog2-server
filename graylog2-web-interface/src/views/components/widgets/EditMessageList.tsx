@@ -22,7 +22,6 @@ import type { EditWidgetComponentProps } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { Row, Col, Checkbox } from 'components/bootstrap';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

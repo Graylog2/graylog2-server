@@ -10,7 +10,6 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import DecoratedValue from './decoration/DecoratedValue';
 import type { Message } from './Types';
 
-import CustomPropTypes from '../CustomPropTypes';
 import InteractiveContext from '../contexts/InteractiveContext';
 
 const SPECIAL_FIELDS = [FULL_MESSAGE_FIELD, 'level'];

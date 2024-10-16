@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useState, useMemo, useContext, useCallback } from 'react';
 import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import styled from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -15,7 +14,6 @@ import Routes from 'routing/Routes';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Input } from 'components/messageloaders/Types';
 import type { Stream } from 'views/stores/StreamsStore';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
 import FormatAssetList from 'views/components/messagelist/FormatAssetList';

@@ -20,7 +20,7 @@ import { useField } from 'formik';
 import { FormikFormGroup, InputOptionalInfo } from 'components/common';
 import { Button, ControlLabel } from 'components/bootstrap';
 
-import { RuleBuilderTypes, outputVariablesPropType } from './types';
+import { RuleBuilderTypes } from './types';
 import type { OutputVariables, BlockFieldDict, BlockType } from './types';
 
 type Props = {

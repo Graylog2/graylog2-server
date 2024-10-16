@@ -21,8 +21,6 @@ import { Spinner, Icon } from 'components/common';
 import EditableTitle from 'views/components/common/EditableTitle';
 import { Input } from 'components/bootstrap';
 
-import CustomPropTypes from '../CustomPropTypes';
-
 const LoadingSpinner = styled(Spinner)`
   margin-left: 10px;
 `;

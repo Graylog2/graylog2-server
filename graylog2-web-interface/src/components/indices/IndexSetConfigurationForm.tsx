@@ -30,7 +30,6 @@ import 'components/indices/rotation';
 import 'components/indices/retention';
 import { DataTieringConfiguration, DataTieringVisualisation, prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
 import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
-import { IndexSetPropType } from 'stores/indices/IndexSetsStore';
 import type {
   RotationStrategyConfig,
   RetentionStrategyConfig,

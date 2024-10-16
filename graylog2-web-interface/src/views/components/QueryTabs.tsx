@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useRef } from 'react';
 import type * as Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { Col, Row } from 'components/bootstrap';
 import type { QueryId } from 'views/logic/queries/Query';

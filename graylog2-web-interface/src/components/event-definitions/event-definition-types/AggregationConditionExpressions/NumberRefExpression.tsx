@@ -39,6 +39,7 @@ type NumberRefExpressionProps = {
   onChange: (...args: any[]) => void;
   renderLabel: boolean;
   validation?: any;
+  parent?: any
 };
 
 const NumberRefExpression = ({
@@ -48,7 +49,7 @@ const NumberRefExpression = ({
   expression,
   onChange,
   renderLabel,
-  validation = {}
+  validation = {},
 }: NumberRefExpressionProps) => {
   const getSeries = useCallback((seriesId) => eventDefinition?.config?.series?.find((series) => series.id === seriesId), [eventDefinition?.config?.series]);
 

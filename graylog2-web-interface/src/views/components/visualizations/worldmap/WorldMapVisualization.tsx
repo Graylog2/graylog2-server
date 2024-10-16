@@ -22,7 +22,6 @@ import zip from 'lodash/zip';
 import isEmpty from 'lodash/isEmpty';
 
 import type Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
-import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';

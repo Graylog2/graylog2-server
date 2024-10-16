@@ -19,7 +19,6 @@ import styled from 'styled-components';
 
 import { Icon, Center } from 'components/common';
 
-import { WidgetErrorsList } from './WidgetPropTypes';
 import styles from './MessageWidgets.css';
 
 type WidgetError = {

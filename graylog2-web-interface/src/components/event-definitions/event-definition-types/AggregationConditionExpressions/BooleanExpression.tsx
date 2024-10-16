@@ -17,7 +17,6 @@
 import React from 'react';
 
 import { Clearfix } from 'components/bootstrap';
-import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 // eslint-disable-next-line import/no-cycle
 import AggregationConditionExpression from '../AggregationConditionExpression';
@@ -27,7 +26,7 @@ type BooleanExpressionProps = {
   parent?: any;
   level: number;
   onChange: (...args: any[]) => void;
-  onChildChange: (...args: any[]) => void;
+  onChildChange: (...args: any[]) => (...args: any[]) => void;
   validation?: any;
 };
 

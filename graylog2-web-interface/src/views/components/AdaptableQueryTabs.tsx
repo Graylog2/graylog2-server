@@ -18,7 +18,6 @@ import * as React from 'react';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import { OrderedSet } from 'immutable';
 
 import UserNotification from 'util/UserNotification';
