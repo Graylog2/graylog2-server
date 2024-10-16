@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 
@@ -120,13 +119,6 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
       </FullHeightCol>
     </FullHeightRow>
   );
-};
-
-EditMessageList.propTypes = {
-  children: CustomPropTypes.OneOrMoreChildren.isRequired,
-  config: PropTypes.object.isRequired,
-  fields: CustomPropTypes.FieldListType.isRequired,
-  onChange: PropTypes.func.isRequired,
 };
 
 export default EditMessageList;

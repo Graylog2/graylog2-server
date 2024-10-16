@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
 import styled, { css } from 'styled-components';
 
@@ -149,23 +148,6 @@ const PageHeader = ({ children = [], subpage = false, title, actions, topActions
       </Col>
     </ContentHeadRow>
   );
-};
-
-PageHeader.propTypes = {
-  /** Page header heading. */
-  title: PropTypes.node.isRequired,
-  /** Provide a page description */
-  children: PropTypes.node,
-  /** Section for actions like create or edit */
-  actions: PropTypes.node,
-  /** Indicates the lifecycle of the current page, which will display an indicator right next to the page title. */
-  lifecycle: PropTypes.oneOf(['experimental', 'legacy']),
-  /** Text to customize the default message for the given lifecycle. */
-  lifecycleMessage: PropTypes.node,
-  /** Specifies if the page header is children of a content `Row` or not. */
-  subpage: PropTypes.bool,
-  /** Specifies a specific link for the documentation. The title should be short. */
-  documentationLink: PropTypes.object,
 };
 
 export default PageHeader;

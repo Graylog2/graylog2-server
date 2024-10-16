@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useField } from 'formik';
 
 import { FormikFormGroup, InputOptionalInfo } from 'components/common';
@@ -198,22 +197,6 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
 
       return null;
   }
-};
-
-RuleBlockFormField.propTypes = {
-  param: PropTypes.shape({
-    type: PropTypes.string.isRequired,
-    transformed_type: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    optional: PropTypes.bool.isRequired,
-    rule_builder_variable: PropTypes.bool.isRequired,
-    description: PropTypes.string,
-  }).isRequired,
-  blockId: PropTypes.string,
-  functionName: PropTypes.string.isRequired,
-  order: PropTypes.number.isRequired,
-  outputVariableList: outputVariablesPropType,
-  resetField: PropTypes.func.isRequired,
 };
 
 export default RuleBlockFormField;

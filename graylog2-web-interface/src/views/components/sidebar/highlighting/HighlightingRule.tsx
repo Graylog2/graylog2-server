@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { forwardRef, useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
@@ -113,12 +112,16 @@ type Props = {
   dragHandleProps?: DragHandleProps;
 };
 
+type HighlightingRuleProps = {
+  rule: Rule;
+};
+
 const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
   rule,
   className,
   draggableProps,
-  dragHandleProps,
-}, ref) => {
+  dragHandleProps
+}: HighlightingRuleProps, ref) => {
   const { field, value, color, condition } = rule;
   const [showForm, setShowForm] = useState(false);
   const dispatch = useAppDispatch();
@@ -163,9 +166,5 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
     </Container>
   );
 });
-
-HighlightingRule.propTypes = {
-  rule: PropTypes.instanceOf(Rule).isRequired,
-};
 
 export default HighlightingRule;

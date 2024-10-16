@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
-import PropTypes from 'prop-types';
 
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import StreamsContext from 'contexts/StreamsContext';
@@ -33,14 +32,6 @@ const FilterAggregationFormContainer = (props: Props) => {
       <FilterAggregationForm streams={streams} {...props} />
     </FormWarningsProvider>
   );
-};
-
-FilterAggregationFormContainer.propTypes = {
-  action: PropTypes.oneOf(['create', 'edit']).isRequired,
-  validation: PropTypes.object.isRequired,
-  eventDefinition: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
 };
 
 export default FilterAggregationFormContainer;

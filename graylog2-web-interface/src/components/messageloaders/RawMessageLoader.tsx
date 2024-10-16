@@ -16,7 +16,6 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import type { Subtract } from 'utility-types';
 
@@ -375,13 +374,6 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, codecTypes
       </Col>
     </Row>
   );
-};
-
-RawMessageLoader.propTypes = {
-  onMessageLoaded: PropTypes.func.isRequired,
-  inputIdSelector: PropTypes.bool,
-  codecTypes: PropTypes.object,
-  inputs: PropTypes.object,
 };
 
 export default connect(

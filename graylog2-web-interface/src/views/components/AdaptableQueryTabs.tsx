@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
@@ -425,18 +424,6 @@ const AdaptableQueryTabs = ({
       )}
     </Container>
   );
-};
-
-AdaptableQueryTabs.propTypes = {
-  maxWidth: PropTypes.number.isRequired,
-  queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
-  titles: PropTypes.object.isRequired,
-  onRemove: PropTypes.func.isRequired,
-  onSelect: PropTypes.func.isRequired,
-  queryTitleEditModal: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.object }),
-  ]).isRequired,
 };
 
 export default AdaptableQueryTabs;

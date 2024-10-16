@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Button, Col, Label, Row, MenuItem } from 'components/bootstrap';
@@ -201,14 +200,6 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
       </Col>
     </StyledRow>
   );
-};
-
-RuleBlockDisplay.propTypes = {
-  block: ruleBlockPropType,
-  onDelete: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  negatable: PropTypes.bool,
-  onNegate: PropTypes.func.isRequired,
 };
 
 export default RuleBlockDisplay;

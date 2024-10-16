@@ -37,8 +37,4 @@ const DataTieringSummary = ({ config } : Props) => (
   </div>
 );
 
-DataTieringSummary.propTypes = {
-  config: dataTieringPropType.isRequired,
-};
-
 export default DataTieringSummary;

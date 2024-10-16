@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useRef, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import union from 'lodash/union';
 import uniq from 'lodash/uniq';
@@ -413,20 +412,6 @@ const CollectorsAdministration = ({
                                             }} />
     </PaginatedListContainer>
   );
-};
-
-CollectorsAdministration.propTypes = {
-  sidecarCollectorPairs: PropTypes.array.isRequired,
-  collectors: PropTypes.array.isRequired,
-  configurations: PropTypes.array.isRequired,
-  pagination: PropTypes.object.isRequired,
-  query: PropTypes.string.isRequired,
-  filters: PropTypes.object.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-  onFilter: PropTypes.func.isRequired,
-  onQueryChange: PropTypes.func.isRequired,
-  onConfigurationChange: PropTypes.func.isRequired,
-  onProcessAction: PropTypes.func.isRequired,
 };
 
 export default CollectorsAdministration;

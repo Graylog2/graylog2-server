@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon, Center } from 'components/common';
@@ -61,10 +60,5 @@ const ErrorWidget = ({ errors, title = 'While retrieving data for this widget, t
     </Description>
   </Center>
 );
-
-ErrorWidget.propTypes = {
-  errors: WidgetErrorsList.isRequired,
-  title: PropTypes.string,
-};
 
 export default ErrorWidget;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
 
@@ -178,12 +177,6 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
         )}
     </LoaderContainer>
   );
-};
-
-RecentMessageLoader.propTypes = {
-  inputs: PropTypes.object,
-  onMessageLoaded: PropTypes.func.isRequired,
-  selectedInputId: PropTypes.string,
 };
 
 export default RecentMessageLoader;

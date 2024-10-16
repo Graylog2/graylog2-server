@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import ActionDropdown from 'views/components/common/ActionDropdown';
 import IconButton from 'components/common/IconButton';
@@ -29,9 +28,5 @@ const QueryActionDropdown = ({ children }: Props) => (
     {children}
   </ActionDropdown>
 );
-
-QueryActionDropdown.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 export default QueryActionDropdown;

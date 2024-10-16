@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { forwardRef, useMemo, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import { useTheme } from 'styled-components';
 import type { IMarker } from 'react-ace';
 
@@ -75,9 +74,27 @@ const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryVal
   ];
 };
 
+type BasicQueryInputProps = {
+  className?: string;
+  // @ts-ignore
+  disabled?: boolean;
+  enableAutocompletion?: boolean;
+  error?: any;
+  height?: number;
+  inputId?: string;
+  maxLines?: number;
+  onBlur?: (...args: any[]) => void;
+  onChange?: (...args: any[]) => void;
+  onLoad?: (...args: any[]) => void;
+  placeholder?: string;
+  value?: string;
+  warning?: any;
+  wrapEnabled?: boolean;
+};
+
 // Basic query input component which is being implemented by the `QueryInput` component.
 // This is just a very basic query input which can be implemented for example to display a read only query.
-const BasicQueryInput = forwardRef<any, Props>((props, ref) => {
+const BasicQueryInput = forwardRef<any, Props>((props: BasicQueryInputProps, ref) => {
   const {
     className = '',
     disabled = false,
@@ -155,23 +172,5 @@ const BasicQueryInput = forwardRef<any, Props>((props, ref) => {
 
   return null;
 });
-
-BasicQueryInput.propTypes = {
-  className: PropTypes.string,
-  // @ts-ignore
-  disabled: PropTypes.bool,
-  enableAutocompletion: PropTypes.bool,
-  error: PropTypes.any,
-  height: PropTypes.number,
-  inputId: PropTypes.string,
-  maxLines: PropTypes.number,
-  onBlur: PropTypes.func,
-  onChange: PropTypes.func,
-  onLoad: PropTypes.func,
-  placeholder: PropTypes.string,
-  value: PropTypes.string,
-  warning: PropTypes.any,
-  wrapEnabled: PropTypes.bool,
-};
 
 export default React.memo(BasicQueryInput);

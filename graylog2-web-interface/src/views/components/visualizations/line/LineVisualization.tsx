@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type { Layout } from 'plotly.js';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
@@ -89,11 +88,5 @@ const LineVisualization = makeVisualization(({
             chartData={chartDataResult} />
   );
 }, 'line');
-
-LineVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-  height: PropTypes.number,
-};
 
 export default LineVisualization;

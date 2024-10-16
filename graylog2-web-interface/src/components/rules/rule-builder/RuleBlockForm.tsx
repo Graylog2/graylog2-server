@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
@@ -247,24 +246,6 @@ const RuleBlockForm = ({
       </Col>
     </Row>
   );
-};
-
-RuleBlockForm.propTypes = {
-  existingBlock: ruleBlockPropType,
-  onAdd: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSelect: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired,
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string,
-      value: PropTypes.any,
-    }),
-  ).isRequired,
-  order: PropTypes.number.isRequired,
-  outputVariableList: outputVariablesPropType,
-  selectedBlockDict: blockDictPropType,
-  type: PropTypes.oneOf(['action', 'condition']).isRequired,
 };
 
 export default RuleBlockForm;

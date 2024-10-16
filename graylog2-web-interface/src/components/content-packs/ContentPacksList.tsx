@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import {
@@ -136,13 +135,6 @@ const ContentPacksList = ({ contentPacks = [], contentPackMetadata = {}, onDelet
       </Row>
     </div>
   );
-};
-
-ContentPacksList.propTypes = {
-  contentPacks: PropTypes.arrayOf(PropTypes.object),
-  contentPackMetadata: PropTypes.object,
-  onDeletePack: PropTypes.func,
-  onInstall: PropTypes.func,
 };
 
 export default ContentPacksList;

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
 
 import CustomPropTypes from 'views/components/CustomPropTypes';
@@ -72,12 +71,6 @@ const FieldSortSelect = ({ fields, onChange, sort }: Props) => {
             aria-label="Select field for sorting"
             value={currentValue(sort, options)} />
   );
-};
-
-FieldSortSelect.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  fields: CustomPropTypes.FieldListType.isRequired,
-  sort: PropTypes.array.isRequired,
 };
 
 export default FieldSortSelect;

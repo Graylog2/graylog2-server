@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -410,20 +409,6 @@ const IndexSetConfigurationForm = ({
       </Col>
     </Row>
   );
-};
-
-IndexSetConfigurationForm.propTypes = {
-  indexSet: IndexSetPropType,
-  rotationStrategies: PropTypes.array.isRequired,
-  retentionStrategies: PropTypes.array.isRequired,
-  retentionStrategiesContext: PropTypes.shape({
-    max_index_retention_period: PropTypes.string,
-  }).isRequired,
-  create: PropTypes.bool,
-  onUpdate: PropTypes.func.isRequired,
-  cancelLink: PropTypes.string.isRequired,
-  submitButtonText: PropTypes.string.isRequired,
-  submitLoadingText: PropTypes.string.isRequired,
 };
 
 export default IndexSetConfigurationForm;

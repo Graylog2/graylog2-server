@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
 
@@ -115,12 +114,6 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title } : Props) => 
       {trafficGraph}
     </>
   );
-};
-
-TrafficGraphWithDaySelect.propTypes = {
-  traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
-  trafficLimit: PropTypes.number,
-  title: PropTypes.string,
 };
 
 export default TrafficGraphWithDaySelect;

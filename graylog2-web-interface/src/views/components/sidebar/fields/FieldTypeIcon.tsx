@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
@@ -68,11 +67,6 @@ const FieldTypeIcon = ({ type, monospace = true }: Props) => {
   const icon = <Icon name={iconName(type.type)} className={styles.fieldTypeIcon} />;
 
   return monospace ? <IconWrapper>{icon}</IconWrapper> : icon;
-};
-
-FieldTypeIcon.propTypes = {
-  type: PropTypes.instanceOf(FieldType).isRequired,
-  monospace: PropTypes.bool,
 };
 
 export default FieldTypeIcon;

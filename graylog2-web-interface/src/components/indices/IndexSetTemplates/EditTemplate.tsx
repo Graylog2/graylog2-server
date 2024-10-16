@@ -71,8 +71,4 @@ const EditTemplate = ({
   );
 };
 
-EditTemplate.propTypes = {
-  template: indexSetTemplatePropType.isRequired,
-};
-
 export default EditTemplate;

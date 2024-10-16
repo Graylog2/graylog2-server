@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import type { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
@@ -51,7 +50,15 @@ type ColorPreviewProps = {
   onClick?: () => void,
 };
 
-const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ color, onClick = () => {} }, ref) => {
+type ColorPreviewProps = {
+  color: any;
+  onClick?: (...args: any[]) => void;
+};
+
+const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({
+  color,
+  onClick = () => {}
+}: ColorPreviewProps, ref) => {
   if (color.type === 'static') {
     return <StaticColorPreview ref={ref} data-testid="static-color-preview" onClick={onClick} color={(color as StaticColor).color} />;
   }
@@ -62,10 +69,5 @@ const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ colo
 
   throw new Error(`Invalid highlighting color type: ${color}`);
 });
-
-ColorPreview.propTypes = {
-  color: PropTypes.any.isRequired,
-  onClick: PropTypes.func,
-};
 
 export default ColorPreview;

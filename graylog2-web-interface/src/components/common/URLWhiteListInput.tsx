@@ -16,7 +16,6 @@
  */
 import type { SyntheticEvent } from 'react';
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';
 import { isValidURL } from 'util/URLUtils';
@@ -126,22 +125,6 @@ const URLWhiteListInput = ({ label, onChange, validationMessage = '', validation
            labelClassName={labelClassName}
            wrapperClassName={wrapperClassName} />
   );
-};
-
-URLWhiteListInput.propTypes = {
-  autofocus: PropTypes.bool,
-  label: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  validationState: PropTypes.string,
-  validationMessage: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.string,
-  ]),
-  url: PropTypes.string,
-  onValidationChange: PropTypes.func,
-  labelClassName: PropTypes.string,
-  wrapperClassName: PropTypes.string,
-  urlType: PropTypes.oneOf(['regex', 'literal']),
 };
 
 export default URLWhiteListInput;

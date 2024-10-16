@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { DataTable } from 'components/common';
 import type { RuleType, MetricsConfigType, RulesContext } from 'stores/rules/RulesStore';
@@ -35,16 +34,6 @@ type State = {
 };
 
 class RuleList extends React.Component<Props, State> {
-  static propTypes = {
-    rules: PropTypes.array.isRequired,
-
-    rulesContext: PropTypes.exact({
-      used_in_pipelines: PropTypes.objectOf(PropTypes.any),
-    }),
-    onDelete: PropTypes.func.isRequired,
-    searchFilter: PropTypes.node.isRequired,
-  };
-
   static defaultProps = {
     rulesContext: undefined,
   };

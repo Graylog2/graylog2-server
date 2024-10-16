@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import isString from 'lodash/isString';
 import trim from 'lodash/trim';
 import trunc from 'lodash/truncate';
@@ -92,12 +91,6 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
     case 'percentage': return <PercentageField value={value} />;
     default: return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
   }
-};
-
-TypeSpecificValue.propTypes = {
-  truncate: PropTypes.bool,
-  type: CustomPropTypes.FieldType,
-  value: PropTypes.any,
 };
 
 export default TypeSpecificValue;

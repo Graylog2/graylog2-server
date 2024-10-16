@@ -25,15 +25,13 @@ type Props = React.ComponentProps<typeof Select>;
  * props to the underlying `Select` component, so please look there to find more information about them.
  */
 class MultiSelect extends React.Component<Props> {
-  static propTypes = Select.propTypes;
+ _select = undefined;
 
-  _select = undefined;
+ getValue = () => this._select.getValue();
 
-  getValue = () => this._select.getValue();
-
-  render() {
-    return <Select ref={(c) => { this._select = c; }} multi {...this.props} />;
-  }
+ render() {
+   return <Select ref={(c) => { this._select = c; }} multi {...this.props} />;
+ }
 }
 
 export default MultiSelect;

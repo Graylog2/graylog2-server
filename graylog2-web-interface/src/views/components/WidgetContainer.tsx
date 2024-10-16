@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
 
 import { RowContentStyles } from 'components/bootstrap/Row';
 
@@ -32,7 +31,20 @@ type Props = React.PropsWithChildren<{
   style?: React.CSSProperties,
 }>
 
-const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(({ children, className, isFocused, style = {}, ...rest }, ref) => {
+type WidgetContainerProps = {
+  children: any;
+  className?: string;
+  isFocused: boolean;
+  style?: any;
+};
+
+const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(({
+  children,
+  className,
+  isFocused,
+  style = {},
+  ...rest
+}: WidgetContainerProps, ref) => {
   let containerStyle = {
     ...style,
     transition: 'none',
@@ -55,12 +67,5 @@ const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(({ children, cla
     </Container>
   );
 });
-
-WidgetContainer.propTypes = {
-  children: PropTypes.any.isRequired,
-  className: PropTypes.string,
-  isFocused: PropTypes.bool.isRequired,
-  style: PropTypes.object,
-};
 
 export default WidgetContainer;

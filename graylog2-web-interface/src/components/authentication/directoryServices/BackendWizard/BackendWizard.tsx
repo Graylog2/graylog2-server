@@ -21,7 +21,6 @@ import camelCase from 'lodash/camelCase';
 import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 import type { $PropertyType } from 'utility-types';
-import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 
 import { validateField } from 'util/FormsUtils';
@@ -364,19 +363,6 @@ const BackendWizard = ({ initialValues, initialStepKey = SERVER_CONFIG_KEY, onSu
         : wizard}
     </BackendWizardContext.Provider>
   );
-};
-
-BackendWizard.propTypes = {
-  authBackendMeta: PropTypes.shape({
-    backendHasPassword: PropTypes.bool,
-    backendId: PropTypes.string,
-    serviceTitle: PropTypes.string.isRequired,
-    serviceType: PropTypes.string.isRequired,
-  }).isRequired,
-  help: PropTypes.object,
-  initialStepKey: PropTypes.string,
-  initialValues: PropTypes.object.isRequired,
-  excludedFields: PropTypes.object,
 };
 
 export default BackendWizard;

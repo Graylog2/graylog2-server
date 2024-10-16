@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useRef } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
@@ -82,18 +81,6 @@ const OverlayDropdown = ({
       </Menu.Dropdown>
     </Menu>
   );
-};
-
-OverlayDropdown.propTypes = {
-  alwaysShowCaret: PropTypes.bool,
-  children: PropTypes.node.isRequired,
-  closeOnSelect: PropTypes.bool,
-  dropdownZIndex: PropTypes.number,
-  menuContainer: PropTypes.object,
-  onToggle: PropTypes.func.isRequired,
-  placement: PropTypes.string,
-  show: PropTypes.bool.isRequired,
-  toggleChild: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 };
 
 export default OverlayDropdown;

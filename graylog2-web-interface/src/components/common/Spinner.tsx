@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import type { IconName } from 'components/common/Icon';
@@ -49,14 +48,5 @@ const Spinner = ({ name = 'progress_activity', text = 'Loading...', delay = 200,
     </Container>
   </Delayed>
 );
-
-Spinner.propTypes = {
-  /** Delay in ms before displaying the spinner */
-  delay: PropTypes.number,
-  /** Name of the Icon to use. */
-  name: PropTypes.string,
-  /** Text to show while loading. */
-  text: PropTypes.string,
-};
 
 export default Spinner;

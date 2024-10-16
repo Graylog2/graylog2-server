@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -306,14 +305,6 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
       </WidgetFrame>
     </WidgetColorContext>
   );
-};
-
-Widget.propTypes = {
-  editing: PropTypes.bool,
-  id: PropTypes.string.isRequired,
-  onPositionsChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  widget: PropTypes.instanceOf(WidgetModel).isRequired,
 };
 
 export default Widget;

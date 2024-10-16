@@ -178,9 +178,4 @@ const HeatmapVisualization = makeVisualization(({ config, data, height, width }:
   );
 }, 'heatmap');
 
-HeatmapVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-};
-
 export default HeatmapVisualization;

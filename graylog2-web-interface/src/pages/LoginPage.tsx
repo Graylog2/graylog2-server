@@ -163,19 +163,17 @@ const LoginPage = () => {
   && loginFormState === LOGIN_INITIALIZED_STATE;
 
   return (
-    (
-      <DocumentTitle title="Sign in">
-        <LoginChrome>
-          <LastError />
-          <PluggableLoginForm />
-          {shouldDisplayFallbackLink && (
-          <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
-            {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
-          </StyledButton>
-          )}
-        </LoginChrome>
-      </DocumentTitle>
-    )
+    (<DocumentTitle title="Sign in">
+      <LoginChrome>
+        <LastError />
+        <PluggableLoginForm />
+        {shouldDisplayFallbackLink && (
+        <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
+          {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
+        </StyledButton>
+        )}
+      </LoginChrome>
+    </DocumentTitle>)
   );
 };
 

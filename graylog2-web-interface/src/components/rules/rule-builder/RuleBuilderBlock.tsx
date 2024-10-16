@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
@@ -267,17 +266,6 @@ const RuleBuilderBlock = ({
       )}
     </BlockContainer>
   );
-};
-
-RuleBuilderBlock.propTypes = {
-  type: PropTypes.oneOf(['action', 'condition']).isRequired,
-  blockDict: PropTypes.arrayOf(blockDictPropType).isRequired,
-  block: ruleBlockPropType,
-  order: PropTypes.number.isRequired,
-  outputVariableList: outputVariablesPropType,
-  addBlock: PropTypes.func.isRequired,
-  updateBlock: PropTypes.func.isRequired,
-  deleteBlock: PropTypes.func.isRequired,
 };
 
 export default RuleBuilderBlock;

@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2020 Graylog, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Server Side Public License, version 1,
- * as published by MongoDB, Inc.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * Server Side Public License for more details.
- *
- * You should have received a copy of the Server Side Public License
- * along with this program. If not, see
- * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import type { ForwardedRef } from 'react';
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
@@ -247,21 +230,6 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     </WrapperComponent>
   );
 });
-
-ConfigurationForm.propTypes = {
-  cancelAction: PropTypes.func,
-  configFields: PropTypes.any,
-  children: PropTypes.any,
-  titleHelpText: PropTypes.string,
-  includeTitleField: PropTypes.bool,
-  submitAction: PropTypes.func.isRequired,
-  title: PropTypes.any,
-  titleValue: PropTypes.string,
-  typeName: PropTypes.string,
-  values: PropTypes.object,
-  wrapperComponent: PropTypes.any,
-  submitButtonText: PropTypes.string,
-};
 
 export default ConfigurationForm as <T extends object>(
   props: Props<T> & { ref?: ForwardedRef<RefType<T>> },

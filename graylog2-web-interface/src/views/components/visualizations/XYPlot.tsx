@@ -16,7 +16,6 @@
  */
 
 import React, { useCallback } from 'react';
-import PropTypes from 'prop-types';
 import merge from 'lodash/merge';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -124,21 +123,6 @@ const XYPlot = ({
                    setChartColor={setChartColor} />
     </PlotLegend>
   );
-};
-
-XYPlot.propTypes = {
-  axisType: PropTypes.oneOf(axisTypes),
-  chartData: PropTypes.array.isRequired,
-  config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
-  effectiveTimerange: PropTypes.exact({
-
-    type: PropTypes.string.isRequired,
-    from: PropTypes.string.isRequired,
-    to: PropTypes.string.isRequired,
-  }),
-  plotLayout: PropTypes.object,
-  setChartColor: PropTypes.func,
-  onZoom: PropTypes.func,
 };
 
 export default XYPlot;

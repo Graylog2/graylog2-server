@@ -115,11 +115,6 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
   );
 }, 'pie');
 
-PieVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-};
-
 PieVisualization.displayName = 'PieVisualization';
 
 export default PieVisualization;

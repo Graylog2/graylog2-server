@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type { Layout } from 'plotly.js';
 
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
@@ -90,11 +89,5 @@ const AreaVisualization = makeVisualization(({
             chartData={chartDataResult} />
   );
 }, 'area');
-
-AreaVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-  height: PropTypes.number,
-};
 
 export default AreaVisualization;

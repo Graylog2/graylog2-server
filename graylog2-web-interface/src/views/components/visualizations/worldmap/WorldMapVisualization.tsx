@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
-import PropTypes from 'prop-types';
 import flow from 'lodash/flow';
 import fromPairs from 'lodash/fromPairs';
 import get from 'lodash/get';
@@ -115,12 +114,5 @@ const WorldMapVisualization = makeVisualization(({
                       onChange={_onChange} />
   );
 }, 'map');
-
-WorldMapVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-  onChange: PropTypes.func.isRequired,
-  width: PropTypes.number.isRequired,
-};
 
 export default WorldMapVisualization;

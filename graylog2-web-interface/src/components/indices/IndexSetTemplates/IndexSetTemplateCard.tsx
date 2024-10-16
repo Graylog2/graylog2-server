@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -85,12 +84,6 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
       )}
     </StyledCard>
   );
-};
-
-IndexSetTemplateCard.propTypes = {
-  template: indexSetTemplatePropType.isRequired,
-  handleCardClick: PropTypes.func.isRequired,
-  isSelected: PropTypes.bool.isRequired,
 };
 
 export default IndexSetTemplateCard;

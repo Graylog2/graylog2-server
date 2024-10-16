@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { ListGroupItem } from 'components/bootstrap';
@@ -42,10 +41,6 @@ const ControlledTableListHeader = ({ children = '' }: { children?: React.ReactNo
   const header = typeof children === 'string' ? wrapStringChildren(children) : children;
 
   return <StyledListGroupItem>{header}</StyledListGroupItem>;
-};
-
-ControlledTableListHeader.propTypes = {
-  children: PropTypes.node,
 };
 
 export default ControlledTableListHeader;

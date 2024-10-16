@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { OverlayTrigger } from 'components/common';
@@ -100,18 +99,6 @@ const HoverForHelp = ({
                 size={iconSize} />
   </OverlayTrigger>
 );
-
-HoverForHelp.propTypes = {
-  displayLeftMargin: PropTypes.bool,
-  children: PropTypes.any.isRequired,
-  className: PropTypes.string,
-  id: PropTypes.string,
-  placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-  pullRight: PropTypes.bool,
-  title: PropTypes.string,
-  testId: PropTypes.string,
-  trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'focus', 'hover'])) || PropTypes.oneOf(['click', 'focus', 'hover']),
-};
 
 /** @component */
 export default HoverForHelp;

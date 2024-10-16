@@ -18,7 +18,6 @@
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
@@ -362,11 +361,3 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
 };
 
 export default TemplateForm;
-
-TemplateForm.propTypes = {
-  initialValues: indexSetTemplatePropType,
-  submitButtonText: PropTypes.string.isRequired,
-  submitLoadingText: PropTypes.string.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-};

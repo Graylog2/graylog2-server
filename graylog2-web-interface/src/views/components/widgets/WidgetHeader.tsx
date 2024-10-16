@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Spinner, Icon } from 'components/common';
@@ -112,13 +111,5 @@ const WidgetHeader = ({ children = null, onRename, hideDragHandle = false, title
     </WidgetActionDropdown>
   </Container>
 );
-
-WidgetHeader.propTypes = {
-  children: CustomPropTypes.OneOrMoreChildren,
-  onRename: PropTypes.func,
-  hideDragHandle: PropTypes.bool,
-  title: PropTypes.node.isRequired,
-  loading: PropTypes.bool,
-};
 
 export default WidgetHeader;

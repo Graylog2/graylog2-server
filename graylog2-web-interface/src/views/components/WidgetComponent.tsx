@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import PropTypes from 'prop-types';
 
 import type { BackendWidgetPosition } from 'views/types';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -80,12 +79,6 @@ const WidgetComponent = ({
       </WidgetContext.Provider>
     </DrilldownContextProvider>
   );
-};
-
-WidgetComponent.propTypes = {
-  editing: PropTypes.bool.isRequired,
-  onPositionsChange: PropTypes.func,
-  position: PropTypes.shape(Position).isRequired,
 };
 
 export default WidgetComponent;

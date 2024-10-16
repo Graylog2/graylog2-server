@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useContext, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -120,15 +119,6 @@ const TimeRangeFilter = ({
       </FlexContainer>
     </TimeRangePicker>
   );
-};
-
-TimeRangeFilter.propTypes = {
-  className: PropTypes.string,
-  disabled: PropTypes.bool,
-  hasErrorOnMount: PropTypes.bool,
-  noOverride: PropTypes.bool,
-  validTypes: PropTypes.arrayOf(PropTypes.string),
-  withinPortal: PropTypes.bool,
 };
 
 export default TimeRangeFilter;

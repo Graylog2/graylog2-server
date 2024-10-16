@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type { Layout } from 'plotly.js';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
@@ -154,11 +153,5 @@ const BarVisualization = makeVisualization(({
             plotLayout={layout} />
   );
 }, 'bar');
-
-BarVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-  height: PropTypes.number,
-};
 
 export default BarVisualization;

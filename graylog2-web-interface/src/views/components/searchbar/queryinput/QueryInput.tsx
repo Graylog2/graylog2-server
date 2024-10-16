@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo, useContext, useRef, useImperativeHandle } from 'react';
-import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -247,6 +246,27 @@ type Props = BaseProps & {
   view?: View
 };
 
+type QueryInputProps = {
+  className?: string;
+  completerFactory?: (...args: any[]) => void;
+  disableExecution?: boolean;
+  error?: any;
+  inputId?: string;
+  height?: number;
+  isValidating: boolean;
+  maxLines?: number;
+  onBlur?: (...args: any[]) => void;
+  onChange: (...args: any[]) => void;
+  onExecute: (...args: any[]) => void;
+  placeholder?: string;
+  streams?: any[];
+  timeRange?: any;
+  value?: string;
+  warning?: any;
+  wrapEnabled?: boolean;
+  validate: (...args: any[]) => void;
+};
+
 const QueryInput = React.forwardRef<Editor, Props>(({
   className = '',
   commands = [],
@@ -268,8 +288,8 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   warning,
   wrapEnabled,
   name,
-  view,
-}, outerRef) => {
+  view
+}: QueryInputProps, outerRef) => {
   const innerRef = useRef<Editor>(null);
   const inputElement = innerRef.current?.container;
   const { width: inputWidth } = useElementDimensions(inputElement);
@@ -355,26 +375,5 @@ const QueryInput = React.forwardRef<Editor, Props>(({
     </Container>
   );
 });
-
-QueryInput.propTypes = {
-  className: PropTypes.string,
-  completerFactory: PropTypes.func,
-  disableExecution: PropTypes.bool,
-  error: PropTypes.any,
-  inputId: PropTypes.string,
-  height: PropTypes.number,
-  isValidating: PropTypes.bool.isRequired,
-  maxLines: PropTypes.number,
-  onBlur: PropTypes.func,
-  onChange: PropTypes.func.isRequired,
-  onExecute: PropTypes.func.isRequired,
-  placeholder: PropTypes.string,
-  streams: PropTypes.array,
-  timeRange: PropTypes.object,
-  value: PropTypes.string,
-  warning: PropTypes.any,
-  wrapEnabled: PropTypes.bool,
-  validate: PropTypes.func.isRequired,
-};
 
 export default QueryInput;

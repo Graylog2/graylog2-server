@@ -297,7 +297,7 @@ const RuleBuilder = () => {
   );
 
   return (
-    <RuleBuilderProvider>
+    (<RuleBuilderProvider>
       <form onSubmit={(e) => handleSave(e, true)}>
         <Row className="content">
           <Col xs={12}>
@@ -326,14 +326,14 @@ const RuleBuilder = () => {
                 <StyledPanelBody>
                   {rule.rule_builder.conditions.map((condition, index) => (
                   // eslint-disable-next-line react/no-array-index-key
-                    <RuleBuilderBlock key={index}
+                    (<RuleBuilderBlock key={index}
                                       blockDict={conditionsDict || []}
                                       block={condition}
                                       order={index}
                                       type="condition"
                                       addBlock={addBlock}
                                       updateBlock={updateBlock}
-                                      deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
+                                      deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />)
                   ))}
                   <RuleBuilderBlock blockDict={conditionsDict || []}
                                     order={newConditionBlockIndex}
@@ -358,7 +358,7 @@ const RuleBuilder = () => {
                 <StyledPanelBody>
                   {rule.rule_builder.actions.map((action, index) => (
                   // eslint-disable-next-line react/no-array-index-key
-                    <RuleBuilderBlock key={index}
+                    (<RuleBuilderBlock key={index}
                                       blockDict={actionsDict || []}
                                       block={action}
                                       order={index}
@@ -366,7 +366,7 @@ const RuleBuilder = () => {
                                       outputVariableList={outputVariableList()}
                                       addBlock={addBlock}
                                       updateBlock={updateBlock}
-                                      deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
+                                      deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />)
                   ))}
                   <RuleBuilderBlock blockDict={actionsDict || []}
                                     order={newActionBlockIndex}
@@ -428,7 +428,7 @@ const RuleBuilder = () => {
                                   rule={ruleSourceCodeToShow} />
         )}
       </form>
-    </RuleBuilderProvider>
+    </RuleBuilderProvider>)
   );
 };
 

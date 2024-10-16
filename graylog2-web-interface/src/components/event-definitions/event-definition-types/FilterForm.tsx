@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
@@ -606,11 +605,3 @@ const FilterForm = ({
 };
 
 export default FilterForm;
-
-FilterForm.propTypes = {
-  eventDefinition: PropTypes.object.isRequired,
-  validation: PropTypes.object.isRequired,
-  streams: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
-  currentUser: PropTypes.object.isRequired,
-};

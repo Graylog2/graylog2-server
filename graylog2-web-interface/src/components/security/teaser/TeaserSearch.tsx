@@ -54,9 +54,9 @@ const searchAreaContainer = (hotspots: Array<HotspotMeta>) => ({ children }: Rea
     <DashboardOverlay>
       {hotspots.map(({ description, positionX, positionY }, index) => (
         // eslint-disable-next-line react/no-array-index-key
-        <Hotspot positionX={positionX} positionY={positionY} index={index} key={`hotspot-${index}`}>
+        (<Hotspot positionX={positionX} positionY={positionY} index={index} key={`hotspot-${index}`}>
           {description}
-        </Hotspot>
+        </Hotspot>)
       ))}
     </DashboardOverlay>
     <div inert="">

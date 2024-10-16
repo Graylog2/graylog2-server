@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -202,26 +201,6 @@ const MessageTableEntry = ({
       </TableBody>
     </AdditionalContext.Provider>
   );
-};
-
-MessageTableEntry.propTypes = {
-  disableSurroundingSearch: PropTypes.bool,
-  expandAllRenderAsync: PropTypes.bool.isRequired,
-  expanded: PropTypes.bool.isRequired,
-  fields: PropTypes.object.isRequired,
-  message: PropTypes.shape({
-    fields: PropTypes.object.isRequired,
-    highlight_ranges: PropTypes.object,
-    id: PropTypes.string.isRequired,
-    index: PropTypes.string.isRequired,
-    decoration_stats: PropTypes.shape({
-      added_fields: PropTypes.object,
-      changed_fields: PropTypes.object,
-      removed_fields: PropTypes.object,
-    }),
-  }).isRequired,
-  showMessageRow: PropTypes.bool,
-  toggleDetail: PropTypes.func.isRequired,
 };
 
 export default MessageTableEntry;

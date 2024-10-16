@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { useContext, useMemo } from 'react';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -45,16 +44,6 @@ const ValueActions = ({ children, element, field, menuContainer = document.body,
       {children}
     </Action>
   );
-};
-
-ValueActions.propTypes = {
-  children: PropTypes.node.isRequired,
-  element: PropTypes.node.isRequired,
-  field: PropTypes.string.isRequired,
-  menuContainer: PropTypes.object,
-  queryId: PropTypes.string.isRequired,
-  type: CustomPropTypes.FieldType,
-  value: PropTypes.oneOfType([PropTypes.node, PropTypes.object]).isRequired,
 };
 
 export default ValueActions;

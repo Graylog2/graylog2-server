@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2020 Graylog, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Server Side Public License, version 1,
- * as published by MongoDB, Inc.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * Server Side Public License for more details.
- *
- * You should have received a copy of the Server Side Public License
- * along with this program. If not, see
- * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
@@ -225,61 +208,6 @@ const SearchForm = ({
       </FormContent>
     </StyledContainer>
   );
-};
-
-SearchForm.propTypes = {
-  /** The query string value. */
-  query: PropTypes.string,
-  /**
-   * Callback that gets called on every update of the query string.
-   * The first argument of the function is the query string.
-   */
-  onQueryChange: PropTypes.func,
-  /**
-   * Callback when a search was submitted. The function receives the query
-   * and a callback to reset the loading state of the form as arguments.
-   */
-  onSearch: PropTypes.func,
-  /** Callback when the input was reset. The function is called with no arguments. */
-  onReset: PropTypes.func,
-  /** Search field label. */
-  label: PropTypes.string,
-  /** The className is needed to override the component style with styled-components  */
-  className: PropTypes.string,
-  /** Search field placeholder. */
-  placeholder: PropTypes.string,
-  /** Class name for the search form container. */
-  wrapperClass: PropTypes.string,
-  /** Width to use in the search field. */
-  queryWidth: PropTypes.any,
-  /** Top margin to use in the search form container. */
-  topMargin: PropTypes.number,
-  /** Separation between search field and buttons. */
-  buttonLeftMargin: PropTypes.number,
-  /**
-   * Specifies if it should display a loading state from the moment the
-   * search button is pressed until the component receives new props or
-   * the callback function in the `onSearch` method is called.
-   */
-  useLoadingState: PropTypes.bool,
-  /**
-   * Specifies a component that should be render inside the search input
-   * field, and is meant to act as a trigger to display help about the query.
-   * You may want to enlarge `queryWidth` to give the user more room to write the
-   * query if you use this prop.
-   *
-   * **Note:** Due to size constraints rendering this component inside the input,
-   * this component should contain very little text and should be very light. For
-   * instance, a `Button` component with `bsStyle="link"` and an icon
-   * inside would work just fine.
-   */
-  queryHelpComponent: PropTypes.element,
-  /** Elements to display on the right of the search form. */
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]),
-  focusAfterMount: PropTypes.bool,
 };
 
 export default SearchForm;

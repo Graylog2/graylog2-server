@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { DataTable, Icon } from 'components/common';
@@ -93,12 +92,6 @@ const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
                filterLabel=""
                filterKeys={[]} />
   );
-};
-
-StageRules.propTypes = {
-  pipeline: PropTypes.object.isRequired,
-  stage: PropTypes.object.isRequired,
-  rules: PropTypes.array,
 };
 
 export default StageRules;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Table } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -102,12 +101,6 @@ const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick } : Props) =>
       {renderFunctions(entries)}
     </Table>
   );
-};
-
-RuleHelperTable.propTypes = {
-  entries: PropTypes.arrayOf(blockDictPropType).isRequired,
-  expanded: PropTypes.objectOf(PropTypes.bool),
-  onFunctionClick: PropTypes.func,
 };
 
 export default RuleHelperTable;

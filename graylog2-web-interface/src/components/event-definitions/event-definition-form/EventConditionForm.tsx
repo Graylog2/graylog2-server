@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import defaultTo from 'lodash/defaultTo';
 import get from 'lodash/get';
@@ -183,15 +182,6 @@ const EventConditionForm = ({ action = 'create', entityTypes, eventDefinition, v
       )}
     </Row>
   );
-};
-
-EventConditionForm.propTypes = {
-  action: PropTypes.oneOf(['create', 'edit']),
-  entityTypes: PropTypes.object,
-  eventDefinition: PropTypes.object.isRequired,
-  currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
-  validation: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
 };
 
 export default EventConditionForm;

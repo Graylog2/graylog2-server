@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import type { SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
 import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
@@ -95,35 +94,6 @@ const FormikInput = ({ children = null, disabled = false, required = false, auto
       }}
     </Field>
   );
-};
-
-FormikInput.propTypes = {
-  autoComplete: PropTypes.string,
-  addonAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  bsSize: PropTypes.string,
-  buttonAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  children: PropTypes.oneOfType([
-    PropTypes.array,
-    PropTypes.element,
-  ]),
-  disabled: PropTypes.bool,
-  error: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  formGroupClassName: PropTypes.string,
-  help: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  labelClassName: PropTypes.string,
-  max: PropTypes.number,
-  min: PropTypes.number,
-  maxLength: PropTypes.number,
-  minLength: PropTypes.number,
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-  placeholder: PropTypes.string,
-  required: PropTypes.bool,
-  type: PropTypes.string,
-  validate: PropTypes.func,
-  wrapperClassName: PropTypes.string,
-  autoFocus: PropTypes.bool,
 };
 
 export default FormikInput;

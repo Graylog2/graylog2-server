@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useContext, useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -179,15 +178,6 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
       </TableWrapper>
     </MessageTableProviders>
   );
-};
-
-MessageTable.propTypes = {
-  activeQueryId: PropTypes.string.isRequired,
-  config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-  fields: CustomPropTypes.FieldListType.isRequired,
-  messages: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onSortChange: PropTypes.func.isRequired,
-  setLoadingState: PropTypes.func.isRequired,
 };
 
 export default React.memo(MessageTable);
