@@ -29,8 +29,8 @@ const Container = styled.div`
 `;
 
 type Props = {
-  disabled?: boolean
-  value?: Array<string>
+  disabled?: boolean,
+  value?: Array<string>,
   streams: Array<{ key: string, value: string }>,
   onChange: (newStreamIds: Array<string>) => void,
   multi?: boolean,
