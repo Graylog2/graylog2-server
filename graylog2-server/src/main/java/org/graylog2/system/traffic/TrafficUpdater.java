@@ -28,8 +28,7 @@ public interface TrafficUpdater {
                        NodeId nodeId,
                        long inLastMinute,
                        long outLastMinute,
-                       long decodedLastMinute,
-                       long dataWarehouseOutLastMinute);
+                       long decodedLastMinute);
 
     static DateTime getDayBucketStart(DateTime observationTime) {
         return observationTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
