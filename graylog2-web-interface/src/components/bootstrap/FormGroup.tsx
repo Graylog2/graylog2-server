@@ -73,7 +73,7 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
 `;
 });
 
-type FormGroupProps = {
+type FormGroupProps = React.ComponentProps<typeof StyledFormGroup> & {
   children: React.ReactNode;
   validationState?: "error" | "success" | "warning";
 };
