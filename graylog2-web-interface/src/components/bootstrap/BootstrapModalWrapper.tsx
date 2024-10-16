@@ -58,7 +58,7 @@ BootstrapModalWrapper.propTypes = {
   bsSize: PropTypes.oneOf([
     'large', 'lg', 'small', 'sm',
   ]),
-  backdrop: PropTypes.oneOf(['static', true, false]),
+  backdrop: PropTypes.oneOfType([PropTypes.bool, PropTypes.oneOf(['static'])]),
   role: PropTypes.string,
 };
 

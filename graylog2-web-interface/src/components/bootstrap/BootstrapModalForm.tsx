@@ -111,7 +111,7 @@ const BootstrapModalForm = ({
 };
 
 BootstrapModalForm.propTypes = {
-  backdrop: PropTypes.oneOf([true, false, 'static']),
+  backdrop: PropTypes.oneOfType([PropTypes.bool, PropTypes.oneOf(['static'])]),
   bsSize: PropTypes.oneOf(['lg', 'large', 'sm', 'small']),
   /* Modal title */
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
