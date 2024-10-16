@@ -25,7 +25,7 @@ import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/ho
 import AppConfig from 'util/AppConfig';
 import { FormikInput, FormSubmit, Section, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col, Row, SegmentedControl } from 'components/bootstrap';
+import { Alert, Col, Row, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
@@ -387,6 +387,12 @@ const IndexSetConfigurationForm = ({
                     </Field>
                   </Section>
                   )}
+                  <Section title="Important Note">
+                    <Alert bsStyle="info">
+                      These changes do not apply to any existing indices. They only apply to newly created indices.
+                      To apply this to the current index set immediately, rotate the index.
+                    </Alert>
+                  </Section>
                   <SubmitWrapper>
                     <FormSubmit disabledSubmit={!isValid}
                                 submitButtonText={submitButtonText}

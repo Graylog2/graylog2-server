@@ -563,19 +563,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     width: auto;
   }
 
-  .typeahead-wrapper .tt-menu {
-    background-color: ${theme.colors.global.contentBackground};
-    box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
-    color: ${theme.colors.global.textDefault};
-
-    .tt-suggestion:hover,
-    .tt-suggestion.tt-cursor {
-      color: ${theme.colors.variant.darkest.info};
-      background-color: ${theme.colors.variant.lighter.info};
-      background-image: none;
-    }
-  }
-
   .form-group-inline {
     display: inline-block;
     margin: 0;
