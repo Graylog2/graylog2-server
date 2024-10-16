@@ -47,7 +47,7 @@ type ValidatedInputProps = {
   onChange?: (...args: any[]) => void;
   required?: boolean;
   type: string;
-};
+} & React.ComponentProps<typeof Input>;
 
 const ValidatedInput = ({
   className,
