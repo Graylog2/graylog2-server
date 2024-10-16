@@ -220,8 +220,6 @@ MessageTableEntry.propTypes = {
       removed_fields: PropTypes.object,
     }),
   }).isRequired,
-  // @ts-ignore
-  selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
   showMessageRow: PropTypes.bool,
   toggleDetail: PropTypes.func.isRequired,
 };
