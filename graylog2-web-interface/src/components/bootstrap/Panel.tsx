@@ -157,7 +157,7 @@ const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   ${deprecatedVariantStyles}
 `);
 
-type PanelProps = {
+type PanelProps = React.ComponentProps<typeof DeprecatedStyledPanel> & {
   children: any;
   /** @deprecated No longer used, replace with `<Panel.Collapse />` &  `expanded`. */
   collapsible?: boolean;
