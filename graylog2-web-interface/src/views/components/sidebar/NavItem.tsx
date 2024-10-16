@@ -152,13 +152,13 @@ export type Props = {
   title: string,
   icon: IconName,
   onClick?: () => void,
-  sidebarIsPinned: boolean,
+  sidebarIsPinned?: boolean,
   disabled?: boolean,
   ariaLabel: string,
   linkTarget?: string,
 };
 
-const NavItem = ({ isSelected = false, title, icon, onClick = undefined, sidebarIsPinned, disabled = false, ariaLabel, linkTarget = undefined }: Props) => {
+const NavItem = ({ isSelected = false, title, icon, onClick = undefined, sidebarIsPinned = false, disabled = false, ariaLabel, linkTarget = undefined }: Props) => {
   const isLink = !!linkTarget;
   const containerProps = isLink ? { as: Link, to: linkTarget, $isLink: true } : { $isLink: false };
 
