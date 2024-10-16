@@ -123,7 +123,7 @@ const ProfileFormSelect = ({ onChange, options, error, name, value, placeholder,
   </SelectContainer>
 );
 
-const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCancel, onSubmit }: Props) => {
+const ProfileForm = ({ initialValues = { name: '', description: '', customFieldMappings: [{ type: '', field: '' }] }, submitButtonText, submitLoadingText, onCancel, onSubmit }: Props) => {
   const { data, isLoading } = useFieldTypes(undefined, undefined);
   const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypesForMapping();
   const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)
@@ -139,7 +139,7 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
   };
 
   return (
-    <Col lg={8}>
+    (<Col lg={8}>
       <Formik<IndexSetFieldTypeProfileForm> initialValues={initialValues}
                                             onSubmit={_onSubmit}
                                             validate={validate}
@@ -169,7 +169,7 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
                             <List>
                               {(isLoading || isLoadingFieldTypes) ? <Spinner /> : customFieldMappings.map(({ field }, index) => (
                                 // eslint-disable-next-line react/no-array-index-key
-                                <Item key={index} data-testid={`custom-mapping-row-for-${field}`}>
+                                (<Item key={index} data-testid={`custom-mapping-row-for-${field}`}>
                                   <SelectGroup>
                                     <Field name={`customFieldMappings.${index}.field`} required>
                                       {({ field: { name, value, onChange }, meta: { error } }) => (
@@ -195,7 +195,7 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
                                     </Field>
                                   </SelectGroup>
                                   {(customFieldMappings.length > 1) && <IconButton name="delete" onClick={() => (remove(index))} title="Remove mapping" />}
-                                </Item>
+                                </Item>)
                               ))}
                             </List>
                             <Button bsSize="xs" onClick={() => push({})} name="plus" title="Add mapping">Add mapping</Button>
@@ -209,12 +209,8 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
           </Form>
         )}
       </Formik>
-    </Col>
+    </Col>)
   );
-};
-
-ProfileForm.defaultProps = {
-  initialValues: { name: '', description: '', customFieldMappings: [{ type: '', field: '' }] },
 };
 
 export default ProfileForm;

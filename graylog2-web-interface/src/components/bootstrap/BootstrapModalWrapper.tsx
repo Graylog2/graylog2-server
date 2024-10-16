@@ -21,10 +21,10 @@ import Modal from './Modal';
 
 type Props = {
   title?: string | undefined,
-  backdrop: boolean|'static'|undefined,
-  bsSize: 'lg'|'large'|'sm'|'small',
+  backdrop?: boolean|'static'|undefined
+  bsSize?: 'lg'|'large'|'sm'|'small'
   showModal: boolean,
-  role: string,
+  role?: string
   onHide: () => void,
   children: React.ReactNode,
 };
@@ -34,8 +34,8 @@ const BootstrapModalWrapper = ({
   children,
   onHide,
   bsSize,
-  backdrop,
-  role,
+  backdrop = 'static',
+  role = 'dialog',
   ...restProps
 }: Props) => (
   <Modal show={showModal}
@@ -60,13 +60,6 @@ BootstrapModalWrapper.propTypes = {
   ]),
   backdrop: PropTypes.oneOf(['static', true, false]),
   role: PropTypes.string,
-};
-
-BootstrapModalWrapper.defaultProps = {
-  bsSize: undefined,
-  backdrop: 'static',
-  role: 'dialog',
-  title: undefined,
 };
 
 export default BootstrapModalWrapper;

@@ -41,7 +41,7 @@ type Props = {
 }
 
 // Don't pass active prop, since `a` tag doesn't support it.
-const BrandComponent = ({ active: _active, ...props }: Props) => {
+const BrandComponent = ({ active: _active = false, ...props }: Props) => {
   const theme = useTheme();
 
   return (
@@ -76,11 +76,6 @@ const BrandComponent = ({ active: _active, ...props }: Props) => {
 BrandComponent.propTypes = {
   active: PropTypes.bool,
   className: PropTypes.string,
-};
-
-BrandComponent.defaultProps = {
-  active: false,
-  className: undefined,
 };
 
 export default BrandComponent;

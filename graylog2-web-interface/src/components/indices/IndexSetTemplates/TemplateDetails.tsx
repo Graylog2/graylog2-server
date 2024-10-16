@@ -83,7 +83,7 @@ const formatRefreshInterval = (intervalInMs : number) => {
 
 const TemplateDetails = ({
   template,
-  showDescription,
+  showDescription = false,
 }: Props) => {
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
@@ -171,10 +171,6 @@ const TemplateDetails = ({
 TemplateDetails.propTypes = {
   template: indexSetTemplatePropType.isRequired,
   showDescription: PropTypes.bool,
-};
-
-TemplateDetails.defaultProps = {
-  showDescription: false,
 };
 
 export default TemplateDetails;

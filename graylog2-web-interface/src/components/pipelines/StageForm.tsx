@@ -32,11 +32,15 @@ import useCurrentUser from 'hooks/useCurrentUser';
 type Props = {
   pipeline: PipelineType,
   stage?: StageType,
-  create: boolean,
+  create?: boolean
   save: (nextStage: StageType, callback: () => void) => void,
 };
 
-const StageForm = ({ pipeline, stage, create, save }: Props) => {
+const StageForm = ({ pipeline, stage = {
+  stage: 0,
+  match: 'EITHER',
+  rules: [],
+}, create = false, save }: Props) => {
   const currentUser = useCurrentUser();
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -169,15 +173,6 @@ StageForm.propTypes = {
   stage: PropTypes.object,
   create: PropTypes.bool,
   save: PropTypes.func.isRequired,
-};
-
-StageForm.defaultProps = {
-  create: false,
-  stage: {
-    stage: 0,
-    match: 'EITHER',
-    rules: [],
-  },
 };
 
 export default StageForm;

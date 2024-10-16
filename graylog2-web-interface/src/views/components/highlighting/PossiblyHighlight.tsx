@@ -38,10 +38,10 @@ type Ranges = { [key: string]: Array<HighlightRange> };
 const highlight = (value: any, idx: number, style = {}) => <span key={`highlight-${idx}`} style={style}>{value}</span>;
 
 type Props = {
-  color: HighlightingColor,
+  color?: HighlightingColor
   field: string,
   value?: any,
-  highlightRanges: Ranges,
+  highlightRanges?: Ranges
 };
 
 function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
@@ -116,12 +116,6 @@ PossiblyHighlight.propTypes = {
   field: PropTypes.string.isRequired,
   value: PropTypes.any,
   highlightRanges: PropTypes.object,
-};
-
-PossiblyHighlight.defaultProps = {
-  color: DEFAULT_HIGHLIGHT_COLOR,
-  highlightRanges: {},
-  value: undefined,
 };
 
 export default PossiblyHighlight;

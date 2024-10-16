@@ -40,7 +40,7 @@ type Props = {
   topLevel?: boolean,
 }
 
-const NavigationLink = ({ description, path, topLevel, ...rest }: Props) => (
+const NavigationLink = ({ description, path, topLevel = false, ...rest }: Props) => (
   <LinkContainer key={path} to={path} relativeActive {...rest}>
     {topLevel ? <NavItem>{description}</NavItem> : <DropdownOption component="a">{description}</DropdownOption>}
   </LinkContainer>
@@ -50,10 +50,6 @@ NavigationLink.propTypes = {
   description: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   path: PropTypes.string.isRequired,
   topLevel: PropTypes.bool,
-};
-
-NavigationLink.defaultProps = {
-  topLevel: false,
 };
 
 export default NavigationLink;

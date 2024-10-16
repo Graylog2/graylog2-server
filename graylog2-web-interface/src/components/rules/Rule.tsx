@@ -34,12 +34,12 @@ import RuleHelper from './rule-helper/RuleHelper';
 import PipelinesPageNavigation from '../pipelines/PipelinesPageNavigation';
 
 type Props = {
-  create: boolean,
-  title: string,
-  isRuleBuilder: boolean,
+  create?: boolean
+  title?: string
+  isRuleBuilder?: boolean
 };
 
-const Rule = ({ create, title, isRuleBuilder }: Props) => {
+const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
   const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
 
   const history = useHistory();
@@ -131,12 +131,6 @@ Rule.propTypes = {
   title: PropTypes.string,
   create: PropTypes.bool,
   isRuleBuilder: PropTypes.bool,
-};
-
-Rule.defaultProps = {
-  title: '',
-  create: false,
-  isRuleBuilder: false,
 };
 
 export default Rule;

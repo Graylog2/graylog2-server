@@ -40,8 +40,4 @@ const CopyToClipboardCapture = React.forwardRef<HTMLDivElement, Props>(({ format
   );
 });
 
-CopyToClipboardCapture.defaultProps = {
-  className: undefined,
-};
-
 export default CopyToClipboardCapture;

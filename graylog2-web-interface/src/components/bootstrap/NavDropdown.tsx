@@ -92,7 +92,7 @@ type Props = {
   hoverTitle?: string,
 }
 
-const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret, children, hoverTitle }: React.PropsWithChildren<Props>) => {
+const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret = false, children, hoverTitle }: React.PropsWithChildren<Props>) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
   return (
@@ -120,13 +120,6 @@ NavDropdown.propTypes = {
   inactiveTitle: PropTypes.string,
   badge: PropTypes.func,
   hoverTitle: PropTypes.string,
-};
-
-NavDropdown.defaultProps = {
-  inactiveTitle: undefined,
-  badge: undefined,
-  noCaret: false,
-  hoverTitle: undefined,
 };
 
 const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`

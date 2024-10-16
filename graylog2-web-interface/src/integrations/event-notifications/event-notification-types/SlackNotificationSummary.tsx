@@ -74,8 +74,4 @@ function SlackNotificationSummary({ notification, ...restProps }: SlackNotificat
   );
 }
 
-SlackNotificationSummary.defaultProps = {
-  notification: {},
-};
-
 export default SlackNotificationSummary;

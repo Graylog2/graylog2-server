@@ -76,16 +76,16 @@ type Props = {
 
 const HoverForHelp = ({
   children,
-  className,
-  displayLeftMargin,
+  className = '',
+  displayLeftMargin = false,
   title,
-  id,
-  pullRight,
-  placement,
+  id = 'help-popover',
+  pullRight = true,
+  placement = 'bottom',
   testId,
-  type,
+  type = 'info',
   iconSize,
-  trigger,
+  trigger = ['hover', 'focus'],
 }: Props) => (
   <OverlayTrigger trigger={trigger}
                   placement={placement}
@@ -111,19 +111,6 @@ HoverForHelp.propTypes = {
   title: PropTypes.string,
   testId: PropTypes.string,
   trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'focus', 'hover'])) || PropTypes.oneOf(['click', 'focus', 'hover']),
-};
-
-HoverForHelp.defaultProps = {
-  id: 'help-popover',
-  className: '',
-  pullRight: true,
-  placement: 'bottom',
-  testId: undefined,
-  title: undefined,
-  type: 'info',
-  iconSize: undefined,
-  trigger: ['hover', 'focus'],
-  displayLeftMargin: false,
 };
 
 /** @component */

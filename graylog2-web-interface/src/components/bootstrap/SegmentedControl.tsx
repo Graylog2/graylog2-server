@@ -29,7 +29,7 @@ type Props<OptionValue> = {
   radius?: MantineRadius,
 }
 
-const SegmentedControl = <OptionValue extends string>({ className, data, defaultValue, disabled, onChange, value, radius }: Props<OptionValue>) => {
+const SegmentedControl = <OptionValue extends string>({ className, data, defaultValue, disabled = false, onChange, value, radius = 'xs' }: Props<OptionValue>) => {
   const theme = useTheme();
 
   return (
@@ -43,15 +43,6 @@ const SegmentedControl = <OptionValue extends string>({ className, data, default
                              onChange={onChange}
                              styles={{ label: { marginBottom: 0 } }} />
   );
-};
-
-SegmentedControl.defaultProps = {
-  className: undefined,
-  defaultValue: undefined,
-  disabled: false,
-  onChange: undefined,
-  value: undefined,
-  radius: 'xs',
 };
 
 export default SegmentedControl;

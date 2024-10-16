@@ -37,10 +37,10 @@ type Props = {
   buttonText?: string,
   className?: string,
   disabled?: boolean,
-  streamId: string,
+  streamId?: string
 }
 
-const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, disabled, streamId }: Props) => {
+const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText = 'Create Rule', className, disabled = false, streamId }: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const queryClient = useQueryClient();
   const toggleCreateModal = useCallback(() => setShowCreateModal((cur) => !cur), []);
@@ -87,15 +87,6 @@ CreateStreamRuleButton.propTypes = {
   bsSize: PropTypes.string,
   className: PropTypes.string,
   streamId: PropTypes.string,
-};
-
-CreateStreamRuleButton.defaultProps = {
-  buttonText: 'Create Rule',
-  bsSize: undefined,
-  bsStyle: undefined,
-  className: undefined,
-  disabled: false,
-  streamId: undefined,
 };
 
 export default CreateStreamRuleButton;

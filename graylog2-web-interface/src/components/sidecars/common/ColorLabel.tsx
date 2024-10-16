@@ -38,7 +38,7 @@ type Props = {
   text?: string | React.ReactNode,
 }
 
-const ColorLabel = ({ color, size, text }: Props) => {
+const ColorLabel = ({ color, size = 'normal', text = <span>&emsp;</span> }: Props) => {
   const theme = useTheme();
   const borderColor = theme.utils.colorLevel(color, 5);
   const textColor = theme.utils.contrastingColor(color);
@@ -65,11 +65,6 @@ ColorLabel.propTypes = {
   color: PropTypes.string.isRequired,
   text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   size: PropTypes.oneOf(['normal', 'small', 'xsmall']),
-};
-
-ColorLabel.defaultProps = {
-  text: <span>&emsp;</span>,
-  size: 'normal',
 };
 
 export default ColorLabel;

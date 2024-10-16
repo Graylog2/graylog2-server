@@ -28,11 +28,11 @@ type Props = {
   disabled?: boolean,
   name: string,
   menuContainer?: HTMLElement,
-  queryId: string,
+  queryId?: string
   type: FieldType,
 };
 
-const Field = ({ children, disabled = false, menuContainer, name, queryId, type }: Props) => (
+const Field = ({ children = null, disabled = false, menuContainer = document.body, name, queryId, type }: Props) => (
   <InteractiveContext.Consumer>
     {(interactive) => (interactive
       ? (
@@ -56,13 +56,6 @@ Field.propTypes = {
   menuContainer: PropTypes.object,
   queryId: PropTypes.string,
   type: CustomPropTypes.FieldType.isRequired,
-};
-
-Field.defaultProps = {
-  children: null,
-  disabled: false,
-  menuContainer: document.body,
-  queryId: undefined,
 };
 
 export default Field;

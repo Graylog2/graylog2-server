@@ -218,8 +218,4 @@ HighlightForm.propTypes = {
   rule: PropTypes.object,
 };
 
-HighlightForm.defaultProps = {
-  rule: undefined,
-};
-
 export default HighlightForm;

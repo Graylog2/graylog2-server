@@ -32,7 +32,7 @@ type Props = {
   hidePreviousAndNextPageLinks?: boolean,
   hideFirstAndLastPageLinks?: boolean,
   disabled?: boolean,
-  onChange: (nextPage: number) => void,
+  onChange?: (nextPage: number) => void
 };
 
 const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css`
@@ -178,13 +178,13 @@ const UltimatePagination = createUltimatePagination({
 const Pagination = ({
   currentPage,
   totalPages,
-  boundaryPagesRange,
-  siblingPagesRange,
-  hideEllipsis,
-  hidePreviousAndNextPageLinks,
-  hideFirstAndLastPageLinks,
-  disabled,
-  onChange,
+  boundaryPagesRange = 1,
+  siblingPagesRange = 1,
+  hideEllipsis = false,
+  hidePreviousAndNextPageLinks = false,
+  hideFirstAndLastPageLinks = false,
+  disabled = false,
+  onChange = () => {},
 }: Props) => {
   if (totalPages <= 1) {
     return null;
@@ -249,16 +249,6 @@ Pagination.propTypes = {
    * @returns {nextPageNumber: number}
    */
   onChange: PropTypes.func,
-};
-
-Pagination.defaultProps = {
-  boundaryPagesRange: 1,
-  siblingPagesRange: 1,
-  hideEllipsis: false,
-  hidePreviousAndNextPageLinks: false,
-  hideFirstAndLastPageLinks: false,
-  disabled: false,
-  onChange: () => {},
 };
 
 export default Pagination;

@@ -31,7 +31,7 @@ type Props = {
   value?: boolean,
 };
 
-const BooleanField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
+const BooleanField = ({ autoFocus = false, field, onChange, title, typeName, value = false }: Props) => {
   const handleChange = (event) => {
     const nextValue = getValueFromInput(event.target);
 
@@ -57,11 +57,6 @@ BooleanField.propTypes = {
   title: PropTypes.string.isRequired,
   typeName: PropTypes.string.isRequired,
   value: PropTypes.bool,
-};
-
-BooleanField.defaultProps = {
-  autoFocus: false,
-  value: false,
 };
 
 export default BooleanField;

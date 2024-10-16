@@ -208,9 +208,9 @@ const InteractiveLegend = ({ activeQuery, config, fieldTypes, labelFields, label
 
   const result = chunk(tableCells, 5).map((cells, index) => (
     // eslint-disable-next-line react/no-array-index-key
-    <LegendRow key={index}>
+    (<LegendRow key={index}>
       {cells}
-    </LegendRow>
+    </LegendRow>)
   ));
 
   return (
@@ -251,7 +251,7 @@ const PlotLegend = ({
   chartData,
   labelMapper = defaultLabelMapper,
   labelFields = columnPivotsToFields,
-  neverHide,
+  neverHide = false,
   height,
   width,
 }: Props) => {
@@ -277,12 +277,6 @@ const PlotLegend = ({
       <LegendComponent activeQuery={activeQuery} config={config} fieldTypes={fieldTypes} labelFields={labelFields} labels={labels} />
     </Container>
   );
-};
-
-PlotLegend.defaultProps = {
-  labelFields: columnPivotsToFields,
-  labelMapper: defaultLabelMapper,
-  neverHide: false,
 };
 
 export default PlotLegend;

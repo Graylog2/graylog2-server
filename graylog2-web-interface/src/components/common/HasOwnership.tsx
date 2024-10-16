@@ -24,12 +24,12 @@ type ChildFun = (props: { disabled: boolean }) => React.ReactElement;
 
 type Props = {
   children: React.ReactNode | ChildFun,
-  id: string,
+  id?: string
   type: string,
-  hideChildren: boolean,
+  hideChildren?: boolean
 };
 
-const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
+const HasOwnership = ({ children, id, type, hideChildren = false }: Props) => {
   const currentUser = useCurrentUser();
   const entity = createGRN(type, id);
   const ownership = `entity:own:${entity}`;
@@ -67,11 +67,6 @@ HasOwnership.propTypes = {
   type: PropTypes.string.isRequired,
   /** Will add disabled=true as a prop to the child in stead of not rendering it */
   hideChildren: PropTypes.bool,
-};
-
-HasOwnership.defaultProps = {
-  hideChildren: false,
-  id: undefined,
 };
 
 export default HasOwnership;
