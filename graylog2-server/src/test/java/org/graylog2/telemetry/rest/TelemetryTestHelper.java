@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 public class TelemetryTestHelper {
     public static final TrafficCounterService.TrafficHistogram TRAFFIC_HISTOGRAM = TrafficCounterService.TrafficHistogram.create(
-            DateTime.now(DateTimeZone.UTC), DateTime.now(DateTimeZone.UTC), Map.of(), Map.of(), Map.of(), Map.of());
+            DateTime.now(DateTimeZone.UTC), DateTime.now(DateTimeZone.UTC), Map.of(), Map.of(), Map.of());
     static final String CLUSTER = "cluster";
     static final String CURRENT_USER = "current_user";
     static final String USER_TELEMETRY_SETTINGS = "user_telemetry_settings";

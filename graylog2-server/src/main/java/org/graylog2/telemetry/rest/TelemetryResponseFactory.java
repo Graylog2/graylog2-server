@@ -97,7 +97,7 @@ class TelemetryResponseFactory {
         clusterInfo.put("cluster_creation_date", clusterCreationDate);
         clusterInfo.put("nodes_count", nodes.size());
         clusterInfo.put("traffic_last_month", sumTraffic(trafficLastMonth.output()));
-        clusterInfo.put("data_warehouse_output_traffic_last_month", sumTraffic(trafficLastMonth.dataWarehouseOutput()));
+        clusterInfo.put("data_warehouse_output_traffic_last_month", 0);
         clusterInfo.put("input_traffic_last_month", sumTraffic(trafficLastMonth.input()));
         clusterInfo.put("users_count", usersCount);
         clusterInfo.put("license_count", licenseCount);

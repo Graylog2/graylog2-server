@@ -33,7 +33,6 @@ public final class GlobalMetricNames {
     public static final String INPUT_TRAFFIC = "org.graylog2.traffic.input";
     public static final String DECODED_TRAFFIC = "org.graylog2.traffic.decoded";
     public static final String OUTPUT_TRAFFIC = "org.graylog2.traffic.output";
-    public static final String DATA_WAREHOUSE_OUTPUT_TRAFFIC = "org.graylog2.traffic.data-warehouse-output";
     public static final String SYSTEM_OUTPUT_TRAFFIC = "org.graylog2.traffic.system-output-traffic";
 
     public static final String INPUT_BUFFER_USAGE = "org.graylog2.buffers.input.usage";
