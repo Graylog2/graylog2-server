@@ -42,7 +42,7 @@ const EventsPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <EventsContainer key={streamId} streamId={streamId} />
+          <EventsContainer key={streamId as string} streamId={streamId} />
         </Col>
       </Row>
     </DocumentTitle>
