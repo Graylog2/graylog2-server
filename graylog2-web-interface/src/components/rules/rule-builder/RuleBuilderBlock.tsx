@@ -26,7 +26,6 @@ import { Modal } from 'components/bootstrap';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
-import { ruleBlockPropType, blockDictPropType, outputVariablesPropType } from './types';
 import { getDictForFunction } from './helpers';
 
 const BlockContainer = styled.div(({ theme }) => css`
