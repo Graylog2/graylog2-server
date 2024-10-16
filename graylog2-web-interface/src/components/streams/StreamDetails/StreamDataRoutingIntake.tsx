@@ -40,6 +40,7 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
   const hasStreamRules = !!stream.rules?.length;
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
+  const disableStreamRuleActions = isDefaultStream || isNotEditable;
 
   const handleMatchingTypeSwitched = () => {
     queryClient.invalidateQueries(['stream', stream.id]);
@@ -56,11 +57,13 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
                actions={(
                  <IfPermitted permissions={`streams:edit:${stream.id}`}>
                    <CreateStreamRuleButton bsStyle="success"
-                                           disabled={isDefaultStream || isNotEditable}
+                                           disabled={disableStreamRuleActions}
                                            streamId={stream.id} />
                  </IfPermitted>
              )}>
-        <MatchingTypeSwitcher stream={stream} onChange={handleMatchingTypeSwitched} />
+        {!disableStreamRuleActions && (
+          <MatchingTypeSwitcher stream={stream} onChange={handleMatchingTypeSwitched} />
+        )}
         <Table condensed striped hover>
           <thead>
             <tr>
