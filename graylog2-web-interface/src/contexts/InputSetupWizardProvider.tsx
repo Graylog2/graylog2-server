@@ -24,7 +24,7 @@ const DEFAULT_ACTIVE_STEP = INPUT_WIZARD_STEPS[0];
 const DEFAULT_WIZARD_DATA = {};
 const DEFAULT_STEPS_DATA = {};
 
-const InputSetupWizardProvider = ({ children }: React.PropsWithChildren<{}>) => {
+const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{}>) => {
   const [activeStep, setActiveStep] = useState<InputSetupWizardStep>(DEFAULT_ACTIVE_STEP);
   const [wizardData, setWizardData] = useState<WizardData>(DEFAULT_WIZARD_DATA);
   const [stepsData, setStepsData] = useState<StepsData>(DEFAULT_STEPS_DATA);
@@ -92,7 +92,3 @@ const InputSetupWizardProvider = ({ children }: React.PropsWithChildren<{}>) => 
 };
 
 export default InputSetupWizardProvider;
-
-InputSetupWizardProvider.defaultProps = {
-  children: null,
-};
