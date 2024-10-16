@@ -9,8 +9,9 @@ import FormControl from './FormControl';
 import FormGroup from './FormGroup';
 import InputGroup from './InputGroup';
 import InputWrapper from './InputWrapper';
+import HTMLAttributes = React.HTMLAttributes;
 
-type InputProps = {
+type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   id: string;
   type?: string;
   name?: string;
@@ -56,6 +57,7 @@ class Input extends React.Component<InputProps, {
     buttonAfter: null,
     children: null,
   };
+  private input: HTMLInputElement;
 
   getInputDOMNode = () => this.input;
 
@@ -79,7 +81,7 @@ class Input extends React.Component<InputProps, {
   // eslint-disable-next-line react/no-unused-class-component-methods
   getChecked = () => this.getInputDOMNode().checked;
 
-  _renderFormControl = (componentClass, controlProps, children) => (
+  _renderFormControl = (componentClass, controlProps, children?) => (
     <FormControl inputRef={(ref) => { this.input = ref; }} componentClass={componentClass} {...controlProps}>
       {children}
     </FormControl>
@@ -173,9 +175,12 @@ class Input extends React.Component<InputProps, {
       ...controlProps
     } = this.props;
 
-    controlProps.type = type;
-    controlProps.label = label;
-    controlProps.name = name || id;
+    const commonProps = {
+      type,
+      label,
+      name: name ?? id,
+      ...controlProps
+    };
 
     if (!type) {
       return this._renderFormGroup(children);
@@ -188,15 +193,15 @@ class Input extends React.Component<InputProps, {
       case 'number':
       case 'file':
       case 'tel':
-        return this._renderFormGroup(this._renderFormControl('input', controlProps));
+        return this._renderFormGroup(this._renderFormControl('input', commonProps));
       case 'textarea':
-        return this._renderFormGroup(this._renderFormControl('textarea', controlProps));
+        return this._renderFormGroup(this._renderFormControl('textarea', commonProps));
       case 'select':
-        return this._renderFormGroup(this._renderFormControl('select', controlProps, children));
+        return this._renderFormGroup(this._renderFormControl('select', commonProps, children));
       case 'checkbox':
-        return this._renderCheckboxGroup(controlProps);
+        return this._renderCheckboxGroup(commonProps);
       case 'radio':
-        return this._renderRadioGroup(controlProps);
+        return this._renderRadioGroup(commonProps);
       default:
         // eslint-disable-next-line no-console
         console.warn(`Unsupported input type ${type}`);
