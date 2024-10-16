@@ -92,3 +92,7 @@ const InputSetupWizardProvider = ({ children }: React.PropsWithChildren<{}>) => 
 };
 
 export default InputSetupWizardProvider;
+
+InputSetupWizardProvider.defaultProps = {
+  children: null,
+};
