@@ -50,15 +50,10 @@ type ColorPreviewProps = {
   onClick?: () => void,
 };
 
-type ColorPreviewProps = {
-  color: any;
-  onClick?: (...args: any[]) => void;
-};
-
 const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({
   color,
-  onClick = () => {}
-}: ColorPreviewProps, ref) => {
+  onClick = () => {},
+}, ref) => {
   if (color.type === 'static') {
     return <StaticColorPreview ref={ref} data-testid="static-color-preview" onClick={onClick} color={(color as StaticColor).color} />;
   }
