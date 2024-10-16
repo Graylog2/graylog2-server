@@ -29,9 +29,11 @@ type Props = {
   }
 }
 
-const EventDefinitionValidationSummary = ({ validation = {
-  errors: [],
-} }: Props) => {
+const EventDefinitionValidationSummary = ({
+  validation = {
+    errors: [],
+  },
+}: Props) => {
   const fieldsWithErrors = Object.keys(validation.errors);
 
   if (fieldsWithErrors.length === 0) {

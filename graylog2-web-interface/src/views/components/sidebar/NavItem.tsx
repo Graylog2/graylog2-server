@@ -99,6 +99,7 @@ const IconWrap = styled.span<IconWrapProps>(({
   &:hover {
     color: ${$isSelected ? colors.variant.darkest.default : colors.variant.darker.default};
     background: ${$isSelected ? colors.gray[80] : colors.variant.lightest.default};
+
     + div {
       display: ${$isLink || !$isSelected ? 'flex' : 'none'};
     }

@@ -19,9 +19,11 @@ import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';
 
-const ARN = ({ awsARN = {
-  value: '',
-}, onChange }) => (
+const ARN = ({
+  awsARN = {
+    value: '',
+  }, onChange,
+}) => (
   <Input id="awsCloudWatchAssumeARN"
          type="text"
          value={awsARN.value}

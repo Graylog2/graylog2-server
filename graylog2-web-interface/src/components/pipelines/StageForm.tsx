@@ -36,11 +36,13 @@ type Props = {
   save: (nextStage: StageType, callback: () => void) => void,
 };
 
-const StageForm = ({ pipeline, stage = {
-  stage: 0,
-  match: 'EITHER',
-  rules: [],
-}, create = false, save }: Props) => {
+const StageForm = ({
+  pipeline, stage = {
+    stage: 0,
+    match: 'EITHER',
+    rules: [],
+  }, create = false, save,
+}: Props) => {
   const currentUser = useCurrentUser();
   const [showModal, setShowModal] = useState<boolean>(false);
 
