@@ -61,6 +61,7 @@ import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useView from 'views/hooks/useView';
 import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
 import TimeRangeFilter from './searchbar/time-range-filter';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -114,14 +115,15 @@ const DashboardSearchBar = () => {
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const dispatch = useAppDispatch();
   const handlerContext = useHandlerContext();
-
+  const { restartAutoRefresh } = useAutoRefresh();
   const submitForm = useCallback(async (values) => {
     const { timerange: newTimerange, queryString: newQueryString } = values;
+    restartAutoRefresh();
     await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls);
 
     dispatch(setGlobalOverride(newQueryString, newTimerange));
     dispatch(execute());
-  }, [dispatch, pluggableSearchBarControls]);
+  }, [dispatch, pluggableSearchBarControls, restartAutoRefresh]);
 
   const { parameters } = useParameters();
   const initialValues = useInitialFormValues(timerange, queryString);
