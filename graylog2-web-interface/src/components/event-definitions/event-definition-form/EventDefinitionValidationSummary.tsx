@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 
@@ -56,10 +55,6 @@ const EventDefinitionValidationSummary = ({
       </Col>
     </Row>
   );
-};
-
-EventDefinitionValidationSummary.propTypes = {
-  validation: PropTypes.object,
 };
 
 export default EventDefinitionValidationSummary;

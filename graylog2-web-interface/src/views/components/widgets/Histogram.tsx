@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import moment from 'moment';
 
@@ -34,7 +33,20 @@ const _generateSeries = (results): Plotly.Data[] => {
   }];
 };
 
-export default function Histogram({ data }) {
+type HistogramProps = {
+  data: {
+    config: {
+      timerange: any;
+    };
+    interval: string;
+    timerange: any;
+    results: any;
+  };
+};
+
+export default function Histogram({
+  data,
+}: HistogramProps) {
   return (
     <Plot data={_generateSeries(data.results)}
           style={{ position: 'absolute' }}
@@ -47,14 +59,3 @@ export default function Histogram({ data }) {
           config={{ displayModeBar: false }} />
   );
 }
-
-Histogram.propTypes = {
-  data: PropTypes.shape({
-    config: PropTypes.shape({
-      timerange: PropTypes.object.isRequired,
-    }).isRequired,
-    interval: PropTypes.string.isRequired,
-    timerange: PropTypes.object.isRequired,
-    results: PropTypes.object.isRequired,
-  }).isRequired,
-};

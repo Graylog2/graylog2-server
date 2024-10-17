@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
@@ -77,11 +76,6 @@ const TabRelativeTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
       </RelativeWrapper>
     </div>
   );
-};
-
-TabRelativeTimeRange.propTypes = {
-  limitDuration: PropTypes.number,
-  disabled: PropTypes.bool,
 };
 
 export default TabRelativeTimeRange;

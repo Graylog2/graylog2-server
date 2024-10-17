@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import { useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -71,10 +70,6 @@ const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinitio
                                                   titleValue={output.title} />
     </>
   );
-};
-
-EditOutputButton.propTypes = {
-  disabled: PropTypes.bool,
 };
 
 export default EditOutputButton;

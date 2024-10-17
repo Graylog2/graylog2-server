@@ -16,13 +16,11 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { IconButton } from 'components/common';
-import { Position } from 'views/components/widgets/WidgetPropTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -84,13 +82,6 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
                       $stretched={stretched}
                       rotation={stretched ? 90 : undefined} />
   );
-};
-
-WidgetHorizontalStretch.propTypes = {
-  widgetId: PropTypes.string.isRequired,
-  widgetType: PropTypes.string.isRequired,
-  position: PropTypes.shape(Position).isRequired,
-  onStretch: PropTypes.func.isRequired,
 };
 
 export default WidgetHorizontalStretch;

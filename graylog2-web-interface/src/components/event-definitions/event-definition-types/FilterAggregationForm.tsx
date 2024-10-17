@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
@@ -26,6 +25,7 @@ import * as FormsUtils from 'util/FormsUtils';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'views/stores/StreamsStore';
 import type User from 'logic/users/User';
+import type { EventDefinitionValidation } from 'components/event-definitions/types';
 
 import FilterForm from './FilterForm';
 import FilterPreviewContainer from './FilterPreviewContainer';
@@ -63,7 +63,7 @@ type Props = {
   },
   streams: Array<Stream>,
   currentUser: User,
-  validation: { errors: { [key: string]: Array<string> } },
+  validation: EventDefinitionValidation,
 };
 
 const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validation, currentUser, onChange }: Props) => {
@@ -150,7 +150,7 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
                      label="Event Limit"
                      type="number"
                      bsStyle={validation.errors.event_limit ? 'error' : null}
-                     help={get(validation, 'errors.event_limit', 'Maximum number of events to be created.')}
+                     help={get(validation, 'errors.event_limit', 'Maximum number of events to be created.') as string}
                      value={eventDefinition.config.event_limit}
                      onChange={handleConfigChange}
                      required />
@@ -174,15 +174,6 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
       )}
     </>
   );
-};
-
-FilterAggregationForm.propTypes = {
-  eventDefinition: PropTypes.object.isRequired,
-  validation: PropTypes.object.isRequired,
-  entityTypes: PropTypes.object.isRequired,
-  streams: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
-  currentUser: PropTypes.object.isRequired,
 };
 
 FilterAggregationForm.defaultConfig = {

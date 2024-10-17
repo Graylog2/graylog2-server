@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import useMaxIndexRotationLimit from 'hooks/useMaxIndexRotationLimit';
@@ -36,10 +35,10 @@ type Props = {
 
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
-const getInitialRangeInDays = (indexLifeTimeMin, IndexLifeTimeMax, timeSizeOptimizingFixedLeeway) => (
+const getInitialRangeInDays = (indexLifeTimeMin, indexLifeTimeMax, timeSizeOptimizingFixedLeeway) => (
   timeSizeOptimizingFixedLeeway
     ? [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(indexLifeTimeMin) + durationToRoundedDays(timeSizeOptimizingFixedLeeway)]
-    : [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(IndexLifeTimeMax)]
+    : [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(indexLifeTimeMax)]
 );
 
 const YEAR_IN_DAYS = 365;
@@ -111,11 +110,6 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({
                   onAfterChange={(value) => onRangeChange(value)} />
     </div>
   );
-};
-
-TimeBasedSizeOptimizingStrategyConfiguration.propTypes = {
-  config: PropTypes.object.isRequired,
-  updateConfig: PropTypes.func.isRequired,
 };
 
 export default TimeBasedSizeOptimizingStrategyConfiguration;

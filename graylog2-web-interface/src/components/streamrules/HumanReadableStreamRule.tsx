@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import type { Input } from 'components/messageloaders/Types';
@@ -80,11 +79,6 @@ const HumanReadableStreamRule = ({ streamRule, inputs = [] }: Props) => {
       <em>{formatRuleField(streamRule)}</em> <strong>must {negation}</strong>{longDesc} <em>{formatRuleValue(inputs, streamRule)}</em>
     </span>
   );
-};
-
-HumanReadableStreamRule.propTypes = {
-  streamRule: PropTypes.object.isRequired,
-  inputs: PropTypes.array.isRequired,
 };
 
 export default HumanReadableStreamRule;

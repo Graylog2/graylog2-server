@@ -16,7 +16,6 @@
  */
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import style from './ExpandableList.css';
 
@@ -35,12 +34,5 @@ const ExpandableList = ({ children, className = '' }: Props) => (
     {children}
   </ul>
 );
-
-ExpandableList.propTypes = {
-  /**
-   * One or more elements of ExpandableListItem
-   */
-  className: PropTypes.string,
-};
 
 export default ExpandableList;

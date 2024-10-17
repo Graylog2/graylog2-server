@@ -16,7 +16,6 @@
  */
 import type { SyntheticEvent } from 'react';
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import defaultTo from 'lodash/defaultTo';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
@@ -215,19 +214,6 @@ const EventDefinitionForm = ({
       </Col>
     </Row>
   );
-};
-
-EventDefinitionForm.propTypes = {
-  action: PropTypes.oneOf(['create', 'edit']),
-  eventDefinition: PropTypes.object.isRequired,
-  currentUser: PropTypes.object.isRequired,
-  validation: PropTypes.object.isRequired,
-  entityTypes: PropTypes.object.isRequired,
-  notifications: PropTypes.array.isRequired,
-  defaults: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
 };
 
 export default EventDefinitionForm;

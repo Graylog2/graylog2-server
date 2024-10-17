@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useRef, useEffect, useState } from 'react';
 import type { FormikProps } from 'formik';
-import PropTypes from 'prop-types';
 import upperCase from 'lodash/upperCase';
 
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
@@ -113,16 +112,6 @@ const EntityShareModal = ({
       )}
     </BootstrapModalConfirm>
   );
-};
-
-EntityShareModal.propTypes = {
-  description: PropTypes.string.isRequired,
-  entityId: PropTypes.string.isRequired,
-  entityTitle: PropTypes.string.isRequired,
-  entityType: PropTypes.string.isRequired,
-  entityTypeTitle: PropTypes.string,
-  onClose: PropTypes.func.isRequired,
-  showShareableEntityURL: PropTypes.bool,
 };
 
 export default EntityShareModal;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 type Props = {
   children?: React.ReactNode
@@ -28,9 +27,5 @@ const EnterpriseProductLink = ({ children = null }: Props) => (
     {children}
   </a>
 );
-
-EnterpriseProductLink.propTypes = {
-  children: PropTypes.node,
-};
 
 export default EnterpriseProductLink;

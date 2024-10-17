@@ -300,8 +300,6 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   );
 };
 
-WidgetQueryControls.propTypes = {};
-
 export default connect(
   WidgetQueryControls,
   {

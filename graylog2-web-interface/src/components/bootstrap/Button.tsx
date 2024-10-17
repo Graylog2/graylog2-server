@@ -220,6 +220,7 @@ type Props = React.PropsWithChildren<{
   onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void),
   rel?: 'noopener noreferrer',
   role?: string,
+  style?: React.ComponentProps<typeof StyledButton>['style'],
   tabIndex?: number,
   target?: '_blank',
   title?: string,

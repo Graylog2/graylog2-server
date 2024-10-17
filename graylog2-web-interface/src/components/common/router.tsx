@@ -46,6 +46,7 @@ type Props = {
   // if set the child component will receive the active class
   // when the part of the URL path matches the `to` prop.
   relativeActive?: boolean,
+  target?: string,
 };
 
 const isLeftClickEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => (e.button === 0);

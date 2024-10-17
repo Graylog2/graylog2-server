@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
@@ -79,14 +78,6 @@ const RuntimeErrorPage = ({ error, componentStack }: Props) => {
       </dl>
     </ErrorPage>
   );
-};
-
-RuntimeErrorPage.propTypes = {
-  error: PropTypes.shape({
-    message: PropTypes.string.isRequired,
-    stack: PropTypes.string,
-  }).isRequired,
-  componentStack: PropTypes.string.isRequired,
 };
 
 export default RuntimeErrorPage;

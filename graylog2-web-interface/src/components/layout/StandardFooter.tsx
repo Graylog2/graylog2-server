@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 
 import { getFullVersion } from 'util/Version';
 import connect from 'stores/connect';
@@ -68,13 +67,6 @@ const StandardFooter = ({ system }: Props) => {
       Graylog {system.version} on {system.hostname} ({jvm.info})
     </>
   );
-};
-
-StandardFooter.propTypes = {
-  system: PropTypes.shape({
-    version: PropTypes.string,
-    hostname: PropTypes.string,
-  }),
 };
 
 export default connect(

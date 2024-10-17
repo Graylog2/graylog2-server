@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
@@ -45,11 +44,5 @@ const NavigationLink = ({ description, path, topLevel = false, ...rest }: Props)
     {topLevel ? <NavItem>{description}</NavItem> : <DropdownOption component="a">{description}</DropdownOption>}
   </LinkContainer>
 );
-
-NavigationLink.propTypes = {
-  description: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-  path: PropTypes.string.isRequired,
-  topLevel: PropTypes.bool,
-};
 
 export default NavigationLink;

@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import * as Immutable from 'immutable';
-import PropTypes from 'prop-types';
 
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { filtersToStreamSet } from 'views/logic/queries/Query';
@@ -49,10 +48,6 @@ const DefaultFieldTypesProvider = ({ children }: { children: React.ReactElement 
       {children}
     </FieldTypesContext.Provider>
   );
-};
-
-DefaultFieldTypesProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default DefaultFieldTypesProvider;

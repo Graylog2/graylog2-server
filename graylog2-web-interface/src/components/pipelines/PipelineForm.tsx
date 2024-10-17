@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -132,14 +131,6 @@ const PipelineForm = ({
       </Row>
     </form>
   );
-};
-
-PipelineForm.propTypes = {
-  pipeline: PropTypes.object,
-  create: PropTypes.bool,
-  modal: PropTypes.bool,
-  save: PropTypes.func.isRequired,
-  onCancel: PropTypes.func,
 };
 
 export default PipelineForm;

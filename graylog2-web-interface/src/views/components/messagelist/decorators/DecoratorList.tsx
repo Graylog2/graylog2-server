@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -40,12 +39,6 @@ type Props = {
 };
 
 class DecoratorList extends React.Component<Props> {
-  static propTypes = {
-    decorators: PropTypes.arrayOf(PropTypes.object).isRequired,
-    disableDragging: PropTypes.bool,
-    onReorder: PropTypes.func,
-  };
-
   static defaultProps = {
     disableDragging: false,
     onReorder: () => {

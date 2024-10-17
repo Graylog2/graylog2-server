@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
@@ -51,10 +50,5 @@ const EnterprisePluginNotFound = ({ featureName, wrapperClassName = 'no-bm' }: P
     </Panel.Body>
   </Panel>
 );
-
-EnterprisePluginNotFound.propTypes = {
-  featureName: PropTypes.string.isRequired,
-  wrapperClassName: PropTypes.string,
-};
 
 export default EnterprisePluginNotFound;

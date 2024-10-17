@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 import { Alert } from 'components/bootstrap';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
@@ -35,10 +34,6 @@ const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
       It looks like the plugin supplying this widget is not loaded.
     </Alert>
   );
-};
-
-WidgetVisualizationNotFound.propTypes = {
-  widgetClassName: PropTypes.string.isRequired,
 };
 
 export default WidgetVisualizationNotFound;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Select from 'components/common/Select';
@@ -57,18 +56,6 @@ const StreamCategoryFilter = ({ disabled = false, value = [], streamCategories, 
               value={selectedCategories} />
     </Container>
   );
-};
-
-StreamCategoryFilter.propTypes = {
-  disabled: PropTypes.bool,
-  value: PropTypes.arrayOf(PropTypes.string),
-  streamCategories: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-    }),
-  ).isRequired,
-  onChange: PropTypes.func.isRequired,
 };
 
 export default StreamCategoryFilter;

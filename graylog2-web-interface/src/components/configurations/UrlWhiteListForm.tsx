@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import map from 'lodash/map';
@@ -245,13 +244,6 @@ const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
       <Button bsSize="sm" onClick={(event) => _onAdd(event)}>Add Url</Button>
     </>
   );
-};
-
-UrlWhiteListForm.propTypes = {
-  urls: PropTypes.array,
-  disabled: PropTypes.bool,
-  onUpdate: PropTypes.func,
-  newEntryId: PropTypes.string,
 };
 
 export default UrlWhiteListForm;

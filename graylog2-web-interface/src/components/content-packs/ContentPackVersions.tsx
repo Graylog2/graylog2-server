@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { DataTable } from 'components/common';
@@ -59,13 +58,6 @@ const ContentPackVersions = ({ onDeletePack = () => {}, contentPackRevisions, on
                rows={contentPacks}
                filterKeys={[]} />
   );
-};
-
-ContentPackVersions.propTypes = {
-  contentPackRevisions: PropTypes.object.isRequired,
-  onChange: PropTypes.func,
-  onDeletePack: PropTypes.func,
-  onInstall: PropTypes.func,
 };
 
 export default ContentPackVersions;

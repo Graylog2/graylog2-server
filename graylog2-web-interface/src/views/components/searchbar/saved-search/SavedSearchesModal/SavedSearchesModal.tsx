@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { Modal, Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
@@ -46,10 +45,5 @@ const SavedSearchesModal = ({ toggleModal, deleteSavedSearch, activeSavedSearchI
     </Modal.Footer>
   </Modal>
 );
-
-SavedSearchesModal.propTypes = {
-  toggleModal: PropTypes.func.isRequired,
-  deleteSavedSearch: PropTypes.func.isRequired,
-};
 
 export default SavedSearchesModal;

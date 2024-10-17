@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
 import isFunction from 'lodash/isFunction';
@@ -85,12 +84,6 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
       )}
     </Formik>
   );
-};
-
-SearchBarForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  limitDuration: PropTypes.number.isRequired,
-  validateOnMount: PropTypes.bool,
 };
 
 export default SearchBarForm;

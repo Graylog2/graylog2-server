@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -156,16 +155,6 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty = false, onC
 
   return (
     showReadOnly ? readOnlyFileInput() : fileInput());
-};
-
-EncryptedInlineBinaryField.propTypes = {
-  autoFocus: PropTypes.bool,
-  dirty: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.object,
 };
 
 export default EncryptedInlineBinaryField;

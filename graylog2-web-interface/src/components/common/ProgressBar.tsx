@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css, keyframes } from 'styled-components';
 import chroma from 'chroma-js';
 import type { ColorVariant } from '@graylog/sawmill';
@@ -137,17 +136,6 @@ const ProgressBar = ({ bars = [DEFAULT_BAR], className }: ProgressBarProps) => (
     })}
   </ProgressWrap>
 );
-
-ProgressBar.propTypes = {
-  bars: PropTypes.arrayOf(PropTypes.shape({
-    animated: PropTypes.bool,
-    bsStyle: PropTypes.string,
-    label: PropTypes.string,
-    striped: PropTypes.bool,
-    value: PropTypes.number,
-  })),
-  className: PropTypes.string,
-};
 
 export default ProgressBar;
 export { Bar };

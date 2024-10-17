@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { PanelGroup } from 'components/bootstrap/imports';
@@ -46,13 +45,6 @@ const Accordion = ({ activeKey, children, id, onSelect = () => {}, ...restProps 
       {children}
     </StyledPanelGroup>
   );
-};
-
-Accordion.propTypes = {
-  activeKey: PropTypes.string,
-  children: PropTypes.node.isRequired,
-  id: PropTypes.string.isRequired,
-  onSelect: PropTypes.func,
 };
 
 export default Accordion;

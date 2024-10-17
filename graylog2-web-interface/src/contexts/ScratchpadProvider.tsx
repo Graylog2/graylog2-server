@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { createContext, useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
 
 import Store from 'logic/local-storage/Store';
 import useHotkey from 'hooks/useHotkey';
@@ -72,9 +71,4 @@ export const ScratchpadProvider = ({ children, loginName }: Props) => {
       {children}
     </ScratchpadContext.Provider>
   );
-};
-
-ScratchpadProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  loginName: PropTypes.string.isRequired,
 };

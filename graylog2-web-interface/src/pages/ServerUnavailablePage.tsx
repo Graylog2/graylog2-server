@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -143,10 +142,6 @@ const ServerUnavailablePage = ({ server }: Props) => {
       </LoginChrome>
     </DocumentTitle>
   );
-};
-
-ServerUnavailablePage.propTypes = {
-  server: PropTypes.object,
 };
 
 export default ServerUnavailablePage;

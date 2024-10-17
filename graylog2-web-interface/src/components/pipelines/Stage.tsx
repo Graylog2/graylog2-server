@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Col, Button } from 'components/bootstrap';
@@ -113,14 +112,6 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
                     description={block}
                     contentRow={<Col md={12}>{content}</Col>} />
   );
-};
-
-Stage.propTypes = {
-  stage: PropTypes.object.isRequired,
-  pipeline: PropTypes.object.isRequired,
-  isLastStage: PropTypes.bool.isRequired,
-  onUpdate: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
 };
 
 export default Stage;

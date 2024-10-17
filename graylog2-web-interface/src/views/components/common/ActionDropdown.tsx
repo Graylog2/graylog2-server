@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { MenuItem } from 'components/bootstrap';
 import Menu from 'components/bootstrap/Menu';
@@ -41,11 +40,5 @@ const ActionDropdown = ({ children, element, 'data-testid': dataTestid, header =
     </Menu>
   </StopPropagation>
 );
-
-ActionDropdown.propTypes = {
-  children: PropTypes.node.isRequired,
-  element: PropTypes.node.isRequired,
-  'data-testid': PropTypes.string,
-};
 
 export default ActionDropdown;

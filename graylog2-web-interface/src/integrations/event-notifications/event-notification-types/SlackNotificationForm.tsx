@@ -226,7 +226,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
                    type="checkbox"
                    bsStyle={validation.errors.notify_channel ? 'error' : null}
                    help={get(validation, 'errors.notify_channel[0]', 'Notify all users in channel by adding @channel to the message')}
-                   checked={config.notify_channel || ''}
+                   checked={config.notify_channel ?? false}
                    onChange={this.handleChange} />
           </Col>
           <Col md={4}>
@@ -236,7 +236,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
                    type="checkbox"
                    bsStyle={validation.errors.notify_here ? 'error' : null}
                    help={get(validation, 'errors.notify_here[0]', 'Notify active users in channel by adding @here to the message')}
-                   checked={config.notify_here || ''}
+                   checked={config.notify_here ?? false}
                    onChange={this.handleChange} />
           </Col>
         </Row>
@@ -246,7 +246,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
                type="checkbox"
                bsStyle={validation.errors.link_names ? 'error' : null}
                help={get(validation, 'errors.link_names[0]', 'Find and link channel names and user names')}
-               checked={config.link_names || ''}
+               checked={!!config.link_names}
                onChange={this.handleChange} />
         <Input id="notification-iconUrl"
                name="icon_url"

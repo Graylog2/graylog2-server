@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { Formik, Form } from 'formik';
-import PropTypes from 'prop-types';
 import _omit from 'lodash/omit';
 import type { LookupTable } from 'src/logic/lookup-tables/types';
 
@@ -254,12 +253,6 @@ const LookupTableForm = ({ saved, create = true, table = INIT_TABLE_VALUES }: Pr
       )}
     </Formik>
   );
-};
-
-LookupTableForm.propTypes = {
-  saved: PropTypes.func.isRequired,
-  create: PropTypes.bool,
-  table: PropTypes.object,
 };
 
 export default LookupTableForm;

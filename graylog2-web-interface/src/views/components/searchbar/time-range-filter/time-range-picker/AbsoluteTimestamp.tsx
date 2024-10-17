@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Field } from 'formik';
 
@@ -56,11 +55,5 @@ const AbsoluteTimestamp = ({ disabled = false, timeRange, range }: Props) => (
     }}
   </Field>
 );
-
-AbsoluteTimestamp.propTypes = {
-  disabled: PropTypes.bool,
-  timeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
-  range: PropTypes.oneOf(['to', 'from']).isRequired,
-};
 
 export default AbsoluteTimestamp;

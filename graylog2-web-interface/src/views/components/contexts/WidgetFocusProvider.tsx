@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import isEqual from 'lodash/isEqual';
-import PropTypes from 'prop-types';
 import URI from 'urijs';
 
 import useLocation from 'routing/useLocation';
@@ -202,10 +201,6 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
       {children}
     </WidgetFocusContext.Provider>
   );
-};
-
-WidgetFocusProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default WidgetFocusProvider;

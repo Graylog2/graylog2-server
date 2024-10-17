@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Rnd } from 'react-rnd';
 import styled, { css } from 'styled-components';
 import debounce from 'lodash/debounce';
@@ -239,37 +238,6 @@ const InteractableModal = ({
       </StyledRnd>
     </InteractableModalWrapper>
   );
-};
-
-InteractableModal.propTypes = {
-  /** className that will be applied to `react-rnd` */
-  className: PropTypes.string,
-  /** Content of the InteractableModal modal */
-  children: PropTypes.node.isRequired,
-  /** Minimum height that modal can be reduced to */
-  minHeight: PropTypes.number,
-  /** Minimum width that modal can be reduced to */
-  minWidth: PropTypes.number,
-  /** Function that is called when InteractableModal is closed */
-  onClose: PropTypes.func,
-  /** Function that is called when InteractableModal has finished being dragged */
-  onDrag: PropTypes.func,
-  /** Function that is called when InteractableModal has finished being resized */
-  onResize: PropTypes.func,
-  /** If you want to control InteractableModal you can pass specific position */
-  position: PropTypes.shape({
-    x: PropTypes.number,
-    y: PropTypes.number,
-  }),
-  /** If you want to control InteractableModal you can pass specific size */
-  size: PropTypes.shape({
-    height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  }),
-  /** Title that appears at the top of the window */
-  title: PropTypes.string,
-  /** Used to style wrapping component */
-  wrapperClassName: PropTypes.string,
 };
 
 export default InteractableModal;

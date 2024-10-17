@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 import chroma from 'chroma-js';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import type QueryResult from 'views/logic/QueryResult';
@@ -35,8 +34,6 @@ import type { SidebarSection } from './sidebarSections';
 import sidebarSections from './sidebarSections';
 import type { SidebarAction } from './sidebarActions';
 import sidebarActions from './sidebarActions';
-
-import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
   children: React.ReactElement,
@@ -127,12 +124,6 @@ const Sidebar = ({ searchPageLayout, results, children, sections = sidebarSectio
       )}
     </Container>
   );
-};
-
-Sidebar.propTypes = {
-  children: CustomPropTypes.OneOrMoreChildren.isRequired,
-  results: PropTypes.object,
-  sections: PropTypes.arrayOf(PropTypes.object),
 };
 
 const SidebarWithContext = ({ children, ...props }: React.ComponentProps<typeof Sidebar>) => (

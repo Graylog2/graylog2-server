@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import moment from 'moment';
 import { useFormikContext } from 'formik';
@@ -139,11 +138,6 @@ const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
       </StyledAccordion>
     </AbsoluteWrapper>
   );
-};
-
-TabAbsoluteTimeRange.propTypes = {
-  disabled: PropTypes.bool,
-  limitDuration: PropTypes.number,
 };
 
 export default TabAbsoluteTimeRange;

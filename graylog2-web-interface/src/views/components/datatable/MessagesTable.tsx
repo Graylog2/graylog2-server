@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
@@ -147,13 +146,5 @@ const MessagesTable = ({ children, condensed = true, striped = false, bordered =
     </StyledTable>
   </MessagesContainer>
 );
-
-MessagesTable.propTypes = {
-  children: PropTypes.node.isRequired,
-  condensed: PropTypes.bool,
-  striped: PropTypes.bool,
-  bordered: PropTypes.bool,
-  stickyHeader: PropTypes.bool,
-};
 
 export default MessagesTable;

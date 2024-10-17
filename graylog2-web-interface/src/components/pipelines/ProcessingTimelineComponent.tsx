@@ -228,6 +228,4 @@ const ProcessingTimelineComponent = () => {
   );
 };
 
-ProcessingTimelineComponent.propTypes = {};
-
 export default ProcessingTimelineComponent;

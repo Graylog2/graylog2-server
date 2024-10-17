@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useCallback, useState } from 'react';
 
 import { MetricDetails } from 'components/metrics';
@@ -69,12 +68,6 @@ const Metric = ({ metric, namespace, nodeId }: Props) => {
       {details}
     </span>
   );
-};
-
-Metric.propTypes = {
-  metric: PropTypes.object.isRequired,
-  namespace: PropTypes.string.isRequired,
-  nodeId: PropTypes.string.isRequired,
 };
 
 export default Metric;

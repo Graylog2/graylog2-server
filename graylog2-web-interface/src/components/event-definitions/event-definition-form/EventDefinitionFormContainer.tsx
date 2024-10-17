@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -240,12 +239,6 @@ const EventDefinitionFormContainer = ({
                            validation={validation} />
     </>
   );
-};
-
-EventDefinitionFormContainer.propTypes = {
-  action: PropTypes.oneOf(['create', 'edit']),
-  eventDefinition: PropTypes.object,
-  onEventDefinitionChange: PropTypes.func,
 };
 
 export default EventDefinitionFormContainer;

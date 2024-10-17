@@ -1,0 +1,229 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React from 'react';
+
+import { BootstrapModalForm, Input, Panel, Button } from 'components/bootstrap';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+
+import GrokPatternInput from './GrokPatternInput';
+
+type EditPatternModalProps = {
+  id?: string;
+  name?: string;
+  pattern?: string;
+  patterns?: any[];
+  create?: boolean;
+  sampleData?: string;
+  savePattern: (...args: any[]) => void;
+  testPattern: (...args: any[]) => void;
+  validPatternName: (...args: any[]) => boolean;
+  sendTelemetry?: (...args: any[]) => void;
+};
+
+class EditPatternModal extends React.Component<EditPatternModalProps, {
+  [key: string]: any;
+}> {
+  static defaultProps = {
+    id: '',
+    name: '',
+    pattern: '',
+    patterns: [],
+    create: false,
+    sampleData: '',
+    sendTelemetry: () => {},
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showModal: false,
+      id: props.id,
+      name: props.name,
+      pattern: props.pattern,
+      sampleData: props.sampleData,
+      test_result: '',
+      test_error: undefined,
+      error: false,
+      error_message: '',
+    };
+  }
+
+  openModal = () => {
+    this.setState({ showModal: true });
+  };
+
+  _onPatternChange = (newPattern) => {
+    this.setState({ pattern: newPattern });
+  };
+
+  _onNameChange = (event) => {
+    const { validPatternName } = this.props;
+    const name = event.target.value;
+
+    if (!validPatternName(name)) {
+      this.setState({ name: name, error: true, error_message: 'Pattern with that name already exists!' });
+    } else {
+      this.setState({ name: name, error: false, error_message: '' });
+    }
+  };
+
+  _onSampleDataChange = (event) => {
+    this.setState({ sampleData: event.target.value });
+  };
+
+  _getId = (prefixIdName) => {
+    const { name } = this.state;
+
+    return name !== undefined ? prefixIdName + name : prefixIdName;
+  };
+
+  _closeModal = () => {
+    this.setState({ showModal: false });
+  };
+
+  _saved = () => {
+    const { create, sendTelemetry } = this.props;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN[create ? 'CREATED' : 'UPDATED'], {
+      app_pathname: 'grokpatterns',
+      app_section: 'grokpatterns',
+    });
+
+    this._closeModal();
+
+    if (create) {
+      this.setState({ name: '', pattern: '', sampleData: '', test_result: '' });
+    }
+  };
+
+  _save = () => {
+    const { savePattern } = this.props;
+    const { error } = this.state;
+
+    if (!error) {
+      savePattern(this.state, this._saved);
+    }
+  };
+
+  _sendTelemetry = () => {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.TESTED, {
+      app_pathname: 'grokpatterns',
+      app_section: 'grokpatterns',
+    });
+  };
+
+  _testPattern = () => {
+    const { name, pattern } = this.state;
+    const { testPattern } = this.props;
+
+    if (name === '' || pattern === '') {
+      this.setState({ error: true, error_message: 'To test the pattern a name and a pattern must be given!' });
+
+      return;
+    }
+
+    this.setState({ error: false, error_message: '' });
+
+    testPattern(this.state, (response) => {
+      this.setState({ test_result: JSON.stringify(response, null, 2), test_error: undefined });
+      this._sendTelemetry();
+    }, (errMessage) => {
+      this.setState({ test_result: '', test_error: errMessage });
+      this._sendTelemetry();
+    });
+  };
+
+  render() {
+    const { create, patterns } = this.props;
+    const {
+      showModal,
+      name,
+      error,
+      error_message: errorMessage,
+      pattern,
+      test_error: testError,
+      sampleData,
+      test_result: testResult,
+    } = this.state;
+
+    let triggerButtonContent;
+
+    if (create) {
+      triggerButtonContent = 'Create pattern';
+    } else {
+      triggerButtonContent = <span>Edit</span>;
+    }
+
+    return (
+      <span>
+        <Button onClick={this.openModal}
+                bsStyle={create ? 'success' : 'default'}
+                bsSize={create ? undefined : 'xs'}>
+          {triggerButtonContent}
+        </Button>
+        <BootstrapModalForm show={showModal}
+                            title={`${create ? 'Create' : 'Edit'} Grok Pattern ${name}`}
+                            data-telemetry-title={`${create ? 'Create' : 'Edit'} Grok Pattern`}
+                            bsSize="large"
+                            onSubmitForm={this._save}
+                            onCancel={this._closeModal}
+                            submitButtonText={`${create ? 'Create' : 'Update'} pattern`}>
+          <fieldset>
+            <Input type="text"
+                   id={this._getId('pattern-name')}
+                   label="Name"
+                   onChange={this._onNameChange}
+                   value={name}
+                   bsStyle={error ? 'error' : null}
+                   help={error ? errorMessage : "Under this name the pattern will be stored and can be used like: '%{THISNAME}' later on "}
+                   autoFocus
+                   required />
+            <GrokPatternInput onPatternChange={this._onPatternChange}
+                              pattern={pattern}
+                              patterns={patterns} />
+            {testError
+              && (
+              <Panel bsStyle="danger" header="Grok Error">
+                <code style={{ display: 'block', whiteSpace: 'pre-wrap' }}>{testError}</code>
+              </Panel>
+              )}
+            <Input type="textarea"
+                   id={this._getId('sampleData')}
+                   label="Sample Data"
+                   help="Here you can add sample data to test your pattern"
+                   onChange={this._onSampleDataChange}
+                   value={sampleData} />
+            <Button bsStyle="info" onClick={this._testPattern}>Test with Sample Data</Button>
+            <br />
+            <br />
+            <Input type="textarea"
+                   id={this._getId('test_result')}
+                   readOnly
+                   rows={8}
+                   help="Will contain the result of your test in a JSON format"
+                   label="Test Result"
+                   value={testResult} />
+          </fieldset>
+        </BootstrapModalForm>
+      </span>
+    );
+  }
+}
+
+export default withTelemetry(EditPatternModal);

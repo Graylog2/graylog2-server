@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
@@ -69,10 +68,6 @@ const NodeName = ({ nodeId }: Props) => {
       <NodeTitle shortNodeId={node.short_node_id} hostname={node.hostname} />
     </Link>
   );
-};
-
-NodeName.propTypes = {
-  nodeId: PropTypes.string.isRequired,
 };
 
 export default NodeName;

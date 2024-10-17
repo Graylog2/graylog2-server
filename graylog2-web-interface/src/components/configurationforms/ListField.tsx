@@ -16,7 +16,6 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import type { ListField as ListFieldType } from 'components/configurationforms/types';
 import { MultiSelect } from 'components/common';
@@ -65,15 +64,6 @@ const ListField = ({ autoFocus = false, field, onChange, title, typeName, value 
                    allowCreate={allowCreate} />
     </Input>
   );
-};
-
-ListField.propTypes = {
-  autoFocus: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
 };
 
 export default ListField;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -204,11 +203,6 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
       </Modal.Footer>
     </Modal>
   );
-};
-
-SelectIndexSetTemplateModal.propTypes = {
-  hideModal: PropTypes.func.isRequired,
-  show: PropTypes.bool.isRequired,
 };
 
 export default SelectIndexSetTemplateModal;

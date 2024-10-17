@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import type { Moment } from 'moment';
 
@@ -59,30 +58,6 @@ const Timestamp = ({ dateTime, field, format = 'default', render: Component = ({
       <Component value={formattedDateTime} field={field} />
     </time>
   );
-};
-
-Timestamp.propTypes = {
-  /**
-   * Date time to be displayed in the component. You can provide an ISO
-   * 8601 string, a JS native `Date` object, a moment `Date` object, or
-   * a number containing seconds after UNIX epoch.
-   */
-  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]),
-  /**
-   * Format to represent the date time.
-   */
-  format: PropTypes.string,
-  /** Provides field prop for the render function. */
-  field: PropTypes.string,
-  /**
-   * Specifies the time zone to convert `dateTime` to.
-   * If not defined the user zone will be used.
-   */
-  tz: PropTypes.string,
-  /**
-   * Override render default function to add a decorator.
-   */
-  render: PropTypes.func,
 };
 
 export default Timestamp;

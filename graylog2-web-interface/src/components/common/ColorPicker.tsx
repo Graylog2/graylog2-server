@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import PropTypes from 'prop-types';
 import type { ColorResult } from 'react-color';
 import { SwatchesPicker } from 'react-color';
 
@@ -39,37 +38,6 @@ const ColorPicker = ({ onChange, height = (135 * 2) + 24 + 16, width = (50 * 5),
   return (
     <SwatchesPicker height={height} width={width} {...rest} onChange={onColorChange} />
   );
-};
-
-ColorPicker.propTypes = {
-  /** Indicates the selected color in hexadecimal format. */
-  color: PropTypes.string,
-  /**
-     * Color palette in hexadecimal format. By default it uses the color palette defined by react-color,
-     * including 95 colors to pick from.
-     */
-  colors: PropTypes.array,
-  /**
-     * Height of the color picker in pixels. By default it displays 2 rows of colors and the first color
-     * of the third row, indicating users that they can scroll through the list:
-     *
-     * `135px height per color row * 2 rows + 24px first color of 3rd row + 16px padding = 310px`
-     *
-     * You can set `Infinity` as `height` if you don't want the component to scroll.
-     */
-  height: PropTypes.number,
-  /**
-     * Width of the color picker in pixels. By default it displays 5 columns of colors:
-     *
-     * `50px width per color column * 5 columns + 22px of padding = 272px`
-     */
-  width: PropTypes.number,
-  /**
-     * Function that will be called when the selected color changes.
-     * The function receives the color in hexadecimal format as first
-     * argument and the event as the second argument.
-     */
-  onChange: PropTypes.func.isRequired,
 };
 
 export default ColorPicker;

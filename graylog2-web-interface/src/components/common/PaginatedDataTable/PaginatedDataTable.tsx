@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 import type { Pagination } from 'stores/PaginationTypes';
 import DataTable from 'components/common/DataTable';
@@ -130,10 +129,6 @@ const PaginatedDataTable = ({ rows = [], pagination: initialPagination = DEFAULT
                  rows={paginatedRows} />
     </PaginatedList>
   );
-};
-
-PaginatedDataTable.propTypes = {
-  pagination: PropTypes.object,
 };
 
 export default PaginatedDataTable;

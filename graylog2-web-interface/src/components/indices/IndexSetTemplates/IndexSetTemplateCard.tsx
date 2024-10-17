@@ -15,14 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import { Card } from 'components/common';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 import { prepareDataTieringInitialValues, DataTieringVisualisation } from 'components/indices/data-tiering';
 
 type Props = {
@@ -85,12 +83,6 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
       )}
     </StyledCard>
   );
-};
-
-IndexSetTemplateCard.propTypes = {
-  template: indexSetTemplatePropType.isRequired,
-  handleCardClick: PropTypes.func.isRequired,
-  isSelected: PropTypes.bool.isRequired,
 };
 
 export default IndexSetTemplateCard;

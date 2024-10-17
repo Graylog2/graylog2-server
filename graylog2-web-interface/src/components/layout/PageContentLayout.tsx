@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Outlet } from 'react-router-dom';
 
@@ -61,10 +60,5 @@ const PageContentLayout = ({ children, className, FooterComponent = Footer, Noti
     </NotificationsComponent>
   </Container>
 );
-
-PageContentLayout.propTypes = {
-  children: PropTypes.node,
-  className: PropTypes.string,
-};
 
 export default PageContentLayout;

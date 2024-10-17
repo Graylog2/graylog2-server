@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import type { SyntheticEvent } from 'react';
 
@@ -107,13 +106,6 @@ const DropdownMenu = ({ show = false, children, zIndex = 1050, onMenuItemSelect 
       {mappedChildren}
     </StyledDropdownMenu>
   );
-};
-
-DropdownMenu.propTypes = {
-  children: PropTypes.node.isRequired,
-  zIndex: PropTypes.number,
-  show: PropTypes.bool,
-  minWidth: PropTypes.number,
 };
 
 export default DropdownMenu;

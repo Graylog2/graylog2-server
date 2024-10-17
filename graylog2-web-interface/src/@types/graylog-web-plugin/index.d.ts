@@ -160,10 +160,16 @@ type License = {
   }>,
 }
 
-type FieldValueProvider = {
+export type FieldValueProvider = {
   type: string,
   displayName: string,
-  formComponent: React.ComponentType,
+  formComponent: React.ComponentType<{
+    fieldName: string,
+    config: EventDefinition['field_spec'][number],
+    onChange: (nextConfig: EventDefinition['field_spec'][number]) => void,
+    validation: any,
+    currentUser: User,
+  }>,
   summaryComponent: React.ComponentType<{
     fieldName: string,
     keys: Array<string>,
@@ -175,11 +181,7 @@ type FieldValueProvider = {
     table_name?: string,
     key_field?: string,
   },
-  requiredFields: {
-    template?: string,
-    table_name?: string,
-    key_field?: string,
-  },
+  requiredFields: string[],
 }
 
 interface PluginDataWarehouse {

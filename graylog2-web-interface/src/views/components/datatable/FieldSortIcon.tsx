@@ -15,12 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import PropTypes from 'prop-types';
-import { OrderedMap } from 'immutable';
+import type { OrderedMap } from 'immutable';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import { SortIcon } from 'components/common';
 
 type Props = {
@@ -97,13 +95,6 @@ const FieldSortIcon = ({ fieldName, type, sortConfigMap, onSortChange, setLoadin
   return (
     <SortIcon onChange={() => handleSortChange(changeSort)} activeDirection={activeDirection} title={title} order={order} />
   );
-};
-
-FieldSortIcon.propTypes = {
-  sortConfigMap: CustomPropTypes.instanceOf(OrderedMap).isRequired,
-  fieldName: PropTypes.string.isRequired,
-  onSortChange: PropTypes.func.isRequired,
-  setLoadingState: PropTypes.func.isRequired,
 };
 
 export default FieldSortIcon;

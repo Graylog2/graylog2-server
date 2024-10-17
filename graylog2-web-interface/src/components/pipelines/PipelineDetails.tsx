@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -86,13 +85,6 @@ const PipelineDetails = ({ pipeline, create = false, onChange, onCancel = () => 
       <hr />
     </div>
   );
-};
-
-PipelineDetails.propTypes = {
-  pipeline: PropTypes.object,
-  create: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  onCancel: PropTypes.func,
 };
 
 export default PipelineDetails;

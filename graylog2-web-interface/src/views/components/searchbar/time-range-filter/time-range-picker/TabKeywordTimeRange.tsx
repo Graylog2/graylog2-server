@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Field, useField } from 'formik';
 import { useQuery } from '@tanstack/react-query';
@@ -147,9 +146,5 @@ const TabKeywordTimeRange = ({ disabled = false }: Props) => (
     </Col>
   </Row>
 );
-
-TabKeywordTimeRange.propTypes = {
-  disabled: PropTypes.bool,
-};
 
 export default TabKeywordTimeRange;

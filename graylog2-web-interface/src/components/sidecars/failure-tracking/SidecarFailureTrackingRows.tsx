@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -107,10 +106,6 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
       })}
     </>
   );
-};
-
-SidecarFailureTrackingRows.propTypes = {
-  sidecar: PropTypes.object.isRequired,
 };
 
 export default SidecarFailureTrackingRows;

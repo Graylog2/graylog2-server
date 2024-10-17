@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { useTheme } from 'styled-components';
 
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
@@ -71,11 +70,6 @@ const BrandComponent = ({ active: _active = false, ...props }: Props) => {
       </svg>
     </Link>
   );
-};
-
-BrandComponent.propTypes = {
-  active: PropTypes.bool,
-  className: PropTypes.string,
 };
 
 export default BrandComponent;

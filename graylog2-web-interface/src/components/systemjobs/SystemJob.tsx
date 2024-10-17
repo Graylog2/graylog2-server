@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
@@ -76,7 +75,24 @@ const AcknowledgeButton = styled(Button)(({ theme }) => css`
   }
 `);
 
-const SystemJob = ({ job }) => {
+type SystemJobProps = {
+  job: {
+    info?: string;
+    id?: string;
+    percent_complete?: number;
+    is_cancelable?: boolean;
+    name?: string;
+    node_id?: string;
+    started_at?: string;
+    execution_duration?: string;
+    job_status?: string;
+    provides_progress?: boolean,
+  };
+};
+
+const SystemJob = ({
+  job,
+}: SystemJobProps) => {
   const jobIsOver = job.job_status === JobStatus.Complete
                     || job.percent_complete === 100
                     || job.job_status === JobStatus.Cancelled
@@ -120,20 +136,6 @@ const SystemJob = ({ job }) => {
       {!jobIsOver && job.provides_progress && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
     </div>
   );
-};
-
-SystemJob.propTypes = {
-  job: PropTypes.shape({
-    info: PropTypes.string,
-    id: PropTypes.string,
-    percent_complete: PropTypes.number,
-    is_cancelable: PropTypes.bool,
-    name: PropTypes.string,
-    node_id: PropTypes.string,
-    started_at: PropTypes.string,
-    execution_duration: PropTypes.string,
-    job_status: PropTypes.oneOf(Object.values(JobStatus)),
-  }).isRequired,
 };
 
 export default SystemJob;

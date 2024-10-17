@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -104,13 +103,6 @@ const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }:
       {menuItems}
     </DropdownButton>
   );
-};
-
-SurroundingSearchButton.propTypes = {
-  id: PropTypes.string.isRequired,
-  timestamp: PropTypes.string.isRequired,
-  searchConfig: PropTypes.object.isRequired,
-  messageFields: PropTypes.object.isRequired,
 };
 
 export default SurroundingSearchButton;

@@ -16,7 +16,6 @@
  */
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import type { PublicNotificationsHooks } from 'theme/types';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -109,10 +108,6 @@ const PublicNotifications = ({ readFromConfig = false }: Props) => {
   }
 
   return null;
-};
-
-PublicNotifications.propTypes = {
-  readFromConfig: PropTypes.bool,
 };
 
 export default PublicNotifications;

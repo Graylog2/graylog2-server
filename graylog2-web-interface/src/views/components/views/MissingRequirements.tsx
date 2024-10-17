@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as PropTypes from 'prop-types';
 import capitalize from 'lodash/capitalize';
 
 import type { PluginMetadata, Requirements } from 'views/logic/views/View';
 import { Col, Row, Button } from 'components/bootstrap';
 import fixup from 'views/pages/StyleFixups.css';
-import View from 'views/logic/views/View';
+import type View from 'views/logic/views/View';
 import useHistory from 'routing/useHistory';
 
 type Props = {
@@ -58,14 +57,6 @@ const MissingRequirements = ({ view, missingRequirements }: Props) => {
       </Col>
     </Row>
   );
-};
-
-MissingRequirements.propTypes = {
-  view: PropTypes.instanceOf(View).isRequired,
-  missingRequirements: PropTypes.objectOf(PropTypes.shape({
-    name: PropTypes.string,
-    url: PropTypes.string,
-  })).isRequired,
 };
 
 export default MissingRequirements;

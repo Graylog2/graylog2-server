@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import Modal from './Modal';
@@ -47,19 +46,5 @@ const BootstrapModalWrapper = ({
     {children}
   </Modal>
 );
-
-BootstrapModalWrapper.propTypes = {
-  showModal: PropTypes.bool.isRequired,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
-  onHide: PropTypes.func.isRequired,
-  bsSize: PropTypes.oneOf([
-    'large', 'lg', 'small', 'sm',
-  ]),
-  backdrop: PropTypes.oneOf(['static', true, false]),
-  role: PropTypes.string,
-};
 
 export default BootstrapModalWrapper;

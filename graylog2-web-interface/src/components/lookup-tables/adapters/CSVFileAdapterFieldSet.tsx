@@ -23,7 +23,7 @@ import type { LookupTableDataAdapterConfig } from 'logic/lookup-tables/types';
 type Props = {
   config: LookupTableDataAdapterConfig,
   handleFormEvent: (event: SyntheticEvent<EventTarget>) => void,
-  validationState: (state: string) => string,
+  validationState: (state: string) => 'error' | 'warning' | 'success',
   validationMessage: (field: string, message: string) => string,
 };
 

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { ListGroup } from 'components/bootstrap';
 
@@ -42,9 +41,5 @@ const ControlledTableList = ({ children }: { children: Array<React.ReactNode>}) 
 
 ControlledTableList.Header = ControlledTableListHeader;
 ControlledTableList.Item = ControlledTableListItem;
-
-ControlledTableList.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 export default ControlledTableList;

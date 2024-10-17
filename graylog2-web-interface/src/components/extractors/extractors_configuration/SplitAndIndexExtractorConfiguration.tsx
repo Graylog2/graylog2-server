@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -119,13 +118,6 @@ const SplitAndIndexExtractorConfiguration = ({ configuration: initialConfigurati
       </Row>
     </div>
   );
-};
-
-SplitAndIndexExtractorConfiguration.propTypes = {
-  configuration: PropTypes.object.isRequired,
-  exampleMessage: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  onExtractorPreviewLoad: PropTypes.func.isRequired,
 };
 
 export default SplitAndIndexExtractorConfiguration;

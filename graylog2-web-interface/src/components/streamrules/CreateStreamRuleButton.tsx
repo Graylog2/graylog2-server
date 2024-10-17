@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import PropTypes from 'prop-types';
 
 import { Button } from 'components/bootstrap';
 import type { BsSize } from 'components/bootstrap/types';
@@ -79,14 +78,6 @@ const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText = 'Create Rule', c
 
     </IfPermitted>
   );
-};
-
-CreateStreamRuleButton.propTypes = {
-  buttonText: PropTypes.string,
-  bsStyle: PropTypes.string,
-  bsSize: PropTypes.string,
-  className: PropTypes.string,
-  streamId: PropTypes.string,
 };
 
 export default CreateStreamRuleButton;

@@ -18,10 +18,8 @@
 import type { SystemConfigurationComponentProps } from 'views/types';
 import type { RotationJsonSchema } from 'components/indices/Types';
 
-type IndexRotationConfigProp = object;
-
-interface IndexRotationConfigComponentProps extends SystemConfigurationComponentProps {
-  config: IndexRotationConfigProp;
+interface IndexRotationConfigComponentProps<Config> extends SystemConfigurationComponentProps {
+  config: Config;
   jsonSchema: RotationJsonSchema;
   updateConfig: (update: IndexRotationConfigProp) => void;
 }

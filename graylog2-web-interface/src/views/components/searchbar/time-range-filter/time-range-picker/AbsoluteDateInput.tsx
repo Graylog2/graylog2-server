@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
@@ -66,14 +65,6 @@ const AbsoluteDateInput = ({ name, disabled = false, onChange = () => {}, value 
              bsStyle={hasError ? 'error' : null} />
     </Wrapper>
   );
-};
-
-AbsoluteDateInput.propTypes = {
-  disabled: PropTypes.bool,
-  hasError: PropTypes.bool,
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-  value: PropTypes.string,
 };
 
 export default AbsoluteDateInput;

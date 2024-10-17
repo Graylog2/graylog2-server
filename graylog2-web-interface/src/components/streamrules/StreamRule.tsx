@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
 
@@ -122,17 +121,6 @@ const StreamRule = ({ matchData, stream, streamRule, onSubmit = () => {}, onDele
       {description}
     </ListGroupItem>
   );
-};
-
-StreamRule.propTypes = {
-  matchData: PropTypes.shape({
-    matches: PropTypes.bool,
-    rules: PropTypes.object,
-  }),
-  onDelete: PropTypes.func,
-  onSubmit: PropTypes.func,
-  stream: PropTypes.object.isRequired,
-  streamRule: PropTypes.object.isRequired,
 };
 
 export default StreamRule;

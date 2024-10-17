@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
@@ -36,10 +35,6 @@ type State = {
 };
 
 class QueryTitleEditModal extends React.Component<Props, State> {
-  static propTypes = {
-    onTitleChange: PropTypes.func.isRequired,
-  };
-
   constructor(props: Props) {
     super(props);
 

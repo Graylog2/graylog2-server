@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import isEqual from 'lodash/isEqual';
 import styled, { css } from 'styled-components';
 
@@ -276,18 +275,6 @@ const CollectorConfigurationModal = ({
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
-};
-
-CollectorConfigurationModal.propTypes = {
-  show: PropTypes.bool.isRequired,
-  selectedCollectorName: PropTypes.string.isRequired,
-  selectedSidecarNames: PropTypes.array.isRequired,
-  initialAssignedConfigs: PropTypes.array.isRequired,
-  initialPartiallyAssignedConfigs: PropTypes.array.isRequired,
-  unassignedConfigs: PropTypes.array.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-  getRowData: PropTypes.func.isRequired,
 };
 
 export default CollectorConfigurationModal;

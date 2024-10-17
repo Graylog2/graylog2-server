@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useMemo, useState } from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -110,13 +109,6 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
       </BootstrapModalForm>
     </span>
   );
-};
-
-PipelineConnectionsForm.propTypes = {
-  pipeline: PropTypes.object.isRequired,
-  connections: PropTypes.array.isRequired,
-  streams: PropTypes.array.isRequired,
-  save: PropTypes.func.isRequired,
 };
 
 export default PipelineConnectionsForm;

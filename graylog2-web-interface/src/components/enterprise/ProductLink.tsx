@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { ExternalLinkButton } from 'components/common';
 import { ButtonToolbar } from 'components/bootstrap';
@@ -43,12 +42,6 @@ const ProductLink = ({ href = '', clusterId, children } : Props) => {
       </ExternalLinkButton>
     </ButtonToolbar>
   );
-};
-
-ProductLink.propTypes = {
-  href: PropTypes.string,
-  clusterId: PropTypes.string,
-  children: PropTypes.node,
 };
 
 export default ProductLink;

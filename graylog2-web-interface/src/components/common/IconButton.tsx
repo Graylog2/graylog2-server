@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
@@ -83,11 +82,5 @@ const IconButton = React.forwardRef<HTMLButtonElement, Props>(({
     <Icon type={iconType} {...rest} />
   </Wrapper>
 ));
-
-IconButton.propTypes = {
-  className: PropTypes.string,
-  onClick: PropTypes.func,
-  name: PropTypes.any,
-};
 
 export default IconButton;

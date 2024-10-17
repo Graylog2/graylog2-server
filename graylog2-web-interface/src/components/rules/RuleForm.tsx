@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
@@ -155,10 +154,6 @@ const RuleForm = ({ create = false }: Props) => {
       </Row>
     </form>
   );
-};
-
-RuleForm.propTypes = {
-  create: PropTypes.bool,
 };
 
 export default RuleForm;

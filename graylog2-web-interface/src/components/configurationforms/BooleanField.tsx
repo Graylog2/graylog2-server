@@ -16,7 +16,6 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input } from 'components/bootstrap';
@@ -48,15 +47,6 @@ const BooleanField = ({ autoFocus = false, field, onChange, title, typeName, val
            onChange={handleChange}
            autoFocus={autoFocus} />
   );
-};
-
-BooleanField.propTypes = {
-  autoFocus: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.bool,
 };
 
 export default BooleanField;

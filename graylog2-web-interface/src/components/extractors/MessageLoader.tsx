@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { FormSubmit } from 'components/common';
@@ -104,14 +103,6 @@ const MessageLoader = ({ hidden = true, hideText = false, onMessageLoaded, messa
       )}
     </div>
   );
-};
-
-MessageLoader.propTypes = {
-  hidden: PropTypes.bool,
-  hideText: PropTypes.bool,
-  onMessageLoaded: PropTypes.func.isRequired,
-  messageId: PropTypes.string,
-  index: PropTypes.string,
 };
 
 export default MessageLoader;

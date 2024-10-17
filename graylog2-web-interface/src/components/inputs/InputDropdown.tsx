@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import * as PropTypes from 'prop-types';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
@@ -108,14 +107,6 @@ const InputDropdown = ({ disabled = false, inputs = Immutable.Map(), onLoadMessa
   }
 
   return <Spinner />;
-};
-
-InputDropdown.propTypes = {
-  inputs: PropTypes.object,
-  title: PropTypes.string.isRequired,
-  preselectedInputId: PropTypes.string,
-  onLoadMessage: PropTypes.func,
-  disabled: PropTypes.bool,
 };
 
 export default InputDropdown;

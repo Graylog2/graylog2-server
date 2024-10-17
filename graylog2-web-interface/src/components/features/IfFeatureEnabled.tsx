@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type React from 'react';
-import PropTypes from 'prop-types';
 
 import useFeature from 'hooks/useFeature';
 
@@ -33,12 +32,6 @@ const IfFeatureEnabled = ({ name, fallback = null, children }: Props) => {
   }
 
   return fallback;
-};
-
-IfFeatureEnabled.propTypes = {
-  name: PropTypes.string.isRequired,
-  fallback: PropTypes.node,
-  children: PropTypes.node.isRequired,
 };
 
 export default IfFeatureEnabled;

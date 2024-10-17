@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { Pluralize } from 'components/common';
 
@@ -38,10 +37,6 @@ const TimeBasedSizeOptimizingStrategySummary = ({ config: { index_lifetime_max, 
       </dl>
     </div>
   );
-};
-
-TimeBasedSizeOptimizingStrategySummary.propTypes = {
-  config: PropTypes.object.isRequired,
 };
 
 export default TimeBasedSizeOptimizingStrategySummary;

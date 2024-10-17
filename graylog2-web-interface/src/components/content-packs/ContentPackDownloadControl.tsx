@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -67,13 +66,6 @@ const ContentPackDownloadControl = ({
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
-};
-
-ContentPackDownloadControl.propTypes = {
-  contentPackId: PropTypes.string.isRequired,
-  revision: PropTypes.number.isRequired,
-  show: PropTypes.bool,
-  onHide: PropTypes.func,
 };
 
 export default ContentPackDownloadControl;

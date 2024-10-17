@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
 
 import { OverlayTrigger, Icon } from 'components/common';
@@ -75,13 +74,6 @@ const StatusIndicator = ({ message: messageProp = '', status = -1, lastSeen, id 
       <Icon name={icon} /> {text}
     </span>
   );
-};
-
-StatusIndicator.propTypes = {
-  id: PropTypes.string,
-  lastSeen: PropTypes.string,
-  message: PropTypes.string,
-  status: PropTypes.number,
 };
 
 export default StatusIndicator;

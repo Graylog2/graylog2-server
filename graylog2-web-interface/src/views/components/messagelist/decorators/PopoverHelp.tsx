@@ -44,6 +44,4 @@ const PopoverHelp = () => (
   </Popover>
 );
 
-PopoverHelp.propTypes = {};
-
 export default PopoverHelp;

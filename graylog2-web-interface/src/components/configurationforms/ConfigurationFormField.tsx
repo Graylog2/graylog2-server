@@ -16,7 +16,6 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import {
   BooleanField,
@@ -113,16 +112,6 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
     default:
       return null;
   }
-};
-
-ConfigurationFormField.propTypes = {
-  typeName: PropTypes.string.isRequired,
-  configField: PropTypes.object.isRequired,
-  configKey: PropTypes.string.isRequired,
-  configValue: PropTypes.any,
-  autoFocus: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  dirty: PropTypes.bool,
 };
 
 export default ConfigurationFormField;

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 
 import { Row, Col, HelpBlock, Input, Alert } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
@@ -129,11 +128,6 @@ const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Prop
       </>
     </Input>
   );
-};
-
-TimeoutInput.propTypes = {
-  value: PropTypes.number,
-  onChange: PropTypes.func,
 };
 
 export default TimeoutInput;

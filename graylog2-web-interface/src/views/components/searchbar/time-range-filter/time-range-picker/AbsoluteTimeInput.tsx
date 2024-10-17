@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useRef } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 import type { Moment } from 'moment';
@@ -285,12 +284,6 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
       </FormGroupGrid>
     </SetTimeOption>
   );
-};
-
-AbsoluteTimeInput.propTypes = {
-  dateTime: PropTypes.string.isRequired,
-  range: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
 };
 
 export default AbsoluteTimeInput;

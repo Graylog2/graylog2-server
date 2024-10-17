@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import find from 'lodash/find';
 import styled, { css } from 'styled-components';
 
@@ -289,37 +288,6 @@ type State = {
  * selected step. In a optional third column the consumer can render a preview.
  */
 class Wizard extends React.Component<Props, State> {
-  static propTypes = {
-    /**
-     * Array of objects which will describe the wizard. The object must
-     * contain a unique 'key' attribute, a 'title' which will be shown as step link on the left side and
-     * a 'component' attribute which will hold the component which is to render for the step.
-     */
-    steps: PropTypes.arrayOf(PropTypes.object).isRequired,
-    /**
-     * Indicates the active step that should be rendered, in case the step state is stored outside this
-     * component, and it is being used in a controlled way.
-     * The prop **must** take the value of one of the keys in `steps`, otherwise a warning is logged in the console.
-     */
-    activeStep: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    /**
-     * Callback which is called when the user changes the step. As an argument the callback gets the key
-     * of the next step.
-     */
-    onStepChange: PropTypes.func,
-    /** Optional component which can be rendered on the right side e.g a preview */
-    children: PropTypes.element,
-    /** Indicates if wizard should be rendered in horizontal or vertical */
-    horizontal: PropTypes.bool,
-    /** Indicates if wizard should take the full width of their parent */
-    justified: PropTypes.bool,
-    /** Customize the container CSS class used by this component */
-    containerClassName: PropTypes.string,
-    /** Indicates if wizard should render next/previous buttons or not */
-    hidePreviousNextButtons: PropTypes.bool,
-    style: PropTypes.oneOf(['stepper', undefined]),
-  };
-
   static defaultProps = {
     children: undefined,
     activeStep: undefined,

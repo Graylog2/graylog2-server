@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
-import PropTypes from 'prop-types';
 import flow from 'lodash/flow';
 import fromPairs from 'lodash/fromPairs';
 import get from 'lodash/get';
@@ -23,7 +22,6 @@ import zip from 'lodash/zip';
 import isEmpty from 'lodash/isEmpty';
 
 import type Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
-import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -115,12 +113,5 @@ const WorldMapVisualization = makeVisualization(({
                       onChange={_onChange} />
   );
 }, 'map');
-
-WorldMapVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-  onChange: PropTypes.func.isRequired,
-  width: PropTypes.number.isRequired,
-};
 
 export default WorldMapVisualization;

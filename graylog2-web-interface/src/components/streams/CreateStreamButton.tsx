@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useCallback, useState } from 'react';
 
 import { Button } from 'components/bootstrap';
@@ -65,15 +64,6 @@ const CreateStreamButton = ({ bsSize, bsStyle, buttonText = 'Create stream', cla
       )}
     </>
   );
-};
-
-CreateStreamButton.propTypes = {
-  buttonText: PropTypes.string,
-  bsStyle: PropTypes.string,
-  bsSize: PropTypes.string,
-  className: PropTypes.string,
-  onCreate: PropTypes.func.isRequired,
-  indexSets: PropTypes.array.isRequired,
 };
 
 export default CreateStreamButton;

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import UIUtils from 'util/UIUtils';
 
@@ -37,11 +36,6 @@ const ScrollToHint = ({ children, value }: Props) => {
       {children}
     </span>
   );
-};
-
-ScrollToHint.propTypes = {
-  children: PropTypes.node.isRequired,
-  value: PropTypes.any.isRequired,
 };
 
 export default ScrollToHint;

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -50,16 +49,6 @@ const EntityList = ({ bsNoItemsStyle, items, noItemsText = 'No items available' 
       {items}
     </StyledList>
   );
-};
-
-EntityList.propTypes = {
-  /** Text to show when there are no items in the list. */
-  noItemsText: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]),
-  /** Array of `EntityListItem` that will be shown.  */
-  items: PropTypes.array.isRequired,
 };
 
 export default EntityList;

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -157,15 +156,6 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
       <EntityList bsNoItemsStyle="info" noItemsText="There are no rules on this stage." items={formattedStages} />
     </div>
   );
-};
-
-Pipeline.propTypes = {
-  pipeline: PropTypes.object.isRequired,
-  connections: PropTypes.array.isRequired,
-  streams: PropTypes.array.isRequired,
-  onConnectionsChange: PropTypes.func.isRequired,
-  onStagesChange: PropTypes.func.isRequired,
-  onPipelineChange: PropTypes.func.isRequired,
 };
 
 export default Pipeline;
