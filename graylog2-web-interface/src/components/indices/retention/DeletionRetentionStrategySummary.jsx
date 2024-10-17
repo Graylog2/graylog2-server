@@ -39,8 +39,4 @@ DeletionRetentionStrategySummary.propTypes = {
   rotationStrategyClass: PropTypes.string,
 };
 
-DeletionRetentionStrategySummary.defaultProps = {
-  rotationStrategyClass: undefined,
-};
-
 export default DeletionRetentionStrategySummary;

@@ -225,10 +225,10 @@ const _setDefaultCreateRole = (roles, stepsState, setStepsState) => {
 
 type Props = {
   authBackendMeta: AuthBackendMeta,
-  initialStepKey: $PropertyType<StepType, 'key'>,
+  initialStepKey?: $PropertyType<StepType, 'key'>
   initialValues: WizardFormValues,
-  excludedFields: { [inputName: string]: boolean },
-  help: { [inputName: string]: React.ReactElement | string | null | undefined },
+  excludedFields?: { [inputName: string]: boolean }
+  help?: { [inputName: string]: React.ReactElement | string | null | undefined }
   onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean) => Promise<LoadBackendResponse>,
 };
 
@@ -238,7 +238,7 @@ const _loadRoles = (setPaginatedRoles) => {
   AuthzRolesDomain.loadRolesPaginated(getUnlimited).then(setPaginatedRoles);
 };
 
-const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, help, excludedFields }: Props) => {
+const BackendWizard = ({ initialValues, initialStepKey = SERVER_CONFIG_KEY, onSubmit, authBackendMeta, help, excludedFields = {} }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
@@ -364,12 +364,6 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
         : wizard}
     </BackendWizardContext.Provider>
   );
-};
-
-BackendWizard.defaultProps = {
-  initialStepKey: SERVER_CONFIG_KEY,
-  help: undefined,
-  excludedFields: {},
 };
 
 BackendWizard.propTypes = {

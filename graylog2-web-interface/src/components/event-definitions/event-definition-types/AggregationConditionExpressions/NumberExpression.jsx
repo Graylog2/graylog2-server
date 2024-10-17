@@ -23,7 +23,7 @@ import { Input, Col } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 import { numberExpressionNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
-const NumberExpression = ({ expression, onChange, renderLabel, validation }) => {
+const NumberExpression = ({ expression, onChange, renderLabel, validation = {} }) => {
   const handleChange = (event) => {
     const nextExpression = cloneDeep(expression);
 
@@ -50,10 +50,6 @@ NumberExpression.propTypes = {
   onChange: PropTypes.func.isRequired,
   renderLabel: PropTypes.bool.isRequired,
   validation: PropTypes.object,
-};
-
-NumberExpression.defaultProps = {
-  validation: {},
 };
 
 export default NumberExpression;

@@ -143,17 +143,17 @@ const ListWithOwnState = ({
  * the selected page is displayed on screen.
  */
 const PaginatedList = ({
-  activePage,
+  activePage = 1,
   children,
   className,
-  hideFirstAndLastPageLinks,
-  hidePreviousAndNextPageLinks,
+  hideFirstAndLastPageLinks = false,
+  hidePreviousAndNextPageLinks = false,
   onChange,
-  pageSize,
-  pageSizes,
-  showPageSizeSelect,
+  pageSize = DEFAULT_PAGE_SIZES[0],
+  pageSizes = DEFAULT_PAGE_SIZES,
+  showPageSizeSelect = true,
   totalItems,
-  useQueryParameter,
+  useQueryParameter = true,
 }: Props & {
   activePage?: number,
   pageSize?: number,
@@ -187,18 +187,6 @@ const PaginatedList = ({
       {children}
     </ListWithOwnState>
   );
-};
-
-PaginatedList.defaultProps = {
-  activePage: 1,
-  className: undefined,
-  hideFirstAndLastPageLinks: false,
-  hidePreviousAndNextPageLinks: false,
-  pageSizes: DEFAULT_PAGE_SIZES,
-  pageSize: DEFAULT_PAGE_SIZES[0],
-  showPageSizeSelect: true,
-  onChange: undefined,
-  useQueryParameter: true,
 };
 
 export default PaginatedList;

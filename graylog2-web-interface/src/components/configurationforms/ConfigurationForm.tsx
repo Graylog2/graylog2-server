@@ -34,7 +34,7 @@ type Props<Configuration extends object> = {
   titleHelpText?: string,
   includeTitleField?: boolean,
   submitAction: (data: ConfigurationFormData<Configuration>) => void,
-  title: string | React.ReactNode | null,
+  title?: string | React.ReactNode | null
   titleValue?: string,
   typeName?: string,
   values?: { [key:string]: any },
@@ -53,18 +53,19 @@ type RefType<Configuration extends object> = {
   getValue: () => ConfigurationFormData<Configuration>,
 }
 
+const defaultConfigFields = {};
 const ConfigurationForm = forwardRef(<Configuration extends object>({
-  cancelAction,
-  configFields,
-  children,
-  titleHelpText,
-  includeTitleField,
+  cancelAction = () => {},
+  configFields = defaultConfigFields,
+  children = null,
+  titleHelpText = '',
+  includeTitleField = true,
   submitAction,
-  title,
-  titleValue: initialTitleValue,
+  title = null,
+  titleValue: initialTitleValue = '',
   typeName,
-  values: initialValues,
-  wrapperComponent: WrapperComponent,
+  values: initialValues = {},
+  wrapperComponent: WrapperComponent = BootstrapModalForm as unknown as Props<{ }>['wrapperComponent'],
   submitButtonText,
 } : Props<Configuration>, ref: React.ForwardedRef<RefType<Configuration>>) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
@@ -260,20 +261,6 @@ ConfigurationForm.propTypes = {
   values: PropTypes.object,
   wrapperComponent: PropTypes.any,
   submitButtonText: PropTypes.string,
-};
-
-ConfigurationForm.defaultProps = {
-  cancelAction: () => {},
-  configFields: {},
-  children: null,
-  titleHelpText: '',
-  title: null,
-  includeTitleField: true,
-  submitButtonText: undefined,
-  titleValue: '',
-  typeName: undefined,
-  values: {},
-  wrapperComponent: BootstrapModalForm as unknown as Props<{ }>['wrapperComponent'],
 };
 
 export default ConfigurationForm as <T extends object>(

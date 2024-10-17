@@ -110,11 +110,6 @@ const RotationConfig = ({ rotationStrategies, indexSetRotationStrategy, indexSet
   );
 };
 
-RotationConfig.defaultProps = {
-  indexSetRotationStrategy: undefined,
-  indexSetRotationStrategyClass: undefined,
-};
-
 const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, indexSetRetentionStrategy, indexSetRetentionStrategyClass }: RetentionConfigProps) => {
   if (!retentionStrategies) return <Spinner />;
 
@@ -133,11 +128,6 @@ const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, inde
                                              }}
                                              getState={getRetentionConfigState} />
   );
-};
-
-RetentionConfig.defaultProps = {
-  indexSetRetentionStrategy: undefined,
-  indexSetRetentionStrategyClass: undefined,
 };
 
 const validate = (formValues: IndexSetTemplateFormValues, usesLegacyRetention: boolean) => {
@@ -379,8 +369,4 @@ TemplateForm.propTypes = {
   submitLoadingText: PropTypes.string.isRequired,
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-};
-
-TemplateForm.defaultProps = {
-  initialValues: undefined,
 };

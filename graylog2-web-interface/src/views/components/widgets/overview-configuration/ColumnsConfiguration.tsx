@@ -35,11 +35,11 @@ type Props = {
 const ColumnsConfiguration = ({
   columnTitle,
   columns,
-  createSelectPlaceholder,
-  displaySortableListOverlayInPortal,
+  createSelectPlaceholder = 'Add a column',
+  displaySortableListOverlayInPortal = false,
   menuPortalTarget,
   name,
-  testPrefix,
+  testPrefix = '',
 }: Props) => (
   <Field name={name}>
     {({ field: { value, onChange } }) => (
@@ -65,12 +65,5 @@ const ColumnsConfiguration = ({
     )}
   </Field>
 );
-
-ColumnsConfiguration.defaultProps = {
-  createSelectPlaceholder: 'Add a column',
-  displaySortableListOverlayInPortal: false,
-  menuPortalTarget: undefined,
-  testPrefix: '',
-};
 
 export default ColumnsConfiguration;

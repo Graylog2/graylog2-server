@@ -39,8 +39,4 @@ const TelemetryInfoText = ({ showProfile }: Props) => (
   </Alert>
 );
 
-TelemetryInfoText.defaultProps = {
-  showProfile: undefined,
-};
-
 export default TelemetryInfoText;

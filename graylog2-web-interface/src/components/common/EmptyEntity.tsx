@@ -36,14 +36,14 @@ const Headline = styled.h2`
 
 type Props = {
   children: React.ReactNode,
-  title: string,
+  title?: string
 };
 
 /**
  * Component used to represent an empty entity in Graylog. This component allows us to display some larger
  * text to the user explaining what that entity is and a link to create a new one.
  */
-const EmptyEntity = ({ children, title }: Props) => (
+const EmptyEntity = ({ children, title = 'Looks like there is nothing here, yet!' }: Props) => (
   <Container>
     <Headline>{title}</Headline>
     {children}
@@ -61,10 +61,6 @@ EmptyEntity.propTypes = {
    * or link to easily create a new entity.
    */
   children: PropTypes.node.isRequired,
-};
-
-EmptyEntity.defaultProps = {
-  title: 'Looks like there is nothing here, yet!',
 };
 
 export default EmptyEntity;

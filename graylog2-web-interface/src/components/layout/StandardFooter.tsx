@@ -77,10 +77,6 @@ StandardFooter.propTypes = {
   }),
 };
 
-StandardFooter.defaultProps = {
-  system: undefined,
-};
-
 export default connect(
   StandardFooter,
   { system: SystemStore as Store<SystemStoreState> },

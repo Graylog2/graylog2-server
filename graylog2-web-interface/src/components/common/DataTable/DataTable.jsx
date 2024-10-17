@@ -30,7 +30,6 @@ const StyledTable = styled.table`
   ${tableCss}
 `;
 
-// eslint-disable-next-line react/prop-types
 const NoData = ({ noDataText }) => {
   if (typeof noDataText === 'string') {
     return (

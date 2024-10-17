@@ -32,27 +32,23 @@ const StyledButton = styled(Button)`
   vertical-align: baseline;
 `;
 
-const AggregationConditionsFormSummary = (props) => {
-  const { conditions, series, expressionValidation, showInlineValidation, toggleShowValidation } = props;
-
-  return (
-    <div>
-      <StyledPanel header="Condition summary">
-        {expressionValidation.isValid
-          ? <p className="text-success"><Icon name="check_box" />&nbsp;Condition is valid</p>
-          : (
-            <p className="text-danger">
-              <Icon name="warning" />&nbsp;Condition is not valid
-              <StyledButton bsSize="xsmall" onClick={toggleShowValidation}>
-                {showInlineValidation ? 'Hide errors' : 'Show errors'}
-              </StyledButton>
-            </p>
-          )}
-        <b>Preview:</b> <AggregationConditionSummary series={series} conditions={conditions} />
-      </StyledPanel>
-    </div>
-  );
-};
+const AggregationConditionsFormSummary = ({ conditions, series, expressionValidation = { isValid: true }, showInlineValidation = false, toggleShowValidation }) => (
+  <div>
+    <StyledPanel header="Condition summary">
+      {expressionValidation.isValid
+        ? <p className="text-success"><Icon name="check_box" />&nbsp;Condition is valid</p>
+        : (
+          <p className="text-danger">
+            <Icon name="warning" />&nbsp;Condition is not valid
+            <StyledButton bsSize="xsmall" onClick={toggleShowValidation}>
+              {showInlineValidation ? 'Hide errors' : 'Show errors'}
+            </StyledButton>
+          </p>
+        )}
+      <b>Preview:</b> <AggregationConditionSummary series={series} conditions={conditions} />
+    </StyledPanel>
+  </div>
+);
 
 AggregationConditionsFormSummary.propTypes = {
   conditions: PropTypes.object.isRequired,
@@ -60,11 +56,6 @@ AggregationConditionsFormSummary.propTypes = {
   expressionValidation: PropTypes.object,
   showInlineValidation: PropTypes.bool,
   toggleShowValidation: PropTypes.func.isRequired,
-};
-
-AggregationConditionsFormSummary.defaultProps = {
-  expressionValidation: { isValid: true },
-  showInlineValidation: false,
 };
 
 export default AggregationConditionsFormSummary;

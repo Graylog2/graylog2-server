@@ -124,8 +124,4 @@ EventDefinitions.propTypes = {
   onDisable: PropTypes.func.isRequired,
 };
 
-EventDefinitions.defaultProps = {
-  context: undefined,
-};
-
 export default EventDefinitions;

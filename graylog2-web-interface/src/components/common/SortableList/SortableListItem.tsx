@@ -43,7 +43,7 @@ const SortableListItem = <ItemType extends ListItemType>({
   className,
   customContentRender,
   customListItemRender,
-  disableDragging,
+  disableDragging = false,
   displayOverlayInPortal,
   index,
   item,
@@ -71,13 +71,5 @@ const SortableListItem = <ItemType extends ListItemType>({
     }}
   </Draggable>
   );
-
-SortableListItem.defaultProps = {
-  alignItemContent: undefined,
-  className: undefined,
-  customContentRender: undefined,
-  customListItemRender: undefined,
-  disableDragging: false,
-};
 
 export default SortableListItem;

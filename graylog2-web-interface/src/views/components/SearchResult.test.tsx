@@ -38,7 +38,7 @@ describe('SearchResult', () => {
   });
 
   const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
-  const SimpleSearchResult = ({ fieldTypes }) => (
+  const SimpleSearchResult = ({ fieldTypes = initialFieldTypes }) => (
     <FieldTypesContext.Provider value={fieldTypes}>
       <SearchResult />
     </FieldTypesContext.Provider>
@@ -46,10 +46,6 @@ describe('SearchResult', () => {
 
   SimpleSearchResult.propTypes = {
     fieldTypes: PropTypes.object,
-  };
-
-  SimpleSearchResult.defaultProps = {
-    fieldTypes: initialFieldTypes,
   };
 
   it('should show spinner with undefined fields', () => {

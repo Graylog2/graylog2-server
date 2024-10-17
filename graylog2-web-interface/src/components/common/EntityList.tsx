@@ -36,7 +36,7 @@ type Props = {
  * action buttons, etc. You need to use this component alongside `EntityListItem` in order to get a similar
  * look and feel among different entities.
  */
-const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
+const EntityList = ({ bsNoItemsStyle, items, noItemsText = 'No items available' }: Props) => {
   if (items.length === 0) {
     return (
       <Alert bsStyle={bsNoItemsStyle}>
@@ -50,11 +50,6 @@ const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
       {items}
     </StyledList>
   );
-};
-
-EntityList.defaultProps = {
-  bsNoItemsStyle: undefined,
-  noItemsText: 'No items available',
 };
 
 EntityList.propTypes = {

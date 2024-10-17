@@ -46,8 +46,4 @@ const NestedForm = ({ children }: React.PropsWithChildren) => {
   );
 };
 
-NestedForm.defaultProps = {
-  onReset: undefined,
-};
-
 export default NestedForm;

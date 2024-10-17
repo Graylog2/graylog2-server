@@ -23,8 +23,8 @@ import { Spinner } from 'components/common';
 import { NodesStore } from 'stores/nodes/NodesStore';
 
 type Props = {
-  global: boolean,
-  node: string,
+  global?: boolean
+  node?: string
   onChange: (type: 'node' | 'global', value: boolean | string | undefined | null) => void,
 };
 
@@ -102,11 +102,6 @@ NodeOrGlobalSelect.propTypes = {
   global: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   node: PropTypes.string,
-};
-
-NodeOrGlobalSelect.defaultProps = {
-  global: false,
-  node: undefined,
 };
 
 export default NodeOrGlobalSelect;

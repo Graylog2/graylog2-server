@@ -41,7 +41,7 @@ type Props = {
   showLabel?: boolean
 };
 
-const PageSizeSelect = ({ pageSizes, pageSize, onChange, className, showLabel }: Props) => {
+const PageSizeSelect = ({ pageSizes = DEFAULT_PAGE_SIZES, pageSize, onChange, className = '', showLabel = true }: Props) => {
   const select = (
     <StyledDropdownButton className={className}
                           id="page-size-select"
@@ -72,12 +72,6 @@ PageSizeSelect.propTypes = {
   pageSize: PropTypes.number.isRequired,
   pageSizes: PropTypes.arrayOf(PropTypes.number),
   showLabel: PropTypes.bool,
-};
-
-PageSizeSelect.defaultProps = {
-  className: '',
-  pageSizes: DEFAULT_PAGE_SIZES,
-  showLabel: true,
 };
 
 export default PageSizeSelect;

@@ -60,7 +60,7 @@ const getConditionPlugin = (type: string | undefined) => {
 
 type Props = {
   activeStep: string,
-  action: 'edit' | 'create',
+  action?: 'edit' | 'create'
   eventDefinition: EventDefinition,
   currentUser: User,
   validation: {
@@ -81,14 +81,14 @@ type Props = {
 }
 
 const EventDefinitionForm = ({
-  action,
+  action = 'edit',
   activeStep,
   canEdit,
   currentUser,
   defaults,
   entityTypes,
   eventDefinition,
-  formControls: FormControls,
+  formControls: FormControls = EventDefinitionFormControls,
   notifications,
   onCancel,
   onChange,
@@ -228,11 +228,6 @@ EventDefinitionForm.propTypes = {
   onChange: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-};
-
-EventDefinitionForm.defaultProps = {
-  action: 'edit',
-  formControls: EventDefinitionFormControls,
 };
 
 export default EventDefinitionForm;

@@ -29,7 +29,7 @@ const IconHeader = styled(Icon)`
 
 const ConditionalCollapse = ({ condition, wrapper, children }) => (condition ? wrapper(children) : children);
 
-export const HelpPanel = ({ bsStyle, children, className, collapsible, header, title, defaultExpanded }) => {
+export const HelpPanel = ({ bsStyle = 'info', children, className = '', collapsible = false, header, title = '', defaultExpanded = false }) => {
   const defaultHeader = <h3><IconHeader name="info" />{title}</h3>;
 
   return (
@@ -58,16 +58,6 @@ HelpPanel.propTypes = {
   header: PropTypes.node,
   title: PropTypes.string,
   defaultExpanded: PropTypes.bool,
-};
-
-HelpPanel.defaultProps = {
-  bsStyle: 'info',
-  children: undefined,
-  className: '',
-  collapsible: false,
-  header: undefined,
-  title: '',
-  defaultExpanded: false,
 };
 
 export default HelpPanel;

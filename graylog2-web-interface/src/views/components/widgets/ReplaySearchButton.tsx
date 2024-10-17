@@ -111,19 +111,4 @@ const ReplaySearchButton = ({ queryString, timerange, streams, streamCategories,
   );
 };
 
-ReplaySearchButton.defaultProps = {
-  queryString: undefined,
-  timerange: undefined,
-  streams: undefined,
-  streamCategories: undefined,
-  parameters: undefined,
-  parameterBindings: undefined,
-  children: undefined,
-};
-
-ReplaySearchButtonComponent.defaultProps = {
-  children: undefined,
-  onClick: undefined,
-};
-
 export default ReplaySearchButton;

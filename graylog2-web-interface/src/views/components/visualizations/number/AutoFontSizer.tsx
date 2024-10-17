@@ -90,7 +90,7 @@ const useAutoFontSize = (target, _container, height, width) => {
   return fontSize;
 };
 
-const AutoFontSizer = ({ children, target, height, width, center }: Props) => {
+const AutoFontSizer = ({ children, target = null, height, width, center = false }: Props) => {
   const _container = useRef<HTMLElement | undefined>();
   const fontSize = useAutoFontSize(target, _container, height, width);
   const _mixedContainer: { current } = _container;
@@ -100,11 +100,6 @@ const AutoFontSizer = ({ children, target, height, width, center }: Props) => {
       {children}
     </FontSize>
   );
-};
-
-AutoFontSizer.defaultProps = {
-  target: null,
-  center: false,
 };
 
 export default AutoFontSizer;

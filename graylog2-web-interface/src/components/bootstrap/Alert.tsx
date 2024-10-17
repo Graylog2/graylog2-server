@@ -63,7 +63,7 @@ const iconNameForType = (bsStyle: ColorVariant) => {
   }
 };
 
-const Alert = ({ children, bsStyle, title, style, className, onDismiss, noIcon }: Props) => {
+const Alert = ({ children, bsStyle = 'default', title, style, className, onDismiss, noIcon = false }: Props) => {
   const displayCloseButton = typeof onDismiss === 'function';
   const iconName = iconNameForType(bsStyle);
 
@@ -80,15 +80,6 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss, noIcon }
       {children}
     </StyledAlert>
   );
-};
-
-Alert.defaultProps = {
-  className: undefined,
-  onDismiss: undefined,
-  style: undefined,
-  title: undefined,
-  bsStyle: 'default',
-  noIcon: false,
 };
 
 export default Alert;

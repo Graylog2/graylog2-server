@@ -31,7 +31,7 @@ import formValidation from 'integrations/aws/utils/formValidation';
 import AWSAuthenticationTypes from 'integrations/aws/authentication/AWSAuthenticationTypes';
 import AWSCustomEndpoints from 'integrations/aws/authentication/AWSCustomEndpoints';
 
-const StepAuthorize = ({ onChange, onSubmit, sidebarComponent }) => {
+const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }) => {
   const { formData } = useContext(FormDataContext);
   const { clearSidebar, setSidebar } = useContext(SidebarContext);
   const { availableRegions, setRegions, setStreams } = useContext(ApiContext);
@@ -93,7 +93,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent }) => {
   const isFormValid = formValidation.isFormValid([
     'awsCloudWatchName',
     'awsCloudWatchAwsRegion',
-    ...authType !== AWS_AUTH_TYPES.automatic ? ['awsCloudWatchAwsKey', 'awsCloudWatchAwsSecret'] : [],
+    ...(authType !== AWS_AUTH_TYPES.automatic ? ['awsCloudWatchAwsKey', 'awsCloudWatchAwsSecret'] : []),
   ], formData);
 
   return (
@@ -139,10 +139,6 @@ StepAuthorize.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
   sidebarComponent: PropTypes.node,
-};
-
-StepAuthorize.defaultProps = {
-  sidebarComponent: null,
 };
 
 const DisappearingInput = styled.input`

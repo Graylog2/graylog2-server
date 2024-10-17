@@ -93,13 +93,4 @@ const RangeInput = ({
   </Input>
 );
 
-RangeInput.defaultProps = {
-  label: undefined,
-  help: undefined,
-  error: undefined,
-  bsStyle: undefined,
-  labelClassName: undefined,
-  wrapperClassName: undefined,
-};
-
 export default RangeInput;

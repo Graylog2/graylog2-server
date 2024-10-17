@@ -99,12 +99,12 @@ const LifecycleIndicator = ({
 
 type Props = {
   title: React.ReactNode,
-  children: React.ReactElement | Array<React.ReactElement>,
+  children?: React.ReactElement | Array<React.ReactElement>
   actions?: React.ReactElement,
   topActions?: React.ReactElement,
   lifecycle?: 'experimental' | 'legacy',
   lifecycleMessage?: React.ReactNode,
-  subpage: boolean,
+  subpage?: boolean
   documentationLink?: { title: string, path: string }
 };
 
@@ -113,7 +113,7 @@ type Props = {
  * This ensures all pages look and feel the same way across the product, so
  * please use it in your pages.
  */
-const PageHeader = ({ children, subpage, title, actions, topActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
+const PageHeader = ({ children = [], subpage = false, title, actions, topActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
   const topLevelClassNames = subpage ? '' : 'content';
 
   return (
@@ -166,16 +166,6 @@ PageHeader.propTypes = {
   subpage: PropTypes.bool,
   /** Specifies a specific link for the documentation. The title should be short. */
   documentationLink: PropTypes.object,
-};
-
-PageHeader.defaultProps = {
-  children: [],
-  lifecycle: undefined,
-  lifecycleMessage: undefined,
-  topActions: undefined,
-  actions: undefined,
-  subpage: false,
-  documentationLink: undefined,
 };
 
 export default PageHeader;

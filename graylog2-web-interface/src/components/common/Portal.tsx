@@ -25,10 +25,6 @@ type Props = {
 /**
  * Simple wrapper component for ReactDOMs native portal functionality.
  */
-const Portal = ({ children, container }: Props) => (<>{createPortal(children, container)}</>);
-
-Portal.defaultProps = {
-  container: document.body,
-};
+const Portal = ({ children, container = document.body }: Props) => (<>{createPortal(children, container)}</>);
 
 export default Portal;

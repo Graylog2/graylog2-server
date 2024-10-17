@@ -209,8 +209,6 @@ describe('AggregationWizard/Visualizations', () => {
       );
     };
 
-    WorldMap.defaultProps = { onVisualizationConfigChange: undefined };
-
     render((
       <SimpleAggregationWizard onChange={onChange} config={worldMapConfig}>
         <WorldMap />

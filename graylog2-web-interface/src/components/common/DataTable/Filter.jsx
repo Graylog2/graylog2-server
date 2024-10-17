@@ -74,13 +74,4 @@ Filter.propTypes = {
   rows: PropTypes.array.isRequired,
 };
 
-Filter.defaultProps = {
-  children: undefined,
-  displayKey: undefined,
-  filterBy: undefined,
-  filterKeys: undefined,
-  filterSuggestions: undefined,
-  label: undefined,
-};
-
 export default Filter;

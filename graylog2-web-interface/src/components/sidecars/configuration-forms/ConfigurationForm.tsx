@@ -38,14 +38,21 @@ import ConfigurationTagsSelect from './ConfigurationTagsSelect';
 import type { Collector, Configuration, ConfigurationSidecarsResponse } from '../types';
 
 type Props = {
-  action: string,
-  configuration: Configuration,
-  configurationSidecars: ConfigurationSidecarsResponse,
+  action?: string
+  configuration?: Configuration
+  configurationSidecars?: ConfigurationSidecarsResponse
 };
 
 const ConfigurationForm = ({
-  action,
-  configuration,
+  action = 'edit',
+  configuration = {
+    id: '',
+    name: '',
+    collector_id: '',
+    template: '',
+    color: '#FFFFFF',
+    tags: [],
+  },
   configurationSidecars,
 }: Props) => {
   const initFormData = {
@@ -70,11 +77,11 @@ const ConfigurationForm = ({
     CollectorsActions.all().then((response) => setCollectors(response.collectors));
   }, []);
 
-  const _isTemplateSet = (template) => template !== undefined && template !== '';
+  const _isTemplateSet = (template: string) => template !== undefined && template !== '';
 
   const _hasErrors = () => error || !_isTemplateSet(formData.template);
 
-  const _validateFormData = (nextFormData, checkForRequiredFields) => {
+  const _validateFormData = (nextFormData: Partial<Configuration>, checkForRequiredFields: boolean) => {
     CollectorConfigurationsActions.validate(nextFormData).then((validation) => {
       const nextValidation = clone(validation);
 
@@ -117,7 +124,7 @@ const ConfigurationForm = ({
 
   const _debouncedValidateFormData = debounce(_validateFormData, 200);
 
-  const _formDataUpdate = (key) => (nextValue, _?: React.ChangeEvent<HTMLInputElement>, hideCallback?: () => void) => {
+  const _formDataUpdate = (key: string) => (nextValue, _?: React.ChangeEvent<HTMLInputElement>, hideCallback?: () => void) => {
     const nextFormData = cloneDeep(formData);
 
     nextFormData[key] = nextValue;
@@ -129,7 +136,7 @@ const ConfigurationForm = ({
     }
   };
 
-  const _onTemplateChange = (nextTemplate) => {
+  const _onTemplateChange = (nextTemplate: string) => {
     _formDataUpdate('template')(nextTemplate);
   };
 
@@ -144,19 +151,19 @@ const ConfigurationForm = ({
     _onTemplateChange(updatedTemplate);
   };
 
-  const _onNameChange = (event) => {
+  const _onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextName = event.target.value;
 
     _formDataUpdate('name')(nextName);
   };
 
-  const _onTagsChange = (nextTags) => {
+  const _onTagsChange = (nextTags: string) => {
     const nextTagsArray = nextTags.split(',');
 
     _formDataUpdate('tags')(nextTagsArray);
   };
 
-  const _getCollectorDefaultTemplate = (collectorId) => {
+  const _getCollectorDefaultTemplate = (collectorId: string | number) => {
     const storedTemplate = defaultTemplates.current[collectorId];
 
     if (storedTemplate !== undefined) {
@@ -171,7 +178,7 @@ const ConfigurationForm = ({
     });
   };
 
-  const _onCollectorChange = async (nextId) => {
+  const _onCollectorChange = async (nextId: string) => {
     // Start loading the request to get the default template, so it is available asap.
     const defaultTemplate = await _getCollectorDefaultTemplate(nextId);
 
@@ -189,7 +196,7 @@ const ConfigurationForm = ({
     setFormData(nextFormData);
   };
 
-  const _onSubmit = (event) => {
+  const _onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     _save();
   };
@@ -202,7 +209,7 @@ const ConfigurationForm = ({
     setShowPreviewModal(true);
   };
 
-  const _formatCollector = (collector) => (collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector');
+  const _formatCollector = (collector: Collector) => (collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector');
 
   const _formatCollectorOptions = () => {
     const options = [];
@@ -218,7 +225,7 @@ const ConfigurationForm = ({
     return options;
   };
 
-  const _formatValidationMessage = (fieldName, defaultText) => {
+  const _formatValidationMessage = (fieldName: string, defaultText: React.ReactNode) => {
     if (validationErrors[fieldName]) {
       return <span>{validationErrors[fieldName][0]}</span>;
     }
@@ -226,7 +233,7 @@ const ConfigurationForm = ({
     return <span>{defaultText}</span>;
   };
 
-  const _validationState = (fieldName) => {
+  const _validationState = (fieldName: string) => {
     if (validationErrors[fieldName]) {
       return 'error';
     }
@@ -234,8 +241,8 @@ const ConfigurationForm = ({
     return null;
   };
 
-  const _renderCollectorTypeField = (collectorId, _collectors, _configurationSidecars) => {
-    const isConfigurationInUse = _configurationSidecars.sidecar_ids && _configurationSidecars.sidecar_ids.length > 0;
+  const _renderCollectorTypeField = (collectorId: string, _collectors: Array<Collector>, _configurationSidecars: ConfigurationSidecarsResponse) => {
+    const isConfigurationInUse = _configurationSidecars?.sidecar_ids?.length > 0;
 
     if (isConfigurationInUse) {
       const collector = _collectors ? _collectors.find((c) => c.id === collectorId) : undefined;
@@ -361,19 +368,6 @@ ConfigurationForm.propTypes = {
     tags: PropTypes.array.isRequired,
   }),
   configurationSidecars: PropTypes.object,
-};
-
-ConfigurationForm.defaultProps = {
-  action: 'edit',
-  configuration: {
-    id: '',
-    name: '',
-    collector_id: '',
-    template: '',
-    color: '#FFFFFF',
-    tags: [],
-  },
-  configurationSidecars: {},
 };
 
 export default ConfigurationForm;

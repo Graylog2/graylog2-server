@@ -82,7 +82,7 @@ type Props = {
   onFullMode?: (fullMode: boolean) => void;
 }
 
-function Editor({ id, value, height, readOnly, onChange, onFullMode }: Props) {
+function Editor({ id, value, height, readOnly = false, onChange, onFullMode }: Props) {
   const [localValue, setLocalValue] = React.useState<string>(value);
   const [showPreview, setShowPreview] = React.useState<boolean>(false);
   const [fullView, setFullView] = React.useState<boolean>(false);
@@ -133,11 +133,5 @@ function Editor({ id, value, height, readOnly, onChange, onFullMode }: Props) {
     </>
   );
 }
-
-Editor.defaultProps = {
-  id: undefined,
-  readOnly: false,
-  onFullMode: undefined,
-};
 
 export default Editor;

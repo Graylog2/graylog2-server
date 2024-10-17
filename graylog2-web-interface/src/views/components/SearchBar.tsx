@@ -304,6 +304,4 @@ SearchBar.propTypes = {
   onSubmit: PropTypes.func,
 };
 
-SearchBar.defaultProps = defaultProps;
-
 export default SearchBar;

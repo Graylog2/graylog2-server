@@ -30,7 +30,7 @@ import { ApiContext } from 'integrations/aws/context/Api';
 
 import SetupModal from './setup-steps/SetupModal';
 
-const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
+const KinesisSetup = ({ onChange, onSubmit, toggleSetup = null }) => {
   const { availableGroups, setGroups, clearLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState(null);
@@ -153,10 +153,6 @@ KinesisSetup.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
   toggleSetup: PropTypes.func,
-};
-
-KinesisSetup.defaultProps = {
-  toggleSetup: null,
 };
 
 const BackButton = styled(Button)`

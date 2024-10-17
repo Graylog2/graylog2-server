@@ -38,7 +38,7 @@ import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextP
 
 type Props = {
   editing: boolean,
-  onPositionsChange: (position: BackendWidgetPosition) => void,
+  onPositionsChange?: (position: BackendWidgetPosition) => void
   position: WidgetPosition,
   widgetId: string,
 };
@@ -86,10 +86,6 @@ WidgetComponent.propTypes = {
   editing: PropTypes.bool.isRequired,
   onPositionsChange: PropTypes.func,
   position: PropTypes.shape(Position).isRequired,
-};
-
-WidgetComponent.defaultProps = {
-  onPositionsChange: () => {},
 };
 
 export default WidgetComponent;

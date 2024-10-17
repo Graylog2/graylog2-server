@@ -30,9 +30,9 @@ jest.mock('hooks/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 type SUTProps = {
-  // eslint-disable-next-line react/require-default-props
+
   error?: QueryValidationState,
-  // eslint-disable-next-line react/require-default-props
+
   warning?: QueryValidationState,
 }
 

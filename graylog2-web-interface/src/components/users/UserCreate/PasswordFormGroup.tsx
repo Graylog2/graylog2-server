@@ -75,9 +75,4 @@ const PasswordFormGroup = ({}: Props) => (
   </Input>
 );
 
-PasswordFormGroup.defaultProps = {
-  passwordRef: undefined,
-  passwordRepeatRef: undefined,
-};
-
 export default PasswordFormGroup;

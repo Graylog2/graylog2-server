@@ -41,14 +41,15 @@ type Props = {
  * cancel or confirm.
  */
 const ConfirmDialog = ({
-  show,
+  show = false,
   title,
   children,
-  onCancel,
+  onCancel = () => {
+  },
   onConfirm,
-  btnConfirmDisabled,
-  btnConfirmText,
-  hideCancelButton,
+  btnConfirmDisabled = false,
+  btnConfirmText = 'Confirm',
+  hideCancelButton = false,
 }: Props) => {
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
@@ -106,15 +107,6 @@ ConfirmDialog.propTypes = {
     PropTypes.string,
     PropTypes.element,
   ]).isRequired,
-};
-
-ConfirmDialog.defaultProps = {
-  btnConfirmText: 'Confirm',
-  btnConfirmDisabled: false,
-  show: false,
-  hideCancelButton: false,
-  onCancel: () => {
-  },
 };
 
 export default ConfirmDialog;

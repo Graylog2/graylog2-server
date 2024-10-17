@@ -90,19 +90,15 @@ const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
   return qualified ? <span>{children}</span> : <UnqualifiedOption>{children}</UnqualifiedOption>;
 };
 
-OptionRenderer.defaultProps = {
-  type: undefined,
-};
-
 const FieldSelect = ({
   ariaLabel,
   autoFocus,
-  allowCreate,
+  allowCreate = false,
   className,
-  clearable,
-  excludedFields,
+  clearable = false,
+  excludedFields = [],
   id,
-  isFieldQualified,
+  isFieldQualified = () => true,
   menuPortalTarget,
   name,
   onChange,
@@ -111,12 +107,12 @@ const FieldSelect = ({
   persistSelection,
   placeholder,
   selectRef,
-  size,
+  size = 'small',
   value,
   onSelectAllRest,
-  showSelectAllRest,
+  showSelectAllRest = false,
   onDeSelectAll,
-  showDeSelectAll,
+  showDeSelectAll = false,
 }: Props) => {
   const activeQuery = useActiveQueryId();
   const fieldTypes = useContext(FieldTypesContext);
@@ -167,27 +163,6 @@ const FieldSelect = ({
     </>
 
   );
-};
-
-FieldSelect.defaultProps = {
-  allowCreate: false,
-  ariaLabel: undefined,
-  autoFocus: undefined,
-  className: undefined,
-  clearable: false,
-  isFieldQualified: () => true,
-  excludedFields: [],
-  onMenuClose: undefined,
-  openMenuOnFocus: undefined,
-  persistSelection: undefined,
-  placeholder: undefined,
-  selectRef: undefined,
-  size: 'small',
-  menuPortalTarget: undefined,
-  onSelectAllRest: undefined,
-  showSelectAllRest: false,
-  onDeSelectAll: undefined,
-  showDeSelectAll: false,
 };
 
 export default FieldSelect;

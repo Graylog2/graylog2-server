@@ -33,8 +33,4 @@ const NoSearchResult = ({ children, className }: Props) => (
   </Alert>
 );
 
-NoSearchResult.defaultProps = {
-  className: undefined,
-};
-
 export default NoSearchResult;

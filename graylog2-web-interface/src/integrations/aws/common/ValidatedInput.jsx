@@ -35,7 +35,13 @@ const Label = ({ label, error }) => {
   return label;
 };
 
-const ValidatedInput = ({ className, help, onChange, id, label, fieldData, type, ...restProps }) => {
+const ValidatedInput = ({
+  className, help = '', onChange = () => {}, id, label, fieldData = {
+    dirty: false,
+    error: undefined,
+    value: undefined,
+  }, type, required = false, ...restProps
+}) => {
   const { dirty, error, value } = fieldData;
 
   const checkValidity = (event) => {
@@ -48,6 +54,7 @@ const ValidatedInput = ({ className, help, onChange, id, label, fieldData, type,
 
   return (
     <Input {...restProps}
+           required={required}
            id={id}
            type={type}
            onChange={onChange}
@@ -77,18 +84,6 @@ ValidatedInput.propTypes = {
   onChange: PropTypes.func,
   required: PropTypes.bool,
   type: PropTypes.string.isRequired,
-};
-
-ValidatedInput.defaultProps = {
-  className: undefined,
-  onChange: () => {},
-  required: false,
-  help: '',
-  fieldData: {
-    dirty: false,
-    error: undefined,
-    value: undefined,
-  },
 };
 
 const Error = styled.span`

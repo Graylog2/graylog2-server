@@ -50,7 +50,7 @@ const StyledHelpPanel = styled(StyledPanel)`
 const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const isElasticsearch = useIsElasticsearch();
   const isRemoteReindexingEnabled = AppConfig.isFeatureEnabled('remote_reindex_migration');
-  
+
   return (
     <Row>
       <Col md={isRemoteReindexingEnabled ? 6 : 12}>
@@ -113,6 +113,6 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: Migra
       )}
     </Row>
   );
-}
+};
 
 export default MigrationWelcomeStep;

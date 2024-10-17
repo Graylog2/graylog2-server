@@ -39,7 +39,7 @@ type Props = {
   entityId: SharedEntity['id'],
   entityTitle: SharedEntity['title'],
   entityType: SharedEntity['type'],
-  entityTypeTitle: string | null | undefined,
+  entityTypeTitle?: string | null | undefined
   onClose: () => void,
   showShareableEntityURL?: boolean
 };
@@ -51,7 +51,7 @@ const EntityShareModal = ({
   entityTitle,
   entityTypeTitle,
   onClose,
-  showShareableEntityURL,
+  showShareableEntityURL = true,
 }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
@@ -123,11 +123,6 @@ EntityShareModal.propTypes = {
   entityTypeTitle: PropTypes.string,
   onClose: PropTypes.func.isRequired,
   showShareableEntityURL: PropTypes.bool,
-};
-
-EntityShareModal.defaultProps = {
-  entityTypeTitle: undefined,
-  showShareableEntityURL: true,
 };
 
 export default EntityShareModal;

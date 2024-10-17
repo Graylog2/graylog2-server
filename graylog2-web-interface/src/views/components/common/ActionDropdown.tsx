@@ -28,7 +28,7 @@ type Props = {
   header?: string,
 };
 
-const ActionDropdown = ({ children, element, 'data-testid': dataTestid, header }: Props) => (
+const ActionDropdown = ({ children, element, 'data-testid': dataTestid, header = 'Actions' }: Props) => (
   <StopPropagation data-testid={dataTestid}>
     <Menu position="bottom" withinPortal>
       <Menu.Target>
@@ -46,11 +46,6 @@ ActionDropdown.propTypes = {
   children: PropTypes.node.isRequired,
   element: PropTypes.node.isRequired,
   'data-testid': PropTypes.string,
-};
-
-ActionDropdown.defaultProps = {
-  'data-testid': undefined,
-  header: 'Actions',
 };
 
 export default ActionDropdown;

@@ -68,8 +68,4 @@ const CompatibilityCheckStep = ({ currentStep, onTriggerStep, hideActions }: Mig
   );
 };
 
-CompatibilityCheckStep.defaultProps = {
-  canSkip: true,
-};
-
 export default CompatibilityCheckStep;

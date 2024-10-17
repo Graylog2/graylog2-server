@@ -80,7 +80,7 @@ const EntityShareSettings = ({
   entityTitle,
   setDisableSubmit,
   granteesSelectFormRef,
-  showShareableEntityURL,
+  showShareableEntityURL = true,
   entityTypeTitle,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
@@ -165,11 +165,6 @@ EntityShareSettings.propTypes = {
   setDisableSubmit: PropTypes.func.isRequired,
   showShareableEntityURL: PropTypes.bool,
   entityTypeTitle: PropTypes.string,
-};
-
-EntityShareSettings.defaultProps = {
-  showShareableEntityURL: true,
-  entityTypeTitle: undefined,
 };
 
 export default EntityShareSettings;

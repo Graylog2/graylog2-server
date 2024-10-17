@@ -67,10 +67,6 @@ SimpleComponentWithDummyStore.propTypes = {
   }),
 };
 
-SimpleComponentWithDummyStore.defaultProps = {
-  simpleStore: undefined,
-};
-
 describe('connect()', () => {
   beforeEach(() => {
     act(() => {
@@ -170,13 +166,9 @@ describe('connect()', () => {
   });
 
   it('types props which have a default value (defaultProps) as optional', async () => {
-    const BaseComponent = ({ exampleProp }: {
-      exampleProp: string
+    const BaseComponent = ({ exampleProp = 'hello!' }: {
+      exampleProp?: string
     }) => <span>{exampleProp}</span>;
-
-    BaseComponent.defaultProps = {
-      exampleProp: 'hello!',
-    };
 
     BaseComponent.propTypes = {
       exampleProp: PropTypes.string,

@@ -26,13 +26,13 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import style from './StatusIndicator.css';
 
 type Props = {
-  message: string,
-  status: number,
-  lastSeen: string,
-  id: string,
+  message?: string
+  status?: number
+  lastSeen?: string
+  id?: string
 }
 
-const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) => {
+const StatusIndicator = ({ message: messageProp = '', status = -1, lastSeen, id = '' }: Props) => {
   const { toUserTimezone } = useUserDateTime();
   let message = messageProp;
   const text = upperFirst(SidecarStatusEnum.toString(status));
@@ -82,13 +82,6 @@ StatusIndicator.propTypes = {
   lastSeen: PropTypes.string,
   message: PropTypes.string,
   status: PropTypes.number,
-};
-
-StatusIndicator.defaultProps = {
-  id: '',
-  lastSeen: undefined,
-  message: '',
-  status: -1,
 };
 
 export default StatusIndicator;

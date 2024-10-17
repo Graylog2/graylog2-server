@@ -86,7 +86,7 @@ type Props = {
   onDone?: (newValue?: string) => void;
 }
 
-function EditorModal({ value, readOnly, onChange, show, onClose, onDone }: Props) {
+function EditorModal({ value, readOnly = false, onChange, show, onClose, onDone }: Props) {
   const [height, setHeight] = React.useState<number>(0);
   const [localValue, setLocalValue] = React.useState<string>(value);
 
@@ -147,10 +147,5 @@ function EditorModal({ value, readOnly, onChange, show, onClose, onDone }: Props
 
   return <>{ReactDom.createPortal(Component, document.body)}</>;
 }
-
-EditorModal.defaultProps = {
-  readOnly: false,
-  onDone: undefined,
-};
 
 export default EditorModal;

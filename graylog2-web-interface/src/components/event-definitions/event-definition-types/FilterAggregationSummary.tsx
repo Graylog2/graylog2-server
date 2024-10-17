@@ -242,8 +242,4 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId }: Props) 
   );
 };
 
-FilterAggregationSummary.defaultProps = {
-  definitionId: undefined,
-};
-
 export default FilterAggregationSummary;

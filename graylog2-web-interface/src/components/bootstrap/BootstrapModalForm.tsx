@@ -25,13 +25,13 @@ import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  backdrop: boolean | 'static' | undefined,
-  submitButtonDisabled: boolean,
-  formProps: object,
-  bsSize: 'lg' | 'large' | 'sm' | 'small',
+  backdrop?: boolean | 'static' | undefined
+  submitButtonDisabled?: boolean
+  formProps?: object
+  bsSize?: 'lg' | 'large' | 'sm' | 'small'
   show: boolean,
-  submitButtonText: string,
-  onSubmitForm: (event) => void,
+  submitButtonText?: string
+  onSubmitForm?: (event) => void
   onCancel: () => void,
   title: string | React.ReactNode,
   children: React.ReactNode,
@@ -44,11 +44,11 @@ type Props = {
  */
 const BootstrapModalForm = ({
   backdrop,
-  submitButtonDisabled,
-  formProps,
+  submitButtonDisabled = false,
+  formProps = {},
   bsSize,
   show,
-  submitButtonText,
+  submitButtonText = 'Submit',
   onSubmitForm,
   onCancel,
   title,
@@ -128,16 +128,6 @@ BootstrapModalForm.propTypes = {
   submitButtonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   submitButtonDisabled: PropTypes.bool,
   show: PropTypes.bool.isRequired,
-};
-
-BootstrapModalForm.defaultProps = {
-  backdrop: undefined,
-  formProps: {},
-  submitButtonText: 'Submit',
-  submitButtonDisabled: false,
-  onSubmitForm: undefined,
-  bsSize: undefined,
-  modalTitle: undefined,
 };
 
 export default BootstrapModalForm;

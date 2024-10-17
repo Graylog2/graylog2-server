@@ -49,7 +49,7 @@ const ErrorMessage = styled.div(({ theme }) => css`
 type Props = {
   backgroundImage?: string,
   children?: React.ReactNode,
-  displayPageLayout: boolean,
+  displayPageLayout?: boolean
   description: React.ReactNode,
   title: string,
 };
@@ -58,7 +58,7 @@ const ErrorPageStyles = createGlobalStyle`
     ${generateStyles()}
 `;
 
-const ErrorPage = ({ children, title, description, backgroundImage, displayPageLayout }: Props) => {
+const ErrorPage = ({ children, title, description, backgroundImage = NotFoundBackgroundImage, displayPageLayout = true }: Props) => {
   const PageLayoutComponent = displayPageLayout ? PageContentLayout : React.Fragment;
 
   return (
@@ -84,12 +84,6 @@ ErrorPage.propTypes = {
   displayPageLayout: PropTypes.bool,
   title: PropTypes.string.isRequired,
   backgroundImage: PropTypes.string,
-};
-
-ErrorPage.defaultProps = {
-  children: undefined,
-  displayPageLayout: true,
-  backgroundImage: NotFoundBackgroundImage,
 };
 
 export default ErrorPage;

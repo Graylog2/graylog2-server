@@ -33,7 +33,7 @@ type Props = {
 /**
  * Component that renders a link to an external resource.
  */
-const ExternalLink = ({ children, className, href, iconName, target }: Props) => {
+const ExternalLink = ({ children, className = '', href = '', iconName = 'open_in_new', target = '_blank' }: Props) => {
   const content = (
     <span>
       {children}
@@ -52,13 +52,6 @@ const ExternalLink = ({ children, className, href, iconName, target }: Props) =>
       {content}
     </a>
   );
-};
-
-ExternalLink.defaultProps = {
-  href: '',
-  target: '_blank',
-  iconName: 'open_in_new',
-  className: '',
 };
 
 ExternalLink.propTypes = {

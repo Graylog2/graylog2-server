@@ -96,10 +96,10 @@ const KeywordTimeRangePreview = () => {
 };
 
 type Props = {
-  disabled: boolean,
+  disabled?: boolean
 };
 
-const TabKeywordTimeRange = ({ disabled }: Props) => (
+const TabKeywordTimeRange = ({ disabled = false }: Props) => (
   <Row className="no-bm">
     <Col sm={5}>
       <Headline>Time range:</Headline>
@@ -150,10 +150,6 @@ const TabKeywordTimeRange = ({ disabled }: Props) => (
 
 TabKeywordTimeRange.propTypes = {
   disabled: PropTypes.bool,
-};
-
-TabKeywordTimeRange.defaultProps = {
-  disabled: false,
 };
 
 export default TabKeywordTimeRange;

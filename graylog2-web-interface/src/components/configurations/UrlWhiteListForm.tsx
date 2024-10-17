@@ -69,13 +69,13 @@ const validateUrlEntry = async (idx: number, entry: Url, callback?: (...any) => 
 const debouncedValidateUrlEntry = debounce(validateUrlEntry, 200);
 
 type Props = {
-  urls: Array<Url>,
-  disabled: boolean,
-  onUpdate: (config: WhiteListConfig, valid: boolean) => void,
+  urls?: Array<Url>
+  disabled?: boolean
+  onUpdate?: (config: WhiteListConfig, valid: boolean) => void
   newEntryId?: string,
 };
 
-const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
+const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId }: Props) => {
   const literal = 'literal';
   const regex = 'regex';
   const options = [{ value: literal, label: 'Exact match' }, { value: regex, label: 'Regex' }];
@@ -252,13 +252,6 @@ UrlWhiteListForm.propTypes = {
   disabled: PropTypes.bool,
   onUpdate: PropTypes.func,
   newEntryId: PropTypes.string,
-};
-
-UrlWhiteListForm.defaultProps = {
-  urls: [],
-  disabled: false,
-  onUpdate: () => {},
-  newEntryId: undefined,
 };
 
 export default UrlWhiteListForm;

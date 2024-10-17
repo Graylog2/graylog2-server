@@ -280,9 +280,4 @@ RuleBuilderBlock.propTypes = {
   deleteBlock: PropTypes.func.isRequired,
 };
 
-RuleBuilderBlock.defaultProps = {
-  block: undefined,
-  outputVariableList: undefined,
-};
-
 export default RuleBuilderBlock;

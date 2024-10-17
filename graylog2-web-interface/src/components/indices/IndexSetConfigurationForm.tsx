@@ -186,7 +186,7 @@ const IndexSetConfigurationForm = ({
   rotationStrategies,
   retentionStrategies,
   retentionStrategiesContext,
-  create,
+  create = false,
   onUpdate,
   cancelLink,
   submitButtonText,
@@ -424,11 +424,6 @@ IndexSetConfigurationForm.propTypes = {
   cancelLink: PropTypes.string.isRequired,
   submitButtonText: PropTypes.string.isRequired,
   submitLoadingText: PropTypes.string.isRequired,
-};
-
-IndexSetConfigurationForm.defaultProps = {
-  create: false,
-  indexSet: undefined,
 };
 
 export default IndexSetConfigurationForm;

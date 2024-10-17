@@ -144,6 +144,4 @@ ContentPackListItem.propTypes = {
   onInstall: PropTypes.func.isRequired,
 };
 
-ContentPackListItem.defaultProps = {};
-
 export default ContentPackListItem;

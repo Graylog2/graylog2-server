@@ -186,9 +186,4 @@ RecentMessageLoader.propTypes = {
   selectedInputId: PropTypes.string,
 };
 
-RecentMessageLoader.defaultProps = {
-  inputs: undefined,
-  selectedInputId: undefined,
-};
-
 export default RecentMessageLoader;

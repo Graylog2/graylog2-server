@@ -46,8 +46,4 @@ MessageField.propTypes = {
   value: PropTypes.any.isRequired,
 };
 
-MessageField.defaultProps = {
-  customFieldActions: undefined,
-};
-
 export default MessageField;
