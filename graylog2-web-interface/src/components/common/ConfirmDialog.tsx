@@ -16,9 +16,14 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
+
+const StyledModal = styled(Modal)`
+  z-index: 1070;
+`;
 
 type Props = {
   show?: boolean,
@@ -36,19 +41,20 @@ type Props = {
  * cancel or confirm.
  */
 const ConfirmDialog = ({
-  show,
+  show = false,
   title,
   children,
-  onCancel,
+  onCancel = () => {
+  },
   onConfirm,
-  btnConfirmDisabled,
-  btnConfirmText,
-  hideCancelButton,
+  btnConfirmDisabled = false,
+  btnConfirmText = 'Confirm',
+  hideCancelButton = false,
 }: Props) => {
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
   return (
-    <Modal show={show} onHide={onHide}>
+    <StyledModal show={show} onHide={onHide}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -65,7 +71,7 @@ const ConfirmDialog = ({
                      submitButtonText={btnConfirmText}
                      displayCancel={!hideCancelButton as any} />
       </Modal.Footer>
-    </Modal>
+    </StyledModal>
   );
 };
 
@@ -101,15 +107,6 @@ ConfirmDialog.propTypes = {
     PropTypes.string,
     PropTypes.element,
   ]).isRequired,
-};
-
-ConfirmDialog.defaultProps = {
-  btnConfirmText: 'Confirm',
-  btnConfirmDisabled: false,
-  show: false,
-  hideCancelButton: false,
-  onCancel: () => {
-  },
 };
 
 export default ConfirmDialog;

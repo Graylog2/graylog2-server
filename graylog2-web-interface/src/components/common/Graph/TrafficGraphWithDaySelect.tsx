@@ -123,9 +123,4 @@ TrafficGraphWithDaySelect.propTypes = {
   title: PropTypes.string,
 };
 
-TrafficGraphWithDaySelect.defaultProps = {
-  trafficLimit: undefined,
-  title: undefined,
-};
-
 export default TrafficGraphWithDaySelect;

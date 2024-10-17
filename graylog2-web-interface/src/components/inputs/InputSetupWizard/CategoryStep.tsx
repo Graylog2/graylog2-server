@@ -14,13 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { WidgetActionType } from 'views/components/widgets/Types';
-import ExportWidgetPlug from 'views/components/widgets/ExportWidgetAction/ExportWidgetPlug';
+import * as React from 'react';
 
-const ExportMessageWidgetAction: WidgetActionType = {
-  type: 'export-widget-action-plug',
-  position: 'menu',
-  component: ExportWidgetPlug,
-};
+const CategoryStep = () => (
+  <div>Category Step</div>
+);
 
-export default ExportMessageWidgetAction;
+export default CategoryStep;

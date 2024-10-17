@@ -54,14 +54,14 @@ const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProp
 };
 
 type Props = {
-  hidden: boolean,
-  hideText: string,
+  hidden?: boolean
+  hideText?: boolean
   onMessageLoaded: (data: any) => void,
   messageId?: string,
   index?: string,
 };
 
-const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMessageId, index: defaultIndex }: Props) => {
+const MessageLoader = ({ hidden = true, hideText = false, onMessageLoaded, messageId: defaultMessageId = '', index: defaultIndex = '' }: Props) => {
   const [loading, setLoading] = useState(false);
   const [isHidden, setIsHidden] = useState(hidden);
 
@@ -112,13 +112,6 @@ MessageLoader.propTypes = {
   onMessageLoaded: PropTypes.func.isRequired,
   messageId: PropTypes.string,
   index: PropTypes.string,
-};
-
-MessageLoader.defaultProps = {
-  hidden: true,
-  hideText: false,
-  messageId: '',
-  index: '',
 };
 
 export default MessageLoader;

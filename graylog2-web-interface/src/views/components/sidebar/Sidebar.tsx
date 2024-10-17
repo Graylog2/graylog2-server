@@ -40,7 +40,7 @@ import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
   children: React.ReactElement,
-  results: QueryResult,
+  results?: QueryResult
   searchPageLayout?: SearchPreferencesLayout,
   sections?: Array<SidebarSection>,
   actions?: Array<SidebarAction>,
@@ -80,7 +80,7 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
   setActiveSectionKey(sectionKey);
 };
 
-const Sidebar = ({ searchPageLayout, results, children, sections, actions, forceSideBarPinned }: Props) => {
+const Sidebar = ({ searchPageLayout, results, children, sections = sidebarSections, actions = sidebarActions, forceSideBarPinned = false }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
   const queryId = useActiveQueryId();
@@ -133,14 +133,6 @@ Sidebar.propTypes = {
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
   results: PropTypes.object,
   sections: PropTypes.arrayOf(PropTypes.object),
-};
-
-Sidebar.defaultProps = {
-  results: {},
-  sections: sidebarSections,
-  actions: sidebarActions,
-  searchPageLayout: undefined,
-  forceSideBarPinned: false,
 };
 
 const SidebarWithContext = ({ children, ...props }: React.ComponentProps<typeof Sidebar>) => (

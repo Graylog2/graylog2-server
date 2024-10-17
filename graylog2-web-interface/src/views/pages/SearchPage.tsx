@@ -61,9 +61,9 @@ const SearchPage = ({
   view: viewPromise,
   loadNewView: _loadNewView = defaultLoadNewView,
   loadView: _loadView = defaultLoadView,
-  executionState: initialExecutionState,
+  executionState: initialExecutionState = SearchExecutionState.empty(),
   searchResult,
-  forceSideBarPinned,
+  forceSideBarPinned = false,
 }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
@@ -102,14 +102,6 @@ const SearchPage = ({
       </PluggableStoreProvider>
     )
     : <Spinner />;
-};
-
-SearchPage.defaultProps = {
-  loadNewView: defaultLoadNewView,
-  loadView: defaultLoadView,
-  executionState: SearchExecutionState.empty(),
-  searchResult: undefined,
-  forceSideBarPinned: false,
 };
 
 export default React.memo(SearchPage);

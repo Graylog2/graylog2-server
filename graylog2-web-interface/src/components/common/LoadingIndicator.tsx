@@ -43,9 +43,9 @@ const StyledAlert = styled(Alert)`
 `;
 
 type Props = {
-  text: string,
-  longWaitText: string,
-  longWaitTimeout: number,
+  text?: string
+  longWaitText?: string
+  longWaitTimeout?: number
 };
 
 /**
@@ -55,7 +55,7 @@ type Props = {
  * Use this component when you want to load something in the background, but still provide some feedback that
  * an action is happening.
  */
-const LoadingIndicator = ({ text, longWaitText, longWaitTimeout }: Props) => {
+const LoadingIndicator = ({ text = 'Loading...', longWaitText = 'This is taking a bit longer, please hold on...', longWaitTimeout = 20000 }: Props) => {
   const [indicatorText, setIndicatorText] = useState(text);
 
   useEffect(() => {
@@ -82,12 +82,6 @@ LoadingIndicator.propTypes = {
   text: PropTypes.string,
   longWaitText: PropTypes.string,
   longWaitTimeout: PropTypes.number,
-};
-
-LoadingIndicator.defaultProps = {
-  text: 'Loading...',
-  longWaitText: 'This is taking a bit longer, please hold on...',
-  longWaitTimeout: 20000,
 };
 
 export default LoadingIndicator;

@@ -112,21 +112,21 @@ type Props = {
  * styles customization.
  */
 const SearchForm = ({
-  useLoadingState,
-  queryHelpComponent,
-  queryWidth,
-  focusAfterMount,
-  children,
-  className,
-  placeholder,
-  buttonLeftMargin,
-  label,
-  onReset,
-  onSearch,
-  wrapperClass,
-  topMargin,
+  useLoadingState = false,
+  queryHelpComponent = null,
+  queryWidth = 400,
+  focusAfterMount = false,
+  children = null,
+  className = '',
+  placeholder = 'Enter search query...',
+  buttonLeftMargin = 5,
+  label = null,
+  onReset = null,
+  onSearch = null,
+  wrapperClass = 'search',
+  topMargin = 0,
   onQueryChange,
-  query: propsQuery,
+  query: propsQuery = '',
 }: Props) => {
   const [query, setQuery] = useState(propsQuery);
   const [isLoading, setIsLoading] = useState(false);
@@ -280,24 +280,6 @@ SearchForm.propTypes = {
     PropTypes.element,
   ]),
   focusAfterMount: PropTypes.bool,
-};
-
-SearchForm.defaultProps = {
-  query: '',
-  className: '',
-  onQueryChange: undefined,
-  onSearch: null,
-  onReset: null,
-  label: null,
-  placeholder: 'Enter search query...',
-  wrapperClass: 'search',
-  queryWidth: 400,
-  topMargin: 0,
-  buttonLeftMargin: 5,
-  useLoadingState: false,
-  queryHelpComponent: null,
-  children: null,
-  focusAfterMount: false,
 };
 
 export default SearchForm;

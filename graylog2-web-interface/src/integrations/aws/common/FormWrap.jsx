@@ -21,7 +21,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 import { Button, Panel } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
-export const ErrorMessage = ({ fullMessage, niceMessage }) => {
+export const ErrorMessage = ({ fullMessage, niceMessage = null }) => {
   const [expanded, toggleExpanded] = useState(false);
 
   const Header = (
@@ -59,20 +59,16 @@ ErrorMessage.propTypes = {
   ]),
 };
 
-ErrorMessage.defaultProps = {
-  niceMessage: null,
-};
-
 const FormWrap = ({
-  buttonContent,
+  buttonContent = 'Submit',
   children,
   className,
-  disabled,
-  description,
-  error,
-  loading,
-  onSubmit,
-  title,
+  disabled = false,
+  description = null,
+  error = null,
+  loading = false,
+  onSubmit = () => {},
+  title = null,
 }) => {
   const formRef = useRef();
   const [disabledButton, setDisabledButton] = useState(disabled);
@@ -139,17 +135,6 @@ FormWrap.propTypes = {
     PropTypes.node,
   ]),
   className: PropTypes.string,
-};
-
-FormWrap.defaultProps = {
-  buttonContent: 'Submit',
-  disabled: false,
-  error: null,
-  description: null,
-  loading: false,
-  onSubmit: () => {},
-  title: null,
-  className: undefined,
 };
 
 const ErrorOutputStyle = createGlobalStyle`

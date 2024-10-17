@@ -119,12 +119,12 @@ const Strong = ({ children, strong = false }: React.PropsWithChildren<{ strong: 
 
 const MessageTableEntry = ({
   config,
-  disableSurroundingSearch,
+  disableSurroundingSearch = false,
   expandAllRenderAsync,
   expanded,
   fields,
   message,
-  showMessageRow,
+  showMessageRow = false,
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
@@ -224,12 +224,6 @@ MessageTableEntry.propTypes = {
   selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
   showMessageRow: PropTypes.bool,
   toggleDetail: PropTypes.func.isRequired,
-};
-
-MessageTableEntry.defaultProps = {
-  disableSurroundingSearch: false,
-  selectedFields: Immutable.OrderedSet(),
-  showMessageRow: false,
 };
 
 export default MessageTableEntry;

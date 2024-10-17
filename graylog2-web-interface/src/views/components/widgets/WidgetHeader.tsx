@@ -79,15 +79,15 @@ const TitleInput = styled(Input)(({ theme }) => css`
 `);
 
 type Props = {
-  children: React.ReactNode,
-  onRename: (newTitle: string) => unknown,
-  hideDragHandle: boolean,
+  children?: React.ReactNode
+  onRename?: (newTitle: string) => unknown
+  hideDragHandle?: boolean
   title: string,
-  loading: boolean,
+  loading?: boolean
   editing: boolean,
 };
 
-const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading, editing }: Props) => (
+const WidgetHeader = ({ children = null, onRename, hideDragHandle = false, title, loading = false, editing }: Props) => (
   <Container>
     <Col>
       {hideDragHandle || <DragHandleContainer className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="drag_indicator" /></DragHandleContainer>}
@@ -119,13 +119,6 @@ WidgetHeader.propTypes = {
   hideDragHandle: PropTypes.bool,
   title: PropTypes.node.isRequired,
   loading: PropTypes.bool,
-};
-
-WidgetHeader.defaultProps = {
-  children: null,
-  onRename: undefined,
-  hideDragHandle: false,
-  loading: false,
 };
 
 export default WidgetHeader;

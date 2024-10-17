@@ -68,8 +68,4 @@ ColorPreview.propTypes = {
   onClick: PropTypes.func,
 };
 
-ColorPreview.defaultProps = {
-  onClick: () => {},
-};
-
 export default ColorPreview;

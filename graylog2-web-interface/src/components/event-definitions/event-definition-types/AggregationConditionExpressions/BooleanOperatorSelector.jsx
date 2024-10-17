@@ -32,7 +32,7 @@ const BooleanOperatorSelect = styled(({ isFirstElement: _ignored, ...props }) =>
   margin-right: 1em;
 `;
 
-const BooleanOperatorSelector = ({ initialText, operator, onOperatorChange }) => (
+const BooleanOperatorSelector = ({ initialText = '', operator, onOperatorChange }) => (
   <Col md={12}>
     <OperatorSelector className="form-inline">
       {initialText && (
@@ -64,10 +64,6 @@ BooleanOperatorSelector.propTypes = {
   initialText: PropTypes.string,
   operator: PropTypes.string.isRequired,
   onOperatorChange: PropTypes.func.isRequired,
-};
-
-BooleanOperatorSelector.defaultProps = {
-  initialText: '',
 };
 
 export default BooleanOperatorSelector;

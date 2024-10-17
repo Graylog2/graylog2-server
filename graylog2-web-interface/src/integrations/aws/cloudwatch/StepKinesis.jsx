@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import ExistingStreams from './kinesis/ExistingStreams';
 import SetupNewStream from './kinesis/SetupNewStream';
 
-const StepKinesis = ({ hasStreams, ...restProps }) => {
+const StepKinesis = ({ hasStreams = false, ...restProps }) => {
   const [renderStreams, toggleRenderStreams] = useState(hasStreams);
 
   return (
@@ -36,10 +36,6 @@ StepKinesis.propTypes = {
   hasStreams: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-};
-
-StepKinesis.defaultProps = {
-  hasStreams: false,
 };
 
 export default StepKinesis;

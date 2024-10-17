@@ -32,10 +32,10 @@ const StyledIcon = styled(Icon)`
 `;
 
 type Props = {
-  server: {
+  server?: {
     up: false,
     error?: ServerError,
-  },
+  }
 };
 
 const ServerUnavailablePage = ({ server }: Props) => {
@@ -147,10 +147,6 @@ const ServerUnavailablePage = ({ server }: Props) => {
 
 ServerUnavailablePage.propTypes = {
   server: PropTypes.object,
-};
-
-ServerUnavailablePage.defaultProps = {
-  server: undefined,
 };
 
 export default ServerUnavailablePage;

@@ -98,7 +98,7 @@ type Props = {
   alignActionsAtBottom?: boolean,
 }
 
-const StickyBottomActions = ({ actions, children, className, alignActionsAtBottom }: Props) => {
+const StickyBottomActions = ({ actions, children, className, alignActionsAtBottom = false }: Props) => {
   const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();
 
   return (
@@ -114,11 +114,6 @@ const StickyBottomActions = ({ actions, children, className, alignActionsAtBotto
       </Actions>
     </Container>
   );
-};
-
-StickyBottomActions.defaultProps = {
-  className: undefined,
-  alignActionsAtBottom: false,
 };
 
 export default StickyBottomActions;

@@ -30,15 +30,11 @@ const HotkeyComponent = ({ shortcut }: { shortcut: HotkeysProps }) => {
   return null;
 };
 
-const KeyCapture = ({ children, shortcuts } : Props) => (
+const KeyCapture = ({ children = null, shortcuts } : Props) => (
   <>
     {shortcuts.map((shortcut) => <HotkeyComponent key={`${shortcut.scope}.${shortcut.actionKey}`} shortcut={shortcut} />)}
     {children}
   </>
 );
-
-KeyCapture.defaultProps = {
-  children: null,
-};
 
 export default KeyCapture;

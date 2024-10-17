@@ -45,34 +45,56 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.SELECT_MIGRATION, MigrationState.MIGRATION_WELCOME_PAGE, () -> LOG.info("Migration selected in menu, show welcome page"));
 
         config.configure(MigrationState.MIGRATION_WELCOME_PAGE)
-                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, migrationActions::caDoesNotExist)
-                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist())
-                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && migrationActions.isCompatibleInPlaceMigrationVersion())
-                .permitIf(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && !migrationActions.isCompatibleInPlaceMigrationVersion());
+                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, () ->
+                        (migrationActions.isRemoteReindexMigrationEnabled() || migrationActions.isCompatibleInPlaceMigrationVersion()) && migrationActions.caDoesNotExist()
+                )
+                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> {
+                    if (!migrationActions.isRemoteReindexMigrationEnabled() && !migrationActions.isCompatibleInPlaceMigrationVersion()) {
+                        return false;
+                    }
+                    return !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist();
+                })
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, () -> {
+                    if (!migrationActions.isRemoteReindexMigrationEnabled()) {
+                        return false;
+                    }
+                    return migrationActions.caAndRenewalPolicyExist() && migrationActions.isCompatibleInPlaceMigrationVersion();
+                })
+                .permitIf(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, () -> {
+                    if (!migrationActions.isRemoteReindexMigrationEnabled() && !migrationActions.isCompatibleInPlaceMigrationVersion()) {
+                        return false;
+                    }
+                    return migrationActions.caAndRenewalPolicyExist() && !migrationActions.isCompatibleInPlaceMigrationVersion();
+                })
+                .permitIf(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, () ->
+                        !migrationActions.isRemoteReindexMigrationEnabled() && migrationActions.caAndRenewalPolicyExist());
 
         config.configure(MigrationState.CA_CREATION_PAGE)
                 .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist())
-                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && migrationActions.isCompatibleInPlaceMigrationVersion())
-                .permitIf(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && !migrationActions.isCompatibleInPlaceMigrationVersion());
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && migrationActions.isCompatibleInPlaceMigrationVersion() && migrationActions.isRemoteReindexMigrationEnabled())
+                .permitIf(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && !migrationActions.isCompatibleInPlaceMigrationVersion())
+                .permitIf(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, () -> !migrationActions.isRemoteReindexMigrationEnabled() && migrationActions.caAndRenewalPolicyExist());
 
         config.configure(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
-                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && migrationActions.isCompatibleInPlaceMigrationVersion())
-                .permitIf(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && !migrationActions.isCompatibleInPlaceMigrationVersion());
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && migrationActions.isCompatibleInPlaceMigrationVersion() && migrationActions.isRemoteReindexMigrationEnabled())
+                .permitIf(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && !migrationActions.isCompatibleInPlaceMigrationVersion())
+                .permitIf(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, () -> !migrationActions.isRemoteReindexMigrationEnabled() && migrationActions.caAndRenewalPolicyExist());
 
         // Major decision - remote reindexing or rolling upgrade(in-place)?
         config.configure(MigrationState.MIGRATION_SELECTION_PAGE)
                 .permitIf(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, migrationActions::isCompatibleInPlaceMigrationVersion)
-                .permit(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
+                .permitIf(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, migrationActions::isRemoteReindexMigrationEnabled);
 
         // remote reindexing branch of the migration
         config.configure(MigrationState.REMOTE_REINDEX_WELCOME_PAGE)
                 .onEntry(migrationActions::reindexUpgradeSelected)
-                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.dataNodeStartupFinished() && migrationActions.compatibleDatanodesRunning(), migrationActions::provisionAndStartDataNodes)
-                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
+                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.allDatanodesAvailable() && migrationActions.compatibleDatanodesRunning(), migrationActions::provisionAndStartDataNodes)
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::allDatanodesAvailable)
+                .onExit(migrationActions::setPreflightFinished);
 
         // This page should contain the "Please restart Graylog to continue with data migration"
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
-                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::allDatanodesAvailable);
 
         config.configure(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE)
                 .permit(MigrationStep.SHOW_MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_EXISTING_DATA, migrationActions::getElasticsearchHosts)
@@ -93,7 +115,7 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::isRemoteReindexingFinished);
 
         config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
-                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.FINISHED, migrationActions::isOldClusterStopped, migrationActions::finishRemoteReindexMigration);
+                .permit(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.FINISHED, migrationActions::finishRemoteReindexMigration);
 
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
@@ -114,11 +136,12 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP, migrationActions::stopMessageProcessing);
 
         config.configure(MigrationState.MESSAGE_PROCESSING_STOP)
-                .permit(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.RESTART_GRAYLOG, migrationActions::startDataNodes);
+                .permitIf(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.RESTART_GRAYLOG, migrationActions::isOldClusterStopped, migrationActions::startDataNodes);
 
         // shows the "remove connection string, restart graylog"
         config.configure(MigrationState.RESTART_GRAYLOG)
-                .permitIf(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED, MigrationState.FINISHED, migrationActions::dataNodeStartupFinished);
+                .onEntry(migrationActions::setPreflightFinished)
+                .permitIf(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED, MigrationState.FINISHED, migrationActions::allDatanodesAvailable);
 
         return config;
     }

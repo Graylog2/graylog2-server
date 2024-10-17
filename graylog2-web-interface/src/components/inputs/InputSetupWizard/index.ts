@@ -14,16 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
 
-import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
+import InputSetupWizard from './InputSetupWizard';
 
-describe('<ContentPackUploadControls />', () => {
-  it('should render', () => {
-    const wrapper = mount(<ContentPackUploadControls />);
-
-    expect(wrapper).toExist();
-  });
-});
+export default InputSetupWizard;

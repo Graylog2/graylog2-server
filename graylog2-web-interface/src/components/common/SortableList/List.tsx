@@ -32,8 +32,8 @@ const List = <ItemType extends ListItemType>({
   alignItemContent,
   customContentRender,
   customListItemRender,
-  disableDragging,
-  displayOverlayInPortal,
+  disableDragging = false,
+  displayOverlayInPortal = false,
   items = [],
 }: Props<ItemType>) => (
   <>
@@ -49,13 +49,5 @@ const List = <ItemType extends ListItemType>({
     ))}
   </>
   );
-
-List.defaultProps = {
-  displayOverlayInPortal: false,
-  alignItemContent: undefined,
-  disableDragging: false,
-  customContentRender: undefined,
-  customListItemRender: undefined,
-};
 
 export default React.memo(List);

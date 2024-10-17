@@ -24,6 +24,7 @@ import { Button } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 const DEFAULT_SIZE = { width: 450, height: 400 };
+const DEFAULT_STRING_SIZE = { width: DEFAULT_SIZE.width.toString(), height: DEFAULT_SIZE.height.toString() };
 const halfWidth = Math.ceil((window.innerWidth / 2) - (DEFAULT_SIZE.width / 2));
 const halfHeight = Math.ceil((window.innerHeight / 2) - (DEFAULT_SIZE.height / 2));
 const stayOnScreenHeight = halfHeight < 0 ? 55 : halfHeight;
@@ -100,26 +101,26 @@ type Props = {
   className?: string,
   minHeight?: number,
   minWidth?: number,
-  onClose: () => void,
-  onDrag: (newCoords: Coords) => void,
-  onResize: (newSize: Size) => void,
-  position: Coords,
-  size: Size,
-  title: string,
+  onClose?: () => void
+  onDrag?: (newCoords: Coords) => void
+  onResize?: (newSize: Size) => void
+  position?: Coords
+  size?: Size
+  title?: string
   wrapperClassName?: string,
 };
 
 const InteractableModal = ({
   children,
   className,
-  minHeight,
-  minWidth,
-  onClose,
-  onDrag,
-  onResize,
-  position,
-  size,
-  title,
+  minHeight = DEFAULT_SIZE.height,
+  minWidth = DEFAULT_SIZE.width,
+  onClose = () => {},
+  onDrag = () => {},
+  onResize = () => {},
+  position = DEFAULT_POSITION,
+  size = DEFAULT_STRING_SIZE,
+  title = '',
   wrapperClassName,
 }: React.PropsWithChildren<Props>) => {
   const dragHandleRef = useRef(null);
@@ -269,19 +270,6 @@ InteractableModal.propTypes = {
   title: PropTypes.string,
   /** Used to style wrapping component */
   wrapperClassName: PropTypes.string,
-};
-
-InteractableModal.defaultProps = {
-  className: undefined,
-  minHeight: DEFAULT_SIZE.height,
-  minWidth: DEFAULT_SIZE.width,
-  onClose: () => {},
-  onDrag: () => {},
-  onResize: () => {},
-  position: DEFAULT_POSITION,
-  size: DEFAULT_SIZE,
-  title: '',
-  wrapperClassName: undefined,
 };
 
 export default InteractableModal;
