@@ -9,9 +9,8 @@ import FormControl from './FormControl';
 import FormGroup from './FormGroup';
 import InputGroup from './InputGroup';
 import InputWrapper from './InputWrapper';
-import HTMLAttributes = React.HTMLAttributes;
 
-type InputProps = InputHTMLAttributes<HTMLInputElement> & {
+type InputProps = React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
   id: string;
   type?: string;
   name?: string;

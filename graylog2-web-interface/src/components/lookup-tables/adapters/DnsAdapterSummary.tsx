@@ -23,12 +23,16 @@ type DnsAdapterSummaryProps = {
     config?: {
       lookup_type: string;
       request_timeout: number;
+      server_ips: string;
+      cache_ttl_override_enabled: boolean;
+      cache_ttl_override: string;
+      cache_ttl_override_unit: string;
     };
   };
 };
 
 const DnsAdapterSummary = ({
-  dataAdapter
+  dataAdapter,
 }: DnsAdapterSummaryProps) => {
   const { config } = dataAdapter;
 

@@ -32,7 +32,7 @@ const formatUsers = (users) => users.map((user) => ({ label: `${user.username} (
 
 type Props = {
     value: string,
-    onChange: (nextValue) => string,
+    onChange: (nextValue) => void,
 }
 
 const UsersSelectField = ({ value, onChange }: Props) => {

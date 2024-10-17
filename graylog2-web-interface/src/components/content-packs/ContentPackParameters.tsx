@@ -10,7 +10,7 @@ import ContentPackParameterList from './ContentPackParameterList';
 type ContentPackParametersProps = {
   contentPack: any;
   onStateChange?: (...args: any[]) => void;
-  appliedParameter: any;
+  appliedParameter: { [key: string]: Array<{ configKey: string, paramName: string }> };
 };
 
 class ContentPackParameters extends React.Component<ContentPackParametersProps, {

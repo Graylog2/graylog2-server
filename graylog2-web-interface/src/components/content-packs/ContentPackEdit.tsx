@@ -139,7 +139,7 @@ class ContentPackEdit extends React.Component<ContentPackEditProps, {
 
     return (
       <div>
-        <Wizard steps={steps} onStepChange={this._stepChanged} affixed>
+        <Wizard steps={steps} onStepChange={this._stepChanged}>
           {this.state.selectedStep !== 'preview' ? (
             <ContentPackDetails contentPack={this.props.contentPack} />
           ) : undefined}

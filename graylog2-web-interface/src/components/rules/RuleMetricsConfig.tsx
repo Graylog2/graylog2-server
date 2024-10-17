@@ -23,7 +23,7 @@ import * as FormsUtils from 'util/FormsUtils';
 
 type RuleMetricsConfigProps = {
   config?: any;
-  onChange: (...args: any[]) => void;
+  onChange: (...args: any[]) => Promise<void>;
   onClose?: (...args: any[]) => void;
 };
 

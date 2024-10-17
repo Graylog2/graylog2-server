@@ -23,16 +23,15 @@ type GreyNoiseAdapterFieldSetProps = {
     api_token: any;
   };
   updateConfig: (...args: any[]) => void;
-  handleFormEvent: (...args: any[]) => void;
-  validationState: (...args: any[]) => void;
-  validationMessage: (...args: any[]) => void;
+  validationState: (...args: any[]) => 'error' | 'success' | 'warning';
+  validationMessage: (...args: any[]) => string;
 };
 
 const GreyNoiseAdapterFieldSet = ({
   config,
   updateConfig,
   validationMessage,
-  validationState
+  validationState,
 }: GreyNoiseAdapterFieldSetProps) => {
   const isCreate = useRef(!config.api_token?.is_set);
   const [showResetPasswordButton, setShowResetPasswordButton] = useState(config.api_token?.is_set === true);
@@ -52,7 +51,7 @@ const GreyNoiseAdapterFieldSet = ({
 
   const handleUserPasswordChange = ({ target }) => {
     const typedPassword = target.value;
-    let nextPassword = { set_value: typedPassword };
+    let nextPassword: {} = { set_value: typedPassword };
 
     if (typedPassword === '') {
       nextPassword = { delete_value: true };

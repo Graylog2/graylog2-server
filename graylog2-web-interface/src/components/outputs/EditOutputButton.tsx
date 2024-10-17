@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Button } from 'components/bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
+import type { RefType } from 'components/configurationforms/ConfigurationForm';
 
 type EditOutputButtonProps = {
   output: any;
@@ -18,6 +19,8 @@ class EditOutputButton extends React.Component<EditOutputButtonProps, {
     onUpdate: () => {},
   };
 
+  private configurationForm: React.RefObject<RefType<{}>>;
+
   constructor(props) {
     super(props);
 
@@ -26,8 +29,6 @@ class EditOutputButton extends React.Component<EditOutputButtonProps, {
     this.state = {
       typeDefinition: undefined,
     };
-
-    this.handleClick = this.handleClick.bind(null, props.output);
   }
 
   handleClick = () => {

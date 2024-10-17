@@ -8,6 +8,7 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/
 import Routes from 'routing/Routes';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
+import type { HistoryContext } from 'routing/withHistory';
 import withHistory from 'routing/withHistory';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import withTelemetry from 'logic/telemetry/withTelemetry';
@@ -22,7 +23,7 @@ type ValidationMessageProps = {
 const ValidationMessage = ({
   validationErrors,
   fieldName,
-  defaultText
+  defaultText,
 }: ValidationMessageProps) => {
   if (validationErrors[fieldName]) {
     return <span>{validationErrors[fieldName][0]}</span>;
@@ -51,16 +52,25 @@ const formatOperatingSystems = () => {
   return options;
 };
 
-type CollectorFormProps = {
-  action?: "create" | "edit";
+type CollectorFormProps = HistoryContext & {
+  action?: 'create' | 'edit';
   collector?: any;
-  history: any;
   sendTelemetry?: (...args: any[]) => void;
 };
 
 class CollectorForm extends React.Component<CollectorFormProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    action: 'edit',
+    collector: {
+      default_template: '',
+    },
+    sendTelemetry: () => {},
+  };
+
+  private _debouncedValidateFormData: (formData: React.FormEvent) => void;
+
   constructor(props) {
     super(props);
     const { collector } = this.props;
@@ -179,7 +189,7 @@ class CollectorForm extends React.Component<CollectorFormProps, {
     const { validation_errors: validationErrors } = this.state;
 
     if (validationErrors[fieldName]) {
-      return 'error';
+      return 'error' as const;
     }
 
     return null;
@@ -299,12 +309,4 @@ class CollectorForm extends React.Component<CollectorFormProps, {
   }
 }
 
-CollectorForm.defaultProps = {
-  action: 'edit',
-  collector: {
-    default_template: '',
-  },
-  sendTelemetry: () => {},
-};
-
-export default withTelemetry(withHistory(connect(CollectorForm, { collectors: CollectorsStore })));
+export default connect(withTelemetry(withHistory(CollectorForm)), { collectors: CollectorsStore });

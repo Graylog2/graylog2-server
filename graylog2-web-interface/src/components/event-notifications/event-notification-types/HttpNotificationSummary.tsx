@@ -20,7 +20,7 @@ import CommonNotificationSummary from './CommonNotificationSummary';
 
 type HttpNotificationSummaryProps = {
   type: string;
-  notification?: any;
+  notification: any;
   definitionNotification: any;
 };
 

@@ -8,11 +8,15 @@ type DnsAdapterFieldSetProps = {
   config: {
     request_timeout: number;
     server_ips?: string;
+    lookup_type?: string,
+    cache_ttl_override: string,
+    cache_ttl_override_unit: string,
+    cache_ttl_override_enabled: boolean,
   };
   updateConfig: (...args: any[]) => void;
   handleFormEvent: (...args: any[]) => void;
-  validationMessage: (...args: any[]) => void;
-  validationState: (...args: any[]) => void;
+  validationMessage: (...args: any[]) => string;
+  validationState: (...args: any[]) => 'error' | 'success' | 'warning';
 };
 
 class DnsAdapterFieldSet extends React.Component<DnsAdapterFieldSetProps, {

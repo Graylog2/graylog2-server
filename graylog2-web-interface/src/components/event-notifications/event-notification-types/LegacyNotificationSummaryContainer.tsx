@@ -24,7 +24,7 @@ import LegacyNotificationSummary from './LegacyNotificationSummary';
 
 type LegacyNotificationSummaryContainerProps = {
   type: string;
-  notification?: any;
+  notification: any;
   notifications: any;
   definitionNotification: any;
 };

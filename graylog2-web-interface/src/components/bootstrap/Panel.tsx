@@ -35,7 +35,7 @@ const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
   border-top-color: ${theme.colors.gray[80]};
 `);
 
-const panelVariantStyles = css(({ bsStyle = 'default', theme }) => {
+const panelVariantStyles = css<{ bsStyle?: string }>(({ bsStyle = 'default', theme }) => {
   const backgroundColor = theme.colors.variant.lighter[bsStyle];
   const borderColor = theme.colors.variant.dark[bsStyle];
 
@@ -93,7 +93,7 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   ${panelVariantStyles}
 `);
 
-const deprecatedVariantStyles = css(({ bsStyle = 'default', theme }) => {
+const deprecatedVariantStyles = css<{ bsStyle?: string }>(({ bsStyle = 'default', theme }) => {
   const backgroundColor = theme.colors.variant.lightest[bsStyle];
   const borderColor = theme.colors.variant.light[bsStyle];
 

@@ -10,7 +10,7 @@ const getImmutableProps = (props) => ({
   streams: props.streams ? Immutable.Map(props.streams) : props.streams,
 });
 
-type MessageShowProps = {
+type MessageShowProps = Omit<React.ComponentProps<typeof MessageDetail>, 'renderForDisplay'> & {
   message: any;
   inputs?: any;
   streams?: any;
@@ -54,8 +54,7 @@ class MessageShow extends React.Component<MessageShowProps, {
                          message={message}
                          inputs={inputs}
                          streams={streams}
-                         renderForDisplay={this.renderForDisplay}
-                         showTimestamp />
+                         renderForDisplay={this.renderForDisplay} />
         </Col>
       </Row>
     );

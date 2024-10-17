@@ -98,7 +98,7 @@ class ContentPackParameterList extends React.Component<ContentPackParameterListP
     );
   };
 
-  _filterParameters = (filter, parametersArg) => {
+  _filterParameters = (filter, parametersArg?) => {
     const { contentPack } = this.props;
     const parameters = ObjectUtils.clone(parametersArg || contentPack.parameters);
 
@@ -114,7 +114,7 @@ class ContentPackParameterList extends React.Component<ContentPackParameterListP
     this.setState({ filteredParameters: filteredParameters, filter: filter });
   };
 
-  _parameterModal(parameter) {
+  _parameterModal(parameter?) {
     let editParameter;
 
     const { contentPack, onAddParameter } = this.props;

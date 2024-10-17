@@ -13,8 +13,8 @@ const MessageTerms = styled.span(({ theme }) => css`
 type MessageFieldDescriptionProps = {
   message: any;
   fieldName: string;
-  renderForDisplay: (...args: any[]) => void;
-  customFieldActions?: React.ReactNode;
+  renderForDisplay: (name: string) => React.ReactNode;
+  customFieldActions?: React.ReactElement;
 };
 
 class MessageFieldDescription extends React.Component<MessageFieldDescriptionProps, {

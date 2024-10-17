@@ -19,7 +19,7 @@ import * as React from 'react';
 import type { HistoryFunction } from './useHistory';
 import useHistory from './useHistory';
 
-type HistoryContext = {
+export type HistoryContext = {
   history: HistoryFunction;
 };
 

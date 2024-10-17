@@ -25,7 +25,7 @@ type LegacyNotificationSummaryProps = {
   type: string;
   notification: any;
   definitionNotification: any;
-  legacyTypes: any;
+  legacyTypes: { [key: string]: { configuration: { [key: string]: { human_name: string } }}};
 };
 
 class LegacyNotificationSummary extends React.Component<LegacyNotificationSummaryProps, {

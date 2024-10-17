@@ -31,7 +31,7 @@ type Props<Configuration extends object> = {
   submitButtonText?: string,
 }
 
-type RefType<Configuration extends object> = {
+export type RefType<Configuration extends object> = {
   open: () => void,
   getValue: () => ConfigurationFormData<Configuration>,
 }

@@ -28,7 +28,7 @@ import RawMessageLoader from './RawMessageLoader';
 import RecentMessageLoader from './RecentMessageLoader';
 
 type LoaderTabsProps = {
-  tabs?: "recent" | "messageId" | "raw" | "recent" | "messageId" | "raw"[];
+  tabs?: 'recent' | 'messageId' | 'raw' | 'recent' | 'messageId' | 'raw'[];
   messageId?: string;
   index?: string;
   onMessageLoaded?: (...args: any[]) => void;
@@ -40,6 +40,16 @@ type LoaderTabsProps = {
 class LoaderTabs extends React.Component<LoaderTabsProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    tabs: ['recent', 'messageId'],
+    index: undefined,
+    messageId: undefined,
+    onMessageLoaded: undefined,
+    selectedInputId: undefined,
+    customFieldActions: undefined,
+    inputs: undefined,
+  };
+
   TAB_KEYS = {
     recent: 1,
     messageId: 2,
@@ -191,16 +201,6 @@ class LoaderTabs extends React.Component<LoaderTabsProps, {
     );
   }
 }
-
-LoaderTabs.defaultProps = {
-  tabs: ['recent', 'messageId'],
-  index: undefined,
-  messageId: undefined,
-  onMessageLoaded: undefined,
-  selectedInputId: undefined,
-  customFieldActions: undefined,
-  inputs: undefined,
-};
 
 export default connect(
   LoaderTabs,

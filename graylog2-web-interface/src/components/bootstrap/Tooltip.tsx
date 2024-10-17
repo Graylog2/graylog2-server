@@ -86,19 +86,19 @@ type TooltipProps = {
    * @type {string|number}
    * @required
    */
-  id: string | number;
+  id: string;
   /**
    * Sets the direction the Tooltip is positioned towards.
    */
-  placement?: "top" | "right" | "bottom" | "left";
+  placement?: 'top' | 'right' | 'bottom' | 'left';
   /**
    * The "top" position value for the Tooltip.
    */
-  positionTop?: number | string;
+  positionTop?: number;
   /**
    * The "left" position value for the Tooltip.
    */
-  positionLeft?: number | string;
+  positionLeft?: number;
   /**
    * The "top" position value for the Tooltip arrow.
    */
@@ -119,7 +119,7 @@ const Tooltip = ({
   positionLeft,
   arrowOffsetTop,
   arrowOffsetLeft,
-  show = true
+  show = true,
 }: TooltipProps) => (
   <StyledTooltip className={`${className} ${show ? 'in' : ''}`}
                  id={id}

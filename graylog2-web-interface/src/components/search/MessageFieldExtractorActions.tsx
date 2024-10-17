@@ -12,6 +12,8 @@ type MessageFieldExtractorActionsProps = {
 class MessageFieldExtractorActions extends React.Component<MessageFieldExtractorActionsProps, {
   [key: string]: any;
 }> {
+  private newExtractorRoutes: { [key: string]: string };
+
   UNSAFE_componentWillMount() {
     this._refreshExtractorRoutes(this.props);
   }

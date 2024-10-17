@@ -5,7 +5,7 @@ import Badge from 'components/bootstrap/Badge';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
-const StatusBadge = styled(Badge)(({ status, theme }) => {
+const StatusBadge = styled(Badge)<{ status: string }>(({ status, theme }) => {
   const { success, info, warning, danger } = theme.colors.variant.dark;
   const statuses = {
     installed: success,
@@ -23,12 +23,12 @@ const StatusBadge = styled(Badge)(({ status, theme }) => {
 
 type ContentPackStatusProps = {
   states?: string[];
-  contentPackId: string;
+  contentPackId?: string;
 };
 
 const ContentPackStatus = ({
   contentPackId,
-  states = []
+  states = [],
 }: ContentPackStatusProps) => {
   const badges = states.map((state) => (
     <Link key={state} to={Routes.SYSTEM.CONTENTPACKS.show(contentPackId)}>

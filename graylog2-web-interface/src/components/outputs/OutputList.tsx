@@ -20,6 +20,11 @@ type OutputListProps = {
 class OutputList extends React.Component<OutputListProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    streamId: '',
+    outputs: [],
+  };
+
   _formatOutput = (output) => (
     <Output key={output.id}
             output={output}
@@ -53,10 +58,5 @@ class OutputList extends React.Component<OutputListProps, {
     return <div>{outputs}</div>;
   }
 }
-
-OutputList.defaultProps = {
-  streamId: '',
-  outputs: [],
-};
 
 export default OutputList;

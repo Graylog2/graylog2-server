@@ -24,8 +24,8 @@ type WhoisAdapterFieldSetProps = {
     read_timeout: number;
   };
   handleFormEvent: (...args: any[]) => void;
-  validationMessage: (...args: any[]) => void;
-  validationState: (...args: any[]) => void;
+  validationMessage: (...args: any[]) => string;
+  validationState: (...args: any[]) => 'error' | 'success' | 'warning';
 };
 
 class WhoisAdapterFieldSet extends React.Component<WhoisAdapterFieldSetProps, {

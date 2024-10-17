@@ -39,6 +39,10 @@ type HttpNotificationFormProps = {
 class HttpNotificationForm extends React.Component<HttpNotificationFormProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    setIsSubmitEnabled: () => {},
+  };
+
   static defaultConfig = {
     url: '',
     api_key_as_header: false,
@@ -48,8 +52,8 @@ class HttpNotificationForm extends React.Component<HttpNotificationFormProps, {
     skip_tls_verification: false,
   };
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       api_secret: '',
@@ -215,9 +219,5 @@ class HttpNotificationForm extends React.Component<HttpNotificationFormProps, {
     );
   }
 }
-
-HttpNotificationForm.defaultProps = {
-  setIsSubmitEnabled: () => {},
-};
 
 export default HttpNotificationForm;

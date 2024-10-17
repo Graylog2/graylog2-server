@@ -59,7 +59,7 @@ class ContentPackEntitiesList extends React.Component<ContentPackEntitiesListPro
     this._filterEntities(filter, newProps.contentPack.entities);
   }
 
-  _filterEntities = (filter, entitiesArg) => {
+  _filterEntities = (filter, entitiesArg?) => {
     const { contentPack } = this.props;
 
     const entities = entitiesArg || contentPack.entities;

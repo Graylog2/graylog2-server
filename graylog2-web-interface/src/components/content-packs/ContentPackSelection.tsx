@@ -86,13 +86,13 @@ class ContentPackSelection extends React.Component<ContentPackSelectionProps, {
     this.setState({ contentPack: updatedPack }, this._validate);
   };
 
-  _validate = (newSelection) => {
+  _validate = (newSelection?) => {
     const mandatoryFields = ['name', 'summary', 'vendor'];
     const { contentPack } = this.state;
     const { selectedEntities: prevSelectedEntities } = this.props;
     const selectedEntities = newSelection || prevSelectedEntities;
 
-    const errors = mandatoryFields.reduce((acc, field) => {
+    const errors: { [key: string]: string } = mandatoryFields.reduce((acc, field) => {
       const newErrors = acc;
 
       if (!contentPack[field] || contentPack[field].length <= 0) {
@@ -363,8 +363,7 @@ class ContentPackSelection extends React.Component<ContentPackSelectionProps, {
         </Row>
         <Row>
           <Col smOffset={1} lg={8}>
-            <SearchForm id="filter-input"
-                        onSearch={this._onSetFilter}
+            <SearchForm onSearch={this._onSetFilter}
                         onReset={this._onClearFilter} />
           </Col>
         </Row>

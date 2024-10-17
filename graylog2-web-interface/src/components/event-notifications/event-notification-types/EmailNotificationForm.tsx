@@ -373,8 +373,7 @@ class EmailNotificationForm extends React.Component<EmailNotificationFormProps, 
           <FormGroup controlId="notification-user-recipients"
                      validationState={validation.errors.recipients ? 'error' : null}>
             <ControlLabel>User recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
-            <UsersSelectField id="notification-user-recipients"
-                              value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
+            <UsersSelectField value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
                               onChange={this.handleRecipientsChange('user_recipients')} />
             <HelpBlock>
               {get(validation, 'errors.recipients[0]', 'Select Graylog users that will receive this Notification.')}

@@ -29,6 +29,8 @@ class ContentPackEditParameter extends React.Component<ContentPackEditParameterP
     default_value: '',
   };
 
+  private titleInput: Input;
+
   constructor(props) {
     super(props);
 

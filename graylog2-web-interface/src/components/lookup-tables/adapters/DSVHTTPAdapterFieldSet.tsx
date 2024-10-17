@@ -22,15 +22,15 @@ import { URLWhiteListInput } from 'components/common';
 type DSVHTTPAdapterFieldSetProps = {
        config: any;
        handleFormEvent: (...args: any[]) => void;
-       validationState: (...args: any[]) => void;
-       validationMessage: (...args: any[]) => void;
+       validationState: (type: string) => string;
+       validationMessage: (type: string, message: string) => string;
 };
 
 const DSVHTTPAdapterFieldSet = ({
-       handleFormEvent,
-       validationState,
-       validationMessage,
-       config
+  handleFormEvent,
+  validationState,
+  validationMessage,
+  config,
 }: DSVHTTPAdapterFieldSetProps) => (
   <fieldset>
     <URLWhiteListInput label="File URL"

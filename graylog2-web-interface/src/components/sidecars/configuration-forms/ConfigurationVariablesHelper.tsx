@@ -22,9 +22,22 @@ type ConfigurationVariablesHelperProps = {
   onVariableRename: (...args: any[]) => void;
 };
 
-class ConfigurationVariablesHelper extends React.Component<ConfigurationVariablesHelperProps, {
-  [key: string]: any;
-}> {
+type ConfigurationVariable = {
+  id: string,
+  name: string,
+  description: string,
+  content: string,
+}
+
+type ConfigurationVariablesHelperState = {
+  configurationVariables: { [key: string]: ConfigurationVariable }
+  showModal: boolean,
+  showConfirmModal: boolean,
+  errorModalContent: React.ReactElement,
+  variableToDelete: ConfigurationVariable,
+}
+
+class ConfigurationVariablesHelper extends React.Component<ConfigurationVariablesHelperProps, ConfigurationVariablesHelperState> {
   constructor(props) {
     super(props);
 
@@ -32,8 +45,8 @@ class ConfigurationVariablesHelper extends React.Component<ConfigurationVariable
       showModal: false,
       showConfirmModal: false,
       configurationVariables: undefined,
-      errorModalContent: {},
-      variableToDelete: {},
+      errorModalContent: undefined,
+      variableToDelete: undefined,
     };
   }
 
@@ -167,7 +180,7 @@ class ConfigurationVariablesHelper extends React.Component<ConfigurationVariable
                                onHide={this._closeErrorModal}>
           <Modal.Header>
             <Modal.Title>Error deleting configuration
-              variable <strong>$&#123;user.{variableToDelete.name}&#125;</strong>
+              variable <strong>$&#123;user.{variableToDelete?.name}&#125;</strong>
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>

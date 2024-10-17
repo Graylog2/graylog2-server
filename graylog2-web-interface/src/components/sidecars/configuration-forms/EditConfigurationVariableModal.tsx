@@ -127,7 +127,7 @@ class EditConfigurationVariableModal extends React.Component<EditConfigurationVa
     const { validation_errors: validationErrors } = this.state;
 
     if (validationErrors[fieldName]) {
-      return 'error';
+      return 'error' as const;
     }
 
     return null;
@@ -184,7 +184,7 @@ class EditConfigurationVariableModal extends React.Component<EditConfigurationVa
                    id={this._getId('variable-content')}
                    label="Content"
                    name="content"
-                   rows="10"
+                   rows={10}
                    className={ConfigurationHelperStyle.monoSpaceFont}
                    defaultValue={formData.content}
                    onChange={this._handleInputChange}
