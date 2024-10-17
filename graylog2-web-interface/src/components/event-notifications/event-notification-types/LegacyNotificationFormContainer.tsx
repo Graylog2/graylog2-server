@@ -19,15 +19,11 @@ import React from 'react';
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotificationTypes } from 'components/event-notifications/types';
 
 import LegacyNotificationForm from './LegacyNotificationForm';
 
-type LegacyNotificationFormContainerProps = {
-  config: any;
-  validation: any;
-  onChange: (...args: any[]) => void;
-  notifications: any;
-};
+type LegacyNotificationFormContainerProps = React.ComponentProps<EventNotificationTypes['formComponent']>;
 
 class LegacyNotificationFormContainer extends React.Component<LegacyNotificationFormContainerProps, {
   [key: string]: any;

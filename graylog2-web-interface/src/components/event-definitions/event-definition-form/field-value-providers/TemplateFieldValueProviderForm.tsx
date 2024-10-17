@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import type { FieldValueProvider } from 'graylog-web-plugin';
 
 import { ExternalLink } from 'components/common';
 import { Checkbox, Col, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
@@ -23,11 +24,7 @@ import * as FormsUtils from 'util/FormsUtils';
 
 import TemplateFieldValueProviderPreview from './TemplateFieldValueProviderPreview';
 
-type TemplateFieldValueProviderFormProps = {
-  config: any;
-  validation: any;
-  onChange: (...args: any[]) => void;
-};
+type TemplateFieldValueProviderFormProps = React.ComponentProps<FieldValueProvider['formComponent']>;
 
 class TemplateFieldValueProviderForm extends React.Component<TemplateFieldValueProviderFormProps, {
   [key: string]: any;

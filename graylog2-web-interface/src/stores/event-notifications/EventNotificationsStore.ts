@@ -40,9 +40,7 @@ export type EventNotification = {
   id: string,
   title: string,
   description: string,
-  config: {
-    type?: string
-  },
+  config: Record<string, any | any[]>,
 };
 
 export type LegacyEventNotification = {

@@ -19,12 +19,11 @@ import { useContext } from 'react';
 
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import StreamsContext from 'contexts/StreamsContext';
+import type { EventDefinitionType } from 'components/event-definitions/types';
 
 import FilterAggregationForm from './FilterAggregationForm';
 
-type Props = Omit<React.ComponentProps<typeof FilterAggregationForm>, 'streams'>;
-
-const FilterAggregationFormContainer = (props: Props) => {
+const FilterAggregationFormContainer: EventDefinitionType['formComponent'] = (props) => {
   const streams = useContext(StreamsContext);
 
   return (

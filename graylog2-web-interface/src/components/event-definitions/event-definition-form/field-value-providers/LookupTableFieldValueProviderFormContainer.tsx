@@ -15,17 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { FieldValueProvider } from 'graylog-web-plugin';
 
 import LookupTableFieldValueProviderForm from './LookupTableFieldValueProviderForm';
 
-type Props = {
-  config: {},
-  validation: {},
-  currentUser: {
-    permissions: Array<string>,
-  },
-  onChange: () => void,
-}
+type Props = React.ComponentProps<FieldValueProvider['formComponent']>;
 
 const LookupTableFieldValueProviderFormContainer = ({ ...otherProps }: Props) => (
   <LookupTableFieldValueProviderForm {...otherProps} />

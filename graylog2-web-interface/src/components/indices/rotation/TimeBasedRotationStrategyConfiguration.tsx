@@ -2,15 +2,17 @@ import React from 'react';
 import moment from 'moment';
 
 import { Input } from 'components/bootstrap';
+import type { IndexRotationConfigComponentProps } from 'components/indices/rotation/types';
 
 const _validationLimit = (durationInMilliseconds, rotationLimit) => durationInMilliseconds <= moment.duration(rotationLimit).asMilliseconds();
 
-type TimeBasedRotationStrategyConfigurationProps = {
-  config: any;
-  updateConfig: (...args: any[]) => void;
-};
+type Config = {
+  rotation_period: string,
+  max_rotation_period: string,
+  rotate_empty_index_set: boolean,
+}
 
-class TimeBasedRotationStrategyConfiguration extends React.Component<TimeBasedRotationStrategyConfigurationProps, {
+class TimeBasedRotationStrategyConfiguration extends React.Component<IndexRotationConfigComponentProps<Config>, {
   [key: string]: any;
 }> {
   private inputs: {

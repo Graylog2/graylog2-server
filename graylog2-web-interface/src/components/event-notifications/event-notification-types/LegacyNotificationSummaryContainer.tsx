@@ -15,43 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useEffect } from 'react';
 
 import { Spinner } from 'components/common';
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotificationTypes } from 'components/event-notifications/types';
 
 import LegacyNotificationSummary from './LegacyNotificationSummary';
 
-type LegacyNotificationSummaryContainerProps = {
-  type: string;
-  notification: any;
-  notifications: any;
-  definitionNotification: any;
+type LegacyNotificationSummaryContainerProps = React.ComponentProps<EventNotificationTypes['summaryComponent']>;
+
+const LegacyNotificationSummaryContainer = (props: LegacyNotificationSummaryContainerProps) => {
+  const { allLegacyTypes } = useStore(EventNotificationsStore);
+
+  useEffect(() => {
+    EventNotificationsActions.listAllLegacyTypes();
+  }, []);
+
+  if (!allLegacyTypes) {
+    return <p><Spinner text="Loading legacy notification information..." /></p>;
+  }
+
+  return <LegacyNotificationSummary {...props} legacyTypes={allLegacyTypes} />;
 };
 
-class LegacyNotificationSummaryContainer extends React.Component<LegacyNotificationSummaryContainerProps, {
-  [key: string]: any;
-}> {
-  static defaultProps = {
-    notification: {},
-  };
-
-  componentDidMount() {
-    EventNotificationsActions.listAllLegacyTypes();
-  }
-
-  render() {
-    const { notifications } = this.props;
-    const { allLegacyTypes } = notifications;
-
-    if (!allLegacyTypes) {
-      return <p><Spinner text="Loading legacy notification information..." /></p>;
-    }
-
-    return <LegacyNotificationSummary {...this.props} legacyTypes={allLegacyTypes} />;
-  }
-}
-
-export default connect(LegacyNotificationSummaryContainer, {
-  notifications: EventNotificationsStore,
-});
+export default LegacyNotificationSummaryContainer;

@@ -21,7 +21,7 @@ import type { SearchBarControl } from 'views/types';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
-interface EventDefinitionType {
+export interface EventDefinitionType {
   type: string,
   displayName: string,
   sortOrder: number,
@@ -29,7 +29,10 @@ interface EventDefinitionType {
   defaultConfig: EventDefinition['config'],
   formComponent: React.ComponentType<{
     eventDefinition: EventDefinition,
-    currentUser: UserJSON,
+    entityTypes: {
+      aggregation_functions: Array<{}>
+    },
+    currentUser: User,
     validation: { errors: { [key: string]: Array<string> } },
     onChange: (name: string, newConfig: EventDefinition['config']) => void,
     action: string,

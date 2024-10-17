@@ -160,7 +160,7 @@ type License = {
   }>,
 }
 
-type FieldValueProvider = {
+export type FieldValueProvider = {
   type: string,
   displayName: string,
   formComponent: React.ComponentType<{

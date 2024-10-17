@@ -23,7 +23,7 @@ import styled from 'styled-components';
 import { Select, SourceCodeEditor, TimezoneSelect, URLWhiteListInput } from 'components/common';
 import { Button, Checkbox, Col, ControlLabel, FormGroup, HelpBlock, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
-import type { HttpNotificationConfigV2, HttpNotificationValidationV2 } from 'components/event-notifications/types';
+import type { EventNotificationTypes } from 'components/event-notifications/types';
 
 import { DEFAULT_JSON_TEMPLATE, DEFAULT_FORM_PARAM_TEMPLATE, DEFAULT_PLAIN_TEXT_TEMPLATE } from './templates';
 
@@ -33,12 +33,7 @@ const StyledButton = styled(Button)`
   margin-bottom: 15px;
 `;
 
-type Props = {
-  config: HttpNotificationConfigV2,
-  validation: HttpNotificationValidationV2
-  onChange: any,
-  setIsSubmitEnabled: any,
-};
+type Props = React.ComponentProps<EventNotificationTypes['formComponent']>;
 
 // Only populate the new template if no changes have been made to the existing body or it is empty
 const shouldPopulateTemplate = (currentType: string, currentBody: string): boolean => {

@@ -22,6 +22,7 @@ import styled from 'styled-components';
 import { URLWhiteListInput } from 'components/common';
 import { Button, Checkbox, Col, ControlLabel, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
+import type { EventNotificationTypes } from 'components/event-notifications/types';
 
 const StyledButton = styled(Button)`
   clear: both;
@@ -29,12 +30,7 @@ const StyledButton = styled(Button)`
   margin-bottom: 15px;
 `;
 
-type HttpNotificationFormProps = {
-  config: any;
-  validation: any;
-  onChange: (...args: any[]) => void;
-  setIsSubmitEnabled?: (...args: any[]) => void;
-};
+type HttpNotificationFormProps = React.ComponentProps<EventNotificationTypes['formComponent']>;
 
 class HttpNotificationForm extends React.Component<HttpNotificationFormProps, {
   [key: string]: any;
