@@ -16,14 +16,15 @@
  */
 import React, { createContext, useState } from 'react';
 
-export const SidebarContext = createContext();
+// TODO: Fix typing
+export const SidebarContext = createContext<any>(undefined);
 
 type SidebarProviderProps = {
   children: any;
 };
 
 export const SidebarProvider = ({
-  children
+  children,
 }: SidebarProviderProps) => {
   const [sidebar, setSidebar] = useState(<></>);
 

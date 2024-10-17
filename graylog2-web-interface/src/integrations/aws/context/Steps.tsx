@@ -16,14 +16,15 @@
  */
 import React, { createContext, useState } from 'react';
 
-export const StepsContext = createContext();
+// TODO: Fix typing
+export const StepsContext = createContext<any>(undefined);
 
 type StepsProviderProps = {
   children: any;
 };
 
 export const StepsProvider = ({
-  children
+  children,
 }: StepsProviderProps) => {
   const [currentStep, setCurrentStep] = useState('authorize');
   const [enabledSteps, enableStep] = useState(['authorize']);

@@ -16,14 +16,15 @@
  */
 import React, { createContext, useState } from 'react';
 
-export const ApiContext = createContext();
+// TODO: Fix typing
+export const ApiContext = createContext<any>(undefined);
 
 type ApiProviderProps = {
   children: any;
 };
 
 export const ApiProvider = ({
-  children
+  children,
 }: ApiProviderProps) => {
   const [availableRegions, setRegionsState] = useState([]);
   const [availableStreams, setStreamsState] = useState([]);

@@ -16,14 +16,15 @@
  */
 import React, { createContext, useState } from 'react';
 
-export const AdvancedOptionsContext = createContext();
+// TODO: Fix typing
+export const AdvancedOptionsContext = createContext<any>(undefined);
 
 type AdvancedOptionsProviderProps = {
   children: any;
 };
 
 export const AdvancedOptionsProvider = ({
-  children
+  children,
 }: AdvancedOptionsProviderProps) => {
   const [isAdvancedOptionsVisible, setAdvancedOptionsVisibility] = useState(false);
   const [isAWSCustomEndpointsVisible, setAWSCustomEndpointsVisibility] = useState(false);

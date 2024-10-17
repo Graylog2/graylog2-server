@@ -16,7 +16,8 @@
  */
 import React, { createContext, useState } from 'react';
 
-export const FormDataContext = createContext();
+// TODO: Fix typing
+export const FormDataContext = createContext<any>(undefined);
 
 type FormDataProviderProps = {
   children: any;
@@ -25,7 +26,7 @@ type FormDataProviderProps = {
 
 export const FormDataProvider = ({
   initialFormData = {},
-  children
+  children,
 }: FormDataProviderProps) => {
   const [formData, updateState] = useState(initialFormData);
 
