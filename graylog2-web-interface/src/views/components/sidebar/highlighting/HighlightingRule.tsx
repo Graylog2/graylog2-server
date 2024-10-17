@@ -19,7 +19,8 @@ import { forwardRef, useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
-import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { ColorPickerPopover, Icon, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
@@ -112,16 +113,12 @@ type Props = {
   dragHandleProps?: DragHandleProps;
 };
 
-type HighlightingRuleProps = {
-  rule: Rule;
-};
-
 const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
   rule,
   className,
   draggableProps,
-  dragHandleProps
-}: HighlightingRuleProps, ref) => {
+  dragHandleProps,
+}, ref) => {
   const { field, value, color, condition } = rule;
   const [showForm, setShowForm] = useState(false);
   const dispatch = useAppDispatch();
