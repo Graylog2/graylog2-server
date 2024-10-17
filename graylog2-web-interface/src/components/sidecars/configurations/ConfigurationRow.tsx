@@ -16,7 +16,7 @@ type ConfigurationRowProps = {
   configuration: any;
   collector?: any;
   onCopy: (...args: any[]) => void;
-  validateConfiguration: (...args: any[]) => void;
+  validateConfiguration: (config: { name: string }) => Promise<{ errors: { name: string[] } }>;
   onDelete: (...args: any[]) => void;
   sendTelemetry?: (...args: any[]) => void;
 };

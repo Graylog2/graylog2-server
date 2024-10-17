@@ -104,6 +104,7 @@ const KinesisStreams = ({
       <LoadingModal show={logDataStatus.loading}
                     backdrop="static"
                     keyboard={false}
+                    onHide={() => {}}
                     bsSize="small">
         <LoadingContent>
           <StyledSpinner />

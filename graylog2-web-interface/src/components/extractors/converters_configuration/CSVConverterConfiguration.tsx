@@ -12,11 +12,13 @@ type CSVConverterConfigurationProps = {
 class CSVConverterConfiguration extends React.Component<CSVConverterConfigurationProps, {
   [key: string]: any;
 }> {
+  private converterEnabled: Input;
+
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
   }
 
-  _getConverterObject = (configuration) => ({ type: this.props.type, config: configuration || this.props.configuration });
+  _getConverterObject = (configuration?) => ({ type: this.props.type, config: configuration || this.props.configuration });
 
   _toggleConverter = (event) => {
     let converter;
@@ -71,7 +73,7 @@ class CSVConverterConfiguration extends React.Component<CSVConverterConfiguratio
                      defaultValue={this.props.configuration.separator || ','}
                      labelClassName="col-md-3"
                      wrapperClassName="col-md-9"
-                     maxLength="2"
+                     maxLength={2}
                      onChange={this._onChange('separator')}
                      help={separatorHelpMessage} />
 
@@ -81,7 +83,7 @@ class CSVConverterConfiguration extends React.Component<CSVConverterConfiguratio
                      defaultValue={this.props.configuration.quote_char || '"'}
                      labelClassName="col-md-3"
                      wrapperClassName="col-md-9"
-                     maxLength="1"
+                     maxLength={1}
                      onChange={this._onChange('quote_char')} />
 
               <Input type="text"
@@ -90,7 +92,7 @@ class CSVConverterConfiguration extends React.Component<CSVConverterConfiguratio
                      defaultValue={this.props.configuration.escape_char || '\\'}
                      labelClassName="col-md-3"
                      wrapperClassName="col-md-9"
-                     maxLength="1"
+                     maxLength={1}
                      onChange={this._onChange('escape_char')}
                      help="Character used to escape the separator and quote characters." />
 

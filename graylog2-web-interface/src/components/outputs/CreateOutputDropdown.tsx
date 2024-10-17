@@ -25,7 +25,7 @@ const formatOutputType = (type, typeName) => (<option key={typeName} value={type
 
 type CreateOutputDropdownProps = {
   getTypeDefinition: (...args: any[]) => void;
-  types: any[];
+  types: { [key: string]: any };
   onSubmit: (...args: any[]) => void;
 };
 

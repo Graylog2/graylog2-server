@@ -19,7 +19,7 @@ type Props = {
   config: Config,
   updateConfig: (config: Config) => void,
   handleFormEvent: (event: SyntheticEvent<EventTarget>) => void,
-  validationState: (state: string) => string,
+  validationState: (state: string) => 'error' | 'warning' | 'success',
   validationMessage: (field: string, message: string) => string,
 };
 

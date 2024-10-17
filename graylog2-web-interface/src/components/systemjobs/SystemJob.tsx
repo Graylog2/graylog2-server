@@ -85,12 +85,13 @@ type SystemJobProps = {
     node_id?: string;
     started_at?: string;
     execution_duration?: string;
-    job_status?: any[];
+    job_status?: string;
+    provides_progress?: boolean,
   };
 };
 
 const SystemJob = ({
-  job
+  job,
 }: SystemJobProps) => {
   const jobIsOver = job.job_status === JobStatus.Complete
                     || job.percent_complete === 100

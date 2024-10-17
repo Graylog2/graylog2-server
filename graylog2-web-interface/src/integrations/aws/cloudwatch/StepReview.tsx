@@ -40,7 +40,7 @@ const Default = ({
 
 type StepReviewProps = {
   onSubmit: (...args: any[]) => void;
-  onEditClick: (...args: any[]) => void;
+  onEditClick: (...args: any[]) => (...args: any[]) => void;
   externalInputSubmit?: boolean;
 };
 

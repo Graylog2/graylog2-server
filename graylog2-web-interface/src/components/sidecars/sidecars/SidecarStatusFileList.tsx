@@ -27,7 +27,7 @@ class SidecarStatusFileList extends React.Component<SidecarStatusFileListProps, 
       return (<span><Icon name="folder_open" />&nbsp;&nbsp;{file.path}</span>);
     }
 
-    return (<span><Icon name="note" type="regular" />&nbsp;&nbsp;{file.path}</span>);
+    return (<span><Icon name="notes" type="regular" />&nbsp;&nbsp;{file.path}</span>);
   };
 
   _fileListFormatter = (file) => (

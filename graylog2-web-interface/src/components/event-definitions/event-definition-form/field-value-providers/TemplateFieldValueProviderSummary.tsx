@@ -15,14 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import type { FieldValueProvider } from 'graylog-web-plugin';
 
 import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 
-type TemplateFieldValueProviderSummaryProps = {
-  fieldName: string;
-  config: any;
-  keys: any[];
-};
+type TemplateFieldValueProviderSummaryProps = React.ComponentProps<FieldValueProvider['summaryComponent']>;
 
 class TemplateFieldValueProviderSummary extends React.Component<TemplateFieldValueProviderSummaryProps, {
   [key: string]: any;

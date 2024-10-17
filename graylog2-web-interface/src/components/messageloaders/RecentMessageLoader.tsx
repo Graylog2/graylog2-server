@@ -155,7 +155,7 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
                             type="select"
                             value={selectedInputType ?? 'placeholder'}
                             disabled={!!selectedInputId}
-                            onChange={(e) => setSelectedInputType(e.target.value)}>
+                            onChange={(e) => setSelectedInputType(e.target.value as 'forwarder' | 'server')}>
                 <option value="placeholder" disabled>Select an Input type</option>
                 <option value="server">Server Input</option>
                 <option value="forwarder">Forwarder Input</option>

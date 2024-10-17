@@ -29,6 +29,11 @@ type FilterPreviewProps = {
   displayPreview?: boolean;
 };
 
+type Message = {
+  timestamp: string,
+  message: string,
+}
+
 class FilterPreview extends React.Component<FilterPreviewProps, {
   [key: string]: any;
 }> {
@@ -46,7 +51,7 @@ class FilterPreview extends React.Component<FilterPreviewProps, {
     </tr>
   ));
 
-  renderSearchResult = (searchResult = {}) => {
+  renderSearchResult = (searchResult: { messages?: Array<Message> } = {}) => {
     if (!searchResult.messages || searchResult.messages.length === 0) {
       return <p>Could not find any messages with the current search criteria.</p>;
     }

@@ -18,7 +18,7 @@ type SelectableListProps = {
   /**
    * Array of string or objects containing the selected options.
    */
-  selectedOptions?: string[];
+  selectedOptions?: string[] | { label: string, value: string }[];
   /** Indicates which option object key contains the text to display in the select input. same as react-select's `labelkey` prop. */
   displayKey?: string;
   /** Indicates which option object key contains the value of the option. */

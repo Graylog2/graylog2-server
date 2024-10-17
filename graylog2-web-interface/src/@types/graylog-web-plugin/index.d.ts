@@ -175,11 +175,7 @@ type FieldValueProvider = {
     table_name?: string,
     key_field?: string,
   },
-  requiredFields: {
-    template?: string,
-    table_name?: string,
-    key_field?: string,
-  },
+  requiredFields: string[],
 }
 
 interface PluginDataWarehouse {

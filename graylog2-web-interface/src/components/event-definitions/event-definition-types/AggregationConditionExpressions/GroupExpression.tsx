@@ -20,6 +20,7 @@ import styled from 'styled-components';
 
 import { Clearfix } from 'components/bootstrap';
 import { replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 import BooleanOperatorSelector from './BooleanOperatorSelector';
 
@@ -31,11 +32,15 @@ const Group = styled.div`
 `;
 
 type GroupExpressionProps = {
+  eventDefinition: EventDefinition;
+  formattedFields: any[];
+  aggregationFunctions: any[];
   expression: any;
   level: number;
   onChange: (...args: any[]) => void;
   onChildChange: (...args: any[]) => () => void;
   validation?: any;
+  parent?: any;
 };
 
 const GroupExpression = ({

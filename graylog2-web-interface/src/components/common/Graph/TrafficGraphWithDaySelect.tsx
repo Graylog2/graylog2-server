@@ -65,7 +65,7 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title } : Props) => 
 
   const sendTelemetry = useSendTelemetry();
 
-  const onGraphDaysChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
+  const onGraphDaysChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     event.preventDefault();
     const newDays = Number(event.target.value);
 

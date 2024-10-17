@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Panel } from 'components/bootstrap';
 import useFetch from 'integrations/aws/common/hooks/useFetch';
@@ -89,19 +89,19 @@ const HeaderContent = styled.div`
   flex-grow: 1;
 `;
 
-const IconContainer = styled.span`
-  transform: rotate(${(props) => (props.opened ? '90deg' : '0deg')});
+const IconContainer = styled.span<{ $opened: boolean }>(({ $opened }) => css`
+  transform: rotate(${$opened ? '90deg' : '0deg'});
   transition: transform 150ms ease-in-out;
-`;
+`);
 
-const Policy = styled.pre`
+const Policy = styled.pre<{ opened: boolean }>(({ opened }) => css`
   overflow: hidden;
-  max-height: ${(props) => (props.opened ? '1000px' : '0')};
-  opacity: ${(props) => (props.opened ? '1' : '0')};
+  max-height: ${opened ? '1000px' : '0'};
+  opacity: ${opened ? '1' : '0'};
   transition: max-height 150ms ease-in-out, opacity 150ms ease-in-out, margin 150ms ease-in-out, padding 150ms ease-in-out;
-  margin-bottom: ${(props) => (props.opened ? '12px' : '0')};
-  padding: ${(props) => (props.opened ? '9.5px' : '0')};
-`;
+  margin-bottom: ${opened ? '12px' : '0'};
+  padding: ${opened ? '9.5px' : '0'};
+`);
 
 const Title = styled.h4`
   font-weight: bold;

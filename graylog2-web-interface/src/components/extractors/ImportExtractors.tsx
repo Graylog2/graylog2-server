@@ -11,11 +11,13 @@ type ImportExtractorsProps = {
 class ImportExtractors extends React.Component<ImportExtractorsProps, {
   [key: string]: any;
 }> {
+  private extractorsInput: Input;
+
   _onSubmit = (event) => {
     event.preventDefault();
 
     try {
-      const parsedExtractors = JSON.parse(this.extractorsInput.getValue());
+      const parsedExtractors = JSON.parse(this.extractorsInput.getValue() as string);
       const { extractors } = parsedExtractors;
 
       ExtractorsActions.import(this.props.input.id, extractors);

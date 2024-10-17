@@ -143,7 +143,6 @@ const StageForm = ({
                  label="Stage rules"
                  help={rulesHelp}>
             <SelectableList options={_getFormattedOptions()}
-                            isLoading={!rules}
                             onChange={_onRulesChange}
                             selectedOptions={nextStage.rules} />
           </Input>

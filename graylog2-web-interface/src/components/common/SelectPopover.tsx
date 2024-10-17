@@ -51,7 +51,7 @@ type SelectPopoverProps = {
    * Function that will be called for each item in the list. It receives the current item
    * and must return a React node that will be displayed on screen.
    */
-  itemFormatter?: (...args: any[]) => React.ReactElement;
+  itemFormatter?: (...args: any[]) => React.ReactElement | string;
   /** Indicates whether the component will allow multiple selected items or not. */
   multiple?: boolean;
   /** Indicates which items are selected. This should be the same string that appears in the `items` list. */

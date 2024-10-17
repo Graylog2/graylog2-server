@@ -13,7 +13,10 @@ type TimeBasedRotationStrategyConfigurationProps = {
 class TimeBasedRotationStrategyConfiguration extends React.Component<TimeBasedRotationStrategyConfigurationProps, {
   [key: string]: any;
 }> {
-  inputs = {};
+  private inputs: {
+    rotation_period?: Input,
+    rotate_empty_index_set?: Input,
+  } = {};
 
   constructor(props) {
     super(props);
@@ -74,7 +77,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component<TimeBasedRo
     };
   };
 
-  _isValidPeriod = (duration) => {
+  _isValidPeriod = (duration?) => {
     const { rotation_period: rotationPeriod, rotationLimit } = this.state;
     const check = duration || rotationPeriod;
     const checkInMilliseconds = moment.duration(check).asMilliseconds();
@@ -89,7 +92,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component<TimeBasedRo
       return undefined;
     }
 
-    return 'error';
+    return 'error' as const;
   };
 
   _formatDuration = () => {

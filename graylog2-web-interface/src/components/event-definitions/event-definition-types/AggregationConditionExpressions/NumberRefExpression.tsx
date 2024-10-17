@@ -21,9 +21,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
-import { numberRefNodePropType } from 'logic/alerts/AggregationExpressionTypes';
-
-import { percentileOptions, percentageStrategyOptions } from '../../../../views/Constants';
+import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
 
 const formatFunctions = (functions) => functions
   .sort(naturalSort)

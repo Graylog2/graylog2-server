@@ -13,7 +13,7 @@ type TimingMetricsProps = {
 };
 
 const TimingMetrics = ({
-  timing
+  timing,
 }: TimingMetricsProps) => (
   <dl className="metric-def metric-timer">
     <dt>95th percentile:</dt>
@@ -44,7 +44,7 @@ type MetricsProps = {
 };
 
 const Metrics = ({
-  metrics
+  metrics,
 }: MetricsProps) => {
   let totalRate;
 
@@ -222,7 +222,7 @@ class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
   };
 
   _formatConfiguration = (extractorConfig) => {
-    let formattedOptions = this._formatOptions(extractorConfig);
+    let formattedOptions: React.ReactElement | Array<React.ReactElement> = this._formatOptions(extractorConfig);
 
     if (formattedOptions.length === 0) {
       formattedOptions = <li>No configuration options</li>;

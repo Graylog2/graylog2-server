@@ -31,10 +31,10 @@ const HEADERS = ['Field Name', 'Is Key?', 'Value Source', 'Data Type', 'Configur
 
 const getFieldValueProviderPlugin = (type) => {
   if (type === undefined) {
-    return {};
+    return undefined;
   }
 
-  return PluginStore.exports('fieldValueProviders').find((p) => p.type === type) || {};
+  return PluginStore.exports('fieldValueProviders').find((p) => p.type === type);
 };
 
 const providerFormatter = (config) => {
@@ -97,7 +97,7 @@ class FieldsList extends React.Component<FieldsListProps, {
       <tr key={fieldName}>
         <td>{fieldName}</td>
         <td>{keyIndex < 0 ? 'No' : 'Yes'}</td>
-        <td>{fieldProviderPlugin.displayName || config.providers[0].type}</td>
+        <td>{fieldProviderPlugin?.displayName || config.providers[0].type}</td>
         <td>{config.data_type}</td>
         <td>{providerFormatter(config.providers[0])}</td>
         <td className={styles.actions}>

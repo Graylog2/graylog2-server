@@ -19,7 +19,7 @@ class FlexdateConverterConfiguration extends React.Component<FlexdateConverterCo
     this.props.onChange(this.props.type, this._getConverterObject());
   }
 
-  _getConverterObject = (configuration) => ({ type: this.props.type, config: configuration || this.props.configuration });
+  _getConverterObject = (configuration?) => ({ type: this.props.type, config: configuration || this.props.configuration });
 
   _toggleConverter = (event) => {
     let converter;

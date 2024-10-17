@@ -33,9 +33,10 @@ import GroupExpression from './AggregationConditionExpressions/GroupExpression';
 /* eslint-enable import/no-cycle */
 
 import styles from './AggregationConditionExpression.css';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 type AggregationConditionExpressionProps = {
-  eventDefinition: any;
+  eventDefinition: EventDefinition;
   validation?: any;
   formattedFields: any[];
   aggregationFunctions: any[];
@@ -113,7 +114,7 @@ class AggregationConditionExpression extends React.Component<AggregationConditio
     onChange({ conditions: null });
   };
 
-  handleChildChange = (branch) => (changes) => {
+  handleChildChange = (branch) => (changes?) => {
     const { expression, onChange } = this.props;
 
     if (!Object.keys(changes).includes('conditions')) {
@@ -158,23 +159,24 @@ class AggregationConditionExpression extends React.Component<AggregationConditio
   };
 
   render() {
-    const { expression, parent, renderLabel } = this.props;
+    const { expression, parent, renderLabel, level } = this.props;
     let expressionComponent;
 
     switch (expression.expr) {
       case 'number-ref':
-        expressionComponent = <NumberRefExpression {...this.props} parent={parent} />;
+        expressionComponent = <NumberRefExpression {...this.props} renderLabel={renderLabel ?? true} parent={parent} />;
         break;
       case 'number':
-        expressionComponent = <NumberExpression {...this.props} parent={parent} />;
+        expressionComponent = <NumberExpression {...this.props} renderLabel={renderLabel ?? true} />;
         break;
       case 'group':
-        expressionComponent = <GroupExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />;
+        expressionComponent = <GroupExpression {...this.props} level={level ?? 0} onChildChange={this.handleChildChange} parent={parent} />;
         break;
       case '&&':
       case '||':
         expressionComponent = (
           <BooleanExpression {...this.props}
+                             level={level ?? 0}
                              onChildChange={this.handleChildChange}
                              parent={parent} />
         );
@@ -188,7 +190,7 @@ class AggregationConditionExpression extends React.Component<AggregationConditio
       default:
         expressionComponent = (
           <>
-            <ComparisonExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />
+            <ComparisonExpression {...this.props} level={level ?? 0} renderLabel={renderLabel ?? true} onChildChange={this.handleChildChange} parent={parent} />
             <Col md={2}>
               <FormGroup>
                 <div className={renderLabel ? styles.formControlNoLabel : undefined}>

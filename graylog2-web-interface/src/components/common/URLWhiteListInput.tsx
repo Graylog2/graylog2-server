@@ -23,12 +23,13 @@ import { isValidURL } from 'util/URLUtils';
 import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { triggerInput } from 'util/FormsUtils';
+import type { ValidationState } from 'components/common/types';
 
 type Props = {
   label: string,
   onChange: (event: SyntheticEvent<EventTarget>) => void,
   validationMessage?: string
-  validationState?: string
+  validationState?: ValidationState
   url?: string
   onValidationChange?: (validationState: string) => void,
   labelClassName?: string
@@ -37,7 +38,7 @@ type Props = {
   autofocus?: boolean
 };
 
-const URLWhiteListInput = ({ label, onChange, validationMessage = '', validationState = '', url = '', onValidationChange = () => {}, labelClassName = '', wrapperClassName = '', urlType = 'literal', autofocus = true }: Props) => {
+const URLWhiteListInput = ({ label, onChange, validationMessage = '', validationState, url = '', onValidationChange = () => {}, labelClassName = '', wrapperClassName = '', urlType = 'literal', autofocus = true }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
@@ -108,7 +109,6 @@ const URLWhiteListInput = ({ label, onChange, validationMessage = '', validation
 
   const addButton = isWhitelistError() && !isWhitelisted ? <URLWhiteListFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} /> : '';
   const helpMessage = <>{validationState === null ? ownValidationMessage : validationMessage} {addButton}</>;
-  const bsStyle = currentValidationState === '' ? null : currentValidationState;
 
   return (
     <Input type="text"
@@ -120,7 +120,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage = '', validation
            required
            onChange={onChange}
            help={helpMessage}
-           bsStyle={bsStyle}
+           bsStyle={currentValidationState}
            value={url}
            labelClassName={labelClassName}
            wrapperClassName={wrapperClassName} />

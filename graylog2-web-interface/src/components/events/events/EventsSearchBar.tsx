@@ -29,7 +29,7 @@ const TIME_UNITS = ['DAYS', 'HOURS', 'MINUTES', 'SECONDS'];
 type EventsSearchBarProps = {
   parameters: any;
   onQueryChange: (...args: any[]) => void;
-  onAlertFilterChange: (...args: any[]) => void;
+  onAlertFilterChange: (...args: any[]) => (...args: any[]) => void;
   onTimeRangeChange: (...args: any[]) => void;
   onSearchReload: (...args: any[]) => void;
 };

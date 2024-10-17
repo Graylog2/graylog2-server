@@ -24,7 +24,7 @@ import styles from './CommonNotificationSummary.css';
 type CommonNotificationSummaryProps = React.PropsWithChildren<{
   type: string;
   notification: any;
-  definitionNotification: any;
+  definitionNotification?: any;
 }>;
 
 class CommonNotificationSummary extends React.Component<CommonNotificationSummaryProps, {

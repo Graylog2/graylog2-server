@@ -48,13 +48,13 @@ const requiredFields = [
 
 const getProviderPlugin = (type) => {
   if (type === undefined) {
-    return {};
+    return undefined;
   }
 
-  return PluginStore.exports('fieldValueProviders').find((edt) => edt.type === type) || {};
+  return PluginStore.exports('fieldValueProviders').find((edt) => edt.type === type);
 };
 
-const getConfigProviderType = (config, defaultValue) => get(config, 'providers[0].type', defaultValue);
+const getConfigProviderType = (config, defaultValue?) => get(config, 'providers[0].type', defaultValue);
 
 const formatFieldValueProviders = () => PluginStore.exports('fieldValueProviders')
   .map((type) => ({ label: type.displayName, value: type.type }));
@@ -93,15 +93,15 @@ class FieldForm extends React.Component<FieldFormProps, {
 
   validate = () => {
     const { isKey, keyPosition, config } = this.state;
-    const errors = {};
+    const errors: {} = {};
 
     const providerType = getConfigProviderType(config);
-    let pluginRequiredFields = [];
+    let pluginRequiredFields: {} = [];
 
     if (providerType) {
       const providerPlugin = getProviderPlugin(providerType);
 
-      pluginRequiredFields = providerPlugin.requiredFields;
+      pluginRequiredFields = providerPlugin?.requiredFields;
     }
 
     requiredFields.forEach((requiredField) => {

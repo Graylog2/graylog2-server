@@ -19,18 +19,23 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
-import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 // eslint-disable-next-line import/no-cycle
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+
 import AggregationConditionExpression from '../AggregationConditionExpression';
 
 type ComparisonExpressionProps = {
+  eventDefinition: EventDefinition;
+  formattedFields: any[];
+  aggregationFunctions: any[];
   expression: any;
   level: number;
   onChange: (...args: any[]) => void;
-  onChildChange: (...args: any[]) => void;
+  onChildChange: (...args: any[]) => (...args: any[]) => void;
   renderLabel: boolean;
   validation?: any;
+  parent?: any;
 };
 
 const ComparisonExpression = ({

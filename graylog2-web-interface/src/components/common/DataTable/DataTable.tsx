@@ -66,7 +66,7 @@ type DataTableProps = {
   /** Object key to use to sort data table. */
   sortByKey?: string;
   /** Function that returns the value used to sort data table. (not used if `sortByKey` is defined as well) */
-  sortBy?: (...args: any[]) => void;
+  sortBy?: (...args: any[]) => string;
   /**
    * Indicates whether the table should use a bootstrap responsive table or not:
    * https://getbootstrap.com/docs/3.3/css/#tables-responsive

@@ -20,7 +20,6 @@ import get from 'lodash/get';
 
 import { Input, Col } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
-import { numberExpressionNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 type NumberExpressionProps = {
   expression: any;
@@ -33,7 +32,7 @@ const NumberExpression = ({
   expression,
   onChange,
   renderLabel,
-  validation = {}
+  validation = {},
 }: NumberExpressionProps) => {
   const handleChange = (event) => {
     const nextExpression = cloneDeep(expression);

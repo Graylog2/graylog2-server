@@ -25,14 +25,24 @@ import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { EventDefinitionsActions, EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventsActions, EventsStore } from 'stores/events/EventsStore';
+import type { PaginationProps } from 'components/common/withPaginationQueryParameter';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 import Events, { PAGE_SIZES, EVENTS_MAX_OFFSET_LIMIT } from './Events';
 
 const LOCAL_STORAGE_ITEM = 'events-last-search';
 const SEARCH_DEBOUNCE_THRESHOLD = 500;
 
-const fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
+type FetchEventsParams = {
+  page?: number,
+  pageSize: number,
+  query?: string,
+  filter?: { alerts: string },
+  timerange?: TimeRange,
+}
+
+const fetchEvents = ({ page, pageSize, query, filter, timerange }: FetchEventsParams) => {
   Store.set(LOCAL_STORAGE_ITEM, { filter: filter, timerange: timerange });
 
   return EventsActions.search({
@@ -48,12 +58,11 @@ const fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
 
 const fetchEventDefinitions = () => EventDefinitionsActions.listPaginated({});
 
-type EventsContainerProps = {
+type EventsContainerProps = PaginationProps & {
   events: any;
   eventDefinitions: any;
   currentUser: any;
   streamId?: string;
-  paginationQueryParameter: any;
 };
 
 class EventsContainer extends React.Component<EventsContainerProps, {
@@ -66,9 +75,9 @@ class EventsContainer extends React.Component<EventsContainerProps, {
   componentDidMount() {
     const { streamId } = this.props;
     const { page, pageSize } = this.props.paginationQueryParameter;
-    const lastSearch = Store.get(LOCAL_STORAGE_ITEM) || {};
+    const lastSearch: FetchEventsParams = Store.get(LOCAL_STORAGE_ITEM) || {};
 
-    const params = { page, pageSize };
+    const params: FetchEventsParams = { page, pageSize };
 
     if (streamId) {
       params.query = `source_streams:${streamId}`;

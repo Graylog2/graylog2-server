@@ -15,7 +15,7 @@ type EditPatternModalProps = {
   sampleData?: string;
   savePattern: (...args: any[]) => void;
   testPattern: (...args: any[]) => void;
-  validPatternName: (...args: any[]) => void;
+  validPatternName: (...args: any[]) => boolean;
   sendTelemetry?: (...args: any[]) => void;
 };
 

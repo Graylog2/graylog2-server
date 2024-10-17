@@ -59,10 +59,10 @@ const renderEmptyContent = () => (
 
 const getNotificationPlugin = (type) => {
   if (type === undefined) {
-    return {};
+    return undefined;
   }
 
-  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
+  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type);
 };
 
 type EventNotificationsProps = {
@@ -77,8 +77,8 @@ type EventNotificationsProps = {
   };
   onPageChange: (...args: any[]) => void;
   onQueryChange: (...args: any[]) => void;
-  onDelete: (...args: any[]) => void;
-  onTest: (...args: any[]) => void;
+  onDelete: (...args: any[]) => (...args: any[]) => void;
+  onTest: (...args: any[]) => (...args: any[]) => void;
 };
 
 class EventNotifications extends React.Component<EventNotificationsProps, {
@@ -117,7 +117,7 @@ class EventNotifications extends React.Component<EventNotificationsProps, {
       return (
         <EntityListItem key={`event-definition-${notification.id}`}
                         title={title}
-                        titleSuffix={plugin.displayName || notification.config.type}
+                        titleSuffix={plugin?.displayName || notification.config.type}
                         description={notification.description || <em>No description given</em>}
                         actions={actions}
                         contentRow={content} />

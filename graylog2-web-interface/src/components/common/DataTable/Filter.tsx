@@ -31,7 +31,7 @@ type FilterProps = {
   filterBy?: string;
   filterKeys?: any[];
   filterSuggestions?: any[];
-  id: string;
+  id?: string;
   label?: string;
   onDataFiltered: (...args: any[]) => void;
   rows: any[];
@@ -46,7 +46,7 @@ const Filter = ({
   id,
   label,
   onDataFiltered,
-  rows
+  rows,
 }: FilterProps) => {
   if (filterKeys.length !== 0) {
     return (

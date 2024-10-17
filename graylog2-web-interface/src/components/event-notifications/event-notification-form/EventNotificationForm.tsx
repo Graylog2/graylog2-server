@@ -26,19 +26,19 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import withLocation from 'routing/withLocation';
 
-const getNotificationPlugin = (type) => {
+const getNotificationPlugin = (type: string) => {
   if (type === undefined) {
-    return {};
+    return undefined;
   }
 
-  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
+  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type);
 };
 
 const formattedEventNotificationTypes = () => PluginStore.exports('eventNotificationTypes')
   .map((type) => ({ label: type.displayName, value: type.type }));
 
 type EventNotificationFormProps = {
-  action?: "create" | "edit";
+  action?: 'create' | 'edit';
   notification: any;
   validation: any;
   testResult: {
@@ -117,7 +117,7 @@ class EventNotificationForm extends React.Component<EventNotificationFormProps, 
     });
 
     const notificationPlugin = getNotificationPlugin(nextType);
-    const defaultConfig = notificationPlugin.defaultConfig || {};
+    const defaultConfig = notificationPlugin?.defaultConfig || {};
 
     this.handleConfigChange({ ...defaultConfig, type: nextType });
   };

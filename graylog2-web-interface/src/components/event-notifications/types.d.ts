@@ -49,13 +49,14 @@ export type HttpNotificationValidationV2 = {
   errors?: ErrorType,
 }
 
-interface EventNotificationTypes {
+export interface EventNotificationTypes {
   type: string,
   displayName: string,
   formComponent: React.ComponentType<{
     config: EventNotification['config'],
     validation: { errors: { [key: string]: Array<string> } },
     onChange: (newConfig: EventNotification['config']) => void,
+    setIsSubmitEnabled: (enabled: boolean) => void,
   }>,
   summaryComponent: React.ComponentType<{
     type: string,

@@ -18,12 +18,13 @@ import React from 'react';
 
 import { Input } from 'components/bootstrap';
 import { URLWhiteListInput } from 'components/common';
+import type { ValidationState } from 'components/common/types';
 
 type DSVHTTPAdapterFieldSetProps = {
        config: any;
        handleFormEvent: (...args: any[]) => void;
-       validationState: (type: string) => string;
-       validationMessage: (type: string, message: string) => string;
+       validationState: (type: string) => ValidationState;
+       validationMessage: (type: string, message: string) => ValidationState;
 };
 
 const DSVHTTPAdapterFieldSet = ({

@@ -20,6 +20,8 @@ class LookupTableConverterConfiguration extends React.Component<LookupTableConve
     lookupTables: undefined,
   };
 
+  private converterEnabled: Input;
+
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
 
@@ -29,7 +31,7 @@ class LookupTableConverterConfiguration extends React.Component<LookupTableConve
     });
   }
 
-  _getConverterObject = (configuration) => ({ type: this.props.type, config: configuration || this.props.configuration });
+  _getConverterObject = (configuration?) => ({ type: this.props.type, config: configuration || this.props.configuration });
 
   _toggleConverter = (event) => {
     let converter;

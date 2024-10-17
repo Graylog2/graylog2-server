@@ -23,6 +23,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 export type TestResult = {
   isLoading: boolean,
@@ -58,7 +59,7 @@ type EventNotificationsActionsType = {
   create: (eventNotification: EventNotification) => Promise<void>,
   update: (id: string, eventNotification: EventNotification) => Promise<void>,
   delete: (eventNotification: EventNotification) => Promise<void>,
-  test: (eventNotification: EventNotification) => Promise<void>,
+  test: (eventNotification: EventNotification) => CancellablePromise<void>,
   testPersisted: (eventNotification: EventNotification) => Promise<void>,
 };
 

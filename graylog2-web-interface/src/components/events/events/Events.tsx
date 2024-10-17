@@ -26,6 +26,7 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import Routes from 'routing/Routes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { isPermitted } from 'util/PermissionsMixin';
+import type User from 'logic/users/User';
 
 import EventsSearchBar from './EventsSearchBar';
 import EventDetails from './EventDetails';
@@ -55,7 +56,7 @@ const ExpandedTR = styled.tr(({ theme }) => css`
   }
 `);
 
-const EventsTbody = styled.tbody(({ expanded, theme }) => css`
+const EventsTbody = styled.tbody<{ expanded: boolean }>(({ expanded, theme }) => css`
     border-left: ${expanded ? `3px solid ${theme.colors.variant.light.info}` : ''};
     border-collapse: ${expanded ? 'separate' : 'collapse'};
 `);
@@ -90,7 +91,7 @@ const EventListContainer = styled.div`
 export const PAGE_SIZES = [10, 25, 50, 100];
 export const EVENTS_MAX_OFFSET_LIMIT = 10000;
 
-const priorityFormatter = (eventId, priority) => {
+const priorityFormatter = (_eventId, priority) => {
   const priorityName = capitalize(EventDefinitionPriorityEnum.properties[priority].name);
   let style;
 
@@ -135,13 +136,13 @@ const renderEmptyContent = () => (
 type EventsProps = {
   events: any[];
   parameters: any;
-  currentUser: any;
+  currentUser: User;
   totalEvents: number;
   totalEventDefinitions: number;
   context: any;
   onPageChange: (...args: any[]) => void;
   onQueryChange: (...args: any[]) => void;
-  onAlertFilterChange: (...args: any[]) => void;
+  onAlertFilterChange: (...args: any[]) => (...args: any[]) => void;
   onTimeRangeChange: (...args: any[]) => void;
   onSearchReload: (...args: any[]) => void;
   paginationQueryParameter: any;
@@ -179,7 +180,7 @@ class Events extends React.Component<EventsProps, {
   };
 
   renderEvent = (event) => {
-    const { context, currentUser } = this.props;
+    const { context } = this.props;
     const { expanded } = this.state;
     const eventDefinitionContext = context.event_definitions[event.event_definition_id];
 
@@ -202,7 +203,7 @@ class Events extends React.Component<EventsProps, {
         {expanded.includes(event.id) && (
           <ExpandedTR>
             <td colSpan={HEADERS.length + 1}>
-              <EventDetails event={event} eventDefinitionContext={eventDefinitionContext} currentUser={currentUser} />
+              <EventDetails event={event} eventDefinitionContext={eventDefinitionContext} />
             </td>
           </ExpandedTR>
         )}

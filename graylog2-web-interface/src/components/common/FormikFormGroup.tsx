@@ -15,9 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { SyntheticEvent } from 'react';
-
-import type { Input } from 'components/bootstrap';
 
 import FormikInput from './FormikInput';
 
@@ -28,7 +25,7 @@ type Props = {
   disabled?: boolean,
   label: React.ReactElement | string,
   name: string,
-  onChange?: (event: SyntheticEvent<Input>) => void,
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void,
   labelClassName?: string,
   wrapperClassName?: string,
   formGroupClassName?: string,

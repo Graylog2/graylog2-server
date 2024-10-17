@@ -9,17 +9,19 @@ import FormControl from './FormControl';
 import FormGroup from './FormGroup';
 import InputGroup from './InputGroup';
 import InputWrapper from './InputWrapper';
+import {BsSize} from 'components/bootstrap/types';
 
-type InputProps = React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
-  id: string;
+type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement> & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'>, 'value'> & {
+  id?: string;
   type?: string;
   name?: string;
   label?: React.ReactElement | string;
   labelClassName?: string;
+  bsSize?: BsSize,
   bsStyle?: "success" | "warning" | "error";
   formGroupClassName?: string;
   inputDescClassName?: string;
-  value?: string | number;
+  value?: string | number | boolean;
   placeholder?: string;
   error?: React.ReactElement | string;
   help?: React.ReactElement | string;

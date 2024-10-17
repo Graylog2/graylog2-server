@@ -23,6 +23,7 @@ import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 import Style from './GrokExtractorConfiguration.css';
 
@@ -48,6 +49,8 @@ class GrokExtractorConfiguration extends React.Component<GrokExtractorConfigurat
   componentDidMount() {
     this.loadData();
   }
+
+  private loadPromise: CancellablePromise<void>;
 
   componentWillUnmount() {
     if (this.loadPromise) {

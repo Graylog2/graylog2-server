@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { SyntheticEvent } from 'react';
 import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
@@ -38,7 +37,7 @@ type BaseProps = {
   max?: number,
   minLength?: number,
   name: string,
-  onChange?: (event: SyntheticEvent<Input>) => void,
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void,
   placeholder?: string,
   required?: boolean,
   type?: string,
@@ -58,7 +57,7 @@ const checkboxProps = (value) => ({ checked: value ?? false });
 const inputProps = (value) => ({ value: value ?? '' });
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ children = null, disabled = false, required = false, autoFocus = false, name, type = 'text', help, validate = () => undefined, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {
+const FormikInput = ({ children, disabled = false, required = false, autoFocus = false, name, type = 'text', help, validate = () => undefined, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {
   const { validateOnChange } = useFormikContext();
 
   return (

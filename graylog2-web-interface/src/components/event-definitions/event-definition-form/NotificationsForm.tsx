@@ -48,8 +48,8 @@ type NotificationsFormProps = {
 class NotificationsForm extends React.Component<NotificationsFormProps, {
   [key: string]: any;
 }> {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       showAddNotificationForm: false,

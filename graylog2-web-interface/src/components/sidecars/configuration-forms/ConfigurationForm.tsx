@@ -218,7 +218,7 @@ const ConfigurationForm = ({
 
   const _validationState = (fieldName: string) => {
     if (validationErrors[fieldName]) {
-      return 'error';
+      return 'error' as const;
     }
 
     return null;

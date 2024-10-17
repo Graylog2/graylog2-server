@@ -22,6 +22,7 @@ import { ConfirmLeaveDialog } from 'components/common';
 import Routes from 'routing/Routes';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import withHistory from 'routing/withHistory';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 import EventNotificationForm from './EventNotificationForm';
 
@@ -29,12 +30,14 @@ const initialValidation = {
   errors: {},
 };
 
-const initialTestResult = {
+const initialTestResult: TestResult = {
   isLoading: false,
 };
 
+type TestResult = { isLoading: false, error?: boolean, message?: string };
+
 type EventNotificationFormContainerProps = {
-  action?: "create" | "edit";
+  action?: 'create' | 'edit';
   notification?: any;
   /** Controls whether the form should be embedded into another one, and submitted/cancel externally */
   embedded?: boolean;
@@ -64,6 +67,8 @@ class EventNotificationFormContainer extends React.Component<EventNotificationFo
       document.getElementsByClassName('has-error')[0].scrollIntoView(true);
     }
   }
+
+  private testPromise: CancellablePromise<void>;
 
   constructor(props) {
     super(props);
@@ -149,7 +154,7 @@ class EventNotificationFormContainer extends React.Component<EventNotificationFo
     const { notification } = this.state;
 
     this.setState({ testResult: { isLoading: true }, validation: initialValidation });
-    const testResult = clone(initialTestResult);
+    const testResult: TestResult = clone(initialTestResult);
 
     this.testPromise = EventNotificationsActions.test(notification);
 

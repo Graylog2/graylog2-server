@@ -42,7 +42,7 @@ type SidecarListProps = {
   sort: any;
   onPageChange: (...args: any[]) => void;
   onQueryChange: (...args: any[]) => void;
-  onSortChange: (...args: any[]) => void;
+  onSortChange: (...args: any[]) => (newDirection: string) => void;
   toggleShowInactive: (...args: any[]) => void;
 };
 

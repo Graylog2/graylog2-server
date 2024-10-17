@@ -4,6 +4,7 @@ import AppConfig from 'util/AppConfig';
 import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
 import { Select, TimeUnitInput } from 'components/common';
+import type { ValidationState } from 'components/common/types';
 
 export type Config = {
   path: string,
@@ -15,7 +16,7 @@ type MaxmindAdapterFieldSetProps = {
   config: Config;
   updateConfig: (newConfig: object) => void,
   handleFormEvent: (e: { target: { name: string; value?: string } }) => void;
-  validationState: (key: string) => string | undefined,
+  validationState: (key: string) => ValidationState,
   validationMessage: (key: string, message: string) => string | undefined,
 };
 

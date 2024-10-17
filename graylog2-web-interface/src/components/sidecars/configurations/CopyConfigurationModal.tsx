@@ -5,7 +5,7 @@ import CloneMenuModal from '../common/CloneMenuModal';
 type CopyConfigurationModalProps = {
   configuration: any;
   copyConfiguration: (...args: any[]) => void;
-  validateConfiguration: (...args: any[]) => Promise<{ errors: { name: string[] }}>;
+  validateConfiguration: (config: { name: string }) => Promise<{ errors: { name: string[] } }>;
   onClose: (...args: any[]) => void;
   showModal?: boolean;
 };

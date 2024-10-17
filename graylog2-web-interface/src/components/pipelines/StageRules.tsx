@@ -68,12 +68,12 @@ const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
         <td>{rule.description}</td>
         <td>
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.executed`}>
-            <CounterRate zeroOnMissing suffix="msg/s" />
+            <CounterRate suffix="msg/s" />
           </MetricContainer>
         </td>
         <td>
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.failed`}>
-            <CounterRate showTotal zeroOnMissing suffix="errors/s" />
+            <CounterRate showTotal suffix="errors/s" />
           </MetricContainer>
         </td>
       </tr>

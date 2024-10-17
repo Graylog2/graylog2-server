@@ -15,16 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import type { FieldValueProvider } from 'graylog-web-plugin';
 
 import { IfPermitted } from 'components/common';
 
 import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 
-type LookupTableFieldValueProviderSummaryProps = {
-  fieldName: string;
-  config: any;
-  keys: any[];
-};
+type LookupTableFieldValueProviderSummaryProps = React.ComponentProps<FieldValueProvider['summaryComponent']>;
 
 class LookupTableFieldValueProviderSummary extends React.Component<LookupTableFieldValueProviderSummaryProps, {
   [key: string]: any;

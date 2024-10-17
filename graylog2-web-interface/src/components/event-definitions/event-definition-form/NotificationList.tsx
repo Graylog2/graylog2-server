@@ -22,10 +22,10 @@ import { DataTable } from 'components/common';
 
 const getNotificationPlugin = (type) => {
   if (type === undefined) {
-    return {};
+    return undefined;
   }
 
-  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
+  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type);
 };
 
 type NotificationListProps = {
@@ -64,7 +64,7 @@ class NotificationList extends React.Component<NotificationListProps, {
     return (
       <tr key={notification.id}>
         <td>{notification.title}</td>
-        <td>{plugin.displayName || notification.config.type}</td>
+        <td>{plugin?.displayName || notification.config.type}</td>
         <td className="actions">
           <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(notification.id)}>
             Delete
