@@ -74,27 +74,9 @@ const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryVal
   ];
 };
 
-type BasicQueryInputProps = {
-  className?: string;
-  // @ts-ignore
-  disabled?: boolean;
-  enableAutocompletion?: boolean;
-  error?: any;
-  height?: number;
-  inputId?: string;
-  maxLines?: number;
-  onBlur?: (...args: any[]) => void;
-  onChange?: (...args: any[]) => void;
-  onLoad?: (...args: any[]) => void;
-  placeholder?: string;
-  value?: string;
-  warning?: any;
-  wrapEnabled?: boolean;
-};
-
 // Basic query input component which is being implemented by the `QueryInput` component.
 // This is just a very basic query input which can be implemented for example to display a read only query.
-const BasicQueryInput = forwardRef<any, Props>((props: BasicQueryInputProps, ref) => {
+const BasicQueryInput = forwardRef<any, Props>((props, ref) => {
   const {
     className = '',
     disabled = false,

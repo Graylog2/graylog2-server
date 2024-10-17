@@ -31,20 +31,13 @@ type Props = React.PropsWithChildren<{
   style?: React.CSSProperties,
 }>
 
-type WidgetContainerProps = {
-  children: any;
-  className?: string;
-  isFocused: boolean;
-  style?: any;
-};
-
 const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(({
   children,
   className,
   isFocused,
   style = {},
   ...rest
-}: WidgetContainerProps, ref) => {
+}: Props, ref) => {
   let containerStyle = {
     ...style,
     transition: 'none',
