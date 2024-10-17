@@ -26,6 +26,8 @@ class SidecarStatusPage extends React.Component<SidecarStatusPageProps, {
     };
   }
 
+  private interval: NodeJS.Timeout;
+
   componentDidMount() {
     const reloadSidecar = () => this.reloadSidecar(this.props.history);
     reloadSidecar();
@@ -82,4 +84,4 @@ class SidecarStatusPage extends React.Component<SidecarStatusPageProps, {
   }
 }
 
-export default withHistory(withParams(SidecarStatusPage));
+export default withHistory(withParams<SidecarStatusPageProps>(SidecarStatusPage));
