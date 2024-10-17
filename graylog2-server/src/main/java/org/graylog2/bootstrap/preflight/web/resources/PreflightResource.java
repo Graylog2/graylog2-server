@@ -106,8 +106,8 @@ public class PreflightResource {
     public ProvisioningState getProvisioningState(DataNodeDto n) {
         return switch (n.getDataNodeStatus()) {
             case AVAILABLE -> verifyActualConnection(n);
-            case STARTING -> new ProvisioningState(DataNodeProvisioningConfig.State.CONNECTING);
-            case PREPARED -> new ProvisioningState(DataNodeProvisioningConfig.State.STARTUP_PREPARED);
+            case STARTING -> new ProvisioningState(DataNodeProvisioningConfig.State.STARTING);
+            case PREPARED -> new ProvisioningState(DataNodeProvisioningConfig.State.PROVISIONED);
             case UNAVAILABLE -> new ProvisioningState(DataNodeProvisioningConfig.State.ERROR);
             default -> new ProvisioningState(DataNodeProvisioningConfig.State.UNCONFIGURED);
         };
@@ -115,7 +115,7 @@ public class PreflightResource {
 
     private ProvisioningState verifyActualConnection(DataNodeDto n) {
         final ConnectionCheckResult result = datanodeConnectivityCheck.probe(n);
-        final DataNodeProvisioningConfig.State state = result.succeeded() ? DataNodeProvisioningConfig.State.CONNECTED : DataNodeProvisioningConfig.State.CONNECTING;
+        final DataNodeProvisioningConfig.State state = result.succeeded() ? DataNodeProvisioningConfig.State.CONNECTED : DataNodeProvisioningConfig.State.STARTING;
         return new ProvisioningState(state, result.errorMessage());
     }
 

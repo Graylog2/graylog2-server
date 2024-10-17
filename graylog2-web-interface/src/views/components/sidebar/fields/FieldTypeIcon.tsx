@@ -61,10 +61,10 @@ const IconWrapper = styled.div`
 
 type Props = {
   type: FieldType,
-  monospace: boolean,
+  monospace?: boolean
 };
 
-const FieldTypeIcon = ({ type, monospace }: Props) => {
+const FieldTypeIcon = ({ type, monospace = true }: Props) => {
   const icon = <Icon name={iconName(type.type)} className={styles.fieldTypeIcon} />;
 
   return monospace ? <IconWrapper>{icon}</IconWrapper> : icon;
@@ -73,10 +73,6 @@ const FieldTypeIcon = ({ type, monospace }: Props) => {
 FieldTypeIcon.propTypes = {
   type: PropTypes.instanceOf(FieldType).isRequired,
   monospace: PropTypes.bool,
-};
-
-FieldTypeIcon.defaultProps = {
-  monospace: true,
 };
 
 export default FieldTypeIcon;

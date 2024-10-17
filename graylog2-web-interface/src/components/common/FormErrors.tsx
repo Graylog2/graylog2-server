@@ -33,7 +33,7 @@ const Errors = styled.div(({ theme }) => css`
   }
 `);
 
-const FormErrors = ({ errors }: { errors: { [name: string]: string }}) => {
+const FormErrors = ({ errors = {} }: { errors: { [name: string]: string }}) => {
   if (isEmpty(errors) || Object.values(errors).every((v) => !v)) return null;
 
   return (
@@ -47,10 +47,6 @@ const FormErrors = ({ errors }: { errors: { [name: string]: string }}) => {
 
 FormErrors.propTypes = {
   errors: PropTypes.object,
-};
-
-FormErrors.defaultProps = {
-  errors: {},
 };
 
 export default FormErrors;

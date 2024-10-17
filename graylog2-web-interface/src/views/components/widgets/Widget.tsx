@@ -45,6 +45,7 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
+import FullSizeContainer from 'views/components/aggregationbuilder/FullSizeContainer';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -61,7 +62,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 export type Props = {
   id: string,
   widget: WidgetModel,
-  editing: boolean,
+  editing?: boolean
   title: string,
   position: WidgetPosition,
   onPositionsChange: (position: BackendWidgetPosition) => void,
@@ -122,18 +123,24 @@ const Visualization = ({
     const { config, filter } = widget;
 
     return (
-      <VisComponent config={config}
-                    data={data as WidgetResults}
-                    editing={editing}
-                    fields={fields}
-                    filter={filter}
-                    queryId={queryId}
-                    onConfigChange={onWidgetConfigChange}
-                    setLoadingState={setLoadingState}
-                    title={title}
-                    toggleEdit={onToggleEdit}
-                    type={widget.type}
-                    id={id} />
+      <FullSizeContainer>
+        {({ height, width }) => (
+          <VisComponent config={config}
+                        data={data as WidgetResults}
+                        editing={editing}
+                        fields={fields}
+                        filter={filter}
+                        queryId={queryId}
+                        onConfigChange={onWidgetConfigChange}
+                        setLoadingState={setLoadingState}
+                        title={title}
+                        toggleEdit={onToggleEdit}
+                        type={widget.type}
+                        id={id}
+                        height={height}
+                        width={width} />
+        )}
+      </FullSizeContainer>
     );
   }
 
@@ -188,7 +195,7 @@ const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: 
   return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
 };
 
-const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Props) => {
+const Widget = ({ id, editing = false, widget, title, position, onPositionsChange }: Props) => {
   const viewType = useViewType();
   const fields = useQueryFieldTypes();
   const { stopAutoRefresh } = useAutoRefresh();
@@ -307,10 +314,6 @@ Widget.propTypes = {
   onPositionsChange: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   widget: PropTypes.instanceOf(WidgetModel).isRequired,
-};
-
-Widget.defaultProps = {
-  editing: false,
 };
 
 export default Widget;

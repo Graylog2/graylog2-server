@@ -76,7 +76,7 @@ type Props = {
   showOutsideDays?: boolean,
 };
 
-const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
+const DatePicker = ({ date, fromDate, onChange, showOutsideDays = false }: Props) => {
   const selectedDate = useSelectedDate(date);
 
   const modifiers = useMemo(() => ({
@@ -115,12 +115,6 @@ DatePicker.propTypes = {
   fromDate: PropTypes.instanceOf(Date),
   /** Earliest date possible to select in the date picker. */
   showOutsideDays: PropTypes.bool,
-};
-
-DatePicker.defaultProps = {
-  date: undefined,
-  fromDate: undefined,
-  showOutsideDays: false,
 };
 
 export default DatePicker;

@@ -18,12 +18,16 @@ import * as React from 'react';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
+import camelCase from 'lodash/camelCase';
+import upperCase from 'lodash/upperCase';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import FilterRuleForm from 'components/streams/StreamDetails/output-filter/FilterRuleForm';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import useStreamOutputRuleMutation from 'components/streams/hooks/useStreamOutputRuleMutation';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props ={
   filterRule: Partial<StreamOutputFilterRule>,
@@ -38,15 +42,21 @@ const StyledButton = styled(Button)(({ theme }) => css`
 const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) => {
   const [showForm, setShowForm] = useState(false);
   const { createStreamOutputRule, updateStreamOutputRule } = useStreamOutputRuleMutation();
+  const sendTelemetry = useSendTelemetry();
 
   const queryClient = useQueryClient();
+  const isNew = !filterRule?.id;
 
   const onClick = () => {
     setShowForm(true);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS[`STREAM_ITEM_DATA_ROUTING_${upperCase(camelCase(destinationType))}_FILTER_${isNew ? 'CREATE_OPENED' : 'UPDATE_OPENED'}`], {
+      app_pathname: 'streams',
+    });
   };
 
   const handleSubmit = (filterOutputRule: Partial<StreamOutputFilterRule>) => {
-    const submitFilterHandler = filterOutputRule?.id ? updateStreamOutputRule : createStreamOutputRule;
+    const submitFilterHandler = isNew ? createStreamOutputRule : updateStreamOutputRule;
 
     submitFilterHandler({ streamId, filterOutputRule }).then(() => {
       queryClient.invalidateQueries(['streams']);
@@ -54,7 +64,6 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
     });
   };
 
-  const isNew = !filterRule?.id;
   const title = isNew ? 'Create Filter Rule' : 'Edit Filter Rule';
 
   return (

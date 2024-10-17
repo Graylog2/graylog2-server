@@ -64,7 +64,7 @@ type Props = React.PropsWithChildren<{
 /**
  * Simple section component. Currently only a "filled" version exists.
  */
-const Section = ({ title, actions, headerLeftSection, collapsible, defaultClosed, disableCollapseButton, children }: Props) => {
+const Section = ({ title, actions, headerLeftSection, collapsible = false, defaultClosed = false, disableCollapseButton = false, children }: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
   const onHeaderClick = () => (!disableCollapseButton && toggle());
 
@@ -73,7 +73,7 @@ const Section = ({ title, actions, headerLeftSection, collapsible, defaultClosed
       <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
         <FlexWrapper>
           <h2>{title}</h2>
-          {headerLeftSection && <FlexWrapper>{headerLeftSection}</FlexWrapper>}
+          {headerLeftSection && <FlexWrapper onClick={(e) => { e.stopPropagation(); }}>{headerLeftSection}</FlexWrapper>}
         </FlexWrapper>
         <FlexWrapper>
           {actions && <div>{actions}</div>}
@@ -96,14 +96,6 @@ const Section = ({ title, actions, headerLeftSection, collapsible, defaultClosed
       )}
     </Container>
   );
-};
-
-Section.defaultProps = {
-  actions: undefined,
-  headerLeftSection: undefined,
-  collapsible: false,
-  defaultClosed: false,
-  disableCollapseButton: false,
 };
 
 export default Section;

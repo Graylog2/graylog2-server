@@ -48,7 +48,7 @@ const Container = styled.div`
 type OverlayType = {
   hide: () => void,
 };
-const OverlayTrigger = React.forwardRef<OverlayType, Props>(({ children, disabled, placement, overlay, rootClose, trigger, testId, className, title, width }, ref) => {
+const OverlayTrigger = React.forwardRef<OverlayType, Props>(({ children, disabled = false, placement, overlay, rootClose = false, trigger = 'click', testId, className, title, width = 275 }, ref) => {
   const [opened, { close, open, toggle }] = useDisclosure(false);
 
   useImperativeHandle(ref, () => ({
@@ -95,15 +95,5 @@ const OverlayTrigger = React.forwardRef<OverlayType, Props>(({ children, disable
       </Container>
     );
 });
-
-OverlayTrigger.defaultProps = {
-  disabled: false,
-  trigger: 'click',
-  rootClose: false,
-  testId: undefined,
-  className: undefined,
-  width: 275,
-  title: undefined,
-};
 
 export default OverlayTrigger;

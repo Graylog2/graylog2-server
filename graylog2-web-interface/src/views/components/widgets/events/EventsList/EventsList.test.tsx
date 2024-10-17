@@ -73,7 +73,7 @@ describe('EventsList', () => {
     userEvent.click(nextPageButton);
   };
 
-  const SimpleEventsList = (props: Partial<React.ComponentProps<typeof EventsList>>) => (
+  const SimpleEventsList = ({ data: _data = data, config: _config = config, fields = Immutable.List([]), ...props }: Partial<React.ComponentProps<typeof EventsList>>) => (
     <TestStoreProvider>
       <EventsList title="Events List"
                   editing={false}
@@ -84,18 +84,14 @@ describe('EventsList', () => {
                   queryId="deadbeef"
                   toggleEdit={() => {}}
                   setLoadingState={() => {}}
-                  data={props.data}
-                  config={props.config}
-                  fields={props.fields}
+                  data={_data}
+                  config={_config}
+                  fields={fields}
+                  height={480}
+                  width={640}
                   {...props} />
     </TestStoreProvider>
   );
-
-  SimpleEventsList.defaultProps = {
-    config: config,
-    data: data,
-    fields: Immutable.List([]),
-  };
 
   it('lists events', async () => {
     render(<SimpleEventsList data={data} />);

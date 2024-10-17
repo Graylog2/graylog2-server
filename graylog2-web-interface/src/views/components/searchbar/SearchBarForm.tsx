@@ -44,7 +44,7 @@ type Props = {
 
 const _isFunction = (children: Props['children']): children is FormRenderer => isFunction(children);
 
-const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
+const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount = true, formRef, validateQueryString }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
@@ -91,11 +91,6 @@ SearchBarForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   limitDuration: PropTypes.number.isRequired,
   validateOnMount: PropTypes.bool,
-};
-
-SearchBarForm.defaultProps = {
-  validateOnMount: true,
-  formRef: undefined,
 };
 
 export default SearchBarForm;

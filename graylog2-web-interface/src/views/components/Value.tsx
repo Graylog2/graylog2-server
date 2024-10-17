@@ -41,7 +41,7 @@ const ValueActionTitle = styled.span`
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const InteractiveValue = ({ field, value, render, type, unit }: Props) => {
+const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit }: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
   const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
@@ -56,11 +56,6 @@ const InteractiveValue = ({ field, value, render, type, unit }: Props) => {
   );
 };
 
-InteractiveValue.defaultProps = {
-  render: defaultRenderer,
-  unit: undefined,
-};
-
 const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown, unit }: Props) => (
   <InteractiveContext.Consumer>
     {(interactive) => ((interactive)
@@ -68,10 +63,5 @@ const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknow
       : <span><TypeSpecificValue field={field} value={value} render={render} type={type} unit={unit} /></span>)}
   </InteractiveContext.Consumer>
 );
-
-Value.defaultProps = {
-  render: defaultRenderer,
-  unit: undefined,
-};
 
 export default Value;

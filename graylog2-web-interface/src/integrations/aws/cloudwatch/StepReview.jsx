@@ -37,7 +37,7 @@ Default.propTypes = {
   value: PropTypes.string.isRequired,
 };
 
-const StepReview = ({ onSubmit, onEditClick, externalInputSubmit }) => {
+const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }) => {
   const [formError, setFormError] = useState(null);
   const { formData } = useContext(FormDataContext);
   const { logData } = useContext(ApiContext);
@@ -220,10 +220,6 @@ StepReview.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onEditClick: PropTypes.func.isRequired,
   externalInputSubmit: PropTypes.bool,
-};
-
-StepReview.defaultProps = {
-  externalInputSubmit: false,
 };
 
 const Container = styled.div`

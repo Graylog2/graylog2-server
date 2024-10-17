@@ -29,7 +29,7 @@ import 'material-symbols/rounded.css';
 
 type Props = {
   children: React.ReactNode,
-  initialThemeModeOverride: ColorScheme,
+  initialThemeModeOverride?: ColorScheme
   userIsLoggedIn: boolean,
 }
 
@@ -51,10 +51,6 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride, userIsLogged
 GraylogThemeProvider.propTypes = {
   children: PropTypes.node.isRequired,
   initialThemeModeOverride: PropTypes.oneOf(COLOR_SCHEMES),
-};
-
-GraylogThemeProvider.defaultProps = {
-  initialThemeModeOverride: undefined,
 };
 
 export default GraylogThemeProvider;

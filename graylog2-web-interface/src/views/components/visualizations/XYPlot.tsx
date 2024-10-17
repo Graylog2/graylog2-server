@@ -42,7 +42,8 @@ export type Props = {
     from: string,
     to: string,
   },
-  height?: number;
+  height: number;
+  width: number;
   setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor,
   plotLayout?: Partial<PlotLayout>,
   onZoom?: (from: string, to: string, userTimezone: string) => boolean,
@@ -71,12 +72,13 @@ const mapAxisType = (axisType: AxisType): 'linear' | 'log' => {
 const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({ line: { color: colors.get(chart.originalName ?? chart.name) } });
 
 const XYPlot = ({
-  axisType,
+  axisType = DEFAULT_AXIS_TYPE,
   config,
   chartData,
   effectiveTimerange,
-  setChartColor,
+  setChartColor = defaultSetColor,
   height,
+  width,
   plotLayout = {},
   onZoom,
 }: Props) => {
@@ -115,7 +117,7 @@ const XYPlot = ({
   }
 
   return (
-    <PlotLegend config={config} chartData={chartData}>
+    <PlotLegend config={config} chartData={chartData} height={height} width={width}>
       <GenericPlot chartData={chartData}
                    layout={layout}
                    onZoom={_onZoom}
@@ -137,15 +139,6 @@ XYPlot.propTypes = {
   plotLayout: PropTypes.object,
   setChartColor: PropTypes.func,
   onZoom: PropTypes.func,
-};
-
-XYPlot.defaultProps = {
-  axisType: DEFAULT_AXIS_TYPE,
-  plotLayout: {},
-  setChartColor: defaultSetColor,
-  effectiveTimerange: undefined,
-  onZoom: undefined,
-  height: undefined,
 };
 
 export default XYPlot;

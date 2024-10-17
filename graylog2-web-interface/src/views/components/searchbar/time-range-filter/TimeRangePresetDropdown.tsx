@@ -122,18 +122,18 @@ type Props = {
   className?: string,
   displayTitle?: boolean,
   bsSize?: BsSize,
-  header: string,
+  header?: string
   disabled?: boolean,
   onChange?: (timerange: TimeRange) => void,
 };
 
 const TimeRangePresetDropdown = ({
-  disabled,
+  disabled = false,
   onChange,
   onToggle: onToggleProp,
   className,
-  displayTitle,
-  bsSize,
+  displayTitle = true,
+  bsSize = 'small',
   header,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
@@ -202,16 +202,6 @@ TimeRangePresetDropdown.propTypes = {
   header: PropTypes.string,
   onChange: PropTypes.func,
   onToggle: PropTypes.func,
-};
-
-TimeRangePresetDropdown.defaultProps = {
-  bsSize: 'small',
-  className: undefined,
-  disabled: false,
-  onChange: undefined,
-  onToggle: undefined,
-  header: undefined,
-  displayTitle: true,
 };
 
 export default TimeRangePresetDropdown;

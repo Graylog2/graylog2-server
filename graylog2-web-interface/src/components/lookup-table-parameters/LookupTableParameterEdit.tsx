@@ -46,12 +46,12 @@ type Props = {
 };
 
 const LookupTableParameterEdit = ({
-  validationState,
+  validationState = {},
   onChange,
   lookupTables,
   identifier,
-  parameter,
-  defaultExpandHelp,
+  parameter = {},
+  defaultExpandHelp = true,
 }: Props) => {
   const { lookupTable, key: tableKey, defaultValue, name } = parameter;
   const parameterSyntax = `$${name}$`;
@@ -141,12 +141,6 @@ const LookupTableParameterEdit = ({
       </Panel>
     </>
   );
-};
-
-LookupTableParameterEdit.defaultProps = {
-  parameter: {},
-  validationState: {},
-  defaultExpandHelp: true,
 };
 
 export default LookupTableParameterEdit;

@@ -38,6 +38,16 @@
         <Logger name="org.apache.hadoop" level="warn"/>
         <Logger name="org.apache.parquet.hadoop.InternalParquetRecordReader" level="warn"/>
         <Logger name="org.apache.avro.Schema" level="error"/>
+        <!-- Silence Selenium log chatter -->
+        <Logger name="org.openqa.selenium.devtools.Connection" level="warn"/>
+        <!-- Silence Apache Iceberg log chatter -->
+        <Logger name="org.apache.iceberg.BaseMetastoreCatalog" level="warn"/>
+        <Logger name="org.apache.iceberg.BaseMetastoreTableOperations" level="warn"/>
+        <Logger name="org.apache.iceberg.CatalogUtil" level="warn"/>
+        <Logger name="org.apache.iceberg.IncrementalFileCleanup" level="warn"/>
+        <Logger name="org.apache.iceberg.SnapshotProducer" level="warn"/>
+        <Logger name="org.apache.iceberg.SnapshotScan" level="warn"/>
+        <Logger name="org.apache.iceberg.metrics.LoggingMetricsReporter" level="warn"/>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="graylog-internal-logs"/>

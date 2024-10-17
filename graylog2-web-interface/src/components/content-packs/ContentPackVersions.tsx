@@ -25,9 +25,9 @@ import './ContentPackVersions.css';
 
 type Props = {
   contentPackRevisions: ContentPackVersionsType,
-  onDeletePack: (id: string) => void,
-  onChange: (id: string) => void,
-  onInstall: (id: string, contentPackRev: string, parameters: unknown) => void,
+  onDeletePack?: (id: string) => void
+  onChange?: (id: string) => void
+  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void
 };
 
 const headerFormatter = (header) => {
@@ -38,7 +38,7 @@ const headerFormatter = (header) => {
   return (<th>{header}</th>);
 };
 
-const ContentPackVersions = ({ onDeletePack, contentPackRevisions, onInstall, onChange }: Props) => {
+const ContentPackVersions = ({ onDeletePack = () => {}, contentPackRevisions, onInstall = () => {}, onChange = () => {} }: Props) => {
   const { contentPacks } = contentPackRevisions;
   const headers = ['Select', 'Revision', 'Action'];
   const rowFormatter = (item: ContentPackInstallation) => (
@@ -66,12 +66,6 @@ ContentPackVersions.propTypes = {
   onChange: PropTypes.func,
   onDeletePack: PropTypes.func,
   onInstall: PropTypes.func,
-};
-
-ContentPackVersions.defaultProps = {
-  onChange: () => {},
-  onDeletePack: () => {},
-  onInstall: () => {},
 };
 
 export default ContentPackVersions;

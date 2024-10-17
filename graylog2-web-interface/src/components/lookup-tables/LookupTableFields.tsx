@@ -43,7 +43,7 @@ type Props = {
   customKeyField?: React.ReactNode,
 };
 
-const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, selectedKeyName, nameValidation, keyValidation, lookupTableNameLabel = '', lookupTableKeyLabel = '', customKeyField }: Props) => {
+const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, selectedKeyName, nameValidation, keyValidation, lookupTableNameLabel = '', lookupTableKeyLabel = '', customKeyField = null }: Props) => {
   const { data: allFieldTypes } = useFieldTypes([], ALL_MESSAGES_TIMERANGE);
   const lookupTables = useStore(LookupTablesStore);
   const currentUser = useCurrentUser();
@@ -127,12 +127,6 @@ const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, 
       )}
     </Row>
   );
-};
-
-LookupTableFields.defaultProps = {
-  lookupTableNameLabel: undefined,
-  lookupTableKeyLabel: undefined,
-  customKeyField: null,
 };
 
 export default LookupTableFields;

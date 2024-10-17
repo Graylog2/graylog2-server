@@ -77,8 +77,7 @@ class EventsSearchBar extends React.Component {
       <div className={styles.eventsSearchBar}>
         <div>
           <div className={styles.searchForm}>
-            <SearchForm query={parameters.query}
-                        onSearch={onQueryChange}
+            <SearchForm onSearch={onQueryChange}
                         placeholder="Find Events"
                         topMargin={0}
                         useLoadingState>

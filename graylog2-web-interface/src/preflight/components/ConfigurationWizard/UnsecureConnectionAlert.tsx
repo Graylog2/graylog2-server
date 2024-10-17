@@ -47,8 +47,4 @@ const UnsecureConnectionAlert = ({ renderIfSecure }: Props) => {
   );
 };
 
-UnsecureConnectionAlert.defaultProps = {
-  renderIfSecure: undefined,
-};
-
 export default UnsecureConnectionAlert;

@@ -29,7 +29,7 @@ const Container = styled.div`
 `;
 
 type Props = {
-  operatingSystem: string,
+  operatingSystem?: string
 };
 
 const matchIcon = (os: string) => {
@@ -81,10 +81,6 @@ const OperatingSystemIcon = ({ operatingSystem }: Props) => {
 
 OperatingSystemIcon.propTypes = {
   operatingSystem: PropTypes.string,
-};
-
-OperatingSystemIcon.defaultProps = {
-  operatingSystem: undefined,
 };
 
 export default OperatingSystemIcon;

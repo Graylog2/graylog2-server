@@ -64,10 +64,6 @@ SystemJobsComponent.propTypes = {
   ),
 };
 
-SystemJobsComponent.defaultProps = {
-  jobs: undefined,
-};
-
 export default connect(SystemJobsComponent,
   { systemJobsStore: SystemJobsStore },
   ({ systemJobsStore }) => ({ jobs: (systemJobsStore as any).jobs }));

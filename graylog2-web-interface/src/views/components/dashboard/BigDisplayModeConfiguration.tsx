@@ -154,7 +154,7 @@ type Props = {
   view: View,
 };
 
-const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
+const BigDisplayModeConfiguration = ({ disabled = false, show = false, view }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const history = useHistory();
@@ -182,11 +182,6 @@ const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
       </MenuItem>
     </>
   );
-};
-
-BigDisplayModeConfiguration.defaultProps = {
-  disabled: false,
-  show: false,
 };
 
 export default BigDisplayModeConfiguration;

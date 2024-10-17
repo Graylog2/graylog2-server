@@ -32,10 +32,10 @@ const TitleTd = styled.td`
 type Props = {
   pipeline: PipelineType,
   stage: StageType,
-  rules: RuleType[],
+  rules?: RuleType[]
 };
 
-const StageRules = ({ pipeline, stage, rules }: Props) => {
+const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
   const headers = ['Title', 'Description', 'Throughput', 'Errors'];
 
   const _ruleRowFormatter = (ruleArg, ruleIdx) => {
@@ -99,10 +99,6 @@ StageRules.propTypes = {
   pipeline: PropTypes.object.isRequired,
   stage: PropTypes.object.isRequired,
   rules: PropTypes.array,
-};
-
-StageRules.defaultProps = {
-  rules: [],
 };
 
 export default StageRules;

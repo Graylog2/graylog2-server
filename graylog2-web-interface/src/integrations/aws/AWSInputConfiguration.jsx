@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 
 import Routes from 'integrations/aws/common/Routes.js';
 
-const AWSInputConfiguration = ({ url }) => {
+const AWSInputConfiguration = ({ url = Routes.INTEGRATIONS.AWS.CLOUDWATCH.index }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,10 +32,6 @@ const AWSInputConfiguration = ({ url }) => {
 
 AWSInputConfiguration.propTypes = {
   url: PropTypes.string,
-};
-
-AWSInputConfiguration.defaultProps = {
-  url: Routes.INTEGRATIONS.AWS.CLOUDWATCH.index,
 };
 
 export default AWSInputConfiguration;

@@ -21,23 +21,23 @@ import type { ColorResult } from 'react-color';
 import { SwatchesPicker } from 'react-color';
 
 type Props = {
-  color: string,
-  colors: Array<Array<string>>,
-  height: number,
-  width: number,
+  color?: string
+  colors?: Array<Array<string>>
+  height?: number
+  width?: number
   onChange: (color: string, event: React.ChangeEvent<HTMLInputElement>) => void,
 };
 
 /**
  * Color picker component that let the user select a color from a list of 95 colors grouped by hue.
  */
-const ColorPicker = ({ onChange, ...rest }: Props) => {
+const ColorPicker = ({ onChange, height = (135 * 2) + 24 + 16, width = (50 * 5), ...rest }: Props) => {
   const onColorChange = useCallback((color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(color.hex, event);
   }, [onChange]);
 
   return (
-    <SwatchesPicker {...rest} onChange={onColorChange} />
+    <SwatchesPicker height={height} width={width} {...rest} onChange={onColorChange} />
   );
 };
 
@@ -70,13 +70,6 @@ ColorPicker.propTypes = {
      * argument and the event as the second argument.
      */
   onChange: PropTypes.func.isRequired,
-};
-
-ColorPicker.defaultProps = {
-  color: undefined,
-  colors: undefined, // Use default color palette.
-  height: (135 * 2) + 24 + 16, // 135px color row * 2 rows + 24px first color 3rd row + 16px padding
-  width: (50 * 5), // 50px color columns * 5 columns
 };
 
 export default ColorPicker;

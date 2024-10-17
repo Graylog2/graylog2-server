@@ -317,7 +317,7 @@ public class LocalKafkaJournalTest {
 
         assertEquals(3, countSegmentsInDir(messageJournalDir));
 
-        final int cleanedLogs = journal.cleanupLogs();
+        final int cleanedLogs = journal.runRetention();
         assertEquals(1, cleanedLogs);
 
         final int numberOfSegments = countSegmentsInDir(messageJournalDir);
@@ -366,14 +366,14 @@ public class LocalKafkaJournalTest {
                 i++;
             }
 
-            int cleanedLogs = journal.cleanupLogs();
+            int cleanedLogs = journal.runRetention();
             assertEquals("no segments should've been cleaned", 0, cleanedLogs);
             assertEquals("two segments segment should remain", 2, countSegmentsInDir(messageJournalDir));
 
             // move clock beyond the retention period and clean again
             clock.tick(Period.seconds(120));
 
-            cleanedLogs = journal.cleanupLogs();
+            cleanedLogs = journal.runRetention();
             assertEquals("two segments should've been cleaned (only one will actually be removed...)", 2, cleanedLogs);
             assertEquals("one segment should remain", 1, countSegmentsInDir(messageJournalDir));
 
@@ -407,7 +407,7 @@ public class LocalKafkaJournalTest {
         assertEquals(3, countSegmentsInDir(messageJournalDir));
 
         // we haven't committed any offsets, this should not touch anything.
-        final int cleanedLogs = journal.cleanupLogs();
+        final int cleanedLogs = journal.runRetention();
         assertEquals(0, cleanedLogs);
 
         final int numberOfSegments = countSegmentsInDir(messageJournalDir);
@@ -415,15 +415,15 @@ public class LocalKafkaJournalTest {
 
         // mark first half of first segment committed, should not clean anything
         journal.markJournalOffsetCommitted(bulkSize / 2);
-        assertEquals("should not touch segments", 0, journal.cleanupLogs());
+        assertEquals("should not touch segments", 0, journal.runRetention());
         assertEquals(3, countSegmentsInDir(messageJournalDir));
 
         journal.markJournalOffsetCommitted(bulkSize + 1);
-        assertEquals("first segment should've been purged", 1, journal.cleanupLogs());
+        assertEquals("first segment should've been purged", 1, journal.runRetention());
         assertEquals(2, countSegmentsInDir(messageJournalDir));
 
         journal.markJournalOffsetCommitted(bulkSize * 4);
-        assertEquals("only purge one segment, not the active one", 1, journal.cleanupLogs());
+        assertEquals("only purge one segment, not the active one", 1, journal.runRetention());
         assertEquals(1, countSegmentsInDir(messageJournalDir));
     }
 
@@ -477,7 +477,7 @@ public class LocalKafkaJournalTest {
 
         createBulkChunks(journal, segmentSize, 4);
         journal.flushDirtyLogs();
-        journal.cleanupLogs();
+        journal.runRetention();
         assertThat(serverStatus.getLifecycle()).isEqualTo(Lifecycle.THROTTLED);
     }
 
@@ -499,7 +499,7 @@ public class LocalKafkaJournalTest {
                 serverStatus);
 
         journal.flushDirtyLogs();
-        journal.cleanupLogs();
+        journal.runRetention();
         assertThat(serverStatus.getLifecycle()).isEqualTo(Lifecycle.RUNNING);
     }
 
@@ -576,5 +576,36 @@ public class LocalKafkaJournalTest {
                     }
                 }
         );
+    }
+
+    @Test
+    public void testJournalUtilizationSize() {
+        Size retentionSize = Size.kilobytes(10L);
+        Size segmentSize = Size.kilobytes(1l);
+        final LocalKafkaJournal journal = new LocalKafkaJournal(journalDirectory.toPath(),
+                scheduler,
+                segmentSize,
+                Duration.standardHours(1),
+                retentionSize,
+                Duration.standardDays(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                LocalKafkaJournal.THRESHOLD_THROTTLING_DISABLED,
+                new MetricRegistry(),
+                serverStatus);
+
+        //No message in the journal utilization should be zero
+        assertThat(journal.getJournalUtilization().get()).isZero();
+
+        //After writing messages utilization should be positive
+        final int bulkSize = createBulkChunks(journal, segmentSize, 3);
+        double utilizationAfterBulk = journal.getJournalUtilization().get();
+        assertThat(utilizationAfterBulk).isPositive();
+
+        //Utilization should decrease again when clean up kicked in
+        journal.markJournalOffsetCommitted(bulkSize);
+        final int cleanedLogs = journal.runRetention();
+        assertEquals(1, cleanedLogs);
+        assertThat(journal.getJournalUtilization().get()).isLessThan(utilizationAfterBulk);
     }
 }

@@ -42,13 +42,13 @@ const fetchNotifications = () => {
 };
 
 type Props = {
-  action: 'edit' | 'create',
-  eventDefinition: EventDefinition,
+  action?: 'edit' | 'create'
+  eventDefinition?: EventDefinition
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>,
   initialStep?: string,
   onCancel?: () => void
   onChangeStep?: (step: string) => void,
-  onEventDefinitionChange: (nextEventDefinition: EventDefinition) => void,
+  onEventDefinitionChange?: (nextEventDefinition: EventDefinition) => void
   onSubmit?: () => void,
 }
 
@@ -61,13 +61,28 @@ const getConditionPlugin = (edType): any => {
 };
 
 const EventDefinitionFormContainer = ({
-  action,
-  eventDefinition: eventDefinitionInitial,
+  action = 'edit',
+  eventDefinition: eventDefinitionInitial = {
+    title: '',
+    description: '',
+    priority: EventDefinitionPriorityEnum.NORMAL,
+    // @ts-ignore
+    config: {},
+    field_spec: {},
+    key_spec: [],
+    notification_settings: {
+      grace_period_ms: 300000,
+      // Defaults to system setting for notification backlog size
+      backlog_size: null,
+    },
+    notifications: [],
+    alert: false,
+  },
   formControls,
-  initialStep,
+  initialStep = STEP_KEYS[0],
   onCancel,
   onChangeStep,
-  onEventDefinitionChange,
+  onEventDefinitionChange = () => {},
   onSubmit,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);
@@ -231,31 +246,6 @@ EventDefinitionFormContainer.propTypes = {
   action: PropTypes.oneOf(['create', 'edit']),
   eventDefinition: PropTypes.object,
   onEventDefinitionChange: PropTypes.func,
-};
-
-EventDefinitionFormContainer.defaultProps = {
-  action: 'edit',
-  eventDefinition: {
-    title: '',
-    description: '',
-    priority: EventDefinitionPriorityEnum.NORMAL,
-    config: {},
-    field_spec: {},
-    key_spec: [],
-    notification_settings: {
-      grace_period_ms: 300000,
-      // Defaults to system setting for notification backlog size
-      backlog_size: null,
-    },
-    notifications: [],
-    alert: false,
-  },
-  formControls: undefined,
-  initialStep: STEP_KEYS[0],
-  onCancel: undefined,
-  onSubmit: undefined,
-  onChangeStep: undefined,
-  onEventDefinitionChange: () => {},
 };
 
 export default EventDefinitionFormContainer;

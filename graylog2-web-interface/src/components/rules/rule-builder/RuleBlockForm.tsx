@@ -267,10 +267,4 @@ RuleBlockForm.propTypes = {
   type: PropTypes.oneOf(['action', 'condition']).isRequired,
 };
 
-RuleBlockForm.defaultProps = {
-  existingBlock: undefined,
-  outputVariableList: undefined,
-  selectedBlockDict: undefined,
-};
-
 export default RuleBlockForm;
