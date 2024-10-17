@@ -15,37 +15,39 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
 import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
+import type { Collector } from 'components/sidecars/types';
 
 import CollectorRow from './CollectorRow';
 import style from './CollectorList.css';
 
-const CollectorList = createReactClass({
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  propTypes: {
-    collectors: PropTypes.array.isRequired,
-    pagination: PropTypes.object.isRequired,
-    query: PropTypes.string.isRequired,
-    total: PropTypes.number.isRequired,
-    onClone: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    onPageChange: PropTypes.func.isRequired,
-    onQueryChange: PropTypes.func.isRequired,
-    validateCollector: PropTypes.func.isRequired,
+type CollectorListProps = {
+  collectors: Array<Collector>,
+  pagination: {
+    page: number,
+    pageSize: number,
+    total: number,
   },
-  // eslint-disable-next-line react/no-unstable-nested-components
+  query: string,
+  total: number,
+  onClone: (...args: any[]) => void,
+  onDelete: (...args: any[]) => void,
+  onPageChange: (...args: any[]) => void,
+  onQueryChange: (...args: any[]) => void,
+  validateCollector: (...args: any[]) => void,
+}
+
+class CollectorList extends React.Component<CollectorListProps> {
   headerCellFormatter(header) {
     const className = (header === 'Actions' ? style.actionsColumn : '');
 
     return <th className={className}>{header}</th>;
-  },
+  }
+
   // eslint-disable-next-line react/no-unstable-nested-components
   collectorFormatter(collector) {
     const { onClone, onDelete, validateCollector } = this.props;
@@ -56,7 +58,7 @@ const CollectorList = createReactClass({
                     onDelete={onDelete}
                     validateCollector={validateCollector} />
     );
-  },
+  }
 
   render() {
     const { collectors, pagination, query, total, onPageChange, onQueryChange } = this.props;
@@ -112,7 +114,7 @@ const CollectorList = createReactClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default CollectorList;
