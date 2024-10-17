@@ -35,11 +35,13 @@ const Label = ({ label, error }) => {
   return label;
 };
 
-const ValidatedInput = ({ className, help = '', onChange = () => {}, id, label, fieldData = {
-  dirty: false,
-  error: undefined,
-  value: undefined,
-}, type, required = false, ...restProps }) => {
+const ValidatedInput = ({
+  className, help = '', onChange = () => {}, id, label, fieldData = {
+    dirty: false,
+    error: undefined,
+    value: undefined,
+  }, type, required = false, ...restProps
+}) => {
   const { dirty, error, value } = fieldData;
 
   const checkValidity = (event) => {

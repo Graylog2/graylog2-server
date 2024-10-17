@@ -31,8 +31,10 @@ type Props = {
   onHide?: () => void
 }
 
-const ContentPackDownloadControl = ({ contentPackId, revision, show = false, onHide = () => {
-} }: Props) => {
+const ContentPackDownloadControl = ({
+  contentPackId, revision, show = false, onHide = () => {
+  },
+}: Props) => {
   const [showDownloadModal, setShowDownloadModal] = useState(show);
 
   const getDownloadUrl = () => qualifyUrl(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url);

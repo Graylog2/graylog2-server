@@ -39,8 +39,10 @@ type Props = {
   urlType?: 'regex' | 'literal',
 };
 
-const URLWhiteListFormModal = ({ newUrlEntry = '', urlType, onUpdate = () => {
-} }: Props) => {
+const URLWhiteListFormModal = ({
+  newUrlEntry = '', urlType, onUpdate = () => {
+  },
+}: Props) => {
   const prevNewUrlEntry = useRef<string>();
   const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
