@@ -6,6 +6,7 @@ import { Button, BootstrapModalForm } from 'components/bootstrap';
 import type { LookupTable } from 'logic/lookup-tables/types';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import type { ValidationState } from 'components/common/types';
 
 type Props = {
   queryParameters: Array<LookupTableParameterJson>,
@@ -100,8 +101,8 @@ class EditQueryParameterModal extends React.Component<Props, State> {
     const { queryParameter, validation, showModal } = this.state;
 
     const validationState: {
-      lookupTable?: [string, string],
-      key?: [string, string],
+      lookupTable?: [ValidationState, string],
+      key?: [ValidationState, string],
     } = {
       lookupTable: validation.lookupTable ? ['error', validation.lookupTable] : undefined,
       key: validation.key ? ['error', validation.key] : undefined,

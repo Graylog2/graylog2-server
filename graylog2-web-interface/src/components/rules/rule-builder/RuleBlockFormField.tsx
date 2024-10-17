@@ -118,10 +118,12 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
                        buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
                        help={param.description}
                        {...field}>
-        <option key="placeholder" value="">Select output from list</option>
-        {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
-          <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
-        )}
+        <>
+          <option key="placeholder" value="">Select output from list</option>
+          {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
+            <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
+          )}
+        </>
       </FormikFormGroup>
     );
   }
@@ -187,10 +189,12 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
                                : undefined
                            }
                            {...field}>
-            <option key="placeholder" value="">Select output from list</option>
-            {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
-              <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
-            )}
+            <>
+              <option key="placeholder" value="">Select output from list</option>
+              {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
+                <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
+              )}
+            </>
           </FormikFormGroup>
         );
       }

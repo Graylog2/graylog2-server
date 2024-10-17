@@ -17,6 +17,7 @@
 import React from 'react';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
+import { Map } from 'immutable';
 
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
@@ -58,7 +59,7 @@ class FilterPreviewContainer extends React.Component<FilterPreviewContainerProps
       .id(queryId)
       .query({ type: 'elasticsearch', query_string: config?.query || '*' })
       .timerange({ type: 'relative', range: (config?.search_within_ms || 0) / 1000 })
-      .filter(formattedStreams.length === 0 ? null : { type: 'or', filters: formattedStreams })
+      .filter(formattedStreams.length === 0 ? null : Map({ type: 'or', filters: formattedStreams }))
       .filters(config.filters)
       .searchTypes([{
         id: searchTypeId,

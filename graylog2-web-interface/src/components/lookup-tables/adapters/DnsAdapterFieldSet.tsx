@@ -3,6 +3,7 @@ import React from 'react';
 import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
 import { Select, TimeUnitInput } from 'components/common';
+import type { ValidationState } from 'components/common/types';
 
 type DnsAdapterFieldSetProps = {
   config: {
@@ -16,7 +17,7 @@ type DnsAdapterFieldSetProps = {
   updateConfig: (...args: any[]) => void;
   handleFormEvent: (...args: any[]) => void;
   validationMessage: (...args: any[]) => string;
-  validationState: (...args: any[]) => 'error' | 'success' | 'warning';
+  validationState: (...args: any[]) => ValidationState;
 };
 
 class DnsAdapterFieldSet extends React.Component<DnsAdapterFieldSetProps, {

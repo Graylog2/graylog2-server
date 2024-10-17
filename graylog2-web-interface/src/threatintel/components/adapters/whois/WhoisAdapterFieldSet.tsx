@@ -17,6 +17,7 @@
 import React from 'react';
 
 import { Input } from 'components/bootstrap';
+import type { ValidationState } from 'components/common/types';
 
 type WhoisAdapterFieldSetProps = {
   config: {
@@ -25,7 +26,7 @@ type WhoisAdapterFieldSetProps = {
   };
   handleFormEvent: (...args: any[]) => void;
   validationMessage: (...args: any[]) => string;
-  validationState: (...args: any[]) => 'error' | 'success' | 'warning';
+  validationState: (...args: any[]) => ValidationState;
 };
 
 class WhoisAdapterFieldSet extends React.Component<WhoisAdapterFieldSetProps, {

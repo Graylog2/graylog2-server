@@ -17,13 +17,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
+import type { ValidationState } from 'components/common/types';
 
 type GreyNoiseAdapterFieldSetProps = {
   config: {
     api_token: any;
   };
   updateConfig: (...args: any[]) => void;
-  validationState: (...args: any[]) => 'error' | 'success' | 'warning';
+  validationState: (...args: any[]) => ValidationState;
   validationMessage: (...args: any[]) => string;
 };
 

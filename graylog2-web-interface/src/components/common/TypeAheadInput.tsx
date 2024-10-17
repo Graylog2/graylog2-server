@@ -151,6 +151,12 @@ class TypeAheadInput extends React.Component<TypeAheadInputProps, {
     suggestionText: undefined,
   };
 
+  private fieldInput: HTMLInputElement;
+
+  private fieldInputElem: Input;
+
+  private fieldFormGroup: any;
+
   componentDidMount() {
     const { suggestions, displayKey, suggestionText, onTypeaheadLoaded, onSuggestionSelected } = this.props;
 
@@ -166,13 +172,16 @@ class TypeAheadInput extends React.Component<TypeAheadInputProps, {
     this._destroyTypeahead();
   }
 
+  // @ts-ignore
   getValue = () => $(this.fieldInput).typeahead('val');
 
   clear = () => {
+    // @ts-ignore
     $(this.fieldInput).typeahead('val', '');
   };
 
   _destroyTypeahead = () => {
+    // @ts-ignore
     $(this.fieldInput).typeahead('destroy');
     $(this.fieldFormGroup).off('typeahead:select typeahead:autocomplete');
   };
@@ -184,6 +193,7 @@ class TypeAheadInput extends React.Component<TypeAheadInputProps, {
 
     const $fieldInput = $(this.fieldInput);
 
+    // @ts-ignore
     $fieldInput.typeahead({
       hint: true,
       highlight: true,
@@ -207,6 +217,7 @@ class TypeAheadInput extends React.Component<TypeAheadInputProps, {
 
     if (typeof onTypeaheadLoaded === 'function') {
       onTypeaheadLoaded();
+      // @ts-ignore
       $fieldInput.typeahead('close');
     }
 

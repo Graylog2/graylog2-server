@@ -34,6 +34,9 @@ type TypeAheadFieldInputProps = {
   onBlur?: (...args: any[]) => void;
   /** Display an error for the input * */
   error?: string;
+  type?: string;
+  name?: string;
+  defaultValue?: string;
 };
 
 /**
@@ -52,6 +55,8 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
     error: undefined,
   };
 
+  private fieldInput: Input;
+
   componentDidMount() {
     if (this.fieldInput) {
       const { autoFocus, valueLink, onChange } = this.props;
@@ -60,6 +65,7 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
       fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.fields().url))
         .then(
           (data) => {
+            // @ts-ignore
             fieldInput.typeahead(
               {
                 hint: true,
@@ -75,6 +81,7 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
 
             if (autoFocus) {
               fieldInput.focus();
+              // @ts-ignore
               fieldInput.typeahead('close');
             }
           },
@@ -89,7 +96,7 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
         }
 
         if (valueLink) {
-          valueLink.requestChange(event.target.value);
+          valueLink.requestChange((event.target as HTMLInputElement).value);
         }
       });
     }
@@ -99,6 +106,7 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
     if (this.fieldInput) {
       const fieldInput = $(this.fieldInput.getInputDOMNode());
 
+      // @ts-ignore
       fieldInput.typeahead('destroy');
 
       // eslint-disable-next-line react/no-find-dom-node

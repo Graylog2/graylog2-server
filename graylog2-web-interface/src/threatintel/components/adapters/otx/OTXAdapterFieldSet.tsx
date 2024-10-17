@@ -19,6 +19,7 @@ import lodash from 'lodash';
 
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
+import type { ValidationState } from 'components/common/types';
 
 const OTX_INDICATORS = [
   { label: 'IP Auto-Detect', value: 'IPAutoDetect' },
@@ -45,7 +46,7 @@ type OTXAdapterFieldSetProps = {
   };
   updateConfig: (...args: any[]) => void;
   handleFormEvent: (...args: any[]) => void;
-  validationState: (...args: any[]) => 'error' | 'success' | 'warning';
+  validationState: (...args: any[]) => ValidationState;
   validationMessage: (...args: any[]) => React.ReactElement | string;
 };
 

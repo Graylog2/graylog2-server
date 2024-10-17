@@ -24,7 +24,7 @@ type BaseProps = {
   addonAfter?: React.ReactElement | string,
   bsSize?: 'large' | 'small' | 'xsmall',
   buttonAfter?: React.ReactElement | string,
-  children?: React.ReactNode,
+  children?: React.ReactElement,
   disabled?: boolean,
   error?: React.ReactElement | string,
   formGroupClassName?: string,
