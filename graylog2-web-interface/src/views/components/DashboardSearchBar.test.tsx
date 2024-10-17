@@ -32,7 +32,13 @@ jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 
-jest.mock('views/hooks/useAutoRefresh');
+jest.mock('views/hooks/useAutoRefresh', () => () => ({
+  animationId: 'animation-id',
+  refreshConfig: null,
+  restartAutoRefresh: () => {},
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
 
 jest.mock('views/hooks/useMinimumRefreshInterval', () => () => ({
   data: 'PT1S',
