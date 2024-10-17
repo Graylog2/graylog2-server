@@ -55,6 +55,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.Configuration;
+import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.configuration.PathConfiguration;
@@ -102,10 +103,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
-public abstract class CmdLineTool implements CliCommand {
-
-    public static final String GRAYLOG_ENVIRONMENT_VAR_PREFIX = "GRAYLOG_";
-    public static final String GRAYLOG_SYSTEM_PROP_PREFIX = "graylog.";
+public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfiguration> implements CliCommand {
 
     static {
         // Set up JDK Logging adapter, https://logging.apache.org/log4j/2.x/log4j-jul/index.html
@@ -119,7 +117,7 @@ public abstract class CmdLineTool implements CliCommand {
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
-    protected final Configuration configuration;
+    protected final NodeConfiguration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog configuration and exit")
@@ -132,10 +130,10 @@ public abstract class CmdLineTool implements CliCommand {
     private boolean debug = false;
 
     @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog")
-    private String configFile = "/etc/graylog/server/server.conf";
+    protected String configFile = "/etc/graylog/server/server.conf";
 
     @Option(name = {"-ff", "--featureflagfile"}, description = "Configuration file for Graylog feature flags")
-    private String customFeatureFlagFile = "/etc/graylog/server/feature-flag.conf";
+    protected String customFeatureFlagFile = "/etc/graylog/server/feature-flag.conf";
 
     protected String commandName = "command";
 
@@ -144,11 +142,11 @@ public abstract class CmdLineTool implements CliCommand {
     protected FeatureFlags featureFlags;
     protected PluginLoader pluginLoader;
 
-    protected CmdLineTool(Configuration configuration) {
+    protected CmdLineTool(NodeConfiguration configuration) {
         this(null, configuration);
     }
 
-    protected CmdLineTool(String commandName, Configuration configuration) {
+    protected CmdLineTool(String commandName, NodeConfiguration configuration) {
         jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new GuavaConverterFactory());
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
@@ -275,34 +273,39 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     public void doRun(Level logLevel) {
-        final PluginLoaderConfig pluginLoaderConfig = getPluginLoaderConfig(configFile);
+        PluginLoaderConfig pluginLoaderConfig = null;
+        if (configuration.withPlugins()) { //TODO: change path configuration handling
+            pluginLoaderConfig = getPluginLoaderConfig(configFile);
 
-        // Move the zstd temp folder from /tmp to our native lib dir to avoid issues with noexec-mounted /tmp directories.
-        // See: https://github.com/Graylog2/graylog2-server/issues/17837
-        // WARNING: This needs to be set before the first use of the zstd library. Our in-memory logger is using
-        //          zstd library, so we need to set it before the first usage of the Logger instance.
-        //          Setting it after the first library usage wouldn't have any effect.
-        if (Native.isLoaded()) {
-            LOG.warn("The zstd library is already loaded. Setting the ZstdTempFolder property doesn't have any effect!");
-        }
-        final Path nativeLibPath = pluginLoaderConfig.getNativeLibDir().toAbsolutePath();
-        try {
-            // We are very early in the startup process and the data_dir and native lib dir don't exist yet. Since the
-            // zstd library doesn't create its own temp directory, we have to do it to avoid errors on startup.
-            Files.createDirectories(nativeLibPath);
-            System.setProperty("ZstdTempFolder", nativeLibPath.toString());
-        } catch (IOException e) {
-            LOG.warn("Couldn't create native lib dir <{}>. Unable to set ZstdTempFolder system property.", nativeLibPath, e);
+            // Move the zstd temp folder from /tmp to our native lib dir to avoid issues with noexec-mounted /tmp directories.
+            // See: https://github.com/Graylog2/graylog2-server/issues/17837
+            // WARNING: This needs to be set before the first use of the zstd library. Our in-memory logger is using
+            //          zstd library, so we need to set it before the first usage of the Logger instance.
+            //          Setting it after the first library usage wouldn't have any effect.
+            if (Native.isLoaded()) {
+                LOG.warn("The zstd library is already loaded. Setting the ZstdTempFolder property doesn't have any effect!");
+            }
+            final Path nativeLibPath = pluginLoaderConfig.getNativeLibDir().toAbsolutePath();
+            try {
+                // We are very early in the startup process and the data_dir and native lib dir don't exist yet. Since the
+                // zstd library doesn't create its own temp directory, we have to do it to avoid errors on startup.
+                Files.createDirectories(nativeLibPath);
+                System.setProperty("ZstdTempFolder", nativeLibPath.toString());
+            } catch (IOException e) {
+                LOG.warn("Couldn't create native lib dir <{}>. Unable to set ZstdTempFolder system property.", nativeLibPath, e);
+            }
         }
 
         // This is holding all our metrics.
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
         featureFlags = getFeatureFlags(metricRegistry);
 
-        pluginLoader = getPluginLoader(pluginLoaderConfig, chainingClassLoader);
+        if (configuration.withPlugins())
+            pluginLoader = getPluginLoader(pluginLoaderConfig, chainingClassLoader);
 
         installCommandConfig();
-        installPluginBootstrapConfig(pluginLoader);
+        if (configuration.withPlugins())
+            installPluginBootstrapConfig(pluginLoader);
 
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
@@ -311,16 +314,18 @@ public abstract class CmdLineTool implements CliCommand {
         installConfigRepositories();
 
         beforeStart();
-        beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
+        //beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
 
         processConfiguration(jadConfig);
 
         bootstrapConfigInjector = setupBootstrapConfigInjector();
 
-        final Set<Plugin> plugins = loadPlugins();
-
-        installPluginConfig(plugins);
-        processConfiguration(jadConfig);
+        Set<Plugin> plugins = new HashSet<>();
+        if (configuration.withPlugins()) {
+            plugins = loadPlugins();
+            installPluginConfig(plugins);
+            processConfiguration(jadConfig);
+        }
 
         if (isDumpConfig()) {
             dumpCurrentConfigAndExit();
@@ -451,7 +456,9 @@ public abstract class CmdLineTool implements CliCommand {
 
     private void dumpDefaultConfigAndExit() {
         bootstrapConfigInjector = setupBootstrapConfigInjector();
-        installPluginConfig(pluginLoader.loadPlugins(bootstrapConfigInjector));
+        if (configuration.withPlugins()) {
+            installPluginConfig(pluginLoader.loadPlugins(bootstrapConfigInjector));
+        }
         dumpCurrentConfigAndExit();
     }
 
@@ -463,7 +470,7 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     private FeatureFlags getFeatureFlags(MetricRegistry metricRegistry) {
-        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile, metricRegistry);
+        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile, metricRegistry, configuration);
     }
 
     protected Set<Plugin> loadPlugins() {
@@ -498,8 +505,8 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected Collection<Repository> getConfigRepositories(String configFile) {
         return Arrays.asList(
-                new EnvironmentRepository(GRAYLOG_ENVIRONMENT_VAR_PREFIX),
-                new SystemPropertiesRepository(GRAYLOG_SYSTEM_PROP_PREFIX),
+                new EnvironmentRepository(configuration.getEnvironmentVariablePrefix()),
+                new SystemPropertiesRepository(configuration.getSystemPropertyPrefix()),
                 // Legacy prefixes
                 new EnvironmentRepository("GRAYLOG2_"),
                 new SystemPropertiesRepository("graylog2."),
@@ -604,8 +611,9 @@ public abstract class CmdLineTool implements CliCommand {
             //noinspection ThrowableResultOfMethodCallIgnored
             final Throwable rootCause = ExceptionUtils.getRootCause(message.getCause());
             if (rootCause instanceof NodeIdPersistenceException) {
-                LOG.error(UI.wallString(
-                        "Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
+                //TODO: Check configuration
+//                LOG.error(UI.wallString(
+//                        "Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
                 System.exit(-1);
             } else if (rootCause instanceof AccessDeniedException) {
                 LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));

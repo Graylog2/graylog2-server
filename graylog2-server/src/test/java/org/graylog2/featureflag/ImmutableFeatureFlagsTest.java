@@ -17,6 +17,8 @@
 package org.graylog2.featureflag;
 
 import com.codahale.metrics.MetricRegistry;
+import org.graylog2.CommonNodeConfiguration;
+import org.graylog2.GraylogNodeConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,6 +59,8 @@ class ImmutableFeatureFlagsTest {
     FeatureFlagsResources featureFlagsResources;
 
     MetricRegistry metricRegistry = new MetricRegistry();
+
+    GraylogNodeConfiguration configuration = new CommonNodeConfiguration() {};
 
     @Test
     void testOverrideOrder() throws IOException {
@@ -125,7 +129,7 @@ class ImmutableFeatureFlagsTest {
         String file = Objects.requireNonNull(this.getClass()
                 .getResource("/org/graylog2/featureflag/custom-feature-flag.config")).toURI().getPath();
 
-        FeatureFlags flags = factory.createImmutableFeatureFlags(file, metricRegistry);
+        FeatureFlags flags = factory.createImmutableFeatureFlags(file, metricRegistry, configuration);
 
         assertThat(flags.getAll().keySet()).contains("feature1");
     }
@@ -188,7 +192,7 @@ class ImmutableFeatureFlagsTest {
 
     private FeatureFlags mockAndCreate(Action action) throws IOException {
         action.execute();
-        return factory.createImmutableFeatureFlags(featureFlagsResources, FILE, FILE, metricRegistry);
+        return factory.createImmutableFeatureFlags(featureFlagsResources, FILE, FILE, metricRegistry, configuration);
     }
 
     interface Action {
