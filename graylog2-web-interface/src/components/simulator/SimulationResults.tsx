@@ -43,6 +43,13 @@ type SimulationResultsProps = {
 class SimulationResults extends React.Component<SimulationResultsProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    originalMessage: undefined,
+    simulationResults: undefined,
+    isLoading: false,
+    error: undefined,
+  };
+
   constructor(props) {
     super(props);
 
@@ -176,12 +183,5 @@ class SimulationResults extends React.Component<SimulationResultsProps, {
     );
   }
 }
-
-SimulationResults.defaultProps = {
-  originalMessage: undefined,
-  simulationResults: undefined,
-  isLoading: false,
-  error: undefined,
-};
 
 export default SimulationResults;

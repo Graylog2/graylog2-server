@@ -11,19 +11,25 @@ import EditExtractorConfiguration from './EditExtractorConfiguration';
 import ExtractorExampleMessage from './ExtractorExampleMessage';
 
 type EditExtractorProps = {
-  action: "create" | "edit";
+  action: 'create' | 'edit';
   extractor: any;
   inputId: string;
   exampleMessage?: string;
   onSave: (...args: any[]) => void;
 };
 
-class EditExtractor extends React.Component<EditExtractorProps, {
-  [key: string]: any;
-}> {
+type EditExtractorState = {
+  updatedExtractor?: EditExtractorProps['extractor'],
+  conditionTestResult?: {},
+  exampleMessage?: EditExtractorProps['exampleMessage'],
+}
+
+class EditExtractor extends React.Component<EditExtractorProps, EditExtractorState> {
   static defaultProps = {
     exampleMessage: undefined,
   };
+
+  private targetField: Input;
 
   constructor(props) {
     super(props);
@@ -60,7 +66,7 @@ class EditExtractor extends React.Component<EditExtractorProps, {
   };
 
   _onFieldChange = (key) => (event) => {
-    const nextState = {};
+    const nextState: EditExtractorState = {};
     const { updatedExtractor } = this.state;
 
     updatedExtractor[key] = FormUtils.getValueFromInput(event.target);

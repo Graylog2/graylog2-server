@@ -27,13 +27,13 @@ interface EventDefinitionType {
   sortOrder: number,
   description: string,
   defaultConfig: EventDefinition['config'],
-  formComponent: React.ComponentType<React.ComponentProps<{
+  formComponent: React.ComponentType<{
     eventDefinition: EventDefinition,
     currentUser: UserJSON,
     validation: { errors: { [key: string]: Array<string> } },
     onChange: (name: string, newConfig: EventDefinition['config']) => void,
     action: string,
-  }>>,
+  }>,
   summaryComponent: React.ComponentType<{
     currentUser: User,
     config: EventDefinition['config'],

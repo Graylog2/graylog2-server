@@ -23,7 +23,7 @@ type State = {
 }
 
 interface DurationInput {
-  getValue(): string;
+  getValue(): string | boolean;
 }
 
 class ISODurationInput extends React.Component<Props, State> {
@@ -48,7 +48,7 @@ class ISODurationInput extends React.Component<Props, State> {
   }
 
   _onUpdate = () => {
-    let duration = this.isoDuration.getValue().toUpperCase();
+    let duration = this.isoDuration.getValue().toString().toUpperCase();
 
     if (!duration.startsWith('P')) {
       duration = `P${duration}`;
@@ -66,7 +66,7 @@ class ISODurationInput extends React.Component<Props, State> {
     return (
       <Input id={this.props.id}
              type="text"
-             ref={(isoDuration: DurationInput) => { this.isoDuration = isoDuration; }}
+             ref={(isoDuration) => { this.isoDuration = isoDuration; }}
              label={this.props.label}
              onChange={this._onUpdate}
              value={this.state.duration}

@@ -302,7 +302,7 @@ export const EventNotificationsStore = singletonStore(
     test(notification) {
       const promise = fetch('POST', this.eventNotificationsUrl({ segments: ['test'] }), notification);
 
-      EventNotificationsActions.test.promise(promise);
+      EventNotificationsActions.test.promise(promise as CancellablePromise<any>);
     },
 
     testPersisted(notification) {

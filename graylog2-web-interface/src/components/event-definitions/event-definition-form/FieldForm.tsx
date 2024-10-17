@@ -93,10 +93,10 @@ class FieldForm extends React.Component<FieldFormProps, {
 
   validate = () => {
     const { isKey, keyPosition, config } = this.state;
-    const errors: {} = {};
+    const errors: Record<string, string> = {};
 
     const providerType = getConfigProviderType(config);
-    let pluginRequiredFields: {} = [];
+    let pluginRequiredFields: Array<string> = [];
 
     if (providerType) {
       const providerPlugin = getProviderPlugin(providerType);
@@ -220,7 +220,7 @@ class FieldForm extends React.Component<FieldFormProps, {
 
     const providerPlugin = getProviderPlugin(providerType);
 
-    return (providerPlugin.formComponent
+    return (providerPlugin?.formComponent
       ? React.createElement(providerPlugin.formComponent, {
         fieldName: fieldName,
         config: config,

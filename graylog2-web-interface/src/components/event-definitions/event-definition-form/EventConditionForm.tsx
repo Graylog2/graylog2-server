@@ -54,12 +54,12 @@ const EventConditionForm = ({ action = 'create', entityTypes, eventDefinition, v
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  const getConditionPlugin = (type): any => {
+  const getConditionPlugin = (type: string) => {
     if (type === undefined) {
-      return {};
+      return undefined;
     }
 
-    return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === type) || {};
+    return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === type);
   };
 
   const sortedEventDefinitionTypes = (): any => (PluginStore.exports('eventDefinitionTypes') as any).sort((eventDefinitionType1, eventDefinitionType2) => {
@@ -116,13 +116,13 @@ const EventConditionForm = ({ action = 'create', entityTypes, eventDefinition, v
   const canEditCondition = canEdit && !isSystemEventDefinition;
 
   const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
-    ? React.createElement<React.ComponentProps<any>>(eventDefinitionType.formComponent, {
-      action: action,
-      entityTypes: entityTypes,
-      currentUser: currentUser,
-      validation: validation,
-      eventDefinition: eventDefinition,
-      onChange: onChange,
+    ? React.createElement(eventDefinitionType.formComponent, {
+      action,
+      entityTypes,
+      currentUser,
+      validation,
+      eventDefinition,
+      onChange,
       key: eventDefinition.id,
     })
     : null;

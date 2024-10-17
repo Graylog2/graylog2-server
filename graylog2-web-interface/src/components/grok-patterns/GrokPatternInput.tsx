@@ -37,6 +37,8 @@ class GrokPatternInput extends React.Component<GrokPatternInputProps, {
     onPatternChange(newPattern);
   };
 
+  private patternInput: Input;
+
   render() {
     const { className, patterns, pattern } = this.props;
 

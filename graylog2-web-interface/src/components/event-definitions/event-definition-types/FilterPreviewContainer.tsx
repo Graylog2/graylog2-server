@@ -65,6 +65,15 @@ class FilterPreviewContainer extends React.Component<FilterPreviewContainerProps
         type: 'messages',
         limit: 10,
         offset: 0,
+        filter: undefined,
+        filters: undefined,
+        name: undefined,
+        query: undefined,
+        timerange: undefined,
+        streams: [],
+        stream_categories: [],
+        sort: [],
+        decorators: [],
       }]);
 
     const query = queryBuilder.build();
@@ -127,8 +136,7 @@ class FilterPreviewContainer extends React.Component<FilterPreviewContainerProps
     }
 
     return (
-      <FilterPreview eventDefinition={eventDefinition}
-                     isFetchingData={isLoading}
+      <FilterPreview isFetchingData={isLoading}
                      displayPreview={isPermittedToSeePreview(currentUser, eventDefinition.config)}
                      searchResult={searchResult}
                      errors={errors} />

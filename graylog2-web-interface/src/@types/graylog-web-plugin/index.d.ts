@@ -163,7 +163,13 @@ type License = {
 type FieldValueProvider = {
   type: string,
   displayName: string,
-  formComponent: React.ComponentType,
+  formComponent: React.ComponentType<{
+    fieldName: string,
+    config: EventDefinition['field_spec'][number],
+    onChange: (nextConfig: EventDefinition['field_spec'][number]) => void,
+    validation: any,
+    currentUser: User,
+  }>,
   summaryComponent: React.ComponentType<{
     fieldName: string,
     keys: Array<string>,

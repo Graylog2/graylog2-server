@@ -15,6 +15,12 @@ type BulkLoadPatternModalProps = {
 class BulkLoadPatternModal extends React.Component<BulkLoadPatternModalProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    sendTelemetry: () => {},
+  };
+
+  private patternFile: Input;
+
   constructor(props) {
     super(props);
 
@@ -101,9 +107,5 @@ class BulkLoadPatternModal extends React.Component<BulkLoadPatternModalProps, {
     );
   }
 }
-
-BulkLoadPatternModal.defaultProps = {
-  sendTelemetry: () => {},
-};
 
 export default withTelemetry(BulkLoadPatternModal);
