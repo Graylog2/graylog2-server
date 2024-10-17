@@ -29,7 +29,7 @@ type CurrentUserProviderProps = {
 };
 
 const CurrentUserProvider = ({
-  children
+  children,
 }: CurrentUserProviderProps) => {
   const currentUserJSON = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
   const currentUser = currentUserJSON ? User.fromJSON(currentUserJSON) : undefined;

@@ -45,7 +45,7 @@ type AWSCustomEndpointsProps = {
 };
 
 const AWSCustomEndpoints = ({
-  onChange
+  onChange,
 }: AWSCustomEndpointsProps) => {
   const { formData } = useContext(FormDataContext);
   const { isAWSCustomEndpointsVisible, setAWSCustomEndpointsVisibility } = useContext(AdvancedOptionsContext);

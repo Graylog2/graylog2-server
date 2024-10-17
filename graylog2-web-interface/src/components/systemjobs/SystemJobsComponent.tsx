@@ -29,7 +29,7 @@ type SystemJobsComponentProps = {
 };
 
 const SystemJobsComponent = ({
-  jobs
+  jobs,
 }: SystemJobsComponentProps) => {
   useEffect(() => {
     SystemJobsActions.list();

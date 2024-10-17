@@ -12,7 +12,7 @@ type ContentPackInstallEntityListProps = {
 
 const ContentPackInstallEntityList = ({
   entities,
-  uninstall = false
+  uninstall = false,
 }: ContentPackInstallEntityListProps) => {
   const rowFormatter = (entity) => (<tr><td>{entity.title}</td><td>{entity.type.name}</td></tr>);
   const headers = ['Title', 'Type'];

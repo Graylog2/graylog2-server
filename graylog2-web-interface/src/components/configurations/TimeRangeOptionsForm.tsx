@@ -75,7 +75,7 @@ class TimeRangeOptionsForm extends React.Component<Props> {
     const errorStyle = ISODurationUtils.durationStyle(period, this.props.validator, 'error');
 
     return (
-      // eslint-disable-next-line react/no-array-index-key
+
       (
         <div key={`timerange-option-${idx}`}>
           <Row>

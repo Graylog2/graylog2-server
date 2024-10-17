@@ -125,5 +125,5 @@ export default ({
   OneOrMoreChildren,
   TimeRangeType,
   instanceOf,
-  ValidElements
+  ValidElements,
 });

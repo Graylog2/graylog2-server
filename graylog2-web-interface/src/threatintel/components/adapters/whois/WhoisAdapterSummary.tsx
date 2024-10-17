@@ -26,7 +26,7 @@ type WhoisAdapterSummaryProps = {
 };
 
 const WhoisAdapterSummary = ({
-  dataAdapter
+  dataAdapter,
 }: WhoisAdapterSummaryProps) => {
   const { config } = dataAdapter;
 

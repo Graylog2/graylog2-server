@@ -23,7 +23,7 @@ type HTTPJSONPathAdapterSummaryProps = {
 };
 
 const HTTPJSONPathAdapterSummary = ({
-  dataAdapter
+  dataAdapter,
 }: HTTPJSONPathAdapterSummaryProps) => {
   const { config } = dataAdapter;
 

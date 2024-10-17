@@ -21,7 +21,7 @@ type SystemOverviewSummaryProps = {
 };
 
 export const SystemOverviewSummary = ({
-  information
+  information,
 }: SystemOverviewSummaryProps) => {
   const lbStatus = information.lb_status.toUpperCase();
 

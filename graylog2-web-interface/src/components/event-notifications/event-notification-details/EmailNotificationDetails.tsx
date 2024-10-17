@@ -26,7 +26,7 @@ type EmailNotificationDetailsProps = {
 };
 
 const EmailNotificationDetails = ({
-  notification
+  notification,
 }: EmailNotificationDetailsProps) => {
   const recipients = (
     <ReadOnlyFormGroup label="Email Recipients"

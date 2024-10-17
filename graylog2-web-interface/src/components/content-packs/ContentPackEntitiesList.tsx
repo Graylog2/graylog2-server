@@ -13,7 +13,7 @@ type EntityIconProps = {
 };
 
 const EntityIcon = ({
-  entity
+  entity,
 }: EntityIconProps) => {
   if (!entity.fromServer) {
     return <span><Icon title="Content Pack" name="inventory_2" className={ContentPackEntitiesListStyle.contentPackEntity} /></span>;

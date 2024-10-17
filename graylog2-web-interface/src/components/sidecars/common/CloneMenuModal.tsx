@@ -35,7 +35,7 @@ const CloneMenuModal = ({
   onClose,
   name,
   onChange,
-  onSave
+  onSave,
 }: CloneMenuModalProps) => (
   <BootstrapModalForm show={showModal}
                       title="Clone"

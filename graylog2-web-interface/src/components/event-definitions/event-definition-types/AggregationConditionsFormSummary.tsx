@@ -44,7 +44,7 @@ const AggregationConditionsFormSummary = ({
   series,
   expressionValidation = { isValid: true },
   showInlineValidation = false,
-  toggleShowValidation
+  toggleShowValidation,
 }: AggregationConditionsFormSummaryProps) => (
   <div>
     <StyledPanel header="Condition summary">

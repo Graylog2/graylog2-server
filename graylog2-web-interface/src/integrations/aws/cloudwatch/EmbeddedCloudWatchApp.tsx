@@ -31,7 +31,7 @@ type EmbeddedCloudWatchAppProps = {
 };
 
 const EmbeddedCloudWatchApp = ({
-  onSubmit
+  onSubmit,
 }: EmbeddedCloudWatchAppProps) => {
   const handleSubmit = (formData) => {
     if (!onSubmit) {

@@ -41,7 +41,7 @@ type ErrorJumbotronProps = {
 
 const ErrorJumbotron = ({
   children,
-  title
+  title,
 }: ErrorJumbotronProps) => (
   <ContainerRow>
     <Col mdOffset={2} md={8}>

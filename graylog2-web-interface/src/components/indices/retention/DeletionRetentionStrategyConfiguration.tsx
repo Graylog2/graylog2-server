@@ -9,7 +9,7 @@ type DeletionRetentionStrategyConfigurationProps = {
 };
 
 const DeletionRetentionStrategyConfiguration = ({
-  updateConfig
+  updateConfig,
 }: DeletionRetentionStrategyConfigurationProps) => {
   const [maxNumberOfIndices, setMaxNumberOfIndices] = useIndexRetention().useMaxNumberOfIndices;
 

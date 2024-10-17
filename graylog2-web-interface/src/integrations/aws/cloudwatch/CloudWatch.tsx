@@ -40,7 +40,7 @@ type CloudWatchProps = {
 
 const CloudWatch = ({
   externalInputSubmit = false,
-  onSubmit
+  onSubmit,
 }: CloudWatchProps) => {
   const {
     availableSteps,

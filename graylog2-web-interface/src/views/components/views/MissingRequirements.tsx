@@ -20,7 +20,7 @@ import capitalize from 'lodash/capitalize';
 import type { PluginMetadata, Requirements } from 'views/logic/views/View';
 import { Col, Row, Button } from 'components/bootstrap';
 import fixup from 'views/pages/StyleFixups.css';
-import View from 'views/logic/views/View';
+import type View from 'views/logic/views/View';
 import useHistory from 'routing/useHistory';
 
 type Props = {

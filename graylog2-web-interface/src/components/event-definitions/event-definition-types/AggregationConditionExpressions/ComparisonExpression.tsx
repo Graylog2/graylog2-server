@@ -19,8 +19,6 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
-
-// eslint-disable-next-line import/no-cycle
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 import AggregationConditionExpression from '../AggregationConditionExpression';

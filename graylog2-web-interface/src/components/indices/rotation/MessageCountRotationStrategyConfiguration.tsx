@@ -11,7 +11,7 @@ type MessageCountRotationStrategyConfigurationProps = {
 
 const MessageCountRotationStrategyConfiguration = ({
   config,
-  updateConfig
+  updateConfig,
 }: MessageCountRotationStrategyConfigurationProps) => {
   const { max_docs_per_index } = config;
   const [maxDocsPerIndex, setMaxDocsPerIndex] = useState(max_docs_per_index);

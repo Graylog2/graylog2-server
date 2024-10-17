@@ -109,7 +109,7 @@ describe('UseCreateViewForEventDefinition', () => {
     asMock(generateId).mockImplementation(mockedGenerateIdTwoAggregations);
 
     asMock(ObjectID).mockImplementation(() => (({
-      toString: () => mockedObjectIdTwoAggregations()
+      toString: () => mockedObjectIdTwoAggregations(),
     }) as ObjectID));
 
     const { result } = renderHook(() => UseCreateViewForEventDefinition({ eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation }));
@@ -122,7 +122,7 @@ describe('UseCreateViewForEventDefinition', () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregation);
 
     asMock(ObjectID).mockImplementation(() => (({
-      toString: () => mockedObjectIdOneAggregation()
+      toString: () => mockedObjectIdOneAggregation(),
     }) as ObjectID));
 
     const { result } = renderHook(() => UseCreateViewForEventDefinition({ eventDefinition: mockEventDefinitionOneAggregation, aggregations: [mockedMappedAggregation[0]] }));

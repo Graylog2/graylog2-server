@@ -5,7 +5,7 @@ type MessageCountRotationStrategySummaryProps = {
 };
 
 const MessageCountRotationStrategySummary = ({
-  config
+  config,
 }: MessageCountRotationStrategySummaryProps) => (
   <div>
     <dl>

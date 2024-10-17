@@ -32,7 +32,7 @@ type SystemJobsListProps = {
 };
 
 const SystemJobsList = ({
-  jobs
+  jobs,
 }: SystemJobsListProps): React.ReactElement => {
   const formatSystemJob = (job) => (
     <SystemJobWrap key={`job-${job.id}`}>

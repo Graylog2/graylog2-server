@@ -35,7 +35,7 @@ type StepHealthCheckProps = {
 
 const StepHealthCheck = ({
   onChange,
-  onSubmit
+  onSubmit,
 }: StepHealthCheckProps) => {
   const { logData, setLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);

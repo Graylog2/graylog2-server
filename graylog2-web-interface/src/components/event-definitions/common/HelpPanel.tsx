@@ -29,7 +29,7 @@ const IconHeader = styled(Icon)`
 const ConditionalCollapse = ({ condition, wrapper, children }) => (condition ? wrapper(children) : children);
 
 type HelpPanelProps = {
-  bsStyle?: "success" | "warning" | "danger" | "info" | "default" | "primary";
+  bsStyle?: 'success' | 'warning' | 'danger' | 'info' | 'default' | 'primary';
   children?: React.ReactNode;
   className?: string;
   collapsible?: boolean;
@@ -45,7 +45,7 @@ export const HelpPanel = ({
   collapsible = false,
   header,
   title = '',
-  defaultExpanded = false
+  defaultExpanded = false,
 }: HelpPanelProps) => {
   const defaultHeader = <h3><IconHeader name="info" />{title}</h3>;
 

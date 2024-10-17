@@ -28,7 +28,7 @@ function Countdown({
   callback = () => {},
   className = '',
   timeInSeconds,
-  paused = false
+  paused = false,
 }: CountdownProps) {
   let tickTock = timeInSeconds;
   let logInterval;

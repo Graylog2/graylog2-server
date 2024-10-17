@@ -40,7 +40,7 @@ type BooleanOperatorSelectorProps = {
 const BooleanOperatorSelector = ({
   initialText = '',
   operator,
-  onOperatorChange
+  onOperatorChange,
 }: BooleanOperatorSelectorProps) => (
   <Col md={12}>
     <OperatorSelector className="form-inline">

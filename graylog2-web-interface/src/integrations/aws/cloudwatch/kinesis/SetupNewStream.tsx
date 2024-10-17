@@ -38,7 +38,7 @@ type KinesisSetupProps = {
 const KinesisSetup = ({
   onChange,
   onSubmit,
-  toggleSetup = null
+  toggleSetup = null,
 }: KinesisSetupProps) => {
   const { availableGroups, setGroups, clearLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);

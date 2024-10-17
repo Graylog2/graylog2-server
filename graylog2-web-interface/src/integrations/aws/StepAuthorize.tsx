@@ -39,7 +39,7 @@ type StepAuthorizeProps = {
 const StepAuthorize = ({
   onChange,
   onSubmit,
-  sidebarComponent = null
+  sidebarComponent = null,
 }: StepAuthorizeProps) => {
   const { formData } = useContext(FormDataContext);
   const { clearSidebar, setSidebar } = useContext(SidebarContext);

@@ -21,7 +21,7 @@ type PopoverProps = {
 };
 
 const Popover = ({
- children
+  children,
 }: PopoverProps) => <>{children}</>;
 
 export default Popover;

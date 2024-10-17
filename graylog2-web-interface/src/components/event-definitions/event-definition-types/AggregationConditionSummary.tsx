@@ -23,7 +23,7 @@ type ExpressionProps = {
 
 const Expression = ({
   expression = null,
-  series
+  series,
 }: ExpressionProps) => {
   if (!expression) {
     return 'No condition configured';
@@ -74,7 +74,7 @@ type AggregationConditionSummaryProps = {
 
 const AggregationConditionSummary = ({
   conditions,
-  series
+  series,
 }: AggregationConditionSummaryProps) => <Expression expression={conditions?.expression} series={series} />;
 
 export default AggregationConditionSummary;

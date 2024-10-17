@@ -9,7 +9,7 @@ type ClosingRetentionStrategySummaryProps = {
 
 const ClosingRetentionStrategySummary = ({
   config,
-  rotationStrategyClass
+  rotationStrategyClass,
 }: ClosingRetentionStrategySummaryProps) => (
   <div>
     <dl>

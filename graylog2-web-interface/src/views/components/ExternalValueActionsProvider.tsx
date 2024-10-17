@@ -40,7 +40,7 @@ type ExternalValueActionsProviderProps = {
 };
 
 const ExternalValueActionsProvider = ({
-  children
+  children,
 }: ExternalValueActionsProviderProps) => {
   const contextValue = usePluginExternalActions();
 

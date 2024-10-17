@@ -9,7 +9,7 @@ type DeletionRetentionStrategySummaryProps = {
 
 const DeletionRetentionStrategySummary = ({
   config,
-  rotationStrategyClass
+  rotationStrategyClass,
 }: DeletionRetentionStrategySummaryProps) => (
   <div>
     <dl>

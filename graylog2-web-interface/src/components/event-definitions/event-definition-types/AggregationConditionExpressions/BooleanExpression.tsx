@@ -17,8 +17,6 @@
 import React from 'react';
 
 import { Clearfix } from 'components/bootstrap';
-
-// eslint-disable-next-line import/no-cycle
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 import AggregationConditionExpression from '../AggregationConditionExpression';

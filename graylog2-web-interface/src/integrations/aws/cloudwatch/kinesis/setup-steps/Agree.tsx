@@ -23,7 +23,7 @@ type AgreeProps = {
 
 const Agree = ({
   groupName,
-  streamName
+  streamName,
 }: AgreeProps) => (
   <>
     <p>This auto setup will create the following AWS resources. Click below to acknowledge that you understand that these resources will be created and that you are solely responsible for any associated AWS fees incurred from them. Note that all resources must be manually deleted by you if they are not needed.</p>

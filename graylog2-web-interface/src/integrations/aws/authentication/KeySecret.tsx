@@ -29,7 +29,7 @@ type KeySecretProps = {
 const KeySecret = ({
   onChange,
   awsKey,
-  awsSecret
+  awsSecret,
 }: KeySecretProps) => (
   <>
     <ValidatedInput id="awsCloudWatchAwsKey"

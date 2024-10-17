@@ -51,7 +51,7 @@ type ShardRoutingOverviewProps = {
 
 const ShardRoutingOverview = ({
   indexName,
-  routing
+  routing,
 }: ShardRoutingOverviewProps) => (
   <ShardRoutingWrap>
     <h3>Shard routing</h3>

@@ -7,7 +7,7 @@ type SizeBasedRotationStrategySummaryProps = {
 };
 
 const SizeBasedRotationStrategySummary = ({
-  config
+  config,
 }: SizeBasedRotationStrategySummaryProps) => {
   const { max_size: maxSize } = config;
 

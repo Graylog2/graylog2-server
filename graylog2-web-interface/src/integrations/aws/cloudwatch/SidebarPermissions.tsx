@@ -31,7 +31,7 @@ type PoliciesProps = {
 function Policies({
   title,
   note,
-  policy
+  policy,
 }: PoliciesProps) {
   const [opened, setOpened] = useState(false);
 

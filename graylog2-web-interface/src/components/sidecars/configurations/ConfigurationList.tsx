@@ -60,6 +60,8 @@ class ConfigurationList extends React.Component<ConfigurationListProps, {
     );
   };
 
+  private openModal: () => void;
+
   render() {
     const { configurations, pagination, query, total, onPageChange, onQueryChange } = this.props;
     const headers = ['Configuration', 'Color', 'Collector', 'Actions'];

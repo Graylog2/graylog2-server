@@ -23,7 +23,7 @@ type OptionsProps = {
 
 function Options({
   value,
-  label
+  label,
 }: OptionsProps) {
   return (
     <option value={value} key={value}>{label}</option>

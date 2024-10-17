@@ -31,7 +31,7 @@ type SkipHealthCheckProps = {
 
 const SkipHealthCheck = ({
   onChange,
-  onSubmit
+  onSubmit,
 }: SkipHealthCheckProps) => {
   const { formData } = useContext(FormDataContext);
 

@@ -15,7 +15,7 @@ type SidecarEditConfigurationPageProps = {
 };
 
 const SidecarEditConfigurationPage = ({
-  params
+  params,
 }: SidecarEditConfigurationPageProps) => {
   const [configuration, setConfiguration] = useState<Configuration>(null);
   const [configurationSidecars, setConfigurationSidecars] = useState<ConfigurationSidecarsResponse>(null);

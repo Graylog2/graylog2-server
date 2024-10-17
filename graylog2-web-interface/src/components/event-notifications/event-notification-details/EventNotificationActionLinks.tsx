@@ -26,7 +26,7 @@ type EventNotificationActionLinksProps = {
 };
 
 const EventNotificationActionLinks = ({
-  notificationId
+  notificationId,
 }: EventNotificationActionLinksProps) => (
   <ButtonToolbar>
     <IfPermitted permissions={`eventnotifications:read:${notificationId}`}>

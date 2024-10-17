@@ -30,7 +30,7 @@ type KinesisSetupStepsProps = {
 
 const KinesisSetupSteps = ({
   onSuccess,
-  onError
+  onError,
 }: KinesisSetupStepsProps) => {
   const { formData } = useContext(FormDataContext);
   const [streamArn, setStreamArn] = useState(null);

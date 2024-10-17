@@ -7,7 +7,7 @@ type InputWrapperProps = {
 
 const InputWrapper = ({
   children,
-  className
+  className,
 }: InputWrapperProps) => (className
   ? <div className={className}>{children}</div>
   : <span>{children}</span>);

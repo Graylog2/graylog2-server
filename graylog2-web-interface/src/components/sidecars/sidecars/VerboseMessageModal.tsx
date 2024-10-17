@@ -22,7 +22,7 @@ const VerboseMessageModal = ({
   showModal,
   onHide,
   collectorName,
-  collectorVerbose
+  collectorVerbose,
 }: VerboseMessageModalProps) => (
   <BootstrapModalWrapper showModal={showModal}
                          onHide={onHide}

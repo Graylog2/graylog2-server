@@ -48,7 +48,6 @@ class CollectorList extends React.Component<CollectorListProps> {
     return <th className={className}>{header}</th>;
   }
 
-  // eslint-disable-next-line react/no-unstable-nested-components
   collectorFormatter(collector) {
     const { onClone, onDelete, validateCollector } = this.props;
 

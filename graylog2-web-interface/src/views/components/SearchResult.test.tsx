@@ -26,7 +26,7 @@ describe('SearchResult', () => {
 
   const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
   const SimpleSearchResult = ({
-    fieldTypes = initialFieldTypes
+    fieldTypes = initialFieldTypes,
   }: SimpleSearchResultProps) => (
     <FieldTypesContext.Provider value={fieldTypes}>
       <SearchResult />

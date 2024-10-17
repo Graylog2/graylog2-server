@@ -18,7 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 
 import styles from './FieldTypeIcon.css';
 

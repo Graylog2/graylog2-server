@@ -22,7 +22,7 @@ const ContentPackDetails = ({
   offset = 1,
   verbose = false,
   constraints = [],
-  showConstraints = false
+  showConstraints = false,
 }: ContentPackDetailsProps) => {
   let contentPackAnchor = contentPack.url;
 

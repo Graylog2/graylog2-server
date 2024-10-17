@@ -10,7 +10,7 @@ type SimulationPreviewProps = {
 
 const SimulationPreview = ({
   simulationResults,
-  streams
+  streams,
 }: SimulationPreviewProps) => {
   const { messages } = simulationResults;
 

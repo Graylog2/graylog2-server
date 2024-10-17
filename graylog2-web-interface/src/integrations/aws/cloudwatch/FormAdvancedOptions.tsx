@@ -27,7 +27,7 @@ type FormAdvancedOptionsProps = {
 };
 
 const FormAdvancedOptions = ({
-  onChange
+  onChange,
 }: FormAdvancedOptionsProps) => {
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);

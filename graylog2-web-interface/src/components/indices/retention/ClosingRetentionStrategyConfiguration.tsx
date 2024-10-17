@@ -9,7 +9,7 @@ type ClosingRetentionStrategyConfigurationProps = {
 };
 
 const ClosingRetentionStrategyConfiguration = ({
-  updateConfig
+  updateConfig,
 }: ClosingRetentionStrategyConfigurationProps) => {
   const [maxNumberOfIndices, setMaxNumberOfIndices] = useIndexRetention().useMaxNumberOfIndices;
 

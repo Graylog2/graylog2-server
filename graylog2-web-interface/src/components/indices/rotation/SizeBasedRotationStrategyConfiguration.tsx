@@ -12,7 +12,7 @@ type SizeBasedRotationStrategyConfigurationProps = {
 
 const SizeBasedRotationStrategyConfiguration = ({
   config,
-  updateConfig
+  updateConfig,
 }: SizeBasedRotationStrategyConfigurationProps) => {
   const { max_size } = config;
   const [maxSize, setMaxSize] = useState(max_size);

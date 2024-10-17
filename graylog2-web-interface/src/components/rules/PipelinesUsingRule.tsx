@@ -28,7 +28,7 @@ type PipelinesUsingRuleProps = {
 };
 
 const PipelinesUsingRule = ({
-  create
+  create,
 }: PipelinesUsingRuleProps) => {
   const { usedInPipelines } = useContext(PipelineRulesContext);
 

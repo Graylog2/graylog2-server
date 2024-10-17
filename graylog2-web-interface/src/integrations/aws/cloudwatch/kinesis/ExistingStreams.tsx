@@ -43,7 +43,7 @@ const KinesisStreams = ({
   onSubmit,
 
   toggleSetup = () => {
-  }
+  },
 }: KinesisStreamsProps) => {
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState(null);

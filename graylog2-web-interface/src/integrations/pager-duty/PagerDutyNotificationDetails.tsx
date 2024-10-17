@@ -31,7 +31,7 @@ type PagerDutyNotificationDetailsProps = {
 };
 
 const PagerDutyNotificationDetails = ({
-  notification
+  notification,
 }: PagerDutyNotificationDetailsProps) => (
   <>
     <ReadOnlyFormGroup label="Routing Key" value={notification.config?.routing_key} />

@@ -21,7 +21,7 @@ type TooltipProps = {
 };
 
 const Tooltip = ({
- children
+  children,
 }: TooltipProps) => <>{children}</>;
 
 export default Tooltip;

@@ -21,7 +21,7 @@ type RestApiOverviewProps = {
 };
 
 const RestApiOverview = ({
-  node
+  node,
 }: RestApiOverviewProps) => {
   const { transport_address, last_seen } = node;
 

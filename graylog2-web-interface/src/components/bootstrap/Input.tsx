@@ -1,6 +1,7 @@
 import React from 'react';
 
 import InputDescription from 'components/common/InputDescription';
+import type { BsSize } from 'components/bootstrap/types';
 
 import Checkbox from './Checkbox';
 import { Radio } from './imports';
@@ -9,7 +10,6 @@ import FormControl from './FormControl';
 import FormGroup from './FormGroup';
 import InputGroup from './InputGroup';
 import InputWrapper from './InputWrapper';
-import {BsSize} from 'components/bootstrap/types';
 
 type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement> & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'>, 'value'> & {
   id?: string;
@@ -18,7 +18,7 @@ type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement> & Omit<React.
   label?: React.ReactElement | string;
   labelClassName?: string;
   bsSize?: BsSize,
-  bsStyle?: "success" | "warning" | "error";
+  bsStyle?: 'success' | 'warning' | 'error';
   formGroupClassName?: string;
   inputDescClassName?: string;
   value?: string | number | boolean;
@@ -58,6 +58,7 @@ class Input extends React.Component<InputProps, {
     buttonAfter: null,
     children: null,
   };
+
   private input: HTMLInputElement;
 
   getInputDOMNode = () => this.input;
@@ -171,8 +172,8 @@ class Input extends React.Component<InputProps, {
       name,
       // The following props need to be extracted even if they are not used
       // so they are not passed as controll props to the input
-      bsStyle, formGroupClassName, wrapperClassName, labelClassName, inputDescClassName, // eslint-disable-line no-unused-vars
-      error, help, addonAfter, buttonAfter, // eslint-disable-line no-unused-vars
+      bsStyle, formGroupClassName, wrapperClassName, labelClassName, inputDescClassName,
+      error, help, addonAfter, buttonAfter,
       ...controlProps
     } = this.props;
 
@@ -180,7 +181,7 @@ class Input extends React.Component<InputProps, {
       type,
       label,
       name: name ?? id,
-      ...controlProps
+      ...controlProps,
     };
 
     if (!type) {

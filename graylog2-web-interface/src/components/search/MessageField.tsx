@@ -18,7 +18,7 @@ const MessageField = ({
   value,
   fieldName,
   customFieldActions,
-  renderForDisplay
+  renderForDisplay,
 }: MessageFieldProps) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
 

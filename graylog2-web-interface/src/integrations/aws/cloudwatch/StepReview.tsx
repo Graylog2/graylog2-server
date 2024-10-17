@@ -33,7 +33,7 @@ type DefaultProps = {
 };
 
 const Default = ({
-  value
+  value,
 }: DefaultProps) => (
   <>{value} <small>(default)</small></>
 );
@@ -47,7 +47,7 @@ type StepReviewProps = {
 const StepReview = ({
   onSubmit,
   onEditClick,
-  externalInputSubmit = false
+  externalInputSubmit = false,
 }: StepReviewProps) => {
   const [formError, setFormError] = useState(null);
   const { formData } = useContext(FormDataContext);

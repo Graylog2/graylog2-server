@@ -45,7 +45,7 @@ type HistogramProps = {
 };
 
 export default function Histogram({
-  data
+  data,
 }: HistogramProps) {
   return (
     <Plot data={_generateSeries(data.results)}

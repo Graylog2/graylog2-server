@@ -25,12 +25,11 @@ import { emptyBooleanExpressionConfig, emptyGroupExpressionConfig, replaceBoolea
 import NumberExpression from './AggregationConditionExpressions/NumberExpression';
 import NumberRefExpression from './AggregationConditionExpressions/NumberRefExpression';
 import BooleanOperatorSelector from './AggregationConditionExpressions/BooleanOperatorSelector';
-/* eslint-disable import/no-cycle, import/order */
+/* eslint-disable import/order */
 // We render the expression tree recursively, so complex expressions need to refer back to this component
 import BooleanExpression from './AggregationConditionExpressions/BooleanExpression';
 import ComparisonExpression from './AggregationConditionExpressions/ComparisonExpression';
 import GroupExpression from './AggregationConditionExpressions/GroupExpression';
-/* eslint-enable import/no-cycle */
 
 import styles from './AggregationConditionExpression.css';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';

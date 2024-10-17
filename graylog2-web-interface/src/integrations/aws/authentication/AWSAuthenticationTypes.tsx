@@ -37,7 +37,7 @@ type AWSAuthenticationTypesProps = {
 };
 
 const AWSAuthenticationTypes = ({
-  onChange
+  onChange,
 }: AWSAuthenticationTypesProps) => {
   const { clearField, formData } = useContext(FormDataContext);
 

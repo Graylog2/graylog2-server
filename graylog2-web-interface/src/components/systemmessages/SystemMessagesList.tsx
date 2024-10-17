@@ -21,7 +21,7 @@ type SystemMessagesListProps = {
 };
 
 const SystemMessagesList = ({
-  messages
+  messages,
 }: SystemMessagesListProps) => (
   <SystemMessagesTable striped hover condensed>
     <thead>

@@ -33,7 +33,7 @@ const SetupModal = ({
   onSubmit,
   onCancel,
   groupName,
-  streamName
+  streamName,
 }: SetupModalProps) => {
   const [agreed, setAgreed] = useState(false);
   const [success, setSuccess] = useState(false);
