@@ -39,7 +39,7 @@ const KeySecret = ({
                     onChange={onChange}
                     fieldData={awsKey}
                     autoComplete="off"
-                    maxLength="512"
+                    maxLength={512}
                     help='Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters "AK".'
                     required />
 
@@ -49,7 +49,7 @@ const KeySecret = ({
                        onChange={onChange}
                        fieldData={awsSecret}
                        autoComplete="off"
-                       maxLength="512"
+                       maxLength={512}
                        help="Your AWS Secret is usually a 40-character long, base-64 encoded string."
                        required />
   </>

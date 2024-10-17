@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 
 import { Button, Panel } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -23,39 +23,6 @@ import Icon from 'components/common/Icon';
 type ErrorMessageProps = {
   fullMessage: string;
   niceMessage?: string | React.ReactNode;
-};
-
-export const ErrorMessage = ({
-  fullMessage,
-  niceMessage = null
-}: ErrorMessageProps) => {
-  const [expanded, toggleExpanded] = useState(false);
-
-  const Header = (
-    <>
-      <ErrorOutputStyle />
-      <ErrorOutput>{niceMessage || fullMessage}</ErrorOutput>
-      {niceMessage
-        && (
-          <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)} expanded={expanded}>
-            More Info <MoreIcon name="chevron_right" />
-          </ErrorToggleInfo>
-        )}
-    </>
-  );
-
-  if (!niceMessage) {
-    return <Panel header={Header} bsStyle="danger" />;
-  }
-
-  return (
-    <Panel header={Header}
-           bsStyle="danger"
-           collapsible
-           expanded={expanded}>
-      <strong>Additional Information: </strong>{fullMessage}
-    </Panel>
-  );
 };
 
 type FormWrapProps = {
@@ -82,7 +49,7 @@ const FormWrap = ({
   error = null,
   loading = false,
   onSubmit = () => {},
-  title = null
+  title = null,
 }: FormWrapProps) => {
   const formRef = useRef();
   const [disabledButton, setDisabledButton] = useState(disabled);
@@ -155,9 +122,42 @@ const ErrorToggleInfo = styled.button`
   padding: 0;
 `;
 
-const MoreIcon = styled(Icon)`
-  transform: rotate(${(props) => (props.expanded ? '90deg' : '0deg')});
+const MoreIcon = styled(Icon)<{ expanded: boolean }>(({ expanded }) => css`
+  transform: rotate(${expanded ? '90deg' : '0deg'});
   transition: 150ms transform ease-in-out;
-`;
+`);
+
+export const ErrorMessage = ({
+  fullMessage,
+  niceMessage = null,
+}: ErrorMessageProps) => {
+  const [expanded, toggleExpanded] = useState(false);
+
+  const Header = (
+    <>
+      <ErrorOutputStyle />
+      <ErrorOutput>{niceMessage || fullMessage}</ErrorOutput>
+      {niceMessage
+        && (
+          <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)}>
+            More Info <MoreIcon name="chevron_right" expanded={expanded} />
+          </ErrorToggleInfo>
+        )}
+    </>
+  );
+
+  if (!niceMessage) {
+    return <Panel header={Header} bsStyle="danger" />;
+  }
+
+  return (
+    <Panel header={Header}
+           bsStyle="danger"
+           collapsible
+           expanded={expanded}>
+      <strong>Additional Information: </strong>{fullMessage}
+    </Panel>
+  );
+};
 
 export default FormWrap;

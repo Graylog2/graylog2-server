@@ -23,7 +23,7 @@ export type PaginationQueryParameterObject = {
   pageSizes?: number[];
 };
 
-type PaginationProps = {
+export type PaginationProps = {
   paginationQueryParameter: PaginationQueryParameterResult;
 };
 

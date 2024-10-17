@@ -43,6 +43,12 @@ type ConfigurationListContainerProps = {
 class ConfigurationListContainer extends React.Component<ConfigurationListContainerProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    configurations: undefined,
+    collectors: undefined,
+    sendTelemetry: () => {},
+  };
+
   componentDidMount() {
     reloadConfiguration();
   }
@@ -97,12 +103,6 @@ class ConfigurationListContainer extends React.Component<ConfigurationListContai
     );
   }
 }
-
-ConfigurationListContainer.defaultProps = {
-  configurations: undefined,
-  collectors: undefined,
-  sendTelemetry: () => {},
-};
 
 export default withTelemetry(connect(ConfigurationListContainer, {
   configurations: CollectorConfigurationsStore,

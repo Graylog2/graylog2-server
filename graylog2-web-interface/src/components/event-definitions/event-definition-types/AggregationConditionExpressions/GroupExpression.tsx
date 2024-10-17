@@ -19,7 +19,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import styled from 'styled-components';
 
 import { Clearfix } from 'components/bootstrap';
-import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 import { replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
 
 import BooleanOperatorSelector from './BooleanOperatorSelector';
@@ -35,7 +34,7 @@ type GroupExpressionProps = {
   expression: any;
   level: number;
   onChange: (...args: any[]) => void;
-  onChildChange: (...args: any[]) => void;
+  onChildChange: (...args: any[]) => () => void;
   validation?: any;
 };
 

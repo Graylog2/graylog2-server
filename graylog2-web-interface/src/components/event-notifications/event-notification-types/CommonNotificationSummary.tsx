@@ -21,12 +21,11 @@ import { Icon } from 'components/common';
 
 import styles from './CommonNotificationSummary.css';
 
-type CommonNotificationSummaryProps = {
+type CommonNotificationSummaryProps = React.PropsWithChildren<{
   type: string;
   notification: any;
   definitionNotification: any;
-  children: React.ReactElement;
-};
+}>;
 
 class CommonNotificationSummary extends React.Component<CommonNotificationSummaryProps, {
   [key: string]: any;

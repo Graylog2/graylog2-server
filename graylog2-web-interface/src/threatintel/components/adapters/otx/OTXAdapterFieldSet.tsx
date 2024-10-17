@@ -45,8 +45,8 @@ type OTXAdapterFieldSetProps = {
   };
   updateConfig: (...args: any[]) => void;
   handleFormEvent: (...args: any[]) => void;
-  validationState: (...args: any[]) => void;
-  validationMessage: (...args: any[]) => void;
+  validationState: (...args: any[]) => 'error' | 'success' | 'warning';
+  validationMessage: (...args: any[]) => React.ReactElement | string;
 };
 
 class OTXAdapterFieldSet extends React.Component<OTXAdapterFieldSetProps, {

@@ -32,6 +32,8 @@ class SystemInformation extends React.Component<SystemInformationProps, {
     jvmInformation: undefined,
   };
 
+  private interval: NodeJS.Timeout;
+
   constructor(props) {
     super(props);
     this.state = _getInitialState();

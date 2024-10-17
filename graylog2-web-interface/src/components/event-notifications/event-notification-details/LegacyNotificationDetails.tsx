@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 
 import { ReadOnlyFormGroup, Spinner } from 'components/common';
 import { Alert, Well } from 'components/bootstrap';
+import type { LegacyEventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 
 import emailStyles from '../event-notification-types/EmailNotificationSummary.css';
@@ -28,10 +29,12 @@ type LegacyNotificationDetailsProps = {
   notification: any;
 };
 
+type LegacyTypes = { [key: string]: LegacyEventNotification };
+
 const LegacyNotificationDetails = ({
-  notification
+  notification,
 }: LegacyNotificationDetailsProps) => {
-  const [legacyTypes, setLegacyTypes] = useState();
+  const [legacyTypes, setLegacyTypes] = useState<LegacyTypes>();
   const configurationValues = notification.config.configuration;
   const callbackType = notification.config.callback_type;
   const typeData = legacyTypes?.[callbackType];

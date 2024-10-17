@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import type { SelectInstance } from 'react-select';
 
 import Select from 'components/common/Select';
 import { Button, ListGroup, ListGroupItem } from 'components/bootstrap';
@@ -13,11 +14,11 @@ type SelectableListProps = {
   /** Options to display in the input. See `Select`'s `options` prop for more information. */
   options?: any[];
   /** Specifies whether `selectedOptions` contains strings or objects. */
-  selectedOptionsType?: "string" | "object";
+  selectedOptionsType?: 'string' | 'object';
   /**
    * Array of string or objects containing the selected options.
    */
-  selectedOptions?: string | any[];
+  selectedOptions?: string[];
   /** Indicates which option object key contains the text to display in the select input. same as react-select's `labelkey` prop. */
   displayKey?: string;
   /** Indicates which option object key contains the value of the option. */
@@ -47,6 +48,8 @@ type SelectableListProps = {
 class SelectableList extends React.Component<SelectableListProps, {
   [key: string]: any;
 }> {
+  private select: SelectInstance<unknown, boolean>;
+
   static defaultProps = {
     autoFocus: undefined,
     displayKey: 'label',

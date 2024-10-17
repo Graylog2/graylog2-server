@@ -12,7 +12,7 @@ import recentMessagesTimeRange from 'util/TimeRangeHelper';
 
 import style from './SidecarRow.css';
 
-const SidecarTR = styled.tr(({ inactive, theme }) => css`
+const SidecarTR = styled.tr<{ inactive: boolean }>(({ inactive, theme }) => css`
   color: ${inactive ? theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA') : 'currentColor'};
   opacity: ${inactive ? 0.9 : 1};
 

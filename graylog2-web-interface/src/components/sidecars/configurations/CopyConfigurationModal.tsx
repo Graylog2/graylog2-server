@@ -5,7 +5,7 @@ import CloneMenuModal from '../common/CloneMenuModal';
 type CopyConfigurationModalProps = {
   configuration: any;
   copyConfiguration: (...args: any[]) => void;
-  validateConfiguration: (...args: any[]) => void;
+  validateConfiguration: (...args: any[]) => Promise<{ errors: { name: string[] }}>;
   onClose: (...args: any[]) => void;
   showModal?: boolean;
 };
@@ -13,6 +13,10 @@ type CopyConfigurationModalProps = {
 class CopyConfigurationModal extends React.Component<CopyConfigurationModalProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    showModal: false,
+  };
+
   constructor(props) {
     super(props);
 
@@ -72,9 +76,5 @@ class CopyConfigurationModal extends React.Component<CopyConfigurationModalProps
     );
   }
 }
-
-CopyConfigurationModal.defaultProps = {
-  showModal: false,
-};
 
 export default CopyConfigurationModal;

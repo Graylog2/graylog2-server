@@ -24,6 +24,11 @@ type ConfigurationRowProps = {
 class ConfigurationRow extends React.Component<ConfigurationRowProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    collector: {},
+    sendTelemetry: () => {},
+  };
+
   constructor(props) {
     super(props);
 
@@ -90,10 +95,5 @@ class ConfigurationRow extends React.Component<ConfigurationRowProps, {
     );
   }
 }
-
-ConfigurationRow.defaultProps = {
-  collector: {},
-  sendTelemetry: () => {},
-};
 
 export default withTelemetry(ConfigurationRow);

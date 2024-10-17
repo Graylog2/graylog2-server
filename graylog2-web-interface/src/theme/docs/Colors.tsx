@@ -32,7 +32,7 @@ const Value = styled.span`
   transition: opacity 150ms ease-in-out;
 `;
 
-const StyledTooltip = styled(Tooltip).attrs((props) => ({
+const StyledTooltip = styled(Tooltip).attrs<{ opened: boolean }>((props) => ({
   className: props.opened ? 'in' : '', /* stylelint-disable-line */
 }))(({ opened }) => css`
   display: ${opened ? 'block' : 'none'};
@@ -73,7 +73,7 @@ const ColorSwatch = ({
   className,
   color,
   name = '',
-  copyText
+  copyText,
 }: ColorSwatchProps) => {
   const [opened, setOpened] = useState(false);
 

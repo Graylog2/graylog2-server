@@ -40,7 +40,7 @@ type DataTableProps = {
    * Function that renders a row in the table. It receives two arguments: the row, and its index.
    * It usually returns a `<tr>` element with the formatted row.
    */
-  dataRowFormatter: (...args: any[]) => void;
+  dataRowFormatter: (...args: any[]) => React.ReactElement;
   /** Label to use next to the suggestions for the data filter input. */
   filterBy?: string;
   /** Label to use next to the data filter input. */
@@ -54,7 +54,7 @@ type DataTableProps = {
    * It usually returns a `<th>` element with the header.
    * Default will wrap the headers in a <th> tag.
    */
-  headerCellFormatter?: (...args: any[]) => void;
+  headerCellFormatter?: (...args: any[]) => React.ReactElement;
   /** Array of values to be use as headers. The render is controlled by `headerCellFormatter`. */
   headers: any[];
   /** Element id to use in the table container */

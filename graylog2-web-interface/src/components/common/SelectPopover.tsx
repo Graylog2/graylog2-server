@@ -35,13 +35,13 @@ type SelectPopoverProps = {
   /** Provides an ID for this popover element. */
   id: string;
   /** Indicates where the popover should appear. */
-  placement?: "top" | "right" | "bottom" | "left";
+  placement?: 'top' | 'right' | 'bottom' | 'left';
   /** Title to use in the popover header. */
   title: string;
   /** React node that will be used as trigger to show/hide the popover. */
-  triggerNode: React.ReactNode;
+  triggerNode: React.ReactElement;
   /** Event that will show/hide the popover. */
-  triggerAction?: "click" | "hover" | "focus";
+  triggerAction?: 'click' | 'hover' | 'focus';
   /**
    * Array of strings that contain items to be displayed as options in the list.
    * You can customize the items appearance by giving an `itemFormatter` prop.
@@ -51,7 +51,7 @@ type SelectPopoverProps = {
    * Function that will be called for each item in the list. It receives the current item
    * and must return a React node that will be displayed on screen.
    */
-  itemFormatter?: (...args: any[]) => void;
+  itemFormatter?: (...args: any[]) => React.ReactElement;
   /** Indicates whether the component will allow multiple selected items or not. */
   multiple?: boolean;
   /** Indicates which items are selected. This should be the same string that appears in the `items` list. */
@@ -92,6 +92,8 @@ class SelectPopover extends React.Component<SelectPopoverProps, {
     clearSelectionText: 'Clear selection',
     disabled: false,
   };
+
+  private overlay: { hide: () => void };
 
   constructor(props) {
     super(props);

@@ -20,46 +20,6 @@ import styled from 'styled-components';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
 
-type KinesisSetupStepProps = {
-  progress: {
-    data?: any;
-    error?: any;
-    loading?: boolean;
-  };
-  label: string;
-};
-
-const KinesisSetupStep = ({
-  label,
-  progress
-}: KinesisSetupStepProps) => {
-  const { data, error, loading } = progress;
-
-  const waitingText = !data && !loading && !error && 'Waiting...';
-  const loadingText = loading ? `Creating ${label}` : waitingText;
-  const successText = data ? data.result : loadingText;
-  const defaultText = error || successText;
-
-  return (
-    <StepItem>
-      <IconWrap>
-        {!data && !loading && !error && <Icon name="hourglass_bottom" size="2x" style={{ color: '#dce1e5' }} />}
-        {loading && <Spinner name="spinner" size="2x" style={{ color: '#0063be' }} />}
-        {data && <Icon name="check" size="2x" style={{ color: '#00ae42' }} />}
-        {error && <Icon name="times" size="2x" style={{ color: '#ad0707' }} />}
-      </IconWrap>
-
-      <Content>
-        <StepHeader>Create {label}</StepHeader>
-
-        <StepDetails>
-          {defaultText}
-        </StepDetails>
-      </Content>
-    </StepItem>
-  );
-};
-
 const StepItem = styled.li`
   display: flex;
   margin: 0 0 12px;
@@ -80,5 +40,45 @@ const StepHeader = styled.span`
 const StepDetails = styled.p`
   margin: 3px 0 0;
 `;
+
+type KinesisSetupStepProps = {
+  progress: {
+    data?: any;
+    error?: any;
+    loading?: boolean;
+  };
+  label: string;
+};
+
+const KinesisSetupStep = ({
+  label,
+  progress,
+}: KinesisSetupStepProps) => {
+  const { data, error, loading } = progress;
+
+  const waitingText = !data && !loading && !error && 'Waiting...';
+  const loadingText = loading ? `Creating ${label}` : waitingText;
+  const successText = data ? data.result : loadingText;
+  const defaultText = error || successText;
+
+  return (
+    <StepItem>
+      <IconWrap>
+        {!data && !loading && !error && <Icon name="hourglass_bottom" size="2x" style={{ color: '#dce1e5' }} />}
+        {loading && <Spinner size="2x" style={{ color: '#0063be' }} />}
+        {data && <Icon name="check" size="2x" style={{ color: '#00ae42' }} />}
+        {error && <Icon name="close" size="2x" style={{ color: '#ad0707' }} />}
+      </IconWrap>
+
+      <Content>
+        <StepHeader>Create {label}</StepHeader>
+
+        <StepDetails>
+          {defaultText}
+        </StepDetails>
+      </Content>
+    </StepItem>
+  );
+};
 
 export default KinesisSetupStep;

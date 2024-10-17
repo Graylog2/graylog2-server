@@ -5,12 +5,16 @@ import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import type { PaginationProps } from 'components/common/withPaginationQueryParameter';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTableView, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
+import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
+import type { LocationContext } from 'routing/withLocation';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
+import type { HistoryContext } from 'routing/withHistory';
 import withHistory from 'routing/withHistory';
 
 const _saved = (history) => {
@@ -18,31 +22,43 @@ const _saved = (history) => {
   history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
 };
 
-const _isCreating = ({ action }) => action === 'create';
+const _isCreating = ({ action }: LUTTablesPageProps) => action === 'create';
 
 const _validateTable = (table) => {
   LookupTablesActions.validate(table);
 };
 
-type LUTTablesPageProps = {
+type LUTTablesPageProps = HistoryContext & PaginationProps & ParamsContext & LocationContext & {
   table?: any;
   validationErrors?: any;
   dataAdapter?: any;
   cache?: any;
   tables?: any[];
   caches?: any;
-  dataAdapters?: any;
+  dataAdapters?: { [key: string]: { name: string } };
   pagination?: any;
-  history: any;
   location?: any;
   errorStates?: any;
   action?: string;
-  paginationQueryParameter: any;
 };
 
 class LUTTablesPage extends React.Component<LUTTablesPageProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    errorStates: null,
+    validationErrors: {},
+    dataAdapters: null,
+    table: null,
+    cache: null,
+    caches: null,
+    tables: null,
+    location: null,
+    pagination: null,
+    dataAdapter: null,
+    action: undefined,
+  };
+
   errorStatesTimer = undefined;
 
   errorStatesInterval = 1000;
@@ -187,20 +203,6 @@ class LUTTablesPage extends React.Component<LUTTablesPageProps, {
     );
   }
 }
-
-LUTTablesPage.defaultProps = {
-  errorStates: null,
-  validationErrors: {},
-  dataAdapters: null,
-  table: null,
-  cache: null,
-  caches: null,
-  tables: null,
-  location: null,
-  pagination: null,
-  dataAdapter: null,
-  action: undefined,
-};
 
 export default connect(withHistory(withParams(withLocation(withPaginationQueryParameter(LUTTablesPage)))), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
   ...otherProps,

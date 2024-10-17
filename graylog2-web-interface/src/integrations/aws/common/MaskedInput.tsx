@@ -21,7 +21,7 @@ import { Icon } from 'components/common';
 
 import ValidatedInput from './ValidatedInput';
 
-type MaskedInputProps = {
+type MaskedInputProps = React.ComponentProps<typeof ValidatedInput> & {
   label: string | React.ReactNode;
   className?: string;
 };
@@ -35,7 +35,7 @@ const MaskedInput = ({
   const toggleLabel = (
     <LabelWrapper>
       {label}
-      <ToggleMask onClick={() => setMasked(!masked)} ariaDescription={`Toggle ${label} field input`}>
+      <ToggleMask onClick={() => setMasked(!masked)} aria-description={`Toggle ${label} field input`}>
         <Icon name={masked ? 'visibility_off' : 'visibility'} />
       </ToggleMask>
     </LabelWrapper>

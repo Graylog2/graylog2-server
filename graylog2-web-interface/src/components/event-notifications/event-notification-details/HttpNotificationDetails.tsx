@@ -17,13 +17,14 @@
 import * as React from 'react';
 
 import { ReadOnlyFormGroup } from 'components/common';
+import type { HttpEventNotificationV2 } from 'components/event-notifications/types';
 
 type HttpNotificationDetailsProps = {
-  notification: any;
+  notification: HttpEventNotificationV2;
 };
 
 const HttpNotificationDetails = ({
-  notification
+  notification,
 }: HttpNotificationDetailsProps) => {
   const apiKeySet = notification.config.api_secret?.is_set;
   const apiSentAs = notification.config.api_key_as_header ? 'Header' : 'Query Parameter';

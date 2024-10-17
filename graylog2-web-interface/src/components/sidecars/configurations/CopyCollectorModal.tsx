@@ -22,7 +22,7 @@ import CloneMenuModal from '../common/CloneMenuModal';
 type CopyCollectorModalProps = {
   collector: any;
   copyCollector: (...args: any[]) => void;
-  validateCollector: (...args: any[]) => void;
+  validateCollector: (...args: any[]) => Promise<{ errors: { name: string[] }}>;
 };
 
 class CopyCollectorModal extends React.Component<CopyCollectorModalProps, {

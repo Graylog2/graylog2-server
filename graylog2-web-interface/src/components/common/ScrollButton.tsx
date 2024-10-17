@@ -47,8 +47,8 @@ class ScrollButton extends React.Component<ScrollButtonProps, {
     position: '',
   };
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       intervalId: 0,

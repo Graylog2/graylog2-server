@@ -63,9 +63,7 @@ interface EventNotificationTypes {
     definitionNotification: EventDefinition['notifications'][number],
   }>,
   detailsComponent: React.ComponentType<{
-    config: EventNotification['config'],
-    validation: { errors: { [key: string]: Array<string> } },
-    onChange: (newConfig: EventNotification['config']) => void,
+    notification: EventNotification,
   }>,
   defaultConfig: EventNotification['config'],
 }

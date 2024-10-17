@@ -6,7 +6,9 @@ import { Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup-tables';
+import type { PaginationProps } from 'components/common/withPaginationQueryParameter';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
+import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
@@ -17,13 +19,13 @@ const _saved = (history) => {
   history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
 };
 
-const _isCreating = ({ action }) => action === 'create';
+const _isCreating = ({ action }: LUTCachesPageProps) => action === 'create';
 
 const _validateCache = (adapter) => {
   LookupTableCachesActions.validate(adapter);
 };
 
-type LUTCachesPageProps = {
+type LUTCachesPageProps = ParamsContext & PaginationProps & {
   cache?: any;
   validationErrors?: any;
   types?: any;
@@ -32,12 +34,19 @@ type LUTCachesPageProps = {
   location: any;
   pagination: any;
   action?: string;
-  paginationQueryParameter: any;
 };
 
 class LUTCachesPage extends React.Component<LUTCachesPageProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    cache: null,
+    validationErrors: {},
+    types: null,
+    caches: null,
+    action: undefined,
+  };
+
   componentDidMount() {
     this._loadData(this.props);
   }
@@ -139,14 +148,6 @@ class LUTCachesPage extends React.Component<LUTCachesPageProps, {
     );
   }
 }
-
-LUTCachesPage.defaultProps = {
-  cache: null,
-  validationErrors: {},
-  types: null,
-  caches: null,
-  action: undefined,
-};
 
 export default connect(
   withHistory(withParams(withLocation(withPaginationQueryParameter(LUTCachesPage)))),

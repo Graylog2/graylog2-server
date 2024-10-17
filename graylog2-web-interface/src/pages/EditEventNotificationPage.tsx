@@ -24,16 +24,16 @@ import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
+import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import type { HistoryContext } from 'routing/withHistory';
 import withHistory from 'routing/withHistory';
 
-type EditEventDefinitionPageProps = {
-  params: any;
+type EditEventDefinitionPageProps = ParamsContext & HistoryContext & {
   currentUser: any;
-  history: any;
 };
 
 class EditEventDefinitionPage extends React.Component<EditEventDefinitionPageProps, {
@@ -109,6 +109,6 @@ class EditEventDefinitionPage extends React.Component<EditEventDefinitionPagePro
   }
 }
 
-export default connect(withHistory(withParams(EditEventDefinitionPage)), {
+export default connect(withParams(withHistory<EditEventDefinitionPageProps>(EditEventDefinitionPage)), {
   currentUser: CurrentUserStore,
 }, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));

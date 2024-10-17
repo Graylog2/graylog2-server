@@ -90,7 +90,7 @@ class IndexSummary extends React.Component<IndexSummaryProps, {
 
           <small>
             {this._formatLabels(index)}{' '}
-            {this._formatIndexRange(index)}{' '}
+            {this._formatIndexRange()}{' '}
 
             <IndexSizeSummary index={index} />
 

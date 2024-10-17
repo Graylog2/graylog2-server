@@ -26,9 +26,9 @@ type JSONValueInputProps = {
   label?: string;
   help?: string | any;
   required?: boolean;
-  validationState?: string;
+  validationState?: 'error' | 'success' | 'warning';
   value?: string;
-  valueType?: any[];
+  valueType?: string;
   allowedTypes?: any;
   labelClassName?: string;
   wrapperClassName?: string;
@@ -37,6 +37,19 @@ type JSONValueInputProps = {
 class JSONValueInput extends React.Component<JSONValueInputProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    value: '',
+    valueType: 'STRING',
+    allowedTypes: OPTIONS.map((option) => option.value),
+    label: '',
+    help: '',
+    required: false,
+    validationState: null,
+    labelClassName: undefined,
+    wrapperClassName: undefined,
+    onBlur: undefined,
+  };
+
   constructor(props) {
     super(props);
     this.state = this._computeInitialState();
@@ -74,8 +87,7 @@ class JSONValueInput extends React.Component<JSONValueInputProps, {
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
             <FormControl type="text" onChange={this._onUpdate} onBlur={this.props.onBlur} value={this.state.value} required={this.props.required} />
-            <DropdownButton componentClass={InputGroup.Button}
-                            id="input-dropdown-addon"
+            <DropdownButton id="input-dropdown-addon"
                             bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
                             title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
               {options}
@@ -87,18 +99,5 @@ class JSONValueInput extends React.Component<JSONValueInputProps, {
     );
   }
 }
-
-JSONValueInput.defaultProps = {
-  value: '',
-  valueType: 'STRING',
-  allowedTypes: OPTIONS.map((option) => option.value),
-  label: '',
-  help: '',
-  required: false,
-  validationState: null,
-  labelClassName: undefined,
-  wrapperClassName: undefined,
-  onBlur: undefined,
-};
 
 export default JSONValueInput;

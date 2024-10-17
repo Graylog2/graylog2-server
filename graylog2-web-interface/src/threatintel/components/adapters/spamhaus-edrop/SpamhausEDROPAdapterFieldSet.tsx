@@ -16,19 +16,7 @@
  */
 import React from 'react';
 
-type SpamhausEDROPAdapterFieldSetProps = {
-  config: {};
-  handleFormEvent: (...args: any[]) => void;
-  validationMessage: (...args: any[]) => void;
-  validationState: (...args: any[]) => void;
-};
-
-const SpamhausEDROPAdapterFieldSet = ({
-  handleFormEvent,
-  validationState,
-  validationMessage,
-  config
-}: SpamhausEDROPAdapterFieldSetProps) => (
+const SpamhausEDROPAdapterFieldSet = () => (
   <fieldset />
 );
 

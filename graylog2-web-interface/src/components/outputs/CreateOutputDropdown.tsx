@@ -19,6 +19,7 @@ import $ from 'jquery';
 
 import { Button } from 'components/bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
+import type { RefType } from 'components/configurationforms/ConfigurationForm';
 
 const formatOutputType = (type, typeName) => (<option key={typeName} value={typeName}>{type.name}</option>);
 
@@ -32,6 +33,8 @@ class CreateOutputDropdown extends React.Component<CreateOutputDropdownProps, {
   [key: string]: any;
 }> {
   PLACEHOLDER = 'placeholder';
+
+  private configurationForm: React.RefObject<RefType<{}>>;
 
   constructor(props) {
     super(props);

@@ -25,7 +25,7 @@ type KeyValueTableProps = {
   /** Extra CSS classes for the table container. */
   containerClassName?: string;
   /** Size of action buttons. */
-  actionsSize?: "large" | "medium" | "small" | "xsmall";
+  actionsSize?: 'large' | 'medium' | 'small' | 'xsmall';
 };
 
 /**
@@ -35,6 +35,15 @@ type KeyValueTableProps = {
 class KeyValueTable extends React.Component<KeyValueTableProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    headers: ['Name', 'Value', 'Actions'],
+    editable: false,
+    actionsSize: 'xsmall',
+    className: '',
+    containerClassName: '',
+    onChange: () => {},
+  };
+
   constructor(props) {
     super(props);
 
@@ -79,7 +88,7 @@ class KeyValueTable extends React.Component<KeyValueTableProps, {
   _formattedHeaders = (headers) => (
     <tr>
       {headers.map((header, idx) => {
-        const customStyle = {};
+        const customStyle: { width?: number } = {};
 
         // Hide last column or apply width so it sticks to the right
         if (idx === headers.length - 1) {
@@ -134,7 +143,6 @@ class KeyValueTable extends React.Component<KeyValueTableProps, {
                    name="newKey"
                    id="newKey"
                    data-testid="newKey"
-                   bsSize="small"
                    placeholder={this.props.headers[0]}
                    value={this.state.newKey}
                    onChange={this._bindValue} />
@@ -146,7 +154,6 @@ class KeyValueTable extends React.Component<KeyValueTableProps, {
                    name="newValue"
                    id="newValue"
                    data-testid="newValue"
-                   bsSize="small"
                    placeholder={this.props.headers[1]}
                    value={this.state.newValue}
                    onChange={this._bindValue} />
@@ -175,14 +182,5 @@ class KeyValueTable extends React.Component<KeyValueTableProps, {
     );
   }
 }
-
-KeyValueTable.defaultProps = {
-  headers: ['Name', 'Value', 'Actions'],
-  editable: false,
-  actionsSize: 'xsmall',
-  className: '',
-  containerClassName: '',
-  onChange: () => {},
-};
 
 export default KeyValueTable;

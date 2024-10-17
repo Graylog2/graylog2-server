@@ -231,7 +231,7 @@ class DataAdapterForm extends React.Component<DataAdapterFormProps, {
     const { validationErrors } = this.props;
 
     if (validationErrors[fieldName]) {
-      return 'error';
+      return 'error' as const;
     }
 
     return null;

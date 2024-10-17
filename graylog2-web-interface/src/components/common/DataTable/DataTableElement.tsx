@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 type DataTableElementProps = {
   /** Element to be formatted. */
@@ -7,7 +7,7 @@ type DataTableElementProps = {
    * Formatter function. It expects to receive the `element`, and `index` as arguments and
    * returns an element to be rendered.
    */
-  formatter: (...args: any[]) => void;
+  formatter: (...args: any[]) => React.ReactElement;
   /** Element index. */
   index?: number;
 };
@@ -17,19 +17,6 @@ type DataTableElementProps = {
  * should not use this component directly, but through `DataTable`. Look at the `DataTable`
  * section for a usage example.
  */
-class DataTableElement extends React.Component<DataTableElementProps, {
-  [key: string]: any;
-}> {
-  static defaultProps = {
-    element: undefined,
-    index: undefined,
-  };
-
-  render() {
-    const { formatter, element, index } = this.props;
-
-    return formatter(element, index);
-  }
-}
+const DataTableElement = ({ formatter, element, index }: DataTableElementProps) => formatter(element, index);
 
 export default DataTableElement;

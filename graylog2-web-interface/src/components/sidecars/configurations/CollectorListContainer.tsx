@@ -38,6 +38,11 @@ type CollectorListContainerProps = {
 class CollectorListContainer extends React.Component<CollectorListContainerProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    collectors: undefined,
+    sendTelemetry: () => {},
+  };
+
   componentDidMount() {
     loadCollectors();
   }
@@ -99,10 +104,5 @@ class CollectorListContainer extends React.Component<CollectorListContainerProps
     );
   }
 }
-
-CollectorListContainer.defaultProps = {
-  collectors: undefined,
-  sendTelemetry: () => {},
-};
 
 export default withTelemetry(connect(CollectorListContainer, { collectors: CollectorsStore }));

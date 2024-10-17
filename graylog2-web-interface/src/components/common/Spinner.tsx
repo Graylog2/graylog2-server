@@ -36,6 +36,8 @@ type Props = {
   delay?: number,
   name?: IconName,
   text?: string,
+  size?: React.ComponentProps<typeof StyledIcon>['size'],
+  style?: React.ComponentProps<typeof StyledIcon>['style'],
 };
 
 /**

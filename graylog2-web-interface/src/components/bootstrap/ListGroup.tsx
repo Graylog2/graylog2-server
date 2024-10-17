@@ -21,7 +21,8 @@ import { ListGroup as BootstrapListGroup } from 'react-bootstrap';
 type Props = React.PropsWithChildren<{
   className?: string,
   componentClass?: React.ElementType | undefined,
-  bsClass?: React.ComponentProps<typeof BootstrapListGroup>['bsClass']
+  bsClass?: React.ComponentProps<typeof BootstrapListGroup>['bsClass'],
+  style?: React.ComponentProps<typeof BootstrapListGroup>['style'],
 }>
 
 const ListGroup = ({ className, children, ...props }: Props) => <BootstrapListGroup bsClass={className} {...props}>{children}</BootstrapListGroup>;

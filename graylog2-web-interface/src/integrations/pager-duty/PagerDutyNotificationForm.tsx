@@ -86,7 +86,6 @@ class PagerDutyNotificationForm extends React.Component<PagerDutyNotificationFor
                type="checkbox"
                bsStyle={validation.errors.custom_incident ? 'error' : null}
                help={get(validation, 'errors.custom_incident[0]', 'Generate a custom incident key based on the Stream and the Alert Condition.')}
-               value={config.custom_incident}
                checked={config.custom_incident}
                onChange={this.handleChange} />
         <Input id="pagerduty-notification-v2-key_prefix"

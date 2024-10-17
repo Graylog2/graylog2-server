@@ -30,7 +30,7 @@ const ARN = ({
     value: '',
   },
 
-  onChange
+  onChange,
 }: ARNProps) => (
   <Input id="awsCloudWatchAssumeARN"
          type="text"
@@ -39,7 +39,7 @@ const ARN = ({
          label="AWS Assume Role (ARN)"
          help="Amazon Resource Name with required cross account permission"
          placeholder="arn:aws:sts::123456789012:assumed-role/some-role"
-         maxLength="2048" />
+         maxLength={2048} />
 );
 
 export default ARN;

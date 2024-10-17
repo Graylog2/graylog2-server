@@ -53,7 +53,7 @@ const SetupModal = ({
   };
 
   return (
-    <Modal show>
+    <Modal show onHide={() => {}}>
       <Modal.Header>
         <Modal.Title>{agreed ? 'Executing Auto-Setup' : 'Kinesis Auto Setup Agreement'}</Modal.Title>
       </Modal.Header>
@@ -64,7 +64,7 @@ const SetupModal = ({
           : <Agree groupName={groupName} streamName={streamName} />}
 
         {agreed && success && (
-          <Alert key="delayedLogs" variant="warning">
+          <Alert key="delayedLogs" bsStyle="warning">
             It may take up to ten minutes for the first messages to arrive in the Kinesis stream. The Kinesis Health Check in the following step will not complete successfully until messages are present in the stream. Please see the official <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Subscriptions.html" target="_blank" rel="noopener noreferrer">CloudWatch Subscriptions</a> documentation for more information.
           </Alert>
         )}

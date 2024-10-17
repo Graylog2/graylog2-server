@@ -28,6 +28,10 @@ type LinkToNodeProps = {
 class LinkToNode extends React.PureComponent<LinkToNodeProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    nodes: undefined,
+  };
+
   render() {
     const { nodes } = this.props;
 
@@ -62,10 +66,6 @@ class LinkToNode extends React.PureComponent<LinkToNodeProps, {
     return <i>Unknown Node</i>;
   }
 }
-
-LinkToNode.defaultProps = {
-  nodes: undefined,
-};
 
 export default connect(
   LinkToNode,

@@ -46,7 +46,7 @@ export type EventNotification = {
 
 export type LegacyEventNotification = {
   name: string,
-  configuration: {}
+  configuration: { [key: string]: { human_name: string } }
 };
 
 type EventNotificationsActionsType = {

@@ -15,10 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
+
+const AdditionalFieldsContent = styled.div<{ visible: boolean}>(({ visible }) => css`
+  display: ${visible ? 'block' : 'none'};
+  padding: 0 100px 0 25px;
+`);
+
+const ToggleAdditionalFields = styled(Button)`
+  border: 0;
+  display: block;
+  font-size: 14px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
 
 type AdditionalFieldsProps = {
   children: any;
@@ -33,7 +48,7 @@ const AdditionalFields = ({
   className,
   onToggle = () => {},
   title,
-  visible = false
+  visible = false,
 }: AdditionalFieldsProps) => {
   const [fieldsVisible, setFieldsVisible] = useState(visible);
 
@@ -54,20 +69,5 @@ const AdditionalFields = ({
     </div>
   );
 };
-
-const AdditionalFieldsContent = styled.div`
-  display: ${(props) => (props.visible ? 'block' : 'none')};
-  padding: 0 100px 0 25px;
-`;
-
-const ToggleAdditionalFields = styled(Button)`
-  border: 0;
-  display: block;
-  font-size: 14px;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
 
 export default AdditionalFields;

@@ -1,7 +1,12 @@
 import React from 'react';
+import styled from 'styled-components';
 
 import { DataTable, ExternalLink, Spinner } from 'components/common';
 import { Alert } from 'components/bootstrap';
+
+const StyledExternalLink = styled(ExternalLink)`
+  margin-left: 10;
+`;
 
 type PluginsDataTableProps = {
   plugins?: any[];
@@ -20,7 +25,7 @@ class PluginsDataTable extends React.Component<PluginsDataTableProps, {
       <td className="limited" style={{ width: '50%' }}>
         {plugin.description}
           &nbsp;&nbsp;
-        <ExternalLink href={plugin.url} style={{ marginLeft: 10 }}>Website</ExternalLink>
+        <StyledExternalLink href={plugin.url}>Website</StyledExternalLink>
       </td>
     </tr>
   );

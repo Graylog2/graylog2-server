@@ -104,8 +104,8 @@ class EventDefinitionDescription extends React.Component<EventDefinitionDescript
     }
   };
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       showDetails: false,

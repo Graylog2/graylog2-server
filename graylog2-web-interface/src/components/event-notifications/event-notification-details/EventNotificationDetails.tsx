@@ -20,21 +20,22 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { ReadOnlyFormGroup } from 'components/common';
 import { Alert } from 'components/bootstrap';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 
-const _getNotificationPlugin = (type) => {
+const _getNotificationPlugin = (type: string) => {
   if (type === undefined) {
-    return {};
+    return undefined;
   }
 
-  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
+  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type);
 };
 
 type EventNotificationDetailsProps = {
-  notification: any;
+  notification: EventNotification;
 };
 
 const EventNotificationDetails = ({
-  notification
+  notification,
 }: EventNotificationDetailsProps) => {
   const notificationPlugin = _getNotificationPlugin(notification.config.type);
   const DetailsComponent = notificationPlugin?.detailsComponent;

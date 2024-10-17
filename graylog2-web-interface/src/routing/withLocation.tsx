@@ -29,7 +29,7 @@ export type Location<
   search: string;
 };
 
-type LocationContext = {
+export type LocationContext = {
   location: Location;
 };
 
