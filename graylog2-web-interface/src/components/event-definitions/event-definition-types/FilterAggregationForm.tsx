@@ -25,6 +25,7 @@ import * as FormsUtils from 'util/FormsUtils';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'views/stores/StreamsStore';
 import type User from 'logic/users/User';
+import type { EventDefinitionValidation } from 'components/event-definitions/types';
 
 import FilterForm from './FilterForm';
 import FilterPreviewContainer from './FilterPreviewContainer';
@@ -62,7 +63,7 @@ type Props = {
   },
   streams: Array<Stream>,
   currentUser: User,
-  validation: { errors: { [key: string]: Array<string> } },
+  validation: EventDefinitionValidation,
 };
 
 const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validation, currentUser, onChange }: Props) => {

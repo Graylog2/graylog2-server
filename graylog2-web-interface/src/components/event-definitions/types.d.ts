@@ -21,6 +21,17 @@ import type { SearchBarControl } from 'views/types';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
+export interface EventDefinitionValidation {
+  errors: {
+    config?: unknown,
+    title?: string,
+    event_limit?: string,
+    query_parameters?: string[],
+    search_within_ms?: string[],
+    cron_expression?: string,
+    execute_every_ms?: string[],
+  }
+}
 export interface EventDefinitionType {
   type: string,
   displayName: string,
@@ -33,7 +44,7 @@ export interface EventDefinitionType {
       aggregation_functions: Array<{}>
     },
     currentUser: User,
-    validation: { errors: { [key: string]: Array<string> } },
+    validation: EventDefinitionValidation,
     onChange: (name: string, newConfig: EventDefinition['config']) => void,
     action: string,
   }>,

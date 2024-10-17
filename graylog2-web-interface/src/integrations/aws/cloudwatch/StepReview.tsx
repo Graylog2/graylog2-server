@@ -185,7 +185,7 @@ const StepReview = ({
           </li>
           <li>
             <strong>Global Input</strong>
-            <span><Icon name="done" /></span>
+            <span><Icon name="check" /></span>
           </li>
           <li>
             <strong>Record Batch Size</strong>

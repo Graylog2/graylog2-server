@@ -22,21 +22,12 @@ import CommonNotificationSummary from './CommonNotificationSummary';
 
 type HttpNotificationSummaryProps = React.ComponentProps<EventNotificationTypes['summaryComponent']>;
 
-class HttpNotificationSummary extends React.Component<HttpNotificationSummaryProps, {
-  [key: string]: any;
-}> {
-  render() {
-    const { notification } = this.props;
-
-    return (
-      <CommonNotificationSummary {...this.props}>
-        <tr>
-          <td>URL</td>
-          <td><code>{notification.config.url}</code></td>
-        </tr>
-      </CommonNotificationSummary>
-    );
-  }
-}
-
+const HttpNotificationSummary = (props: HttpNotificationSummaryProps) => (
+  <CommonNotificationSummary {...props}>
+    <tr>
+      <td>URL</td>
+      <td><code>{props.notification.config.url}</code></td>
+    </tr>
+  </CommonNotificationSummary>
+);
 export default HttpNotificationSummary;
