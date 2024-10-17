@@ -31,6 +31,7 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 import GrokPatternQueryHelper from './GrokPatternQueryHelper';
 
@@ -73,6 +74,10 @@ type GrokPatternsProps = {
 class GrokPatterns extends React.Component<GrokPatternsProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    sendTelemetry: () => {},
+  };
+
   constructor(props) {
     super(props);
 
@@ -86,6 +91,8 @@ class GrokPatterns extends React.Component<GrokPatternsProps, {
     };
   }
 
+  private loadPromise: CancellablePromise<unknown>;
+
   componentDidMount() {
     this.loadData();
   }
@@ -96,7 +103,7 @@ class GrokPatterns extends React.Component<GrokPatternsProps, {
     }
   }
 
-  loadData = (callback, page = this.props.paginationQueryParameter.page, perPage = this.props.paginationQueryParameter.pageSize) => {
+  loadData = (callback?, page = this.props.paginationQueryParameter.page, perPage = this.props.paginationQueryParameter.pageSize) => {
     const { pagination: { query } } = this.state;
 
     this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query)
@@ -258,9 +265,5 @@ class GrokPatterns extends React.Component<GrokPatternsProps, {
     );
   }
 }
-
-GrokPatterns.defaultProps = {
-  sendTelemetry: () => {},
-};
 
 export default withTelemetry(withPaginationQueryParameter(GrokPatterns));
