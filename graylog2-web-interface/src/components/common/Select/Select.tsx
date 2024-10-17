@@ -221,7 +221,7 @@ export type Props<OptionValue> = {
   components?: ComponentsProp | null | undefined,
   delimiter?: string,
   disabled?: boolean,
-  displayKey: string,
+  displayKey?: string,
   forwardedRef?: SelectRef,
   id?: string,
   ignoreAccents?: boolean,
@@ -229,6 +229,8 @@ export type Props<OptionValue> = {
   inputProps?: { [key: string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
+  maxMenuHeight?: number,
+  menuPlacement?: 'bottom' | 'auto' | 'top',
   menuPortalTarget?: HTMLElement,
   menuIsOpen?: boolean,
   name?: string,
@@ -239,15 +241,15 @@ export type Props<OptionValue> = {
   onMenuClose?: () => void,
   optionRenderer?: (option: Option, isSelected?: boolean) => React.ReactElement,
   options: Array<Option>,
-  placeholder: string,
-  persistSelection: boolean,
+  placeholder?: string,
+  persistSelection?: boolean,
   // eslint-disable-next-line react/require-default-props
   ref?: SelectRef,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
   required?: boolean,
   value?: OptionValue,
-  valueKey: string,
+  valueKey?: string,
   valueRenderer?: (option: Option) => React.ReactElement,
   async?: boolean,
   total?: number,
@@ -527,4 +529,4 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   }
 }
 
-export default withTheme(Select);
+export default withTheme(Select) as unknown as React.ComponentType<Omit<Props<any>, 'theme'>>;
