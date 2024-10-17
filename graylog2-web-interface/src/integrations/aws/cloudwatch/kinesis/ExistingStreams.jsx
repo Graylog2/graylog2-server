@@ -33,8 +33,10 @@ import Spinner from 'components/common/Spinner';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
 
-const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {
-} }) => {
+const KinesisStreams = ({
+  onChange, onSubmit, toggleSetup = () => {
+  },
+}) => {
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState(null);
   const { availableStreams, setLogData } = useContext(ApiContext);

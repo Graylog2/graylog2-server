@@ -123,10 +123,12 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
     });
 
     return (partsWithHighlight.map((item, index) => (
-      // eslint-disable-next-line react/no-array-index-key
-      (<React.Fragment key={index}>
-        {item}
-      </React.Fragment>)
+
+      (
+        <React.Fragment key={index}>
+          {item}
+        </React.Fragment>
+      )
     )));
   };
 

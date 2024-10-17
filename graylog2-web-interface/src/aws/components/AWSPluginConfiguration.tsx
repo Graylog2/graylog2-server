@@ -47,13 +47,15 @@ const postConfigUpdate = (update) => {
   return fetch('PUT', url, update);
 };
 
-const AWSPluginConfiguration = ({ config = {
-  lookups_enabled: false,
-  lookup_regions: 'us-east-1,us-west-1,us-west-2,eu-west-1,eu-central-1',
-  access_key: '',
-  secret_key: '',
-  proxy_enabled: false,
-} }: Props) => {
+const AWSPluginConfiguration = ({
+  config = {
+    lookups_enabled: false,
+    lookup_regions: 'us-east-1,us-west-1,us-west-2,eu-west-1,eu-central-1',
+    access_key: '',
+    secret_key: '',
+    proxy_enabled: false,
+  },
+}: Props) => {
   const [updateConfig, setUpdateConfig] = useState(_initialState(config));
   const [showAwsConfigModal, setShowAwsConfigModal] = useState(false);
 

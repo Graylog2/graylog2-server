@@ -207,10 +207,12 @@ const InteractiveLegend = ({ activeQuery, config, fieldTypes, labelFields, label
   ));
 
   const result = chunk(tableCells, 5).map((cells, index) => (
-    // eslint-disable-next-line react/no-array-index-key
-    (<LegendRow key={index}>
-      {cells}
-    </LegendRow>)
+
+    (
+      <LegendRow key={index}>
+        {cells}
+      </LegendRow>
+    )
   ));
 
   return (

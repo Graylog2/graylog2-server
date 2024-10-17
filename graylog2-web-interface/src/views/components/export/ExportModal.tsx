@@ -77,8 +77,10 @@ type FormState = {
   format: string,
 };
 
-const ExportModal = ({ closeModal = () => {
-}, view, directExportWidgetId = null }: Props) => {
+const ExportModal = ({
+  closeModal = () => {
+  }, view, directExportWidgetId = null,
+}: Props) => {
   const executionState = useSearchExecutionState();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
