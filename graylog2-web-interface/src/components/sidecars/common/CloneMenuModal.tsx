@@ -25,6 +25,7 @@ type CloneMenuModalProps = {
   name: string;
   onChange: (...args: any[]) => void;
   onSave: (...args: any[]) => void;
+  onSelect?: () => void;
   onClose: (...args: any[]) => void;
 };
 
@@ -36,6 +37,8 @@ const CloneMenuModal = ({
   name,
   onChange,
   onSave,
+  // TODO: Find out why this is not in use (anymore)
+  onSelect: _onSelect,
 }: CloneMenuModalProps) => (
   <BootstrapModalForm show={showModal}
                       title="Clone"
