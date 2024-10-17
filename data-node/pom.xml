@@ -44,7 +44,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.15.0</opensearch.version>
+        <opensearch.version>2.17.0</opensearch.version>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -551,7 +551,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
                             <sha512>
-                                a72f218b581903b1ddf1072498560bc5304516ed57feb39735f920985740366c2779ed9174251a13b9a9dabdfc184119c325bb387dadf96485dc7964ecf32d54
+                                6c00205cf518cc6da3f4f30d486fe0e25c2011b68ec913f98077dea5e4614edc5a1d701c79f20f41c8b4521b7f4c67d942c3046c0a38795cd6ff6251c7a99331
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -575,7 +575,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
                             <sha512>
-                                866c348ac39b7b35e671917349269383c75e1f9d10768742067807569180d1914fd09c6ae7e71d5e74bd77c8c8165ea17c19290b71f887f074dfe8e68dff66bb
+                                8c6b84f67477edee38a8c246684ca97a47459ed388e4eed85cb33775fd91f96fe01ed049475291404bad1040fa040caec1e813aa93ca18092961715f7159f5e1
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -601,7 +601,7 @@
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                de44a181133a33a08703e8464b52aa2ac29d1d9918d9478c307b98909a571baaaf0c9dcb664349802c3dd85fa53275bd2228248fd129179631b9096d470eb8d5
+                                ad69215c8cd9c6caad9eafc765af10b143354b418068b2332828796c6cbb81ad31988532bd0e3a6736b31b2a7b4c247cc897c6f093b60ab89cf0c21e0686941d
                             </sha512>
                         </configuration>
                     </execution>

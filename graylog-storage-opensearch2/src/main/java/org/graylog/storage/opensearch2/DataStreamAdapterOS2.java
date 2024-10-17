@@ -129,9 +129,16 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
             log.debug("Could not set replicas for .opendistro-job-scheduler-lock system index. It might not exist yet.");
         }
         req.indices(dataStreamName);
+        try {
+            client.execute((c, requestOptions) -> c.indices().putSettings(req, requestOptions));
+        } catch (Exception e) {
+            log.debug("Could not set replicas for data stream {}", dataStreamName);
+        }
+    }
 
+    public void setNumberOfReplicasTemplates(int replicas) {
         PutIndexTemplateRequest templateRequest = new PutIndexTemplateRequest("data-stream-system-indices");
-        templateRequest.patterns(List.of(".opendistro-job-scheduler-lock"));
+        templateRequest.patterns(List.of(".opendistro-ism-config", ".opendistro-job-scheduler-lock"));
         templateRequest.settings(Settings.builder().put("number_of_replicas", replicas).build());
         try {
             client.execute((c, requestOptions) -> c.indices().putTemplate(templateRequest, requestOptions));
@@ -145,12 +152,6 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
             client.execute((c, requestOptions) -> c.cluster().putSettings(settingsRequest, requestOptions));
         } catch (Exception e) {
             log.debug("Could not set default replicas for ism history");
-        }
-
-        try {
-            client.execute((c, requestOptions) -> c.indices().putSettings(req, requestOptions));
-        } catch (Exception e) {
-            log.debug("Could not set replicas for data stream {}", dataStreamName);
         }
     }
 
