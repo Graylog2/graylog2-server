@@ -166,40 +166,40 @@ const ProfileForm = ({ initialValues = { name: '', description: '', customFieldM
                               <StyledLabel>Set up mappings</StyledLabel>
                               <HelpBlock>
                                 Here you can set up type mapping to any field.
-                            </HelpBlock>
+                              </HelpBlock>
                               <List>
                                 {(isLoading || isLoadingFieldTypes) ? <Spinner /> : customFieldMappings.map(({ field }, index) => (
 
-                            (
-                                  <Item key={index} data-testid={`custom-mapping-row-for-${field}`}>
-                                    <SelectGroup>
-                                      <Field name={`customFieldMappings.${index}.field`} required>
-                                        {({ field: { name, value, onChange }, meta: { error } }) => (
-                                          <ProfileFormSelect value={value}
-                                                             onChange={onChange}
-                                                             options={fields}
-                                                             name={name}
-                                                             error={error}
-                                                             placeholder="Select or type field name"
-                                                             allowCreate />
-                                        )}
-                                      </Field>
-                                      <Field name={`customFieldMappings.${index}.type`} required>
-                                        {({ field: { name, value, onChange }, meta: { error } }) => (
-                                          <ProfileFormSelect value={value}
-                                                             onChange={onChange}
-                                                             options={fieldTypeOptions}
-                                                             name={name}
-                                                             error={error}
-                                                             placeholder="Select field type"
-                                                             allowCreate={false} />
-                                        )}
-                                      </Field>
-                                    </SelectGroup>
-                                    {(customFieldMappings.length > 1) && <IconButton name="delete" onClick={() => (remove(index))} title="Remove mapping" />}
-                                  </Item>
-                            )
-                          ))}
+                                  (
+                                    <Item key={index} data-testid={`custom-mapping-row-for-${field}`}>
+                                      <SelectGroup>
+                                        <Field name={`customFieldMappings.${index}.field`} required>
+                                          {({ field: { name, value, onChange }, meta: { error } }) => (
+                                            <ProfileFormSelect value={value}
+                                                               onChange={onChange}
+                                                               options={fields}
+                                                               name={name}
+                                                               error={error}
+                                                               placeholder="Select or type field name"
+                                                               allowCreate />
+                                          )}
+                                        </Field>
+                                        <Field name={`customFieldMappings.${index}.type`} required>
+                                          {({ field: { name, value, onChange }, meta: { error } }) => (
+                                            <ProfileFormSelect value={value}
+                                                               onChange={onChange}
+                                                               options={fieldTypeOptions}
+                                                               name={name}
+                                                               error={error}
+                                                               placeholder="Select field type"
+                                                               allowCreate={false} />
+                                          )}
+                                        </Field>
+                                      </SelectGroup>
+                                      {(customFieldMappings.length > 1) && <IconButton name="delete" onClick={() => (remove(index))} title="Remove mapping" />}
+                                    </Item>
+                                  )
+                                ))}
                               </List>
                               <Button bsSize="xs" onClick={() => push({})} name="plus" title="Add mapping">Add mapping</Button>
                             </>
