@@ -31,7 +31,7 @@ import useLocation from 'routing/useLocation';
 import { Col, Row, Button } from 'components/bootstrap';
 import { ExternalLinkButton, Select } from 'components/common';
 import { InputForm } from 'components/inputs';
-import type { InputWithConfiguration } from 'components/messageloaders/Types';
+import type { ConfiguredInput } from 'components/messageloaders/Types';
 
 const StyledForm = styled.form`
   display: flex;
@@ -106,7 +106,7 @@ const CreateInputControl = () => {
     setShowConfigurationForm(true);
   };
 
-  const createInput = (data: InputWithConfiguration) => {
+  const createInput = (data: ConfiguredInput) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_CREATED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-create',

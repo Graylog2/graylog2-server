@@ -35,7 +35,7 @@ export interface Input extends InputBase {
   },
 }
 
-export interface InputWithConfiguration extends InputBase {
+export interface ConfiguredInput extends InputBase {
   configuration: {
     [type: string]: any,
   },

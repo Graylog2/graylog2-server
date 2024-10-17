@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import type { Input, InputWithConfiguration } from 'components/messageloaders/Types';
+import type { Input, ConfiguredInput } from 'components/messageloaders/Types';
 import { useStore } from 'stores/connect';
 import AppConfig from 'util/AppConfig';
 import { LinkContainer } from 'components/common/router';
@@ -80,7 +80,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
     });
   };
 
-  const updateInput = (inputData: InputWithConfiguration) => {
+  const updateInput = (inputData: ConfiguredInput) => {
     InputsActions.update(input.id, inputData);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_UPDATED, {
