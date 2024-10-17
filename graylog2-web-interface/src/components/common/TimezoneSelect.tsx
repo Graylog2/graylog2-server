@@ -1,10 +1,11 @@
 import React from 'react';
 import moment from 'moment-timezone';
 import uniq from 'lodash/uniq';
+import type { SelectInstance } from 'react-select';
 
 import Select from 'components/common/Select';
 
-type TimezoneSelectProps = {
+type TimezoneSelectProps = Omit<React.ComponentProps<typeof Select>, 'inputId' | 'onChange' | 'placeholder' | 'options' | 'optionRenderer'> & {
   /**
    * Function that will be called when the selected timezone changes. The
    * function will receive the new time zone identifier as argument. See
@@ -37,7 +38,7 @@ class TimezoneSelect extends React.Component<TimezoneSelectProps, {
   getValue = () => this.timezone.getValue();
 
   _formatTimezones = () => {
-    const timezones = {};
+    const timezones: { [key: string]: Array<string> } = {};
 
     // Group time zones by area
     moment.tz.names().forEach((timezone) => {
@@ -81,6 +82,8 @@ class TimezoneSelect extends React.Component<TimezoneSelectProps, {
 
     return <span key={option.value} title={option.value}>{option.label}</span>;
   };
+
+  private timezone: SelectInstance<unknown, boolean>;
 
   render() {
     const timezones = this._formatTimezones();
