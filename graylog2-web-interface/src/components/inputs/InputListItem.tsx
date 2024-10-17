@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import type { Input } from 'components/messageloaders/Types';
+import type { Input, ConfiguredInput } from 'components/messageloaders/Types';
 import { useStore } from 'stores/connect';
 import AppConfig from 'util/AppConfig';
 import { LinkContainer } from 'components/common/router';
@@ -80,13 +80,35 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
     });
   };
 
-  const updateInput = (inputData: Input) => {
+  const updateInput = (inputData: ConfiguredInput) => {
     InputsActions.update(input.id, inputData);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_UPDATED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-edit',
     });
+  };
+
+  const enterInputSetupMode = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_ENTERED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_action_value: 'input-enter-setup',
+    });
+
+    const { attributes: configuration, ...inputData } = input;
+
+    InputsActions.update(input.id, { ...inputData, configuration, setup_mode: true });
+  };
+
+  const exitInputSetupMode = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_EXITED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_action_value: 'input-exit-setup',
+    });
+
+    const { attributes: configuration, ...inputData } = input;
+
+    InputsActions.update(input.id, { ...inputData, configuration, setup_mode: false });
   };
 
   const handleConfirmDelete = () => {
@@ -176,6 +198,20 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
                   disabled={definition === undefined}>
           Edit input
         </MenuItem>
+        {input.setup_mode ? (
+          <MenuItem key={`remove-setup-mode-${input.id}`}
+                    onSelect={exitInputSetupMode}
+                    disabled={definition === undefined}>
+            Exit Setup mode
+          </MenuItem>
+        ) : (
+          <MenuItem key={`setup-mode-${input.id}`}
+                    onSelect={enterInputSetupMode}
+                    disabled={definition === undefined}>
+            Enter Setup mode
+          </MenuItem>
+        )}
+
       </IfPermitted>
 
       {input.global && (

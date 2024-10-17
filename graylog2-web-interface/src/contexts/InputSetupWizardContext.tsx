@@ -45,6 +45,9 @@ type InputSetupWizardContextType = {
   setStepData: (stepName: InputSetupWizardStep, data: object) => void,
   wizardData: WizardData,
   setWizardDataAttribute: (key: keyof WizardData, value: WizardData[typeof key]) => void,
+  show: boolean,
+  openWizard: (inputId: string) => void,
+  closeWizard: () => void,
 };
 
 const InputSetupWizardContext = React.createContext<InputSetupWizardContextType | undefined>(undefined);
