@@ -56,7 +56,7 @@ type ErrorState = {
 
 type LookupTablesStoreState = {
   pagination: PaginatedResponseType,
-  errorState: ErrorState,
+  errorStates: ErrorState,
   table: LookupTable | null,
   cache: LookupTableCache | null,
   dataAdapter: LookupTableAdapter | null,

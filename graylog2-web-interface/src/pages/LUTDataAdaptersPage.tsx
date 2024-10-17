@@ -7,19 +7,21 @@ import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
+import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
 import withHistory from 'routing/withHistory';
+import type { HistoryFunction } from 'routing/useHistory';
 
 const _saved = (history) => {
   // reset detail state
   history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
 };
 
-const _isCreating = ({ action }) => action === 'create';
+const _isCreating = ({ action }: LUTDataAdaptersPageProps) => action === 'create';
 
 const _validateAdapter = (adapter) => {
   LookupTableDataAdaptersActions.validate(adapter);
@@ -35,12 +37,22 @@ type LUTDataAdaptersPageProps = {
   location: any;
   action?: string;
   paginationQueryParameter: any;
-  history: any;
-};
+  history: HistoryFunction;
+} & ParamsContext;
 
 class LUTDataAdaptersPage extends React.Component<LUTDataAdaptersPageProps, {
   [key: string]: any;
 }> {
+  static defaultProps = {
+    errorStates: null,
+    validationErrors: {},
+    dataAdapters: null,
+    types: null,
+    pagination: null,
+    dataAdapter: null,
+    action: undefined,
+  };
+
   errorStatesTimer = undefined;
 
   errorStatesInterval = 1000;
@@ -178,16 +190,6 @@ class LUTDataAdaptersPage extends React.Component<LUTDataAdaptersPageProps, {
     );
   }
 }
-
-LUTDataAdaptersPage.defaultProps = {
-  errorStates: null,
-  validationErrors: {},
-  dataAdapters: null,
-  types: null,
-  pagination: null,
-  dataAdapter: null,
-  action: undefined,
-};
 
 export default connect(
   withHistory(withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage)))),
