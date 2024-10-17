@@ -99,7 +99,7 @@ const Label = styled.div<LabelProps>(({ value }) => css`
     : 'left: 0;'}
 `);
 
-const StyledTooltip = styled(Tooltip)(({ value }) => css`
+const StyledTooltip = styled(Tooltip)<{ value: number }>(({ value }) => css`
   position: absolute;
   top: 0;
   
