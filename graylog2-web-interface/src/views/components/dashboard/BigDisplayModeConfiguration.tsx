@@ -87,7 +87,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
              onChange={({ target: { value } }) => setRefreshInterval(Number.parseInt(value, 10))}
              required
              step={1}
-             value={refreshInterval} />
+             value={Number.isNaN(refreshInterval) ? '' : refreshInterval} />
 
       <FormGroup>
         <ControlLabel>Tabs</ControlLabel>
@@ -118,7 +118,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
              onChange={({ target: { value } }) => setQueryCycleInterval(Number.parseInt(value, 10))}
              required
              step="1"
-             value={queryCycleInterval} />
+             value={Number.isNaN(queryCycleInterval) ? '' : queryCycleInterval} />
     </BootstrapModalForm>
   );
 };
