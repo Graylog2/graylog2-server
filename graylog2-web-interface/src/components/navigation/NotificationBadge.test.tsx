@@ -46,6 +46,7 @@ describe('NotificationBadge', () => {
 
   beforeEach(() => {
     jest.restoreAllMocks();
+    jest.clearAllMocks();
   });
 
   it('triggers update of notifications', async () => {
