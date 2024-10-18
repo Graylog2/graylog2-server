@@ -35,11 +35,11 @@ const rolesList = (defaultRolesIds: Immutable.List<string>, roles: Immutable.Lis
 
 type Props = {
   authenticationBackend: DirectoryServiceBackend,
-  excludedFields: {[ inputName: string ]: boolean },
+  excludedFields?: {[ inputName: string ]: boolean }
   roles: Immutable.List<Role>,
 };
 
-const UserSyncSection = ({ authenticationBackend, roles, excludedFields }: Props) => {
+const UserSyncSection = ({ authenticationBackend, roles, excludedFields = {} }: Props) => {
   const {
     userSearchBase,
     userSearchPattern,
@@ -65,10 +65,6 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields }: Props
       <ReadOnlyFormGroup label="Default Roles" value={rolesList(defaultRoles, roles)} />
     </SectionComponent>
   );
-};
-
-UserSyncSection.defaultProps = {
-  excludedFields: {},
 };
 
 UserSyncSection.propTypes = {

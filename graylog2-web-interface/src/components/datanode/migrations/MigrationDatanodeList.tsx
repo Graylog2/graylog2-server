@@ -30,7 +30,7 @@ const StyledIcon = styled(Icon)`
   margin-right: 0.5em;
 `;
 
-const MigrationDatanodeList = ({ showProvisioningState }: Props) => {
+const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
   const { data: dataNodes, isInitialLoading } = useDataNodes();
 
   if (isInitialLoading) {
@@ -89,10 +89,6 @@ const MigrationDatanodeList = ({ showProvisioningState }: Props) => {
       )}
     </div>
   );
-};
-
-MigrationDatanodeList.defaultProps = {
-  showProvisioningState: true,
 };
 
 export default MigrationDatanodeList;

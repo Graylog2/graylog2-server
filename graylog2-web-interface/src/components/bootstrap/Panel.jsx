@@ -161,12 +161,12 @@ const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`
 const Panel = ({
   title,
   children,
-  collapsible,
-  defaultExpanded,
-  expanded,
+  collapsible = false,
+  defaultExpanded = null,
+  expanded = null,
   footer,
   header,
-  onToggle,
+  onToggle = () => {},
   ...props
 }) => {
   const [isExpanded, setIsExpanded] = useState(null);
@@ -258,16 +258,6 @@ Panel.propTypes = {
   header: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   /** @deprecated No longer used, replace with `<Panel.Title />`. */
   title: PropTypes.string,
-};
-
-Panel.defaultProps = {
-  collapsible: false,
-  defaultExpanded: null,
-  expanded: null,
-  footer: undefined,
-  header: undefined,
-  onToggle: () => {},
-  title: undefined,
 };
 
 Panel.Body = BootstrapPanel.Body;

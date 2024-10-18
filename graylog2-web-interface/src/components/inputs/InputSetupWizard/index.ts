@@ -14,13 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { WidgetActionType } from 'views/components/widgets/Types';
-import ExportWidgetPlug from 'views/components/widgets/ExportWidgetAction/ExportWidgetPlug';
 
-const ExportMessageWidgetAction: WidgetActionType = {
-  type: 'export-widget-action-plug',
-  position: 'menu',
-  component: ExportWidgetPlug,
-};
+import InputSetupWizard from './InputSetupWizard';
 
-export default ExportMessageWidgetAction;
+export default InputSetupWizard;

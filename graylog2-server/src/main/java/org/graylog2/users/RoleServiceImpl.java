@@ -28,7 +28,6 @@ import jakarta.validation.Validator;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoDBUpsertRetryer;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.security.Permissions;
@@ -204,8 +203,7 @@ public class RoleServiceImpl implements RoleService {
         if (!violations.isEmpty()) {
             throw new ValidationException("Validation failed.", violations.toString());
         }
-        return MongoDBUpsertRetryer.run(() ->
-                dbCollection.findAndModify(is(NAME_LOWER, role.nameLower()), null, null, false, role, true, true));
+        return dbCollection.findAndModify(is(NAME_LOWER, role.nameLower()), null, null, false, role, true, true);
     }
 
     @Override

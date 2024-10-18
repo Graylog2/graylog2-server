@@ -98,7 +98,7 @@ describe('SearchActionsMenu', () => {
 
   const SimpleSearchActionsMenu = ({
     loadNewView = () => Promise.resolve(),
-    onLoadView,
+    onLoadView = () => Promise.resolve(),
     ...props
   }: SimpleSearchActionsMenuProps) => (
     <TestStoreProvider>
@@ -117,11 +117,6 @@ describe('SearchActionsMenu', () => {
   const findShareButton = () => screen.findByRole('button', { name: 'Share' });
   const expectShareButton = findShareButton;
   const findCreateNewButton = () => screen.findByRole('button', { name: /create new/i });
-
-  SimpleSearchActionsMenu.defaultProps = {
-    loadNewView: () => Promise.resolve(),
-    onLoadView: () => Promise.resolve(),
-  };
 
   beforeEach(() => {
     asMock(useSaveViewFormControls).mockReturnValue([]);

@@ -43,7 +43,7 @@ const StyledRow = styled(Row)(({ theme }) => css`
 
 type Props = {
   children: React.ReactNode,
-  className: string,
+  className?: string
 };
 
 const ContentHeadRow = ({ children, className, ...props }: Props) => (
@@ -55,10 +55,6 @@ const ContentHeadRow = ({ children, className, ...props }: Props) => (
 ContentHeadRow.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
-};
-
-ContentHeadRow.defaultProps = {
-  className: undefined,
 };
 
 export default ContentHeadRow;

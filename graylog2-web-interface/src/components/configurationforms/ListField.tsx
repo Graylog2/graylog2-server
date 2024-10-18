@@ -29,10 +29,10 @@ type Props = {
   onChange: (title: string, value: Array<string>, dirty?: boolean) => void,
   title: string,
   typeName: string,
-  value: Array<string> | string,
+  value?: Array<string> | string
 };
 
-const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
+const ListField = ({ autoFocus = false, field, onChange, title, typeName, value }: Props) => {
   const handleChange = (nextValue) => {
     const values = (nextValue === '' ? [] : nextValue.split(','));
 
@@ -74,11 +74,6 @@ ListField.propTypes = {
   title: PropTypes.string.isRequired,
   typeName: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-};
-
-ListField.defaultProps = {
-  autoFocus: false,
-  value: undefined,
 };
 
 export default ListField;

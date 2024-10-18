@@ -45,13 +45,13 @@ type Props = {
 const ColumnSelect = ({
   ariaLabel,
   autoFocus,
-  allowCreate,
+  allowCreate = false,
   className,
-  clearable,
+  clearable = false,
   columns,
   columnTitle,
   id,
-  excludedColumns,
+  excludedColumns = [],
   menuPortalTarget,
   name,
   onChange,
@@ -89,21 +89,6 @@ const ColumnSelect = ({
             menuPortalTarget={menuPortalTarget}
             onChange={onChange} />
   );
-};
-
-ColumnSelect.defaultProps = {
-  allowCreate: false,
-  ariaLabel: undefined,
-  autoFocus: undefined,
-  className: undefined,
-  clearable: false,
-  excludedColumns: [],
-  onMenuClose: undefined,
-  openMenuOnFocus: undefined,
-  persistSelection: undefined,
-  placeholder: undefined,
-  selectRef: undefined,
-  menuPortalTarget: undefined,
 };
 
 export default ColumnSelect;

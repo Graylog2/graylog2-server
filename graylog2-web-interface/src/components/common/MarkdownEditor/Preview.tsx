@@ -107,7 +107,7 @@ type Props = {
   noBorder?: boolean;
 };
 
-function Preview({ value, height, show, withFullView, noBackground, noBorder }: Props) {
+function Preview({ value, height, show, withFullView = false, noBackground = false, noBorder = false }: Props) {
   const [fullView, setFullView] = React.useState<boolean>(false);
 
   return show && (
@@ -120,12 +120,5 @@ function Preview({ value, height, show, withFullView, noBackground, noBorder }: 
     </Container>
   );
 }
-
-Preview.defaultProps = {
-  withFullView: false,
-  noBackground: false,
-  noBorder: false,
-  height: undefined,
-};
 
 export default Preview;

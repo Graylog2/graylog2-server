@@ -46,7 +46,7 @@ type Props = CreatableProps<any, boolean, any> & {
   help?: React.ReactNode,
 };
 
-const InputList = ({ name, values, onChange, label, size, bsStyle, error, help, ...rest }: Props) => {
+const InputList = ({ name, values, onChange, label = null, size = 'normal', bsStyle = null, error = null, help = null, ...rest }: Props) => {
   const { inputListTheme, styles } = useInputListStyles(size);
   const inputRef = React.useRef(null);
   const [inputValue, setInputValue] = React.useState<string>('');
@@ -100,14 +100,6 @@ const InputList = ({ name, values, onChange, label, size, bsStyle, error, help, 
       <InputDescription error={error} help={help} />
     </FormGroup>
   );
-};
-
-InputList.defaultProps = {
-  label: null,
-  size: 'normal',
-  bsStyle: null,
-  error: null,
-  help: null,
 };
 
 export default InputList;

@@ -39,7 +39,7 @@ const _checkPermissions = (permissions, anyPermissions, currentUser) => {
   return isPermitted(currentUser.permissions, permissions);
 };
 
-const IfPermitted = ({ children, permissions, anyPermissions, ...rest }: Props) => {
+const IfPermitted = ({ children, permissions, anyPermissions = false, ...rest }: Props) => {
   const currentUser = useCurrentUser();
 
   if ((!permissions || permissions.length === 0) || (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))) {
@@ -77,10 +77,6 @@ IfPermitted.propTypes = {
   ]).isRequired,
   /** This flag controls which permissions the user must fulfill: (all, at least one). */
   anyPermissions: PropTypes.bool,
-};
-
-IfPermitted.defaultProps = {
-  anyPermissions: false,
 };
 
 /** @component */

@@ -22,10 +22,10 @@ import Spinner from 'components/common/Spinner';
 import LoginChrome from 'components/login/LoginChrome';
 
 type Props = {
-  text: string,
+  text?: string
 };
 
-const LoadingPage = ({ text }: Props) => (
+const LoadingPage = ({ text = 'Loading, please wait...' }: Props) => (
   <DocumentTitle title="Loading...">
     <LoginChrome>
       <Spinner text={text} delay={0} />
@@ -35,10 +35,6 @@ const LoadingPage = ({ text }: Props) => (
 
 LoadingPage.propTypes = {
   text: PropTypes.string,
-};
-
-LoadingPage.defaultProps = {
-  text: 'Loading, please wait...',
 };
 
 export default LoadingPage;

@@ -19,10 +19,10 @@ package org.graylog.events.processor;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoDBUpsertRetryer;
 import org.joda.time.DateTime;
 import org.mongojack.DBQuery;
 import org.mongojack.DBUpdate;
@@ -31,8 +31,6 @@ import org.mongojack.UpdateOperationValue;
 import org.mongojack.internal.update.SingleUpdateOperationValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Optional;
 import java.util.Set;
@@ -140,7 +138,7 @@ public class DBEventProcessorStateService {
                 .addOperation("$min", FIELD_MIN_PROCESSED_TIMESTAMP, updateValue(minProcessedTimestamp))
                 .addOperation("$max", FIELD_MAX_PROCESSED_TIMESTAMP, updateValue(maxProcessedTimestamp));
 
-        return Optional.ofNullable(MongoDBUpsertRetryer.run(() -> db.findAndModify(
+        return Optional.ofNullable(db.findAndModify(
                 // We have a unique index on the eventDefinitionId so this query is enough
                 DBQuery.is(FIELD_EVENT_DEFINITION_ID, eventDefinitionId),
                 null,
@@ -148,7 +146,7 @@ public class DBEventProcessorStateService {
                 false,
                 update,
                 true, // We want to return the updated document to the caller
-                true)));
+                true));
     }
 
     /**

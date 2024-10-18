@@ -21,12 +21,12 @@ import { ExternalLinkButton } from 'components/common';
 import { ButtonToolbar } from 'components/bootstrap';
 
 type Props = {
-  href: string,
+  href?: string
   clusterId?: string,
-  children: React.ReactNode,
+  children?: React.ReactNode
 }
 
-const ProductLink = ({ href, clusterId, children } : Props) => {
+const ProductLink = ({ href = '', clusterId, children } : Props) => {
   let hrefWithParam = href;
 
   if (clusterId) {
@@ -49,12 +49,6 @@ ProductLink.propTypes = {
   href: PropTypes.string,
   clusterId: PropTypes.string,
   children: PropTypes.node,
-};
-
-ProductLink.defaultProps = {
-  href: '',
-  clusterId: undefined,
-  children: undefined,
 };
 
 export default ProductLink;

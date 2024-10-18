@@ -37,8 +37,8 @@ import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  action: 'create' | 'edit',
-  entityTypes: any,
+  action?: 'create' | 'edit'
+  entityTypes?: any
   eventDefinition: EventDefinition,
   validation: {
     errors: {
@@ -51,7 +51,7 @@ type Props = {
   canEdit: boolean,
 }
 
-const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange, canEdit }: Props) => {
+const EventConditionForm = ({ action = 'create', entityTypes, eventDefinition, validation, currentUser, onChange, canEdit }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
@@ -183,11 +183,6 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
       )}
     </Row>
   );
-};
-
-EventConditionForm.defaultProps = {
-  action: 'create',
-  entityTypes: undefined,
 };
 
 EventConditionForm.propTypes = {

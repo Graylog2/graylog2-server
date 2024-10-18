@@ -26,8 +26,4 @@ InputWrapper.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-InputWrapper.defaultProps = {
-  className: undefined,
-};
-
 export default InputWrapper;

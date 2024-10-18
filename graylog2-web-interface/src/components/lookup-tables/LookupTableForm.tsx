@@ -53,11 +53,11 @@ const INIT_TABLE_VALUES: LookupTableType = {
 
 type Props = {
   saved: () => void,
-  create: boolean,
-  table: LookupTableType,
+  create?: boolean
+  table?: LookupTableType
 };
 
-const LookupTableForm = ({ saved, create, table }: Props) => {
+const LookupTableForm = ({ saved, create = true, table = INIT_TABLE_VALUES }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
@@ -260,11 +260,6 @@ LookupTableForm.propTypes = {
   saved: PropTypes.func.isRequired,
   create: PropTypes.bool,
   table: PropTypes.object,
-};
-
-LookupTableForm.defaultProps = {
-  create: true,
-  table: INIT_TABLE_VALUES,
 };
 
 export default LookupTableForm;
