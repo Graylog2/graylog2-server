@@ -39,7 +39,7 @@ const NumberRefExpression = ({
   expression,
   onChange,
   renderLabel,
-  validation,
+  validation = {},
 }) => {
   const getSeries = useCallback((seriesId) => eventDefinition?.config?.series?.find((series) => series.id === seriesId), [eventDefinition?.config?.series]);
 
@@ -154,10 +154,6 @@ NumberRefExpression.propTypes = {
   onChange: PropTypes.func.isRequired,
   renderLabel: PropTypes.bool.isRequired,
   validation: PropTypes.object,
-};
-
-NumberRefExpression.defaultProps = {
-  validation: {},
 };
 
 export default NumberRefExpression;

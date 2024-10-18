@@ -79,15 +79,15 @@ const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryVal
 // This is just a very basic query input which can be implemented for example to display a read only query.
 const BasicQueryInput = forwardRef<any, Props>((props, ref) => {
   const {
-    className,
-    disabled,
+    className = '',
+    disabled = false,
     error,
     height,
-    maxLines,
-    placeholder,
-    value,
+    maxLines = 4,
+    placeholder = '',
+    value = '',
     warning,
-    wrapEnabled,
+    wrapEnabled = true,
     onLoad,
     inputId,
   } = props;
@@ -141,7 +141,7 @@ const BasicQueryInput = forwardRef<any, Props>((props, ref) => {
     const {
       onBlur,
       onChange,
-      enableAutocompletion,
+      enableAutocompletion = false,
     } = props;
 
     return (
@@ -172,23 +172,6 @@ BasicQueryInput.propTypes = {
   value: PropTypes.string,
   warning: PropTypes.any,
   wrapEnabled: PropTypes.bool,
-};
-
-BasicQueryInput.defaultProps = {
-  className: '',
-  disabled: false,
-  enableAutocompletion: false,
-  error: undefined,
-  height: undefined,
-  inputId: undefined,
-  maxLines: 4,
-  onBlur: undefined,
-  onChange: undefined,
-  onLoad: undefined,
-  placeholder: '',
-  value: '',
-  warning: undefined,
-  wrapEnabled: true,
 };
 
 export default React.memo(BasicQueryInput);

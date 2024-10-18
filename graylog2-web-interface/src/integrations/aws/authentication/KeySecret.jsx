@@ -56,9 +56,4 @@ KeySecret.propTypes = {
   awsSecret: PropTypes.object,
 };
 
-KeySecret.defaultProps = {
-  awsKey: undefined,
-  awsSecret: undefined,
-};
-
 export default KeySecret;

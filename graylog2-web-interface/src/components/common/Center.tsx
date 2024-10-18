@@ -32,14 +32,10 @@ type Props = {
 /**
  * This component centers its children horizontally and vertically.
  */
-const Center = ({ children, fullHeight }: Props) => (
+const Center = ({ children, fullHeight = true }: Props) => (
   <Container $fullHeight={fullHeight}>
     {children}
   </Container>
 );
-
-Center.defaultProps = {
-  fullHeight: true,
-};
 
 export default Center;

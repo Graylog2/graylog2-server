@@ -99,8 +99,4 @@ const TableRow = <Entity extends EntityBase>({
   );
 };
 
-TableRow.defaultProps = {
-  actions: undefined,
-};
-
 export default React.memo(TableRow);

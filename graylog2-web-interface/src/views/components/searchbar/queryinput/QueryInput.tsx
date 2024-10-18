@@ -248,10 +248,10 @@ type Props = BaseProps & {
 };
 
 const QueryInput = React.forwardRef<Editor, Props>(({
-  className,
-  commands,
+  className = '',
+  commands = [],
   completerFactory = defaultCompleterFactory,
-  disableExecution,
+  disableExecution = false,
   error,
   height,
   inputId,
@@ -260,10 +260,10 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   onBlur,
   onChange,
   onExecute: onExecuteProp,
-  placeholder,
+  placeholder = '',
   streams,
   timeRange,
-  value,
+  value = '',
   validate,
   warning,
   wrapEnabled,
@@ -375,25 +375,6 @@ QueryInput.propTypes = {
   warning: PropTypes.any,
   wrapEnabled: PropTypes.bool,
   validate: PropTypes.func.isRequired,
-};
-
-QueryInput.defaultProps = {
-  className: '',
-  commands: [],
-  completerFactory: defaultCompleterFactory,
-  disableExecution: false,
-  error: undefined,
-  height: undefined,
-  inputId: undefined,
-  maxLines: undefined,
-  onBlur: undefined,
-  placeholder: '',
-  streams: undefined,
-  timeRange: undefined,
-  value: '',
-  warning: undefined,
-  wrapEnabled: undefined,
-  view: undefined,
 };
 
 export default QueryInput;

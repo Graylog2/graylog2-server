@@ -50,8 +50,4 @@ const DefaultQueryClientProvider = ({ children, options: optionsProp }: Props) =
   );
 };
 
-DefaultQueryClientProvider.defaultProps = {
-  options: undefined,
-};
-
 export default DefaultQueryClientProvider;

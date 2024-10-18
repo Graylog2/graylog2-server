@@ -25,9 +25,9 @@ import BootstrapModalWrapper from './BootstrapModalWrapper';
 type Props = {
   showModal: boolean,
   title: string | React.ReactNode,
-  confirmButtonText: string,
-  cancelButtonDisabled: boolean,
-  confirmButtonDisabled: boolean,
+  confirmButtonText?: string
+  cancelButtonDisabled?: boolean
+  confirmButtonDisabled?: boolean
   onConfirm: (e: React.BaseSyntheticEvent) => void,
   onCancel: () => void,
   children: React.ReactNode,
@@ -41,9 +41,9 @@ const BootstrapModalConfirm = ({
   showModal,
   title,
   children,
-  cancelButtonDisabled,
-  confirmButtonDisabled,
-  confirmButtonText,
+  cancelButtonDisabled = false,
+  confirmButtonDisabled = false,
+  confirmButtonText = 'Confirm',
   onCancel,
   onConfirm,
   ...restProps
@@ -100,12 +100,6 @@ BootstrapModalConfirm.propTypes = {
     PropTypes.string,
     PropTypes.element,
   ]).isRequired,
-};
-
-BootstrapModalConfirm.defaultProps = {
-  confirmButtonText: 'Confirm',
-  cancelButtonDisabled: false,
-  confirmButtonDisabled: false,
 };
 
 export default BootstrapModalConfirm;

@@ -64,7 +64,7 @@ type Props = {
   onSaveMessage?: (message: string) => void,
 };
 
-const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
+const RuleSimulation = ({ rule: currentRule, onSaveMessage = () => {} }: Props) => {
   const {
     rule,
     simulateRule,
@@ -231,11 +231,6 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
 RuleSimulation.propTypes = {
   rule: PropTypes.object,
   onSaveMessage: PropTypes.func,
-};
-
-RuleSimulation.defaultProps = {
-  rule: undefined,
-  onSaveMessage: () => {},
 };
 
 export default RuleSimulation;

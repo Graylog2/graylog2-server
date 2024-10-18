@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 
-const AdditionalFields = ({ children, className, onToggle, title, visible }) => {
+const AdditionalFields = ({ children, className, onToggle = () => {}, title, visible = false }) => {
   const [fieldsVisible, setFieldsVisible] = useState(visible);
 
   const handleToggle = () => {
@@ -48,12 +48,6 @@ AdditionalFields.propTypes = {
   onToggle: PropTypes.func,
   visible: PropTypes.bool,
   className: PropTypes.string,
-};
-
-AdditionalFields.defaultProps = {
-  onToggle: () => {},
-  visible: false,
-  className: undefined,
 };
 
 const AdditionalFieldsContent = styled.div`

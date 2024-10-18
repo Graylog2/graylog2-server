@@ -42,12 +42,12 @@ then
 end`;
 
 type Props = {
-  functionDescriptors: Array<BlockDict>,
+  functionDescriptors?: Array<BlockDict>
   paginationQueryParameter: any,
-  hideExampleTab: boolean,
+  hideExampleTab?: boolean
 }
 
-const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExampleTab } : Props) => {
+const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExampleTab = false } : Props) => {
   const [expanded, setExpanded] = useState<{ [key: string]: boolean}>({});
   const [currentPage, setCurrentPage] = useState<number>(paginationQueryParameter.page);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -187,11 +187,6 @@ RuleHelper.propTypes = {
   functionDescriptors: PropTypes.array,
   paginationQueryParameter: PropTypes.object.isRequired,
   hideExampleTab: PropTypes.bool,
-};
-
-RuleHelper.defaultProps = {
-  functionDescriptors: undefined,
-  hideExampleTab: false,
 };
 
 export default connect(withPaginationQueryParameter(RuleHelper),

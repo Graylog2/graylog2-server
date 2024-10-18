@@ -185,8 +185,4 @@ DataTieringConfiguration.propTypes = {
   valuesPrefix: PropTypes.string,
 };
 
-DataTieringConfiguration.defaultProps = {
-  valuesPrefix: undefined,
-};
-
 export default DataTieringConfiguration;

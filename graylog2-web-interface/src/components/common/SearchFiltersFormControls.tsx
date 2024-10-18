@@ -29,7 +29,7 @@ type Props = {
   hideFiltersPreview?: (val: boolean) => void,
 };
 
-function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview }: Props) {
+function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview = () => {} }: Props) {
   const searchFiltersPlugin = usePluginEntities('eventDefinitions.components.searchForm') ?? [];
   const pluggableControls = searchFiltersPlugin.map((controlFn) => controlFn()).filter((control) => !!control);
 
@@ -62,9 +62,5 @@ function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview }: Pr
     </Formik>
   );
 }
-
-SearchFiltersFormControls.defaultProps = {
-  hideFiltersPreview: () => {},
-};
 
 export default SearchFiltersFormControls;

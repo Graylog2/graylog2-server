@@ -55,8 +55,4 @@ EmbeddedCloudWatchApp.propTypes = {
   onSubmit: PropTypes.func,
 };
 
-EmbeddedCloudWatchApp.defaultProps = {
-  onSubmit: undefined,
-};
-
 export default EmbeddedCloudWatchApp;

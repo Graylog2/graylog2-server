@@ -46,10 +46,6 @@ MaskedInput.propTypes = {
   className: PropTypes.string,
 };
 
-MaskedInput.defaultProps = {
-  className: undefined,
-};
-
 const LabelWrapper = styled.span`
   display: flex;
   align-items: center;

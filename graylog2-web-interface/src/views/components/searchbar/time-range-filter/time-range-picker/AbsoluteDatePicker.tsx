@@ -28,7 +28,7 @@ type Props = {
   startDate?: Date,
 }
 
-const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
+const AbsoluteDatePicker = ({ dateTime, onChange = () => {}, startDate }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
   const initialDateTime = toUTCFromTz(dateTime, userTimezone);
   const initialDate = formatTime(initialDateTime, 'date');
@@ -60,11 +60,6 @@ AbsoluteDatePicker.propTypes = {
   dateTime: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   startDate: PropTypes.instanceOf(Date),
-};
-
-AbsoluteDatePicker.defaultProps = {
-  onChange: () => {},
-  startDate: undefined,
 };
 
 export default AbsoluteDatePicker;

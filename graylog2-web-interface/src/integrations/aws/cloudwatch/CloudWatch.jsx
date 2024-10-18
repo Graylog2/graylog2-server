@@ -34,7 +34,7 @@ import StepHealthCheck from './StepHealthCheck';
 import StepReview from './StepReview';
 import SidebarPermissions from './SidebarPermissions';
 
-const CloudWatch = ({ externalInputSubmit, onSubmit }) => {
+const CloudWatch = ({ externalInputSubmit = false, onSubmit }) => {
   const {
     availableSteps,
     currentStep,
@@ -155,11 +155,6 @@ const CloudWatch = ({ externalInputSubmit, onSubmit }) => {
 CloudWatch.propTypes = {
   externalInputSubmit: PropTypes.bool,
   onSubmit: PropTypes.func,
-};
-
-CloudWatch.defaultProps = {
-  externalInputSubmit: false,
-  onSubmit: undefined,
 };
 
 export default CloudWatch;

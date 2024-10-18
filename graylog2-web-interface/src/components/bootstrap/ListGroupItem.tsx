@@ -153,21 +153,10 @@ type Props = React.PropsWithChildren<{
   onClick?:() => void
 }>
 
-const ListGroupItem = forwardRef<HTMLElement, Props>(({ containerProps, ...rest }, ref) => (
+const ListGroupItem = forwardRef<HTMLElement, Props>(({ containerProps = {}, ...rest }, ref) => (
   <RefContainer ref={ref} {...containerProps}>
     <StyledListGroupItem {...rest} />
   </RefContainer>
 ));
-
-ListGroupItem.defaultProps = {
-  active: undefined,
-  bsStyle: undefined,
-  className: undefined,
-  containerProps: {},
-  disabled: undefined,
-  header: undefined,
-  href: undefined,
-  onClick: undefined,
-};
 
 export default ListGroupItem;

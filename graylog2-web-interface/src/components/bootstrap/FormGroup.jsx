@@ -74,7 +74,7 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
 `;
 });
 
-const FormGroup = memo(({ children, validationState, ...props }) => (
+const FormGroup = memo(({ children, validationState = null, ...props }) => (
   <StyledFormGroup validationState={validationState} {...props}>
     {children}
   </StyledFormGroup>
@@ -83,10 +83,6 @@ const FormGroup = memo(({ children, validationState, ...props }) => (
 FormGroup.propTypes = {
   children: PropTypes.node.isRequired,
   validationState: PropTypes.oneOf([null, 'error', 'success', 'warning']),
-};
-
-FormGroup.defaultProps = {
-  validationState: null,
 };
 
 export default FormGroup;

@@ -23,7 +23,7 @@ type Props = {
   displayPageLayout?: boolean,
 }
 
-const NotFoundPage = ({ displayPageLayout }: Props) => {
+const NotFoundPage = ({ displayPageLayout = true }: Props) => {
   const description = (
     <>
       <p>The party gorilla was just here, but had another party to rock.</p>
@@ -36,10 +36,6 @@ const NotFoundPage = ({ displayPageLayout }: Props) => {
 
 NotFoundPage.propTypes = {
   displayPageLayout: PropTypes.bool,
-};
-
-NotFoundPage.defaultProps = {
-  displayPageLayout: true,
 };
 
 export default NotFoundPage;

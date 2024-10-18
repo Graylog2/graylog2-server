@@ -32,8 +32,8 @@ import type { TimeRangePickerFormValues } from './TimeRangePicker';
 import RelativeRangeSelect from './RelativeRangeSelect';
 
 type Props = {
-  disabled: boolean,
-  limitDuration: number,
+  disabled?: boolean
+  limitDuration?: number
 };
 
 const RelativeWrapper = styled.div`
@@ -47,7 +47,7 @@ const StyledIcon = styled(Icon)`
   flex: 0.75;
 `;
 
-const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
+const TabRelativeTimeRange = ({ disabled = false, limitDuration = 0 }: Props) => {
   const { values: { timeRangeTabs }, setFieldValue } = useFormikContext<TimeRangePickerFormValues>();
   const activeTabTimeRange = timeRangeTabs.relative;
   const disableUntil = disabled || (isTypeRelativeWithEnd(activeTabTimeRange) && activeTabTimeRange.from === RELATIVE_ALL_TIME);
@@ -82,11 +82,6 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
 TabRelativeTimeRange.propTypes = {
   limitDuration: PropTypes.number,
   disabled: PropTypes.bool,
-};
-
-TabRelativeTimeRange.defaultProps = {
-  disabled: false,
-  limitDuration: 0,
 };
 
 export default TabRelativeTimeRange;

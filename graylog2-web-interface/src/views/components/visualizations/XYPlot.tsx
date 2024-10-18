@@ -72,11 +72,11 @@ const mapAxisType = (axisType: AxisType): 'linear' | 'log' => {
 const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({ line: { color: colors.get(chart.originalName ?? chart.name) } });
 
 const XYPlot = ({
-  axisType,
+  axisType = DEFAULT_AXIS_TYPE,
   config,
   chartData,
   effectiveTimerange,
-  setChartColor,
+  setChartColor = defaultSetColor,
   height,
   width,
   plotLayout = {},
@@ -139,14 +139,6 @@ XYPlot.propTypes = {
   plotLayout: PropTypes.object,
   setChartColor: PropTypes.func,
   onZoom: PropTypes.func,
-};
-
-XYPlot.defaultProps = {
-  axisType: DEFAULT_AXIS_TYPE,
-  plotLayout: {},
-  setChartColor: defaultSetColor,
-  effectiveTimerange: undefined,
-  onZoom: undefined,
 };
 
 export default XYPlot;

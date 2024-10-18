@@ -49,9 +49,4 @@ InactiveNavItem.propTypes = {
   className: PropTypes.string,
 };
 
-InactiveNavItem.defaultProps = {
-  active: undefined,
-  className: undefined,
-};
-
 export default InactiveNavItem;

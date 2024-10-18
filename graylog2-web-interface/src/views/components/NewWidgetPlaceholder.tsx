@@ -60,7 +60,7 @@ type Props = {
   component: React.ComponentType<ChildProps>,
 }
 
-const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style, position, component: Component }, ref) => {
+const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style = {}, position, component: Component }, ref) => {
   const [show, setShow] = useState(false);
   const onCancel = useCallback(() => setShow(false), []);
   const onClick = useCallback(() => setShow(true), []);
@@ -80,9 +80,5 @@ const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style, p
     </div>
   );
 });
-
-NewWidgetPlaceholder.defaultProps = {
-  style: {},
-};
 
 export default NewWidgetPlaceholder;

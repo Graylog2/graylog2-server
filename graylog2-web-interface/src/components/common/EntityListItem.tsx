@@ -116,11 +116,4 @@ EntityListItem.propTypes = {
   contentRow: PropTypes.node,
 };
 
-EntityListItem.defaultProps = {
-  actions: undefined,
-  contentRow: undefined,
-  description: undefined,
-  titleSuffix: undefined,
-};
-
 export default EntityListItem;

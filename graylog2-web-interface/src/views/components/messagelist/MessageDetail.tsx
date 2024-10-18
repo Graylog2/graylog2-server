@@ -68,7 +68,7 @@ type Props = {
   disableSurroundingSearch?: boolean,
   disableTestAgainstStream?: boolean,
   expandAllRenderAsync?: boolean,
-  fields: FieldTypeMappingsList,
+  fields?: FieldTypeMappingsList
   inputs?: Immutable.Map<string, Input>,
   message: Message,
   showTimestamp?: boolean,
@@ -76,16 +76,16 @@ type Props = {
 };
 
 const MessageDetail = ({
-  disableMessageActions,
-  disableSurroundingSearch,
-  disableTestAgainstStream,
-  expandAllRenderAsync,
-  fields: messageFields,
+  disableMessageActions = false,
+  disableSurroundingSearch = false,
+  disableTestAgainstStream = false,
+  expandAllRenderAsync = false,
+  fields: messageFields = Immutable.List(),
   message,
-  streams,
-  inputs,
-  showTimestamp,
-  allStreams,
+  streams = Immutable.Map(),
+  inputs = Immutable.Map(),
+  showTimestamp = true,
+  allStreams = Immutable.List(),
 }: Props) => {
   const { config: searchesClusterConfig } = useSearchConfiguration();
   const [showOriginal, setShowOriginal] = useState(false);
@@ -198,18 +198,6 @@ MessageDetail.propTypes = {
   message: CustomPropTypes.Message.isRequired,
   showTimestamp: PropTypes.bool,
   streams: ImmutablePropTypes.map,
-};
-
-MessageDetail.defaultProps = {
-  allStreams: Immutable.List(),
-  disableMessageActions: false,
-  disableSurroundingSearch: false,
-  disableTestAgainstStream: false,
-  expandAllRenderAsync: false,
-  fields: Immutable.List(),
-  inputs: Immutable.Map(),
-  showTimestamp: true,
-  streams: Immutable.Map(),
 };
 
 export default MessageDetail;

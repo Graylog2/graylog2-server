@@ -58,7 +58,11 @@ type Props = {
 }
 
 const StreamModal = ({
-  initialValues,
+  initialValues = {
+    title: '',
+    description: '',
+    remove_matches_from_default_stream: false,
+  },
   title: modalTitle,
   submitButtonText,
   submitLoadingText,
@@ -121,14 +125,6 @@ const StreamModal = ({
       </Formik>
     </Modal>
   );
-};
-
-StreamModal.defaultProps = {
-  initialValues: {
-    title: '',
-    description: '',
-    remove_matches_from_default_stream: false,
-  },
 };
 
 export default StreamModal;

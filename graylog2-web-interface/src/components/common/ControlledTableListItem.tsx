@@ -30,8 +30,4 @@ ControlledTableListItem.propTypes = {
   className: PropTypes.string,
 };
 
-ControlledTableListItem.defaultProps = {
-  className: undefined,
-};
-
 export default ControlledTableListItem;

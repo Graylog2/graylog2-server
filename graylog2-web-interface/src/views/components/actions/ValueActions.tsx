@@ -29,13 +29,13 @@ type Props = {
   children: React.ReactNode,
   element: React.ReactNode,
   field: string,
-  menuContainer: HTMLElement | undefined | null,
+  menuContainer?: HTMLElement | undefined | null
   queryId: QueryId,
-  type: FieldType,
+  type?: FieldType
   value: React.ReactNode,
 };
 
-const ValueActions = ({ children, element, field, menuContainer, queryId, type, value }: Props) => {
+const ValueActions = ({ children, element, field, menuContainer = document.body, queryId, type = FieldType.Unknown, value }: Props) => {
   const actionContext = useContext(ActionContext);
   const handlerArgs = useMemo(() => ({ queryId, field, type, value, contexts: actionContext }), [actionContext, field, queryId, type, value]);
   const elementWithStatus = (() => element) as React.ComponentType<{ active: boolean }>;
@@ -55,11 +55,6 @@ ValueActions.propTypes = {
   queryId: PropTypes.string.isRequired,
   type: CustomPropTypes.FieldType,
   value: PropTypes.oneOfType([PropTypes.node, PropTypes.object]).isRequired,
-};
-
-ValueActions.defaultProps = {
-  menuContainer: document.body,
-  type: FieldType.Unknown,
 };
 
 export default ValueActions;

@@ -36,7 +36,7 @@ type Props = {
   name: string,
 }
 
-const SortConfiguration = ({ name: attributeName, directions, columns, columnTitle, directionTitle }: Props) => {
+const SortConfiguration = ({ name: attributeName, directions, columns, columnTitle = (column: string) => column, directionTitle = (direction: string) => direction }: Props) => {
   const { values } = useFormikContext();
   const columnOptions = useMemo(() => (
     columns
@@ -93,11 +93,6 @@ const SortConfiguration = ({ name: attributeName, directions, columns, columnTit
       </Field>
     </Container>
   );
-};
-
-SortConfiguration.defaultProps = {
-  columnTitle: (column: string) => column,
-  directionTitle: (direction: string) => direction,
 };
 
 export default SortConfiguration;

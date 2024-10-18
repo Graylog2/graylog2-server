@@ -28,17 +28,17 @@ import { triggerInput } from 'util/FormsUtils';
 type Props = {
   label: string,
   onChange: (event: SyntheticEvent<EventTarget>) => void,
-  validationMessage: string,
-  validationState: string,
-  url: string,
+  validationMessage?: string
+  validationState?: string
+  url?: string
   onValidationChange?: (validationState: string) => void,
-  labelClassName: string,
-  wrapperClassName: string,
-  urlType: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'],
-  autofocus: boolean,
+  labelClassName?: string
+  wrapperClassName?: string
+  urlType?: React.ComponentProps<typeof URLWhiteListFormModal>['urlType']
+  autofocus?: boolean
 };
 
-const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, onValidationChange, labelClassName, wrapperClassName, urlType, autofocus }: Props) => {
+const URLWhiteListInput = ({ label, onChange, validationMessage = '', validationState = '', url = '', onValidationChange = () => {}, labelClassName = '', wrapperClassName = '', urlType = 'literal', autofocus = true }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
@@ -142,17 +142,6 @@ URLWhiteListInput.propTypes = {
   labelClassName: PropTypes.string,
   wrapperClassName: PropTypes.string,
   urlType: PropTypes.oneOf(['regex', 'literal']),
-};
-
-URLWhiteListInput.defaultProps = {
-  autofocus: true,
-  url: '',
-  validationState: '',
-  validationMessage: '',
-  labelClassName: '',
-  wrapperClassName: '',
-  urlType: 'literal',
-  onValidationChange: () => {},
 };
 
 export default URLWhiteListInput;

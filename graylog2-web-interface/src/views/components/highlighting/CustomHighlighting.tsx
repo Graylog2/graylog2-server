@@ -58,9 +58,4 @@ CustomHighlighting.propTypes = {
   value: PropTypes.any,
 };
 
-CustomHighlighting.defaultProps = {
-  children: undefined,
-  value: undefined,
-};
-
 export default CustomHighlighting;

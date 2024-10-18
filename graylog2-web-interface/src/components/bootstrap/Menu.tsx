@@ -36,7 +36,7 @@ type Props = PropsWithChildren<{
 
 const Menu = ({
   children,
-  closeOnItemClick,
+  closeOnItemClick = true,
   keepMounted,
   offset,
   onChange,
@@ -46,7 +46,7 @@ const Menu = ({
   position,
   shadow,
   width,
-  withinPortal,
+  withinPortal = false,
   zIndex,
 }: Props) => (
   <MantineMenu closeOnItemClick={closeOnItemClick}
@@ -97,20 +97,5 @@ Menu.Dropdown = styled(MantineMenu.Dropdown)(({ theme }) => css`
 Menu.Item = StyledMenuItem;
 Menu.Divider = StyledMenuDivider;
 Menu.Label = StyledMenuLabel;
-
-Menu.defaultProps = {
-  closeOnItemClick: true,
-  keepMounted: undefined,
-  offset: undefined,
-  onChange: undefined,
-  onClose: undefined,
-  opened: undefined,
-  portalProps: undefined,
-  position: undefined,
-  shadow: undefined,
-  width: undefined,
-  withinPortal: false,
-  zIndex: undefined,
-};
 
 export default Menu;

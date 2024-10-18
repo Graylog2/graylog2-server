@@ -33,7 +33,7 @@ const StyledPanelGroup = styled(PanelGroup)`
   margin-bottom: 0;
 `;
 
-const Accordion = ({ activeKey, children, id, onSelect, ...restProps }:Props) => {
+const Accordion = ({ activeKey, children, id, onSelect = () => {}, ...restProps }:Props) => {
   const cleanActiveKey = activeKey?.replace(/[^0-9a-zA-Z-]/g, '-').toLowerCase();
   const _onSelect = useCallback((eventKey: any) => onSelect(eventKey), [onSelect]);
 
@@ -53,12 +53,6 @@ Accordion.propTypes = {
   children: PropTypes.node.isRequired,
   id: PropTypes.string.isRequired,
   onSelect: PropTypes.func,
-};
-
-Accordion.defaultProps = {
-  activeKey: undefined,
-  defaultActiveKey: undefined,
-  onSelect: () => {},
 };
 
 export default Accordion;

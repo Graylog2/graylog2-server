@@ -81,7 +81,7 @@ type Props = {
   showRightControls?: boolean,
 }
 
-const PluggableSearchBarControls = ({ showLeftControls, showRightControls }: Props) => {
+const PluggableSearchBarControls = ({ showLeftControls = true, showRightControls = true }: Props) => {
   const [hidePluggableControlsPreview, setHidePluggableControlsPreview] = useState(() => !!Store.get(PLUGGABLE_CONTROLS_HIDDEN_KEY));
   const { leftControls, rightControls } = usePluggableControls();
   const hasPluggableControls = !!(leftControls?.length || rightControls?.length);
@@ -116,11 +116,6 @@ const PluggableSearchBarControls = ({ showLeftControls, showRightControls }: Pro
       <div>{showRightControls && renderControls(rightControls)}</div>
     </Container>
   );
-};
-
-PluggableSearchBarControls.defaultProps = {
-  showLeftControls: true,
-  showRightControls: true,
 };
 
 export default PluggableSearchBarControls;

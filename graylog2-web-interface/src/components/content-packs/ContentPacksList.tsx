@@ -34,10 +34,10 @@ import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import type { ContentPackInstallation, ContentPackMetadata } from './Types';
 
 type Props = {
-  contentPacks: Array<ContentPackInstallation>,
-  contentPackMetadata: ContentPackMetadata,
-  onDeletePack: (id: string) => void,
-  onInstall: (id: string, contentPackRev: string, parameters: unknown) => void,
+  contentPacks?: Array<ContentPackInstallation>
+  contentPackMetadata?: ContentPackMetadata
+  onDeletePack?: (id: string) => void
+  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void
 };
 
 const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => css`
@@ -47,7 +47,7 @@ const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => css`
   float: right;
 `);
 
-const ContentPacksList = ({ contentPacks, contentPackMetadata, onDeletePack, onInstall }: Props) => {
+const ContentPacksList = ({ contentPacks = [], contentPackMetadata = {}, onDeletePack = () => {}, onInstall = () => {} }: Props) => {
   const [filteredContentPacks, setFilteredContentPacks] = useState(contentPacks);
   const [paginationOption, setPaginationOption] = useState(DEFAULT_PAGINATION);
 
@@ -143,13 +143,6 @@ ContentPacksList.propTypes = {
   contentPackMetadata: PropTypes.object,
   onDeletePack: PropTypes.func,
   onInstall: PropTypes.func,
-};
-
-ContentPacksList.defaultProps = {
-  contentPacks: [],
-  contentPackMetadata: {},
-  onDeletePack: () => {},
-  onInstall: () => {},
 };
 
 export default ContentPacksList;

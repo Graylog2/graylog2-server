@@ -60,14 +60,4 @@ const Switch = ({
                 style={style} />
 );
 
-Switch.defaultProps = {
-  'aria-label': undefined,
-  className: undefined,
-  disabled: undefined,
-  id: undefined,
-  label: undefined,
-  name: undefined,
-  style: undefined,
-};
-
 export default Switch;

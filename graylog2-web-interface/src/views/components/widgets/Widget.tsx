@@ -62,7 +62,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 export type Props = {
   id: string,
   widget: WidgetModel,
-  editing: boolean,
+  editing?: boolean
   title: string,
   position: WidgetPosition,
   onPositionsChange: (position: BackendWidgetPosition) => void,
@@ -195,7 +195,7 @@ const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: 
   return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
 };
 
-const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Props) => {
+const Widget = ({ id, editing = false, widget, title, position, onPositionsChange }: Props) => {
   const viewType = useViewType();
   const fields = useQueryFieldTypes();
   const { stopAutoRefresh } = useAutoRefresh();
@@ -314,10 +314,6 @@ Widget.propTypes = {
   onPositionsChange: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   widget: PropTypes.instanceOf(WidgetModel).isRequired,
-};
-
-Widget.defaultProps = {
-  editing: false,
 };
 
 export default Widget;

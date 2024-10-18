@@ -271,7 +271,7 @@ public class JerseyService extends AbstractIdleService {
 
 
         final SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
-        final char[] password = firstNonNull(keystoreInformation.passwordAsString(), "").toCharArray();
+        final char[] password = firstNonNull(keystoreInformation.password(), new char[]{});
 
         final KeyStore keyStore = readKeystore(keystoreInformation);
 

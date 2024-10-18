@@ -18,7 +18,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { duration } from 'moment';
 
-function Countdown({ callback, className, timeInSeconds, paused }) {
+function Countdown({ callback = () => {}, className = '', timeInSeconds, paused = false }) {
   let tickTock = timeInSeconds;
   let logInterval;
 
@@ -64,12 +64,6 @@ Countdown.propTypes = {
   callback: PropTypes.func,
   className: PropTypes.string,
   paused: PropTypes.bool,
-};
-
-Countdown.defaultProps = {
-  callback: () => {},
-  className: '',
-  paused: false,
 };
 
 export default Countdown;

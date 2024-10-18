@@ -84,8 +84,4 @@ AccordionItem.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-AccordionItem.defaultProps = {
-  id: undefined,
-};
-
 export default AccordionItem;

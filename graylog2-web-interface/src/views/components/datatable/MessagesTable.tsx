@@ -137,7 +137,7 @@ type Props = {
   condensed?: boolean,
 };
 
-const MessagesTable = ({ children, condensed, striped, bordered, stickyHeader }: Props) => (
+const MessagesTable = ({ children, condensed = true, striped = false, bordered = false, stickyHeader = false }: Props) => (
   <MessagesContainer>
     <StyledTable condensed={condensed}
                  striped={striped}
@@ -154,13 +154,6 @@ MessagesTable.propTypes = {
   striped: PropTypes.bool,
   bordered: PropTypes.bool,
   stickyHeader: PropTypes.bool,
-};
-
-MessagesTable.defaultProps = {
-  condensed: true,
-  striped: false,
-  bordered: false,
-  stickyHeader: false,
 };
 
 export default MessagesTable;

@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Expression = ({ expression, series }) => {
+const Expression = ({ expression = null, series }) => {
   if (!expression) {
     return 'No condition configured';
   }
@@ -63,10 +63,6 @@ const Expression = ({ expression, series }) => {
 Expression.propTypes = {
   expression: PropTypes.object,
   series: PropTypes.array.isRequired,
-};
-
-Expression.defaultProps = {
-  expression: null,
 };
 
 const AggregationConditionSummary = ({ conditions, series }) => <Expression expression={conditions?.expression} series={series} />;

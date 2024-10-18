@@ -72,10 +72,4 @@ InputDescription.propTypes = {
   ]),
 };
 
-InputDescription.defaultProps = {
-  className: undefined,
-  error: undefined,
-  help: undefined,
-};
-
 export default InputDescription;

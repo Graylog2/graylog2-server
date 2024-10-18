@@ -53,18 +53,18 @@ type Props = {
 }
 
 const FieldsConfiguration = ({
-  createSelectPlaceholder,
-  displaySortableListOverlayInPortal,
+  createSelectPlaceholder = 'Add a field',
+  displaySortableListOverlayInPortal = false,
   menuPortalTarget,
   onChange,
   isFieldQualified,
   selectSize,
   selectedFields,
-  testPrefix,
-  showSelectAllRest,
-  showDeSelectAll,
-  showListCollapseButton,
-  showUnit,
+  testPrefix = '',
+  showSelectAllRest = false,
+  showDeSelectAll = false,
+  showListCollapseButton = false,
+  showUnit = false,
 }: Props) => {
   const [showSelectedList, setShowSelectedList] = useState(true);
   const onAddField = useCallback((newField: string) => (
@@ -124,19 +124,6 @@ const FieldsConfiguration = ({
                    showDeSelectAll={showDeSelectAll && !!selectedFields.length} />
     </>
   );
-};
-
-FieldsConfiguration.defaultProps = {
-  createSelectPlaceholder: 'Add a field',
-  displaySortableListOverlayInPortal: false,
-  isFieldQualified: undefined,
-  selectSize: undefined,
-  menuPortalTarget: undefined,
-  testPrefix: '',
-  showSelectAllRest: false,
-  showDeSelectAll: false,
-  showListCollapseButton: false,
-  showUnit: false,
 };
 
 export default FieldsConfiguration;

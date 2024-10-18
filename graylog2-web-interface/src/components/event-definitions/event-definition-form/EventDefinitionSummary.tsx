@@ -41,11 +41,11 @@ import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 type Props = {
   eventDefinition: Omit<EventDefinition, 'id'>,
   notifications: Array<EventNotification>,
-  validation: {
+  validation?: {
     errors: {
       title?: string,
     }
-  },
+  }
   currentUser: User,
 }
 
@@ -277,10 +277,6 @@ EventDefinitionSummary.propTypes = {
   notifications: PropTypes.array.isRequired,
   validation: PropTypes.object,
   currentUser: PropTypes.object.isRequired,
-};
-
-EventDefinitionSummary.defaultProps = {
-  validation: undefined,
 };
 
 export default EventDefinitionSummary;

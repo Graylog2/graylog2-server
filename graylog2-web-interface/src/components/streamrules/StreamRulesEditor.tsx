@@ -54,11 +54,11 @@ const getListClassName = (matchData) => (matchData.matches ? 'success' : 'danger
 
 type Props = {
   streamId: string,
-  messageId: string | undefined,
-  index: string,
+  messageId?: string | undefined
+  index?: string
 }
 
-const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
+const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [message, setMessage] = useState<{ [fieldName: string]: unknown } | undefined>();
   const [matchData, setMatchData] = useState<MatchData | undefined>();
@@ -173,11 +173,6 @@ StreamRulesEditor.propTypes = {
   streamId: PropTypes.string.isRequired,
   messageId: PropTypes.string,
   index: PropTypes.string,
-};
-
-StreamRulesEditor.defaultProps = {
-  messageId: '',
-  index: '',
 };
 
 export default StreamRulesEditor;

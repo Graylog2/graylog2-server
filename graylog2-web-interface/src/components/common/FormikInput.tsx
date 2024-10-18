@@ -59,7 +59,7 @@ const checkboxProps = (value) => ({ checked: value ?? false });
 const inputProps = (value) => ({ value: value ?? '' });
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {
+const FormikInput = ({ children = null, disabled = false, required = false, autoFocus = false, name, type = 'text', help, validate = () => undefined, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {
   const { validateOnChange } = useFormikContext();
 
   return (
@@ -79,13 +79,18 @@ const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, 
 
         return (
           <Input {...rest}
+                 disabled={disabled}
+                 required={required}
+                 autoFocus={autoFocus}
                  {...typeSpecificProps}
                  onBlur={onBlur}
                  help={help}
                  id={name}
                  error={error}
                  onChange={_handleChange}
-                 type={type} />
+                 type={type}>
+            {children}
+          </Input>
         );
       }}
     </Field>
@@ -119,31 +124,6 @@ FormikInput.propTypes = {
   validate: PropTypes.func,
   wrapperClassName: PropTypes.string,
   autoFocus: PropTypes.bool,
-};
-
-FormikInput.defaultProps = {
-  autoComplete: undefined,
-  addonAfter: undefined,
-  bsSize: undefined,
-  buttonAfter: undefined,
-  children: null,
-  disabled: false,
-  error: undefined,
-  formGroupClassName: undefined,
-  help: undefined,
-  label: undefined,
-  labelClassName: undefined,
-  max: undefined,
-  min: undefined,
-  maxLength: undefined,
-  minLength: undefined,
-  onChange: undefined,
-  placeholder: undefined,
-  required: false,
-  type: 'text',
-  validate: () => undefined,
-  wrapperClassName: undefined,
-  autoFocus: false,
 };
 
 export default FormikInput;

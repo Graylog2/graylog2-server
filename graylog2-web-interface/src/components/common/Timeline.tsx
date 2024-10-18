@@ -35,8 +35,4 @@ const Timeline = ({ children, bulletSize, color, active, className }: Props) => 
 
 Timeline.Item = MantineTimeline.Item;
 
-Timeline.defaultProps = {
-  className: undefined,
-};
-
 export default Timeline;

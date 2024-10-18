@@ -51,7 +51,7 @@ type Props = {
   config: MessagesWidgetConfig,
 };
 
-const MessagePreview = ({ onRowClick, colSpanFixup, message, messageFieldType, showMessageRow, config }: Props) => {
+const MessagePreview = ({ onRowClick, colSpanFixup, message, messageFieldType, showMessageRow = false, config }: Props) => {
   const MessageRowOverride = usePluginEntities('views.components.widgets.messageTable.messageRowOverride')?.[0];
 
   return showMessageRow && (
@@ -66,10 +66,6 @@ const MessagePreview = ({ onRowClick, colSpanFixup, message, messageFieldType, s
       </td>
     </TableRow>
   );
-};
-
-MessagePreview.defaultProps = {
-  showMessageRow: false,
 };
 
 export default MessagePreview;

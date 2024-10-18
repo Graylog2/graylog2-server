@@ -161,9 +161,4 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
   );
 };
 
-GranteesSelector.defaultProps = {
-  className: undefined,
-  formRef: undefined,
-};
-
 export default GranteesSelector;

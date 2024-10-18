@@ -158,8 +158,4 @@ TrafficGraph.propTypes = {
   trafficLimit: PropTypes.number,
 };
 
-TrafficGraph.defaultProps = {
-  trafficLimit: undefined,
-};
-
 export default TrafficGraph;

@@ -54,7 +54,7 @@ const PluginRoute = ({
     requiredFeatureFlag,
     BadgeComponent,
   },
-  topLevel,
+  topLevel = false,
 }: PluginRouteProps) => {
   const currentUser = useCurrentUser();
   if (permissions && !isPermitted(currentUser.permissions, permissions)) return null;
@@ -69,10 +69,6 @@ const PluginRoute = ({
                     path={path}
                     topLevel={topLevel} />
   );
-};
-
-PluginRoute.defaultProps = {
-  topLevel: false,
 };
 
 type PluginNavDropdownProps = {

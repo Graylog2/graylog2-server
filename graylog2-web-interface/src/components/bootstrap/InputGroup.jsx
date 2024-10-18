@@ -29,11 +29,11 @@ export const StyledAddon = styled(StyledBootstrapInputAddon)(({ theme }) => css`
   border-color: ${theme.colors.input.border};
 `);
 
-const Addon = ({ bsClass, className, ...addonProps }) => <StyledAddon className={classNames(bsClass, className)} {...addonProps} />;
+const Addon = ({ bsClass = 'input-group-addon', className, ...addonProps }) => <StyledAddon className={classNames(bsClass, className)} {...addonProps} />;
 
-const Button = ({ bsClass, className, ...addonProps }) => <BootstrapInputGroup.Button bsClass={classNames(bsClass, className)} {...addonProps} />;
+const Button = ({ bsClass = 'input-group-btn', className, ...addonProps }) => <BootstrapInputGroup.Button bsClass={classNames(bsClass, className)} {...addonProps} />;
 
-const InputGroup = ({ bsClass, className, ...restProps }) => <BootstrapInputGroup bsClass={classNames(bsClass, className)} {...restProps} />;
+const InputGroup = ({ bsClass = 'input-group', className, ...restProps }) => <BootstrapInputGroup bsClass={classNames(bsClass, className)} {...restProps} />;
 
 InputGroup.Addon = Addon;
 InputGroup.Button = Button;
@@ -42,19 +42,10 @@ StyledBootstrapInputAddon.propTypes = {
   className: PropTypes.string,
 };
 
-StyledBootstrapInputAddon.defaultProps = {
-  className: undefined,
-};
-
 InputGroup.propTypes = {
   bsClass: PropTypes.string,
   className: PropTypes.string,
   children: PropTypes.node.isRequired,
-};
-
-InputGroup.defaultProps = {
-  bsClass: 'input-group',
-  className: undefined,
 };
 
 Addon.propTypes = {
@@ -63,20 +54,10 @@ Addon.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-Addon.defaultProps = {
-  bsClass: 'input-group-addon',
-  className: undefined,
-};
-
 Button.propTypes = {
   bsClass: PropTypes.string,
   className: PropTypes.string,
   children: PropTypes.node.isRequired,
-};
-
-Button.defaultProps = {
-  bsClass: 'input-group-btn',
-  className: undefined,
 };
 
 /** @component */

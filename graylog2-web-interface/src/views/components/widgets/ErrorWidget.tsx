@@ -48,7 +48,7 @@ const Row = styled.div`
   }
 `;
 
-const ErrorWidget = ({ errors, title }: Props) => (
+const ErrorWidget = ({ errors, title = 'While retrieving data for this widget, the following error(s) occurred:' }: Props) => (
   <Center>
     <Icon name="warning" size="3x" className={styles.iconMargin} />
     <Description>
@@ -65,10 +65,6 @@ const ErrorWidget = ({ errors, title }: Props) => (
 ErrorWidget.propTypes = {
   errors: WidgetErrorsList.isRequired,
   title: PropTypes.string,
-};
-
-ErrorWidget.defaultProps = {
-  title: 'While retrieving data for this widget, the following error(s) occurred:',
 };
 
 export default ErrorWidget;

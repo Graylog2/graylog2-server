@@ -38,12 +38,12 @@ type Props = {
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
  */
 const OverlayDropdownButton = ({
-  alwaysShowCaret,
+  alwaysShowCaret = false,
   bsSize,
   buttonTitle,
   children,
-  closeOnSelect,
-  disabled,
+  closeOnSelect = true,
+  disabled = false,
   dropdownZIndex,
   onToggle: onToggleProp,
   title,
@@ -79,16 +79,6 @@ const OverlayDropdownButton = ({
       {typeof children === 'function' ? children({ toggleDropdown: _onToggle }) : children}
     </OverlayDropdown>
   );
-};
-
-OverlayDropdownButton.defaultProps = {
-  alwaysShowCaret: false,
-  bsSize: undefined,
-  buttonTitle: undefined,
-  closeOnSelect: true,
-  disabled: false,
-  dropdownZIndex: undefined,
-  onToggle: undefined,
 };
 
 export default OverlayDropdownButton;

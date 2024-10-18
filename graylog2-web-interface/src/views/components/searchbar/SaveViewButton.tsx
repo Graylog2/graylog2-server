@@ -32,7 +32,7 @@ type Props = {
   disabled?: boolean,
 }
 
-const SaveViewButton = forwardRef<HTMLButtonElement, Props>(({ title, onClick, disabled }, ref) => {
+const SaveViewButton = forwardRef<HTMLButtonElement, Props>(({ title, onClick, disabled = false }, ref) => {
   const isDirty = useIsDirty();
 
   return (
@@ -44,9 +44,5 @@ const SaveViewButton = forwardRef<HTMLButtonElement, Props>(({ title, onClick, d
     </Button>
   );
 });
-
-SaveViewButton.defaultProps = {
-  disabled: false,
-};
 
 export default SaveViewButton;

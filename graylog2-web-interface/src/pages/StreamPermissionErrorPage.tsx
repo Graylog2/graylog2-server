@@ -23,7 +23,7 @@ import UnauthorizedErrorPage from './UnauthorizedErrorPage';
 
 type Props = {
   error: FetchError | undefined | null,
-  missingStreamIds: string[],
+  missingStreamIds?: string[]
 };
 
 const StreamPermissionErrorPage = ({ error, missingStreamIds = [] }: Props) => {
@@ -53,10 +53,6 @@ StreamPermissionErrorPage.propTypes = {
     }),
   }).isRequired,
   missingStreamIds: PropTypes.arrayOf(PropTypes.string),
-};
-
-StreamPermissionErrorPage.defaultProps = {
-  missingStreamIds: [],
 };
 
 export default StreamPermissionErrorPage;

@@ -46,6 +46,8 @@ const init = (key: string, host: string) => {
       api_host: host,
       capture_pageview: false,
       capture_pageleave: false,
+      cross_subdomain_cookie: false,
+      persistence: 'cookie',
     },
   );
 

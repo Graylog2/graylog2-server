@@ -49,10 +49,6 @@ const SortableHighlightingRule = ({ item: { id, rule }, draggableProps, dragHand
                     ref={ref} />
 );
 
-SortableHighlightingRule.defaultProps = {
-  className: undefined,
-};
-
 const HighlightingRules = () => {
   const [showForm, setShowForm] = useState(false);
   const rules = useContext(HighlightingRulesContext) ?? [];

@@ -25,10 +25,5 @@ type Props = React.PropsWithChildren<{
 
 const ListGroup = ({ className, children, ...props }: Props) => <BootstrapListGroup bsClass={className} {...props}>{children}</BootstrapListGroup>;
 
-ListGroup.defaultProps = {
-  className: undefined,
-  componentClass: undefined,
-};
-
 /** @component */
 export default ListGroup;

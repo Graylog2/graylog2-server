@@ -164,12 +164,6 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
   );
 });
 
-HighlightingRule.defaultProps = {
-  className: undefined,
-  draggableProps: undefined,
-  dragHandleProps: undefined,
-};
-
 HighlightingRule.propTypes = {
   rule: PropTypes.instanceOf(Rule).isRequired,
 };

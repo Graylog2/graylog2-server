@@ -52,9 +52,9 @@ const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => 
 `);
 
 type Props = {
-  disabled: boolean,
-  glyph: IconName,
-  dirty: boolean,
+  disabled?: boolean
+  glyph?: IconName
+  dirty?: boolean
   displaySpinner?: boolean,
 };
 
@@ -67,7 +67,7 @@ const onButtonClick = (e: MouseEvent, disabled: Boolean, triggerTelemetry: () =>
   triggerTelemetry();
 };
 
-const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
+const SearchButton = ({ dirty = false, disabled = false, glyph = 'search', displaySpinner = false }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
   const className = disabled ? 'disabled' : '';
@@ -94,13 +94,6 @@ const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>
   );
-};
-
-SearchButton.defaultProps = {
-  disabled: false,
-  displaySpinner: false,
-  dirty: false,
-  glyph: 'search',
 };
 
 SearchButton.propTypes = {

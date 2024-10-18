@@ -37,7 +37,7 @@ type Props = React.PropsWithChildren<{
 }>
 
 const Badge = React.forwardRef<HTMLDivElement, Props>(({
-  bsStyle,
+  bsStyle = 'default',
   className,
   children,
   'data-testid': dataTestid,
@@ -54,13 +54,5 @@ const Badge = React.forwardRef<HTMLDivElement, Props>(({
     {children}
   </StyledBadge>
 ));
-
-Badge.defaultProps = {
-  bsStyle: 'default',
-  className: undefined,
-  'data-testid': undefined,
-  onClick: undefined,
-  title: undefined,
-};
 
 export default Badge;

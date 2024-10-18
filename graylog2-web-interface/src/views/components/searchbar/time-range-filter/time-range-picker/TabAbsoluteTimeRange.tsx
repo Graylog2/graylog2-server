@@ -29,8 +29,8 @@ import AbsoluteTimestamp from './AbsoluteTimestamp';
 import type { TimeRangePickerFormValues } from './TimeRangePicker';
 
 type Props = {
-  disabled: boolean,
-  limitDuration: number,
+  disabled?: boolean
+  limitDuration?: number
 };
 
 const AbsoluteWrapper = styled.div`
@@ -74,7 +74,7 @@ const FlexWrap = styled.div`
   display: flex;
 `;
 
-const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
+const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) => {
   const { values: { timeRangeTabs } } = useFormikContext<TimeRangePickerFormValues>();
   const activeTabTimeRange = timeRangeTabs.absolute;
 
@@ -144,11 +144,6 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
 TabAbsoluteTimeRange.propTypes = {
   disabled: PropTypes.bool,
   limitDuration: PropTypes.number,
-};
-
-TabAbsoluteTimeRange.defaultProps = {
-  disabled: false,
-  limitDuration: 0,
 };
 
 export default TabAbsoluteTimeRange;

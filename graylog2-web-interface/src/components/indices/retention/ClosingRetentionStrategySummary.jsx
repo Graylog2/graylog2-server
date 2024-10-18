@@ -39,8 +39,4 @@ ClosingRetentionStrategySummary.propTypes = {
   rotationStrategyClass: PropTypes.string,
 };
 
-ClosingRetentionStrategySummary.defaultProps = {
-  rotationStrategyClass: undefined,
-};
-
 export default ClosingRetentionStrategySummary;

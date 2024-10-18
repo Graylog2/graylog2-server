@@ -52,7 +52,7 @@ type Props = {
   onCancel?: () => void,
 };
 
-const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
+const PipelineDetails = ({ pipeline, create = false, onChange, onCancel = () => {} }: Props) => {
   if (create) {
     return <PipelineForm create save={onChange} onCancel={onCancel} modal={false} />;
   }
@@ -93,12 +93,6 @@ PipelineDetails.propTypes = {
   create: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   onCancel: PropTypes.func,
-};
-
-PipelineDetails.defaultProps = {
-  pipeline: undefined,
-  create: false,
-  onCancel: () => {},
 };
 
 export default PipelineDetails;

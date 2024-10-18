@@ -27,7 +27,7 @@ import type { OutputVariables, BlockFieldDict, BlockType } from './types';
 type Props = {
   param: BlockFieldDict,
   functionName: string,
-  blockId: string,
+  blockId?: string
   order: number,
   outputVariableList?: OutputVariables,
   blockType: BlockType,
@@ -36,7 +36,7 @@ type Props = {
 
 const SupportedFieldTypes = [RuleBuilderTypes.String, RuleBuilderTypes.Object, RuleBuilderTypes.Number, RuleBuilderTypes.Boolean];
 
-const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariableList, blockType, resetField }: Props) => {
+const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariableList = [], blockType, resetField }: Props) => {
   const [primaryInputToggle, setPrimaryInputToggle] = useState<'custom' | 'select' | undefined>(undefined);
   const [field, fieldMeta] = useField(param.name);
 
@@ -214,11 +214,6 @@ RuleBlockFormField.propTypes = {
   order: PropTypes.number.isRequired,
   outputVariableList: outputVariablesPropType,
   resetField: PropTypes.func.isRequired,
-};
-
-RuleBlockFormField.defaultProps = {
-  blockId: undefined,
-  outputVariableList: [],
 };
 
 export default RuleBlockFormField;

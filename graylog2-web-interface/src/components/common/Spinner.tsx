@@ -42,7 +42,7 @@ type Props = {
 /**
  * Simple spinner to use while waiting for something to load.
  */
-const Spinner = ({ name, text, delay, ...rest }: Props) => (
+const Spinner = ({ name = 'progress_activity', text = 'Loading...', delay = 200, ...rest }: Props) => (
   <Delayed delay={delay}>
     <Container>
       <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />{text}
@@ -57,12 +57,6 @@ Spinner.propTypes = {
   name: PropTypes.string,
   /** Text to show while loading. */
   text: PropTypes.string,
-};
-
-Spinner.defaultProps = {
-  name: 'progress_activity',
-  text: 'Loading...',
-  delay: 200,
 };
 
 export default Spinner;

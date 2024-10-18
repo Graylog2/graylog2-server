@@ -29,10 +29,10 @@ type Props = {
   onChange: (title: string, value: number, dirty?: boolean) => void,
   title: string,
   typeName: string,
-  value: number,
+  value?: number
 };
 
-const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
+const NumberField = ({ autoFocus = false, field, onChange, title, typeName, value = 0 }: Props) => {
   const _getDefaultValidationSpecs = () => ({ min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER });
 
   const _mapValidationAttribute = (attribute) => {
@@ -90,11 +90,6 @@ NumberField.propTypes = {
   title: PropTypes.string.isRequired,
   typeName: PropTypes.string.isRequired,
   value: PropTypes.number,
-};
-
-NumberField.defaultProps = {
-  autoFocus: false,
-  value: 0,
 };
 
 export default NumberField;

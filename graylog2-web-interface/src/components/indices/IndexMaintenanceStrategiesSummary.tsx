@@ -60,8 +60,4 @@ IndexMaintenanceStrategiesSummary.propTypes = {
   rotationStrategyClass: PropTypes.string,
 };
 
-IndexMaintenanceStrategiesSummary.defaultProps = {
-  rotationStrategyClass: undefined,
-};
-
 export default IndexMaintenanceStrategiesSummary;

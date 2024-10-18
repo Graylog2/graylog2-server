@@ -74,9 +74,4 @@ const ReadOnlyFormGroup = ({ label, value, help, className }: Props) => (
   </StyledRow>
 );
 
-ReadOnlyFormGroup.defaultProps = {
-  help: undefined,
-  className: undefined,
-};
-
 export default ReadOnlyFormGroup;

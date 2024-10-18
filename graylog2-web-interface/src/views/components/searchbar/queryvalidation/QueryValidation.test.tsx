@@ -30,14 +30,14 @@ jest.mock('hooks/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 type SUTProps = {
-  // eslint-disable-next-line react/require-default-props
+
   error?: QueryValidationState,
-  // eslint-disable-next-line react/require-default-props
+
   warning?: QueryValidationState,
 }
 
 describe('QueryValidation', () => {
-  const validationErrorIconTitle = 'Toggle validation error explanation';
+  const validationErrorIconTitle = /Toggle validation/;
 
   const openExplanation = async () => {
     const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);

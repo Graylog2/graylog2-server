@@ -55,7 +55,7 @@ type Props = {
   className?: string,
 }
 
-const DefaultBrand = ({ className }: Props) => {
+const DefaultBrand = ({ className = '' }: Props) => {
   const theme = useTheme();
 
   return (
@@ -63,10 +63,6 @@ const DefaultBrand = ({ className }: Props) => {
       <Logo color={theme.colors.brand.logo} />
     </Container>
   );
-};
-
-DefaultBrand.defaultProps = {
-  className: '',
 };
 
 export default DefaultBrand;
