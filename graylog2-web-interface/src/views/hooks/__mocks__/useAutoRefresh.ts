@@ -14,8 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const useAutoRefresh = jest.fn(() => ({
+import type { AutoRefreshContextType } from 'views/components/contexts/AutoRefreshContext';
+
+const useAutoRefresh = jest.fn((): AutoRefreshContextType => ({
+  animationId: 'animation-id',
   refreshConfig: null,
+  restartAutoRefresh: () => {},
   startAutoRefresh: () => {},
   stopAutoRefresh: () => {},
 }));
