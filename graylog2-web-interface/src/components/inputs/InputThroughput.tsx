@@ -15,17 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /* eslint-disable no-restricted-globals */
-import PropTypes from 'prop-types';
 import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import numeral from 'numeral';
 import styled, { css } from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
 import { Icon, LinkToNode, Spinner } from 'components/common';
+import type { ClusterMetric } from 'stores/metrics/MetricsStore';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+import type { Input } from 'components/messageloaders/Types';
+import connect from 'stores/connect';
 
 const InputIO = styled.span(({ theme }) => css`
   .total {
@@ -56,28 +55,30 @@ const InputIO = styled.span(({ theme }) => css`
   }
 `);
 
-const InputThroughput = createReactClass({
-  displayName: 'InputThroughput',
+type Props = {
+  input: Input,
+  metrics: ClusterMetric,
+}
+type State = {
+  showDetails: boolean,
+}
 
-  propTypes: {
-    input: PropTypes.object.isRequired,
-  },
+class InputThroughput extends React.Component<Props, State> {
+  constructor(props: Readonly<Props>) {
+    super(props);
 
-  mixins: [Reflux.connect(MetricsStore)],
-
-  getInitialState() {
-    return {
+    this.state = {
       showDetails: false,
     };
-  },
+  }
 
   UNSAFE_componentWillMount() {
     this._metricNames().forEach((metricName) => MetricsActions.addGlobal(metricName));
-  },
+  }
 
   componentWillUnmount() {
     this._metricNames().forEach((metricName) => MetricsActions.removeGlobal(metricName));
-  },
+  }
 
   _metricNames() {
     return [
@@ -90,13 +91,13 @@ const InputThroughput = createReactClass({
       this._prefix('read_bytes_1sec'),
       this._prefix('read_bytes_total'),
     ];
-  },
+  }
 
   _prefix(metric) {
     const { input } = this.props;
 
     return `${input.type}.${input.id}.${metric}`;
-  },
+  }
 
   _getValueFromMetric(metric) {
     if (metric === null || metric === undefined) {
@@ -113,7 +114,7 @@ const InputThroughput = createReactClass({
       default:
         return undefined;
     }
-  },
+  }
 
   _calculateMetrics(metrics) {
     const result = {};
@@ -124,10 +125,10 @@ const InputThroughput = createReactClass({
           return previous;
         }
 
-        const value = this._getValueFromMetric(metrics[nodeId][metricName]);
+        const _value = this._getValueFromMetric(metrics[nodeId][metricName]);
 
-        if (value !== undefined) {
-          return isNaN(previous) ? value : previous + value;
+        if (_value !== undefined) {
+          return isNaN(previous) ? _value : previous + _value;
         }
 
         return previous;
@@ -135,11 +136,11 @@ const InputThroughput = createReactClass({
     });
 
     return result;
-  },
+  }
 
   _formatCount(count) {
     return numeral(count).format('0,0');
-  },
+  }
 
   _formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal) {
     const network = (
@@ -167,7 +168,7 @@ const InputThroughput = createReactClass({
     );
 
     return network;
-  },
+  }
 
   _formatConnections(openConnections, totalConnections) {
     return (
@@ -177,7 +178,7 @@ const InputThroughput = createReactClass({
         <br />
       </span>
     );
-  },
+  }
 
   _formatAllNodeDetails(metrics) {
     return (
@@ -186,7 +187,7 @@ const InputThroughput = createReactClass({
         {Object.keys(metrics).map((nodeId) => this._formatNodeDetails(nodeId, metrics[nodeId]))}
       </span>
     );
-  },
+  }
 
   _formatNodeDetails(nodeId, metrics) {
     const { input } = this.props;
@@ -209,17 +210,18 @@ const InputThroughput = createReactClass({
         <br />
       </span>
     );
-  },
+  }
 
   _toggleShowDetails(evt) {
     evt.preventDefault();
     const { showDetails } = this.state;
 
     this.setState({ showDetails: !showDetails });
-  },
+  }
 
   render() {
-    const { metrics, showDetails } = this.state;
+    const { metrics } = this.props;
+    const { showDetails } = this.state;
     const { input } = this.props;
 
     if (!metrics) {
@@ -251,7 +253,10 @@ const InputThroughput = createReactClass({
         </span>
       </div>
     );
-  },
-});
+  }
+}
 
-export default InputThroughput;
+export default connect(InputThroughput, { metrics: MetricsStore }, (props) => ({
+  ...props,
+  metrics: props.metrics?.metrics,
+}));
