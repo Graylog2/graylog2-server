@@ -316,11 +316,11 @@ const RuleBuilder = () => {
                     <Radio checked={rule.rule_builder.operator === 'AND'}
                            onChange={() => updateWhenOperator('AND')}>
                       and
-                  </Radio>
+                    </Radio>
                     <Radio checked={rule.rule_builder.operator === 'OR'}
                            onChange={() => updateWhenOperator('OR')}>
                       or
-                  </Radio>
+                    </Radio>
                   </WhenOperator>
                 </StyledPanelHeading>
                 <Panel.Collapse>
@@ -328,14 +328,14 @@ const RuleBuilder = () => {
                     {rule.rule_builder.conditions.map((condition, index) => (
 
                       (
-                  <RuleBuilderBlock key={index}
-                                        blockDict={conditionsDict || []}
-                                        block={condition}
-                                        order={index}
-                                        type="condition"
-                                        addBlock={addBlock}
-                                        updateBlock={updateBlock}
-                                        deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
+                        <RuleBuilderBlock key={index}
+                                          blockDict={conditionsDict || []}
+                                          block={condition}
+                                          order={index}
+                                          type="condition"
+                                          addBlock={addBlock}
+                                          updateBlock={updateBlock}
+                                          deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
                       )
                     ))}
                     <RuleBuilderBlock blockDict={conditionsDict || []}
@@ -344,9 +344,9 @@ const RuleBuilder = () => {
                                       addBlock={addBlock}
                                       updateBlock={updateBlock}
                                       deleteBlock={() => setBlockToDelete({
-                                  orderIndex: newConditionBlockIndex,
-                                  type: 'condition',
-                                })} />
+                                        orderIndex: newConditionBlockIndex,
+                                        type: 'condition',
+                                      })} />
                   </StyledPanelBody>
                 </Panel.Collapse>
               </StyledPanel>
@@ -362,15 +362,15 @@ const RuleBuilder = () => {
                     {rule.rule_builder.actions.map((action, index) => (
 
                       (
-                  <RuleBuilderBlock key={index}
-                                        blockDict={actionsDict || []}
-                                        block={action}
-                                        order={index}
-                                        type="action"
-                                        outputVariableList={outputVariableList()}
-                                        addBlock={addBlock}
-                                        updateBlock={updateBlock}
-                                        deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
+                        <RuleBuilderBlock key={index}
+                                          blockDict={actionsDict || []}
+                                          block={action}
+                                          order={index}
+                                          type="action"
+                                          outputVariableList={outputVariableList()}
+                                          addBlock={addBlock}
+                                          updateBlock={updateBlock}
+                                          deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
                       )
                     ))}
                     <RuleBuilderBlock blockDict={actionsDict || []}
@@ -395,21 +395,21 @@ const RuleBuilder = () => {
                           <>
                             <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors(rule)}>
                               Update rule
-                          </Button>
+                            </Button>
                             <Button bsStyle="info"
                                     title="Convert Rule Builder to Source Code"
                                     disabled={hasRuleBuilderErrors(rule)}
                                     onClick={() => {
-                                sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CONVERT_TO_SOURCE_CODE_CLICKED, {
-                                  app_pathname: getPathnameWithoutId(pathname),
-                                  app_section: 'pipeline-rules',
-                                  app_action_value: 'convert-rule-builder-to-source-code-button',
-                                });
+                                      sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CONVERT_TO_SOURCE_CODE_CLICKED, {
+                                        app_pathname: getPathnameWithoutId(pathname),
+                                        app_section: 'pipeline-rules',
+                                        app_action_value: 'convert-rule-builder-to-source-code-button',
+                                      });
 
-                                setRuleSourceCodeToShow(rule);
-                              }}>
+                                      setRuleSourceCodeToShow(rule);
+                                    }}>
                               Convert to Source Code
-                          </Button>
+                            </Button>
                           </>
                           )}
                           onCancel={handleCancel} />
