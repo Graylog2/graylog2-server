@@ -22,8 +22,6 @@ import com.google.inject.Module;
 import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.bindings.GraylogNodeModule;
 import org.graylog2.bootstrap.CmdLineTool;
-import org.graylog2.configuration.PathConfiguration;
-import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 
 import javax.annotation.Nonnull;
@@ -67,28 +65,4 @@ public abstract class AbstractNodeCommand extends CmdLineTool<CommonNodeConfigur
 
     protected abstract @Nonnull List<Object> getNodeCommandConfigurationBeans();
 
-    @Override
-    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
-        super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
-
-        // This needs to run before the first SSLContext is instantiated,
-        // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings(tlsProtocolsConfiguration);
-
-        // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults(pathConfiguration);
-    }
-
-    private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
-        // Give netty a better spot than /tmp to unpack its tcnative libraries
-        if (System.getProperty("io.netty.native.workdir") == null) {
-            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir()
-                    .toAbsolutePath()
-                    .toString());
-        }
-        // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
-        if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
-            System.setProperty("io.netty.native.deleteLibAfterLoading", "false");
-        }
-    }
 }

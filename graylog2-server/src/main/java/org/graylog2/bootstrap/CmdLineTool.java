@@ -201,13 +201,6 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     }
 
     /**
-     * Things that have to run before the {@link #startCommand()} method is being called.
-     * Please note that this happens *before* the configuration file has been parsed.
-     */
-    protected void beforeStart(TLSProtocolsConfiguration configuration, PathConfiguration pathConfiguration) {
-    }
-
-    /**
      * Things that have to run before the guice injector is created.
      * This call happens *after* the configuration file has been parsed.
      *
@@ -315,7 +308,6 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         installConfigRepositories();
 
         beforeStart();
-        //beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
 
         processConfiguration(jadConfig);
 
@@ -378,7 +370,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
     // Parse only the TLSConfiguration bean
     // to avoid triggering anything that might initialize the default SSLContext
-    private TLSProtocolsConfiguration parseAndGetTLSConfiguration() {
+    protected TLSProtocolsConfiguration parseAndGetTLSConfiguration(String configFile) {
         final JadConfig jadConfig = new JadConfig();
         jadConfig.setRepositories(getConfigRepositories(configFile));
         final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
@@ -388,7 +380,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         return tlsConfiguration;
     }
 
-    private PathConfiguration parseAndGetPathConfiguration(String configFile) {
+    protected PathConfiguration parseAndGetPathConfiguration(String configFile) {
         final PathConfiguration pathConfiguration = new PathConfiguration();
         processConfiguration(new JadConfig(getConfigRepositories(configFile), pathConfiguration));
         return pathConfiguration;

@@ -47,7 +47,6 @@ import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.preflight.GraylogServerProvisioningBindings;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
-import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationType;
 import org.graylog2.plugin.MessageBindings;
@@ -131,8 +130,8 @@ public abstract class ServerBootstrap extends CmdLineTool<Configuration> {
     }
 
     @Override
-    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
-        super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
+    protected void beforeStart() {
+        super.beforeStart();
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
@@ -140,11 +139,10 @@ public abstract class ServerBootstrap extends CmdLineTool<Configuration> {
         }
         // This needs to run before the first SSLContext is instantiated,
         // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings(tlsProtocolsConfiguration);
+        applySecuritySettings(parseAndGetTLSConfiguration(configFile));
 
         // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults(pathConfiguration);
-
+        setNettyNativeDefaults(parseAndGetPathConfiguration(configFile));
     }
 
     @Override
