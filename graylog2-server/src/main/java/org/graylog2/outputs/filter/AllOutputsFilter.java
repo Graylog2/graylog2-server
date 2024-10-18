@@ -38,6 +38,6 @@ public class AllOutputsFilter implements OutputFilter {
 
     @Override
     public FilteredMessage apply(Message msg) {
-        return new DefaultFilteredMessage(msg, outputNames);
+        return DefaultFilteredMessage.forDestinationKeys(msg, outputNames);
     }
 }

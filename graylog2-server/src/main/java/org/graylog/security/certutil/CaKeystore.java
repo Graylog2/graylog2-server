@@ -16,9 +16,7 @@
  */
 package org.graylog.security.certutil;
 
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
@@ -33,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
  import java.security.Security;
@@ -52,27 +49,25 @@ public class CaKeystore {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CaKeystore.class);
-    private final CaService caService;
-    private final String passwordSecret;
+    private final CaPersistenceService caPersistenceService;
     private final CsrSigner csrSigner;
 
     public static final int DEFAULT_SELFSIGNED_VALIDITY_DAYS = 10 * 365;
 
     @Inject
-    public CaKeystore(final CaService caService,
-                      final @Named("password_secret") String passwordSecret,
-                      @Nullable final @Named("ca_password") String configuredCaPassword,
+    public CaKeystore(final CaPersistenceService caPersistenceService,
                       final CsrSigner csrSigner) {
-        this.caService = caService;
-        this.passwordSecret = configuredCaPassword != null ? configuredCaPassword : passwordSecret;
+        this.caPersistenceService = caPersistenceService;
         this.csrSigner = csrSigner;
     }
 
     public synchronized CertificateChain signCertificateRequest(CertificateSigningRequest request, RenewalPolicy renewalPolicy) throws CaKeystoreException {
-        final KeyStore caKeystore = loadKeystore().orElseThrow(() -> new CaKeystoreException("Can't sign certificates, no CA configured!"));
+        final CaKeystoreWithPassword caKeystore = loadKeystore().orElseThrow(() -> new CaKeystoreException("Can't sign certificates, no CA configured!"));
         try {
-            var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, passwordSecret.toCharArray());
-            var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
+            LOG.info("Signing certificate for  node {}, subject: {}", request.nodeId(), request.request().getSubject());
+            // TODO: better abstraction to protect the private key and password!
+            var caPrivateKey = (PrivateKey) caKeystore.keyStore().getKey(CA_KEY_ALIAS, caKeystore.password().toCharArray());
+            var caCertificate = (X509Certificate) caKeystore.keyStore().getCertificate(CA_KEY_ALIAS);
             var cert = csrSigner.sign(caPrivateKey, caCertificate, request.request(), renewalPolicy);
             final List<X509Certificate> caCertificates = List.of(caCertificate);
             return new CertificateChain(cert, caCertificates);
@@ -92,7 +87,7 @@ public class CaKeystore {
 
     public synchronized Optional<CertificateAuthorityInformation> getInformation() {
         try {
-            return Optional.ofNullable(caService.get());
+            return caPersistenceService.get();
         } catch (KeyStoreStorageException e) {
             throw new RuntimeException(e);
         }
@@ -102,9 +97,9 @@ public class CaKeystore {
      * NEVER EVER allow the keystore to escape this abstraction. It contains a private key for the
      * CA and we need to protect it.
      */
-    private Optional<KeyStore> loadKeystore() throws CaKeystoreException {
+    private Optional<CaKeystoreWithPassword> loadKeystore() throws CaKeystoreException {
         try {
-            return caService.loadKeyStore();
+            return caPersistenceService.loadKeyStore();
         } catch (KeyStoreStorageException e) {
             throw new CaKeystoreException(e);
         }
@@ -112,7 +107,7 @@ public class CaKeystore {
 
     public CertificateAuthorityInformation createSelfSigned(String organization) throws CaKeystoreException {
         try {
-            return caService.create(organization, DEFAULT_SELFSIGNED_VALIDITY_DAYS, passwordSecret.toCharArray());
+            return caPersistenceService.create(organization, DEFAULT_SELFSIGNED_VALIDITY_DAYS);
         } catch (CACreationException | KeyStoreStorageException | KeyStoreException e) {
             throw new RuntimeException(e);
         }
@@ -120,7 +115,7 @@ public class CaKeystore {
 
     public void createFromUpload(String password, List<FormDataBodyPart> files) throws CaKeystoreException {
         try {
-            caService.upload(password, files);
+            caPersistenceService.upload(password, files);
         } catch (CACreationException e) {
             throw new CaKeystoreException(e);
         }
@@ -130,7 +125,9 @@ public class CaKeystore {
      * @return PEM encoded public key of the CA.
      */
     public Optional<String> getEncodedCertificate() {
-        return loadKeystore().map(ks -> {
+        return loadKeystore()
+                .map(CaKeystoreWithPassword::keyStore)
+                .map(ks -> {
             final Certificate caPublicKey;
             try {
                 caPublicKey = ks.getCertificate(CertConstants.CA_KEY_ALIAS);
@@ -150,11 +147,13 @@ public class CaKeystore {
     }
 
     public void reset() {
-        caService.startOver();
+        caPersistenceService.startOver();
     }
 
     public Optional<Date> getCertificateExpiration() {
-        return loadKeystore().map(keyStore -> {
+        return loadKeystore()
+                .map(CaKeystoreWithPassword::keyStore)
+                .map(keyStore -> {
             try {
                 final Certificate certificate = keyStore.getCertificate(CA_KEY_ALIAS);
                 return ((X509Certificate) certificate).getNotAfter();

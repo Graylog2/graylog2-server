@@ -21,6 +21,7 @@ import org.graylog.plugins.views.storage.migration.RemoteReindexResource;
 import org.graylog.security.rest.CAClientResource;
 import org.graylog.security.rest.CAResource;
 import org.graylog.security.rest.CertificateRenewalResource;
+import org.graylog.security.rest.CertificatesResource;
 import org.graylog2.Configuration;
 import org.graylog2.contentstream.rest.ContentStreamResource;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -40,6 +41,7 @@ import org.graylog2.rest.resources.cluster.ClusterSystemShutdownResource;
 import org.graylog2.rest.resources.datanodes.DataNodeApiProxyResource;
 import org.graylog2.rest.resources.datanodes.DataNodeManagementResource;
 import org.graylog2.rest.resources.datanodes.DataNodeRestApiProxyResource;
+import org.graylog2.rest.resources.datanodes.DatanodeResource;
 import org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource;
 import org.graylog2.rest.resources.messages.MessageResource;
 import org.graylog2.rest.resources.roles.RolesResource;
@@ -48,6 +50,8 @@ import org.graylog2.rest.resources.search.DecoratorResource;
 import org.graylog2.rest.resources.search.KeywordSearchResource;
 import org.graylog2.rest.resources.search.RelativeSearchResource;
 import org.graylog2.rest.resources.streams.StreamResource;
+import org.graylog2.rest.resources.streams.destinations.filters.StreamDestinationFilterBuilderResource;
+import org.graylog2.rest.resources.streams.destinations.filters.StreamDestinationFiltersResource;
 import org.graylog2.rest.resources.streams.outputs.StreamOutputResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleInputsResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleResource;
@@ -159,12 +163,14 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(TelemetryResource.class);
         addSystemRestResource(ContentStreamResource.class);
         addSystemRestResource(CertificateRenewalResource.class);
+        addSystemRestResource(DatanodeResource.class);
         addSystemRestResource(DataNodeApiProxyResource.class);
         addSystemRestResource(DataNodeRestApiProxyResource.class);
         addSystemRestResource(DataNodeManagementResource.class);
         addSystemRestResource(RemoteReindexResource.class);
         addSystemRestResource(CAResource.class);
         addSystemRestResource(CAClientResource.class);
+        addSystemRestResource(CertificatesResource.class);
     }
 
     private void addDebugResources() {
@@ -258,6 +264,8 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StreamRuleResource.class);
         addSystemRestResource(StreamResource.class);
         addSystemRestResource(StreamRuleInputsResource.class);
+        addSystemRestResource(StreamDestinationFiltersResource.class);
+        addSystemRestResource(StreamDestinationFilterBuilderResource.class);
     }
 
     private void addMonitoringResources() {

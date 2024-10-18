@@ -18,7 +18,6 @@ package org.graylog.testing.completebackend.apis;
 
 import io.restassured.response.ValidatableResponse;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -35,6 +34,10 @@ public class EventDefinitions implements GraylogRestApi {
     }
 
     public String createEventDefinition(String httpNotificationID, List<String> groupByFields) {
+        return createEventDefinition(httpNotificationID, groupByFields, List.of());
+    }
+
+    public String createEventDefinition(String httpNotificationID, List<String> groupByFields, List<String> streams) {
         final String body = """
                 {
                   "title": "my alert def",
@@ -43,7 +46,7 @@ public class EventDefinitions implements GraylogRestApi {
                   "config": {
                     "query": "",
                     "query_parameters": [],
-                    "streams": [],
+                    "streams": [%s],
                     "search_within_ms": 5000,
                     "execute_every_ms": 5000,
                     "event_limit": 100,
@@ -82,8 +85,9 @@ public class EventDefinitions implements GraylogRestApi {
                 }
                 """;
 
+        final var streamsList = streams.stream().map(stream -> "\"" + stream + "\"").collect(Collectors.joining(","));
         final String groupByClause = groupByFields.stream().map(f -> "\"" + f + "\"").collect(Collectors.joining(","));
-        final String req = String.format(Locale.ROOT, body, groupByClause, httpNotificationID);
+        final String req = String.format(Locale.ROOT, body, streamsList, groupByClause, httpNotificationID);
 
         final ValidatableResponse response = api.post("/events/definitions", req, 200);
         return response.extract().body().jsonPath().getString("id");

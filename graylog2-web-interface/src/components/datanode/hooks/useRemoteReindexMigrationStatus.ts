@@ -42,8 +42,8 @@ export type RemoteReindexMigration = {
   error: string,
   status: MigrationStatus,
   progress: number,
-  logs: RemoteReindexLog[]
-  tasks_progress: { [task: string]: number }
+  logs: RemoteReindexLog[],
+  tasks_progress: { [task: string]: number },
 }
 
 export type RemoteReindexRequest = {
@@ -53,6 +53,8 @@ export type RemoteReindexRequest = {
   indices: string[],
   synchronous: boolean,
   user: string,
+  threads: number,
+  trust_unknown_certs: boolean,
 }
 
 export const RemoteReindexFinishedStatusActions: MigrationActions[] = ['RETRY_MIGRATE_EXISTING_DATA', 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER'];

@@ -35,6 +35,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.Collection;
 import java.util.List;
@@ -242,7 +244,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
 
     public ViewDTO update(ViewDTO viewDTO) {
         checkArgument(viewDTO.id() != null, "Id of view must not be null.");
-        final ViewDTO viewWithRequirements = requirementsForView(viewDTO);
+        final ViewDTO viewWithRequirements = requirementsForView(viewDTO).toBuilder().lastUpdatedAt(DateTime.now(DateTimeZone.UTC)).build();
         collection.replaceOne(MongoUtils.idEq(viewWithRequirements.id()), viewWithRequirements);
         return viewWithRequirements;
     }

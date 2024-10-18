@@ -17,16 +17,23 @@
 
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import styled, { css } from 'styled-components';
 
+import { IfPermitted } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
-
-import DestinationIndexSetSection from './routing-destination/DestinationIndexSetSection';
-import DestinationOutputs from './routing-destination/DestinationOutputs';
+import DestinationOutputs from 'components/streams/StreamDetails/routing-destination/DestinationOutputs';
+import DestinationIndexSetSection from 'components/streams/StreamDetails/routing-destination/DestinationIndexSetSection';
 
 type Props = {
   stream: Stream;
 };
+
+const Container = styled.div(({ theme }) => css`
+  > div {
+    margin-bottom: ${theme.spacings.sm};
+  }
+`);
 
 const StreamDataRoutingDestinations = ({ stream }: Props) => {
   const { index_set_id: indexSetId } = stream;
@@ -34,11 +41,13 @@ const StreamDataRoutingDestinations = ({ stream }: Props) => {
   const StreamDataWarehouseComponent = PluginStore.exports('dataWarehouse')?.[0]?.StreamDataWarehouse;
 
   return (
-    <>
+    <Container>
       {isSuccess && <DestinationIndexSetSection indexSet={indexSet} stream={stream} />}
       {StreamDataWarehouseComponent && <StreamDataWarehouseComponent />}
-      <DestinationOutputs stream={stream} />
-    </>
+      <IfPermitted permissions="outputs:edit">
+        <DestinationOutputs stream={stream} />
+      </IfPermitted>
+    </Container>
   );
 };
 

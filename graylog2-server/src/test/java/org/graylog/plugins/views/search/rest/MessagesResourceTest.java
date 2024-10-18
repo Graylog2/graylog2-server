@@ -70,7 +70,7 @@ public class MessagesResourceTest {
         when(commandFactory.buildFromRequest(any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithSearchOnly(any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithMessageList(any(), any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
-        final PermittedStreams permittedStreams = new PermittedStreams(() -> Stream.of("a-default-stream"));
+        final PermittedStreams permittedStreams = new PermittedStreams(() -> Stream.of("a-default-stream"), (categories) -> Stream.of());
         executionGuard = mock(SearchExecutionGuard.class);
         SearchDomain searchDomain = mock(SearchDomain.class);
 
@@ -91,7 +91,7 @@ public class MessagesResourceTest {
 
     class MessagesTestResource extends MessagesResource {
         public MessagesTestResource(MessagesExporter exporter, CommandFactory commandFactory, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams, ObjectMapper objectMapper, EventBus eventBus, QueryValidationService validationService) {
-            super(exporter, commandFactory, searchDomain, executionGuard, eventBus, mock(ExportJobService.class), validationService);
+            super(exporter, commandFactory, searchDomain, executionGuard, eventBus, mock(ExportJobService.class), validationService, categories -> Stream.of());
         }
 
         @Nullable

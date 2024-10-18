@@ -39,6 +39,7 @@ import SecurityBindings from 'components/security/bindings';
 
 import '@graylog/sawmill/fonts';
 import '@mantine/core/styles.css';
+import '@mantine/dropzone/styles.css';
 
 Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 

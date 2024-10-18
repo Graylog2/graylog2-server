@@ -37,7 +37,7 @@ type SUTProps = {
 }
 
 describe('QueryValidation', () => {
-  const validationErrorIconTitle = 'Toggle validation error explanation';
+  const validationErrorIconTitle = /Toggle validation/;
 
   const openExplanation = async () => {
     const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);
@@ -86,7 +86,7 @@ describe('QueryValidation', () => {
     await openExplanation();
 
     await screen.findByText('Parse Exception');
-    await screen.findByTitle('Parse Exception documentation');
+    await screen.findByTitle('Query error documentation');
   });
 
   it('renders pluggable validation explanation', async () => {

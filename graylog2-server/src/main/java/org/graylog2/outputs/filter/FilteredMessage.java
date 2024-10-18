@@ -16,12 +16,12 @@
  */
 package org.graylog2.outputs.filter;
 
-import org.graylog2.plugin.Message;
-
-import java.util.Set;
+import com.google.common.collect.Multimap;
+import org.graylog2.indexer.messages.ImmutableMessage;
+import org.graylog2.plugin.streams.Stream;
 
 /**
- * A filtered message that contains output target information.
+ * A filtered message that contains output destination information.
  */
 public interface FilteredMessage {
     /**
@@ -29,14 +29,14 @@ public interface FilteredMessage {
      *
      * @return the message
      */
-    Message message();
+    ImmutableMessage message();
 
     /**
-     * A set of output targets names.
+     * A multimap of destination streams.
      *
-     * @return set of output targets
+     * @return multimap of destination streams
      */
-    Set<String> outputs();
+    Multimap<String, Stream> destinations();
 
     /**
      * Whether the message has been indexed or not.

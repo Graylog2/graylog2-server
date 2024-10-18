@@ -20,7 +20,7 @@ const TableHeaderCell = styled.th<{ $isNumeric?: boolean, $borderedHeader?: bool
   && {
     background-color: ${theme.colors.table.head.background};
     min-width: 50px;
-    border: ${$borderedHeader ? `1px solid ${theme.colors.table.row.backgroundAlt}` : '0'};
+    border: ${$borderedHeader ? `1px solid ${theme.colors.table.row.divider}` : '0'};
     padding: 0 5px;
     vertical-align: middle;
     white-space: nowrap;

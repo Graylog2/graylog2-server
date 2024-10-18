@@ -17,6 +17,8 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -47,6 +49,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 import static java.util.Locale.ENGLISH;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -56,6 +59,24 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
+    public enum Scope {
+        @JsonProperty("read")
+        READ,
+        @JsonProperty("update")
+        UPDATE;
+
+        // Jersey will look for a #fromString method to deserialize a query parameter
+        @JsonCreator
+        public static Scope fromString(String scope) {
+            return switch (scope.toLowerCase(Locale.ENGLISH)) {
+                case "read" -> READ;
+                case "update" -> UPDATE;
+                // throwing an IllegalArgumentException here would have Jersey abort with a 404
+                default -> throw new BadRequestException("Unknown scope: " + scope);
+            };
+        }
+    }
+
     private final ViewService dbService;
 
     private static final String DEFAULT_SORT_FIELD = ViewDTO.FIELD_TITLE;
@@ -64,6 +85,7 @@ public class DashboardsResource extends RestResource {
             EntityAttribute.builder().id("_id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_TITLE).title("Title").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_LAST_UPDATED_AT).title("Last Updated").type(SearchQueryField.Type.DATE).filterable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
@@ -93,7 +115,16 @@ public class DashboardsResource extends RestResource {
                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
                                                   @ApiParam(name = "query") @QueryParam("query") String query,
                                                   @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+                                                  @ApiParam(name = "scope",
+                                                            value = "The scope of the permissions",
+                                                            required = true,
+                                                            allowableValues = "read,update") @DefaultValue("read") @QueryParam("scope") Scope scope,
                                                   @Context SearchUser searchUser) {
+
+        final Predicate<ViewSummaryDTO> predicate = switch (scope) {
+            case READ -> searchUser::canReadView;
+            case UPDATE -> searchUser::canUpdateView;
+        };
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
@@ -105,7 +136,7 @@ public class DashboardsResource extends RestResource {
                     searchUser,
                     ViewDTO.Type.DASHBOARD,
                     dbQuery,
-                    searchUser::canReadView,
+                    predicate,
                     order,
                     sortField,
                     page,

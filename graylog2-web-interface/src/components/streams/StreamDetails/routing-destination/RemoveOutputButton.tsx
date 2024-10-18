@@ -40,7 +40,7 @@ const RemoveOutputButton = ({ output, streamId }: Props) => {
 
   return (
     <>
-      <Button bsStyle="danger"
+      <Button bsStyle="link"
               bsSize="xsmall"
               onClick={() => setShowConfirmRemove(true)}
               title="Edit Output">

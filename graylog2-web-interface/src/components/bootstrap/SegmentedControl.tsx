@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { SegmentedControl as MantineSegmentedControl } from '@mantine/core';
 import { useTheme } from 'styled-components';
-import type { SegmentedControlItem } from '@mantine/core';
+import type { MantineRadius, SegmentedControlItem } from '@mantine/core';
 
 type Props<OptionValue> = {
   data: Array<SegmentedControlItem & { value: OptionValue }>,
@@ -25,15 +25,19 @@ type Props<OptionValue> = {
   disabled?: boolean,
   onChange?: (value: OptionValue) => void,
   value?: OptionValue,
+  className?: string,
+  radius?: MantineRadius,
 }
 
-const SegmentedControl = <OptionValue extends string>({ data, defaultValue, disabled, onChange, value }: Props<OptionValue>) => {
+const SegmentedControl = <OptionValue extends string>({ className, data, defaultValue, disabled, onChange, value, radius }: Props<OptionValue>) => {
   const theme = useTheme();
 
   return (
     <MantineSegmentedControl color={theme.colors.variant.info}
+                             className={className}
                              data={data}
                              defaultValue={defaultValue}
+                             radius={radius}
                              disabled={disabled}
                              value={value}
                              onChange={onChange}
@@ -42,10 +46,12 @@ const SegmentedControl = <OptionValue extends string>({ data, defaultValue, disa
 };
 
 SegmentedControl.defaultProps = {
+  className: undefined,
   defaultValue: undefined,
   disabled: false,
   onChange: undefined,
   value: undefined,
+  radius: 'xs',
 };
 
 export default SegmentedControl;

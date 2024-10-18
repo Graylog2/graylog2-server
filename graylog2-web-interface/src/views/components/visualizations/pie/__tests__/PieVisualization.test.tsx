@@ -28,6 +28,7 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
 import asMock from 'helpers/mocking/AsMock';
+import AppConfig from 'util/AppConfig';
 
 import { oneRowPivotOneColumnPivot, oneRowPivot } from './fixtures';
 
@@ -60,6 +61,8 @@ describe('PieVisualization', () => {
   useViewsPlugin();
 
   beforeEach(() => {
+    AppConfig.isFeatureEnabled = jest.fn(() => false);
+
     asMock(useExternalValueActions).mockReturnValue({
       isLoading: false,
       externalValueActions: [],

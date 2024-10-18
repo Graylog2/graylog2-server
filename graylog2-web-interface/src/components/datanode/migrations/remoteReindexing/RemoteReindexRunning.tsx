@@ -22,6 +22,8 @@ import { useQueryParam, StringParam } from 'use-query-params';
 
 import { ConfirmDialog } from 'components/common';
 import { Alert, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
@@ -64,12 +66,15 @@ const getColorVariantFromLogLevel = (logLovel: string): ColorVariant|undefined =
 
 const RetryMigrateExistingData = 'RETRY_MIGRATE_EXISTING_DATA';
 
-const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
+const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const { nextSteps, migrationStatus, handleTriggerStep } = useRemoteReindexMigrationStatus(currentStep, onTriggerStep);
   const indicesWithErrors = migrationStatus?.indices.filter((index) => index.status === 'ERROR') || [];
   const [showLogView, setShowLogView] = useState<boolean>(false);
   const [showRetryMigrationConfirmDialog, setShowRetryMigrationConfirmDialog] = useState<boolean>(false);
   const [showLogsQuery, setShowLogsQuery] = useQueryParam('show_logs', StringParam);
+  const sendTelemetry = useSendTelemetry();
+
+  const hasMigrationFailed = migrationStatus?.progress === 100 && migrationStatus?.status === 'ERROR';
 
   useEffect(() => {
     if (showLogsQuery === 'true' && !showLogView) {
@@ -82,7 +87,37 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
     setShowLogsQuery(undefined);
   };
 
-  const hasMigrationFailed = migrationStatus?.progress === 100 && migrationStatus?.status === 'ERROR';
+  const handleLogViewClick = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.REMOTEREINDEX_RUNNING_LOGVIEW_CLICKED, {
+      app_pathname: 'datanode',
+      app_section: 'migration',
+    });
+
+    setShowLogView(true);
+  };
+
+  const handleRetryClick = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.REMOTEREINDEX_RUNNING_RETRY_CLICKED, {
+      app_pathname: 'datanode',
+      app_section: 'migration',
+    });
+
+    if (hasMigrationFailed) {
+      handleTriggerStep(RetryMigrateExistingData);
+    } else {
+      setShowRetryMigrationConfirmDialog(true);
+    }
+  };
+
+  const handleRetryConfirmClick = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.REMOTEREINDEX_RUNNING_RETRY_CONFIRM_CLICKED, {
+      app_pathname: 'datanode',
+      app_section: 'migration',
+    });
+
+    handleTriggerStep(RetryMigrateExistingData);
+    setShowRetryMigrationConfirmDialog(false);
+  };
 
   return (
     <>
@@ -103,18 +138,15 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
           </IndicesContainer>
         </Alert>
       )}
-      <MigrationStepTriggerButtonToolbar nextSteps={(nextSteps || currentStep.next_steps).filter((step) => step !== RetryMigrateExistingData)} onTriggerStep={handleTriggerStep}>
-        <Button bsStyle="default" bsSize="small" onClick={() => setShowLogView(true)}>Log View</Button>
-        <Button bsStyle="default" bsSize="small" onClick={() => (hasMigrationFailed ? handleTriggerStep(RetryMigrateExistingData) : setShowRetryMigrationConfirmDialog(true))}>{MIGRATION_ACTIONS[RetryMigrateExistingData]?.label}</Button>
+      <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={(nextSteps || currentStep.next_steps).filter((step) => step !== RetryMigrateExistingData)} onTriggerStep={handleTriggerStep}>
+        <Button bsStyle="default" bsSize="small" onClick={handleLogViewClick}>Log View</Button>
+        <Button bsStyle="default" bsSize="small" onClick={handleRetryClick}>{MIGRATION_ACTIONS[RetryMigrateExistingData]?.label}</Button>
       </MigrationStepTriggerButtonToolbar>
       {showRetryMigrationConfirmDialog && (
         <ConfirmDialog show={showRetryMigrationConfirmDialog}
                        title="Retry migrating existing data"
                        onCancel={() => setShowRetryMigrationConfirmDialog(false)}
-                       onConfirm={() => {
-                         handleTriggerStep(RetryMigrateExistingData);
-                         setShowRetryMigrationConfirmDialog(false);
-                       }}>
+                       onConfirm={handleRetryConfirmClick}>
           Are you sure you want to stop the current running remote reindexing migration and retry migrating existing data?
         </ConfirmDialog>
       )}
@@ -133,7 +165,8 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
                   <table>
                     <tbody>
                       {migrationStatus.logs.map((log) => (
-                        <tr title={new Date(log.timestamp).toLocaleString()}>
+                        <tr>
+                          <td width={180}>{new Date(log.timestamp).toLocaleString()}</td>
                           <td width={80}>[<StyledLog $colorVariant={getColorVariantFromLogLevel(log.log_level)}>{log.log_level}</StyledLog>]</td>
                           <td><StyledLog $colorVariant={getColorVariantFromLogLevel(log.log_level)}>{log.message}</StyledLog></td>
                         </tr>

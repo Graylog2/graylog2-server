@@ -55,6 +55,7 @@ describe('ShowViewPage', () => {
     properties: List<any>(),
     state: {},
     created_at: '2022-01-01 00:00:00',
+    last_updated_at: '2022-01-01 00:00:00',
     owner: 'admin',
     requires: {},
     favorite: false,

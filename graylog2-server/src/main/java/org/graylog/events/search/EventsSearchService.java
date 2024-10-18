@@ -156,6 +156,7 @@ public class EventsSearchService {
                 .map(eventDefinitionService::get)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toMap(EventDefinitionDto::id, d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description())));
+                .collect(Collectors.toMap(EventDefinitionDto::id,
+                        d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description(), d.remediationSteps())));
     }
 }

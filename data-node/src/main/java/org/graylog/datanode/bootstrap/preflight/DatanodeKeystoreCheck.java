@@ -16,20 +16,32 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import jakarta.inject.Inject;
 import org.graylog.datanode.configuration.DatanodeKeystore;
+import org.graylog.datanode.configuration.DatanodeKeystoreException;
+import org.graylog.datanode.opensearch.CsrRequester;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
+import org.graylog2.plugin.certificates.RenewalPolicy;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.KeyStore;
-import java.security.Security;
 import java.time.Duration;
+import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This check verifies that each datanode has a private key configured. It may be needed right now, but at the moment
@@ -46,11 +58,24 @@ public class DatanodeKeystoreCheck implements PreflightCheck {
 
     private final DatanodeKeystore datanodeKeystore;
     private final LegacyDatanodeKeystoreProvider legacyDatanodeKeystoreProvider;
+    private final CsrRequester csrRequester;
+    private final DatanodeCertReceiver datanodeCertReceiver;
+
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public DatanodeKeystoreCheck(DatanodeKeystore datanodeKeystore, LegacyDatanodeKeystoreProvider legacyDatanodeKeystoreProvider) {
+    public DatanodeKeystoreCheck(
+            DatanodeKeystore datanodeKeystore,
+            LegacyDatanodeKeystoreProvider legacyDatanodeKeystoreProvider,
+            CsrRequester csrRequester,
+            DatanodeCertReceiver datanodeCertReceiver, ClusterConfigService clusterConfigService
+
+    ) {
         this.datanodeKeystore = datanodeKeystore;
         this.legacyDatanodeKeystoreProvider = legacyDatanodeKeystoreProvider;
+        this.csrRequester = csrRequester;
+        this.datanodeCertReceiver = datanodeCertReceiver;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -71,6 +96,54 @@ public class DatanodeKeystoreCheck implements PreflightCheck {
             }
         } else {
             LOG.debug("Private key for this data node already exists, skipping creation.");
+            checkCertificateRenewal();
+        }
+    }
+
+    private void checkCertificateRenewal() {
+        try {
+            if (isAutomaticRenewal() && datanodeKeystore.hasSignedCertificate()) {
+                final Date expiration = datanodeKeystore.getCertificateExpiration();
+                final Date now = new Date();
+                final boolean expired = now.after(expiration);
+                if (expired) {
+                    LOG.info("Datanode certificate expired on {}. Requesting and awaiting new certificate", expiration);
+                    csrRequester.triggerCertificateSigningRequest();
+                    waitForCertificateRenewal();
+                }
+            }
+        } catch (DatanodeKeystoreException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean isAutomaticRenewal() {
+        return Optional.ofNullable(this.clusterConfigService.get(RenewalPolicy.class))
+                .map(RenewalPolicy::mode)
+                .filter(RenewalPolicy.Mode.AUTOMATIC::equals)
+                .isPresent();
+    }
+
+    private void waitForCertificateRenewal() {
+        try {
+            RetryerBuilder.<Date>newBuilder()
+                    .retryIfResult(expiration -> {
+                        final Date now = new Date();
+                        return now.after(expiration);
+                    })
+                    .withStopStrategy(StopStrategies.neverStop())
+                    .withWaitStrategy(WaitStrategies.fixedWait(5, TimeUnit.SECONDS))
+                    .withRetryListener(new RetryListener() {
+                        @Override
+                        public <V> void onRetry(Attempt<V> attempt) {
+                            LOG.info("Waiting for datanode certificate renewal, retry #{}", attempt.getAttemptNumber());
+                            datanodeCertReceiver.pollCertificate();
+                        }
+                    })
+                    .build()
+                    .call(datanodeKeystore::getCertificateExpiration);
+        } catch (ExecutionException | RetryException e) {
+            throw new RuntimeException(e);
         }
     }
 

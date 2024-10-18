@@ -32,6 +32,8 @@ import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsT
 import org.graylog.plugins.views.migrations.V20200409083200_RemoveRootQueriesFromMigratedDashboards;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.migrations.V20240605120000_RemoveUnitFieldFromSearchDocuments;
+import org.graylog.plugins.views.migrations.V20240626143000_CreateDashboardsView;
+import org.graylog.plugins.views.migrations.V20240704100700_DashboardAddLastUpdated;
 import org.graylog.plugins.views.providers.ExportBackendProvider;
 import org.graylog.plugins.views.providers.QuerySuggestionsProvider;
 import org.graylog.plugins.views.search.SearchRequirements;
@@ -54,6 +56,7 @@ import org.graylog.plugins.views.search.export.SimpleMessageChunkCsvWriter;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
+import org.graylog.plugins.views.search.filter.StreamCategoryFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService;
 import org.graylog.plugins.views.search.querystrings.MongoLastUsedQueryStringsService;
@@ -175,6 +178,7 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(AndFilter.class);
         registerJacksonSubtype(OrFilter.class);
         registerJacksonSubtype(StreamFilter.class);
+        registerJacksonSubtype(StreamCategoryFilter.class);
         registerJacksonSubtype(QueryStringFilter.class);
 
         // query backends for jackson
@@ -239,6 +243,8 @@ public class ViewsBindings extends ViewsModule {
         addMigration(V20200409083200_RemoveRootQueriesFromMigratedDashboards.class);
         addMigration(V20200730000000_AddGl2MessageIdFieldAliasForEvents.class);
         addMigration(V20240605120000_RemoveUnitFieldFromSearchDocuments.class);
+        addMigration(V20240626143000_CreateDashboardsView.class);
+        addMigration(V20240704100700_DashboardAddLastUpdated.class);
 
         addAuditEventTypes(ViewsAuditEventTypes.class);
 

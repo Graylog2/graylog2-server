@@ -18,13 +18,13 @@ import * as React from 'react';
 import { useContext, useMemo, useCallback } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
-import type * as Plotly from 'plotly.js';
 import type { Layout } from 'plotly.js';
 
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import { ROOT_FONT_SIZE } from 'theme/constants';
+import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
 
 import ChartColorContext from './ChartColorContext';
 
@@ -101,6 +101,7 @@ type Props = {
   onClickMarker?: (event: OnClickMarkerEvent) => void
   onHoverMarker?: (event: OnHoverMarkerEvent) => void,
   onUnhoverMarker?: () => void,
+  onAfterPlot?: () => void,
 };
 
 type Axis = {
@@ -117,7 +118,7 @@ const style = { height: '100%', width: '100%' };
 
 const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
 
-const usePlotLayout = (layout: {}) => {
+const usePlotLayout = (layout: Partial<Layout>) => {
   const theme = useTheme();
   const interactive = useContext(InteractiveContext);
   const { colors } = useContext(ChartColorContext);
@@ -152,14 +153,7 @@ const usePlotLayout = (layout: {}) => {
       title: {
         font: fontSettings,
       },
-      yaxis: {
-        automargin: true,
-        gridcolor: theme.colors.variant.lightest.default,
-        tickfont: fontSettings,
-        title: {
-          font: fontSettings,
-        },
-      },
+      yaxis: getDefaultPlotYLayoutSettings(theme),
       xaxis: {
         automargin: true,
         tickfont: fontSettings,
@@ -176,8 +170,8 @@ const usePlotLayout = (layout: {}) => {
       line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
     }));
 
-    return interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout);
-  }, [colors, interactive, layout, theme.colors.global.textDefault, theme.colors.variant.lightest.default, theme.fonts.family.body, theme.fonts.size.small]);
+    return interactive ? plotLayout : merge({}, plotLayout, nonInteractiveLayout);
+  }, [colors, interactive, layout, theme]);
 };
 
 const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfig, color: ColorMapper) => ChartColor) => {
@@ -209,7 +203,7 @@ const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfi
   }), [chartData, colors, setChartColor, theme.colors.global.textDefault]);
 };
 
-const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverMarker, onUnhoverMarker, onZoom }: Props) => {
+const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverMarker, onUnhoverMarker, onZoom, onAfterPlot }: Props) => {
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);
   const plotChartData = usePlotChatData(chartData, setChartColor);
@@ -242,12 +236,17 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
     });
   }, [onClickMarker]);
 
+  const _onAfterPlot = useCallback(() => {
+    onRenderComplete();
+    onAfterPlot();
+  }, [onRenderComplete, onAfterPlot]);
+
   return (
     <StyledPlot data={plotChartData}
                 useResizeHandler
                 layout={plotLayout}
                 style={style}
-                onAfterPlot={onRenderComplete}
+                onAfterPlot={_onAfterPlot}
                 onClick={interactive ? _onMarkerClick : () => false}
                 onHover={_onHoverMarker}
                 onUnhover={onUnhoverMarker}
@@ -260,9 +259,10 @@ GenericPlot.defaultProps = {
   layout: {},
   onZoom: () => {},
   setChartColor: undefined,
-  onClickMarker: (_event) => {},
-  onHoverMarker: (_event) => {},
+  onClickMarker: () => {},
+  onHoverMarker: () => {},
   onUnhoverMarker: () => {},
+  onAfterPlot: () => {},
 };
 
 export default GenericPlot;

@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.rest;
 
-import com.github.joschi.jadconfig.ValidationException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -25,7 +24,6 @@ import jakarta.ws.rs.core.MediaType;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.DirectoryReadableValidator;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
@@ -66,7 +64,7 @@ public class IndicesDirectoryController {
                     .map(node -> String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, node.nodeVersion()))
                     .toList();
             return new CompatibilityResult(hostname, opensearchVersion, info, compatibilityErrors);
-        } catch (IncompatibleIndexVersionException | ValidationException e) {
+        } catch (Exception e) {
             return new CompatibilityResult(hostname, opensearchVersion, new IndexerDirectoryInformation(dataTargetDir, Collections.emptyList()), Collections.singletonList(e.getMessage()));
         }
     }

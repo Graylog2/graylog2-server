@@ -22,13 +22,14 @@ import { Formik, Form, Field } from 'formik';
 
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import { FormikInput, Icon } from 'components/common';
+import { FormikInput, Icon, Dropzone } from 'components/common';
 import { Button, Label, Alert } from 'components/bootstrap';
-import { Dropzone } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type FormValues = {
   files?: Array<File>,
@@ -60,7 +61,7 @@ const File = styled.div`
   align-items: center;
 `;
 
-const DeleteIcon: React.ComponentType<{ name: 'xmark', onClick: () => void }> = styled(Icon)`
+const DeleteIcon = styled(Icon)`
   cursor: pointer;
 `;
 
@@ -96,6 +97,7 @@ const Explanation = styled.p`
 
 const CAUpload = () => {
   const queryClient = useQueryClient();
+  const sendTelemetry = useSendTelemetry();
   const onRejectUpload = useCallback(() => {
     UserNotification.error('CA upload failed');
   }, []);
@@ -111,7 +113,14 @@ const CAUpload = () => {
     },
   });
 
-  const onSubmit = useCallback((formValues: FormValues) => onProcessUpload(formValues).catch(() => {}), [onProcessUpload]);
+  const onSubmit = useCallback((formValues: FormValues) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_UPLOAD_CA_CLICKED, {
+      app_pathname: 'datanode',
+      app_section: 'migration',
+    });
+
+    return onProcessUpload(formValues).catch(() => {});
+  }, [onProcessUpload, sendTelemetry]);
 
   return (
     <Formik<FormValues> initialValues={{}} onSubmit={onSubmit} validate={validate}>
@@ -148,7 +157,7 @@ const CAUpload = () => {
                 <Files>
                   {value?.filter((file) => !!file).map(({ name: fileName }, index) => (
                     <File key={fileName}>
-                      <Icon name="draft" /> {fileName} <DeleteIcon name="xmark"
+                      <Icon name="draft" /> {fileName} <DeleteIcon name="cancel"
                                                                    onClick={() => {
                                                                      const newValue = value.filter((_ignored, idx) => idx !== index);
                                                                      onChange({ target: { name, value: newValue } });

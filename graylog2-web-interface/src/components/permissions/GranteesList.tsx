@@ -39,7 +39,7 @@ const Header = styled.div`
 
 const List = styled.div(({ theme }) => `
   >:nth-child(even) {
-    background: ${theme.colors.table.row.backgroundAlt};
+    background: ${theme.colors.table.row.backgroundStriped};
   };
 
   >:nth-child(odd) {

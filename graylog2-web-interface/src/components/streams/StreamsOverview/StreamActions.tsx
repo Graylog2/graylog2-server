@@ -22,9 +22,7 @@ import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import Routes from 'routing/Routes';
-import HideOnCloud from 'util/conditional/HideOnCloud';
 import { StartpageStore } from 'stores/users/StartpageStore';
-import UserNotification from 'util/UserNotification';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
@@ -35,8 +33,10 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { LinkContainer } from 'components/common/router';
-
-import StreamModal from '../StreamModal';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import UserNotification from 'util/UserNotification';
+import StreamDeleteModal from 'components/streams/StreamsOverview/StreamDeleteModal';
+import StreamModal from 'components/streams/StreamModal';
 
 const DefaultStreamHelp = () => (
   <HoverForHelp displayLeftMargin>Action not available for the default
@@ -53,6 +53,7 @@ const StreamActions = ({
 }) => {
   const currentUser = useCurrentUser();
   const { deselectEntity } = useSelectedEntities();
+  const [showDeleteModal, setDeleteModal] = useState(false);
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const [showStreamRuleModal, setShowStreamRuleModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -94,6 +95,10 @@ const StreamActions = ({
     setShowEntityShareModal((cur) => !cur);
   }, [sendTelemetry]);
 
+  const toggleDeleteModal = useCallback(() => {
+    setDeleteModal((cur) => !cur);
+  }, []);
+
   const toggleUpdateModal = useCallback(() => {
     setShowUpdateModal((cur) => !cur);
   }, []);
@@ -107,21 +112,19 @@ const StreamActions = ({
   }, []);
 
   const onDelete = useCallback(() => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Do you really want to remove this stream?')) {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DELETED, {
-        app_pathname: 'streams',
-        app_action_value: 'stream-item-delete',
-      });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DELETED, {
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-delete',
+    });
 
-      StreamsStore.remove(stream.id).then(() => {
-        deselectEntity(stream.id);
-        UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
-      }).catch((error) => {
-        UserNotification.error(`An error occurred while deleting the stream. ${error}`);
-      });
-    }
-  }, [deselectEntity, sendTelemetry, stream.id, stream.title]);
+    StreamsStore.remove(stream.id).then(() => {
+      deselectEntity(stream.id);
+      UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
+      toggleDeleteModal();
+    }).catch((error) => {
+      UserNotification.error(`An error occurred while deleting the stream. ${error}`);
+    });
+  }, [deselectEntity, sendTelemetry, stream.id, stream.title, toggleDeleteModal]);
 
   const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(stream.id, streamRule, () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_RULE_SAVED, {
@@ -156,9 +159,19 @@ const StreamActions = ({
 
   return (
     <ButtonToolbar>
-      <LinkContainer to={Routes.stream_view(stream.id)}>
-        <Button disabled={isNotEditable} bsStyle="primary" bsSize="xsmall">View details</Button>
-      </LinkContainer>
+      <IfPermitted permissions={`streams:edit:${stream.id}`}>
+        <LinkContainer to={Routes.stream_view(stream.id)}>
+          <Button disabled={isNotEditable}
+                  bsStyle="primary"
+                  bsSize="xsmall"
+                  onClick={() => {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_CLICKED, {
+                      app_pathname: 'stream',
+                    });
+                  }}>Data Routing
+          </Button>
+        </LinkContainer>
+      </IfPermitted>
       <ShareButton entityId={stream.id}
                    entityType="stream"
                    onClick={toggleEntityShareModal}
@@ -221,7 +234,7 @@ const StreamActions = ({
         </IfPermitted>
 
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <MenuItem onSelect={onDelete} disabled={isDefaultStream}>
+          <MenuItem onSelect={toggleDeleteModal} disabled={isDefaultStream}>
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
@@ -256,6 +269,12 @@ const StreamActions = ({
                           entityTitle={stream.title}
                           description="Search for a User or Team to add as collaborator on this stream."
                           onClose={toggleEntityShareModal} />
+      )}
+      {showDeleteModal && (
+      <StreamDeleteModal streamTitle={stream.title}
+                         streamId={stream.id}
+                         onCancel={toggleDeleteModal}
+                         onDelete={onDelete} />
       )}
     </ButtonToolbar>
   );

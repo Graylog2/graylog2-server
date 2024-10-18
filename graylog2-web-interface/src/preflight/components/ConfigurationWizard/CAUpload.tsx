@@ -23,10 +23,11 @@ import { Formik, Form, Field } from 'formik';
 import Icon from 'components/common/Icon';
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
-import { Input, Dropzone, FormikInput, Button, Space } from 'preflight/components/common';
+import { Input, FormikInput, Button, Space } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
+import Dropzone from 'components/common/Dropzone';
 
 type FormValues = {
   files?: Array<File>,
@@ -58,7 +59,7 @@ const File = styled.div`
   align-items: center;
 `;
 
-const DeleteIcon: React.ComponentType<{ name: 'xmark', onClick: () => void }> = styled(Icon)`
+const DeleteIcon = styled(Icon)`
   cursor: pointer;
 `;
 
@@ -145,7 +146,7 @@ const CAUpload = () => {
                 <Files>
                   {value?.filter((file) => !!file).map(({ name: fileName }, index) => (
                     <File key={fileName}>
-                      <Icon name="draft" /> {fileName} <DeleteIcon name="xmark"
+                      <Icon name="draft" /> {fileName} <DeleteIcon name="cancel"
                                                                    onClick={() => {
                                                                      const newValue = value.filter((_ignored, idx) => idx !== index);
                                                                      onChange({ target: { name, value: newValue } });

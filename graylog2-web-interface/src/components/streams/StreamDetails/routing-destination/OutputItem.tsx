@@ -19,11 +19,9 @@ import styled, { css } from 'styled-components';
 
 import type { Output } from 'stores/outputs/OutputsStore';
 import type { ConfigurationFormData } from 'components/configurationforms';
-
-import EditOutputButton from './EditOutputButton';
-import RemoveOutputButton from './RemoveOutputButton';
-
-import type { AvailableOutputRequestedConfiguration } from '../../useAvailableOutputTypes';
+import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
+import EditOutputButton from 'components/streams/StreamDetails/routing-destination/EditOutputButton';
+import RemoveOutputButton from 'components/streams/StreamDetails/routing-destination/RemoveOutputButton';
 
 type Props = {
   output: Output,
@@ -41,7 +39,7 @@ const ActionButtonsWrap = styled.span(({ theme }) => css`
 const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeDefinition }: Props) => (
   <tr>
     <td>{output.title} <small>{`(Type: ${output.type})`}</small> </td>
-    {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+    {}
     <td>
       <ActionButtonsWrap className="align-right">
         <EditOutputButton disabled={isLoadingOutputTypes}

@@ -147,6 +147,7 @@ const ApiRoutes = {
   IndexerClusterApiController: {
     health: () => ({ url: '/system/indexer/cluster/health' }),
     name: () => ({ url: '/system/indexer/cluster/name' }),
+    info: () => ({ url: '/system/indexer/cluster/info' }),
   },
   IndexerFailuresApiController: {
     count: (since: number) => ({ url: `/system/indexer/failures/count?since=${since}` }),
@@ -164,6 +165,7 @@ const ApiRoutes = {
     list: (stats) => ({ url: `/system/indices/index_sets?stats=${stats}` }),
     listPaginated: (skip, limit, stats) => ({ url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}` }),
     get: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}` }),
+    getIndexSetStats: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}/stats` }),
     create: () => ({ url: '/system/indices/index_sets' }),
     delete: (indexSetId: string, deleteIndices) => ({ url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}` }),
     searchPaginated: (searchTerm, skip, limit, stats) => ({ url: `/system/indices/index_sets/search?searchTitle=${searchTerm}&skip=${skip}&limit=${limit}&stats=${stats}` }),
@@ -265,6 +267,12 @@ const ApiRoutes = {
     delete: (streamId: string, streamRuleId: string) => ({ url: `/streams/${streamId}/rules/${streamRuleId}` }),
     update: (streamId: string, streamRuleId: string) => ({ url: `/streams/${streamId}/rules/${streamRuleId}` }),
     create: (streamId: string) => ({ url: `/streams/${streamId}/rules` }),
+  },
+  StreamOutputFilterRuleApiController: {
+    get: (streamId: string) => ({ url: `/streams/${streamId}/destinations/filters` }),
+    delete: (streamId: string, filterId: string) => ({ url: `/streams/${streamId}/destinations/filters/${filterId}` }),
+    update: (streamId: string, filterId: string) => ({ url: `/streams/${streamId}/destinations/filters/${filterId}` }),
+    create: (streamId: string) => ({ url: `/streams/${streamId}/destinations/filters` }),
   },
   SystemApiController: {
     info: () => ({ url: '/system' }),

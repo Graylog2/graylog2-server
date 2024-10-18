@@ -30,7 +30,7 @@ import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
-import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import type { PaginatedResponse, FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 const SearchRow = styled.div`
@@ -53,6 +53,7 @@ type Props<T> = {
   entityAttributesAreCamelCase: boolean,
   expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'],
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T>>,
+  fetchOptions?: FetchOptions,
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'],
   humanName: string,
   keyFn: (options: SearchParams) => Array<unknown>,
@@ -78,7 +79,7 @@ const PaginatedEntityTable = <T extends EntityBase>({
   actionsCellWidth, columnsOrder, entityActions, tableLayout, fetchEntities, keyFn,
   humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
   expandedSectionsRenderer, bulkSelection, additionalAttributes,
-  entityAttributesAreCamelCase, topRightCol, searchPlaceholder,
+  entityAttributesAreCamelCase, topRightCol, searchPlaceholder, fetchOptions: reactQueryOptions,
 }: Props<T>) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
@@ -98,7 +99,7 @@ const PaginatedEntityTable = <T extends EntityBase>({
     data: paginatedEntities = INITIAL_DATA,
     isInitialLoading: isLoadingEntities,
     refetch,
-  } = useFetchEntities<T>({ fetchKey, searchParams: fetchOptions, enabled: !isLoadingLayoutPreferences, fetchEntities, humanName });
+  } = useFetchEntities<T>({ fetchKey, searchParams: fetchOptions, enabled: !isLoadingLayoutPreferences, fetchEntities, humanName, fetchOptions: reactQueryOptions });
 
   const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
     paginationQueryParameter.resetPage();
@@ -184,6 +185,7 @@ PaginatedEntityTable.defaultProps = {
   queryHelpComponent: undefined,
   topRightCol: undefined,
   searchPlaceholder: undefined,
+  fetchOptions: undefined,
 };
 
 export default PaginatedEntityTable;

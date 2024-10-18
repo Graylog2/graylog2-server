@@ -50,6 +50,9 @@ export const mockEventData = {
     streams: [
       '002',
     ],
+    stream_categories: [
+      'firewall',
+    ],
     source_streams: [
       '001',
     ],
@@ -65,6 +68,9 @@ export const mockEventData = {
       query: 'http_method: GET',
       streams: [
         '001',
+      ],
+      stream_categories: [
+        'firewall',
       ],
     },
     group_by_fields: { field4: 'value4' },
@@ -88,6 +94,9 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
     _is_scheduled: true,
     streams: [
       '001',
+    ],
+    stream_categories: [
+      'firewall',
     ],
     group_by: [
       'field1',
@@ -214,7 +223,7 @@ export const mockedMappedAggregationNoField: Array<EventDefinitionAggregation> =
   },
 ];
 const eventData = mockEventData.event;
-const query = QueryGenerator(eventData.replay_info.streams, 'query-id', {
+const query = QueryGenerator(eventData.replay_info.streams, eventData.replay_info.stream_categories, 'query-id', {
   type: 'absolute',
   from: eventData?.replay_info?.timerange_start,
   to: eventData?.replay_info?.timerange_end,
@@ -308,6 +317,11 @@ const searchTwoAggregations = Search.create().toBuilder().id('search-id').querie
     .toBuilder()
     .searchTypes(Array(5).fill({
       filters: [],
+      id: undefined,
+      query: undefined,
+      stream_categories: undefined,
+      streams: undefined,
+      timerange: undefined,
       type: 'AGGREGATION',
       typeDefinition: {},
     })).build()])
@@ -416,7 +430,7 @@ export const mockedViewWithOneAggregationNoField = View.create()
   .search(searchOneAggregation)
   .build();
 
-const queryED = QueryGenerator(eventData.replay_info.streams, 'query-id', {
+const queryED = QueryGenerator(eventData.replay_info.streams, eventData.replay_info.stream_categories, 'query-id', {
   type: 'relative',
   range: 60,
 }, {

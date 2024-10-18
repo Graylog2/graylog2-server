@@ -43,6 +43,11 @@ export type DataTieringFormValues = {
   warm_tier_repository_name?: string | null,
 }
 
+export type DataTieringStatus = {
+  has_failed_snapshot: boolean,
+  failed_snapshot_name: string | null,
+}
+
 export const dataTieringPropType = PropTypes.shape({
   type: PropTypes.oneOf(['hot_only', 'hot_warm']).isRequired,
   index_lifetime_min: PropTypes.string.isRequired,

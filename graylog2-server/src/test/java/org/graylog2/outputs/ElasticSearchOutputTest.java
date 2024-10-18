@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.messages.ImmutableMessage.wrap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -101,13 +102,13 @@ public class ElasticSearchOutputTest {
         }
 
         verify(messages, times(1)).bulkIndex(eq(List.of(
-                new MessageWithIndex(messageList.get(0), defaultIndexSet)
+                new MessageWithIndex(wrap(messageList.get(0)), defaultIndexSet)
         )));
         verify(messages, times(1)).bulkIndex(eq(List.of(
-                new MessageWithIndex(messageList.get(1), defaultIndexSet)
+                new MessageWithIndex(wrap(messageList.get(1)), defaultIndexSet)
         )));
         verify(messages, times(1)).bulkIndex(eq(List.of(
-                new MessageWithIndex(messageList.get(2), defaultIndexSet)
+                new MessageWithIndex(wrap(messageList.get(2)), defaultIndexSet)
         )));
 
         verifyNoMoreInteractions(messages);
@@ -120,9 +121,9 @@ public class ElasticSearchOutputTest {
         output.write(messageList);
 
         verify(messages, times(1)).bulkIndex(eq(List.of(
-                new MessageWithIndex(messageList.get(0), defaultIndexSet),
-                new MessageWithIndex(messageList.get(1), defaultIndexSet),
-                new MessageWithIndex(messageList.get(2), defaultIndexSet)
+                new MessageWithIndex(wrap(messageList.get(0)), defaultIndexSet),
+                new MessageWithIndex(wrap(messageList.get(1)), defaultIndexSet),
+                new MessageWithIndex(wrap(messageList.get(2)), defaultIndexSet)
         )));
 
         verifyNoMoreInteractions(messages);
@@ -142,14 +143,14 @@ public class ElasticSearchOutputTest {
         verify(messages, times(1)).bulkIndex(argThat(argument -> {
             assertThat(argument).size().isEqualTo(7);
             assertThat(argument).containsExactlyInAnyOrderElementsOf(List.of(
-                    new MessageWithIndex(messageList.get(0), defaultIndexSet),
-                    new MessageWithIndex(messageList.get(0), testIndexSet),
-                    new MessageWithIndex(messageList.get(1), defaultIndexSet),
-                    new MessageWithIndex(messageList.get(1), testIndexSet),
-                    new MessageWithIndex(messageList.get(2), defaultIndexSet),
-                    new MessageWithIndex(messageList.get(2), testIndexSet),
+                    new MessageWithIndex(wrap(messageList.get(0)), defaultIndexSet),
+                    new MessageWithIndex(wrap(messageList.get(0)), testIndexSet),
+                    new MessageWithIndex(wrap(messageList.get(1)), defaultIndexSet),
+                    new MessageWithIndex(wrap(messageList.get(1)), testIndexSet),
+                    new MessageWithIndex(wrap(messageList.get(2)), defaultIndexSet),
+                    new MessageWithIndex(wrap(messageList.get(2)), testIndexSet),
                     // Only one message for the 4th message because it only contains the test stream.
-                    new MessageWithIndex(messageList.get(3), testIndexSet)
+                    new MessageWithIndex(wrap(messageList.get(3)), testIndexSet)
             ));
             return true;
         }));
@@ -163,12 +164,12 @@ public class ElasticSearchOutputTest {
 
         output.writeFiltered(List.of(
                 // The first message should not be written to the output because the output's filter key is not included.
-                new DefaultFilteredMessage(messageList.get(0), Set.of("foo")),
-                new DefaultFilteredMessage(messageList.get(1), Set.of("foo", ElasticSearchOutput.FILTER_KEY))
+                DefaultFilteredMessage.forDestinationKeys(messageList.get(0), Set.of("foo")),
+                DefaultFilteredMessage.forDestinationKeys(messageList.get(1), Set.of("foo", ElasticSearchOutput.FILTER_KEY))
         ));
 
         verify(messages, times(1)).bulkIndex(eq(List.of(
-                new MessageWithIndex(messageList.get(1), defaultIndexSet)
+                new MessageWithIndex(wrap(messageList.get(1)), defaultIndexSet)
         )));
 
         verifyNoMoreInteractions(messages);
@@ -182,15 +183,15 @@ public class ElasticSearchOutputTest {
 
         output.writeFiltered(List.of(
                 // The first message should not be written to the output because the output's filter key is not included.
-                new DefaultFilteredMessage(messageList.get(0), Set.of("foo")),
-                new DefaultFilteredMessage(messageList.get(1), Set.of("foo", ElasticSearchOutput.FILTER_KEY))
+                DefaultFilteredMessage.forDestinationKeys(messageList.get(0), Set.of("foo")),
+                DefaultFilteredMessage.forDestinationKeys(messageList.get(1), Set.of("foo", ElasticSearchOutput.FILTER_KEY))
         ));
 
         verify(messages, times(1)).bulkIndex(argThat(argument -> {
             assertThat(argument).size().isEqualTo(2);
             assertThat(argument).containsExactlyInAnyOrderElementsOf(List.of(
-                    new MessageWithIndex(messageList.get(1), defaultIndexSet),
-                    new MessageWithIndex(messageList.get(1), testIndexSet)
+                    new MessageWithIndex(wrap(messageList.get(1)), defaultIndexSet),
+                    new MessageWithIndex(wrap(messageList.get(1)), testIndexSet)
             ));
             return true;
         }));

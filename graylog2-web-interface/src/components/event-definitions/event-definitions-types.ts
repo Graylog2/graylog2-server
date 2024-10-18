@@ -75,6 +75,7 @@ export type EventDefinition = {
     query_parameters: LookupTableParameterJson[],
     filters: SearchFilter[],
     streams: string[],
+    stream_categories?: string[],
     group_by: string[],
     _is_scheduled: boolean,
     series: Array<{field: string, id: string, type: string}>,

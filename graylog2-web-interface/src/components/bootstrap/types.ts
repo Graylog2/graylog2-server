@@ -16,4 +16,4 @@
  */
 
 export type SelectCallback = (eventKey: any) => void;
-export type BsSize = 'xs' | 'xsmall' | 'sm' | 'small' | 'medium' | 'lg' | 'large';
+export type BsSize = 'xs' | 'xsmall' | 'sm' | 'small' | 'md' | 'medium' | 'lg' | 'large';

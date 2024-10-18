@@ -87,6 +87,8 @@ describe('EventsList', () => {
                   data={props.data}
                   config={props.config}
                   fields={props.fields}
+                  height={480}
+                  width={640}
                   {...props} />
     </TestStoreProvider>
   );

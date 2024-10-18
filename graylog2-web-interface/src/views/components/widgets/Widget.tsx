@@ -45,6 +45,7 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
+import FullSizeContainer from 'views/components/aggregationbuilder/FullSizeContainer';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -122,18 +123,24 @@ const Visualization = ({
     const { config, filter } = widget;
 
     return (
-      <VisComponent config={config}
-                    data={data as WidgetResults}
-                    editing={editing}
-                    fields={fields}
-                    filter={filter}
-                    queryId={queryId}
-                    onConfigChange={onWidgetConfigChange}
-                    setLoadingState={setLoadingState}
-                    title={title}
-                    toggleEdit={onToggleEdit}
-                    type={widget.type}
-                    id={id} />
+      <FullSizeContainer>
+        {({ height, width }) => (
+          <VisComponent config={config}
+                        data={data as WidgetResults}
+                        editing={editing}
+                        fields={fields}
+                        filter={filter}
+                        queryId={queryId}
+                        onConfigChange={onWidgetConfigChange}
+                        setLoadingState={setLoadingState}
+                        title={title}
+                        toggleEdit={onToggleEdit}
+                        type={widget.type}
+                        id={id}
+                        height={height}
+                        width={width} />
+        )}
+      </FullSizeContainer>
     );
   }
 
@@ -259,6 +266,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
             <WidgetHeader title={title}
                           hideDragHandle={!interactive || isFocused}
                           loading={loading}
+                          editing={editing}
                           onRename={onRenameWidget}>
               {!editing ? (
                 <WidgetActionsMenu isFocused={isFocused}

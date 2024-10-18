@@ -19,6 +19,7 @@ package org.graylog.datanode.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.opensearch.OpensearchProcess;
@@ -44,6 +45,8 @@ public class OpensearchProcessBindings extends AbstractModule {
         // this service both starts and provides the opensearch process
         serviceBinder.addBinding().to(OpensearchConfigurationService.class).asEagerSingleton();
         serviceBinder.addBinding().to(OpensearchProcessService.class).asEagerSingleton();
+
+        bind(DatanodeTrustManagerProvider.class);
 
         // tracer
         Multibinder<StateMachineTracer> tracerBinder = Multibinder.newSetBinder(binder(), StateMachineTracer.class);

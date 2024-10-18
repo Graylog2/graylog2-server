@@ -131,8 +131,8 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
             // If this filter references a newly imported filter, update this filter with the ID of the new filter created in MongoDB.
             return this.withId(dbFilter.id());
         } else {
-            // Otherwise return this filter as it is in the parent entity.
-            return this;
+            // Otherwise return this filter as it is in the parent entity, but convert to inline.
+            return this.toInlineRepresentation();
         }
     }
 
@@ -159,6 +159,9 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                                        Map<String, ValueReference> parameters,
                                        Map<EntityDescriptor, Entity> entities,
                                        MutableGraph<Entity> graph) {
-        graph.putEdge(entity, entities.get(EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1)));
+        final Entity filterEntity = entities.get(EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1));
+        if (filterEntity != null) {
+            graph.putEdge(entity, filterEntity);
+        }
     }
 }

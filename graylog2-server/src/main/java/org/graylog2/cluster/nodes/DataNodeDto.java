@@ -23,11 +23,12 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.graylog2.plugin.Version;
 
-import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -43,6 +44,7 @@ import java.util.Optional;
 public abstract class DataNodeDto extends NodeDto {
 
     public static final String FIELD_CERT_VALID_UNTIL = "cert_valid_until";
+    public static final String FIELD_DATANODE_VERSION = "datanode_version";
 
     @Nullable
     @JsonProperty("cluster_address")
@@ -59,17 +61,27 @@ public abstract class DataNodeDto extends NodeDto {
     @JsonProperty("action_queue")
     public abstract DataNodeLifecycleTrigger getActionQueue();
 
-    @jakarta.annotation.Nullable
+    @Nullable
     @JsonProperty(FIELD_CERT_VALID_UNTIL)
     public abstract Date getCertValidUntil();
+
+    @Nullable
+    @JsonProperty(FIELD_DATANODE_VERSION)
+    public abstract String getDatanodeVersion();
+
+    @JsonProperty("version_compatible")
+    public boolean isCompatibleWithVersion() {
+        return getDatanodeVersion() != null &&
+                Version.CURRENT_CLASSPATH.compareTo(new Version(com.github.zafarkhaja.semver.Version.valueOf(getDatanodeVersion()))) == 0;
+    }
 
     @Nullable
     @JsonUnwrapped
     public CertRenewalService.ProvisioningInformation getProvisioningInformation() {
         DataNodeProvisioningConfig.State state = switch (getDataNodeStatus()) {
             case AVAILABLE -> DataNodeProvisioningConfig.State.CONNECTED;
-            case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
-            case PREPARED -> DataNodeProvisioningConfig.State.STARTUP_PREPARED;
+            case STARTING -> DataNodeProvisioningConfig.State.STARTING;
+            case PREPARED -> DataNodeProvisioningConfig.State.PROVISIONED;
             default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
         };
 
@@ -106,6 +118,10 @@ public abstract class DataNodeDto extends NodeDto {
             params.put(FIELD_CERT_VALID_UNTIL, getCertValidUntil());
         }
 
+        if(Objects.nonNull(getDatanodeVersion())) {
+            params.put(FIELD_DATANODE_VERSION, getDatanodeVersion());
+        }
+
         return params;
     }
 
@@ -135,6 +151,9 @@ public abstract class DataNodeDto extends NodeDto {
 
         @JsonProperty(FIELD_CERT_VALID_UNTIL)
         public abstract Builder setCertValidUntil(Date certValidUntil);
+
+        @JsonProperty(FIELD_DATANODE_VERSION)
+        public abstract Builder setDatanodeVersion(String datanodeVersion);
 
         public abstract DataNodeDto build();
     }

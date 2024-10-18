@@ -26,6 +26,7 @@ import Routes from 'routing/Routes';
 
 import DataNodeActions from './DataNodeActions';
 import DataNodeStatusCell from './DataNodeStatusCell';
+import DataNodeBulkActions from './DataNodeBulkActions';
 
 import { fetchDataNodes, keyFn } from '../hooks/useDataNodes';
 
@@ -33,16 +34,10 @@ const DEFAULT_LAYOUT = {
   entityTableId: 'datanodes',
   defaultPageSize: 10,
   defaultSort: { attributeId: 'hostname', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'],
+  defaultDisplayedAttributes: ['hostname', 'transport_address', 'data_node_status', 'is_leader', 'cert_valid_until', 'datanode_version'],
 };
 
-const COLUMNS_ORDER = ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'];
-
-const additionalAttributes = [
-  { id: 'transport_address', title: 'Transport address' },
-  { id: 'status', title: 'Status', sortable: false },
-  { id: 'cert_valid_until', title: 'Certificate valid until', sortable: false },
-];
+const COLUMNS_ORDER = ['hostname', 'transport_address', 'data_node_status', 'is_leader', 'cert_valid_until', 'datanode_version'];
 
 const columnRenderers: ColumnRenderers<DataNode> = {
   attributes: {
@@ -53,7 +48,7 @@ const columnRenderers: ColumnRenderers<DataNode> = {
         </Link>
       ),
     },
-    status: {
+    data_node_status: {
       renderCell: (_status: DataNodeStatus, dataNode: DataNode) => <DataNodeStatusCell dataNode={dataNode} />,
     },
     is_leader: {
@@ -72,7 +67,6 @@ const entityActions = (dataNode: DataNode) => (
 const DataNodeList = () => (
   <PaginatedEntityTable<DataNode> humanName="data nodes"
                                   columnsOrder={COLUMNS_ORDER}
-                                  additionalAttributes={additionalAttributes}
                                   queryHelpComponent={(
                                     <QueryHelper entityName="datanode"
                                                  commonFields={['name']}
@@ -83,9 +77,11 @@ const DataNodeList = () => (
                                                    </p>
                                             )} />
                              )}
+                                  bulkSelection={{ actions: <DataNodeBulkActions /> }}
                                   entityActions={entityActions}
                                   tableLayout={DEFAULT_LAYOUT}
                                   fetchEntities={fetchDataNodes}
+                                  fetchOptions={{ refetchInterval: 5000 }}
                                   keyFn={keyFn}
                                   entityAttributesAreCamelCase={false}
                                   columnRenderers={columnRenderers} />
