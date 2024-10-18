@@ -59,7 +59,7 @@ const Button = ({
   ...addonProps
 }: ButtonProps) => <BootstrapInputGroup.Button bsClass={classNames(bsClass, className)} {...addonProps} />;
 
-type InputGroupProps = {
+type InputGroupProps = React.ComponentProps<typeof BootstrapInputGroup> & {
   bsClass?: string;
   className?: string;
   children: React.ReactNode;

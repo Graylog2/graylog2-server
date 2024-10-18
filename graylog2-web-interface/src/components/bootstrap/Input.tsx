@@ -27,7 +27,7 @@ import FormGroup from './FormGroup';
 import InputGroup from './InputGroup';
 import InputWrapper from './InputWrapper';
 
-type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement> & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'>, 'value'> & {
+type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement> & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'onBlur'>, 'value'> & {
   id?: string;
   type?: string;
   name?: string;
@@ -37,7 +37,7 @@ type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement> & Omit<React.
   bsStyle?: 'success' | 'warning' | 'error';
   formGroupClassName?: string;
   inputDescClassName?: string;
-  value?: string | number | boolean;
+  value?: string | number | boolean | string[];
   placeholder?: string;
   error?: React.ReactElement | string;
   help?: React.ReactElement | string;
