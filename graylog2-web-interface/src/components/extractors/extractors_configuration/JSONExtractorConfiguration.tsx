@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
 
 import { Icon } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
@@ -24,43 +22,57 @@ import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 
-const JSONExtractorConfiguration = createReactClass({
-  displayName: 'JSONExtractorConfiguration',
+type Configuration = {
+  flatten: boolean,
+  list_separator: string,
+  key_separator: string,
+  kv_separator: string,
+  replace_key_whitespace: boolean,
+  key_whitespace_replacement: string,
+  key_prefix: string,
+  string: string
+};
+type Props = {
+  configuration: Configuration,
+  exampleMessage?: string,
+  onChange: (newConfig: Configuration) => void,
+  onExtractorPreviewLoad: (content: React.ReactNode) => void,
+}
+type State = {
+  configuration: Configuration,
+  trying: boolean,
+}
 
-  propTypes: {
-    configuration: PropTypes.object.isRequired,
-    exampleMessage: PropTypes.string,
-    onChange: PropTypes.func.isRequired,
-    onExtractorPreviewLoad: PropTypes.func.isRequired,
-  },
-
-  getInitialState() {
-    return {
-      trying: false,
-      configuration: this._getEffectiveConfiguration(this.props.configuration),
-    };
-  },
-
-  componentDidMount() {
-    this.props.onChange(this.state.configuration);
-  },
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState({ configuration: this._getEffectiveConfiguration(nextProps.configuration) });
-  },
-
-  DEFAULT_CONFIGURATION: {
+class JSONExtractorConfiguration extends React.Component<Props, State> {
+  private DEFAULT_CONFIGURATION = {
     list_separator: ', ',
     key_separator: '_',
     kv_separator: '=',
     key_prefix: '',
     replace_key_whitespace: false,
     key_whitespace_replacement: '_',
-  },
+  };
+
+  constructor(props: Props, context: any) {
+    super(props, context);
+
+    this.state = {
+      trying: false,
+      configuration: this._getEffectiveConfiguration(props.configuration),
+    };
+  }
+
+  componentDidMount() {
+    this.props.onChange(this.state.configuration);
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    this.setState({ configuration: this._getEffectiveConfiguration(nextProps.configuration) });
+  }
 
   _getEffectiveConfiguration(configuration) {
     return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
-  },
+  }
 
   _onChange(key) {
     return (event) => {
@@ -70,7 +82,7 @@ const JSONExtractorConfiguration = createReactClass({
       newConfig[key] = FormUtils.getValueFromInput(event.target);
       this.props.onChange(newConfig);
     };
-  },
+  }
 
   _onTryClick() {
     this.setState({ trying: true });
@@ -94,11 +106,11 @@ const JSONExtractorConfiguration = createReactClass({
     });
 
     promise.finally(() => this.setState({ trying: false }));
-  },
+  }
 
   _isTryButtonDisabled() {
     return this.state.trying || !this.props.exampleMessage;
-  },
+  }
 
   render() {
     return (
@@ -178,7 +190,7 @@ const JSONExtractorConfiguration = createReactClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default JSONExtractorConfiguration;

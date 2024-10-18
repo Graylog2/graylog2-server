@@ -79,6 +79,7 @@ const ToolsStore = {
     key_whitespace_replacement: string,
     key_prefix: string,
     string: string,
+    matches: { [key: string]: string }
   }> {
     const { url } = ApiRoutes.ToolsApiController.jsonTest();
     const payload = {
