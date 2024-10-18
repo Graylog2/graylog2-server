@@ -60,9 +60,17 @@ public class CsvDocsPrinter implements DocsPrinter {
 
     private void writeField(ConfigurationEntry f) {
         try {
-            this.csvPRinter.printRecord(f.configName(), f.type(), f.required(), f.defaultValue(), f.documentation());
+            this.csvPRinter.printRecord(f.configName(), f.type(), boolToHumanReadable(f.required()), f.defaultValue(), f.documentation());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private String boolToHumanReadable(boolean required) {
+        if (required) {
+            return "yes";
+        } else {
+            return "no";
         }
     }
 

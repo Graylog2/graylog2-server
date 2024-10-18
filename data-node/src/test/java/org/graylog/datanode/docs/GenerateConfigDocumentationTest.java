@@ -67,7 +67,7 @@ class GenerateConfigDocumentationTest {
                     Assertions.assertThat(line.get(CsvDocsPrinter.HEADER_DEFAULT_VALUE)).isEqualTo("data/node-id");
                     Assertions.assertThat(line.get(CsvDocsPrinter.HEADER_PARAMETER)).isEqualTo("node_id_file");
                     Assertions.assertThat(line.get(CsvDocsPrinter.HEADER_TYPE)).isEqualTo("String");
-                    Assertions.assertThat(line.get(CsvDocsPrinter.HEADER_REQUIRED)).isEqualTo("false");
+                    Assertions.assertThat(line.get(CsvDocsPrinter.HEADER_REQUIRED)).isEqualTo("no");
                     Assertions.assertThat(line.get(CsvDocsPrinter.HEADER_DESCRIPTION)).contains("The auto-generated node ID will be stored in this file and read after restarts");
                 });
 
