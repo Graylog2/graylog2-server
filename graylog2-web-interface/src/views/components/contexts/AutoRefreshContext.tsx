@@ -23,7 +23,7 @@ export type RefreshConfig = {
   enabled: boolean
 }
 
-type AutoRefreshContextType = {
+export type AutoRefreshContextType = {
   refreshConfig: RefreshConfig | null,
   startAutoRefresh: (interval: number) => void
   stopAutoRefresh: () => void,
