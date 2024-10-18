@@ -273,9 +273,8 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     }
 
     public void doRun(Level logLevel) {
-        PluginLoaderConfig pluginLoaderConfig = null;
-        if (configuration.withPlugins()) { //TODO: change path configuration handling
-            pluginLoaderConfig = getPluginLoaderConfig(configFile);
+        if (configuration instanceof PathConfiguration) {
+            PathConfiguration pathConfiguration = parseAndGetPathConfiguration(configFile);
 
             // Move the zstd temp folder from /tmp to our native lib dir to avoid issues with noexec-mounted /tmp directories.
             // See: https://github.com/Graylog2/graylog2-server/issues/17837
@@ -285,7 +284,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
             if (Native.isLoaded()) {
                 LOG.warn("The zstd library is already loaded. Setting the ZstdTempFolder property doesn't have any effect!");
             }
-            final Path nativeLibPath = pluginLoaderConfig.getNativeLibDir().toAbsolutePath();
+            final Path nativeLibPath = pathConfiguration.getNativeLibDir().toAbsolutePath();
             try {
                 // We are very early in the startup process and the data_dir and native lib dir don't exist yet. Since the
                 // zstd library doesn't create its own temp directory, we have to do it to avoid errors on startup.
@@ -300,12 +299,14 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
         featureFlags = getFeatureFlags(metricRegistry);
 
-        if (configuration.withPlugins())
-            pluginLoader = getPluginLoader(pluginLoaderConfig, chainingClassLoader);
+        if (configuration.withPlugins()) {
+            pluginLoader = getPluginLoader(getPluginLoaderConfig(configFile), chainingClassLoader);
+        }
 
         installCommandConfig();
-        if (configuration.withPlugins())
+        if (configuration.withPlugins()) {
             installPluginBootstrapConfig(pluginLoader);
+        }
 
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
