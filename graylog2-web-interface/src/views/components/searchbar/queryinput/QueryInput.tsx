@@ -171,7 +171,10 @@ const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCo
     });
 
     commands.forEach((command) => editor.commands.addCommand(command));
-    editor.completers = [completer];
+
+    if (completer) {
+      editor.completers = [completer];
+    }
   }
 };
 
@@ -187,7 +190,7 @@ const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props
     return { all: allFieldsByName, query: queryFieldsByName };
   }, [allFields, queryFields]);
 
-  return useMemo(() => completerFactory(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
+  return useMemo(() => completerFactory?.(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
     [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view]);
 };
 

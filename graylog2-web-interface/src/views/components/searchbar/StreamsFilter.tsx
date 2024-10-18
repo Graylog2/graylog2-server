@@ -34,9 +34,13 @@ type Props = {
   streams: Array<{ key: string, value: string }>,
   onChange: (newStreamIds: Array<string>) => void,
   multi?: boolean,
+  clearable?: boolean
 };
 
-const StreamsFilter = ({ disabled = false, value = [], streams, onChange, multi = true }: Props) => {
+const StreamsFilter = ({
+  disabled = false, value = [], streams, onChange, multi = true,
+  clearable = true,
+}: Props) => {
   const sendTelemetry = useSendTelemetry();
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
@@ -59,6 +63,7 @@ const StreamsFilter = ({ disabled = false, value = [], streams, onChange, multi 
     <Container data-testid="streams-filter" title={placeholder}>
       <Select placeholder={placeholder}
               disabled={disabled}
+              clearable={clearable}
               inputProps={{ 'aria-label': placeholder }}
               displayKey="key"
               inputId="streams-filter"
