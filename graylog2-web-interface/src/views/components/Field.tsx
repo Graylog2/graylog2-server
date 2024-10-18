@@ -15,11 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 
-import CustomPropTypes from './CustomPropTypes';
 import FieldActions from './actions/FieldActions';
 import InteractiveContext from './contexts/InteractiveContext';
 
@@ -48,14 +46,5 @@ const Field = ({ children = null, disabled = false, menuContainer = document.bod
       : <span>{children}</span>)}
   </InteractiveContext.Consumer>
 );
-
-Field.propTypes = {
-  children: PropTypes.node,
-  disabled: PropTypes.bool,
-  name: PropTypes.string.isRequired,
-  menuContainer: PropTypes.object,
-  queryId: PropTypes.string,
-  type: CustomPropTypes.FieldType.isRequired,
-};
 
 export default Field;

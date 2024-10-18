@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import upperFirst from 'lodash/upperFirst';
@@ -129,12 +128,6 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Pr
       </Col>
     </Row>
   );
-};
-
-EventDetailsForm.propTypes = {
-  eventDefinition: PropTypes.object.isRequired,
-  validation: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
 };
 
 export default EventDetailsForm;

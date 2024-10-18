@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { useField } from 'formik';
-import PropTypes from 'prop-types';
 import type { LookupTableAdapter } from 'src/logic/lookup-tables/types';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -55,10 +54,6 @@ const DataAdapterPicker = ({
       </Input>
     </fieldset>
   );
-};
-
-DataAdapterPicker.propTypes = {
-  dataAdapters: PropTypes.array,
 };
 
 export default DataAdapterPicker;

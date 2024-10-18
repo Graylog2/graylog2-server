@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
@@ -64,14 +63,6 @@ const PageSizeSelect = ({ pageSizes = DEFAULT_PAGE_SIZES, pageSize, onChange, cl
   }
 
   return select;
-};
-
-PageSizeSelect.propTypes = {
-  className: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  pageSize: PropTypes.number.isRequired,
-  pageSizes: PropTypes.arrayOf(PropTypes.number),
-  showLabel: PropTypes.bool,
 };
 
 export default PageSizeSelect;

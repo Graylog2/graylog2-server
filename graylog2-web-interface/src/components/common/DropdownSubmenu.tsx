@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Dropdown, MenuItem } from 'components/bootstrap';
@@ -80,11 +79,5 @@ const DropdownSubmenu = ({ children, left = false, title }: Props) => (
     </StyledSubmenu>
   </MenuItem>
 );
-
-DropdownSubmenu.propTypes = {
-  children: PropTypes.node.isRequired,
-  left: PropTypes.bool,
-  title: PropTypes.string,
-};
 
 export default DropdownSubmenu;

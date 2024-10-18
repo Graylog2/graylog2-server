@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import countBy from 'lodash/countBy';
 import intersection from 'lodash/intersection';
 import uniq from 'lodash/uniq';
@@ -201,15 +200,6 @@ const CollectorConfigurationModalContainer = ({
       {renderConfigurationSummary()}
     </>
   );
-};
-
-CollectorConfigurationModalContainer.propTypes = {
-  collectors: PropTypes.array.isRequired,
-  configurations: PropTypes.array.isRequired,
-  selectedSidecarCollectorPairs: PropTypes.array.isRequired,
-  onConfigurationSelectionChange: PropTypes.func.isRequired,
-  show: PropTypes.bool.isRequired,
-  onCancel: PropTypes.func.isRequired,
 };
 
 export default CollectorConfigurationModalContainer;

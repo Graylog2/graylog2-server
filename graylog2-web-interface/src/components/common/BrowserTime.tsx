@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import type { Moment } from 'moment';
 
 import type { DateTimeFormats } from 'util/DateTime';
@@ -39,19 +38,6 @@ const BrowserTime = ({ dateTime: dateTimeProp, format = 'default' }: Props) => {
       {timeInBrowserTimeZone}
     </time>
   );
-};
-
-BrowserTime.propTypes = {
-  /**
-   * Date time to be displayed in the component. You can provide an ISO
-   * 8601 string, a JS native `Date` object, a moment `Date` object, or
-   * a number containing seconds after UNIX epoch.
-   */
-  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]),
-  /**
-   * Format to use to represent the date time.
-   */
-  format: PropTypes.string,
 };
 
 export default BrowserTime;

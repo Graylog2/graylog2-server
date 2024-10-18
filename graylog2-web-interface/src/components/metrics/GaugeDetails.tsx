@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 
@@ -29,9 +28,5 @@ const GaugeDetails = ({ metric: { metric: gauge } }: Props) => (
     <dd><span className="number-format">{numeral(gauge.value).format('0,0')}</span></dd>
   </dl>
 );
-
-GaugeDetails.propTypes = {
-  metric: PropTypes.object.isRequired,
-};
 
 export default GaugeDetails;

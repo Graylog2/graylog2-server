@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { createUltimatePagination, ITEM_TYPES } from 'react-ultimate-pagination';
@@ -209,46 +208,6 @@ const Pagination = ({
                         onChange={onChange}
                         data-testid="graylog-pagination" />
   );
-};
-
-Pagination.propTypes = {
-  /**
-   * @required
-   */
-  currentPage: PropTypes.number.isRequired,
-  /**
-   * @required
-   */
-  totalPages: PropTypes.number.isRequired,
-  /**
-   * number of always visible pages at the beginning and end
-   */
-  boundaryPagesRange: PropTypes.number,
-  /**
-   * number of always visible pages before and after the current one
-   */
-  siblingPagesRange: PropTypes.number,
-  /**
-   * boolean flag to hide ellipsis
-   */
-  hideEllipsis: PropTypes.bool,
-  /**
-   * boolean flag to hide first and last page links
-   */
-  hidePreviousAndNextPageLinks: PropTypes.bool,
-  /**
-   * number of always visible pages at the beginning and end
-   */
-  hideFirstAndLastPageLinks: PropTypes.bool,
-  /**
-   * boolean flag to disable all buttons in pagination
-   */
-  disabled: PropTypes.bool,
-  /**
-   * callback that will be called with new page when it should be changed by user interaction (optional)
-   * @returns {nextPageNumber: number}
-   */
-  onChange: PropTypes.func,
 };
 
 export default Pagination;

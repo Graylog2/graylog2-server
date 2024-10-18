@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { ConfirmDialog } from 'components/common';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
@@ -35,10 +34,5 @@ const TelemetryInfoModal = ({ show, onConfirm }: Props) => (
     <TelemetryInfoText showProfile />
   </ConfirmDialog>
 );
-
-TelemetryInfoModal.propTypes = {
-  show: PropTypes.bool.isRequired,
-  onConfirm: PropTypes.func.isRequired,
-};
 
 export default TelemetryInfoModal;

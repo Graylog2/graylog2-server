@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-env browser */
-import PropTypes from 'prop-types';
 import React from 'react';
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import chroma from 'chroma-js';
@@ -130,24 +128,6 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
   _isMapReady = false;
 
   _areTilesReady = false;
-
-  static propTypes = {
-    id: PropTypes.string.isRequired,
-    data: PropTypes.arrayOf(PropTypes.object),
-    height: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
-    url: PropTypes.string,
-    attribution: PropTypes.string,
-    onRenderComplete: PropTypes.func,
-    onChange: PropTypes.func.isRequired,
-    locked: PropTypes.bool, // Disables zoom and dragging
-    markerRadiusSize: PropTypes.number,
-    markerRadiusIncrementSize: PropTypes.number,
-    viewport: PropTypes.shape({
-      center: PropTypes.arrayOf(PropTypes.number),
-      zoom: PropTypes.number,
-    }),
-  };
 
   static defaultProps = {
     data: {},

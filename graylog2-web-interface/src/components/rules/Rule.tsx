@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { PageHeader } from 'components/common';
@@ -125,12 +124,6 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
       )}
     </div>
   );
-};
-
-Rule.propTypes = {
-  title: PropTypes.string,
-  create: PropTypes.bool,
-  isRuleBuilder: PropTypes.bool,
 };
 
 export default Rule;

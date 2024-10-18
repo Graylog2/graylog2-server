@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useRef } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
@@ -290,10 +289,6 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
       )}
     </WidgetFocusContext.Consumer>
   );
-};
-
-SearchBar.propTypes = {
-  onSubmit: PropTypes.func,
 };
 
 export default SearchBar;

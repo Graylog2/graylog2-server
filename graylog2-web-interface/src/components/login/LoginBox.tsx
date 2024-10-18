@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 const Wrapper = styled.div(({ theme }) => css`
@@ -44,9 +43,5 @@ const LoginBox = ({ children }: Props) => (
     </Container>
   </Wrapper>
 );
-
-LoginBox.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 export default LoginBox;
