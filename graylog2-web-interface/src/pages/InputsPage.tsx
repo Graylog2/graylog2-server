@@ -16,9 +16,9 @@
  */
 import React, { useEffect } from 'react';
 
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { InputsList } from 'components/inputs';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';

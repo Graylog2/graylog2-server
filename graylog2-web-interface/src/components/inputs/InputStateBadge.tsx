@@ -21,6 +21,7 @@ import { OverlayTrigger, LinkToNode, Spinner } from 'components/common';
 import { Label } from 'components/bootstrap';
 import InputStateComparator from 'logic/inputs/InputStateComparator';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import type { InputStates } from 'stores/inputs/InputStatesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import type { Input } from 'components/messageloaders/Types';
 import { useStore } from 'stores/connect';
@@ -30,18 +31,6 @@ type Props = {
 }
 
 const comparator = new InputStateComparator();
-
-type InputState = {
-  count: number,
-  state:
-    | 'RUNNING'
-    | 'FAILED'
-    | 'STOPPED'
-    | 'STARTING'
-}
-type InputStates = {
-  [inputId: string]: InputState,
-}
 
 const InputStateBadge = ({ input }: Props) => {
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };

@@ -20,10 +20,15 @@ import { useCallback, useMemo, useState } from 'react';
 import InputSetupWizardContext, { INPUT_WIZARD_STEPS } from 'contexts/InputSetupWizardContext';
 import type { InputSetupWizardStep, StepsData, WizardData } from 'contexts/InputSetupWizardContext';
 
-const InputSetupWizardProvider = ({ children }: React.PropsWithChildren<{}>) => {
-  const [activeStep, setActiveStep] = useState<InputSetupWizardStep>(INPUT_WIZARD_STEPS[0]);
-  const [wizardData, setWizardData] = useState<WizardData>({});
-  const [stepsData, setStepsData] = useState<StepsData>({});
+const DEFAULT_ACTIVE_STEP = INPUT_WIZARD_STEPS[0];
+const DEFAULT_WIZARD_DATA = {};
+const DEFAULT_STEPS_DATA = {};
+
+const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{}>) => {
+  const [activeStep, setActiveStep] = useState<InputSetupWizardStep>(DEFAULT_ACTIVE_STEP);
+  const [wizardData, setWizardData] = useState<WizardData>(DEFAULT_WIZARD_DATA);
+  const [stepsData, setStepsData] = useState<StepsData>(DEFAULT_STEPS_DATA);
+  const [show, setShow] = useState<boolean>(false);
 
   const setStepData = useCallback(
     (stepName: InputSetupWizardStep, data: object) => {
@@ -41,6 +46,22 @@ const InputSetupWizardProvider = ({ children }: React.PropsWithChildren<{}>) => 
     [wizardData],
   );
 
+  const clearWizard = useCallback(() => {
+    setActiveStep(DEFAULT_ACTIVE_STEP);
+    setWizardData(DEFAULT_WIZARD_DATA);
+    setStepsData(DEFAULT_STEPS_DATA);
+  }, []);
+
+  const closeWizard = useCallback(() => {
+    clearWizard();
+    setShow(false);
+  }, [clearWizard]);
+
+  const openWizard = useCallback((inputId: string) => {
+    setWizardData({ inputId });
+    setShow(true);
+  }, []);
+
   const value = useMemo(() => ({
     setActiveStep,
     activeStep,
@@ -48,6 +69,9 @@ const InputSetupWizardProvider = ({ children }: React.PropsWithChildren<{}>) => 
     setStepData,
     wizardData,
     setWizardDataAttribute,
+    show,
+    openWizard,
+    closeWizard,
   }), [
     setActiveStep,
     activeStep,
@@ -55,11 +79,16 @@ const InputSetupWizardProvider = ({ children }: React.PropsWithChildren<{}>) => 
     setStepData,
     wizardData,
     setWizardDataAttribute,
+    show,
+    openWizard,
+    closeWizard,
   ]);
 
+  return (
     <InputSetupWizardContext.Provider value={value}>
       {children}
-    </InputSetupWizardContext.Provider>;
+    </InputSetupWizardContext.Provider>
+  );
 };
 
 export default InputSetupWizardProvider;
