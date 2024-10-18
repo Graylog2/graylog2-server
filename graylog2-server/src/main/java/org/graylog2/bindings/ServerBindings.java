@@ -100,6 +100,8 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.system.traffic.OpenTrafficCounterCalculator;
+import org.graylog2.system.traffic.TrafficCounterCalculator;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.system.traffic.TrafficUpdater;
 import org.graylog2.telemetry.enterprise.DefaultTelemetryEnterpriseDataProvider;
@@ -215,6 +217,7 @@ public class ServerBindings extends Graylog2Module {
 
         OptionalBinder.newOptionalBinder(binder(), DataTieringStatusService.class).setDefault().to(DefaultDataTieringStatusService.class);
 
+        Multibinder.newSetBinder(binder(), TrafficCounterCalculator.class).addBinding().to(OpenTrafficCounterCalculator.class);
         OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
     }
 
