@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { useStore } from 'stores/connect';
@@ -36,11 +35,13 @@ type Props = {
   save: (nextStage: StageType, callback: () => void) => void,
 };
 
-const StageForm = ({ pipeline, stage = {
-  stage: 0,
-  match: 'EITHER',
-  rules: [],
-}, create = false, save }: Props) => {
+const StageForm = ({
+  pipeline, stage = {
+    stage: 0,
+    match: 'EITHER',
+    rules: [],
+  }, create = false, save,
+}: Props) => {
   const currentUser = useCurrentUser();
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -158,7 +159,6 @@ const StageForm = ({ pipeline, stage = {
                  label="Stage rules"
                  help={rulesHelp}>
             <SelectableList options={_getFormattedOptions()}
-                            isLoading={!rules}
                             onChange={_onRulesChange}
                             selectedOptions={nextStage.rules} />
           </Input>
@@ -166,13 +166,6 @@ const StageForm = ({ pipeline, stage = {
       </BootstrapModalForm>
     </span>
   );
-};
-
-StageForm.propTypes = {
-  pipeline: PropTypes.object.isRequired,
-  stage: PropTypes.object,
-  create: PropTypes.bool,
-  save: PropTypes.func.isRequired,
 };
 
 export default StageForm;

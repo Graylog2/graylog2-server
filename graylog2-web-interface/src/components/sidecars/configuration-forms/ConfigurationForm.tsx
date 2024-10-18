@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState, useRef, useEffect } from 'react';
 import clone from 'lodash/clone';
 import cloneDeep from 'lodash/cloneDeep';
@@ -235,7 +234,7 @@ const ConfigurationForm = ({
 
   const _validationState = (fieldName: string) => {
     if (validationErrors[fieldName]) {
-      return 'error';
+      return 'error' as const;
     }
 
     return null;
@@ -355,19 +354,6 @@ const ConfigurationForm = ({
       </Col>
     </Row>
   );
-};
-
-ConfigurationForm.propTypes = {
-  action: PropTypes.oneOf(['create', 'edit']),
-  configuration: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    color: PropTypes.string.isRequired,
-    collector_id: PropTypes.string.isRequired,
-    template: PropTypes.string.isRequired,
-    tags: PropTypes.array.isRequired,
-  }),
-  configurationSidecars: PropTypes.object,
 };
 
 export default ConfigurationForm;

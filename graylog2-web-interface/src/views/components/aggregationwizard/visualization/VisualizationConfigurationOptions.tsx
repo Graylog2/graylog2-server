@@ -63,13 +63,13 @@ const titleForField = (field: ConfigurationField) => {
         </TitleHoverForHelp>
       </TitleLabelWithHelp>
     )
-    : field.title;
+    : <>{field.title}</>;
 };
 
 export type FieldComponentProps = {
   field: ConfigurationField,
   name: string,
-  title: React.ReactNode,
+  title: React.ReactElement,
   value: any,
   onChange: (e: React.ChangeEvent<any>) => void,
   error: string | undefined,

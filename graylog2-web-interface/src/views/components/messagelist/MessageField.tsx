@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -27,7 +26,6 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import DecoratedValue from './decoration/DecoratedValue';
 import type { Message } from './Types';
 
-import CustomPropTypes from '../CustomPropTypes';
 import InteractiveContext from '../contexts/InteractiveContext';
 
 const SPECIAL_FIELDS = [FULL_MESSAGE_FIELD, 'level'];
@@ -83,13 +81,6 @@ const MessageField = ({ fieldName, fieldType, message, value }: Props) => {
       </DefinitionDescription>
     </>
   );
-};
-
-MessageField.propTypes = {
-  fieldName: PropTypes.string.isRequired,
-  fieldType: CustomPropTypes.FieldType.isRequired,
-  message: CustomPropTypes.Message.isRequired,
-  value: PropTypes.any.isRequired,
 };
 
 export default MessageField;

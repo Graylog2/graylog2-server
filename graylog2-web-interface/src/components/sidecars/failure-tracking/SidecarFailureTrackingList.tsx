@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Button, Col, Row, Table } from 'components/bootstrap';
@@ -184,19 +183,6 @@ const SidecarFailureTrackingList = ({
       )}
     </div>
   );
-};
-
-SidecarFailureTrackingList.propTypes = {
-  sidecars: PropTypes.array.isRequired,
-  collectors: PropTypes.array.isRequired,
-  pagination: PropTypes.object.isRequired,
-  query: PropTypes.string.isRequired,
-  sort: PropTypes.object.isRequired,
-  onlyActive: PropTypes.bool.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-  onQueryChange: PropTypes.func.isRequired,
-  onSortChange: PropTypes.func.isRequired,
-  toggleShowInactive: PropTypes.func.isRequired,
 };
 
 export default SidecarFailureTrackingList;

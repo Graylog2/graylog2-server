@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { DateUtils } from 'react-day-picker';
 
 import { DatePicker } from 'components/common';
@@ -54,12 +53,6 @@ const AbsoluteDatePicker = ({ dateTime, onChange = () => {}, startDate }: Props)
                 onChange={_onDatePicked}
                 fromDate={startDate} />
   );
-};
-
-AbsoluteDatePicker.propTypes = {
-  dateTime: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-  startDate: PropTypes.instanceOf(Date),
 };
 
 export default AbsoluteDatePicker;

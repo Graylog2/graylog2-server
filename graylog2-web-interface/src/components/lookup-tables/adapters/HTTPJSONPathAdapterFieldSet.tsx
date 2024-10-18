@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import type { SyntheticEvent } from 'react';
 import React from 'react';
 
@@ -36,19 +35,11 @@ type Props = {
   config: Config,
   updateConfig: (config: Config) => void,
   handleFormEvent: (event: SyntheticEvent<EventTarget>) => void,
-  validationState: (state: string) => string,
+  validationState: (state: string) => 'error' | 'warning' | 'success',
   validationMessage: (field: string, message: string) => string,
 };
 
 class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    updateConfig: PropTypes.func.isRequired,
-    handleFormEvent: PropTypes.func.isRequired,
-    validationState: PropTypes.func.isRequired,
-    validationMessage: PropTypes.func.isRequired,
-  };
-
   onHTTPHeaderUpdate = (headers: Headers) => {
     const { config, updateConfig } = this.props;
     const configChange = ObjectUtils.clone(config);

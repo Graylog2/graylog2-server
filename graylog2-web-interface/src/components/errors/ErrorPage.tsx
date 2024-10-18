@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
@@ -76,14 +75,6 @@ const ErrorPage = ({ children, title, description, backgroundImage = NotFoundBac
       </PageLayoutComponent>
     </DocumentTitle>
   );
-};
-
-ErrorPage.propTypes = {
-  children: PropTypes.node,
-  description: PropTypes.node.isRequired,
-  displayPageLayout: PropTypes.bool,
-  title: PropTypes.string.isRequired,
-  backgroundImage: PropTypes.string,
 };
 
 export default ErrorPage;

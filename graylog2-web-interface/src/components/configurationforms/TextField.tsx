@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
@@ -122,16 +121,6 @@ const TextField = ({ field, title, typeName, dirty = false, onChange, value = ''
            buttonAfter={buttonAfter()}
            autoFocus={autoFocus} />
   );
-};
-
-TextField.propTypes = {
-  autoFocus: PropTypes.bool,
-  dirty: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
 };
 
 export default TextField;

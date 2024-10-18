@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -106,14 +105,6 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
       {actionButtons}
     </div>
   );
-};
-
-IndexDetails.propTypes = {
-  index: PropTypes.object.isRequired,
-  indexName: PropTypes.string.isRequired,
-  indexRange: PropTypes.object.isRequired,
-  indexSetId: PropTypes.string.isRequired,
-  isDeflector: PropTypes.bool.isRequired,
 };
 
 export default IndexDetails;

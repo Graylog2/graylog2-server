@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -31,8 +30,10 @@ type Props = {
   onHide?: () => void
 }
 
-const ContentPackDownloadControl = ({ contentPackId, revision, show = false, onHide = () => {
-} }: Props) => {
+const ContentPackDownloadControl = ({
+  contentPackId, revision, show = false, onHide = () => {
+  },
+}: Props) => {
   const [showDownloadModal, setShowDownloadModal] = useState(show);
 
   const getDownloadUrl = () => qualifyUrl(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url);
@@ -65,13 +66,6 @@ const ContentPackDownloadControl = ({ contentPackId, revision, show = false, onH
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
-};
-
-ContentPackDownloadControl.propTypes = {
-  contentPackId: PropTypes.string.isRequired,
-  revision: PropTypes.number.isRequired,
-  show: PropTypes.bool,
-  onHide: PropTypes.func,
 };
 
 export default ContentPackDownloadControl;

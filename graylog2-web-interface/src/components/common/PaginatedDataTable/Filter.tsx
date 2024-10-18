@@ -23,9 +23,9 @@ type Props = {
   resetPagination: () => void,
   rows: Array<unknown>,
   id?: string,
-  filterKeys?: unknown,
-  displayKey?: unknown,
-  filterBy?: unknown,
+  filterKeys?: any[],
+  displayKey?: string,
+  filterBy?: string,
   filterLabel?: unknown,
 };
 

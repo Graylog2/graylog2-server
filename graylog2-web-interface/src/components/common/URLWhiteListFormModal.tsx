@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import { useStore } from 'stores/connect';
@@ -39,8 +38,10 @@ type Props = {
   urlType?: 'regex' | 'literal',
 };
 
-const URLWhiteListFormModal = ({ newUrlEntry = '', urlType, onUpdate = () => {
-} }: Props) => {
+const URLWhiteListFormModal = ({
+  newUrlEntry = '', urlType, onUpdate = () => {
+  },
+}: Props) => {
   const prevNewUrlEntry = useRef<string>();
   const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -146,12 +147,6 @@ const URLWhiteListFormModal = ({ newUrlEntry = '', urlType, onUpdate = () => {
   }
 
   return null;
-};
-
-URLWhiteListFormModal.propTypes = {
-  newUrlEntry: PropTypes.string,
-  onUpdate: PropTypes.func,
-  urlType: PropTypes.oneOf(['regex', 'literal']),
 };
 
 export default URLWhiteListFormModal;
