@@ -75,6 +75,7 @@ import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -90,9 +91,9 @@ const StreamsAndRefresh = styled.div`
   flex: 1.5;
 `;
 
-const defaultOnSubmit = async (dispatch: AppDispatch, values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query) => {
+const defaultOnSubmit = async (dispatch: AppDispatch, values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query, restartAutoRefresh: () => void) => {
   const { timerange, streams, streamCategories, queryString } = values;
-
+  restartAutoRefresh();
   const queryWithPluginData = await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls, currentQuery);
 
   const newQuery = queryWithPluginData.toBuilder()
@@ -140,7 +141,13 @@ const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarCon
 };
 
 type Props = {
-  onSubmit?: (dispatch: AppDispatch, update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
+  onSubmit?: (
+    dispatch: AppDispatch,
+    update: SearchBarFormValues,
+    pluggableSearchBarControls: Array<() => SearchBarControl>,
+    query: Query,
+    restartAutoRefresh: () => void
+  ) => Promise<any>
 };
 
 const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
@@ -166,8 +173,9 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const dispatch = useAppDispatch();
-  const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery),
-    [currentQuery, dispatch, onSubmit, pluggableSearchBarControls]);
+  const { restartAutoRefresh } = useAutoRefresh();
+  const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery, restartAutoRefresh),
+    [currentQuery, dispatch, onSubmit, pluggableSearchBarControls, restartAutoRefresh]);
   const handlerContext = useHandlerContext();
   const isLoadingExecution = useIsLoading();
 
