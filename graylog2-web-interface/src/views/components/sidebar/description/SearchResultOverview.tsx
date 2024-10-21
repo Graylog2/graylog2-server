@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
@@ -84,10 +83,6 @@ const SearchResultOverview = ({ results }: Props) => {
       </p>
     </>
   );
-};
-
-SearchResultOverview.propTypes = {
-  results: PropTypes.object.isRequired,
 };
 
 export default SearchResultOverview;

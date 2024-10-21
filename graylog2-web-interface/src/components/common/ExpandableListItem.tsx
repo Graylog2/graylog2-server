@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Checkbox } from 'components/bootstrap';
@@ -123,41 +122,6 @@ interface CheckboxInstance {
  */
 class ExpandableListItem extends React.Component<Props, State> {
   private _checkbox: CheckboxInstance | undefined;
-
-  static propTypes = {
-    /** Is the Item checked */
-    checked: PropTypes.bool,
-    /**
-     * Indicates whether the checkbox on this item should be in an indetermined state or not.
-     * This is mostly helpful to represent cases where the element is only partially checked,
-     * for instance when ExpandableListItem's child is an ExpandableList and some of its items
-     * are checked, but others are not.
-     */
-    indetermined: PropTypes.bool,
-    /** Is the item selectable */
-    selectable: PropTypes.bool,
-    /** Is the Item expandable */
-    expandable: PropTypes.bool,
-    /** Is the Item expanded */
-    expanded: PropTypes.bool,
-    /** Forces to stay expanded regardless of clicking on the arrow */
-    stayExpanded: PropTypes.bool,
-    /** The header of the item */
-    header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
-    /** The possible subheader of the item */
-    subheader: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-    /** Can be a html tag or again a ExpandableList */
-    children: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.arrayOf(PropTypes.element),
-    ]),
-    /** Leave space before and after list item */
-    padded: PropTypes.bool,
-    /** Mark checkbox as read only */
-    readOnly: PropTypes.bool,
-    /** onChange handler for the checkbox */
-    onChange: PropTypes.func,
-  };
 
   static defaultProps = {
     checked: false,

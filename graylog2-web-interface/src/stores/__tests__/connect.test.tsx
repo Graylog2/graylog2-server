@@ -17,7 +17,6 @@
 import React from 'react';
 import { act, render, screen } from 'wrappedTestingLibrary';
 import Reflux from 'reflux';
-import PropTypes from 'prop-types';
 import { Map, List } from 'immutable';
 
 import { asMock } from 'helpers/mocking/index';
@@ -53,18 +52,20 @@ const createSimpleStore = () => Reflux.createStore<{ value: number }>({
 
 const SimpleStore = createSimpleStore();
 
-const SimpleComponentWithDummyStore = ({ simpleStore }) => {
+type SimpleComponentWithDummyStoreProps = {
+  simpleStore?: {
+    value?: number;
+  };
+};
+
+const SimpleComponentWithDummyStore = ({
+  simpleStore,
+}: SimpleComponentWithDummyStoreProps) => {
   if (simpleStore && simpleStore.value) {
     return <span>Value is: {simpleStore.value}</span>;
   }
 
   return <span>No value.</span>;
-};
-
-SimpleComponentWithDummyStore.propTypes = {
-  simpleStore: PropTypes.shape({
-    value: PropTypes.number,
-  }),
 };
 
 describe('connect()', () => {
@@ -169,10 +170,6 @@ describe('connect()', () => {
     const BaseComponent = ({ exampleProp = 'hello!' }: {
       exampleProp?: string
     }) => <span>{exampleProp}</span>;
-
-    BaseComponent.propTypes = {
-      exampleProp: PropTypes.string,
-    };
 
     const Component = connect(BaseComponent, { simpleStore: SimpleStore });
     render(<Component />);

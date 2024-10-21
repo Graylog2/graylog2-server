@@ -23,6 +23,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 export type TestResult = {
   isLoading: boolean,
@@ -39,14 +40,12 @@ export type EventNotification = {
   id: string,
   title: string,
   description: string,
-  config: {
-    type?: string
-  },
+  config: Record<string, any | any[]>,
 };
 
 export type LegacyEventNotification = {
   name: string,
-  configuration: {}
+  configuration: { [key: string]: { human_name: string } }
 };
 
 type EventNotificationsActionsType = {
@@ -58,7 +57,7 @@ type EventNotificationsActionsType = {
   create: (eventNotification: EventNotification) => Promise<void>,
   update: (id: string, eventNotification: EventNotification) => Promise<void>,
   delete: (eventNotification: EventNotification) => Promise<void>,
-  test: (eventNotification: EventNotification) => Promise<void>,
+  test: (eventNotification: EventNotification) => CancellablePromise<void>,
   testPersisted: (eventNotification: EventNotification) => Promise<void>,
 };
 
@@ -301,7 +300,7 @@ export const EventNotificationsStore = singletonStore(
     test(notification) {
       const promise = fetch('POST', this.eventNotificationsUrl({ segments: ['test'] }), notification);
 
-      EventNotificationsActions.test.promise(promise);
+      EventNotificationsActions.test.promise(promise as CancellablePromise<any>);
     },
 
     testPersisted(notification) {

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -94,13 +93,6 @@ const SearchButton = ({ dirty = false, disabled = false, glyph = 'search', displ
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>
   );
-};
-
-SearchButton.propTypes = {
-  disabled: PropTypes.bool,
-  displaySpinner: PropTypes.bool,
-  dirty: PropTypes.bool,
-  glyph: PropTypes.string,
 };
 
 export default SearchButton;

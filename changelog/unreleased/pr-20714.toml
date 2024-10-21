@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Hide stream rule Matching-Type-Switcher when stream is not editable"
+
+pulls = ["20714"]

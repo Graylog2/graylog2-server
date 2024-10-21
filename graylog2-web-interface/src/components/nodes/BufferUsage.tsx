@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useEffect } from 'react';
 import styled, { css } from 'styled-components';
@@ -94,12 +93,6 @@ const BufferUsage = ({ nodeId, bufferType, title }: Props) => {
       <span><strong>{usage} messages</strong> in {title.toLowerCase()}, {percentLabel} utilized.</span>
     </div>
   );
-};
-
-BufferUsage.propTypes = {
-  bufferType: PropTypes.string.isRequired,
-  nodeId: PropTypes.string.isRequired,
-  title: PropTypes.node.isRequired,
 };
 
 export default BufferUsage;

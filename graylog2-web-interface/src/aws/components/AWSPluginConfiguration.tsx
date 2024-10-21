@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import omit from 'lodash/omit';
 
@@ -236,16 +235,6 @@ const AWSPluginConfiguration = ({
       </BootstrapModalForm>
     </div>
   );
-};
-
-AWSPluginConfiguration.propTypes = {
-  config: PropTypes.shape({
-    lookups_enabled: PropTypes.bool,
-    lookup_regions: PropTypes.string,
-    access_key: PropTypes.string,
-    secret_key: PropTypes.string,
-    proxy_enabled: PropTypes.bool,
-  }),
 };
 
 export default AWSPluginConfiguration;

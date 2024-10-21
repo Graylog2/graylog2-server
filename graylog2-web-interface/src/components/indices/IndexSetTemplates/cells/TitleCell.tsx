@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
@@ -53,13 +52,6 @@ const TitleCell = ({ title, id, isDefault, isEnabled }: Props) => {
       {isDefault && (<StyledBadge>Default</StyledBadge>)}
     </Link>
   );
-};
-
-TitleCell.propTypes = {
-  id: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  isDefault: PropTypes.bool.isRequired,
-  isEnabled: PropTypes.bool.isRequired,
 };
 
 export default TitleCell;

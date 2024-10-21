@@ -297,138 +297,144 @@ const RuleBuilder = () => {
   );
 
   return (
-    <RuleBuilderProvider>
-      <form onSubmit={(e) => handleSave(e, true)}>
-        <Row className="content">
-          <Col xs={12}>
-            <RuleBuilderForm rule={rule}
-                             onChange={setRule} />
-          </Col>
-          <Col xs={8}>
-            <label htmlFor="rule_builder">Rule Builder</label>
-            <StyledPanel expanded={conditionsExpanded}>
-              <StyledPanelHeading>
-                <Panel.Title toggle>
-                  When
-                </Panel.Title>
-                <WhenOperator>
-                  <Radio checked={rule.rule_builder.operator === 'AND'}
-                         onChange={() => updateWhenOperator('AND')}>
-                    and
-                  </Radio>
-                  <Radio checked={rule.rule_builder.operator === 'OR'}
-                         onChange={() => updateWhenOperator('OR')}>
-                    or
-                  </Radio>
-                </WhenOperator>
-              </StyledPanelHeading>
-              <Panel.Collapse>
-                <StyledPanelBody>
-                  {rule.rule_builder.conditions.map((condition, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                    <RuleBuilderBlock key={index}
-                                      blockDict={conditionsDict || []}
-                                      block={condition}
-                                      order={index}
+    (
+      <RuleBuilderProvider>
+        <form onSubmit={(e) => handleSave(e, true)}>
+          <Row className="content">
+            <Col xs={12}>
+              <RuleBuilderForm rule={rule}
+                               onChange={setRule} />
+            </Col>
+            <Col xs={8}>
+              <label htmlFor="rule_builder">Rule Builder</label>
+              <StyledPanel expanded={conditionsExpanded}>
+                <StyledPanelHeading>
+                  <Panel.Title toggle>
+                    When
+                  </Panel.Title>
+                  <WhenOperator>
+                    <Radio checked={rule.rule_builder.operator === 'AND'}
+                           onChange={() => updateWhenOperator('AND')}>
+                      and
+                    </Radio>
+                    <Radio checked={rule.rule_builder.operator === 'OR'}
+                           onChange={() => updateWhenOperator('OR')}>
+                      or
+                    </Radio>
+                  </WhenOperator>
+                </StyledPanelHeading>
+                <Panel.Collapse>
+                  <StyledPanelBody>
+                    {rule.rule_builder.conditions.map((condition, index) => (
+
+                      (
+                        <RuleBuilderBlock key={index}
+                                          blockDict={conditionsDict || []}
+                                          block={condition}
+                                          order={index}
+                                          type="condition"
+                                          addBlock={addBlock}
+                                          updateBlock={updateBlock}
+                                          deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
+                      )
+                    ))}
+                    <RuleBuilderBlock blockDict={conditionsDict || []}
+                                      order={newConditionBlockIndex}
                                       type="condition"
                                       addBlock={addBlock}
                                       updateBlock={updateBlock}
-                                      deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
-                  ))}
-                  <RuleBuilderBlock blockDict={conditionsDict || []}
-                                    order={newConditionBlockIndex}
-                                    type="condition"
-                                    addBlock={addBlock}
-                                    updateBlock={updateBlock}
-                                    deleteBlock={() => setBlockToDelete({
-                                      orderIndex: newConditionBlockIndex,
-                                      type: 'condition',
-                                    })} />
-                </StyledPanelBody>
-              </Panel.Collapse>
-            </StyledPanel>
-            <br />
-            <StyledPanel expanded={actionsExpanded}>
-              <StyledPanelHeading>
-                <Panel.Title toggle>
-                  Then
-                </Panel.Title>
-              </StyledPanelHeading>
-              <Panel.Collapse>
-                <StyledPanelBody>
-                  {rule.rule_builder.actions.map((action, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                    <RuleBuilderBlock key={index}
-                                      blockDict={actionsDict || []}
-                                      block={action}
-                                      order={index}
+                                      deleteBlock={() => setBlockToDelete({
+                                        orderIndex: newConditionBlockIndex,
+                                        type: 'condition',
+                                      })} />
+                  </StyledPanelBody>
+                </Panel.Collapse>
+              </StyledPanel>
+              <br />
+              <StyledPanel expanded={actionsExpanded}>
+                <StyledPanelHeading>
+                  <Panel.Title toggle>
+                    Then
+                  </Panel.Title>
+                </StyledPanelHeading>
+                <Panel.Collapse>
+                  <StyledPanelBody>
+                    {rule.rule_builder.actions.map((action, index) => (
+
+                      (
+                        <RuleBuilderBlock key={index}
+                                          blockDict={actionsDict || []}
+                                          block={action}
+                                          order={index}
+                                          type="action"
+                                          outputVariableList={outputVariableList()}
+                                          addBlock={addBlock}
+                                          updateBlock={updateBlock}
+                                          deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
+                      )
+                    ))}
+                    <RuleBuilderBlock blockDict={actionsDict || []}
+                                      order={newActionBlockIndex}
                                       type="action"
                                       outputVariableList={outputVariableList()}
                                       addBlock={addBlock}
                                       updateBlock={updateBlock}
-                                      deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
-                  ))}
-                  <RuleBuilderBlock blockDict={actionsDict || []}
-                                    order={newActionBlockIndex}
-                                    type="action"
-                                    outputVariableList={outputVariableList()}
-                                    addBlock={addBlock}
-                                    updateBlock={updateBlock}
-                                    deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
-                </StyledPanelBody>
-              </Panel.Collapse>
-            </StyledPanel>
-            <Errors objectWithErrors={rule.rule_builder} />
-          </Col>
-          <Col xs={4}>
-            <RuleSimulation rule={rule} onSaveMessage={saveSimulatorMessage} />
-          </Col>
-          <ActionsCol xs={12}>
-            <FormSubmit disabledSubmit={hasRuleBuilderErrors(rule)}
-                        submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
-                        centerCol={initialRule && (
-                        <>
-                          <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors(rule)}>
-                            Update rule
-                          </Button>
-                          <Button bsStyle="info"
-                                  title="Convert Rule Builder to Source Code"
-                                  disabled={hasRuleBuilderErrors(rule)}
-                                  onClick={() => {
-                                    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CONVERT_TO_SOURCE_CODE_CLICKED, {
-                                      app_pathname: getPathnameWithoutId(pathname),
-                                      app_section: 'pipeline-rules',
-                                      app_action_value: 'convert-rule-builder-to-source-code-button',
-                                    });
+                                      deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
+                  </StyledPanelBody>
+                </Panel.Collapse>
+              </StyledPanel>
+              <Errors objectWithErrors={rule.rule_builder} />
+            </Col>
+            <Col xs={4}>
+              <RuleSimulation rule={rule} onSaveMessage={saveSimulatorMessage} />
+            </Col>
+            <ActionsCol xs={12}>
+              <FormSubmit disabledSubmit={hasRuleBuilderErrors(rule)}
+                          submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
+                          centerCol={initialRule && (
+                          <>
+                            <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors(rule)}>
+                              Update rule
+                            </Button>
+                            <Button bsStyle="info"
+                                    title="Convert Rule Builder to Source Code"
+                                    disabled={hasRuleBuilderErrors(rule)}
+                                    onClick={() => {
+                                      sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CONVERT_TO_SOURCE_CODE_CLICKED, {
+                                        app_pathname: getPathnameWithoutId(pathname),
+                                        app_section: 'pipeline-rules',
+                                        app_action_value: 'convert-rule-builder-to-source-code-button',
+                                      });
 
-                                    setRuleSourceCodeToShow(rule);
-                                  }}>
-                            Convert to Source Code
-                          </Button>
-                        </>
-                        )}
-                        onCancel={handleCancel} />
-          </ActionsCol>
-        </Row>
-        {blockToDelete && (
-        <ConfirmDialog title={`Delete ${blockToDelete.type}`}
-                       show
-                       onConfirm={() => {
-                         deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
-                         setBlockToDelete(null);
-                       }}
-                       onCancel={() => setBlockToDelete(null)}>
-          <>Are you sure you want to delete <strong>{blockToDelete.type} N° {blockToDelete.orderIndex + 1}</strong>?</>
-        </ConfirmDialog>
-        )}
-        {ruleSourceCodeToShow && (
-        <ConvertToSourceCodeModal show
-                                  onNavigateAway={updateRule}
-                                  onHide={() => setRuleSourceCodeToShow(null)}
-                                  rule={ruleSourceCodeToShow} />
-        )}
-      </form>
-    </RuleBuilderProvider>
+                                      setRuleSourceCodeToShow(rule);
+                                    }}>
+                              Convert to Source Code
+                            </Button>
+                          </>
+                          )}
+                          onCancel={handleCancel} />
+            </ActionsCol>
+          </Row>
+          {blockToDelete && (
+          <ConfirmDialog title={`Delete ${blockToDelete.type}`}
+                         show
+                         onConfirm={() => {
+                           deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
+                           setBlockToDelete(null);
+                         }}
+                         onCancel={() => setBlockToDelete(null)}>
+            <>Are you sure you want to delete <strong>{blockToDelete.type} N° {blockToDelete.orderIndex + 1}</strong>?</>
+          </ConfirmDialog>
+          )}
+          {ruleSourceCodeToShow && (
+          <ConvertToSourceCodeModal show
+                                    onNavigateAway={updateRule}
+                                    onHide={() => setRuleSourceCodeToShow(null)}
+                                    rule={ruleSourceCodeToShow} />
+          )}
+        </form>
+      </RuleBuilderProvider>
+    )
   );
 };
 
