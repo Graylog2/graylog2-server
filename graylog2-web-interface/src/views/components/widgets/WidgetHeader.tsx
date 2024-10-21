@@ -85,7 +85,15 @@ type Props = {
   titleIcon?: React.ReactNode,
 };
 
-const WidgetHeader = ({ children = null, onRename, hideDragHandle = false, title, loading = false, editing, titleIcon }: Props) => (
+const WidgetHeader = ({
+  title,
+  editing,
+  hideDragHandle = false,
+  loading = false,
+  children = null,
+  titleIcon = null,
+  onRename = null,
+}: Props) => (
   <Container>
     <Col>
       {hideDragHandle || <DragHandleContainer className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="drag_indicator" /></DragHandleContainer>}
