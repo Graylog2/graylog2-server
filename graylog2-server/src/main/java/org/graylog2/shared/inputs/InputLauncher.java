@@ -19,6 +19,7 @@ package org.graylog2.shared.inputs;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.IOState;
@@ -28,8 +29,6 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -75,6 +74,7 @@ public class InputLauncher {
         if (inputRegistry.getInputState(input.getId()) == null) {
             inputState = inputStateFactory.create(input);
             inputRegistry.add(inputState);
+            return inputState;
         } else {
             inputState = inputRegistry.getInputState(input.getId());
             switch (inputState.getState()) {

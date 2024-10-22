@@ -40,6 +40,10 @@ public abstract class InputCreateRequest implements WithInputConfiguration<Input
     @JsonProperty
     public abstract boolean global();
 
+    @JsonProperty
+    @Nullable
+    public abstract Boolean setupMode();
+
     @Override
     @JsonProperty
     public abstract Map<String, Object> configuration();
@@ -59,13 +63,14 @@ public abstract class InputCreateRequest implements WithInputConfiguration<Input
     public static InputCreateRequest create(@JsonProperty("title") String title,
                                             @JsonProperty("type") String type,
                                             @JsonProperty("global") boolean global,
+                                            @JsonProperty("setup_mode") Boolean setupMode,
                                             @JsonProperty("configuration") Map<String, Object> configuration,
                                             @JsonProperty("node") String node) {
-        return new AutoValue_InputCreateRequest(title, type, global, configuration, node);
+        return new AutoValue_InputCreateRequest(title, type, global, setupMode, configuration, node);
     }
 
     public static Builder builder() {
-        return new AutoValue_InputCreateRequest.Builder();
+        return new AutoValue_InputCreateRequest.Builder().setupMode(false);
     }
 
     @AutoValue.Builder
@@ -75,6 +80,8 @@ public abstract class InputCreateRequest implements WithInputConfiguration<Input
         public abstract Builder type(String type);
 
         public abstract Builder global(boolean global);
+
+        public abstract Builder setupMode(Boolean setupMode);
 
         public abstract Builder configuration(Map<String, Object> configuration);
 

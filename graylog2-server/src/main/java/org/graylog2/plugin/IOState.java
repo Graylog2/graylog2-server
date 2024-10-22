@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.events.inputs.IOStateChangedEvent;
 import org.joda.time.DateTime;
 
@@ -34,6 +35,7 @@ public class IOState<T extends Stoppable> {
 
     public enum Type {
         CREATED,
+        SETUP,
         INITIALIZED,
         INVALID_CONFIGURATION,
         STARTING,
@@ -53,8 +55,9 @@ public class IOState<T extends Stoppable> {
     protected String detailedMessage;
 
     @AssistedInject
-    public IOState(EventBus eventbus, @Assisted T stoppable) {
-        this(eventbus, stoppable, Type.CREATED);
+    public IOState(EventBus eventbus, @Assisted T stoppable, FeatureFlags featureFlags) {
+        this(eventbus, stoppable,
+                featureFlags.isOn("SETUP_MODE") ? Type.SETUP : Type.CREATED);
     }
 
     @AssistedInject
@@ -78,13 +81,10 @@ public class IOState<T extends Stoppable> {
     }
 
     public boolean canBeStarted() {
-        switch (getState()) {
-            case RUNNING:
-            case STARTING:
-                return false;
-            default:
-                return true;
-        }
+        return switch (getState()) {
+            case RUNNING, STARTING -> false;
+            default -> true;
+        };
     }
 
     public void setState(Type state, String detailedMessage) {

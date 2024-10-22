@@ -17,12 +17,12 @@
 package org.graylog2.shared.inputs;
 
 import com.google.common.collect.Maps;
+import jakarta.inject.Inject;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 import java.util.Optional;
@@ -30,9 +30,13 @@ import java.util.Optional;
 public class MessageInputFactory {
     private final Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories;
 
+    private final FeatureFlags featureFlags;
+
     @Inject
-    public MessageInputFactory(Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories) {
+    public MessageInputFactory(Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories,
+                               FeatureFlags featureFlags) {
         this.inputFactories = inputFactories;
+        this.featureFlags = featureFlags;
     }
 
     public MessageInput create(String type, Configuration configuration) throws NoSuchInputTypeException {
@@ -51,6 +55,12 @@ public class MessageInputFactory {
         input.setCreatedAt(Tools.nowUTC());
         if (!lr.global()) {
             input.setNodeId(nodeId);
+        }
+
+        if (featureFlags.isOn("SETUP_MODE") && lr.setupMode() != null) {
+            input.setSetupMode(lr.setupMode());
+        } else {
+            input.setSetupMode(false);
         }
 
         return input;
