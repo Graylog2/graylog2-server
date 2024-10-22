@@ -14,8 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export { default as InputSetupWizardProvider } from './contexts/InputSetupWizardProvider';
-export { default as InputSetupWizard } from './InputSetupWizard';
-export { default as useInputSetupWizard } from './hooks/useInputSetupWizard';
-export * from './types';
+const UpdateIlluminateStep = () => (
+  <div>Update Illuminate Step</div>
+);
+
+export default UpdateIlluminateStep;

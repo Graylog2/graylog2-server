@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export { default as InputSetupWizardProvider } from './contexts/InputSetupWizardProvider';
-export { default as InputSetupWizard } from './InputSetupWizard';
-export { default as useInputSetupWizard } from './hooks/useInputSetupWizard';
-export * from './types';
+export { default as ActivateIlluminateStep } from './ActivateIlluminateStep';
+export { default as SelectCategoryStep } from './SelectCategoryStep';
+export { default as TestInputStep } from './TestInputStep';
+export { default as UpdateIlluminateStep } from './UpdateIlluminateStep';

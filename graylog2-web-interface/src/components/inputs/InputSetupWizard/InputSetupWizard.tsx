@@ -15,30 +15,113 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 
 import { Modal } from 'components/bootstrap';
 import { Wizard } from 'components/common';
-import { INPUT_WIZARD_STEPS } from 'contexts/InputSetupWizardContext';
-import useInputSetupWizard from 'hooks/useInputSetupWizard';
+import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
+import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
+import useIlluminateValidityForSubject from 'components/inputs/InputSetupWizard/hooks/useIlluminateValidityForSubject';
 
-import CategoryStep from './CategoryStep';
+import { ActivateIlluminateStep, SelectCategoryStep, UpdateIlluminateStep, TestInputStep } from './steps';
 
 const InputSetupWizard = () => {
-  const { activeStep, setActiveStep, show, closeWizard } = useInputSetupWizard();
+  const { activeStep, setActiveStep, show, closeWizard, wizardData } = useInputSetupWizard();
+  const [orderedSteps, setOrderedSteps] = useState([]);
+  const { category, subcategory } = wizardData;
 
-  const steps = [{
-    key: INPUT_WIZARD_STEPS.SELECT_CATEGORY,
-    title: (
-      <>
-        Title
-      </>
-    ),
-    component: (
-      <CategoryStep />
-    ),
-  }];
+  const {
+    data: dataIlluminateValidty,
+    isFetching: isFetchingIlluminateValidty,
+    isError: isErrorIlluminateValidty,
+  } = useIlluminateValidityForSubject(category, subcategory);
 
-  if (!show) return null;
+  const steps = useMemo(() => ({
+    [INPUT_WIZARD_STEPS.UPDATE_ILLUMINATE]: {
+      key: INPUT_WIZARD_STEPS.UPDATE_ILLUMINATE,
+      title: (
+        <>
+          Update Illuminate
+        </>
+      ),
+      component: (
+        <UpdateIlluminateStep />
+      ),
+    },
+    [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+      key: INPUT_WIZARD_STEPS.SELECT_CATEGORY,
+      title: (
+        <>
+          Select Category
+        </>
+      ),
+      component: (
+        <SelectCategoryStep />
+      ),
+    },
+    [INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]: {
+      key: INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE,
+      title: (
+        <>
+          Activate Illuminate
+        </>
+      ),
+      component: (
+        <ActivateIlluminateStep />
+      ),
+    },
+    [INPUT_WIZARD_STEPS.TEST_INPUT]: {
+      key: INPUT_WIZARD_STEPS.TEST_INPUT,
+      title: (
+        <>
+          Test Input
+        </>
+      ),
+      component: (
+        <TestInputStep />
+      ),
+    },
+  }), []);
+
+  const isIlluminateOutdated = true;
+
+  const determineFirstStep = useCallback(() => {
+    if (isIlluminateOutdated) {
+      setActiveStep(INPUT_WIZARD_STEPS.UPDATE_ILLUMINATE);
+      setOrderedSteps([INPUT_WIZARD_STEPS.UPDATE_ILLUMINATE]);
+
+      return;
+    }
+
+    if (!category || !subcategory) {
+      setActiveStep(INPUT_WIZARD_STEPS.SELECT_CATEGORY);
+      setOrderedSteps([INPUT_WIZARD_STEPS.SELECT_CATEGORY]);
+
+      return;
+    }
+
+    if (isFetchingIlluminateValidty || isErrorIlluminateValidty || !dataIlluminateValidty?.category_valid || !dataIlluminateValidty.subcategory_valid) {
+      setActiveStep(INPUT_WIZARD_STEPS.TEST_INPUT);
+      setOrderedSteps([INPUT_WIZARD_STEPS.TEST_INPUT]);
+
+      return;
+    }
+
+    setActiveStep(INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE);
+    setOrderedSteps([INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]);
+  }, [setActiveStep, category, subcategory, dataIlluminateValidty, isFetchingIlluminateValidty, isErrorIlluminateValidty, isIlluminateOutdated]);
+
+  useEffect(() => {
+    if (!activeStep) {
+      determineFirstStep();
+    }
+
+    if (activeStep && orderedSteps.length < 1) {
+      setOrderedSteps([activeStep]);
+    }
+  }, [activeStep, determineFirstStep, orderedSteps]);
+
+  if (!show || orderedSteps.length < 1) return null;
 
   return (
     <Modal show onHide={closeWizard}>
@@ -48,7 +131,7 @@ const InputSetupWizard = () => {
                 horizontal
                 justified
                 onStepChange={setActiveStep}
-                steps={steps} />
+                steps={orderedSteps.map((step) => steps[step])} />
       </Modal.Body>
     </Modal>
   );
