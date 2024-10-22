@@ -101,7 +101,7 @@ const WidgetHeader = ({
         <TitleInputWrapper>
           <TitleInput type="text"
                       id="widget-title"
-                      onChange={(e) => onRename(e.target.value)}
+                      onChange={(e) => onRename && onRename(e.target.value)}
                       value={title}
                       required />
         </TitleInputWrapper>
