@@ -31,7 +31,7 @@ public class TelemetryTestHelper {
     static final String CLUSTER = "cluster";
     static final String CURRENT_USER = "current_user";
     static final String USER_TELEMETRY_SETTINGS = "user_telemetry_settings";
-    static final String LICENSE = "license";
+    public static final String LICENSE = "license";
     static final String PLUGIN = "plugin";
     static final String SEARCH_CLUSTER = "search_cluster";
 
