@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import debounce from 'lodash/debounce';
 
 import Select from 'components/common/Select';
@@ -42,33 +42,42 @@ type Props = Omit<React.ComponentProps<typeof Select>, 'options'> & {
 const PaginatedSelect = ({ onLoadOptions, ...rest }: Props) => {
   const selectRef = useRef();
   const [paginatedOptions, setPaginatedOptions] = useState<PaginatedOptions | undefined>();
-  const [isSearching, setIsSearching] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadOptions = useCallback((pagination: Pagination, processResponse = (res: PaginatedOptions, _cur: PaginatedOptions) => res) => {
+    setIsLoading(true);
+
+    return onLoadOptions(pagination).then((res) => {
+      setPaginatedOptions((cur) => processResponse(res, cur));
+      setIsLoading(false);
+    });
+  }, [onLoadOptions]);
 
   const handleSearch = debounce((newValue, actionMeta) => {
     if (actionMeta.action === 'input-change') {
-      setIsSearching(true);
-
-      onLoadOptions({ ...DEFAULT_PAGINATION, query: newValue }).then((results) => {
-        setIsSearching(false);
-        setPaginatedOptions(results);
-      });
-    } else if (actionMeta.action === 'menu-close') {
-      onLoadOptions(DEFAULT_PAGINATION).then(setPaginatedOptions);
+      return loadOptions({ ...DEFAULT_PAGINATION, query: newValue });
     }
+
+    if (actionMeta.action === 'menu-close') {
+      return loadOptions(DEFAULT_PAGINATION);
+    }
+
+    return Promise.resolve();
   }, 400);
 
   const handleLoadMore = debounce(() => {
     const { pagination, total, list } = paginatedOptions;
+    const extendList = (res: PaginatedOptions, cur: PaginatedOptions) => ({
+      ...res,
+      list: [...cur.list, ...res.list],
+    });
 
-    if (isSearching) {
+    if (isLoading) {
       return;
     }
 
     if (total > list.length) {
-      onLoadOptions({ ...pagination, page: pagination.page + 1, query: '' }).then((res) => setPaginatedOptions((cur) => ({
-        ...res,
-        list: [...cur.list, ...res.list],
-      })));
+      loadOptions({ ...pagination, page: pagination.page + 1, query: '' }, extendList);
     }
   }, 400);
 
