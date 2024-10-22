@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useCallback, useState, useEffect } from 'react';
 import { useFormikContext } from 'formik';
@@ -354,21 +353,6 @@ const IndexMaintenanceStrategiesConfiguration = ({
       </Row>
     </div>
   );
-};
-
-IndexMaintenanceStrategiesConfiguration.propTypes = {
-  title: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  description: PropTypes.string,
-  selectPlaceholder: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  pluginExports: PropTypes.array.isRequired,
-  strategies: PropTypes.array.isRequired,
-  retentionStrategiesContext: PropTypes.shape({
-    max_index_retention_period: PropTypes.string,
-  }),
-  activeConfig: PropTypes.object.isRequired,
-  getState: PropTypes.func.isRequired,
 };
 
 export default IndexMaintenanceStrategiesConfiguration;

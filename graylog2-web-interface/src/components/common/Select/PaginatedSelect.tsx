@@ -29,6 +29,4 @@ const PaginatedSelect = (props: Props) => {
   );
 };
 
-PaginatedSelect.propTypes = Select.propTypes;
-
 export default PaginatedSelect;

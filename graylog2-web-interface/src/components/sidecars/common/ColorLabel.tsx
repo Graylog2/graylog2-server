@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css, useTheme } from 'styled-components';
 
 import { Label } from 'components/bootstrap';
@@ -59,12 +58,6 @@ const ColorLabel = ({ color, size = 'normal', text = <span>&emsp;</span> }: Prop
       </Label>
     </ColorLabelWrap>
   );
-};
-
-ColorLabel.propTypes = {
-  color: PropTypes.string.isRequired,
-  text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  size: PropTypes.oneOf(['normal', 'small', 'xsmall']),
 };
 
 export default ColorLabel;

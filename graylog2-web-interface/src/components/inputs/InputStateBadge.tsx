@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { OverlayTrigger, LinkToNode, Spinner } from 'components/common';
@@ -110,10 +109,6 @@ const InputStateBadge = ({ input }: Props) => {
   return (
     <Label bsStyle="warning" bsSize="xsmall">{text}</Label>
   );
-};
-
-InputStateBadge.propTypes = {
-  input: PropTypes.object.isRequired,
 };
 
 export default InputStateBadge;

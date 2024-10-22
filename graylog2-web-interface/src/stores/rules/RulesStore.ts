@@ -79,7 +79,7 @@ type RulesActionsType = {
   multiple: () => Promise<unknown>,
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
-  updateMetricsConfig: () => Promise<unknown>,
+  updateMetricsConfig: (nextConfig) => Promise<unknown>,
   listPaginated: (pagination: Pagination) => Promise<PaginatedRules>,
 };
 
@@ -103,7 +103,7 @@ export const RulesActions = singletonActions(
 
 export const RulesStore = singletonStore(
   'core.Rules',
-  () => Reflux.createStore<{ rules: RuleType[] }>({
+  () => Reflux.createStore<{ rules: RuleType[], metricsConfig: {} }>({
     listenables: [RulesActions],
     rules: undefined,
     rulesContext: undefined,

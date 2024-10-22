@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useCallback, useState, useEffect } from 'react';
 
 import { useStore } from 'stores/connect';
@@ -96,12 +95,6 @@ const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
       {nodeSelect}
     </span>
   );
-};
-
-NodeOrGlobalSelect.propTypes = {
-  global: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  node: PropTypes.string,
 };
 
 export default NodeOrGlobalSelect;

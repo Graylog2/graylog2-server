@@ -56,7 +56,7 @@ type ErrorState = {
 
 type LookupTablesStoreState = {
   pagination: PaginatedResponseType,
-  errorState: ErrorState,
+  errorStates: ErrorState,
   table: LookupTable | null,
   cache: LookupTableCache | null,
   dataAdapter: LookupTableAdapter | null,
@@ -74,7 +74,7 @@ type LookupTablesStoreState = {
 }
 
 type LookupTableActionsType = {
-  searchPaginated: (page: number, perPage: number, query?: string, resolve?: boolean) => Promise<unknown>,
+  searchPaginated: (page: number, perPage: number, query?: string, resolve?: boolean) => Promise<{ lookup_tables: Array<LookupTable> }>,
   reloadPage: () => Promise<unknown>,
   get: (idOrName: string) => Promise<unknown>,
   create: (table: LookupTable) => Promise<unknown>,

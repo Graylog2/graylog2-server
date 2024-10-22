@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -103,11 +102,6 @@ const ExtractorsList = ({ input, node }: Props) => {
       )}
     </div>
   );
-};
-
-ExtractorsList.propTypes = {
-  input: PropTypes.object.isRequired,
-  node: PropTypes.object.isRequired,
 };
 
 export default ExtractorsList;

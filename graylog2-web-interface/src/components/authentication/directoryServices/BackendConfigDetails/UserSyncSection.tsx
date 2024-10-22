@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as PropTypes from 'prop-types';
 
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import type Role from 'logic/roles/Role';
@@ -65,10 +64,6 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields = {} }: 
       <ReadOnlyFormGroup label="Default Roles" value={rolesList(defaultRoles, roles)} />
     </SectionComponent>
   );
-};
-
-UserSyncSection.propTypes = {
-  excludedFields: PropTypes.object,
 };
 
 export default UserSyncSection;

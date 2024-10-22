@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
 
@@ -63,18 +62,6 @@ const ErrorAlert = ({ children = null, onClose = () => undefined, bsStyle = 'war
       </Alert>
     </Container>
   );
-};
-
-ErrorAlert.propTypes = {
-  bsStyle: PropTypes.string,
-  runtimeError: PropTypes.bool,
-  marginTopBottom: PropTypes.number,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-    PropTypes.string,
-  ]),
-  onClose: PropTypes.func,
 };
 
 export default ErrorAlert;

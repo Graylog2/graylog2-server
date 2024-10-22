@@ -256,8 +256,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
   const additionalContent = (
     <div>
       <Col md={8}>
-        <ConfigurationWell className="configuration-well"
-                           id={input.id}
+        <ConfigurationWell id={input.id}
                            configuration={input.attributes}
                            typeDefinition={definition || {}} />
         {showStaticFieldForm && (
