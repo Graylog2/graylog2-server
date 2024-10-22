@@ -21,8 +21,9 @@ import Select from 'components/common/Select';
 import { defaultCompare } from 'logic/DefaultCompare';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { FormGroup } from 'components/bootstrap';
 
-const Container = styled.div`
+const Container = styled(FormGroup)`
   flex: 1;
   grid-area: streams;
 `;
@@ -34,11 +35,12 @@ type Props = {
   onChange: (newStreamIds: Array<string>) => void,
   multi?: boolean,
   clearable?: boolean
+  hasError?: boolean
 };
 
 const StreamsFilter = ({
   disabled = false, value = [], streams, onChange, multi = true,
-  clearable = true,
+  clearable = true, hasError = false,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const selectedStreams = value.join(',');
@@ -59,7 +61,7 @@ const StreamsFilter = ({
   };
 
   return (
-    <Container data-testid="streams-filter" title={placeholder}>
+    <Container data-testid="streams-filter" title={placeholder} validationState={hasError ? 'error' : undefined} bsClass="no-bm">
       <Select placeholder={placeholder}
               disabled={disabled}
               clearable={clearable}
@@ -70,6 +72,7 @@ const StreamsFilter = ({
               options={options}
               multi={multi}
               value={selectedStreams} />
+
     </Container>
   );
 };
