@@ -203,7 +203,7 @@ const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfi
   }), [chartData, colors, setChartColor, theme.colors.global.textDefault]);
 };
 
-const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverMarker, onUnhoverMarker, onZoom, onAfterPlot }: Props) => {
+const GenericPlot = ({ chartData, layout = {}, setChartColor, onClickMarker = () => {}, onHoverMarker = () => {}, onUnhoverMarker = () => {}, onZoom = () => {}, onAfterPlot = () => {} }: Props) => {
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);
   const plotChartData = usePlotChatData(chartData, setChartColor);
@@ -253,16 +253,6 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
                 onRelayout={interactive ? _onRelayout : () => {}}
                 config={config} />
   );
-};
-
-GenericPlot.defaultProps = {
-  layout: {},
-  onZoom: () => {},
-  setChartColor: undefined,
-  onClickMarker: () => {},
-  onHoverMarker: () => {},
-  onUnhoverMarker: () => {},
-  onAfterPlot: () => {},
 };
 
 export default GenericPlot;

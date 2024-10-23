@@ -29,7 +29,7 @@ type Props = {
   color?: string
 }
 
-const ResumeStartupButton = ({ variant, compact, color }: Props) => {
+const ResumeStartupButton = ({ variant, compact = false, color }: Props) => {
   const [isRestartingConfiguration, setIsRestartingConfiguration] = useState(false);
   const onResumeStartup = useCallback(() => {
     // eslint-disable-next-line no-alert
@@ -56,12 +56,6 @@ const ResumeStartupButton = ({ variant, compact, color }: Props) => {
       {isRestartingConfiguration ? 'restarting...' : 'restart'}
     </Button>
   );
-};
-
-ResumeStartupButton.defaultProps = {
-  variant: undefined,
-  compact: false,
-  color: undefined,
 };
 
 export default ResumeStartupButton;

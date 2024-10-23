@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import PropTypes from 'prop-types';
 
 import { Button } from 'components/bootstrap';
 import type { BsSize } from 'components/bootstrap/types';
@@ -37,10 +36,10 @@ type Props = {
   buttonText?: string,
   className?: string,
   disabled?: boolean,
-  streamId: string,
+  streamId?: string
 }
 
-const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, disabled, streamId }: Props) => {
+const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText = 'Create Rule', className, disabled = false, streamId }: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const queryClient = useQueryClient();
   const toggleCreateModal = useCallback(() => setShowCreateModal((cur) => !cur), []);
@@ -79,23 +78,6 @@ const CreateStreamRuleButton = ({ bsSize, bsStyle, buttonText, className, disabl
 
     </IfPermitted>
   );
-};
-
-CreateStreamRuleButton.propTypes = {
-  buttonText: PropTypes.string,
-  bsStyle: PropTypes.string,
-  bsSize: PropTypes.string,
-  className: PropTypes.string,
-  streamId: PropTypes.string,
-};
-
-CreateStreamRuleButton.defaultProps = {
-  buttonText: 'Create Rule',
-  bsSize: undefined,
-  bsStyle: undefined,
-  className: undefined,
-  disabled: false,
-  streamId: undefined,
 };
 
 export default CreateStreamRuleButton;

@@ -27,7 +27,7 @@ type Props = {
   help?: string,
 }
 
-const IndexSetSelect = ({ indexSets, help }: Props) => {
+const IndexSetSelect = ({ indexSets, help = 'Messages that match this stream will be written to the configured index set.' }: Props) => {
   const indexSetOptions = useMemo(
     () => indexSets
       .filter((indexSet) => indexSet.can_be_default)
@@ -58,10 +58,6 @@ const IndexSetSelect = ({ indexSets, help }: Props) => {
       )}
     </Field>
   );
-};
-
-IndexSetSelect.defaultProps = {
-  help: 'Messages that match this stream will be written to the configured index set.',
 };
 
 export default IndexSetSelect;

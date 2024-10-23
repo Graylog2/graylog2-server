@@ -84,13 +84,4 @@ const ClipboardButton = ({ bsSize, bsStyle, buttonTitle, className, disabled, on
   );
 };
 
-ClipboardButton.defaultProps = {
-  bsSize: undefined,
-  bsStyle: undefined,
-  buttonTitle: undefined,
-  className: undefined,
-  disabled: undefined,
-  onSuccess: undefined,
-};
-
 export default ClipboardButton;

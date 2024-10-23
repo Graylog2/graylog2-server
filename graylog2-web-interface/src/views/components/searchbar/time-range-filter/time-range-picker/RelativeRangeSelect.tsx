@@ -215,8 +215,8 @@ const RelativeRangeSelectInner = ({
 
 const RelativeRangeSelect = ({
   defaultRange,
-  disableUnsetRange,
-  disabled,
+  disableUnsetRange = false,
+  disabled = false,
   fieldName,
   limitDuration,
   onUnsetRange,
@@ -240,11 +240,5 @@ const RelativeRangeSelect = ({
     )}
   </Field>
 );
-
-RelativeRangeSelect.defaultProps = {
-  disabled: false,
-  disableUnsetRange: false,
-  onUnsetRange: undefined,
-};
 
 export default RelativeRangeSelect;

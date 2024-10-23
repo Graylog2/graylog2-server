@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import omit from 'lodash/omit';
 
@@ -29,7 +28,7 @@ import { PLUGIN_API_ENDPOINT, PLUGIN_CONFIG_CLASS_NAME } from '../Constants';
 import UserNotification from '../../util/UserNotification';
 
 type Props = {
-  config: {
+  config?: {
     lookups_enabled: boolean,
     lookup_regions: string,
     access_key: string,
@@ -47,7 +46,15 @@ const postConfigUpdate = (update) => {
   return fetch('PUT', url, update);
 };
 
-const AWSPluginConfiguration = ({ config }: Props) => {
+const AWSPluginConfiguration = ({
+  config = {
+    lookups_enabled: false,
+    lookup_regions: 'us-east-1,us-west-1,us-west-2,eu-west-1,eu-central-1',
+    access_key: '',
+    secret_key: '',
+    proxy_enabled: false,
+  },
+}: Props) => {
   const [updateConfig, setUpdateConfig] = useState(_initialState(config));
   const [showAwsConfigModal, setShowAwsConfigModal] = useState(false);
 
@@ -228,26 +235,6 @@ const AWSPluginConfiguration = ({ config }: Props) => {
       </BootstrapModalForm>
     </div>
   );
-};
-
-AWSPluginConfiguration.propTypes = {
-  config: PropTypes.shape({
-    lookups_enabled: PropTypes.bool,
-    lookup_regions: PropTypes.string,
-    access_key: PropTypes.string,
-    secret_key: PropTypes.string,
-    proxy_enabled: PropTypes.bool,
-  }),
-};
-
-AWSPluginConfiguration.defaultProps = {
-  config: {
-    lookups_enabled: false,
-    lookup_regions: 'us-east-1,us-west-1,us-west-2,eu-west-1,eu-central-1',
-    access_key: '',
-    secret_key: '',
-    proxy_enabled: false,
-  },
 };
 
 export default AWSPluginConfiguration;

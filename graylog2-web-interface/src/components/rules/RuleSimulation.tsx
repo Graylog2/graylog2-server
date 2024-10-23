@@ -16,7 +16,6 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import { Button, ControlLabel, FormGroup, Input, ButtonGroup } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
@@ -64,7 +63,7 @@ type Props = {
   onSaveMessage?: (message: string) => void,
 };
 
-const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
+const RuleSimulation = ({ rule: currentRule, onSaveMessage = () => {} }: Props) => {
   const {
     rule,
     simulateRule,
@@ -226,16 +225,6 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
       </div>
     </StyledFormGroup>
   );
-};
-
-RuleSimulation.propTypes = {
-  rule: PropTypes.object,
-  onSaveMessage: PropTypes.func,
-};
-
-RuleSimulation.defaultProps = {
-  rule: undefined,
-  onSaveMessage: () => {},
 };
 
 export default RuleSimulation;

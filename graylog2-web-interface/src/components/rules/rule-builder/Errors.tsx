@@ -16,14 +16,13 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/bootstrap';
 
 import type { ObjectWithErrors } from './types';
 
 type Props = {
-  objectWithErrors: ObjectWithErrors,
+  objectWithErrors?: ObjectWithErrors
 }
 
 const ErrorsContainer = styled(Row)(({ theme }) => css`
@@ -54,16 +53,6 @@ const Errors = ({ objectWithErrors } : Props) => {
       </Col>
     </ErrorsContainer>
   );
-};
-
-Errors.propTypes = {
-  objectWithErrors: PropTypes.shape({
-    errors: PropTypes.arrayOf(PropTypes.string),
-  }),
-};
-
-Errors.defaultProps = {
-  objectWithErrors: undefined,
 };
 
 export default Errors;

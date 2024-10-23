@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useEffect, useMemo, useState, useContext } from 'react';
 import * as Immutable from 'immutable';
 
@@ -123,13 +122,6 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   }
 
   return <Spinner data-testid="spinner" />;
-};
-
-ShowMessagePage.propTypes = {
-  params: PropTypes.exact({
-    index: PropTypes.string.isRequired,
-    messageId: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default withParams(ShowMessagePage);

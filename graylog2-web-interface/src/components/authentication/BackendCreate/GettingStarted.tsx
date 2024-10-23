@@ -40,8 +40,4 @@ const GettingStarted = ({ title }: Props) => (
   </Row>
 );
 
-GettingStarted.defaultProps = {
-  title: undefined,
-};
-
 export default GettingStarted;

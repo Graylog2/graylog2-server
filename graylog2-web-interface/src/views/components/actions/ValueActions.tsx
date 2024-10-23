@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { useContext, useMemo } from 'react';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -23,19 +22,17 @@ import type { QueryId } from 'views/logic/queries/Query';
 import Action from 'views/components/actions/Action';
 import { ActionContext } from 'views/logic/ActionContext';
 
-import CustomPropTypes from '../CustomPropTypes';
-
 type Props = {
   children: React.ReactNode,
   element: React.ReactNode,
   field: string,
-  menuContainer: HTMLElement | undefined | null,
+  menuContainer?: HTMLElement | undefined | null
   queryId: QueryId,
-  type: FieldType,
+  type?: FieldType
   value: React.ReactNode,
 };
 
-const ValueActions = ({ children, element, field, menuContainer, queryId, type, value }: Props) => {
+const ValueActions = ({ children, element, field, menuContainer = document.body, queryId, type = FieldType.Unknown, value }: Props) => {
   const actionContext = useContext(ActionContext);
   const handlerArgs = useMemo(() => ({ queryId, field, type, value, contexts: actionContext }), [actionContext, field, queryId, type, value]);
   const elementWithStatus = (() => element) as React.ComponentType<{ active: boolean }>;
@@ -45,21 +42,6 @@ const ValueActions = ({ children, element, field, menuContainer, queryId, type, 
       {children}
     </Action>
   );
-};
-
-ValueActions.propTypes = {
-  children: PropTypes.node.isRequired,
-  element: PropTypes.node.isRequired,
-  field: PropTypes.string.isRequired,
-  menuContainer: PropTypes.object,
-  queryId: PropTypes.string.isRequired,
-  type: CustomPropTypes.FieldType,
-  value: PropTypes.oneOfType([PropTypes.node, PropTypes.object]).isRequired,
-};
-
-ValueActions.defaultProps = {
-  menuContainer: document.body,
-  type: FieldType.Unknown,
 };
 
 export default ValueActions;

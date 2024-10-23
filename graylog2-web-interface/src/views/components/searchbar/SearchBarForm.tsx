@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
 import isFunction from 'lodash/isFunction';
@@ -44,7 +43,7 @@ type Props = {
 
 const _isFunction = (children: Props['children']): children is FormRenderer => isFunction(children);
 
-const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
+const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount = true, formRef, validateQueryString }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
@@ -85,17 +84,6 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
       )}
     </Formik>
   );
-};
-
-SearchBarForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  limitDuration: PropTypes.number.isRequired,
-  validateOnMount: PropTypes.bool,
-};
-
-SearchBarForm.defaultProps = {
-  validateOnMount: true,
-  formRef: undefined,
 };
 
 export default SearchBarForm;

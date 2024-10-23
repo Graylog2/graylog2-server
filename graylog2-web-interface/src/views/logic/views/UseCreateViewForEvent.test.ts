@@ -131,9 +131,9 @@ describe('UseCreateViewForEvent', () => {
   it('should create view with 2 aggregation widgets and one summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdTwoAggregations);
 
-    asMock(ObjectID).mockImplementation(() => ({
+    asMock(ObjectID).mockImplementation(() => (({
       toString: () => mockedObjectIdTwoAggregations(),
-    }) as ObjectID);
+    }) as ObjectID));
 
     const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation }));
     const view = await result.current.then((r) => r);
@@ -144,9 +144,9 @@ describe('UseCreateViewForEvent', () => {
   it('should create view with 1 aggregation widgets and without summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregation);
 
-    asMock(ObjectID).mockImplementation(() => ({
+    asMock(ObjectID).mockImplementation(() => (({
       toString: () => mockedObjectIdOneAggregation(),
-    }) as ObjectID);
+    }) as ObjectID));
 
     const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinitionOneAggregation, aggregations: [mockedMappedAggregation[0]] }));
     const view = await result.current.then((r) => r);
@@ -157,9 +157,9 @@ describe('UseCreateViewForEvent', () => {
   it('should create view with 1 aggregation widgets when aggregation has no fields and grouping by', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregationNoFields);
 
-    asMock(ObjectID).mockImplementation(() => ({
+    asMock(ObjectID).mockImplementation(() => (({
       toString: () => mockedObjectIdOneAggregationNoFields(),
-    }) as ObjectID);
+    }) as ObjectID));
 
     const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinitionOneAggregationNoFields, aggregations: mockedMappedAggregationNoField }));
     const view = await result.current.then((r) => r);

@@ -65,8 +65,4 @@ export const FilterConfiguration = ({
   </>
 );
 
-FilterConfiguration.defaultProps = {
-  filter: undefined,
-};
-
 export default FilterConfiguration;

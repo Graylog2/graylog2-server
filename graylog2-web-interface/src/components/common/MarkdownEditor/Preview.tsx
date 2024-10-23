@@ -107,7 +107,7 @@ type Props = {
   noBorder?: boolean;
 };
 
-function Preview({ value, height, show, withFullView, noBackground, noBorder }: Props) {
+function Preview({ value, height = 100, show, withFullView = false, noBackground = false, noBorder = false }: Props) {
   const [fullView, setFullView] = React.useState<boolean>(false);
 
   return show && (
@@ -115,17 +115,10 @@ function Preview({ value, height, show, withFullView, noBackground, noBorder }: 
       <MarkdownStyles>
         <Markdown text={value} />
       </MarkdownStyles>
-      {withFullView && <ExpandIcon name="expand" onClick={() => setFullView(true)} />}
+      {withFullView && <ExpandIcon name="expand_content" size="sm" onClick={() => setFullView(true)} />}
       <PreviewModal value={value} show={fullView} onClose={() => setFullView(false)} />
     </Container>
   );
 }
-
-Preview.defaultProps = {
-  withFullView: false,
-  noBackground: false,
-  noBorder: false,
-  height: undefined,
-};
 
 export default Preview;

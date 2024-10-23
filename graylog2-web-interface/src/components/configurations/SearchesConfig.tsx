@@ -138,7 +138,7 @@ const SearchesConfig = () => {
     setFormConfig({ ...formConfig, query_time_range_limit: queryTimeRangeLimit });
   };
 
-  const onCancelAfterSecondsChanged = ({ target: { value } }: { target: { value: number | null }}) => {
+  const onCancelAfterSecondsChanged = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
     setFormConfig({ ...formConfig, cancel_after_seconds: value });
   };
 

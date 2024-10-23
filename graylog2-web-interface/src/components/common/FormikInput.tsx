@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
 import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
@@ -26,7 +24,7 @@ type BaseProps = {
   addonAfter?: React.ReactElement | string,
   bsSize?: 'large' | 'small' | 'xsmall',
   buttonAfter?: React.ReactElement | string,
-  children?: React.ReactNode,
+  children?: React.ReactElement,
   disabled?: boolean,
   error?: React.ReactElement | string,
   formGroupClassName?: string,
@@ -39,7 +37,7 @@ type BaseProps = {
   max?: number,
   minLength?: number,
   name: string,
-  onChange?: (event: SyntheticEvent<Input>) => void,
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void,
   placeholder?: string,
   required?: boolean,
   type?: string,
@@ -59,7 +57,7 @@ const checkboxProps = (value) => ({ checked: value ?? false });
 const inputProps = (value) => ({ value: value ?? '' });
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {
+const FormikInput = ({ children, disabled = false, required = false, autoFocus = false, name, type = 'text', help, validate = () => undefined, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {
   const { validateOnChange } = useFormikContext();
 
   return (
@@ -79,71 +77,22 @@ const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, 
 
         return (
           <Input {...rest}
+                 disabled={disabled}
+                 required={required}
+                 autoFocus={autoFocus}
                  {...typeSpecificProps}
                  onBlur={onBlur}
                  help={help}
                  id={name}
                  error={error}
                  onChange={_handleChange}
-                 type={type} />
+                 type={type}>
+            {children}
+          </Input>
         );
       }}
     </Field>
   );
-};
-
-FormikInput.propTypes = {
-  autoComplete: PropTypes.string,
-  addonAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  bsSize: PropTypes.string,
-  buttonAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  children: PropTypes.oneOfType([
-    PropTypes.array,
-    PropTypes.element,
-  ]),
-  disabled: PropTypes.bool,
-  error: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  formGroupClassName: PropTypes.string,
-  help: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  labelClassName: PropTypes.string,
-  max: PropTypes.number,
-  min: PropTypes.number,
-  maxLength: PropTypes.number,
-  minLength: PropTypes.number,
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-  placeholder: PropTypes.string,
-  required: PropTypes.bool,
-  type: PropTypes.string,
-  validate: PropTypes.func,
-  wrapperClassName: PropTypes.string,
-  autoFocus: PropTypes.bool,
-};
-
-FormikInput.defaultProps = {
-  autoComplete: undefined,
-  addonAfter: undefined,
-  bsSize: undefined,
-  buttonAfter: undefined,
-  children: null,
-  disabled: false,
-  error: undefined,
-  formGroupClassName: undefined,
-  help: undefined,
-  label: undefined,
-  labelClassName: undefined,
-  max: undefined,
-  min: undefined,
-  maxLength: undefined,
-  minLength: undefined,
-  onChange: undefined,
-  placeholder: undefined,
-  required: false,
-  type: 'text',
-  validate: () => undefined,
-  wrapperClassName: undefined,
-  autoFocus: false,
 };
 
 export default FormikInput;

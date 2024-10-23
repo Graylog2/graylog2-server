@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo, useContext, useRef, useImperativeHandle } from 'react';
-import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -171,7 +170,10 @@ const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCo
     });
 
     commands.forEach((command) => editor.commands.addCommand(command));
-    editor.completers = [completer];
+
+    if (completer) {
+      editor.completers = [completer];
+    }
   }
 };
 
@@ -187,7 +189,7 @@ const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props
     return { all: allFieldsByName, query: queryFieldsByName };
   }, [allFields, queryFields]);
 
-  return useMemo(() => completerFactory(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
+  return useMemo(() => completerFactory?.(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
     [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view]);
 };
 
@@ -248,10 +250,10 @@ type Props = BaseProps & {
 };
 
 const QueryInput = React.forwardRef<Editor, Props>(({
-  className,
-  commands,
+  className = '',
+  commands = [],
   completerFactory = defaultCompleterFactory,
-  disableExecution,
+  disableExecution = false,
   error,
   height,
   inputId,
@@ -260,10 +262,10 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   onBlur,
   onChange,
   onExecute: onExecuteProp,
-  placeholder,
+  placeholder = '',
   streams,
   timeRange,
-  value,
+  value = '',
   validate,
   warning,
   wrapEnabled,
@@ -355,45 +357,5 @@ const QueryInput = React.forwardRef<Editor, Props>(({
     </Container>
   );
 });
-
-QueryInput.propTypes = {
-  className: PropTypes.string,
-  completerFactory: PropTypes.func,
-  disableExecution: PropTypes.bool,
-  error: PropTypes.any,
-  inputId: PropTypes.string,
-  height: PropTypes.number,
-  isValidating: PropTypes.bool.isRequired,
-  maxLines: PropTypes.number,
-  onBlur: PropTypes.func,
-  onChange: PropTypes.func.isRequired,
-  onExecute: PropTypes.func.isRequired,
-  placeholder: PropTypes.string,
-  streams: PropTypes.array,
-  timeRange: PropTypes.object,
-  value: PropTypes.string,
-  warning: PropTypes.any,
-  wrapEnabled: PropTypes.bool,
-  validate: PropTypes.func.isRequired,
-};
-
-QueryInput.defaultProps = {
-  className: '',
-  commands: [],
-  completerFactory: defaultCompleterFactory,
-  disableExecution: false,
-  error: undefined,
-  height: undefined,
-  inputId: undefined,
-  maxLines: undefined,
-  onBlur: undefined,
-  placeholder: '',
-  streams: undefined,
-  timeRange: undefined,
-  value: '',
-  warning: undefined,
-  wrapEnabled: undefined,
-  view: undefined,
-};
 
 export default QueryInput;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
@@ -28,7 +27,7 @@ import PipelinesUsingRule from './PipelinesUsingRule';
 import RuleSimulation from './RuleSimulation';
 
 type Props = {
-  create: boolean,
+  create?: boolean
 };
 
 const StyledContainer = styled.div`
@@ -49,7 +48,7 @@ const StyledContainer = styled.div`
   }
 `;
 
-const RuleForm = ({ create }: Props) => {
+const RuleForm = ({ create = false }: Props) => {
   const {
     description,
     handleDescription,
@@ -155,14 +154,6 @@ const RuleForm = ({ create }: Props) => {
       </Row>
     </form>
   );
-};
-
-RuleForm.propTypes = {
-  create: PropTypes.bool,
-};
-
-RuleForm.defaultProps = {
-  create: false,
 };
 
 export default RuleForm;

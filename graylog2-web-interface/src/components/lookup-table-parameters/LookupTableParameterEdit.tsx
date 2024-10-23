@@ -22,6 +22,7 @@ import Select from 'components/common/Select';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Spinner from 'components/common/Spinner';
 import type { LookupTable } from 'logic/lookup-tables/types';
+import type { ValidationState } from 'components/common/types';
 
 const StyledInlineCode = styled('code')`
   margin: 0 0.25em;
@@ -40,18 +41,18 @@ type Props = {
     name?: string,
   },
   validationState?: {
-    lookupTable?: [string, string],
-    key?: [string, string],
+    lookupTable?: [ValidationState, string],
+    key?: [ValidationState, string],
   }
 };
 
 const LookupTableParameterEdit = ({
-  validationState,
+  validationState = {},
   onChange,
   lookupTables,
   identifier,
-  parameter,
-  defaultExpandHelp,
+  parameter = {},
+  defaultExpandHelp = true,
 }: Props) => {
   const { lookupTable, key: tableKey, defaultValue, name } = parameter;
   const parameterSyntax = `$${name}$`;
@@ -141,12 +142,6 @@ const LookupTableParameterEdit = ({
       </Panel>
     </>
   );
-};
-
-LookupTableParameterEdit.defaultProps = {
-  parameter: {},
-  validationState: {},
-  defaultExpandHelp: true,
 };
 
 export default LookupTableParameterEdit;

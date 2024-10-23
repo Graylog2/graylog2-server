@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { PageHeader } from 'components/common';
@@ -34,12 +33,12 @@ import RuleHelper from './rule-helper/RuleHelper';
 import PipelinesPageNavigation from '../pipelines/PipelinesPageNavigation';
 
 type Props = {
-  create: boolean,
-  title: string,
-  isRuleBuilder: boolean,
+  create?: boolean
+  title?: string
+  isRuleBuilder?: boolean
 };
 
-const Rule = ({ create, title, isRuleBuilder }: Props) => {
+const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
   const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
 
   const history = useHistory();
@@ -125,18 +124,6 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
       )}
     </div>
   );
-};
-
-Rule.propTypes = {
-  title: PropTypes.string,
-  create: PropTypes.bool,
-  isRuleBuilder: PropTypes.bool,
-};
-
-Rule.defaultProps = {
-  title: '',
-  create: false,
-  isRuleBuilder: false,
 };
 
 export default Rule;
