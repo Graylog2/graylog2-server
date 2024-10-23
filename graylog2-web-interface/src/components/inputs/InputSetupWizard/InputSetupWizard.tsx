@@ -23,7 +23,7 @@ import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useIlluminateValidityForSubject from 'components/inputs/InputSetupWizard/hooks/useIlluminateValidityForSubject';
 
-import { ActivateIlluminateStep, SelectCategoryStep, UpdateIlluminateStep, TestInputStep } from './steps';
+import { ActivateIlluminateStep, SelectCategoryStep, TestInputStep } from './steps';
 
 const InputSetupWizard = () => {
   const { activeStep, setActiveStep, show, closeWizard, wizardData } = useInputSetupWizard();
@@ -37,17 +37,6 @@ const InputSetupWizard = () => {
   } = useIlluminateValidityForSubject(category, subcategory);
 
   const steps = useMemo(() => ({
-    [INPUT_WIZARD_STEPS.UPDATE_ILLUMINATE]: {
-      key: INPUT_WIZARD_STEPS.UPDATE_ILLUMINATE,
-      title: (
-        <>
-          Update Illuminate
-        </>
-      ),
-      component: (
-        <UpdateIlluminateStep />
-      ),
-    },
     [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
       key: INPUT_WIZARD_STEPS.SELECT_CATEGORY,
       title: (
@@ -83,16 +72,7 @@ const InputSetupWizard = () => {
     },
   }), []);
 
-  const isIlluminateOutdated = true;
-
   const determineFirstStep = useCallback(() => {
-    if (isIlluminateOutdated) {
-      setActiveStep(INPUT_WIZARD_STEPS.UPDATE_ILLUMINATE);
-      setOrderedSteps([INPUT_WIZARD_STEPS.UPDATE_ILLUMINATE]);
-
-      return;
-    }
-
     if (!category || !subcategory) {
       setActiveStep(INPUT_WIZARD_STEPS.SELECT_CATEGORY);
       setOrderedSteps([INPUT_WIZARD_STEPS.SELECT_CATEGORY]);
@@ -109,7 +89,7 @@ const InputSetupWizard = () => {
 
     setActiveStep(INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE);
     setOrderedSteps([INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]);
-  }, [setActiveStep, category, subcategory, dataIlluminateValidty, isFetchingIlluminateValidty, isErrorIlluminateValidty, isIlluminateOutdated]);
+  }, [setActiveStep, category, subcategory, dataIlluminateValidty, isFetchingIlluminateValidty, isErrorIlluminateValidty]);
 
   useEffect(() => {
     if (!activeStep) {

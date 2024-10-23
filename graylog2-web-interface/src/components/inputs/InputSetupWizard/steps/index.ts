@@ -18,4 +18,3 @@
 export { default as ActivateIlluminateStep } from './ActivateIlluminateStep';
 export { default as SelectCategoryStep } from './SelectCategoryStep';
 export { default as TestInputStep } from './TestInputStep';
-export { default as UpdateIlluminateStep } from './UpdateIlluminateStep';
