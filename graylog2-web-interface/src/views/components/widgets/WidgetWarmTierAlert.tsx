@@ -17,9 +17,10 @@
 import * as React from 'react';
 import { useContext, useMemo } from 'react';
 
-import { Alert } from 'components/bootstrap';
+import Popover from 'components/common/Popover';
 import useView from 'views/hooks/useView';
 import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
+import { IconButton } from 'components/common';
 
 type Props = {
   activeQuery: string
@@ -37,9 +38,14 @@ const WidgetWarmTierAlert = ({ activeQuery, widgetId } : Props) => {
   if (!isWidgetInWarmTier) return null;
 
   return (
-    <Alert bsStyle="info">
-      This widget is retrieving data from the Warm Tier and may take longer to load.
-    </Alert>
+    <Popover position="bottom">
+      <Popover.Target>
+        <IconButton title="Info" name="info" />
+      </Popover.Target>
+      <Popover.Dropdown title="Info">
+        This widget is retrieving data from the Warm Tier and may take longer to load.
+      </Popover.Dropdown>
+    </Popover>
   );
 };
 
