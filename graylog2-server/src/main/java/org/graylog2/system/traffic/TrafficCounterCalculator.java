@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.telemetry.enterprise;
+package org.graylog2.system.traffic;
 
-import java.util.List;
+import org.joda.time.DateTime;
 
-public interface TelemetryEnterpriseDataProvider {
+public interface TrafficCounterCalculator {
 
-    List<TelemetryLicenseStatus> licenseStatus();
-
-    int teamsCount(String userId);
-
+    void calculate(DateTime previousMinute);
 }

@@ -100,10 +100,10 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.system.traffic.OpenTrafficCounterCalculator;
+import org.graylog2.system.traffic.TrafficCounterCalculator;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.system.traffic.TrafficUpdater;
-import org.graylog2.telemetry.enterprise.DefaultTelemetryEnterpriseDataProvider;
-import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
 import org.graylog2.users.GrantsCleanupListener;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
@@ -208,13 +208,13 @@ public class ServerBindings extends Graylog2Module {
 
         bind(RoleService.class).to(RoleServiceImpl.class).in(Scopes.SINGLETON);
         OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
-        OptionalBinder.newOptionalBinder(binder(), TelemetryEnterpriseDataProvider.class).setDefault().to(DefaultTelemetryEnterpriseDataProvider.class);
 
         bind(CSPService.class).to(CSPServiceImpl.class).asEagerSingleton();
         bind(CSPEventListener.class).asEagerSingleton();
 
         OptionalBinder.newOptionalBinder(binder(), DataTieringStatusService.class).setDefault().to(DefaultDataTieringStatusService.class);
 
+        Multibinder.newSetBinder(binder(), TrafficCounterCalculator.class).addBinding().to(OpenTrafficCounterCalculator.class);
         OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
     }
 
