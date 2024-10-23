@@ -44,7 +44,7 @@ public class DatanodeDnsPreflightCheck implements PreflightCheck {
         try {
             final InetAddress[] addresses = InetAddress.getAllByName(configuredHostname);
             final List<String> ips = Stream.of(addresses).map(InetAddress::getHostAddress).toList();
-            LOG.debug("Datanode host " + configuredHostname + " is available on " + ips + " addresses");
+            LOG.debug("Datanode host {} is available on {} addresses", configuredHostname, ips);
         } catch (UnknownHostException e) {
             throw new PreflightCheckException("Configured hostname " + configuredHostname + " is not bound to any address! Please configure your DNS so the hostname points to this machine");
         }
