@@ -72,10 +72,14 @@ public class InputLauncher {
 
         final IOState<MessageInput> inputState;
         if (inputRegistry.getInputState(input.getId()) == null) {
+            // new input: do not launch if currently still in setup mode
             inputState = inputStateFactory.create(input);
             inputRegistry.add(inputState);
-            return inputState;
+            if (inputState.getState() == IOState.Type.SETUP) {
+                return inputState;
+            }
         } else {
+            // existing input: launch it, if it hasn't already been launched
             inputState = inputRegistry.getInputState(input.getId());
             switch (inputState.getState()) {
                 case RUNNING, STARTING, FAILING -> {
