@@ -139,7 +139,7 @@ class EventNotificationForm extends React.Component<EventNotificationFormProps, 
     const { isSubmitEnabled } = this.state;
 
     const notificationPlugin = getNotificationPlugin(notification.config.type);
-    const notificationFormComponent = notificationPlugin.formComponent
+    const notificationFormComponent = notificationPlugin?.formComponent
       ? React.createElement(notificationPlugin.formComponent, {
         config: notification.config,
         onChange: this.handleConfigChange,
