@@ -41,6 +41,8 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import useFeature from 'hooks/useFeature';
+import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
 
 type Props = {
   input: Input,
@@ -66,6 +68,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const { inputTypes, inputDescriptions } = useStore(InputTypesStore);
+  const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
 
   const deleteInput = () => {
     setShowConfirmDeleteDialog(true);
@@ -198,20 +201,21 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
                   disabled={definition === undefined}>
           Edit input
         </MenuItem>
-        {input.setup_mode ? (
-          <MenuItem key={`remove-setup-mode-${input.id}`}
-                    onSelect={exitInputSetupMode}
-                    disabled={definition === undefined}>
-            Exit Setup mode
-          </MenuItem>
-        ) : (
-          <MenuItem key={`setup-mode-${input.id}`}
-                    onSelect={enterInputSetupMode}
-                    disabled={definition === undefined}>
-            Enter Setup mode
-          </MenuItem>
+        {inputSetupFeatureFlagIsEnabled && (
+          input.setup_mode ? (
+            <MenuItem key={`remove-setup-mode-${input.id}`}
+                      onSelect={exitInputSetupMode}
+                      disabled={definition === undefined}>
+              Exit Setup mode
+            </MenuItem>
+          ) : (
+            <MenuItem key={`setup-mode-${input.id}`}
+                      onSelect={enterInputSetupMode}
+                      disabled={definition === undefined}>
+              Enter Setup mode
+            </MenuItem>
+          )
         )}
-
       </IfPermitted>
 
       {input.global && (
