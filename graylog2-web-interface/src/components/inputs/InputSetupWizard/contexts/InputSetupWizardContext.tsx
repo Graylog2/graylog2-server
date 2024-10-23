@@ -17,36 +17,17 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-
-export const INPUT_WIZARD_STEPS = {
-  SELECT_CATEGORY: 'SELECT_CATEGORY',
-  PREFLIGHT: 'PREFLIGHT',
-  ACTIVATE_ILLUMINATE: 'ACTIVATE_ILLUMINATE',
-  TEST_INPUT: 'TEST_INPUT',
-  SETUP_ROUTING: 'SETUP_ROUTING',
-  CREATE_STREAM: 'CREATE_STREAM',
-  COMPLETE: 'COMPLETE',
-} as const;
-
-export type InputSetupWizardStep = typeof INPUT_WIZARD_STEPS[keyof typeof INPUT_WIZARD_STEPS]
-
-export type StepsData = {
-  [key in InputSetupWizardStep]?: any
-}
-
-export type WizardData = {
-  inputId?: string
-}
+import type { InputSetupWizardStep, WizardData } from 'components/inputs/InputSetupWizard/types';
 
 type InputSetupWizardContextType = {
-  activeStep: InputSetupWizardStep,
+  activeStep: InputSetupWizardStep | undefined,
   setActiveStep: (InputSetupWizardStep) => void,
   getStepData: (stepName: InputSetupWizardStep) => object | undefined;
   setStepData: (stepName: InputSetupWizardStep, data: object) => void,
   wizardData: WizardData,
   setWizardDataAttribute: (key: keyof WizardData, value: WizardData[typeof key]) => void,
   show: boolean,
-  openWizard: (inputId: string) => void,
+  openWizard: (data?: WizardData) => void,
   closeWizard: () => void,
 };
 

@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
-import InputSetupWizardContext, { INPUT_WIZARD_STEPS } from 'contexts/InputSetupWizardContext';
-import type { InputSetupWizardStep, StepsData, WizardData } from 'contexts/InputSetupWizardContext';
+import InputSetupWizardContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardContext';
+import type { InputSetupWizardStep, StepsData, WizardData } from 'components/inputs/InputSetupWizard/types';
 
-const DEFAULT_ACTIVE_STEP = INPUT_WIZARD_STEPS[0];
+const DEFAULT_ACTIVE_STEP = undefined;
 const DEFAULT_WIZARD_DATA = {};
 const DEFAULT_STEPS_DATA = {};
 
@@ -57,10 +57,10 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
     setShow(false);
   }, [clearWizard]);
 
-  const openWizard = useCallback((inputId: string) => {
-    setWizardData({ inputId });
+  const openWizard = useCallback((data: WizardData = {}) => {
+    setWizardData({ ...wizardData, ...data });
     setShow(true);
-  }, []);
+  }, [wizardData]);
 
   const value = useMemo(() => ({
     setActiveStep,
