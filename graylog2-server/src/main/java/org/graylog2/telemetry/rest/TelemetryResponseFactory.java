@@ -17,8 +17,10 @@
 package org.graylog2.telemetry.rest;
 
 import com.google.common.base.Strings;
+import jakarta.annotation.Nullable;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.traffic.TrafficCounterService.TrafficHistogram;
+import org.graylog2.system.traffic.TrafficCounterService.TrafficHistograms;
 import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.joda.time.DateTime;
 
@@ -90,8 +92,8 @@ class TelemetryResponseFactory {
                                           TrafficHistogram trafficLastMonth,
                                           long usersCount,
                                           int licenseCount,
-                                          String installationSource
-    ) {
+                                          String installationSource,
+                                          @Nullable TrafficHistograms enterpriseTraffic) {
         Map<String, Object> clusterInfo = new LinkedHashMap<>();
         clusterInfo.put("cluster_id", clusterId);
         clusterInfo.put("cluster_creation_date", clusterCreationDate);
@@ -104,6 +106,10 @@ class TelemetryResponseFactory {
         clusterInfo.put("node_leader_app_version", leaderNodeVersion(nodes));
         clusterInfo.put("installation_source", installationSource);
         clusterInfo.put("nodes", nodes);
+        if (enterpriseTraffic != null) {
+            clusterInfo.put("data_warehouse_accounted_output_traffic_last_month", enterpriseTraffic.sumTraffic("data_warehouse_indexed_output"));
+            clusterInfo.put("data_warehouse_not_accounted_output_traffic_last_month", enterpriseTraffic.sumTraffic("data_warehouse_not_indexed_output"));
+        }
         return clusterInfo;
     }
 

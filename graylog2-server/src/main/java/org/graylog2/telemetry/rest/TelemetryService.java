@@ -188,7 +188,8 @@ public class TelemetryService {
                 trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(30), TrafficCounterService.Interval.DAILY),
                 userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count(),
                 licenseStatuses.size(),
-                installationSource);
+                installationSource,
+                enterpriseDataProvider.enterpriseTraffic());
     }
 
     private Map<String, Object> getPluginInfo() {
