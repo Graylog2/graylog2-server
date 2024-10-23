@@ -27,7 +27,7 @@ import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
 import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
-import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
+import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
@@ -258,21 +258,21 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                                   {({ warnings }) => (
                                     <PluggableCommands usage="search_query">
                                       {(customCommands) => (
-                                        <QueryInput value={value}
-                                                    ref={editorRef}
-                                                    view={view}
-                                                    timeRange={values.timerange}
-                                                    streams={values.streams}
-                                                    name={name}
-                                                    onChange={onChange}
-                                                    placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                                    error={error}
-                                                    isValidating={isValidating}
-                                                    warning={warnings.queryString}
-                                                    disableExecution={disableSearchSubmit}
-                                                    validate={validateForm}
-                                                    onExecute={handleSubmit as () => void}
-                                                    commands={customCommands} />
+                                        <ViewsQueryInput value={value}
+                                                         ref={editorRef}
+                                                         view={view}
+                                                         timeRange={values.timerange}
+                                                         streams={values.streams}
+                                                         name={name}
+                                                         onChange={onChange}
+                                                         placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                                         error={error}
+                                                         isValidating={isValidating}
+                                                         warning={warnings.queryString}
+                                                         disableExecution={disableSearchSubmit}
+                                                         validate={validateForm}
+                                                         onExecute={handleSubmit as () => void}
+                                                         commands={customCommands} />
                                       )}
                                     </PluggableCommands>
                                   )}
