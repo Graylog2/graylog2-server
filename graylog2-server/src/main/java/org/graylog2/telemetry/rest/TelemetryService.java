@@ -185,21 +185,17 @@ public class TelemetryService {
                 clusterId,
                 clusterCreationDate,
                 telemetryClusterService.nodesTelemetryInfo(),
-                getAverageLastMonthTraffic(),
+                trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(30), TrafficCounterService.Interval.DAILY),
                 userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count(),
                 licenseStatuses.size(),
-                installationSource);
+                installationSource,
+                enterpriseDataProvider.enterpriseTraffic());
     }
 
     private Map<String, Object> getPluginInfo() {
         boolean isEnterprisePluginInstalled = pluginMetaDataSet.stream().anyMatch(p -> "Graylog Enterprise".equals(p.getName()));
         List<String> plugins = pluginMetaDataSet.stream().map(p -> f("%s:%s", p.getName(), p.getVersion())).toList();
         return telemetryResponseFactory.createPluginInfo(isEnterprisePluginInstalled, plugins);
-    }
-
-    private long getAverageLastMonthTraffic() {
-        return trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(30), TrafficCounterService.Interval.DAILY)
-                .output().values().stream().mapToLong(Long::longValue).sum();
     }
 
     private String generateUserHash(User currentUser, String clusterId) throws NoSuchAlgorithmException {

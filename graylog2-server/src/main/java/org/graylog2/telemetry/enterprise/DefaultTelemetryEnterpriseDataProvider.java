@@ -16,6 +16,9 @@
  */
 package org.graylog2.telemetry.enterprise;
 
+import jakarta.annotation.Nullable;
+import org.graylog2.system.traffic.TrafficCounterService;
+
 import java.util.List;
 
 public class DefaultTelemetryEnterpriseDataProvider implements TelemetryEnterpriseDataProvider {
@@ -27,5 +30,11 @@ public class DefaultTelemetryEnterpriseDataProvider implements TelemetryEnterpri
     @Override
     public int teamsCount(String userId) {
         return 0;
+    }
+
+    @Nullable
+    @Override
+    public TrafficCounterService.TrafficHistograms enterpriseTraffic() {
+        return null;
     }
 }
