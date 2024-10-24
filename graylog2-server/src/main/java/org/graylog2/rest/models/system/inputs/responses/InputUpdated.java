@@ -29,8 +29,15 @@ public abstract class InputUpdated {
     @JsonProperty
     public abstract String id();
 
+    @JsonProperty("start_request")
+    public abstract boolean startRequest();
+
+    public static InputUpdated create(String id) {
+        return create(id, false);
+    }
+
     @JsonCreator
-    public static InputUpdated create(@JsonProperty("id") String inputId) {
-        return new AutoValue_InputUpdated(inputId);
+    public static InputUpdated create(@JsonProperty("id") String inputId, @JsonProperty("start_request") boolean startRequest) {
+        return new AutoValue_InputUpdated(inputId, startRequest);
     }
 }

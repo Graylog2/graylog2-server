@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.events.inputs.IOStateChangedEvent;
 import org.joda.time.DateTime;
 
@@ -49,15 +48,14 @@ public class IOState<T extends Stoppable> {
     }
 
     protected T stoppable;
-    private EventBus eventbus;
+    final private EventBus eventbus;
     protected Type state;
     protected DateTime startedAt;
     protected String detailedMessage;
 
     @AssistedInject
-    public IOState(EventBus eventbus, @Assisted T stoppable, FeatureFlags featureFlags) {
-        this(eventbus, stoppable,
-                featureFlags.isOn("SETUP_MODE") ? Type.SETUP : Type.CREATED);
+    public IOState(EventBus eventbus, @Assisted T stoppable) {
+        this(eventbus, stoppable, Type.CREATED);
     }
 
     @AssistedInject

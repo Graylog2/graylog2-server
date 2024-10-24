@@ -37,6 +37,8 @@ public interface Input extends Persisted {
 
     Boolean isGlobal();
 
+    Boolean isSetupMode();
+
     String getContentPack();
 
     String getNodeId();
