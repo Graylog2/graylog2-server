@@ -15,42 +15,56 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useRef } from 'react';
 
-import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
-import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
-import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
-import Routes from 'routing/Routes';
-import { StartpageStore } from 'stores/users/StartpageStore';
-import StreamRuleModal from 'components/streamrules/StreamRuleModal';
-import EntityShareModal from 'components/permissions/EntityShareModal';
-import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
-import useCurrentUser from 'hooks/useCurrentUser';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { ButtonToolbar, MenuItem } from 'components/bootstrap';
 import { MoreActions } from 'components/common/EntityDataTable';
-import { LinkContainer } from 'components/common/router';
-import HideOnCloud from 'util/conditional/HideOnCloud';
-import UserNotification from 'util/UserNotification';
-import StreamDeleteModal from 'components/streams/StreamsOverview/StreamDeleteModal';
-import StreamModal from 'components/streams/StreamModal';
+import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
+import usePluginEntities from 'hooks/usePluginEntities';
+import type { Event } from 'components/events/events/types';
 
-const DefaultStreamHelp = () => (
-  <HoverForHelp displayLeftMargin>Action not available for the default
-    stream
-  </HoverForHelp>
-);
+const usePluggableEventActions = (eventId: string) => {
+  const modalRefs = useRef({});
+  const pluggableActions = usePluginEntities('views.components.eventActions');
+  const availableActions = pluggableActions.filter(
+    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
+  );
+  const actions = availableActions.map(({ component: PluggableEventAction, key }) => (
+    <PluggableEventAction key={`event-action-${key}`}
+                          eventId={eventId}
+                          modalRef={() => modalRefs.current[key]} />
+  ));
 
-const EventActions = ({ listItem }) => (
-  <ButtonToolbar>
-    <Button bsStyle="primary"
-            bsSize="xsmall"
-            onClick={() => {}}>Data Routing
-    </Button>
-  </ButtonToolbar>
-);
+  const actionModals = availableActions
+    .filter(({ modal }) => !!modal)
+    .map(({ modal: ActionModal, key }) => (
+      <ActionModal key={`event-action-modal-${key}`}
+                   eventId={eventId}
+                   ref={(r) => { modalRefs.current[key] = r; }} />
+    ));
+
+  return ({ actions, actionModals });
+};
+
+const EventActions = ({ event }: { event: Event }) => {
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(event.id);
+
+  const moreActions = [
+    event.replay_info ? <MenuItem><LinkToReplaySearch id={event.id} isEvent /></MenuItem> : null,
+    event.replay_info && pluggableActions.length ? <MenuItem divider key="divider" /> : null,
+    pluggableActions.length ? pluggableActions : null,
+  ].filter(Boolean);
+
+  return (
+    <>
+      <ButtonToolbar>
+        <MoreActions>
+          {moreActions}
+        </MoreActions>
+      </ButtonToolbar>
+      {pluggableActionModals}
+    </>
+  );
+};
 
 export default EventActions;

@@ -30,6 +30,7 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import type { TimeRange } from 'views/logic/queries/Query';
 
 import Events, { PAGE_SIZES, EVENTS_MAX_OFFSET_LIMIT } from './Events';
+import EventsEntityTable from 'components/events/EventsEntityTable';
 
 const LOCAL_STORAGE_ITEM = 'events-last-search';
 const SEARCH_DEBOUNCE_THRESHOLD = 500;
@@ -175,6 +176,7 @@ class EventsContainer extends React.Component<EventsContainerProps, {
     }
 
     return (
+      <>
       <Events events={events.events}
               parameters={events.parameters}
               totalEvents={events.totalEvents}
@@ -186,6 +188,8 @@ class EventsContainer extends React.Component<EventsContainerProps, {
               onAlertFilterChange={this.handleAlertFilterChange}
               onTimeRangeChange={this.handleTimeRangeChange}
               onSearchReload={this.handleSearchReload} />
+        <EventsEntityTable />
+        </>
     );
   }
 }
