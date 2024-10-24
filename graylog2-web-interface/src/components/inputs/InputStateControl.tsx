@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import type { InputStates } from 'stores/inputs/InputStatesStore';
 import { useStore } from 'stores/connect';
+import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import type { Input } from 'components/messageloaders/Types';
@@ -27,6 +28,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
 import useInputSetupWizard from 'hooks/useInputSetupWizard';
+import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
 
 type Props = {
   input: Input
@@ -38,6 +40,7 @@ const InputStateControl = ({ input } : Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const { openWizard } = useInputSetupWizard();
+  const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
 
   const inputState = inputStates ? inputStates[input.id] : undefined;
 
@@ -114,7 +117,7 @@ const InputStateControl = ({ input } : Props) => {
     openWizard(input.id);
   };
 
-  if (isInputinSetupMode()) {
+  if (inputSetupFeatureFlagIsEnabled && isInputinSetupMode()) {
     return (
       <Button bsStyle="warning" onClick={setupInput}>
         Setup Input

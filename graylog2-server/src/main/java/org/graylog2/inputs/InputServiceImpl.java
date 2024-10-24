@@ -30,6 +30,8 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -42,6 +44,7 @@ import org.graylog2.inputs.extractors.events.ExtractorCreated;
 import org.graylog2.inputs.extractors.events.ExtractorDeleted;
 import org.graylog2.inputs.extractors.events.ExtractorUpdated;
 import org.graylog2.jackson.TypeReferences;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.Persisted;
@@ -58,8 +61,6 @@ import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -169,10 +170,10 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
-    public String update(Input model) throws ValidationException {
+    public String update(Input model, boolean start) throws ValidationException {
         final String resultId = super.save(model);
         if (resultId != null && !resultId.isEmpty()) {
-            publishChange(InputUpdated.create(resultId));
+            publishChange(InputUpdated.create(resultId, start));
         }
         return resultId;
     }
@@ -408,6 +409,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         input.setCreatedAt(io.getCreatedAt());
         input.setContentPack(io.getContentPack());
         input.setDesiredState(io.getDesiredState());
+        input.setSetupMode(io.isSetupMode());
 
         if (io.isGlobal()) {
             input.setGlobal(true);
@@ -548,4 +550,16 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         }
         super.fieldTransformations(doc);
     }
+
+    @Override
+    public void persistDesiredState(Input input, IOState.Type desiredState) {
+        try {
+            input.setDesiredState(desiredState);
+            saveWithoutEvents(input);
+        } catch (ValidationException e) {
+            LOG.error("Missing or invalid input configuration.", e);
+            throw new BadRequestException("Missing or invalid input configuration.", e);
+        }
+    }
+
 }

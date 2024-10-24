@@ -14,5 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as InputSetupWizard } from './InputSetupWizard';
-export * from './constants';
+
+export const INPUT_SETUP_MODE_FEATURE_FLAG = 'setup_mode';
+
+export default INPUT_SETUP_MODE_FEATURE_FLAG;

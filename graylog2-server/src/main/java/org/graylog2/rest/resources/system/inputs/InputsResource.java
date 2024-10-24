@@ -22,6 +22,21 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
@@ -42,24 +57,6 @@ import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -85,7 +82,9 @@ public class InputsResource extends AbstractInputsResource {
     private final Configuration config;
 
     @Inject
-    public InputsResource(InputService inputService, MessageInputFactory messageInputFactory, Configuration config) {
+    public InputsResource(InputService inputService,
+                          MessageInputFactory messageInputFactory,
+                          Configuration config) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
@@ -137,8 +136,14 @@ public class InputsResource extends AbstractInputsResource {
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
         try {
             throwBadRequestIfNotGlobal(lr);
+
+            // Launch in setup mode, unless otherwise specified
+            final InputCreateRequest lrWithSetupMode = lr.toBuilder()
+                    .setupMode(lr.setupMode() == null || lr.setupMode())
+                    .build();
+
             // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
-            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
+            final MessageInput messageInput = messageInputFactory.create(lrWithSetupMode, getCurrentUser().getName(), lr.node());
             if (config.isCloud() && !messageInput.isCloudCompatible()) {
                 throw new BadRequestException(String.format(Locale.ENGLISH,
                         "The input type <%s> is not allowed in the cloud environment!", lr.type()));
@@ -193,11 +198,14 @@ public class InputsResource extends AbstractInputsResource {
 
         throwBadRequestIfNotGlobal(lr);
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
-
         final Input input = inputService.find(inputId);
 
-        final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
+        // For backcompat, setup mode is assumed false if not specified
+        final InputCreateRequest lrWithSetupMode = lr.toBuilder()
+                .setupMode(lr.setupMode() == null ? false : lr.setupMode())
+                .build();
 
+        final MessageInput messageInput = messageInputFactory.create(lrWithSetupMode, getCurrentUser().getName(), lr.node());
         messageInput.checkConfiguration();
 
         final Map<String, Object> mergedInput = new HashMap<>(input.getFields());
@@ -208,8 +216,9 @@ public class InputsResource extends AbstractInputsResource {
         final Map<String, Object> updatedConfig = Objects.requireNonNullElse(messageInput.getConfiguration().getSource(), Map.of());
         mergedInput.put(MessageInput.FIELD_CONFIGURATION, EncryptedInputConfigs.merge(origConfig, updatedConfig));
 
+        boolean start = input.isSetupMode() && Boolean.FALSE.equals(lrWithSetupMode.setupMode());
         final Input newInput = inputService.create(input.getId(), mergedInput);
-        inputService.update(newInput);
+        inputService.update(newInput, start);
 
         final URI inputUri = getUriBuilderToSelf().path(InputsResource.class)
                 .path("{inputId}")

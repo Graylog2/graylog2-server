@@ -18,6 +18,7 @@ package org.graylog2.inputs;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import jakarta.inject.Inject;
 import org.graylog2.cluster.leader.LeaderChangedEvent;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
@@ -35,8 +36,6 @@ import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 public class InputEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(InputEventListener.class);
@@ -80,7 +79,8 @@ public class InputEventListener {
         }
 
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-        if (inputState != null) {
+
+        if (inputState != null && inputState.getState() != IOState.Type.SETUP) {
             inputRegistry.remove(inputState);
         }
 
@@ -101,13 +101,11 @@ public class InputEventListener {
             return;
         }
 
-        final boolean startInput;
+        boolean startInput = inputUpdatedEvent.startRequest();
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
-            startInput = inputState.getState() == IOState.Type.RUNNING;
+            startInput = inputUpdatedEvent.startRequest() || inputState.getState() == IOState.Type.RUNNING;
             inputRegistry.remove(inputState);
-        } else {
-            startInput = false;
         }
 
         if (startInput && (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId()))) {

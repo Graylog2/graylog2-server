@@ -295,7 +295,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new ServerPreflightChecksModule(),
                 new CertificateAuthorityBindings(),
                 (binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader),
-                binder -> preflightCheckModules.forEach(binder::install));
+                binder -> preflightCheckModules.forEach(binder::install),
+                this::featureFlagsBinding);
     }
 
     private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
