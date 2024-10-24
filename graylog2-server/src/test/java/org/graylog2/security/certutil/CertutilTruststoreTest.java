@@ -79,4 +79,22 @@ class CertutilTruststoreTest {
                 .extracting(c -> c.getSubjectX500Principal().getName())
                 .isEqualTo("CN=Graylog CA");
     }
+
+    @Test
+    void testUnknownCaPath(@TempDir Path tempDir) {
+        TestableConsole inputHttp = TestableConsole.empty()
+                .silent()
+                .register(CertutilTruststore.PROMPT_ENTER_CA_PASSWORD, "asdfgh")
+                .register(CertutilTruststore.PROMPT_ENTER_TRUSTSTORE_PASSWORD, "asdfgh");
+
+        final String caPath = tempDir.resolve("unknown-file.p12").toAbsolutePath().toString();
+
+        CertutilTruststore certutilCert = new CertutilTruststore(
+                caPath,
+                tempDir.resolve("truststore.p12").toAbsolutePath().toString(),
+                inputHttp);
+
+        Assertions.assertThatThrownBy(certutilCert::run)
+                        .hasMessageContaining("File " + caPath + " doesn't exist!");
+    }
 }
