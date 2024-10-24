@@ -1,5 +1,5 @@
 type = "a"
-message = "Add new Trim Message option for UDP inputs"
+message = "Add new Trim Message option for UDP inputs."
 
-issues = ["/graylog-plugin-enterprise#8980"]
+issues = ["graylog-plugin-enterprise#8980"]
 pulls = ["20788"]
