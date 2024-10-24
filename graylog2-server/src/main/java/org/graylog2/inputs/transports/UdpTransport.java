@@ -43,6 +43,7 @@ import org.graylog2.inputs.transports.netty.NettyTransportType;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
@@ -61,9 +62,11 @@ import java.util.concurrent.Callable;
 
 public class UdpTransport extends NettyTransport {
     private static final Logger LOG = LoggerFactory.getLogger(UdpTransport.class);
+    public static final String CK_TRIM_MESSAGE = "trim_message";
 
     private final NettyTransportConfiguration nettyTransportConfiguration;
     private final ChannelGroup channels;
+    private final Configuration configuration;
     private EventLoopGroup eventLoopGroup;
     private Bootstrap bootstrap;
 
@@ -76,6 +79,7 @@ public class UdpTransport extends NettyTransport {
         super(configuration, eventLoopGroupFactory, throughputCounter, localRegistry);
         this.nettyTransportConfiguration = nettyTransportConfiguration;
         this.channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+        this.configuration = configuration;
     }
 
     @VisibleForTesting
@@ -114,7 +118,8 @@ public class UdpTransport extends NettyTransport {
             LOG.debug("Adding codec aggregator {} to channel pipeline", aggregator);
             handlerList.put("codec-aggregator", () -> new EnvelopeMessageAggregationHandler(aggregator, localRegistry));
         }
-        handlerList.put("envelope-message-handler", () -> new EnvelopeMessageHandler(input));
+        handlerList.put("envelope-message-handler", () -> new EnvelopeMessageHandler(input,
+                configuration.getBoolean(CK_TRIM_MESSAGE)));
 
         return handlerList;
     }
@@ -177,7 +182,11 @@ public class UdpTransport extends NettyTransport {
 
             final int recvBufferSize = Ints.saturatedCast(Size.kilobytes(256L).toBytes());
             r.addField(ConfigurationRequest.Templates.recvBufferSize(CK_RECV_BUFFER_SIZE, recvBufferSize));
-
+            r.addField(new BooleanField(
+                    CK_TRIM_MESSAGE,
+                    "Trim Message",
+                    false,
+                    "Trim spaces and line breaks the beginning and end of the received message."));
             return r;
         }
     }
