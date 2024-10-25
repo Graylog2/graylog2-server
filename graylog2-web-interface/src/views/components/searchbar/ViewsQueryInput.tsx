@@ -70,7 +70,8 @@ type Props = {
   validate: () => Promise<FormikErrors<{}>>,
   commands?: Array<Command>,
   disableExecution?: boolean,
-  placeholder: string,
+  placeholder?: string,
+  onBlur?: (query: string) => void,
 }
 
 const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
@@ -78,13 +79,14 @@ const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBar
 const ViewsQueryInput = forwardRef<Editor, Props>(({
   value, timeRange, streams, name, onChange, error,
   isValidating, disableExecution, validate, onExecute,
-  commands, view, warning, placeholder,
+  commands, view, warning, placeholder, onBlur,
   completerFactory = defaultCompleterFactory,
 }, ref) => {
   const completer = useCompleter({ streams, timeRange, completerFactory, view });
 
   return (
     <AsyncQueryInput value={value}
+                     onBlur={onBlur}
                      completer={completer}
                      ref={ref}
                      name={name}
