@@ -437,8 +437,8 @@ public class SyslogCodecTest {
         doTestFortigate(FORTIGATE + "\r\n ");
     }
 
-    private void doTestFortigate(String FORTIGATE) {
-        final RawMessage rawMessage = buildRawMessage(FORTIGATE);
+    private void doTestFortigate(String fortigateMessage) {
+        final RawMessage rawMessage = buildRawMessage(fortigateMessage);
         final Message message = codec.decode(rawMessage);
 
         assertThat(message).isNotNull();
