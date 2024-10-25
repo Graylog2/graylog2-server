@@ -1,5 +1,5 @@
 type = "a"
-message = "Add new Trim Message option for UDP inputs."
+message = "Automatically trim newline characters for Fortigate messages received through Syslog inputs."
 
 issues = ["graylog-plugin-enterprise#8980"]
 pulls = ["20788"]
