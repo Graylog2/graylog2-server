@@ -27,18 +27,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
 
 public class EnvelopeMessageHandler extends SimpleChannelInboundHandler<AddressedEnvelope<ByteBuf, InetSocketAddress>> {
     private static final Logger LOG = LoggerFactory.getLogger(NettyTransport.class);
-    private static final Charset CHARSET = Charset.defaultCharset();
 
     private final MessageInput input;
-    private final boolean trim;
 
-    public EnvelopeMessageHandler(MessageInput input, boolean trim) {
+    public EnvelopeMessageHandler(MessageInput input) {
         this.input = input;
-        this.trim = trim;
     }
 
     @Override
@@ -46,12 +42,7 @@ public class EnvelopeMessageHandler extends SimpleChannelInboundHandler<Addresse
         final ByteBuf msg = envelope.content();
         final byte[] bytes = new byte[msg.readableBytes()];
         msg.readBytes(bytes);
-        final RawMessage raw;
-        if (trim) {
-            raw = new RawMessage(new String(bytes, CHARSET).trim().getBytes(CHARSET), envelope.sender());
-        } else {
-            raw = new RawMessage(bytes, envelope.sender());
-        }
+        final RawMessage raw = new RawMessage(bytes, envelope.sender());
         input.processRawMessage(raw);
     }
 
