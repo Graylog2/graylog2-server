@@ -16,10 +16,8 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
 
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import { defaultCompare } from 'logic/DefaultCompare';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -72,12 +70,6 @@ const FieldSortSelect = ({ fields, onChange, sort }: Props) => {
             aria-label="Select field for sorting"
             value={currentValue(sort, options)} />
   );
-};
-
-FieldSortSelect.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  fields: CustomPropTypes.FieldListType.isRequired,
-  sort: PropTypes.array.isRequired,
 };
 
 export default FieldSortSelect;

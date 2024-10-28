@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
 import {
@@ -109,23 +108,6 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
       </Col>
     </Row>
   );
-};
-
-EventDefinitions.propTypes = {
-  eventDefinitions: PropTypes.array.isRequired,
-  context: PropTypes.object,
-  pagination: PropTypes.object.isRequired,
-  query: PropTypes.string.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-  onQueryChange: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onCopy: PropTypes.func.isRequired,
-  onEnable: PropTypes.func.isRequired,
-  onDisable: PropTypes.func.isRequired,
-};
-
-EventDefinitions.defaultProps = {
-  context: undefined,
 };
 
 export default EventDefinitions;

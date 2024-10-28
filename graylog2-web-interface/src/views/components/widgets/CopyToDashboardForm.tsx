@@ -151,9 +151,4 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
   );
 };
 
-CopyToDashboardForm.defaultProps = {
-  activeDashboardId: undefined,
-  onCreateNewDashboard: undefined,
-};
-
 export default CopyToDashboardForm;

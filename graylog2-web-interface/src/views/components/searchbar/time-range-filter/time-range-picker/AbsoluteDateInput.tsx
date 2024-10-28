@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
@@ -34,13 +33,13 @@ const Wrapper = styled.div`
 type Props = {
   name: string,
   disabled?: boolean,
-  onChange: (newValue: string) => void,
-  value: string | undefined,
+  onChange?: (newValue: string) => void
+  value?: string | undefined
   hasError?: boolean,
   className?: string,
 }
 
-const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError, className }: Props) => {
+const AbsoluteDateInput = ({ name, disabled = false, onChange = () => {}, value = '', hasError = false, className }: Props) => {
   const { formatTime } = useUserDateTime();
   const _onSetTimeToNow = () => onChange(formatTime(new Date(), 'complete'));
   const _onChange = (event) => onChange(event.target.value);
@@ -66,22 +65,6 @@ const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError, classNam
              bsStyle={hasError ? 'error' : null} />
     </Wrapper>
   );
-};
-
-AbsoluteDateInput.propTypes = {
-  disabled: PropTypes.bool,
-  hasError: PropTypes.bool,
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-  value: PropTypes.string,
-};
-
-AbsoluteDateInput.defaultProps = {
-  className: undefined,
-  disabled: false,
-  hasError: false,
-  onChange: () => {},
-  value: '',
 };
 
 export default AbsoluteDateInput;

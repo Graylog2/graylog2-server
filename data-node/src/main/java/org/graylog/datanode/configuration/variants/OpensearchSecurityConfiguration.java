@@ -25,6 +25,7 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
+import org.graylog2.security.JwtSecret;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +76,7 @@ public class OpensearchSecurityConfiguration {
      * This method will take the current security setup and apply it to the managed opensearch. It will change the
      * initial set of opensearch users, it will create and persist a truststore
      */
-    public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, List<X509Certificate> trustedCertificates, byte[] signingKey) throws GeneralSecurityException, IOException {
+    public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, List<X509Certificate> trustedCertificates, JwtSecret signingKey) throws GeneralSecurityException, IOException {
         opensearchHeap = datanodeConfiguration.opensearchHeap();
         if (securityEnabled()) {
 
@@ -105,23 +106,23 @@ public class OpensearchSecurityConfiguration {
 
             config.put("plugins.security.ssl.transport.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.keystore_filepath", transportCertificate.location().getFileName().toString()); // todo: this should be computed as a relative path
-            config.put("plugins.security.ssl.transport.keystore_password", transportCertificate.passwordAsString());
+            config.put("plugins.security.ssl.transport.keystore_password", new String(transportCertificate.password()));
             config.put("plugins.security.ssl.transport.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.transport.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILE.toString());
-            config.put("plugins.security.ssl.transport.truststore_password", truststore.passwordAsString());
+            config.put("plugins.security.ssl.transport.truststore_password", new String(truststore.password()));
 
             config.put("plugins.security.ssl.http.enabled", "true");
 
             config.put("plugins.security.ssl.http.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.http.keystore_filepath", httpCertificate.location().getFileName().toString());  // todo: this should be computed as a relative path
-            config.put("plugins.security.ssl.http.keystore_password", httpCertificate.passwordAsString());
+            config.put("plugins.security.ssl.http.keystore_password", new String(httpCertificate.password()));
             config.put("plugins.security.ssl.http.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.http.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILE.toString());
-            config.put("plugins.security.ssl.http.truststore_password", truststore.passwordAsString());
+            config.put("plugins.security.ssl.http.truststore_password", new String(truststore.password()));
 
             // enable client cert auth
             config.put("plugins.security.ssl.http.clientauth_mode", "OPTIONAL");
@@ -140,13 +141,13 @@ public class OpensearchSecurityConfiguration {
         return result;
     }
 
-    private void enableJwtAuthenticationInConfig(final Path opensearchConfigDir, final byte[] signingKey) throws IOException {
+    private void enableJwtAuthenticationInConfig(final Path opensearchConfigDir, final JwtSecret signingKey) throws IOException {
         final ObjectMapper objectMapper = new YAMLMapper();
         final File file = opensearchConfigDir.resolve(Path.of("opensearch-security", "config.yml")).toFile();
         Map<String, Object> contents = objectMapper.readValue(file, new TypeReference<>() {});
 
         Map<String, Object> config = filterConfigurationMap(contents, "config", "dynamic", "authc", "jwt_auth_domain", "http_authenticator", "config");
-        config.put("signing_key", Base64.getEncoder().encodeToString(signingKey));
+        config.put("signing_key", signingKey.getBase64Encoded());
 
         objectMapper.writeValue(file, contents);
     }

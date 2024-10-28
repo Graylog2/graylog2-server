@@ -38,6 +38,7 @@ const IconWrapper = styled.div`
 type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void
 
 type Props<T = undefined> = React.PropsWithChildren<{
+  active?: boolean,
   className?: string,
   component?: 'a',
   'data-tab-id'?: string,
@@ -57,7 +58,7 @@ type Props<T = undefined> = React.PropsWithChildren<{
   closeMenuOnClick?: boolean,
 }>;
 
-const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey, header, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component, variant, closeMenuOnClick }: Props<T>) => {
+const CustomMenuItem = <T, >({ children, className, disabled = false, divider = false, eventKey, header = false, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component, variant, closeMenuOnClick }: Props<T>) => {
   const callback = onClick ?? onSelect;
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
 
@@ -94,26 +95,6 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
       {children}
     </StyledMenuItem>
   );
-};
-
-CustomMenuItem.defaultProps = {
-  className: undefined,
-  closeMenuOnClick: undefined,
-  component: undefined,
-  'data-tab-id': undefined,
-  disabled: false,
-  divider: false,
-  eventKey: undefined,
-  header: false,
-  href: undefined,
-  icon: undefined,
-  id: undefined,
-  onClick: undefined,
-  onSelect: undefined,
-  rel: undefined,
-  target: undefined,
-  title: undefined,
-  variant: undefined,
 };
 
 /** @component */

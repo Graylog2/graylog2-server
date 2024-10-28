@@ -17,8 +17,6 @@
 import * as React from 'react';
 import { useRef } from 'react';
 import type * as Immutable from 'immutable';
-import PropTypes from 'prop-types';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { Col, Row } from 'components/bootstrap';
 import type { QueryId } from 'views/logic/queries/Query';
@@ -68,14 +66,6 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, titles, dashboa
       </Col>
     </Row>
   );
-};
-
-QueryTabs.propTypes = {
-  onRemove: PropTypes.func.isRequired,
-  onSelect: PropTypes.func.isRequired,
-  onTitleChange: PropTypes.func.isRequired,
-  queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
-  titles: PropTypes.object.isRequired,
 };
 
 export default QueryTabs;

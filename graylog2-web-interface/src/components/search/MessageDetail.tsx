@@ -157,10 +157,4 @@ const MessageDetail = ({ renderForDisplay, inputs, streams, message, customField
   );
 };
 
-MessageDetail.defaultProps = {
-  inputs: undefined,
-  streams: undefined,
-  customFieldActions: undefined,
-};
-
 export default MessageDetail;

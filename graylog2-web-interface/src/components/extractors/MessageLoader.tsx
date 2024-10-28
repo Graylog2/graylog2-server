@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { FormSubmit } from 'components/common';
@@ -54,14 +53,14 @@ const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProp
 };
 
 type Props = {
-  hidden: boolean,
-  hideText: string,
+  hidden?: boolean
+  hideText?: boolean
   onMessageLoaded: (data: any) => void,
   messageId?: string,
   index?: string,
 };
 
-const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMessageId, index: defaultIndex }: Props) => {
+const MessageLoader = ({ hidden = true, hideText = false, onMessageLoaded, messageId: defaultMessageId = '', index: defaultIndex = '' }: Props) => {
   const [loading, setLoading] = useState(false);
   const [isHidden, setIsHidden] = useState(hidden);
 
@@ -104,21 +103,6 @@ const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMe
       )}
     </div>
   );
-};
-
-MessageLoader.propTypes = {
-  hidden: PropTypes.bool,
-  hideText: PropTypes.bool,
-  onMessageLoaded: PropTypes.func.isRequired,
-  messageId: PropTypes.string,
-  index: PropTypes.string,
-};
-
-MessageLoader.defaultProps = {
-  hidden: true,
-  hideText: false,
-  messageId: '',
-  index: '',
 };
 
 export default MessageLoader;

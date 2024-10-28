@@ -16,7 +16,6 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import type { Subtract } from 'utility-types';
 
@@ -120,7 +119,7 @@ const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSele
              label="Select an Input type (optional)"
              help="Select the Input type you want to load the message from."
              value={selectedInputType ?? 'placeholder'}
-             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedInputType(e.target.value as 'server' | 'forwarder')}>
+             onChange={(e) => setSelectedInputType(e.target.value as 'server' | 'forwarder')}>
         <option value="placeholder" disabled>Select an Input type</option>
         <option value="server">Server Input</option>
         <option value="forwarder">Forwarder Input</option>
@@ -150,7 +149,7 @@ type OptionsType = {
 
 type Props = {
   inputs?: Immutable.Map<string, InputType>,
-  codecTypes: CodecTypes,
+  codecTypes?: CodecTypes
   onMessageLoaded: (message: Message | undefined, option: OptionsType) => void,
   inputIdSelector?: boolean,
 };
@@ -180,7 +179,7 @@ const parseRawMessage = (message: string, remoteAddress: string, codec: string, 
     );
 };
 
-const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs }: Props) => {
+const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, codecTypes, inputs }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [remoteAddress, setRemoteAddress] = useState<string>(DEFAULT_REMOTE_ADDRESS);
@@ -251,11 +250,11 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     setInputId(selectedInput);
   };
 
-  const _onMessageChange = (event: React.SyntheticEvent<HTMLTextAreaElement>) => {
+  const _onMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(getValueFromInput(event.target));
   };
 
-  const _onRemoteAddressChange = (event: React.SyntheticEvent<HTMLSelectElement>) => {
+  const _onRemoteAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRemoteAddress(getValueFromInput(event.target));
   };
 
@@ -375,19 +374,6 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
       </Col>
     </Row>
   );
-};
-
-RawMessageLoader.propTypes = {
-  onMessageLoaded: PropTypes.func.isRequired,
-  inputIdSelector: PropTypes.bool,
-  codecTypes: PropTypes.object,
-  inputs: PropTypes.object,
-};
-
-RawMessageLoader.defaultProps = {
-  inputIdSelector: false,
-  codecTypes: undefined,
-  inputs: undefined,
 };
 
 export default connect(

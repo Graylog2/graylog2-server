@@ -49,10 +49,10 @@ type autocompleteProps = {
 const Autocomplete = ({
   fieldName,
   label,
-  clearable,
-  required,
-  helpText,
-  options,
+  clearable = false,
+  required = false,
+  helpText = '',
+  options = [],
 }: autocompleteProps) => (
   <Field name={fieldName} help={helpText}>
     {({ field: { name, value, onChange } }) => (
@@ -75,12 +75,5 @@ const Autocomplete = ({
     )}
   </Field>
 );
-
-Autocomplete.defaultProps = {
-  clearable: false,
-  required: false,
-  helpText: '',
-  options: [],
-};
 
 export default Autocomplete;

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState, useCallback, useContext } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { MenuItem } from 'components/bootstrap';
@@ -47,7 +46,7 @@ type Props = {
   title: string,
 };
 
-const QueryTitle = ({ active, allowsClosing, id, onRemove, openEditModal, openCopyToDashboardModal, title }: Props) => {
+const QueryTitle = ({ active, allowsClosing = true, id, onRemove, openEditModal, openCopyToDashboardModal, title }: Props) => {
   const [titleValue, setTitleValue] = useState(title);
   const { setDashboardPage } = useContext(DashboardPageContext);
   const dispatch = useAppDispatch();
@@ -78,17 +77,6 @@ const QueryTitle = ({ active, allowsClosing, id, onRemove, openEditModal, openCo
       )}
     </Container>
   );
-};
-
-QueryTitle.propTypes = {
-  allowsClosing: PropTypes.bool,
-  onRemove: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  openEditModal: PropTypes.func.isRequired,
-};
-
-QueryTitle.defaultProps = {
-  allowsClosing: true,
 };
 
 export default QueryTitle;

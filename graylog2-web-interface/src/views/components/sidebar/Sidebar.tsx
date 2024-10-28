@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 import chroma from 'chroma-js';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import type QueryResult from 'views/logic/QueryResult';
@@ -36,11 +35,9 @@ import sidebarSections from './sidebarSections';
 import type { SidebarAction } from './sidebarActions';
 import sidebarActions from './sidebarActions';
 
-import CustomPropTypes from '../CustomPropTypes';
-
 type Props = {
   children: React.ReactElement,
-  results: QueryResult,
+  results?: QueryResult
   searchPageLayout?: SearchPreferencesLayout,
   sections?: Array<SidebarSection>,
   actions?: Array<SidebarAction>,
@@ -80,7 +77,7 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
   setActiveSectionKey(sectionKey);
 };
 
-const Sidebar = ({ searchPageLayout, results, children, sections, actions, forceSideBarPinned }: Props) => {
+const Sidebar = ({ searchPageLayout, results, children, sections = sidebarSections, actions = sidebarActions, forceSideBarPinned = false }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
   const queryId = useActiveQueryId();
@@ -127,20 +124,6 @@ const Sidebar = ({ searchPageLayout, results, children, sections, actions, force
       )}
     </Container>
   );
-};
-
-Sidebar.propTypes = {
-  children: CustomPropTypes.OneOrMoreChildren.isRequired,
-  results: PropTypes.object,
-  sections: PropTypes.arrayOf(PropTypes.object),
-};
-
-Sidebar.defaultProps = {
-  results: {},
-  sections: sidebarSections,
-  actions: sidebarActions,
-  searchPageLayout: undefined,
-  forceSideBarPinned: false,
 };
 
 const SidebarWithContext = ({ children, ...props }: React.ComponentProps<typeof Sidebar>) => (

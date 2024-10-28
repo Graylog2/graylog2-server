@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import { forwardRef, useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
-import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { ColorPickerPopover, Icon, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
@@ -163,15 +163,5 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
     </Container>
   );
 });
-
-HighlightingRule.defaultProps = {
-  className: undefined,
-  draggableProps: undefined,
-  dragHandleProps: undefined,
-};
-
-HighlightingRule.propTypes = {
-  rule: PropTypes.instanceOf(Rule).isRequired,
-};
 
 export default HighlightingRule;

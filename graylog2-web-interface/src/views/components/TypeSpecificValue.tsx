@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import isString from 'lodash/isString';
 import trim from 'lodash/trim';
 import trunc from 'lodash/truncate';
@@ -34,7 +33,6 @@ import { MISSING_BUCKET_NAME } from 'views/Constants';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
 import EmptyValue from './EmptyValue';
-import CustomPropTypes from './CustomPropTypes';
 import type { ValueRendererProps, ValueRenderer } from './messagelist/decoration/ValueRenderer';
 import DecoratorValue from './DecoratorValue';
 
@@ -52,7 +50,7 @@ const _formatValue = (field: string, value: any, truncate: boolean, render: Valu
 type TypeSpecificValueProps = {
   field: string,
   value?: any,
-  type: FieldType,
+  type?: FieldType
   truncate?: boolean,
   render?: React.ComponentType<ValueRendererProps>,
   unit?: FieldUnit,
@@ -64,19 +62,12 @@ const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit
   return <span title={value.toString()}>{formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev)}</span>;
 };
 
-const FormattedValue = ({ field, value, truncate, render, unit, type }: TypeSpecificValueProps) => {
+const FormattedValue = ({ field, value, truncate = false, render = defaultComponent, unit, type }: TypeSpecificValueProps) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const shouldRenderValueWithUnit = unitFeatureEnabled && unit?.isDefined && value && value !== MISSING_BUCKET_NAME && unitFeatureEnabled;
   if (shouldRenderValueWithUnit) return <ValueWithUnitRenderer value={value} unit={unit} />;
 
   return _formatValue(field, value, truncate, render, type);
-};
-
-FormattedValue.defaultProps = {
-  value: undefined,
-  truncate: false,
-  render: defaultComponent,
-  unit: undefined,
 };
 
 const TypeSpecificValue = ({ field, value, render = defaultComponent, type = FieldType.Unknown, truncate = false, unit }: TypeSpecificValueProps) => {
@@ -99,20 +90,6 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
     case 'percentage': return <PercentageField value={value} />;
     default: return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
   }
-};
-
-TypeSpecificValue.propTypes = {
-  truncate: PropTypes.bool,
-  type: CustomPropTypes.FieldType,
-  value: PropTypes.any,
-};
-
-TypeSpecificValue.defaultProps = {
-  truncate: false,
-  render: defaultComponent,
-  type: undefined,
-  value: undefined,
-  unit: undefined,
 };
 
 export default TypeSpecificValue;

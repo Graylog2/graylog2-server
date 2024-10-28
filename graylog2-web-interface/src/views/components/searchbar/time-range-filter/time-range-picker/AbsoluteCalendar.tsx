@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Field } from 'formik';
 
@@ -60,15 +59,5 @@ const AbsoluteCalendar = ({ startDate, timeRange, range }: Props) => (
     }}
   </Field>
 );
-
-AbsoluteCalendar.propTypes = {
-  timeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
-  startDate: PropTypes.instanceOf(Date),
-  range: PropTypes.oneOf(['to', 'from']).isRequired,
-};
-
-AbsoluteCalendar.defaultProps = {
-  startDate: undefined,
-};
 
 export default AbsoluteCalendar;

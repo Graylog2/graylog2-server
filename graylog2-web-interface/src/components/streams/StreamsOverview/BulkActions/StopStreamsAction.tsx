@@ -56,8 +56,4 @@ const StopStreamsAction = ({ handleFailures, refetchStreams, descriptor, onSelec
   );
 };
 
-StopStreamsAction.defaultProps = {
-  onSelect: undefined,
-};
-
 export default StopStreamsAction;

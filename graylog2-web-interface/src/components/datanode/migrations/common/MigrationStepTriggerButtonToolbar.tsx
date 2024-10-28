@@ -92,7 +92,7 @@ const getTelemetryEvent = (state: MigrationStateItem, step: MigrationActions): T
   }
 };
 
-const MigrationStepTriggerButtonToolbar = ({ nextSteps, disabled, onTriggerStep, args, hidden, children }: Props) => {
+const MigrationStepTriggerButtonToolbar = ({ nextSteps = [], disabled = false, onTriggerStep, args = {}, hidden = false, children }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { currentStep } = useMigrationState();
 
@@ -119,14 +119,6 @@ const MigrationStepTriggerButtonToolbar = ({ nextSteps, disabled, onTriggerStep,
       {children}
     </StyledButtonToolbar>
   );
-};
-
-MigrationStepTriggerButtonToolbar.defaultProps = {
-  nextSteps: [],
-  disabled: false,
-  args: {},
-  hidden: false,
-  children: undefined,
 };
 
 export default MigrationStepTriggerButtonToolbar;

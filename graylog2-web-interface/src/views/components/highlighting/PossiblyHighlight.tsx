@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import last from 'lodash/last';
 import sortBy from 'lodash/sortBy';
 import { useTheme } from 'styled-components';
@@ -38,10 +37,10 @@ type Ranges = { [key: string]: Array<HighlightRange> };
 const highlight = (value: any, idx: number, style = {}) => <span key={`highlight-${idx}`} style={style}>{value}</span>;
 
 type Props = {
-  color: HighlightingColor,
+  color?: HighlightingColor
   field: string,
   value?: any,
-  highlightRanges: Ranges,
+  highlightRanges?: Ranges
 };
 
 function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
@@ -109,19 +108,6 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   highlights.push(rest(lastRange.start + lastRange.length));
 
   return <div>{highlights}</div>;
-};
-
-PossiblyHighlight.propTypes = {
-  color: PropTypes.object,
-  field: PropTypes.string.isRequired,
-  value: PropTypes.any,
-  highlightRanges: PropTypes.object,
-};
-
-PossiblyHighlight.defaultProps = {
-  color: DEFAULT_HIGHLIGHT_COLOR,
-  highlightRanges: {},
-  value: undefined,
 };
 
 export default PossiblyHighlight;
