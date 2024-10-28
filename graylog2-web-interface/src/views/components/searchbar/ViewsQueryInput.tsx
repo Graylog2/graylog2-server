@@ -49,9 +49,7 @@ const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props
 };
 
 type Props = {
-  streams?: Array<string> | undefined,
-  timeRange?: TimeRange | NoTimeRangeOverride | undefined,
-  view?: View
+  commands?: Array<Command>,
   completerFactory?: (
     completers: Array<Completer>,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
@@ -60,18 +58,21 @@ type Props = {
     userTimezone: string,
     view: View | undefined,
   ) => AutoCompleter,
-  value: string,
-  name: string,
-  isValidating: boolean,
+  disableExecution?: boolean,
   error?: QueryValidationState,
-  warning?: QueryValidationState,
+  inputId?: string
+  isValidating: boolean,
+  name: string,
+  onBlur?: (query: string) => void,
   onChange: (changeEvent: { target: { value: string, name: string } }) => Promise<string>,
   onExecute: (query: string) => void,
-  validate: () => Promise<FormikErrors<{}>>,
-  commands?: Array<Command>,
-  disableExecution?: boolean,
   placeholder?: string,
-  onBlur?: (query: string) => void,
+  streams?: Array<string> | undefined,
+  timeRange?: TimeRange | NoTimeRangeOverride | undefined,
+  validate: () => Promise<FormikErrors<{}>>,
+  value: string,
+  view?: View
+  warning?: QueryValidationState,
 }
 
 const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
@@ -79,7 +80,7 @@ const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBar
 const ViewsQueryInput = forwardRef<Editor, Props>(({
   value, timeRange, streams, name, onChange, error,
   isValidating, disableExecution, validate, onExecute,
-  commands, view, warning, placeholder, onBlur,
+  commands, view, warning, placeholder, onBlur, inputId,
   completerFactory = defaultCompleterFactory,
 }, ref) => {
   const completer = useCompleter({ streams, timeRange, completerFactory, view });
@@ -87,6 +88,7 @@ const ViewsQueryInput = forwardRef<Editor, Props>(({
   return (
     <AsyncQueryInput value={value}
                      onBlur={onBlur}
+                     inputId={inputId}
                      completer={completer}
                      ref={ref}
                      name={name}
