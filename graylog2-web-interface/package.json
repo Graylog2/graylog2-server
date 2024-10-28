@@ -178,6 +178,6 @@
   "resolutions": {
     "@types/react": "18.0.28",
     "nth-check": "2.0.1",
-    "typescript": "5.5.4"
+    "typescript": "5.6.3"
   }
 }
