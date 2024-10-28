@@ -98,9 +98,9 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       app_action_value: 'input-enter-setup',
     });
 
-    const { attributes: configuration, ...inputData } = input;
+    const { title, type, global, node, attributes: configuration } = input;
 
-    InputsActions.update(input.id, { ...inputData, configuration, setup_mode: true });
+    InputsActions.update(input.id, { title, type, global, node, configuration, setup_mode: true });
   };
 
   const exitInputSetupMode = () => {
@@ -109,9 +109,9 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       app_action_value: 'input-exit-setup',
     });
 
-    const { attributes: configuration, ...inputData } = input;
+    const { title, type, global, node, attributes: configuration } = input;
 
-    InputsActions.update(input.id, { ...inputData, configuration, setup_mode: false });
+    InputsActions.update(input.id, { title, type, global, node, configuration, setup_mode: false });
   };
 
   const handleConfirmDelete = () => {
