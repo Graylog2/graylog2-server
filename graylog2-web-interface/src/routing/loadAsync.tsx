@@ -39,10 +39,10 @@ const emptyPlaceholder = <></>;
 const loadAsync = <TProps, >(factory: ComponentSupplier<TProps>) => {
   const Component = React.lazy(factory) as React.ForwardRefExoticComponent<TProps>;
 
-  return React.forwardRef((props: TProps, ref) => (
+  return React.forwardRef((props: React.PropsWithoutRef<TProps>, ref) => (
     <ErrorBoundary FallbackComponent={ErrorComponent}>
       <React.Suspense fallback={emptyPlaceholder}>
-        <Component {...props} ref={ref} />
+        <Component {...props as TProps} ref={ref} />
       </React.Suspense>
     </ErrorBoundary>
   ));
