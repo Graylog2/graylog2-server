@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import jakarta.validation.constraints.NotBlank;
 import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
@@ -36,9 +37,6 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotBlank;
-
 import java.util.Set;
 
 @AutoValue
@@ -94,6 +92,11 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     private static final String FIELD_LOOKUP_REPLY_TO_EMAIL = "lookup_reply_to_email";
     private static final String FIELD_REPLY_TO_LOOKUP_TABLE_NAME = "reply_to_lut_name";
     private static final String FIELD_REPLY_TO_LOOKUP_TABLE_KEY = "reply_to_lut_key";
+    private static final String FIELD_CC_USERS = "cc_users";
+    private static final String FIELD_CC_EMAILS = "cc_emails";
+    private static final String FIELD_LOOKUP_CC_EMAILS = "lookup_cc_emails";
+    private static final String FIELD_CC_EMAILS_LOOKUP_TABLE_NAME = "cc_emails_lut_name";
+    private static final String FIELD_CC_EMAILS_LOOKUP_TABLE_KEY = "cc_emails_lut_key";
 
     @JsonProperty(FIELD_SENDER)
     public abstract String sender();
@@ -153,6 +156,23 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @Nullable
     public abstract String replyToLUTKey();
 
+    @JsonProperty(FIELD_CC_USERS)
+    public abstract Set<String> ccUsers();
+
+    @JsonProperty(FIELD_CC_EMAILS)
+    public abstract Set<String> ccEmails();
+
+    @JsonProperty(FIELD_LOOKUP_CC_EMAILS)
+    public abstract boolean lookupCcEmails();
+
+    @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_NAME)
+    @Nullable
+    public abstract String ccEmailsLUTName();
+
+    @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_KEY)
+    @Nullable
+    public abstract String ccEmailsLUTKey();
+
     @Override
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
@@ -201,6 +221,14 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 validation.addError(FIELD_REPLY_TO_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
             }
         }
+        if (lookupCcEmails()) {
+            if (Strings.isNullOrEmpty(ccEmailsLUTName())) {
+                validation.addError(FIELD_CC_EMAILS_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
+            }
+            if (Strings.isNullOrEmpty(ccEmailsLUTKey())) {
+                validation.addError(FIELD_CC_EMAILS_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
+            }
+        }
 
         return validation;
     }
@@ -221,7 +249,10 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                     .htmlBodyTemplate("")
                     .lookupRecipientEmails(false)
                     .lookupSenderEmail(false)
-                    .lookupReplyToEmail(false);
+                    .lookupReplyToEmail(false)
+                    .ccUsers(Set.of())
+                    .ccEmails(Set.of())
+                    .lookupCcEmails(false);
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -274,6 +305,21 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
 
         @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
         public abstract Builder replyToLUTKey(String replyToLUTKey);
+
+        @JsonProperty(FIELD_CC_USERS)
+        public abstract Builder ccUsers(Set<String> userCcs);
+
+        @JsonProperty(FIELD_CC_EMAILS)
+        public abstract Builder ccEmails(Set<String> ccEmails);
+
+        @JsonProperty(FIELD_LOOKUP_CC_EMAILS)
+        public abstract Builder lookupCcEmails(boolean lookupCcEmails);
+
+        @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_NAME)
+        public abstract Builder ccEmailsLUTName(String ccEmailsLUTName);
+
+        @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_KEY)
+        public abstract Builder ccEmailsLUTKey(String ccEmailsLUTKey);
 
         public abstract EmailEventNotificationConfig build();
     }
