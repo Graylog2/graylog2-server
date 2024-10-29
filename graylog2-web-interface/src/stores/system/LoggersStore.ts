@@ -21,18 +21,39 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
+type LoggersActionsType = {
+  loggers: () => Promise<void>;
+  subsystems: () => Promise<void>;
+  setSubsystemLoggerLevel: (nodeId: string, subsystem: string, level: string) => Promise<void>;
+}
 export const LoggersActions = singletonActions(
   'core.Loggers',
-  () => Reflux.createActions({
+  () => Reflux.createActions<LoggersActionsType>({
     loggers: { asyncResult: true },
     subsystems: { asyncResult: true },
     setSubsystemLoggerLevel: { asyncResult: true },
   }),
 );
 
+type Logger = {
+  level: string,
+  level_syslog: number,
+};
+type Subsystem = {
+  categories: Array<string>,
+  description: string,
+  level: string,
+  level_syslog: number,
+  title: string,
+};
+type LoggersStateStore = {
+  loggers: { [key: string]: { loggers: Array<Logger>, total: number } },
+  subsystems: { [key: string]: { subsystems: Array<Subsystem> } }
+}
 export const LoggersStore = singletonStore(
   'core.Loggers',
-  () => Reflux.createStore({
+  () => Reflux.createStore<LoggersStateStore>({
+    name: 'LoggersStore',
     listenables: [LoggersActions],
     state: {
       availableLoglevels: [
