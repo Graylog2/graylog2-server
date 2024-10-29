@@ -120,7 +120,7 @@ public class EmailSender {
         }
 
         if (!bccEmails.isEmpty()) {
-            email.setCc(stringsToInternetAddresses(bccEmails, "BCC", notificationId));
+            email.setBcc(stringsToInternetAddresses(bccEmails, "BCC", notificationId));
         }
 
         email.setSubject(buildSubject(config, model));
