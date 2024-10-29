@@ -14,51 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
-import withParams from 'routing/withParams';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
+import useParams from 'routing/useParams';
+import {useStore} from 'stores/connect';
+import { useQuery } from '@tanstack/react-query';
 
-function nodeFilter(state) {
-  return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
-}
+const ProcessBufferDumpPage = () => {
+  const { nodeId } = useParams<{ nodeId: string }>();
+  const { nodes } = useStore(NodesStore);
+  const { data: processbufferDump } = useQuery(['processBufferDump', nodeId], () => ClusterOverviewStore.processbufferDump(nodeId));
 
-const ProcessBufferDumpPage = createReactClass({
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  displayName: 'ProcessBufferDumpPage',
-
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  propTypes: {
-    params: PropTypes.object.isRequired,
-  },
-
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
-
-  componentDidMount() {
-    const { params } = this.props;
-
-    ClusterOverviewStore.processbufferDump(params.nodeId)
-      .then((processbufferDump) => this.setState({ processbufferDump: processbufferDump }));
-  },
-
-  _isLoading() {
-    return !this.state.node;
-  },
-
-  render() {
-    if (this._isLoading()) {
+  const node = nodes?.[nodeId];
+    if (!node) {
       return <Spinner />;
     }
 
-    const { node, processbufferDump } = this.state;
 
     const title = (
       <span>
@@ -82,7 +57,6 @@ const ProcessBufferDumpPage = createReactClass({
         </div>
       </DocumentTitle>
     );
-  },
-});
+  };
 
-export default withParams(ProcessBufferDumpPage);
+export default ProcessBufferDumpPage;
