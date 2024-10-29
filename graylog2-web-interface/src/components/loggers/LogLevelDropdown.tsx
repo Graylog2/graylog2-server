@@ -19,10 +19,8 @@ import { useCallback } from 'react';
 import capitalize from 'lodash/capitalize';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
-import withTelemetry from 'logic/telemetry/withTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import withLocation from 'routing/withLocation';
 import { availableLoglevels } from 'components/loggers/Constants';
 import useSetSubsystemLoggerLevel from 'components/loggers/useSetSubsystemLoggerLevel';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -67,4 +65,4 @@ const LogLevelDropdown = ({ nodeId, name, subsystem }: Props) => {
   );
 };
 
-export default withLocation(withTelemetry(LogLevelDropdown));
+export default LogLevelDropdown;
