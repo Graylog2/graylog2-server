@@ -20,10 +20,21 @@ import UserNotification from 'util/UserNotification';
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type { LookupTableCache } from 'logic/lookup-tables/types';
 
+type Actions = {
+  searchPaginated: (page: number, perPage: number, query?: string) => Promise<StoreState>,
+  reloadPage: () => Promise<void>,
+  get: (idOrName: string) => Promise<void>,
+  create: (cache: LookupTableCache) => Promise<void>,
+  update: (cache: LookupTableCache) => Promise<void>,
+  getTypes: () => Promise<unknown>,
+  delete: (idOrName: string) => Promise<void>,
+  validate: (cache: LookupTableCache) => Promise<void>,
+}
 export const LookupTableCachesActions = singletonActions(
   'core.LookupTableCaches',
-  () => Reflux.createActions({
+  () => Reflux.createActions<Actions>({
     searchPaginated: { asyncResult: true },
     reloadPage: { asyncResult: true },
     get: { asyncResult: true },
@@ -35,9 +46,19 @@ export const LookupTableCachesActions = singletonActions(
   }),
 );
 
+type StoreState = {
+  caches: LookupTableCache[],
+  pagination: {
+    page: number,
+    per_page: number,
+    total: number,
+    count: number,
+    query: string | null
+  }
+}
 export const LookupTableCachesStore = singletonStore(
   'core.LookupTableCaches',
-  () => Reflux.createStore({
+  () => Reflux.createStore<StoreState>({
     listenables: [LookupTableCachesActions],
     cache: null,
     caches: null,

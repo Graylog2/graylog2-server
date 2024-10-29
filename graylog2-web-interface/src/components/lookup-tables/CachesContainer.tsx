@@ -14,51 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
-// eslint-disable-next-line
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import * as React from 'react';
+import { useEffect } from 'react';
 
 import { Spinner } from 'components/common';
 import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
+import { useStore } from 'stores/connect';
 
-const CachesContainer = createReactClass({
-  // eslint-disable-next-line
-  displayName: 'CachesContainer',
+type Props = {
+  children: React.ReactElement[],
+};
 
-  // eslint-disable-next-line
-  propTypes: {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.node),
-      PropTypes.node,
-    ]),
-  },
+const CachesContainer = ({ children }: Props) => {
+  const { caches, pagination } = useStore(LookupTableCachesStore);
 
-  mixins: [Reflux.connect(LookupTableCachesStore)],
-
-  getDefaultProps() {
-    return {
-      children: null,
-    };
-  },
-
-  componentDidMount() {
+  useEffect(() => {
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box
     LookupTableCachesActions.searchPaginated(1, 10000, null);
-  },
+  }, []);
 
-  render() {
-    if (!this.state.caches) {
-      return <Spinner />;
-    }
+  if (!caches) {
+    return <Spinner />;
+  }
 
-    const childrenWithProps = React.Children.map(this.props.children,
-      (child) => React.cloneElement(child,
-        { caches: this.state.caches, pagination: this.state.pagination }));
+  const childrenWithProps = React.Children.map(children,
+    (child) => React.cloneElement(child,
+      { caches, pagination }));
 
-    return <div>{childrenWithProps}</div>;
-  },
-});
+  return <div>{childrenWithProps}</div>;
+};
 
 export default CachesContainer;
