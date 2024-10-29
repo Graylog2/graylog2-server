@@ -15,17 +15,87 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import type Immutable from 'immutable';
+import type { Sort, Attribute } from 'stores/PaginationTypes';
 
-import type { Sort } from 'stores/PaginationTypes';
-import timestamp from 'components/common/Timestamp';
+export const EVENTS_ENTITY_TABLE_ID = 'events';
 
-const getStreamDataWarehouseTableElements = PluginStore.exports('dataWarehouse')?.[0]?.getStreamDataWarehouseTableElements;
+export const additionalAttributes: Array<Attribute> = [
+  {
+    id: 'priority',
+    title: 'Priority',
+    type: 'STRING',
+    sortable: true,
+    searchable: false,
+  },
+  {
+    id: 'message',
+    title: 'Description',
+    type: 'STRING',
+    sortable: false,
+    searchable: false,
+  },
+  {
+    id: 'key',
+    title: 'Key',
+    type: 'STRING',
+    sortable: true,
+    searchable: false,
+  },
+  {
+    id: 'alert',
+    title: 'Type',
+    type: 'BOOLEAN',
+    sortable: true,
+    filterable: true,
+    filter_options: [{ value: 'false', title: 'Event' }, { value: 'true', title: 'Alert' }],
+  },
+  {
+    id: 'event_definition_id',
+    title: 'Event Definition',
+    type: 'STRING',
+    sortable: false,
+    searchable: false,
+  },
+  {
+    id: 'timestamp',
+    title: 'Timestamp',
+    type: 'DATE',
+    sortable: true,
+    filterable: true,
+  },
+  {
+    id: 'id',
+    title: 'ID',
+    type: 'STRING',
+    sortable: true,
+  },
+  {
+    id: 'event_definition_type',
+    title: 'Event Definition Type',
+    type: 'STRING',
+    sortable: true,
+  },
+  {
+    id: 'fields',
+    title: 'Additional fields',
+    type: 'STRING',
+    sortable: false,
+  },
+  {
+    id: 'group_by_fields',
+    title: 'Group-By Fields',
+    sortable: false,
+  },
+  {
+    id: 'remediation_steps',
+    title: 'Remediation Steps',
+    sortable: false,
+  },
+];
 
 const getStreamTableElements = () => {
   const defaultLayout = {
-    entityTableId: 'events',
+    entityTableId: EVENTS_ENTITY_TABLE_ID,
     defaultPageSize: 20,
     defaultSort: { attributeId: 'timestamp', direction: 'desc' } as Sort,
     defaultDisplayedAttributes: [
@@ -34,66 +104,27 @@ const getStreamTableElements = () => {
       'key',
       'alert',
       'event_definition_id',
+      'event_definition_type',
       'timestamp',
     ],
   };
   const columnOrder = [
-    'priority',
     'message',
+    'id',
+    'priority',
     'key',
     'alert',
     'event_definition_id',
+    'event_definition_type',
     'timestamp',
-  ];
-  const additionalAttributes = [
-    {
-      id: 'priority',
-      title: '',
-      type: 'NUMBER',
-      sortable: false,
-      searchable: false,
-    },
-    {
-      id: 'message',
-      title: 'Description',
-      type: 'STRING',
-      sortable: false,
-      searchable: false,
-    },
-    {
-      id: 'key',
-      title: 'Key',
-      type: 'STRING',
-      sortable: false,
-      searchable: false,
-    },
-    {
-      id: 'alert',
-      title: 'Type',
-      type: 'BOOLEAN',
-      sortable: false,
-      searchable: false,
-    },
-    {
-      id: 'event_definition_id',
-      title: 'Event Definition',
-      type: 'STRING',
-      sortable: false,
-      searchable: false,
-    },
-    {
-      id: 'timestamp',
-      title: 'Timestamp',
-      type: 'DATE',
-      sortable: false,
-      filterable: false,
-    },
+    'fields',
+    'group_by_fields',
+    'remediation_steps',
   ];
 
   return {
     defaultLayout,
     columnOrder,
-    additionalAttributes,
   };
 };
 

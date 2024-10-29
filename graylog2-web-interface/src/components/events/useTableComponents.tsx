@@ -16,31 +16,28 @@
  */
 import React, { useCallback, useMemo } from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
-import ExpandedRulesSection from 'components/streams/StreamsOverview/ExpandedRulesSection';
-import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
 import EventActions from 'components/events/EventActions';
 import type { Event } from 'components/events/events/types';
+import ExpandedSection from 'components/events/ExpandedSection';
+import type useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 
-const useTableElements = () => {
+const useTableElements = ({ defaultLayout }: {
+  defaultLayout: Parameters<typeof useTableLayout>[0],
+}) => {
   const entityActions = useCallback((event: Event) => (
     <EventActions event={event} />
   ), []);
 
-  const renderExpandedRules = useCallback((stream: Stream) => (
-    <ExpandedRulesSection stream={stream} />
-  ), []);
-  const renderExpandedRulesActions = useCallback((stream: Stream) => (
-    <ExpandedRulesActions stream={stream} />
-  ), []);
+  const renderExpandedRules = useCallback((event: Event) => (
+    <ExpandedSection defaultLayout={defaultLayout} event={event} />
+  ), [defaultLayout]);
 
   const expandedSections = useMemo(() => ({
-    rules: {
-      title: 'Rules',
+    restFieldsExpandedSection: {
+      title: 'Details',
       content: renderExpandedRules,
-      actions: renderExpandedRulesActions,
     },
-  }), [renderExpandedRules, renderExpandedRulesActions]);
+  }), [renderExpandedRules]);
 
   return {
     entityActions,

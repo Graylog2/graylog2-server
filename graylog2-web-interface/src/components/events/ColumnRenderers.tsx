@@ -15,20 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import type Immutable from 'immutable';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import capitalize from 'lodash/capitalize';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
+import isEmpty from 'lodash/isEmpty';
 
-import type { Output } from 'stores/outputs/OutputsStore';
-import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';
-import TitleCell from 'components/streams/StreamsOverview/cells/TitleCell';
-import ThroughputCell from 'components/streams/StreamsOverview/cells/ThroughputCell';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -36,20 +29,19 @@ import { isPermitted } from 'util/PermissionsMixin';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { Event } from 'components/events/events/types';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import { OverlayTrigger, Icon } from 'components/common';
-
-import StatusCell from './cells/StatusCell';
-import StreamRulesCell from './cells/StreamRulesCell';
-import PipelinesCell from './cells/PipelinesCell';
-import OutputsCell from './cells/OutputsCell';
-import ArchivingsCell from './cells/ArchivingsCell';
+import PriorityName from 'components/events/events/PriorityName';
+import usePluginEntities from 'hooks/usePluginEntities';
+import EventFields from 'components/events/events/EventFields';
+import { MarkdownPreview } from 'components/common/MarkdownEditor';
+import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import type { EventsAdditionalData } from 'components/events/events/fetchEvents';
 
 const useEventsContext = (keyFn: (options: SearchParams) => Array<unknown>) => {
   const { searchParams } = useTableFetchContext();
   const queryClient = useQueryClient();
 
-  return useMemo(() => queryClient.getQueryData(keyFn(searchParams))?.context, []);
+  return useMemo<EventsAdditionalData['context']>(() => queryClient.getQueryData<PaginatedResponse<Event, EventsAdditionalData>>(keyFn(searchParams))?.meta?.context, [keyFn, queryClient, searchParams]);
 };
 
 const EventDefinitionRenderer = ({ eventDefinitionId, keyFn, permissions }: { eventDefinitionId: string, permissions: Immutable.List<string>, keyFn: (options: SearchParams) => Array<unknown> }) => {
@@ -60,55 +52,112 @@ const EventDefinitionRenderer = ({ eventDefinitionId, keyFn, permissions }: { ev
     return <em>{eventDefinitionId}</em>;
   }
 
-  return isPermitted(permissions,
-    `eventdefinitions:edit:${eventDefinitionContext.id}`)
-    ? <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>{eventDefinitionContext.title}</Link>
-    : eventDefinitionContext.title;
+  return (
+    <>{isPermitted(permissions,
+      `eventdefinitions:edit:${eventDefinitionContext.id}`)
+      ? <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>{eventDefinitionContext.title}</Link>
+      : eventDefinitionContext.title}
+    </>
+  );
 };
 
-const EventsIcon = styled(Icon)(({ theme }) => css`
-  font-size: ${theme.fonts.size.large};
-  vertical-align: top;
-`);
+const EventDefinitionTypeRenderer = ({ type }: { type: unknown }) => {
+  const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
+  const plugin = useMemo(() => {
+    if (type === undefined) {
+      return null;
+    }
 
-const PriorityRenderer = ({ priority }: { priority: number }) => {
-  const priorityName = capitalize(EventDefinitionPriorityEnum.properties[priority].name);
-  let style;
+    return eventDefinitionTypes.find((edt) => edt.type === type);
+  }, [eventDefinitionTypes, type]);
 
-  switch (priority) {
-    case EventDefinitionPriorityEnum.LOW:
-      style = 'text-muted';
-      break;
-    case EventDefinitionPriorityEnum.HIGH:
-      style = 'text-danger';
-      break;
-    default:
-      style = 'text-info';
-  }
+  return <>`${(plugin && plugin.displayName) || type}`</>;
+};
 
-  const tooltip = <>{priorityName} Priority</>;
+const PriorityRenderer = ({ priority }: { priority: number }) => <PriorityName priority={priority} />;
+
+const FieldsRenderer = ({ fields }: { fields: Record<string, string> }) => (
+  isEmpty(fields)
+    ? <em>No additional Fields added to this Event.</em>
+    : <EventFields fields={fields} />
+);
+
+const GroupByFieldsRenderer = ({ groupByFields }: {groupByFields: Record<string, string> }) => (
+  isEmpty(groupByFields)
+    ? <em>No group-by fields on this Event.</em>
+    : <EventFields fields={groupByFields} />
+);
+
+const RemediationStepRenderer = ({ eventDefinitionId, keyFn }: { eventDefinitionId: string, keyFn: (options: SearchParams) => Array<unknown> }) => {
+  const eventsContext = useEventsContext(keyFn);
+  const eventDefinitionContext = eventsContext.event_definitions[eventDefinitionId];
 
   return (
-    <OverlayTrigger placement="top" trigger={['hover', 'click', 'focus']} overlay={tooltip}>
-      <EventsIcon name="thermometer" className={style} />
-    </OverlayTrigger>
+    eventDefinitionContext?.remediation_steps ? (
+      <MarkdownPreview show
+                       withFullView
+                       noBorder
+                       noBackground
+                       value={eventDefinitionContext.remediation_steps} />
+    ) : (
+      <em>No remediation steps</em>
+    )
   );
+};
+
+const StyledDiv = styled.div`
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const MessageRenderer = ({ message, eventId }: { message: string, eventId: string }) => {
+  const { toggleSection } = useExpandedSections();
+
+  const toggleExtraSection = () => toggleSection(eventId, 'restFieldsExpandedSection');
+
+  return <StyledDiv onClick={toggleExtraSection}>{message}</StyledDiv>;
 };
 
 const customColumnRenderers = (permissions: Immutable.List<string>, keyFn: (options: SearchParams) => Array<unknown>): ColumnRenderers<Event> => ({
   attributes: {
+    message: {
+      minWidth: 300,
+      renderCell: (_message: string, event) => <MessageRenderer message={_message} eventId={event.id} />,
+    },
     key: {
-      renderCell: (_key: string) => <span>{_key || <em>none</em>}</span>,
+      renderCell: (_key: string) => <span>{_key || <em>No Key set for this Event.</em>}</span>,
+      staticWidth: 200,
+    },
+    id: {
+      staticWidth: 300,
     },
     alert: {
       renderCell: (_alert: boolean) => <EventTypeLabel isAlert={_alert} />,
+      staticWidth: 100,
     },
     event_definition_id: {
       renderCell: (_eventDefinitionId: string) => <EventDefinitionRenderer permissions={permissions} eventDefinitionId={_eventDefinitionId} keyFn={keyFn} />,
     },
     priority: {
       renderCell: (_priority: number) => <PriorityRenderer priority={_priority} />,
-      staticWidth: 20,
+      staticWidth: 100,
+    },
+    event_definition_type: {
+      renderCell: (_type) => <EventDefinitionTypeRenderer type={_type} />,
+      staticWidth: 200,
+    },
+    fields: {
+      renderCell: (_fields: Record<string, string>) => <FieldsRenderer fields={_fields} />,
+      staticWidth: 400,
+    },
+    group_by_fields: {
+      renderCell: (groupByFields: Record<string, string>) => <GroupByFieldsRenderer groupByFields={groupByFields} />,
+      staticWidth: 400,
+    },
+    remediation_steps: {
+      renderCell: (_, event: Event) => <RemediationStepRenderer keyFn={keyFn} eventDefinitionId={event.event_definition_id} />,
     },
   },
 });

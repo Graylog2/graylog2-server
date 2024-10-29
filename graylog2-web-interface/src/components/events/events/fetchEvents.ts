@@ -15,31 +15,78 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import moment from 'moment';
+
 import type { SearchParams } from 'stores/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import type { Event } from 'components/events/events/types';
+import { additionalAttributes } from 'components/events/Constants';
+import { extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
+import { adjustFormat } from 'util/DateTime';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 const url = URLUtils.qualifyUrl('/events/search');
+
+type FiltersResult = { filter: { alerts?: string }, timerange?: { from?: string, to?: string, type: string, range?: number}};
+
+const parseFilters = (filters: UrlQueryFilters) => {
+  const result: FiltersResult = { filter: {} };
+
+  if (filters.get('timestamp')?.[0]) {
+    const [from, to] = extractRangeFromString(filters.get('timestamp')[0]);
+    result.timerange = { from, to: to || adjustFormat(moment().utc(), 'internal'), type: 'absolute' };
+  } else {
+    result.timerange = { type: 'relative', range: 0 };
+  }
+
+  switch (filters?.get('alert')?.[0]) {
+    case 'true':
+      result.filter.alerts = 'only';
+      break;
+    case 'false':
+      result.filter.alerts = 'exclude';
+      break;
+    default:
+      result.filter.alerts = 'include';
+  }
+
+  return result;
+};
+
+const getConcatenatedQuery = (query: string, streamId: string) => {
+  if (!streamId) return query;
+
+  if (streamId && !query) return `source_streams:${streamId}`;
+
+  return `(${query}) AND source_streams:${streamId}`;
+};
+
 export const keyFn = (searchParams: SearchParams) => ['events', 'search', searchParams];
-const fetchEvents = (searchParams: SearchParams, timerange) => fetch('POST', url, {
-  query: searchParams.query,
+type EventContext = {
+  id: string,
+  title: string,
+  description: string,
+  remediation_steps: string,
+}
+export type EventsAdditionalData = {
+  context: {event_definitions: Record<string, EventContext>, streams: Record<string, EventContext>},
+}
+const fetchEvents = (searchParams: SearchParams, streamId: string): Promise<PaginatedResponse<Event, EventsAdditionalData>> => fetch('POST', url, {
+  query: getConcatenatedQuery(searchParams.query, streamId),
   page: searchParams.page,
   per_page: searchParams.pageSize,
-  filter: searchParams.filters,
-  timerange: {
-    type: 'relative',
-    range: 3369600,
+  sort_by: searchParams.sort.attributeId,
+  sort_direction: searchParams.sort.direction,
+  ...parseFilters(searchParams.filters),
+}).then(({ events, total_events, parameters, context }) => ({
+  attributes: additionalAttributes,
+  list: events.map(({ event }) => event),
+  pagination: { total: total_events, page: parameters.page, per_page: parameters.per_page, count: events.length },
+  additionalData: {
+    context,
   },
-}).then(({ events, total_events, parameters, ...rest }) => {
-  console.log({ events, rest, total_events, parameters });
-
-  return ({
-    ...rest,
-    list: events.map(({ event }) => event),
-    total: total_events,
-    pagination: { total: total_events, page: parameters.page, per_page: parameters.per_page, count: events.length },
-    query: searchParams.query,
-  });
-});
+}));
 
 export default fetchEvents;

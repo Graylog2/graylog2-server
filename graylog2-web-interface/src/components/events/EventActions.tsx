@@ -22,6 +22,7 @@ import { MoreActions } from 'components/common/EntityDataTable';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { Event } from 'components/events/events/types';
+import type { EventActionComponentProps } from 'views/types';
 
 const usePluggableEventActions = (eventId: string) => {
   const modalRefs = useRef({});
@@ -29,7 +30,7 @@ const usePluggableEventActions = (eventId: string) => {
   const availableActions = pluggableActions.filter(
     (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
   );
-  const actions = availableActions.map(({ component: PluggableEventAction, key }) => (
+  const actions = availableActions.map(({ component: PluggableEventAction, key }: { component: React.ComponentType<EventActionComponentProps>, key: string }) => (
     <PluggableEventAction key={`event-action-${key}`}
                           eventId={eventId}
                           modalRef={() => modalRefs.current[key]} />
