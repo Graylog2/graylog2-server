@@ -6,3 +6,5 @@ export const availableLoglevels = [
   'debug',
   'trace',
 ] as const;
+
+export type AvailableLogLevels = typeof availableLoglevels;
