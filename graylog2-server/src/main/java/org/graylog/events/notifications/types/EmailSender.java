@@ -32,8 +32,11 @@ import org.graylog2.shared.email.EmailFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -92,7 +95,8 @@ public class EmailSender {
     }
 
     private void sendEmails(EmailEventNotificationConfig config, Set<String> recipients, Set<String> ccEmails,
-                            String sender, String replyTo, Map<String, Object> model) throws TransportConfigurationException, EmailException {
+                            Set<String> bccEmails, String sender, String replyTo, Map<String, Object> model,
+                            String notificationId) throws TransportConfigurationException, EmailException {
         if (!emailFactory.isEmailTransportEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
@@ -112,22 +116,43 @@ public class EmailSender {
         }
 
         if (!ccEmails.isEmpty()) {
-            email.addCc(ccEmails.toArray(new String[]{}));
+            email.setCc(stringsToInternetAddresses(ccEmails, "CC", notificationId));
+        }
+
+        if (!bccEmails.isEmpty()) {
+            email.setCc(stringsToInternetAddresses(bccEmails, "BCC", notificationId));
         }
 
         email.setSubject(buildSubject(config, model));
+        final List<InternetAddress> recipientAddresses = stringsToInternetAddresses(recipients, "TO", notificationId);
         if (config.singleEmail()) {
-            LOG.debug("Sending mail to {}", String.join(", ", recipients));
-            email.addTo(recipients.toArray(new String[]{}));
+            LOG.debug("Sending mail to {}",
+                    String.join(", ", recipientAddresses.stream().map(InternetAddress::getAddress).toList()));
+            email.setTo(recipientAddresses);
             email.send();
         } else {
-            for (String recipient : recipients) {
-                LOG.debug("Sending mail to {}", recipient);
-                email.setTo(List.of());
-                email.addTo(recipient);
+            for (InternetAddress recipient : recipientAddresses) {
+                LOG.debug("Sending mail to {}", recipient.getAddress());
+                email.setTo(List.of(recipient));
                 email.send();
             }
         }
+    }
+
+    private List<InternetAddress> stringsToInternetAddresses(Set<String> addresses, String line, String notificationId) {
+        return addresses.stream()
+                .map(address -> {
+                    try {
+                        LOG.debug("Converting email {} to InternetAddress.", address);
+                        return new InternetAddress(address);
+                    } catch (AddressException e) {
+                        LOG.error("Unable to add {} to the {} line in email notification {}.",
+                                address, line, notificationId, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     Email createEmailWithBody(EmailEventNotificationConfig config, Map<String, Object> model) throws EmailException {
@@ -143,7 +168,7 @@ public class EmailSender {
         }
     }
 
-    void sendEmails(Set<String> emailRecipients, Set<String> ccEmails, String sender, String replyTo, EmailEventNotificationConfig config,
+    void sendEmails(Set<String> emailRecipients, Set<String> ccEmails, Set<String> bccEmails, String sender, String replyTo, EmailEventNotificationConfig config,
                     String notificationId, Map<String, Object> model) throws TransportConfigurationException, EmailException {
         if (!emailFactory.isEmailTransportEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
@@ -161,7 +186,7 @@ public class EmailSender {
             return;
         }
 
-        sendEmails(config, emailRecipients, ccEmails, sender, replyTo, model);
+        sendEmails(config, emailRecipients, ccEmails, bccEmails, sender, replyTo, model, notificationId);
     }
 
 }
