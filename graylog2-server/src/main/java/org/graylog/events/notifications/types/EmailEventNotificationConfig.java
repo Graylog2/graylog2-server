@@ -92,6 +92,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     private static final String FIELD_LOOKUP_REPLY_TO_EMAIL = "lookup_reply_to_email";
     private static final String FIELD_REPLY_TO_LOOKUP_TABLE_NAME = "reply_to_lut_name";
     private static final String FIELD_REPLY_TO_LOOKUP_TABLE_KEY = "reply_to_lut_key";
+    private static final String FIELD_SINGLE_EMAIL = "single_email";
     private static final String FIELD_CC_USERS = "cc_users";
     private static final String FIELD_CC_EMAILS = "cc_emails";
     private static final String FIELD_LOOKUP_CC_EMAILS = "lookup_cc_emails";
@@ -155,6 +156,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
     @Nullable
     public abstract String replyToLUTKey();
+
+    @JsonProperty(FIELD_SINGLE_EMAIL)
+    public abstract boolean singleEmail();
 
     @JsonProperty(FIELD_CC_USERS)
     public abstract Set<String> ccUsers();
@@ -250,6 +254,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                     .lookupRecipientEmails(false)
                     .lookupSenderEmail(false)
                     .lookupReplyToEmail(false)
+                    .singleEmail(false)
                     .ccUsers(Set.of())
                     .ccEmails(Set.of())
                     .lookupCcEmails(false);
@@ -306,6 +311,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
         public abstract Builder replyToLUTKey(String replyToLUTKey);
 
+        @JsonProperty(FIELD_SINGLE_EMAIL)
+        public abstract Builder singleEmail(boolean singleEmail);
+
         @JsonProperty(FIELD_CC_USERS)
         public abstract Builder ccUsers(Set<String> userCcs);
 
@@ -337,7 +345,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 .timeZone(ValueReference.of(timeZone().getID()))
                 .lookupRecipientEmails(ValueReference.of(lookupRecipientEmails()))
                 .lookupSenderEmail(ValueReference.of(lookupSenderEmail()))
-                .lookupReplyToEmail(ValueReference.of(lookupReplyToEmail()));
+                .lookupReplyToEmail(ValueReference.of(lookupReplyToEmail()))
+                .singleEmail(ValueReference.of(singleEmail()))
+                .lookupCcEmails(ValueReference.of(lookupCcEmails()));
         if (lookupRecipientEmails()) {
             builder.recipientsLUTName(ValueReference.ofNullable(recipientsLUTName()))
                     .recipientsLUTKey(ValueReference.ofNullable(recipientsLUTKey()));
@@ -358,6 +368,13 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         } else {
             builder.replyToLUTName(ValueReference.of(""))
                     .replyToLUTKey(ValueReference.of(""));
+        }
+        if (lookupCcEmails()) {
+            builder.ccEmailsLUTName(ValueReference.ofNullable(ccEmailsLUTName()))
+                    .ccEmailsLUTKey(ValueReference.ofNullable(ccEmailsLUTKey()));
+        } else {
+            builder.ccEmailsLUTName(ValueReference.of(""))
+                    .ccEmailsLUTKey(ValueReference.of(""));
         }
 
         return builder.build();

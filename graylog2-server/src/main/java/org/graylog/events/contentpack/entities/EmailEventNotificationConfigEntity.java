@@ -53,6 +53,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     private static final String FIELD_LOOKUP_REPLY_TO_EMAIL = "lookup_reply_to_email";
     private static final String FIELD_REPLY_TO_LOOKUP_TABLE_NAME = "reply_to_lut_name";
     private static final String FIELD_REPLY_TO_LOOKUP_TABLE_KEY = "reply_to_lut_key";
+    private static final String FIELD_SINGLE_EMAIL = "single_email";
     private static final String FIELD_CC_USERS = "cc_users";
     private static final String FIELD_CC_EMAILS = "cc_emails";
     private static final String FIELD_LOOKUP_CC_EMAILS = "lookup_cc_emails";
@@ -110,6 +111,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
     public abstract ValueReference replyToLUTKey();
 
+    @JsonProperty(FIELD_SINGLE_EMAIL)
+    public abstract ValueReference singleEmail();
+
     @JsonProperty(FIELD_CC_USERS)
     public abstract Set<String> ccUsers();
 
@@ -150,6 +154,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                     .lookupReplyToEmail(ValueReference.of(false))
                     .replyToLUTName(ValueReference.of(""))
                     .replyToLUTKey(ValueReference.of(""))
+                    .singleEmail(ValueReference.of(false))
                     .ccUsers(Set.of())
                     .ccEmails(Set.of())
                     .lookupCcEmails(ValueReference.of(false))
@@ -208,6 +213,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
         public abstract Builder replyToLUTKey(ValueReference replyToLUTKey);
 
+        @JsonProperty(FIELD_SINGLE_EMAIL)
+        public abstract Builder singleEmail(ValueReference singleEmail);
+
         @JsonProperty(FIELD_CC_USERS)
         public abstract Builder ccUsers(Set<String> userCcs);
 
@@ -237,6 +245,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
                 .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
+                .singleEmail(singleEmail().asBoolean(parameters))
                 .ccUsers(ccUsers())
                 .ccEmails(ccEmails());
         final boolean lookupRecipientEmails = lookupRecipientEmails().asBoolean(parameters);
