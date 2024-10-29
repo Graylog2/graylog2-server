@@ -15,6 +15,5 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export { default as ActivateIlluminateStep } from './ActivateIlluminateStep';
 export { default as SelectCategoryStep } from './SelectCategoryStep';
 export { default as TestInputStep } from './TestInputStep';

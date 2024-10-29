@@ -16,61 +16,50 @@
  */
 import * as React from 'react';
 import { useEffect, useCallback, useMemo, useState } from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Modal } from 'components/bootstrap';
 import { Wizard } from 'components/common';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
-import useIlluminateValidityForSubject from 'components/inputs/InputSetupWizard/hooks/useIlluminateValidityForSubject';
 
-import { ActivateIlluminateStep, SelectCategoryStep, TestInputStep } from './steps';
+import { SelectCategoryStep, TestInputStep } from './steps';
 
 const InputSetupWizard = () => {
   const { activeStep, setActiveStep, show, closeWizard, wizardData } = useInputSetupWizard();
   const [orderedSteps, setOrderedSteps] = useState([]);
   const { category, subcategory } = wizardData;
+  const enterpriseSteps = PluginStore.exports('inputSetupWizard').find((plugin) => (!!plugin.steps))?.steps;
 
-  const {
-    data: dataIlluminateValidty,
-    isFetching: isFetchingIlluminateValidty,
-    isError: isErrorIlluminateValidty,
-  } = useIlluminateValidityForSubject(category, subcategory);
+  const steps = useMemo(() => {
+    const defaultSteps = {
+      [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+        key: INPUT_WIZARD_STEPS.SELECT_CATEGORY,
+        title: (
+          <>
+            Select Category
+          </>
+        ),
+        component: (
+          <SelectCategoryStep />
+        ),
+      },
+      [INPUT_WIZARD_STEPS.TEST_INPUT]: {
+        key: INPUT_WIZARD_STEPS.TEST_INPUT,
+        title: (
+          <>
+            Test Input
+          </>
+        ),
+        component: (
+          <TestInputStep />
+        ),
+      },
+    };
+    if (enterpriseSteps) return { ...defaultSteps, ...enterpriseSteps };
 
-  const steps = useMemo(() => ({
-    [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
-      key: INPUT_WIZARD_STEPS.SELECT_CATEGORY,
-      title: (
-        <>
-          Select Category
-        </>
-      ),
-      component: (
-        <SelectCategoryStep />
-      ),
-    },
-    [INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]: {
-      key: INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE,
-      title: (
-        <>
-          Activate Illuminate
-        </>
-      ),
-      component: (
-        <ActivateIlluminateStep />
-      ),
-    },
-    [INPUT_WIZARD_STEPS.TEST_INPUT]: {
-      key: INPUT_WIZARD_STEPS.TEST_INPUT,
-      title: (
-        <>
-          Test Input
-        </>
-      ),
-      component: (
-        <TestInputStep />
-      ),
-    },
-  }), []);
+    return defaultSteps;
+  }, [enterpriseSteps]);
 
   const determineFirstStep = useCallback(() => {
     if (!category || !subcategory) {
@@ -80,16 +69,16 @@ const InputSetupWizard = () => {
       return;
     }
 
-    if (isFetchingIlluminateValidty || isErrorIlluminateValidty || !dataIlluminateValidty?.category_valid || !dataIlluminateValidty.subcategory_valid) {
-      setActiveStep(INPUT_WIZARD_STEPS.TEST_INPUT);
-      setOrderedSteps([INPUT_WIZARD_STEPS.TEST_INPUT]);
+    if (steps[INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]) {
+      setActiveStep(INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE);
+      setOrderedSteps([INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]);
 
       return;
     }
 
-    setActiveStep(INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE);
-    setOrderedSteps([INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]);
-  }, [setActiveStep, category, subcategory, dataIlluminateValidty, isFetchingIlluminateValidty, isErrorIlluminateValidty]);
+    setActiveStep(INPUT_WIZARD_STEPS.TEST_INPUT);
+    setOrderedSteps([INPUT_WIZARD_STEPS.TEST_INPUT]);
+  }, [setActiveStep, category, subcategory, steps]);
 
   useEffect(() => {
     if (!activeStep) {
