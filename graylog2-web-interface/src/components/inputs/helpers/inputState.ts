@@ -16,7 +16,7 @@
  */
 import type { InputStates, InputState } from 'stores/inputs/InputStatesStore';
 
-export const inputHasSomeState = (inputStates: InputStates, inputId: string, states: Array<InputState>) : boolean => {
+const inputHasSomeState = (inputStates: InputStates, inputId: string, states: Array<InputState>) : boolean => {
   if (!inputStates) return false;
   const inputState = inputStates[inputId];
   if (!inputState) return false;
@@ -34,4 +34,5 @@ export const inputHasSomeState = (inputStates: InputStates, inputId: string, sta
   });
 };
 
-export default inputHasSomeState;
+export const isInputRunning = (inputStates: InputStates, inputId: string) => inputHasSomeState(inputStates, inputId, ['RUNNING', 'STARTING', 'FAILING']);
+export const isInputInSetupMode = (inputStates: InputStates, inputId: string) => inputHasSomeState(inputStates, inputId, ['SETUP']);

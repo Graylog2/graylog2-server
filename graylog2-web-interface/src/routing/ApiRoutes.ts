@@ -189,12 +189,12 @@ const ApiRoutes = {
   InputStatesController: {
     start: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
     stop: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
+    setup: (inputId: string) => ({ url: `/system/inputstates/setup/${inputId}` }),
   },
   ClusterInputStatesController: {
     list: () => ({ url: '/cluster/inputstates' }),
     start: (inputId: string) => ({ url: `/cluster/inputstates/${inputId}` }),
     stop: (inputId: string) => ({ url: `/cluster/inputstates/${inputId}` }),
-    setup: (inputId: string) => ({ url: `/cluster/inputstates/setup/${inputId}` }),
   },
   ClusterLoggersResource: {
     loggers: () => ({ url: '/cluster/system/loggers' }),

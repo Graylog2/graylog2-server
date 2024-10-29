@@ -19,7 +19,7 @@ import { useState } from 'react';
 
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import type { InputStates } from 'stores/inputs/InputStatesStore';
-import { inputHasSomeState } from 'components/inputs/helpers/inputState';
+import { isInputRunning, isInputInSetupMode } from 'components/inputs/helpers/inputState';
 import { useStore } from 'stores/connect';
 import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -42,10 +42,6 @@ const InputStateControl = ({ input } : Props) => {
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const { openWizard } = useInputSetupWizard();
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
-
-  const isInputRunning = () => inputHasSomeState(inputStates, input.id, ['RUNNING', 'STARTING', 'FAILING']);
-
-  const isInputinSetupMode = () => inputHasSomeState(inputStates, input.id, ['SETUP']);
 
   const startInput = () => {
     setIsLoading(true);
@@ -84,7 +80,7 @@ const InputStateControl = ({ input } : Props) => {
     openWizard(input.id);
   };
 
-  if (inputSetupFeatureFlagIsEnabled && isInputinSetupMode()) {
+  if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
     return (
       <Button bsStyle="warning" onClick={setupInput}>
         Setup Input
@@ -92,7 +88,7 @@ const InputStateControl = ({ input } : Props) => {
     );
   }
 
-  if (isInputRunning()) {
+  if (isInputRunning(inputStates, input.id)) {
     return (
       <Button bsStyle="primary" onClick={stopInput} disabled={isLoading}>
         {isLoading ? 'Stopping...' : 'Stop input'}
