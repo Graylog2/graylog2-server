@@ -24,10 +24,11 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
+type SystemOverview = {};
 // eslint-disable-next-line import/prefer-default-export
 export const ClusterOverviewStore = singletonStore(
   'core.ClusterOverview',
-  () => Reflux.createStore({
+  () => Reflux.createStore<{ clusterOverview: { [nodeId: string]: SystemOverview } }>({
     sourceUrl: '/cluster',
     clusterOverview: undefined,
 
