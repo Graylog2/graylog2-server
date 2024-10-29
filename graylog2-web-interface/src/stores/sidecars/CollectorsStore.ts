@@ -22,10 +22,21 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type { Collector } from 'components/sidecars/types';
 
+type Actions = {
+  getCollector: (id: string) => Promise<Collector>,
+  all: () => Promise<{ collectors: Array<Collector> }>,
+  list: (opts: { query?: string, page?: number, pageSize?: number }) => Promise<unknown>,
+  create: (collector: Collector) => Promise<unknown>,
+  update: (collector: Collector) => Promise<unknown>,
+  delete: (collector: Collector) => Promise<unknown>,
+  copy: (id: string, name: string) => Promise<unknown>,
+  validate: (collector: Collector) => Promise<{ errors: { name: string[] }, failed: boolean }>,
+}
 export const CollectorsActions = singletonActions(
   'core.Collectors',
-  () => Reflux.createActions({
+  () => Reflux.createActions<Actions>({
     getCollector: { asyncResult: true },
     all: { asyncResult: true },
     list: { asyncResult: true },
@@ -37,9 +48,19 @@ export const CollectorsActions = singletonActions(
   }),
 );
 
+type StoreState = {
+  query: string | undefined,
+  collectors: Array<Collector>,
+  pagination: {
+    page: number,
+    pageSize: number,
+    total: number,
+  },
+  total: number,
+}
 export const CollectorsStore = singletonStore(
   'core.Collectors',
-  () => Reflux.createStore({
+  () => Reflux.createStore<StoreState>({
     listenables: [CollectorsActions],
     sourceUrl: '/sidecar',
     collectors: undefined,
@@ -230,9 +251,9 @@ export const CollectorsStore = singletonStore(
       CollectorsActions.copy.promise(promise);
     },
 
-    validate(collector) {
+    validate(collector: Collector) {
     // set minimum api defaults for faster validation feedback
-      const payload = {
+      const payload: Partial<Collector> = {
         id: ' ',
         service_type: 'exec',
         executable_path: ' ',

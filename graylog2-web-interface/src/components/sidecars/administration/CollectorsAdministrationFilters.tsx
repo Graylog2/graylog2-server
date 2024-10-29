@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import createReactClass from 'create-react-class';
-import PropTypes from 'prop-types';
 import find from 'lodash/find';
 import uniq from 'lodash/uniq';
 import upperFirst from 'lodash/upperFirst';
@@ -27,42 +25,53 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
+import type { Collector } from 'components/sidecars/types';
 
-const CollectorsAdministrationFilters = createReactClass({
-  propTypes: {
-    collectors: PropTypes.array.isRequired,
-    configurations: PropTypes.array.isRequired,
-    filters: PropTypes.object.isRequired,
-    filter: PropTypes.func.isRequired,
+type Configuration = {
+  id: string,
+  name: string,
+  color: string,
+}
+type Props = {
+  collectors: Collector[],
+  configurations: Configuration[],
+  filters: {
+    collector?: string,
+    configuration?: string,
+    os?: string,
+    status?: string,
   },
+  filter: (name?: string, value?: string) => void,
+}
 
-  onFilterChange(name, value, callback) {
-    const { filter } = this.props;
+const CollectorsAdministrationFilters = (props: Props) => {
+  const onFilterChange = (name: string, value: string, callback: () => void) => {
+    const { filter } = props;
 
     filter(name, value);
     callback();
-  },
+  };
 
-  getCollectorsFilter() {
-    const { collectors, filters } = this.props;
-    const collectorMapper = (collector) => `${collector.id};${collector.name}`;
+  const getCollectorsFilter = () => {
+    const { collectors, filters } = props;
+    const collectorMapper = (collector: Collector) => `${collector.id};${collector.name}`;
 
     const collectorItems = collectors
       .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
       // TODO: Hack to be able to filter in SelectPopover. We should change that to avoid this hack.
       .map(collectorMapper);
 
-    const collectorFormatter = (collectorId) => {
+    const collectorFormatter = (collectorId: string) => {
       const [id] = collectorId.split(';');
       const collector = find(collectors, { id: id });
 
       return <CollectorIndicator collector={collector.name} operatingSystem={collector.node_operating_system} />;
     };
 
-    const filter = ([collectorId], callback) => {
+    const filter = ([collectorId]: Array<string>, callback: () => void) => {
       const [id] = collectorId ? collectorId.split(';') : [];
 
-      this.onFilterChange('collector', id, callback);
+      onFilterChange('collector', id, callback);
     };
 
     let collectorFilter;
@@ -83,28 +92,28 @@ const CollectorsAdministrationFilters = createReactClass({
                      selectedItems={collectorFilter ? [collectorFilter] : []}
                      filterPlaceholder="Filter by collector" />
     );
-  },
+  };
 
-  getConfigurationFilter() {
-    const { configurations, filters } = this.props;
+  const getConfigurationFilter = () => {
+    const { configurations, filters } = props;
 
-    const configurationMapper = (configuration) => `${configuration.id};${configuration.name}`;
+    const configurationMapper = (configuration: Configuration) => `${configuration.id};${configuration.name}`;
     const configurationItems = configurations
       .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
       // TODO: Hack to be able to filter in SelectPopover. We should change that to avoid this hack.
       .map(configurationMapper);
 
-    const configurationFormatter = (configurationId) => {
+    const configurationFormatter = (configurationId: string) => {
       const [id] = configurationId.split(';');
       const configuration = find(configurations, { id: id });
 
       return <span><ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}</span>;
     };
 
-    const filter = ([configurationId], callback) => {
+    const filter = ([configurationId]: Array<string>, callback: () => void) => {
       const [id] = configurationId ? configurationId.split(';') : [];
 
-      this.onFilterChange('configuration', id, callback);
+      onFilterChange('configuration', id, callback);
     };
 
     let configurationFilter;
@@ -125,15 +134,15 @@ const CollectorsAdministrationFilters = createReactClass({
                      selectedItems={configurationFilter ? [configurationFilter] : []}
                      filterPlaceholder="Filter by configuration" />
     );
-  },
+  };
 
-  getOSFilter() {
-    const { collectors, filters } = this.props;
+  const getOSFilter = () => {
+    const { collectors, filters } = props;
 
     const operatingSystems = uniq(collectors.map((collector) => upperFirst(collector.node_operating_system)))
       .sort(naturalSortIgnoreCase);
 
-    const filter = ([os], callback) => this.onFilterChange('os', os, callback);
+    const filter = ([os]: Array<string>, callback: () => void) => onFilterChange('os', os, callback);
 
     const osFilter = filters.os;
 
@@ -146,15 +155,15 @@ const CollectorsAdministrationFilters = createReactClass({
                      selectedItems={osFilter ? [osFilter] : []}
                      filterPlaceholder="Filter by OS" />
     );
-  },
+  };
 
-  getStatusFilter() {
-    const { filters } = this.props;
+  const getStatusFilter = () => {
+    const { filters } = props;
     const status = Object.keys(SidecarStatusEnum.properties).map((key) => String(key));
-    const filter = ([statusCode], callback) => this.onFilterChange('status', statusCode, callback);
+    const filter = ([statusCode]: Array<string>, callback: () => void) => onFilterChange('status', statusCode, callback);
 
     const statusFilter = filters.status;
-    const statusFormatter = (statusCode) => upperFirst(SidecarStatusEnum.toString(statusCode));
+    const statusFormatter = (statusCode: string) => upperFirst(SidecarStatusEnum.toString(statusCode));
 
     return (
       <SelectPopover id="status-filter"
@@ -166,18 +175,16 @@ const CollectorsAdministrationFilters = createReactClass({
                      selectedItems={statusFilter ? [statusFilter] : []}
                      filterPlaceholder="Filter by collector status" />
     );
-  },
+  };
 
-  render() {
-    return (
-      <ButtonToolbar>
-        {this.getCollectorsFilter()}
-        {this.getConfigurationFilter()}
-        {this.getStatusFilter()}
-        {this.getOSFilter()}
-      </ButtonToolbar>
-    );
-  },
-});
+  return (
+    <ButtonToolbar>
+      {getCollectorsFilter()}
+      {getConfigurationFilter()}
+      {getStatusFilter()}
+      {getOSFilter()}
+    </ButtonToolbar>
+  );
+};
 
 export default CollectorsAdministrationFilters;

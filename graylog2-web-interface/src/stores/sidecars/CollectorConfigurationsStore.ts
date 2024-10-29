@@ -22,10 +22,23 @@ import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type { Configuration, ConfigurationSidecarsResponse } from 'components/sidecars/types';
 
+type Actions = {
+  all: () => Promise<unknown>,
+  list: (opts: { query?: string, page?: number, pageSize?: number }) => Promise<unknown>,
+  getConfiguration: (id: string) => Promise<Configuration>,
+  getConfigurationSidecars: (id: string) => Promise<ConfigurationSidecarsResponse>,
+  createConfiguration: (config: Configuration) => Promise<unknown>,
+  updateConfiguration: (config: Configuration) => Promise<unknown>,
+  renderPreview: (template: string) => Promise<{ preview: string }>,
+  copyConfiguration: (id: string, name: string) => Promise<unknown>,
+  delete: (config: Configuration) => Promise<unknown>,
+  validate: (config: Partial<Configuration>) => Promise<{ errors: { name: string[] }, failed: boolean }>,
+}
 export const CollectorConfigurationsActions = singletonActions(
   'core.CollectorConfigurations',
-  () => Reflux.createActions({
+  () => Reflux.createActions<Actions>({
     all: { asyncResult: true },
     list: { asyncResult: true },
     getConfiguration: { asyncResult: true },
@@ -39,9 +52,19 @@ export const CollectorConfigurationsActions = singletonActions(
   }),
 );
 
+type StoreState = {
+  configurations: Configuration[],
+  pagination: {
+    page: number,
+    pageSize: number,
+    total: number,
+  },
+  total: number,
+  query: string | undefined,
+}
 export const CollectorConfigurationsStore = singletonStore(
   'core.CollectorConfigurations',
-  () => Reflux.createStore({
+  () => Reflux.createStore<StoreState>({
     listenables: [CollectorConfigurationsActions],
     sourceUrl: '/sidecar',
     configurations: undefined,

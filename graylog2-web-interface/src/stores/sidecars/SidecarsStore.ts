@@ -21,7 +21,7 @@ import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import type { SidecarSummary } from 'components/sidecars/types';
+import type { SidecarSummary, SidecarCollectorPairType, Configuration } from 'components/sidecars/types';
 
 export type PaginationOptions = {
   query: string,
@@ -33,10 +33,10 @@ export type PaginationOptions = {
 }
 type Actions = {
   listPaginated: (options: Partial<PaginationOptions>) => Promise<unknown>,
-  getSidecar: () => Promise<unknown>,
+  getSidecar: (id: string) => Promise<unknown>,
   getSidecarActions: () => Promise<unknown>,
   restartCollector: () => Promise<unknown>,
-  assignConfigurations: () => Promise<unknown>,
+  assignConfigurations: (selectedSidecars: SidecarCollectorPairType[], selectedConfigurations: Configuration[]) => Promise<unknown>,
 }
 export const SidecarsActions = singletonActions(
   'core.Sidecars',

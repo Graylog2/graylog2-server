@@ -21,19 +21,48 @@ import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type { SidecarSummary } from 'components/sidecars/types';
 
+type Actions = {
+  list: (opts: { query: string, page: number, pageSize: number, filters?: {} }) => Promise<unknown>,
+  refreshList: () => Promise<unknown>,
+  setAction: (action: string, selectedCollectors: { [sidecarId: string]: string[] }) => Promise<unknown>,
+}
 export const SidecarsAdministrationActions = singletonActions(
   'core.SidecarsAdministration',
-  () => Reflux.createActions({
+  () => Reflux.createActions<Actions>({
     list: { asyncResult: true },
     refreshList: { asyncResult: true },
     setAction: { asyncResult: true },
   }),
 );
 
+type StoreState = {
+  pagination: {
+    count: number,
+    page: number,
+    pageSize: number,
+    total: number,
+    perPage: number
+  },
+  sidecars: Array<SidecarSummary>,
+  filters: {},
+  query: string,
+}
+type Response = {
+  sidecars: Array<SidecarSummary>,
+  query: string,
+  filters: {},
+  pagination: {
+    total: number,
+    count: number,
+    page: number,
+    per_page: number,
+  }
+}
 export const SidecarsAdministrationStore = singletonStore(
   'core.SidecarsAdministration',
-  () => Reflux.createStore({
+  () => Reflux.createStore<StoreState>({
     listenables: [SidecarsAdministrationActions],
     sourceUrl: '/sidecar',
     sidecars: undefined,
@@ -75,7 +104,7 @@ export const SidecarsAdministrationStore = singletonStore(
       const promise = fetchPeriodically('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/administration`), body);
 
       promise.then(
-        (response) => {
+        (response: Response) => {
           this.sidecars = response.sidecars;
           this.query = response.query;
           this.filters = response.filters;

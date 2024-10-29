@@ -14,11 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-import PropTypes from 'prop-types';
-import Reflux from 'reflux';
+import * as React from 'react';
+import { useEffect } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
@@ -32,49 +29,53 @@ import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
 import { SidecarsAdministrationActions, SidecarsAdministrationStore } from 'stores/sidecars/SidecarsAdministrationStore';
 
 import CollectorsAdministration, { PAGE_SIZES } from './CollectorsAdministration';
+import {PaginationQueryParameterResult} from 'hooks/usePaginationQueryParameter';
+import {useStore} from 'stores/connect';
+import type {SidecarCollectorPairType, Configuration} from 'components/sidecars/types';
 
-const CollectorsAdministrationContainer = createReactClass({
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  propTypes: {
-    nodeId: PropTypes.string,
-    paginationQueryParameter: PropTypes.object.isRequired,
-  },
+type Props = {
+  nodeId?: string,
+  paginationQueryParameter: PaginationQueryParameterResult,
+}
+const CollectorsAdministrationContainer = (props: Props) => {
+  const collectors = useStore(CollectorsStore);
+  const sidecars = useStore(SidecarsAdministrationStore);
+  const configurations = useStore(CollectorConfigurationsStore);
 
-  mixins: [Reflux.connect(CollectorsStore, 'collectors'), Reflux.connect(SidecarsAdministrationStore, 'sidecars'), Reflux.connect(CollectorConfigurationsStore, 'configurations')],
+  const reloadSidecars = () => {
+      if (sidecars) {
+        SidecarsAdministrationActions.refreshList();
+      }
+  };
 
-  getDefaultProps() {
-    return {
-      nodeId: undefined,
-    };
-  },
+  const loadData = (nodeId: string) => {
+    const { page, pageSize } = props.paginationQueryParameter;
+    const query = nodeId ? `node_id:${nodeId}` : '';
 
-  componentDidMount() {
-    this.loadData(this.props.nodeId);
-    this.interval = setInterval(this.reloadSidecars, 5000);
-  },
+    CollectorsActions.all();
+    SidecarsAdministrationActions.list({ query, page, pageSize });
+    CollectorConfigurationsActions.all();
+  };
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.nodeId !== this.props.nodeId) {
-      // This means the user changed the URL, so we don't need to keep the previous state.
-      this.loadData(this.props.nodeId);
-    }
-  },
+  useEffect(() => {
+    loadData(props.nodeId);
+  }, [props?.nodeId]);
 
-  componentWillUnmount() {
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
-  },
+  useEffect(() => {
+    const interval = setInterval(reloadSidecars, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-  handlePageChange(page, pageSize) {
-    const { filters, query } = this.state.sidecars;
+
+  const handlePageChange = (page: number, pageSize: number) => {
+    const { filters, query } = sidecars;
 
     SidecarsAdministrationActions.list({ query, filters, page, pageSize });
-  },
+  };
 
-  handleFilter(property, value) {
-    const { resetPage, pageSize } = this.props.paginationQueryParameter;
-    const { filters, query } = this.state.sidecars;
+  const handleFilter = (property: string, value: string) => {
+    const { resetPage, pageSize } = props.paginationQueryParameter;
+    const { filters, query } = sidecars;
     let newFilters;
 
     if (property) {
@@ -87,56 +88,39 @@ const CollectorsAdministrationContainer = createReactClass({
     resetPage();
 
     SidecarsAdministrationActions.list({ query, filters: newFilters, pageSize, page: 1 });
-  },
+  };
 
-  handleQueryChange(query = '', callback = () => {}) {
-    const { resetPage, pageSize } = this.props.paginationQueryParameter;
-    const { filters } = this.state.sidecars;
+  const handleQueryChange = (query = '', callback = () => {}) => {
+    const { resetPage, pageSize } = props.paginationQueryParameter;
+    const { filters } = sidecars;
 
     resetPage();
 
     SidecarsAdministrationActions.list({ query, filters, pageSize, page: 1 }).finally(callback);
-  },
+  };
 
-  handleConfigurationChange(selectedSidecars, selectedConfigurations, doneCallback) {
+  const handleConfigurationChange = (selectedSidecars: SidecarCollectorPairType[], selectedConfigurations: Configuration[], doneCallback: () => void) => {
     SidecarsActions.assignConfigurations(selectedSidecars, selectedConfigurations).then((response) => {
       doneCallback();
-      const { query, filters } = this.state.sidecars;
-      const { page, pageSize } = this.props.paginationQueryParameter;
+      const { query, filters } = sidecars;
+      const { page, pageSize } = props.paginationQueryParameter;
 
       SidecarsAdministrationActions.list({ query, filters, pageSize, page });
 
       return response;
     });
-  },
+  };
 
-  handleProcessAction(action, selectedCollectors, doneCallback) {
+  const handleProcessAction = (action: string, selectedCollectors: { [sidecarId: string]: string[] }, doneCallback: () => void) => {
     SidecarsAdministrationActions.setAction(action, selectedCollectors).then((response) => {
       doneCallback();
 
       return response;
     });
-  },
+  };
 
-  reloadSidecars() {
-    if (this.state.sidecars) {
-      SidecarsAdministrationActions.refreshList();
-    }
-  },
 
-  loadData(nodeId) {
-    const { page, pageSize } = this.props.paginationQueryParameter;
-    const query = nodeId ? `node_id:${nodeId}` : '';
-
-    CollectorsActions.all();
-    SidecarsAdministrationActions.list({ query, page, pageSize });
-    CollectorConfigurationsActions.all();
-  },
-
-  render() {
-    const { collectors, configurations, sidecars } = this.state;
-
-    if (!collectors || !collectors.collectors || !sidecars || !sidecars.sidecars || !configurations || !configurations.configurations) {
+    if (!collectors?.collectors || !sidecars?.sidecars || !configurations?.configurations) {
       return <Spinner text="Loading collector list..." />;
     }
 
@@ -167,13 +151,12 @@ const CollectorsAdministrationContainer = createReactClass({
                                 pagination={sidecars.pagination}
                                 query={sidecars.query}
                                 filters={sidecars.filters}
-                                onPageChange={this.handlePageChange}
-                                onFilter={this.handleFilter}
-                                onQueryChange={this.handleQueryChange}
-                                onConfigurationChange={this.handleConfigurationChange}
-                                onProcessAction={this.handleProcessAction} />
+                                onPageChange={handlePageChange}
+                                onFilter={handleFilter}
+                                onQueryChange={handleQueryChange}
+                                onConfigurationChange={handleConfigurationChange}
+                                onProcessAction={handleProcessAction} />
     );
-  },
-});
+  };
 
 export default withPaginationQueryParameter(CollectorsAdministrationContainer, { pageSizes: PAGE_SIZES });
