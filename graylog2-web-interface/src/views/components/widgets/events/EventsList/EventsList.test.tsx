@@ -63,6 +63,8 @@ describe('EventsList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
+      restartAutoRefresh: () => {},
+      animationId: 'animation-id',
     });
   });
 
@@ -122,6 +124,8 @@ describe('EventsList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh,
+      restartAutoRefresh: () => {},
+      animationId: 'animation-id',
     });
 
     const dispatch = jest.fn().mockResolvedValue(finishedLoading({

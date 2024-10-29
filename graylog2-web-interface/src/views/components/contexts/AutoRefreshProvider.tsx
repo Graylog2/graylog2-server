@@ -17,49 +17,51 @@
 
 import * as React from 'react';
 import { useMemo, useState, useEffect, useCallback } from 'react';
+import { v4 as uuid } from 'uuid';
 
 import type { RefreshConfig } from 'views/components/contexts/AutoRefreshContext';
 import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
-import useAppDispatch from 'stores/useAppDispatch';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
-import useAppSelector from 'stores/useAppSelector';
-import { selectJobIds } from 'views/logic/slices/searchExecutionSelectors';
 
-const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
-  const dispatch = useAppDispatch();
-  const jobIds = useAppSelector(selectJobIds);
+const AutoRefreshProvider = ({ children, onRefresh }: React.PropsWithChildren<{ onRefresh: () => void }>) => {
   const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(null);
-  const startAutoRefresh = useCallback((interval: number) => setRefreshConfig({ enabled: true, interval }), []);
-  const stopAutoRefresh = useCallback(() => setRefreshConfig((cur) => ({ ...cur, enabled: false })), []);
-  const refreshSearch = useCallback(() => {
-    if (!jobIds) {
-      dispatch(execute());
-    }
-  }, [jobIds, dispatch]);
+  const [animationId, setAnimationId] = useState<string | null>(null);
+  const startAutoRefresh = useCallback((interval: number) => {
+    setRefreshConfig({ enabled: true, interval });
+    setAnimationId(uuid());
+  }, []);
+  const stopAutoRefresh = useCallback(() => {
+    setRefreshConfig((cur) => ({ ...cur, enabled: false }));
+    setAnimationId(null);
+  }, []);
 
   useEffect(() => {
     let refreshInterval = null;
 
-    if (refreshConfig?.enabled && !jobIds) {
+    if (refreshConfig?.enabled) {
       refreshInterval = setInterval(() => {
-        refreshSearch();
-      }, refreshConfig.interval);
+        setAnimationId(uuid());
+        onRefresh();
+      }, refreshConfig?.interval);
     }
 
     return () => {
       clearInterval(refreshInterval);
     };
-  }, [refreshSearch, refreshConfig?.enabled, refreshConfig?.interval, jobIds]);
+  }, [refreshConfig?.enabled, refreshConfig?.interval, onRefresh, animationId]);
+
+  const restartAutoRefresh = useCallback(() => {
+    if (refreshConfig?.enabled) {
+      setAnimationId(uuid());
+    }
+  }, [refreshConfig?.enabled]);
 
   const contextValue = useMemo(() => ({
     refreshConfig,
     startAutoRefresh,
     stopAutoRefresh,
-  }), [
-    refreshConfig,
-    startAutoRefresh,
-    stopAutoRefresh,
-  ]);
+    animationId,
+    restartAutoRefresh,
+  }), [animationId, refreshConfig, restartAutoRefresh, startAutoRefresh, stopAutoRefresh]);
 
   return (
     <AutoRefreshContext.Provider value={contextValue}>
