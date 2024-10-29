@@ -29,7 +29,7 @@ type Props = {
   onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void
 };
 
-const headerFormatter = (header) => {
+const headerFormatter = (header: React.ReactNode) => {
   if (header === 'Action') {
     return (<th className="text-right">{header}</th>);
   }

@@ -21,10 +21,27 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type {
+  ContentPackVersionsType,
+  ContentPackMetadata,
+  ContentPackInstallation,
+} from 'components/content-packs/Types';
 
+type Actions = {
+  create: (pack: string) => Promise<unknown>,
+  list: () => Promise<unknown>,
+  get: (id: string) => Promise<unknown>,
+  getRev: () => Promise<unknown>,
+  delete: (id: string) => Promise<unknown>,
+  deleteRev: (id: string, revision: number) => Promise<unknown>,
+  install: (contentPackId: string, contentPackRev: string, parameters: {}) => Promise<unknown>,
+  installList: (id: string) => Promise<unknown>,
+  uninstall: (uninstallContentPackId: string, uninstallInstallId: string) => Promise<unknown>,
+  uninstallDetails: (id: string, installId: string) => Promise<unknown>,
+};
 export const ContentPacksActions = singletonActions(
   'core.ContentPacks',
-  () => Reflux.createActions({
+  () => Reflux.createActions<Actions>({
     create: { asyncResult: true },
     list: { asyncResult: true },
     get: { asyncResult: true },
@@ -38,9 +55,19 @@ export const ContentPacksActions = singletonActions(
   }),
 );
 
+type StoreState = {
+  contentPack: unknown,
+  contentPackMetadata: ContentPackMetadata,
+  contentPacks: Array<ContentPackInstallation>,
+  installations: Array<ContentPackInstallation>,
+  uninstallEntities: unknown,
+  contentPackRevisions: ContentPackVersionsType,
+  selectedVersion: unknown,
+  constraints: unknown,
+}
 export const ContentPacksStore = singletonStore(
   'core.ContentPacks',
-  () => Reflux.createStore({
+  () => Reflux.createStore<StoreState>({
     listenables: [ContentPacksActions],
 
     getInitialState() {
