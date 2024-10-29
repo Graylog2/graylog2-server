@@ -36,7 +36,10 @@ const parseFilters = (filters: UrlQueryFilters) => {
 
   if (filters.get('timestamp')?.[0]) {
     const [from, to] = extractRangeFromString(filters.get('timestamp')[0]);
-    result.timerange = { from, to: to || adjustFormat(moment().utc(), 'internal'), type: 'absolute' };
+
+    result.timerange = from
+      ? { from, to: to || adjustFormat(moment().utc(), 'internal'), type: 'absolute' }
+      : { type: 'relative', range: 0 };
   } else {
     result.timerange = { type: 'relative', range: 0 };
   }
@@ -84,7 +87,7 @@ const fetchEvents = (searchParams: SearchParams, streamId: string): Promise<Pagi
   attributes: additionalAttributes,
   list: events.map(({ event }) => event),
   pagination: { total: total_events, page: parameters.page, per_page: parameters.per_page, count: events.length },
-  additionalData: {
+  meta: {
     context,
   },
 }));

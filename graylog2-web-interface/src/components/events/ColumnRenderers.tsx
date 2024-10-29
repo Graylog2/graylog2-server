@@ -46,7 +46,7 @@ const useEventsContext = (keyFn: (options: SearchParams) => Array<unknown>) => {
 
 const EventDefinitionRenderer = ({ eventDefinitionId, keyFn, permissions }: { eventDefinitionId: string, permissions: Immutable.List<string>, keyFn: (options: SearchParams) => Array<unknown> }) => {
   const eventsContext = useEventsContext(keyFn);
-  const eventDefinitionContext = eventsContext.event_definitions[eventDefinitionId];
+  const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
 
   if (!eventDefinitionContext) {
     return <em>{eventDefinitionId}</em>;
@@ -71,7 +71,7 @@ const EventDefinitionTypeRenderer = ({ type }: { type: unknown }) => {
     return eventDefinitionTypes.find((edt) => edt.type === type);
   }, [eventDefinitionTypes, type]);
 
-  return <>`${(plugin && plugin.displayName) || type}`</>;
+  return <>{(plugin && plugin.displayName) || type}</>;
 };
 
 const PriorityRenderer = ({ priority }: { priority: number }) => <PriorityName priority={priority} />;
@@ -90,7 +90,7 @@ const GroupByFieldsRenderer = ({ groupByFields }: {groupByFields: Record<string,
 
 const RemediationStepRenderer = ({ eventDefinitionId, keyFn }: { eventDefinitionId: string, keyFn: (options: SearchParams) => Array<unknown> }) => {
   const eventsContext = useEventsContext(keyFn);
-  const eventDefinitionContext = eventsContext.event_definitions[eventDefinitionId];
+  const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
 
   return (
     eventDefinitionContext?.remediation_steps ? (

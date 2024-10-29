@@ -49,14 +49,15 @@ const usePluggableEventActions = (eventId: string) => {
 
 const EventActions = ({ event }: { event: Event }) => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(event.id);
+  const hasReplayInfo = !!event.replay_info;
 
   const moreActions = [
-    event.replay_info ? <MenuItem><LinkToReplaySearch id={event.id} isEvent /></MenuItem> : null,
-    event.replay_info && pluggableActions.length ? <MenuItem divider key="divider" /> : null,
-    pluggableActions.length ? pluggableActions : null,
+    hasReplayInfo ? <MenuItem><LinkToReplaySearch id={event.id} isEvent /></MenuItem> : null,
+    pluggableActions.length && hasReplayInfo ? <MenuItem divider key="divider" /> : null,
+    pluggableActions.length && hasReplayInfo ? pluggableActions : null,
   ].filter(Boolean);
 
-  return (
+  return moreActions.length ? (
     <>
       <ButtonToolbar>
         <MoreActions>
@@ -65,7 +66,7 @@ const EventActions = ({ event }: { event: Event }) => {
       </ButtonToolbar>
       {pluggableActionModals}
     </>
-  );
+  ) : null;
 };
 
 export default EventActions;
