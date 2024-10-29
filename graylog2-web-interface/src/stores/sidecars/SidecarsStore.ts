@@ -21,10 +21,26 @@ import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type { SidecarSummary } from 'components/sidecars/types';
 
+export type PaginationOptions = {
+  query: string,
+  sortField?: string,
+  order?: string,
+  pageSize: number,
+  page: number,
+  onlyActive: string | boolean,
+}
+type Actions = {
+  listPaginated: (options: Partial<PaginationOptions>) => Promise<unknown>,
+  getSidecar: () => Promise<unknown>,
+  getSidecarActions: () => Promise<unknown>,
+  restartCollector: () => Promise<unknown>,
+  assignConfigurations: () => Promise<unknown>,
+}
 export const SidecarsActions = singletonActions(
   'core.Sidecars',
-  () => Reflux.createActions({
+  () => Reflux.createActions<Actions>({
     listPaginated: { asyncResult: true },
     getSidecar: { asyncResult: true },
     getSidecarActions: { asyncResult: true },
@@ -33,9 +49,37 @@ export const SidecarsActions = singletonActions(
   }),
 );
 
+type StoreState = {
+  sidecars: SidecarSummary[],
+  onlyActive: string,
+  pagination: {
+    count: number,
+    page: number,
+    pageSize: number,
+    total: undefined,
+  },
+  query: string | undefined,
+  sort: {
+    field: string,
+    order: string,
+  }
+}
+type Response = {
+  sidecars: SidecarSummary[],
+  query: string,
+  only_active: boolean,
+  pagination: {
+    total: number,
+    count: number,
+    page: number,
+    per_page: number,
+  },
+  sort: string,
+  order: string,
+}
 export const SidecarsStore = singletonStore(
   'core.Sidecars',
-  () => Reflux.createStore({
+  () => Reflux.createStore<StoreState>({
     listenables: [SidecarsActions],
     sourceUrl: '/sidecars',
     sidecars: undefined,
@@ -80,7 +124,7 @@ export const SidecarsStore = singletonStore(
       const promise = fetchPeriodically('GET', URLUtils.qualifyUrl(uri));
 
       promise.then(
-        (response) => {
+        (response: Response) => {
           this.sidecars = response.sidecars;
           this.query = response.query;
           this.onlyActive = response.only_active;
@@ -127,11 +171,10 @@ export const SidecarsStore = singletonStore(
     },
 
     restartCollector(sidecarId, collector) {
-      const action = {};
-
-      action.collector = collector;
-      action.properties = {};
-      action.properties.restart = true;
+      const action = {
+        collector,
+        properties: { restart: true },
+      };
       const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/${sidecarId}/action`), [action]);
 
       promise
