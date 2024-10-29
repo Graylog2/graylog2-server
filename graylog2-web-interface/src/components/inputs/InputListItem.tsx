@@ -37,6 +37,9 @@ import {
 } from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import type { InputStates } from 'stores/inputs/InputStatesStore';
+import { inputHasSomeState } from 'components/inputs/helpers/inputState';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -68,7 +71,10 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const { inputTypes, inputDescriptions } = useStore(InputTypesStore);
+  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+
+  const isInputinSetupMode = () => inputHasSomeState(inputStates, input.id, ['SETUP']);
 
   const deleteInput = () => {
     setShowConfirmDeleteDialog(true);
@@ -98,9 +104,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       app_action_value: 'input-enter-setup',
     });
 
-    const { title, type, global, node, attributes: configuration } = input;
-
-    InputsActions.update(input.id, { title, type, global, node, configuration, setup_mode: true });
+    InputStatesStore.setup(input);
   };
 
   const exitInputSetupMode = () => {
@@ -109,9 +113,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       app_action_value: 'input-exit-setup',
     });
 
-    const { title, type, global, node, attributes: configuration } = input;
-
-    InputsActions.update(input.id, { title, type, global, node, configuration, setup_mode: false });
+    InputStatesStore.stop(input);
   };
 
   const handleConfirmDelete = () => {
@@ -202,7 +204,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
           Edit input
         </MenuItem>
         {inputSetupFeatureFlagIsEnabled && (
-          input.setup_mode ? (
+          isInputinSetupMode() ? (
             <MenuItem key={`remove-setup-mode-${input.id}`}
                       onSelect={exitInputSetupMode}
                       disabled={definition === undefined}>

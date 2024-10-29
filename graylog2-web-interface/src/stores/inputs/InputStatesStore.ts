@@ -131,6 +131,23 @@ export const InputStatesStore = singletonStore(
           },
         );
     },
+
+    setup(input) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.setup(input.id).url);
+
+      return fetch('PUT', url)
+        .then(
+          (response) => {
+            this._checkInputStateChangeResponse(input, response, 'SETUP');
+            this.list();
+
+            return response;
+          },
+          (error) => {
+            UserNotification.error(`Error entering setup mode '${input.title}': ${error}`, `Input '${input.title}' could not set to setup mode`);
+          },
+        );
+    },
   }),
 );
 

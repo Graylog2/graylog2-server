@@ -14,42 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { InputStates, InputState } from 'stores/inputs/InputStatesStore';
 
-interface InputBase {
-  title: string,
-  type: string,
-  global: boolean,
-  node?: string,
-}
+export const inputHasSomeState = (inputStates: InputStates, inputId: string, states: Array<InputState>) : boolean => {
+  if (!inputStates) return false;
+  const inputState = inputStates[inputId];
+  if (!inputState) return false;
 
-export interface Input extends InputBase {
-  id: string,
-  name: string,
-  created_at: string,
-  creator_user_id: string,
-  content_pack?: boolean,
-  static_fields: { [field: string]: any },
-  attributes: {
-    [type: string]: any,
-  },
-}
+  const nodeIds = Object.keys(inputState);
 
-export interface ConfiguredInput extends InputBase {
-  configuration: {
-    [type: string]: any,
-  },
-}
+  if (nodeIds.length === 0) {
+    return false;
+  }
 
-export type Codec ={
-  type: string,
-  name: string,
-  requested_configuration: {
-    [key: string]: {
-      [key: string]: any,
-    },
-  },
+  return nodeIds.some((nodeID) => {
+    const nodeState = inputState[nodeID];
+
+    return states.some((state) => nodeState.state === state);
+  });
 };
 
-export type CodecTypes = {
-  [key: string]: Codec,
-};
+export default inputHasSomeState;

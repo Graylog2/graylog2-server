@@ -19,6 +19,7 @@ import { useState } from 'react';
 
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import type { InputStates } from 'stores/inputs/InputStatesStore';
+import { inputHasSomeState } from 'components/inputs/helpers/inputState';
 import { useStore } from 'stores/connect';
 import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -42,43 +43,9 @@ const InputStateControl = ({ input } : Props) => {
   const { openWizard } = useInputSetupWizard();
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
 
-  const inputState = inputStates ? inputStates[input.id] : undefined;
+  const isInputRunning = () => inputHasSomeState(inputStates, input.id, ['RUNNING', 'STARTING', 'FAILING']);
 
-  const inputNodeIds = () => {
-    if (!inputState) {
-      return [];
-    }
-
-    return Object.keys(inputState);
-  };
-
-  const isInputRunning = () => {
-    const nodeIDs = inputNodeIds();
-
-    if (nodeIDs.length === 0) {
-      return false;
-    }
-
-    return nodeIDs.some((nodeID) => {
-      const nodeState = inputState[nodeID];
-
-      return nodeState.state === 'RUNNING' || nodeState.state === 'STARTING' || nodeState.state === 'FAILING';
-    });
-  };
-
-  const isInputinSetupMode = () => {
-    const nodeIDs = inputNodeIds();
-
-    if (nodeIDs.length === 0) {
-      return false;
-    }
-
-    return nodeIDs.some((nodeID) => {
-      const nodeState = inputState[nodeID];
-
-      return nodeState.state === 'SETUP';
-    });
-  };
+  const isInputinSetupMode = () => inputHasSomeState(inputStates, input.id, ['SETUP']);
 
   const startInput = () => {
     setIsLoading(true);
