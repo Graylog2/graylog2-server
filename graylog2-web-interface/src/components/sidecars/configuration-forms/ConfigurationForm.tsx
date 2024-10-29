@@ -318,8 +318,6 @@ const ConfigurationForm = ({
               <FormGroup controlId="template"
                          validationState={_validationState('template')}>
                 <ControlLabel>Configuration</ControlLabel>
-                {/* TODO: Figure out issue with props */}
-                {/* @ts-ignore */}
                 <SourceCodeEditor id="template"
                                   height={400}
                                   value={formData.template || ''}
