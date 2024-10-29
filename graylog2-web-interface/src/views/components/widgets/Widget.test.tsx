@@ -42,6 +42,7 @@ import FieldTypesContext from '../contexts/FieldTypesContext';
 jest.mock('../searchbar/queryinput/QueryInput');
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 const searchExplainContext = (searchedIndexRanges = [
   {
