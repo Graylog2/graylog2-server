@@ -14,11 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
 
 import { Col, Row } from 'components/bootstrap';
 import { Pluralize } from 'components/common';
@@ -57,7 +54,7 @@ const OriginalChanges = styled.div`
   margin-top: 10px;
 `;
 
-const FieldResultWrap = styled.div(({ resultType, theme }) => {
+const FieldResultWrap = styled.div<{ resultType: string }>(({ resultType, theme }) => {
   const { success, danger, info } = theme.colors.variant.light;
   const types = {
     added: success,
@@ -74,7 +71,7 @@ const FieldResultWrap = styled.div(({ resultType, theme }) => {
   `;
 });
 
-const FieldValue = styled.dd(({ removed, theme }) => css`
+const FieldValue = styled.dd<{ removed: boolean }>(({ removed, theme }) => css`
   font-family: ${theme.fonts.family.monospace};
 
   ${removed && css`
@@ -83,27 +80,23 @@ const FieldValue = styled.dd(({ removed, theme }) => css`
 `}
 `);
 
-const SimulationChanges = createReactClass({
-  displayName: 'SimulationChanges',
-
-  propTypes: {
-    originalMessage: PropTypes.object.isRequired,
-    simulationResults: PropTypes.object.isRequired,
+type Props = {
+  originalMessage: {
+    id: string,
   },
-
-  _isOriginalMessageRemoved(originalMessage, processedMessages) {
-    return !processedMessages.find((message) => message.id === originalMessage.id);
+  simulationResults: {
+    messages: any[]
   },
+}
 
-  _formatFieldTitle(field) {
-    return <dt key={`${field}-key`}>{field}</dt>;
-  },
+const SimulationChanges = (props: Props) => {
+  const _isOriginalMessageRemoved = (originalMessage, processedMessages) => !processedMessages.find((message) => message.id === originalMessage.id);
 
-  _formatFieldValue(field, value, isRemoved = false) {
-    return <FieldValue key={`${field}-value`} removed={isRemoved}>{String(value)}</FieldValue>;
-  },
+  const _formatFieldTitle = (field) => <dt key={`${field}-key`}>{field}</dt>;
 
-  _formatAddedFields(addedFields) {
+  const _formatFieldValue = (field, value, isRemoved = false) => <FieldValue key={`${field}-value`} removed={isRemoved}>{String(value)}</FieldValue>;
+
+  const _formatAddedFields = (addedFields) => {
     const keys = Object.keys(addedFields);
 
     if (keys.length === 0) {
@@ -113,8 +106,8 @@ const SimulationChanges = createReactClass({
     const formattedFields = [];
 
     keys.sort().forEach((field) => {
-      formattedFields.push(this._formatFieldTitle(field));
-      formattedFields.push(this._formatFieldValue(field, addedFields[field]));
+      formattedFields.push(_formatFieldTitle(field));
+      formattedFields.push(_formatFieldValue(field, addedFields[field]));
     });
 
     return (
@@ -125,9 +118,9 @@ const SimulationChanges = createReactClass({
         </dl>
       </FieldResultWrap>
     );
-  },
+  };
 
-  _formatRemovedFields(removedFields) {
+  const _formatRemovedFields = (removedFields) => {
     const keys = Object.keys(removedFields);
 
     if (keys.length === 0) {
@@ -137,8 +130,8 @@ const SimulationChanges = createReactClass({
     const formattedFields = [];
 
     keys.sort().forEach((field) => {
-      formattedFields.push(this._formatFieldTitle(field));
-      formattedFields.push(this._formatFieldValue(field, removedFields[field]));
+      formattedFields.push(_formatFieldTitle(field));
+      formattedFields.push(_formatFieldValue(field, removedFields[field]));
     });
 
     return (
@@ -149,9 +142,9 @@ const SimulationChanges = createReactClass({
         </dl>
       </FieldResultWrap>
     );
-  },
+  };
 
-  _formatMutatedFields(mutatedFields) {
+  const _formatMutatedFields = (mutatedFields) => {
     const keys = Object.keys(mutatedFields);
 
     if (keys.length === 0) {
@@ -161,9 +154,9 @@ const SimulationChanges = createReactClass({
     const formattedFields = [];
 
     keys.sort().forEach((field) => {
-      formattedFields.push(this._formatFieldTitle(field));
-      formattedFields.push(this._formatFieldValue(`${field}-original`, mutatedFields[field].before, true));
-      formattedFields.push(this._formatFieldValue(field, mutatedFields[field].after));
+      formattedFields.push(_formatFieldTitle(field));
+      formattedFields.push(_formatFieldValue(`${field}-original`, mutatedFields[field].before, true));
+      formattedFields.push(_formatFieldValue(field, mutatedFields[field].after));
     });
 
     return (
@@ -174,21 +167,21 @@ const SimulationChanges = createReactClass({
         </dl>
       </FieldResultWrap>
     );
-  },
+  };
 
-  _getOriginalMessageChanges() {
-    const { originalMessage, simulationResults } = this.props;
+  const _getOriginalMessageChanges = () => {
+    const { originalMessage, simulationResults } = props;
     const processedMessages = simulationResults.messages;
 
-    if (this._isOriginalMessageRemoved(originalMessage, processedMessages)) {
+    if (_isOriginalMessageRemoved(originalMessage, processedMessages)) {
       return <p>Original message would be dropped during processing.</p>;
     }
 
     const processedMessage = processedMessages.find((message) => message.id === originalMessage.id);
 
-    const formattedAddedFields = this._formatAddedFields(processedMessage.decoration_stats.added_fields);
-    const formattedRemovedFields = this._formatRemovedFields(processedMessage.decoration_stats.removed_fields);
-    const formattedMutatedFields = this._formatMutatedFields(processedMessage.decoration_stats.changed_fields);
+    const formattedAddedFields = _formatAddedFields(processedMessage.decoration_stats.added_fields);
+    const formattedRemovedFields = _formatRemovedFields(processedMessage.decoration_stats.removed_fields);
+    const formattedMutatedFields = _formatMutatedFields(processedMessage.decoration_stats.changed_fields);
 
     if (!formattedAddedFields && !formattedRemovedFields && !formattedMutatedFields) {
       return <p>Original message would be not be modified during processing.</p>;
@@ -201,10 +194,10 @@ const SimulationChanges = createReactClass({
         {formattedMutatedFields}
       </OriginalChanges>
     );
-  },
+  };
 
-  _formatOriginalMessageChanges() {
-    const { originalMessage } = this.props;
+  const _formatOriginalMessageChanges = () => {
+    const { originalMessage } = props;
 
     return (
       <Row className="row-sm">
@@ -213,14 +206,14 @@ const SimulationChanges = createReactClass({
             Changes in original message{' '}
             <small><em>{originalMessage.id}</em></small>
           </h3>
-          {this._getOriginalMessageChanges()}
+          {_getOriginalMessageChanges()}
         </Col>
       </Row>
     );
-  },
+  };
 
-  _formatOtherChanges() {
-    const { originalMessage, simulationResults } = this.props;
+  const _formatOtherChanges = () => {
+    const { originalMessage, simulationResults } = props;
 
     const createdMessages = simulationResults.messages.filter((message) => message.id !== originalMessage.id);
 
@@ -241,16 +234,14 @@ const SimulationChanges = createReactClass({
         </Col>
       </Row>
     );
-  },
+  };
 
-  render() {
-    return (
-      <SimulationChangesWrap>
-        {this._formatOriginalMessageChanges()}
-        {this._formatOtherChanges()}
-      </SimulationChangesWrap>
-    );
-  },
-});
+  return (
+    <SimulationChangesWrap>
+      {_formatOriginalMessageChanges()}
+      {_formatOtherChanges()}
+    </SimulationChangesWrap>
+  );
+};
 
 export default SimulationChanges;
