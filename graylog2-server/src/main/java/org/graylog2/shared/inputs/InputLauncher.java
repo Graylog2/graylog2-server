@@ -76,7 +76,7 @@ public class InputLauncher {
 
         final IOState<MessageInput> inputState;
         if (inputRegistry.getInputState(input.getId()) == null) {
-            if (featureFlags.isOn("SETUP_MODE") && Boolean.TRUE.equals(input.isSetupMode())) {
+            if (featureFlags.isOn("SETUP_MODE") && input.getDesiredState() == IOState.Type.SETUP) {
                 inputState = inputStateFactory.create(input, IOState.Type.SETUP);
             } else {
                 inputState = inputStateFactory.create(input);
@@ -145,20 +145,18 @@ public class InputLauncher {
                         input.toIdentifier(), input.getDesiredState());
                 input.initialize();
                 launch(input);
+            } else if (input.getDesiredState().equals(IOState.Type.SETUP)) {
+                launch(input);
             } else {
                 LOG.info("Not auto-starting input {} - desired state is {}",
                         input.toIdentifier(), input.getDesiredState());
-                if (Boolean.TRUE.equals(input.isSetupMode())) {
-                    inputRegistry.add(inputStateFactory.create(input, IOState.Type.SETUP));
-                }
             }
         }
     }
 
 
     public boolean shouldStartAutomatically(MessageInput input) {
-        return configuration.getAutoRestartInputs()
-                || (input.getDesiredState().equals(IOState.Type.RUNNING) && !input.isSetupMode());
+        return configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING);
     }
 
     public boolean leaderStatusInhibitsLaunch(MessageInput input) {

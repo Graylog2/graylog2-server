@@ -60,7 +60,6 @@ public abstract class MessageInput implements Stoppable {
     public static final String FIELD_ATTRIBUTES = "attributes";
     public static final String FIELD_STATIC_FIELDS = "static_fields";
     public static final String FIELD_GLOBAL = "global";
-    public static final String FIELD_SETUP_MODE = "setup_mode";
     public static final String FIELD_DESIRED_STATE = "desired_state";
     public static final String FIELD_CONTENT_PACK = "content_pack";
 
@@ -93,8 +92,7 @@ public abstract class MessageInput implements Stoppable {
     protected String persistId;
     protected DateTime createdAt;
     protected Boolean global = false;
-    protected Boolean setupMode = false;
-    protected IOState.Type desiredState = IOState.Type.RUNNING;
+    protected IOState.Type desiredState = IOState.Type.SETUP;
     protected String contentPack;
 
     protected final Configuration configuration;
@@ -258,10 +256,6 @@ public abstract class MessageInput implements Stoppable {
         return global;
     }
 
-    public Boolean isSetupMode() {
-        return setupMode;
-    }
-
     /**
      * Determines if Graylog should only launch a single instance of this input at a time in the cluster.
      * <p>
@@ -285,17 +279,14 @@ public abstract class MessageInput implements Stoppable {
         this.global = global;
     }
 
-    public void setSetupMode(Boolean setupMode) {
-        this.setupMode = setupMode;
-    }
-
     public IOState.Type getDesiredState() {
         return desiredState;
     }
 
     public void setDesiredState(IOState.Type newDesiredState) {
         if (newDesiredState.equals(IOState.Type.RUNNING)
-                || newDesiredState.equals(IOState.Type.STOPPED)) {
+                || newDesiredState.equals(IOState.Type.STOPPED)
+                || newDesiredState.equals(IOState.Type.SETUP)) {
             desiredState = newDesiredState;
         } else {
             LOG.error("Ignoring unexpected desired state {} for input {}", newDesiredState, title);
@@ -332,7 +323,6 @@ public abstract class MessageInput implements Stoppable {
         map.put(FIELD_TITLE, getTitle());
         map.put(FIELD_CREATOR_USER_ID, getCreatorUserId());
         map.put(FIELD_GLOBAL, isGlobal());
-        map.put(FIELD_SETUP_MODE, isSetupMode());
         map.put(FIELD_DESIRED_STATE, getDesiredState().toString());
         map.put(FIELD_CONTENT_PACK, getContentPack());
         map.put(FIELD_CONFIGURATION, getConfiguration().getSource());

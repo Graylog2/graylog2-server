@@ -29,6 +29,7 @@ import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputSetup;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -79,8 +80,7 @@ public class InputEventListener {
         }
 
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-
-        if (inputState != null && inputState.getState() != IOState.Type.SETUP) {
+        if (inputState != null) {
             inputRegistry.remove(inputState);
         }
 
@@ -101,11 +101,13 @@ public class InputEventListener {
             return;
         }
 
-        boolean startInput = inputUpdatedEvent.startRequest();
+        final boolean startInput;
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
-            startInput = inputUpdatedEvent.startRequest() || inputState.getState() == IOState.Type.RUNNING;
+            startInput = inputState.getState() == IOState.Type.RUNNING;
             inputRegistry.remove(inputState);
+        } else {
+            startInput = false;
         }
 
         if (startInput && (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId()))) {
@@ -138,10 +140,19 @@ public class InputEventListener {
 
     @Subscribe
     public void inputDeleted(InputDeleted inputDeletedEvent) {
-        LOG.debug("Input deleted: {}", inputDeletedEvent.id());
+        LOG.info("Input deleted: {}", inputDeletedEvent.id());
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputDeletedEvent.id());
         if (inputState != null) {
             inputRegistry.remove(inputState);
+        }
+    }
+
+    @Subscribe
+    public void inputSetup(InputSetup inputSetupEvent) {
+        LOG.info("Input setup: {}", inputSetupEvent.id());
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputSetupEvent.id());
+        if (inputState != null) {
+            inputRegistry.setup(inputState);
         }
     }
 

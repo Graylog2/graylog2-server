@@ -82,9 +82,7 @@ public class InputsResource extends AbstractInputsResource {
     private final Configuration config;
 
     @Inject
-    public InputsResource(InputService inputService,
-                          MessageInputFactory messageInputFactory,
-                          Configuration config) {
+    public InputsResource(InputService inputService, MessageInputFactory messageInputFactory, Configuration config) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
@@ -136,14 +134,8 @@ public class InputsResource extends AbstractInputsResource {
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
         try {
             throwBadRequestIfNotGlobal(lr);
-
-            // Launch in setup mode, unless otherwise specified
-            final InputCreateRequest lrWithSetupMode = lr.toBuilder()
-                    .setupMode(lr.setupMode() == null || lr.setupMode())
-                    .build();
-
             // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
-            final MessageInput messageInput = messageInputFactory.create(lrWithSetupMode, getCurrentUser().getName(), lr.node());
+            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
             if (config.isCloud() && !messageInput.isCloudCompatible()) {
                 throw new BadRequestException(String.format(Locale.ENGLISH,
                         "The input type <%s> is not allowed in the cloud environment!", lr.type()));
@@ -198,14 +190,11 @@ public class InputsResource extends AbstractInputsResource {
 
         throwBadRequestIfNotGlobal(lr);
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
+
         final Input input = inputService.find(inputId);
 
-        // For backcompat, setup mode is assumed false if not specified
-        final InputCreateRequest lrWithSetupMode = lr.toBuilder()
-                .setupMode(lr.setupMode() == null ? false : lr.setupMode())
-                .build();
+        final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
 
-        final MessageInput messageInput = messageInputFactory.create(lrWithSetupMode, getCurrentUser().getName(), lr.node());
         messageInput.checkConfiguration();
 
         final Map<String, Object> mergedInput = new HashMap<>(input.getFields());
@@ -216,9 +205,8 @@ public class InputsResource extends AbstractInputsResource {
         final Map<String, Object> updatedConfig = Objects.requireNonNullElse(messageInput.getConfiguration().getSource(), Map.of());
         mergedInput.put(MessageInput.FIELD_CONFIGURATION, EncryptedInputConfigs.merge(origConfig, updatedConfig));
 
-        boolean start = input.isSetupMode() && Boolean.FALSE.equals(lrWithSetupMode.setupMode());
         final Input newInput = inputService.create(input.getId(), mergedInput);
-        inputService.update(newInput, start);
+        inputService.update(newInput);
 
         final URI inputUri = getUriBuilderToSelf().path(InputsResource.class)
                 .path("{inputId}")

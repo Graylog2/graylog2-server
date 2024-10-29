@@ -42,7 +42,7 @@ public interface InputService extends PersistedService {
 
     <T extends Persisted> String saveWithoutEvents(T model) throws ValidationException;
 
-    String update(Input model, boolean start) throws ValidationException;
+    String update(Input model) throws ValidationException;
 
     Input find(String id) throws NotFoundException;
 

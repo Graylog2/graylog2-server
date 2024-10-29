@@ -22,15 +22,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
-@JsonAutoDetect
 @AutoValue
 @WithBeanGetter
-public abstract class InputUpdated {
+@JsonAutoDetect
+public abstract class InputSetup {
+
     @JsonProperty
     public abstract String id();
 
     @JsonCreator
-    public static InputUpdated create(@JsonProperty("id") String inputId) {
-        return new AutoValue_InputUpdated(inputId);
+    public static InputSetup create(@JsonProperty("id") String id) {
+        return new AutoValue_InputSetup(id);
     }
 }

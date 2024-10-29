@@ -170,10 +170,10 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
-    public String update(Input model, boolean start) throws ValidationException {
+    public String update(Input model) throws ValidationException {
         final String resultId = super.save(model);
         if (resultId != null && !resultId.isEmpty()) {
-            publishChange(InputUpdated.create(resultId, start));
+            publishChange(InputUpdated.create(resultId));
         }
         return resultId;
     }
@@ -409,7 +409,6 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         input.setCreatedAt(io.getCreatedAt());
         input.setContentPack(io.getContentPack());
         input.setDesiredState(io.getDesiredState());
-        input.setSetupMode(io.isSetupMode());
 
         if (io.isGlobal()) {
             input.setGlobal(true);

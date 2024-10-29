@@ -19,6 +19,7 @@ package org.graylog2.shared.inputs;
 import com.google.common.collect.Maps;
 import jakarta.inject.Inject;
 import org.graylog2.featureflag.FeatureFlags;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -57,10 +58,8 @@ public class MessageInputFactory {
             input.setNodeId(nodeId);
         }
 
-        if (featureFlags.isOn("SETUP_MODE") && lr.setupMode() != null) {
-            input.setSetupMode(lr.setupMode());
-        } else {
-            input.setSetupMode(false);
+        if (featureFlags.isOn("SETUP_MODE")) {
+            input.setDesiredState(IOState.Type.SETUP);
         }
 
         return input;

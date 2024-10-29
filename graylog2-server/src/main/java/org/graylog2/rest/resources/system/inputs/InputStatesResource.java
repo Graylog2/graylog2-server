@@ -41,6 +41,7 @@ import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputSetup;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
@@ -115,6 +116,24 @@ public class InputStatesResource extends AbstractInputsResource {
         final Input input = inputService.find(inputId);
         inputService.persistDesiredState(input, IOState.Type.RUNNING);
         final InputCreated result = InputCreated.create(inputId);
+        this.serverEventBus.post(result);
+
+        return result;
+    }
+
+    @PUT
+    @Path("/setup/{inputId}")
+    @Timed
+    @ApiOperation(value = "Switch specified input to setup mode")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node."),
+    })
+    @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)
+    public InputSetup setup(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+        checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
+        final Input input = inputService.find(inputId);
+        inputService.persistDesiredState(input, IOState.Type.SETUP);
+        final InputSetup result = InputSetup.create(inputId);
         this.serverEventBus.post(result);
 
         return result;

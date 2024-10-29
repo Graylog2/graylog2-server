@@ -158,16 +158,6 @@ public class InputImpl extends PersistedImpl implements Input {
     }
 
     @Override
-    public Boolean isSetupMode() {
-        final Object setupModeObj = fields.get(MessageInput.FIELD_SETUP_MODE);
-        if (setupModeObj instanceof Boolean setupMode) {
-            return (Boolean) setupMode;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     public String getContentPack() {
         return (String) fields.get(MessageInput.FIELD_CONTENT_PACK);
     }
