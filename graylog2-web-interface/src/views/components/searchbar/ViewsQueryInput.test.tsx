@@ -23,7 +23,7 @@ import { validationError } from 'fixtures/queryValidationState';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 
-import QueryInput from './QueryInput';
+import ViewsQueryInput from './ViewsQueryInput';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('hooks/useHotkey', () => jest.fn());
@@ -42,18 +42,18 @@ class Completer {
 }
 
 describe('QueryInput', () => {
-  const getQueryInput = () => screen.getByRole('textbox');
+  const findQueryInput = () => screen.findByRole('textbox');
 
-  const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof QueryInput>>) => (
+  const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof ViewsQueryInput>>) => (
     <TestStoreProvider>
-      <QueryInput value=""
-                  name="search-query"
-                  onChange={() => Promise.resolve('')}
-                  validate={() => Promise.resolve({})}
-                  isValidating={false}
-                  onExecute={() => {}}
-                  completerFactory={() => new Completer()}
-                  {...props} />
+      <ViewsQueryInput value=""
+                       name="search-query"
+                       onChange={() => Promise.resolve('')}
+                       validate={() => Promise.resolve({})}
+                       isValidating={false}
+                       onExecute={() => {}}
+                       completerFactory={() => new Completer()}
+                       {...props} />
     </TestStoreProvider>
   );
 
@@ -63,38 +63,38 @@ describe('QueryInput', () => {
     jest.clearAllMocks();
   });
 
-  it('renders with minimal props', () => {
+  it('renders with minimal props', async () => {
     render(<SimpleQueryInput />);
 
-    expect(getQueryInput()).toBeInTheDocument();
+    expect(await findQueryInput()).toBeInTheDocument();
   });
 
-  it('triggers onChange when input is changed', () => {
+  it('triggers onChange when input is changed', async () => {
     const onChange = jest.fn();
     render(<SimpleQueryInput onChange={onChange} />);
 
-    userEvent.paste(getQueryInput(), 'the query');
+    userEvent.paste(await findQueryInput(), 'the query');
 
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenCalledWith({ target: { value: 'the query', name: 'search-query' } });
   });
 
-  it('triggers onBlur when input is blurred', () => {
+  it('triggers onBlur when input is blurred', async () => {
     const onBlur = jest.fn();
     render(<SimpleQueryInput onBlur={onBlur} />);
 
-    userEvent.paste(getQueryInput(), 'the query');
+    userEvent.paste(await findQueryInput(), 'the query');
     userEvent.tab();
 
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
 
   describe('execution', () => {
-    it('triggers onExecute on enter', () => {
+    it('triggers onExecute on enter', async () => {
       const onExecute = jest.fn();
       render(<SimpleQueryInput value="the query" onExecute={onExecute} />);
 
-      const queryInput = getQueryInput();
+      const queryInput = await findQueryInput();
       queryInput.focus();
       userEvent.type(queryInput, '{enter}');
 
@@ -102,22 +102,22 @@ describe('QueryInput', () => {
       expect(onExecute).toHaveBeenCalledWith('the query');
     });
 
-    it('does not trigger onExecute on enter when execution is disabled', () => {
+    it('does not trigger onExecute on enter when execution is disabled', async () => {
       const onExecute = jest.fn();
       render(<SimpleQueryInput value="the query" onExecute={onExecute} disableExecution />);
 
-      const queryInput = getQueryInput();
+      const queryInput = await findQueryInput();
       queryInput.focus();
       userEvent.type(queryInput, '{enter}');
 
       expect(onExecute).not.toHaveBeenCalledTimes(1);
     });
 
-    it('triggers QueryValidationActions.displayValidationErrors when there in an error', () => {
+    it('triggers QueryValidationActions.displayValidationErrors when there in an error', async () => {
       const onExecute = jest.fn();
       render(<SimpleQueryInput value="source:" onExecute={onExecute} error={validationError} />);
 
-      const queryInput = getQueryInput();
+      const queryInput = await findQueryInput();
       queryInput.focus();
       userEvent.type(queryInput, '{enter}');
 
@@ -126,12 +126,12 @@ describe('QueryInput', () => {
       expect(onExecute).not.toHaveBeenCalled();
     });
 
-    it('triggers QueryValidationActions.displayValidationErrors when there is an error after a change', () => {
+    it('triggers QueryValidationActions.displayValidationErrors when there is an error after a change', async () => {
       const onExecute = jest.fn();
       const { rerender } = render(<SimpleQueryInput value="source" onExecute={onExecute} />);
       rerender(<SimpleQueryInput value="source:" onExecute={onExecute} error={validationError} />);
 
-      const queryInput = getQueryInput();
+      const queryInput = await findQueryInput();
       queryInput.focus();
       userEvent.type(queryInput, '{enter}');
 
@@ -155,7 +155,7 @@ describe('QueryInput', () => {
 
       render(<SimpleQueryInput commands={commands} />);
 
-      const queryInput = getQueryInput();
+      const queryInput = await findQueryInput();
       queryInput.focus();
       userEvent.type(queryInput, '{ctrl}{enter}');
 

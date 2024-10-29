@@ -34,7 +34,7 @@ jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mo
 
 jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/searchbar/queryinput/BasicQueryInput');
-
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/hooks/useGlobalOverride');
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({

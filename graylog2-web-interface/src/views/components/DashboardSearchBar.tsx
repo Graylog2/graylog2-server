@@ -24,7 +24,7 @@ import RefreshControls from 'views/components/searchbar/RefreshControls';
 import { Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
-import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
+import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import DashboardActionsMenu from 'views/components/DashboardActionsMenu';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
@@ -172,20 +172,20 @@ const DashboardSearchBar = () => {
                                 {({ warnings }) => (
                                   <PluggableCommands usage="global_override_query">
                                     {(customCommands) => (
-                                      <QueryInput value={value}
-                                                  view={view}
-                                                  timeRange={values?.timerange}
-                                                  placeholder="Apply filter to all widgets"
-                                                  name={name}
-                                                  onChange={onChange}
-                                                  disableExecution={disableSearchSubmit}
-                                                  error={error}
-                                                  isValidating={isValidating}
-                                                  validate={validateForm}
-                                                  warning={warnings.queryString}
-                                                  ref={editorRef}
-                                                  onExecute={handleSubmit as () => void}
-                                                  commands={customCommands} />
+                                      <ViewsQueryInput value={value}
+                                                       view={view}
+                                                       timeRange={values?.timerange}
+                                                       placeholder="Apply filter to all widgets"
+                                                       name={name}
+                                                       onChange={onChange}
+                                                       disableExecution={disableSearchSubmit}
+                                                       error={error}
+                                                       isValidating={isValidating}
+                                                       validate={validateForm}
+                                                       warning={warnings.queryString}
+                                                       ref={editorRef}
+                                                       onExecute={handleSubmit as () => void}
+                                                       commands={customCommands} />
                                     )}
                                   </PluggableCommands>
                                 )}
