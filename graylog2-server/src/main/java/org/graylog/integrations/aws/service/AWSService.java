@@ -271,7 +271,7 @@ public class AWSService {
         // Create and save the input.
         final InputCreateRequest inputCreateRequest = InputCreateRequest.create(request.name(),
                 AWSInput.TYPE,
-                true, true,
+                true,
                 configuration,
                 nodeId.getNodeId());
         try {

@@ -50,7 +50,7 @@ public final class GelfInputUtils {
             InputCreateRequest request = InputCreateRequest.create(
                     "Integration test GELF input",
                     GELFHttpInput.class.getName(),
-                    true, true,
+                    true,
                     ImmutableMap.of("bind_address", "0.0.0.0", "port", gelfHttpPort),
                     null);
 
