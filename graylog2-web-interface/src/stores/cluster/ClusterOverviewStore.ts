@@ -23,8 +23,8 @@ import { singletonStore } from 'logic/singleton';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
+import type { SystemOverview } from 'stores/cluster/types';
 
-type SystemOverview = {};
 // eslint-disable-next-line import/prefer-default-export
 export const ClusterOverviewStore = singletonStore(
   'core.ClusterOverview',
