@@ -14,48 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import * as React from 'react';
+import { useEffect } from 'react';
 
 import { Spinner } from 'components/common';
 import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import { useStore } from 'stores/connect';
 
-const DataAdaptersContainer = createReactClass({
-  displayName: 'DataAdaptersContainer',
+type Props = {
+  children: React.ReactElement[],
+};
 
-  propTypes: {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.node),
-      PropTypes.node,
-    ]),
-  },
+const DataAdaptersContainer = ({ children }: Props) => {
+  const { dataAdapters, pagination } = useStore(LookupTableDataAdaptersStore);
 
-  mixins: [Reflux.connect(LookupTableDataAdaptersStore)],
-
-  getDefaultProps() {
-    return {
-      children: null,
-    };
-  },
-
-  componentDidMount() {
+  useEffect(() => {
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box
     LookupTableDataAdaptersActions.searchPaginated(1, 10000, null);
-  },
+  }, []);
 
-  render() {
-    if (!this.state.dataAdapters) {
-      return <Spinner />;
-    }
+  if (!dataAdapters) {
+    return <Spinner />;
+  }
 
-    const childrenWithProps = React.Children.map(this.props.children,
-      (child) => React.cloneElement(child,
-        { dataAdapters: this.state.dataAdapters, pagination: this.state.pagination }));
+  const childrenWithProps = React.Children.map(children,
+    (child) => React.cloneElement(child,
+      { dataAdapters, pagination }));
 
-    return <div>{childrenWithProps}</div>;
-  },
-});
+  return <div>{childrenWithProps}</div>;
+};
 
 export default DataAdaptersContainer;

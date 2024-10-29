@@ -20,10 +20,22 @@ import UserNotification from 'util/UserNotification';
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
+type Actions = {
+  create: (dataAdapter: LookupTableAdapter) => Promise<unknown>,
+  delete: (idOrName: string) => Promise<unknown>,
+  get: (idOrName: string) => Promise<unknown>,
+  getTypes: () => Promise<unknown>,
+  lookup: (idOrName: string, key: string) => Promise<unknown>,
+  reloadPage: () => Promise<unknown>,
+  searchPaginated: (page: number, perPage: number, query?: string) => Promise<unknown>,
+  update: (dataAdapter: LookupTableAdapter) => Promise<unknown>,
+  validate: (dataAdapter: LookupTableAdapter) => Promise<unknown>,
+}
 export const LookupTableDataAdaptersActions = singletonActions(
   'core.LookupTableDataAdapters',
-  () => Reflux.createActions({
+  () => Reflux.createActions<Actions>({
     searchPaginated: { asyncResult: true },
     reloadPage: { asyncResult: true },
     get: { asyncResult: true },
@@ -36,9 +48,20 @@ export const LookupTableDataAdaptersActions = singletonActions(
   }),
 );
 
+type StoreState = {
+  dataAdapters: LookupTableAdapter[],
+  dataAdapter: LookupTableAdapter,
+  pagination: {
+    page: number,
+    per_page: number,
+    total: number,
+    count: number,
+    query: string | null
+  }
+}
 export const LookupTableDataAdaptersStore = singletonStore(
   'core.LookupTableDataAdapters',
-  () => Reflux.createStore({
+  () => Reflux.createStore<StoreState>({
     listenables: [LookupTableDataAdaptersActions],
     dataAdapter: null,
     dataAdapters: undefined,
