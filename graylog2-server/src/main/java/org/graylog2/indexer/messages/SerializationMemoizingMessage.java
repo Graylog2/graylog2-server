@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Wraps a {@link Message} by making it immutable and caching the result of {@link #serialize(SerializationContext)}
@@ -48,9 +50,44 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
 
     private volatile SoftReference<CacheEntry> lastSerializationResult;
 
-    private record CacheEntry(byte[] serializedBytes,
-                              ObjectMapper objectMapper,
-                              Meter invalidTimeStampMeter) {}
+    private static class CacheEntry {
+        private final byte[] serializedBytes;
+        private final ObjectMapper objectMapper;
+        private final Meter invalidTimeStampMeter;
+
+        CacheEntry(byte[] serializedBytes, ObjectMapper objectMapper, Meter invalidTimeStampMeter) {
+            this.serializedBytes = serializedBytes;
+            this.objectMapper = objectMapper;
+            this.invalidTimeStampMeter = invalidTimeStampMeter;
+        }
+
+        public byte[] serializedBytes() {
+            return serializedBytes;
+        }
+
+        public ObjectMapper objectMapper() {
+            return objectMapper;
+        }
+
+        public Meter invalidTimeStampMeter() {
+            return invalidTimeStampMeter;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final CacheEntry that = (CacheEntry) o;
+            return Objects.equals(objectMapper, that.objectMapper)
+                    && Objects.equals(invalidTimeStampMeter, that.invalidTimeStampMeter)
+                    && Objects.deepEquals(serializedBytes, that.serializedBytes);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(objectMapper, invalidTimeStampMeter, Arrays.hashCode(serializedBytes));
+        }
+    }
 
     public SerializationMemoizingMessage(Message delegate) {
         this.delegate = delegate;

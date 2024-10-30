@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { HelpBlock } from 'components/bootstrap';
@@ -58,24 +57,6 @@ const InputDescription = ({ className, error, help }: Props) => {
       )}
     </HelpBlock>
   );
-};
-
-InputDescription.propTypes = {
-  className: PropTypes.string,
-  error: PropTypes.oneOfType([
-    PropTypes.element,
-    PropTypes.string,
-  ]),
-  help: PropTypes.oneOfType([
-    PropTypes.element,
-    PropTypes.string,
-  ]),
-};
-
-InputDescription.defaultProps = {
-  className: undefined,
-  error: undefined,
-  help: undefined,
 };
 
 export default InputDescription;

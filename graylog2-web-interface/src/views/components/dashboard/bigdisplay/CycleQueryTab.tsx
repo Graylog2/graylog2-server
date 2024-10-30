@@ -54,8 +54,4 @@ const CycleQueryTab = ({ interval, tabs }: Props) => {
   return null;
 };
 
-CycleQueryTab.defaultProps = {
-  tabs: undefined,
-};
-
 export default CycleQueryTab;

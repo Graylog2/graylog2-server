@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -98,29 +97,6 @@ const EntityListItem = ({ actions, contentRow, description, title, titleSuffix }
       )}
     </StyledListItem>
   );
-};
-
-EntityListItem.propTypes = {
-  /** Entity's title. */
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
-  /** Text to append to the title. Usually the type or a short description. */
-  titleSuffix: PropTypes.any,
-  /** Description of the element, which can accommodate more text than `titleSuffix`. */
-  description: PropTypes.any,
-  /** Action buttons or menus shown on the right side of the entity item container. */
-  actions: PropTypes.oneOfType([PropTypes.array, PropTypes.node]),
-  /**
-   * Add any content that is related to the entity and needs more space to be displayed. This is mostly use
-   * to show configuration options.
-   */
-  contentRow: PropTypes.node,
-};
-
-EntityListItem.defaultProps = {
-  actions: undefined,
-  contentRow: undefined,
-  description: undefined,
-  titleSuffix: undefined,
 };
 
 export default EntityListItem;

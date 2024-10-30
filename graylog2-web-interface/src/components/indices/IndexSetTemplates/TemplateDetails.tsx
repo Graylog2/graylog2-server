@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -24,7 +23,6 @@ import { Section, Icon } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import { DataTieringSummary, DATA_TIERING_TYPE, prepareDataTieringInitialValues, DataTieringVisualisation } from 'components/indices/data-tiering';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 
 type Props = {
   template: IndexSetTemplate,
@@ -83,7 +81,7 @@ const formatRefreshInterval = (intervalInMs : number) => {
 
 const TemplateDetails = ({
   template,
-  showDescription,
+  showDescription = false,
 }: Props) => {
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
@@ -166,15 +164,6 @@ const TemplateDetails = ({
       </FlexWrapper>
     </Row>
   );
-};
-
-TemplateDetails.propTypes = {
-  template: indexSetTemplatePropType.isRequired,
-  showDescription: PropTypes.bool,
-};
-
-TemplateDetails.defaultProps = {
-  showDescription: false,
 };
 
 export default TemplateDetails;

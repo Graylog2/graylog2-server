@@ -39,7 +39,6 @@ jest.mock('react-router-dom', () => {
   };
 });
 
-// eslint-disable-next-line react/prop-types
 const TestCommonProviders = ({ children }) => (
   <ApiContext.Provider value={{
     availableStreams: [],

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
@@ -47,7 +46,7 @@ type Props = {
   title: string,
   onClick?: () => void,
   className?: string,
-  name: IconName,
+  name: IconName
   iconType?: IconType,
   disabled?: boolean,
   rotation?: RotateProp,
@@ -64,9 +63,9 @@ const handleClick = (onClick: () => void | undefined) => {
 const IconButton = React.forwardRef<HTMLButtonElement, Props>(({
   title,
   onClick,
-  focusable,
+  focusable = true,
   className,
-  disabled,
+  disabled = false,
   iconType,
   'data-testid': dataTestId,
   ...rest
@@ -83,23 +82,5 @@ const IconButton = React.forwardRef<HTMLButtonElement, Props>(({
     <Icon type={iconType} {...rest} />
   </Wrapper>
 ));
-
-IconButton.propTypes = {
-  className: PropTypes.string,
-  onClick: PropTypes.func,
-  name: PropTypes.any,
-};
-
-IconButton.defaultProps = {
-  className: undefined,
-  focusable: true,
-  onClick: undefined,
-  name: undefined,
-  disabled: false,
-  rotation: undefined,
-  iconType: undefined,
-  'data-testid': undefined,
-  size: undefined,
-};
 
 export default IconButton;

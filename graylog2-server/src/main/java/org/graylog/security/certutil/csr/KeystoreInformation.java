@@ -23,8 +23,4 @@ public interface KeystoreInformation {
     KeyStore loadKeystore() throws Exception;
 
     char[] password();
-
-    default String passwordAsString() {
-        return new String(password());
-    }
 }

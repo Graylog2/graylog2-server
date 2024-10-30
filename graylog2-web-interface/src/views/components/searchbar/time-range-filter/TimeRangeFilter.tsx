@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useContext, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -52,7 +51,7 @@ type Props = {
   limitDuration: number,
   noOverride?: boolean,
   onChange: (timeRange: TimeRange | NoTimeRangeOverride) => void,
-  position?: 'bottom' | 'right',
+  position?: 'bottom' | 'bottom-start' | 'right',
   showPresetDropdown?: boolean,
   validTypes?: Array<SupportedTimeRangeType>,
   value: TimeRange | NoTimeRangeOverride,
@@ -60,17 +59,17 @@ type Props = {
 };
 
 const TimeRangeFilter = ({
-  disabled,
-  hasErrorOnMount,
-  noOverride,
+  disabled = false,
+  hasErrorOnMount = false,
+  noOverride = false,
   value = NO_TIMERANGE_OVERRIDE,
   onChange,
   validTypes,
-  position,
+  position = 'bottom-start',
   className,
   showPresetDropdown = true,
   limitDuration,
-  withinPortal,
+  withinPortal = true,
 }: Props) => {
   const containerRef = useRef();
   const { showDropdownButton } = useContext(TimeRangeFilterSettingsContext);
@@ -120,26 +119,6 @@ const TimeRangeFilter = ({
       </FlexContainer>
     </TimeRangePicker>
   );
-};
-
-TimeRangeFilter.propTypes = {
-  className: PropTypes.string,
-  disabled: PropTypes.bool,
-  hasErrorOnMount: PropTypes.bool,
-  noOverride: PropTypes.bool,
-  validTypes: PropTypes.arrayOf(PropTypes.string),
-  withinPortal: PropTypes.bool,
-};
-
-TimeRangeFilter.defaultProps = {
-  className: undefined,
-  disabled: false,
-  hasErrorOnMount: false,
-  noOverride: false,
-  validTypes: undefined,
-  position: 'bottom-start',
-  showPresetDropdown: true,
-  withinPortal: true,
 };
 
 export default TimeRangeFilter;

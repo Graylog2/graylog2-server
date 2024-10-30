@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
 
@@ -156,7 +155,7 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
                             type="select"
                             value={selectedInputType ?? 'placeholder'}
                             disabled={!!selectedInputId}
-                            onChange={(e) => setSelectedInputType(e.target.value)}>
+                            onChange={(e) => setSelectedInputType(e.target.value as 'forwarder' | 'server')}>
                 <option value="placeholder" disabled>Select an Input type</option>
                 <option value="server">Server Input</option>
                 <option value="forwarder">Forwarder Input</option>
@@ -178,17 +177,6 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
         )}
     </LoaderContainer>
   );
-};
-
-RecentMessageLoader.propTypes = {
-  inputs: PropTypes.object,
-  onMessageLoaded: PropTypes.func.isRequired,
-  selectedInputId: PropTypes.string,
-};
-
-RecentMessageLoader.defaultProps = {
-  inputs: undefined,
-  selectedInputId: undefined,
 };
 
 export default RecentMessageLoader;

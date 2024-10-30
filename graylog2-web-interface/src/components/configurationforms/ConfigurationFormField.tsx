@@ -16,7 +16,6 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import {
   BooleanField,
@@ -32,13 +31,13 @@ type Props = {
   typeName: string,
   configField: ConfigurationField,
   configKey: string,
-  configValue: FieldValue | EncryptedFieldValue<FieldValue>,
-  dirty: boolean,
-  autoFocus: boolean,
+  configValue?: FieldValue | EncryptedFieldValue<FieldValue>
+  dirty?: boolean
+  autoFocus?: boolean
   onChange: (field: string, value: FieldValue | EncryptedFieldValue<FieldValue>, dirty?: boolean) => void,
 };
 
-const ConfigurationFormField = ({ typeName, configField, configKey, configValue, dirty, autoFocus, onChange }: Props) => {
+const ConfigurationFormField = ({ typeName, configField, configKey, configValue, dirty = false, autoFocus = false, onChange }: Props) => {
   const elementKey = `${typeName}-${configKey}`;
 
   switch (configField.type) {
@@ -113,22 +112,6 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
     default:
       return null;
   }
-};
-
-ConfigurationFormField.propTypes = {
-  typeName: PropTypes.string.isRequired,
-  configField: PropTypes.object.isRequired,
-  configKey: PropTypes.string.isRequired,
-  configValue: PropTypes.any,
-  autoFocus: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  dirty: PropTypes.bool,
-};
-
-ConfigurationFormField.defaultProps = {
-  configValue: undefined,
-  autoFocus: false,
-  dirty: false,
 };
 
 export default ConfigurationFormField;

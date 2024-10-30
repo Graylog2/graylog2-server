@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Outlet } from 'react-router-dom';
 
@@ -51,7 +50,7 @@ const StyledGrid = styled(Grid)`
  * Provides the basic layout for the page content section.
  * The section includes all page specific components, but not elements like the navigation or sidebar.
  */
-const PageContentLayout = ({ children, className, FooterComponent, NotificationsComponent }: Props) => (
+const PageContentLayout = ({ children, className, FooterComponent = Footer, NotificationsComponent = WithGlobalAppNotifications }: Props) => (
   <Container className={className}>
     <NotificationsComponent>
       <StyledGrid fluid className="page-content-grid">
@@ -61,17 +60,5 @@ const PageContentLayout = ({ children, className, FooterComponent, Notifications
     </NotificationsComponent>
   </Container>
 );
-
-PageContentLayout.propTypes = {
-  children: PropTypes.node,
-  className: PropTypes.string,
-};
-
-PageContentLayout.defaultProps = {
-  children: undefined,
-  className: undefined,
-  FooterComponent: Footer,
-  NotificationsComponent: WithGlobalAppNotifications,
-};
 
 export default PageContentLayout;

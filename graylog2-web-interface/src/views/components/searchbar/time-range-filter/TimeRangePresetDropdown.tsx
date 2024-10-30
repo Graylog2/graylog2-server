@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
@@ -122,18 +121,18 @@ type Props = {
   className?: string,
   displayTitle?: boolean,
   bsSize?: BsSize,
-  header: string,
+  header?: string
   disabled?: boolean,
   onChange?: (timerange: TimeRange) => void,
 };
 
 const TimeRangePresetDropdown = ({
-  disabled,
+  disabled = false,
   onChange,
   onToggle: onToggleProp,
   className,
-  displayTitle,
-  bsSize,
+  displayTitle = true,
+  bsSize = 'small',
   header,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
@@ -192,26 +191,6 @@ const TimeRangePresetDropdown = ({
       </IfPermitted>
     </DropdownButton>
   );
-};
-
-TimeRangePresetDropdown.propTypes = {
-  bsSize: PropTypes.string,
-  className: PropTypes.string,
-  disabled: PropTypes.bool,
-  displayTitle: PropTypes.bool,
-  header: PropTypes.string,
-  onChange: PropTypes.func,
-  onToggle: PropTypes.func,
-};
-
-TimeRangePresetDropdown.defaultProps = {
-  bsSize: 'small',
-  className: undefined,
-  disabled: false,
-  onChange: undefined,
-  onToggle: undefined,
-  header: undefined,
-  displayTitle: true,
 };
 
 export default TimeRangePresetDropdown;

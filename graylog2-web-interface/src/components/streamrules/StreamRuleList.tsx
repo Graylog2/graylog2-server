@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import type { Stream, MatchData } from 'src/stores/streams/StreamsStore';
 
@@ -23,16 +22,16 @@ import { Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 type Props = {
-  matchData: MatchData,
-  onDelete: (ruleId: string) => void,
-  onSubmit: (ruleId: string, data: unknown) => void,
+  matchData?: MatchData
+  onDelete?: (ruleId: string) => void
+  onSubmit?: (ruleId: string, data: unknown) => void
   stream: Stream | undefined,
 }
 
 const StreamRuleList = ({
   matchData,
-  onDelete,
-  onSubmit,
+  onDelete = () => {},
+  onSubmit = () => {},
   stream,
 }: Props) => {
   if (!stream) {
@@ -55,22 +54,6 @@ const StreamRuleList = ({
       {!hasStreamRules && <ListGroupItem>No rules defined.</ListGroupItem>}
     </ListGroup>
   );
-};
-
-StreamRuleList.propTypes = {
-  matchData: PropTypes.shape({
-    matches: PropTypes.bool,
-    rules: PropTypes.object,
-  }),
-  onSubmit: PropTypes.func,
-  onDelete: PropTypes.func,
-  stream: PropTypes.object.isRequired,
-};
-
-StreamRuleList.defaultProps = {
-  matchData: {},
-  onSubmit: () => {},
-  onDelete: () => {},
 };
 
 export default StreamRuleList;

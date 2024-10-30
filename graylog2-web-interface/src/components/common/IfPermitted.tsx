@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -39,7 +38,7 @@ const _checkPermissions = (permissions, anyPermissions, currentUser) => {
   return isPermitted(currentUser.permissions, permissions);
 };
 
-const IfPermitted = ({ children, permissions, anyPermissions, ...rest }: Props) => {
+const IfPermitted = ({ children, permissions, anyPermissions = false, ...rest }: Props) => {
   const currentUser = useCurrentUser();
 
   if ((!permissions || permissions.length === 0) || (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))) {
@@ -65,22 +64,6 @@ const IfPermitted = ({ children, permissions, anyPermissions, ...rest }: Props) 
   }
 
   return null;
-};
-
-IfPermitted.propTypes = {
-  /** Children to render if user has permissions. */
-  children: PropTypes.node.isRequired,
-  /** Permissions the current user must fulfill. By default, the user must have all permissions that are passed in this prop. */
-  permissions: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string),
-  ]).isRequired,
-  /** This flag controls which permissions the user must fulfill: (all, at least one). */
-  anyPermissions: PropTypes.bool,
-};
-
-IfPermitted.defaultProps = {
-  anyPermissions: false,
 };
 
 /** @component */

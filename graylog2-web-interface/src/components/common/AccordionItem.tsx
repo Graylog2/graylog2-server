@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -76,16 +75,6 @@ const AccordionItem = ({ children, name, id, ...restProps }: Props) => {
       </Panel.Collapse>
     </StyledPanel>
   );
-};
-
-AccordionItem.propTypes = {
-  name: PropTypes.node.isRequired,
-  id: PropTypes.string,
-  children: PropTypes.node.isRequired,
-};
-
-AccordionItem.defaultProps = {
-  id: undefined,
 };
 
 export default AccordionItem;

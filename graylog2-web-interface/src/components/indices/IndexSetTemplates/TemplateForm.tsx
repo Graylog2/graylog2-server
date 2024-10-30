@@ -18,7 +18,6 @@
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
@@ -31,7 +30,6 @@ import type {
 } from 'components/indices/Types';
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import type { IndexSetTemplateFormValues, IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { FormikInput, FormSubmit, InputOptionalInfo, Section, Spinner, TimeUnitInput } from 'components/common';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
@@ -110,11 +108,6 @@ const RotationConfig = ({ rotationStrategies, indexSetRotationStrategy, indexSet
   );
 };
 
-RotationConfig.defaultProps = {
-  indexSetRotationStrategy: undefined,
-  indexSetRotationStrategyClass: undefined,
-};
-
 const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, indexSetRetentionStrategy, indexSetRetentionStrategyClass }: RetentionConfigProps) => {
   if (!retentionStrategies) return <Spinner />;
 
@@ -133,11 +126,6 @@ const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, inde
                                              }}
                                              getState={getRetentionConfigState} />
   );
-};
-
-RetentionConfig.defaultProps = {
-  indexSetRetentionStrategy: undefined,
-  indexSetRetentionStrategyClass: undefined,
 };
 
 const validate = (formValues: IndexSetTemplateFormValues, usesLegacyRetention: boolean) => {
@@ -372,15 +360,3 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
 };
 
 export default TemplateForm;
-
-TemplateForm.propTypes = {
-  initialValues: indexSetTemplatePropType,
-  submitButtonText: PropTypes.string.isRequired,
-  submitLoadingText: PropTypes.string.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-};
-
-TemplateForm.defaultProps = {
-  initialValues: undefined,
-};

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -31,7 +30,6 @@ import 'components/indices/rotation';
 import 'components/indices/retention';
 import { DataTieringConfiguration, DataTieringVisualisation, prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
 import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
-import { IndexSetPropType } from 'stores/indices/IndexSetsStore';
 import type {
   RotationStrategyConfig,
   RetentionStrategyConfig,
@@ -186,7 +184,7 @@ const IndexSetConfigurationForm = ({
   rotationStrategies,
   retentionStrategies,
   retentionStrategiesContext,
-  create,
+  create = false,
   onUpdate,
   cancelLink,
   submitButtonText,
@@ -410,25 +408,6 @@ const IndexSetConfigurationForm = ({
       </Col>
     </Row>
   );
-};
-
-IndexSetConfigurationForm.propTypes = {
-  indexSet: IndexSetPropType,
-  rotationStrategies: PropTypes.array.isRequired,
-  retentionStrategies: PropTypes.array.isRequired,
-  retentionStrategiesContext: PropTypes.shape({
-    max_index_retention_period: PropTypes.string,
-  }).isRequired,
-  create: PropTypes.bool,
-  onUpdate: PropTypes.func.isRequired,
-  cancelLink: PropTypes.string.isRequired,
-  submitButtonText: PropTypes.string.isRequired,
-  submitLoadingText: PropTypes.string.isRequired,
-};
-
-IndexSetConfigurationForm.defaultProps = {
-  create: false,
-  indexSet: undefined,
 };
 
 export default IndexSetConfigurationForm;

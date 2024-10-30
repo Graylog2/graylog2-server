@@ -67,8 +67,6 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
     setShowAddOutput(false);
   };
 
-  const { id: streamId } = stream;
-
   const handleCreateOutput = (data) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_CREATED, {
       app_pathname: 'stream',
@@ -125,12 +123,10 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
             {currentSegment === CREATE_SEGMENT && (
             <CreateOutputDropdown types={availableOutputTypes}
                                   onSubmit={handleCreateOutput}
-                                  getTypeDefinition={getTypeDefinition}
-                                  streamId={streamId} />
+                                  getTypeDefinition={getTypeDefinition} />
             )}
             {currentSegment === ASSIGN_SEGMENT && (
-            <AssignOutputDropdown streamId={streamId}
-                                  outputs={assignableOutputs}
+            <AssignOutputDropdown outputs={assignableOutputs}
                                   onSubmit={handleAssignOutput} />
             )}
           </SegmentedContainer>

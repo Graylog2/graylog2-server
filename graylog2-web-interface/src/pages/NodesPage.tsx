@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import URI from 'urijs';
-import PropTypes from 'prop-types';
 
 import * as URLUtils from 'util/URLUtils';
 import { DocumentTitle, ExternalLinkButton, PageHeader, Spinner } from 'components/common';
@@ -50,10 +49,6 @@ const GlobalAPIButton = ({ nodes }: { nodes: { [nodeId: string]: NodeInfo } }) =
   }
 
   return null;
-};
-
-GlobalAPIButton.propTypes = {
-  nodes: PropTypes.object.isRequired,
 };
 
 const NodesPage = () => {

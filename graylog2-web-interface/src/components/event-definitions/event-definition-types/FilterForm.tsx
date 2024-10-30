@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
@@ -64,6 +63,7 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
 import type { FiltersType } from 'views/types';
 import { defaultCompare } from 'logic/DefaultCompare';
+import type { EventDefinitionValidation } from 'components/event-definitions/types';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -92,7 +92,7 @@ type Props = {
   eventDefinition: EventDefinition,
   onChange: (name: string, config: EventDefinitionConfig) => void,
   streams: Array<Stream>,
-  validation: { errors: { [key: string]: Array<string> } }
+  validation: EventDefinitionValidation
 }
 
 const FilterForm = ({
@@ -606,11 +606,3 @@ const FilterForm = ({
 };
 
 export default FilterForm;
-
-FilterForm.propTypes = {
-  eventDefinition: PropTypes.object.isRequired,
-  validation: PropTypes.object.isRequired,
-  streams: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
-  currentUser: PropTypes.object.isRequired,
-};

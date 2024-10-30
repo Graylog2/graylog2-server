@@ -27,7 +27,7 @@ import HighlightingRulesProvider from 'views/components/contexts/HighlightingRul
 
 import OriginalHighlightingRules from './HighlightingRules';
 
-const HighlightingRules = ({ rules }: { rules?: Array<HighlightingRule> }) => {
+const HighlightingRules = ({ rules = [] }: { rules?: Array<HighlightingRule> }) => {
   const formatting = FormattingSettings.create(rules);
   const defaultView = createSearch();
   const view = defaultView
@@ -42,10 +42,6 @@ const HighlightingRules = ({ rules }: { rules?: Array<HighlightingRule> }) => {
       </HighlightingRulesProvider>
     </TestStoreProvider>
   );
-};
-
-HighlightingRules.defaultProps = {
-  rules: [],
 };
 
 describe('HighlightingRules', () => {

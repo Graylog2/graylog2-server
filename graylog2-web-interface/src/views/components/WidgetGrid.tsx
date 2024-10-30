@@ -142,10 +142,6 @@ const Grid = ({ children, locked, onPositionsChange, onSyncLayout, positions, wi
   );
 };
 
-Grid.defaultProps = {
-  onSyncLayout: undefined,
-};
-
 const MAXIMUM_GRID_SIZE = 12;
 
 const convertPosition = ({ col, row, height, width }: BackendWidgetPosition) => new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);

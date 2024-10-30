@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { TextField } from 'components/configurationforms';
@@ -23,12 +22,12 @@ import type { TextField as TextFieldType } from './types';
 
 type Props = {
   helpText?: string,
-  onChange: (title: string, value: string, dirty?: boolean) => void,
+  onChange?: (title: string, value: string, dirty?: boolean) => void
   typeName: string,
-  value: string,
+  value?: string
 };
 
-const TitleField = ({ typeName, helpText, value, onChange }: Props) => {
+const TitleField = ({ typeName, helpText = '', value = '', onChange = () => {} }: Props) => {
   const titleField: TextFieldType = {
     is_optional: false,
     attributes: [],
@@ -50,19 +49,6 @@ const TitleField = ({ typeName, helpText, value, onChange }: Props) => {
                onChange={onChange}
                autoFocus />
   );
-};
-
-TitleField.propTypes = {
-  helpText: PropTypes.string,
-  onChange: PropTypes.func,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.string,
-};
-
-TitleField.defaultProps = {
-  helpText: '',
-  onChange: () => {},
-  value: '',
 };
 
 export default TitleField;

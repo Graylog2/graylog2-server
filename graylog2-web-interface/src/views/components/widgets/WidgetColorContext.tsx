@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import PropTypes from 'prop-types';
 
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 import useAppDispatch from 'stores/useAppDispatch';
@@ -60,11 +59,6 @@ const WidgetColorContext = ({ children, id }: Props) => {
       {children}
     </ChartColorContext.Provider>
   );
-};
-
-WidgetColorContext.propTypes = {
-  children: PropTypes.node.isRequired,
-  id: PropTypes.string.isRequired,
 };
 
 export default WidgetColorContext;

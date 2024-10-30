@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import defaultTo from 'lodash/defaultTo';
 import get from 'lodash/get';
@@ -37,8 +36,8 @@ import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  action: 'create' | 'edit',
-  entityTypes: any,
+  action?: 'create' | 'edit'
+  entityTypes?: any
   eventDefinition: EventDefinition,
   validation: {
     errors: {
@@ -51,16 +50,16 @@ type Props = {
   canEdit: boolean,
 }
 
-const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange, canEdit }: Props) => {
+const EventConditionForm = ({ action = 'create', entityTypes, eventDefinition, validation, currentUser, onChange, canEdit }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  const getConditionPlugin = (type): any => {
+  const getConditionPlugin = (type: string) => {
     if (type === undefined) {
-      return {};
+      return undefined;
     }
 
-    return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === type) || {};
+    return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === type);
   };
 
   const sortedEventDefinitionTypes = (): any => (PluginStore.exports('eventDefinitionTypes') as any).sort((eventDefinitionType1, eventDefinitionType2) => {
@@ -117,13 +116,13 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
   const canEditCondition = canEdit && !isSystemEventDefinition;
 
   const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
-    ? React.createElement<React.ComponentProps<any>>(eventDefinitionType.formComponent, {
-      action: action,
-      entityTypes: entityTypes,
-      currentUser: currentUser,
-      validation: validation,
-      eventDefinition: eventDefinition,
-      onChange: onChange,
+    ? React.createElement(eventDefinitionType.formComponent, {
+      action,
+      entityTypes,
+      currentUser,
+      validation,
+      eventDefinition,
+      onChange,
       key: eventDefinition.id,
     })
     : null;
@@ -183,20 +182,6 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
       )}
     </Row>
   );
-};
-
-EventConditionForm.defaultProps = {
-  action: 'create',
-  entityTypes: undefined,
-};
-
-EventConditionForm.propTypes = {
-  action: PropTypes.oneOf(['create', 'edit']),
-  entityTypes: PropTypes.object,
-  eventDefinition: PropTypes.object.isRequired,
-  currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
-  validation: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
 };
 
 export default EventConditionForm;

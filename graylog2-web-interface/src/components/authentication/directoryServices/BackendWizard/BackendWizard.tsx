@@ -21,7 +21,6 @@ import camelCase from 'lodash/camelCase';
 import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 import type { $PropertyType } from 'utility-types';
-import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 
 import { validateField } from 'util/FormsUtils';
@@ -225,10 +224,10 @@ const _setDefaultCreateRole = (roles, stepsState, setStepsState) => {
 
 type Props = {
   authBackendMeta: AuthBackendMeta,
-  initialStepKey: $PropertyType<StepType, 'key'>,
+  initialStepKey?: $PropertyType<StepType, 'key'>
   initialValues: WizardFormValues,
-  excludedFields: { [inputName: string]: boolean },
-  help: { [inputName: string]: React.ReactElement | string | null | undefined },
+  excludedFields?: { [inputName: string]: boolean }
+  help?: { [inputName: string]: React.ReactElement | string | null | undefined }
   onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean) => Promise<LoadBackendResponse>,
 };
 
@@ -238,7 +237,7 @@ const _loadRoles = (setPaginatedRoles) => {
   AuthzRolesDomain.loadRolesPaginated(getUnlimited).then(setPaginatedRoles);
 };
 
-const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, help, excludedFields }: Props) => {
+const BackendWizard = ({ initialValues, initialStepKey = SERVER_CONFIG_KEY, onSubmit, authBackendMeta, help, excludedFields = {} }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
@@ -364,25 +363,6 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
         : wizard}
     </BackendWizardContext.Provider>
   );
-};
-
-BackendWizard.defaultProps = {
-  initialStepKey: SERVER_CONFIG_KEY,
-  help: undefined,
-  excludedFields: {},
-};
-
-BackendWizard.propTypes = {
-  authBackendMeta: PropTypes.shape({
-    backendHasPassword: PropTypes.bool,
-    backendId: PropTypes.string,
-    serviceTitle: PropTypes.string.isRequired,
-    serviceType: PropTypes.string.isRequired,
-  }).isRequired,
-  help: PropTypes.object,
-  initialStepKey: PropTypes.string,
-  initialValues: PropTypes.object.isRequired,
-  excludedFields: PropTypes.object,
 };
 
 export default BackendWizard;

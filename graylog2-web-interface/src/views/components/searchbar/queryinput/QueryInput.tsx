@@ -16,21 +16,13 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo, useContext, useRef, useImperativeHandle } from 'react';
-import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
-import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
-import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import { DEFAULT_TIMERANGE } from 'views/Constants';
-import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
-import usePluginEntities from 'hooks/usePluginEntities';
-import useUserDateTime from 'hooks/useUserDateTime';
-import type View from 'views/logic/views/View';
 import useElementDimensions from 'hooks/useElementDimensions';
 import { displayHistoryCompletions } from 'views/components/searchbar/QueryHistoryButton';
 import { startAutocomplete } from 'views/components/searchbar/queryinput/commands';
@@ -39,11 +31,6 @@ import useHotkey from 'hooks/useHotkey';
 import type { AutoCompleter, Editor, Command } from './ace-types';
 import type { BaseProps } from './BasicQueryInput';
 import BasicQueryInput from './BasicQueryInput';
-
-import SearchBarAutoCompletions from '../SearchBarAutocompletions';
-import type { Completer, FieldTypes } from '../SearchBarAutocompletions';
-
-const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
 
 const GlobalEditorStyles = createGlobalStyle<{ $width?: number; $offsetLeft: number }>`
   .ace_editor.ace_autocomplete {
@@ -171,24 +158,11 @@ const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCo
     });
 
     commands.forEach((command) => editor.commands.addCommand(command));
-    editor.completers = [completer];
+
+    if (completer) {
+      editor.completers = [completer];
+    }
   }
-};
-
-const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory' | 'view'>) => {
-  const { userTimezone } = useUserDateTime();
-  const completers = usePluginEntities('views.completers');
-  const { data: queryFields } = useFieldTypes(streams, isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange);
-  const { data: allFields } = useFieldTypes([], DEFAULT_TIMERANGE);
-  const fieldTypes = useMemo(() => {
-    const queryFieldsByName = Object.fromEntries((queryFields ?? []).map((field) => [field.name, field]));
-    const allFieldsByName = Object.fromEntries((allFields ?? []).map((field) => [field.name, field]));
-
-    return { all: allFieldsByName, query: queryFieldsByName };
-  }, [allFields, queryFields]);
-
-  return useMemo(() => completerFactory(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
-    [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view]);
 };
 
 const useShowHotkeysInOverview = () => {
@@ -227,31 +201,20 @@ const useShowHotkeysInOverview = () => {
 
 type Props = BaseProps & {
   commands?: Array<Command>,
-  completerFactory?: (
-    completers: Array<Completer>,
-    timeRange: TimeRange | NoTimeRangeOverride | undefined,
-    streams: Array<string>,
-    fieldTypes: FieldTypes,
-    userTimezone: string,
-    view: View | undefined,
-  ) => AutoCompleter,
   disableExecution?: boolean,
   isValidating?: boolean,
   name: string,
   onBlur?: (query: string) => void,
   onChange: (changeEvent: { target: { value: string, name: string } }) => Promise<string>,
   onExecute: (query: string) => void,
-  streams?: Array<string> | undefined,
-  timeRange?: TimeRange | NoTimeRangeOverride | undefined,
   validate: () => Promise<FormikErrors<{}>>,
-  view?: View
+  completer: any,
 };
 
 const QueryInput = React.forwardRef<Editor, Props>(({
-  className,
-  commands,
-  completerFactory = defaultCompleterFactory,
-  disableExecution,
+  className = '',
+  commands = [],
+  disableExecution = false,
   error,
   height,
   inputId,
@@ -260,22 +223,19 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   onBlur,
   onChange,
   onExecute: onExecuteProp,
-  placeholder,
-  streams,
-  timeRange,
-  value,
+  placeholder = '',
+  value = '',
   validate,
   warning,
   wrapEnabled,
   name,
-  view,
+  completer,
 }, outerRef) => {
   const innerRef = useRef<Editor>(null);
   const inputElement = innerRef.current?.container;
   const { width: inputWidth } = useElementDimensions(inputElement);
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
-  const completer = useCompleter({ streams, timeRange, completerFactory, view });
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
   const onExecute = useCallback((editor: Editor) => handleExecution({
     editor,
@@ -355,45 +315,5 @@ const QueryInput = React.forwardRef<Editor, Props>(({
     </Container>
   );
 });
-
-QueryInput.propTypes = {
-  className: PropTypes.string,
-  completerFactory: PropTypes.func,
-  disableExecution: PropTypes.bool,
-  error: PropTypes.any,
-  inputId: PropTypes.string,
-  height: PropTypes.number,
-  isValidating: PropTypes.bool.isRequired,
-  maxLines: PropTypes.number,
-  onBlur: PropTypes.func,
-  onChange: PropTypes.func.isRequired,
-  onExecute: PropTypes.func.isRequired,
-  placeholder: PropTypes.string,
-  streams: PropTypes.array,
-  timeRange: PropTypes.object,
-  value: PropTypes.string,
-  warning: PropTypes.any,
-  wrapEnabled: PropTypes.bool,
-  validate: PropTypes.func.isRequired,
-};
-
-QueryInput.defaultProps = {
-  className: '',
-  commands: [],
-  completerFactory: defaultCompleterFactory,
-  disableExecution: false,
-  error: undefined,
-  height: undefined,
-  inputId: undefined,
-  maxLines: undefined,
-  onBlur: undefined,
-  placeholder: '',
-  streams: undefined,
-  timeRange: undefined,
-  value: '',
-  warning: undefined,
-  wrapEnabled: undefined,
-  view: undefined,
-};
 
 export default QueryInput;

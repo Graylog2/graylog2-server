@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { ActionContext } from 'views/logic/ActionContext';
 import ExtractorUtils from 'util/ExtractorUtils';
@@ -34,10 +33,6 @@ const _renderOption = ({ label }: { label: string }) => <strong>{label}</strong>
 const _getExtractorTypes = () => ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => ({ label: ExtractorUtils.getReadableExtractorTypeName(extractorType), value: extractorType }));
 
 class SelectExtractorType extends React.Component<ActionComponentProps, State> {
-  static propTypes = {
-    onClose: PropTypes.func.isRequired,
-  };
-
   static contextType = ActionContext;
 
   readonly context: ActionContexts;

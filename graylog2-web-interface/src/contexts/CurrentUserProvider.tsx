@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import get from 'lodash/get';
 
 import { useStore } from 'stores/connect';
@@ -25,7 +24,13 @@ import Spinner from 'components/common/Spinner';
 
 import CurrentUserContext from './CurrentUserContext';
 
-const CurrentUserProvider = ({ children }) => {
+type CurrentUserProviderProps = {
+  children: React.ReactNode;
+};
+
+const CurrentUserProvider = ({
+  children,
+}: CurrentUserProviderProps) => {
   const currentUserJSON = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
   const currentUser = currentUserJSON ? User.fromJSON(currentUserJSON) : undefined;
 
@@ -38,10 +43,6 @@ const CurrentUserProvider = ({ children }) => {
       {children}
     </CurrentUserContext.Provider>
   );
-};
-
-CurrentUserProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default CurrentUserProvider;
