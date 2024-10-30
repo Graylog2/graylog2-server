@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+
+import type { TimeUnit as TimeUnitString } from './types';
 
 /**
  * Component that renders a time value given in a certain unit.
@@ -22,7 +24,7 @@ import React from 'react';
  */
 type Props = {
   value: number,
-  unit: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS',
+  unit: TimeUnitString,
   zeroIsNever?: boolean,
 }
 
