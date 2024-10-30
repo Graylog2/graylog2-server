@@ -119,7 +119,6 @@ function EditorModal({ value, readOnly = false, onChange, show, onClose, onDone 
             {height > 0 && (
               <>
                 <EditorWrapper style={{ width: '50%' }}>
-                  {/* @ts-ignore */}
                   <SourceCodeEditor id="md-editor"
                                     mode="markdown"
                                     theme="light"

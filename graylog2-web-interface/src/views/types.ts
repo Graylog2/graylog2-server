@@ -263,29 +263,32 @@ type MessageDetailContextProviderProps = {
   message: Message,
 }
 
-type DashboardActionComponentProps = {
+type DashboardActionComponentProps<T> = {
   dashboard: View,
-  modalRef: () => unknown,
+  modalRef: () => T,
 }
 
-type EventWidgetActionComponentProps = {
+type EventWidgetActionComponentProps<T> = {
   eventId: string,
-  modalRef: () => unknown,
+  modalRef: () => T,
 }
 
-type DashboardActionModalProps = {
+type DashboardActionModalProps<T> = React.PropsWithRef<{
   dashboard: View,
-  ref: React.Ref<unknown>,
-}
+}> & {
+  ref: React.LegacyRef<T>
+};
 
-type EventActionModalProps = {
+type EventActionModalProps<T> = React.PropsWithRef<{
   eventId: string,
-  ref: React.Ref<unknown>,
+}> & {
+  ref: React.LegacyRef<T>,
 }
 
-type SearchActionModalProps = {
+type SearchActionModalProps = React.PropsWithRef<{
   search: View,
-  ref: React.Ref<unknown>,
+}> & {
+  ref: React.LegacyRef<unknown>,
 }
 
 type AssetInformationComponentProps = {
@@ -300,10 +303,10 @@ type SearchAction = {
   useCondition: () => boolean,
 };
 
-type DashboardAction = {
+type DashboardAction<T> = {
   key: string,
-  component: React.ComponentType<DashboardActionComponentProps>,
-  modal?: React.ComponentType<DashboardActionModalProps>,
+  component: React.ComponentType<DashboardActionComponentProps<T>>,
+  modal?: React.ComponentType<DashboardActionModalProps<T>>,
   useCondition?: () => boolean,
 }
 
@@ -314,15 +317,16 @@ type EventAction = {
   key: string,
 }
 
-type EventWidgetAction = {
+type EventWidgetAction<T> = {
   key: string,
-  component: React.ComponentType<EventWidgetActionComponentProps>,
-  modal?: React.ComponentType<EventActionModalProps>,
+  component: React.ComponentType<EventWidgetActionComponentProps<T>>,
+  modal?: React.ComponentType<EventActionModalProps<T>>,
   useCondition?: () => boolean,
 }
 
 type AssetInformation = {
   component: React.ComponentType<AssetInformationComponentProps>,
+  key: string,
 }
 
 export type EventActionComponentProps = {
@@ -478,7 +482,7 @@ declare module 'graylog-web-plugin/plugin' {
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
-    'views.components.dashboardActions'?: Array<DashboardAction>;
+    'views.components.dashboardActions'?: Array<DashboardAction<unknown>>
     'views.components.eventActions'?: Array<EventAction>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
@@ -496,7 +500,7 @@ declare module 'graylog-web-plugin/plugin' {
       useCondition: () => boolean,
       key: string,
     }>;
-    'views.components.widgets.events.actions'?: Array<EventWidgetAction>;
+    'views.components.widgets.events.actions'?: Array<EventWidgetAction<unknown>>;
     'views.components.searchActions'?: Array<SearchAction>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
