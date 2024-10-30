@@ -19,9 +19,6 @@ package org.graylog.integrations.aws.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.InternalServerErrorException;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.AWSPolicy;
 import org.graylog.integrations.aws.AWSPolicyStatement;
@@ -49,6 +46,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.RegionMetadata;
+
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.InternalServerErrorException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
