@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-unused-vars, no-unused-vars
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import ThreatIntelPluginConfig from './components/ThreatIntelPluginConfig';
 import {
@@ -40,7 +40,7 @@ import {
 } from './components/adapters/abusech/index';
 import { OTXAdapterDocumentation, OTXAdapterFieldSet, OTXAdapterSummary } from './components/adapters/otx';
 
-const bindings = {
+const bindings: PluginExports = {
   systemConfigurations: [
     {
       component: ThreatIntelPluginConfig,
