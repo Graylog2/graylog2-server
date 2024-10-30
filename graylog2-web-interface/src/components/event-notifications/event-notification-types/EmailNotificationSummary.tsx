@@ -193,8 +193,4 @@ const EmailNotificationSummary = ({
   </CommonNotificationSummary>
 );
 
-EmailNotificationSummary.defaultProps = {
-  notification: {},
-};
-
 export default EmailNotificationSummary;
