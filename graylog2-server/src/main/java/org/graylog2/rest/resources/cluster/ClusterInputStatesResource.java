@@ -93,7 +93,7 @@ public class ClusterInputStatesResource extends ProxiedResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input."),
     })
-    @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_START)
+    @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_SETUP)
     public Map<String, Optional<InputSetup>> setup(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         return stripCallResult(requestOnAllNodes(RemoteInputStatesResource.class, r -> r.setup(inputId)));
     }

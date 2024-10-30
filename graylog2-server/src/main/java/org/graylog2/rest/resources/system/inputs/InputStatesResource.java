@@ -128,7 +128,7 @@ public class InputStatesResource extends AbstractInputsResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node."),
     })
-    @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)
+    @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_SETUP)
     public InputSetup setup(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
