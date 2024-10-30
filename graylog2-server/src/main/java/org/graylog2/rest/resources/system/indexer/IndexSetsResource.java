@@ -77,10 +77,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets", description = "Index sets", tags = {CLOUD_VISIBLE})
+@Api(value = "System/IndexSets", description = "Index sets")
 @Path("/system/indices/index_sets")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsResource extends RestResource {
