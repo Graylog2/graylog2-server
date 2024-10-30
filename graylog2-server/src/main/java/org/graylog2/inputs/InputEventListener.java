@@ -140,7 +140,7 @@ public class InputEventListener {
 
     @Subscribe
     public void inputDeleted(InputDeleted inputDeletedEvent) {
-        LOG.info("Input deleted: {}", inputDeletedEvent.id());
+        LOG.debug("Input deleted: {}", inputDeletedEvent.id());
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputDeletedEvent.id());
         if (inputState != null) {
             inputRegistry.remove(inputState);
@@ -153,6 +153,20 @@ public class InputEventListener {
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputSetupEvent.id());
         if (inputState != null) {
             inputRegistry.setup(inputState);
+        } else {
+            final String inputId = inputSetupEvent.id();
+            LOG.debug("Input created for setup: {}", inputId);
+            final Input input;
+            try {
+                input = inputService.find(inputId);
+            } catch (NotFoundException e) {
+                LOG.warn("Received InputSetupEvent event but could not find input {}", inputId, e);
+                return;
+            }
+
+            if (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId())) {
+                startInput(input);
+            }
         }
     }
 
