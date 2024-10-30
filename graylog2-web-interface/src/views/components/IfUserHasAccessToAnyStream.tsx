@@ -15,17 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import {useContext} from 'react';
 
 import StreamsContext from 'contexts/StreamsContext';
 import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
 
 type Props = {
   children: React.ReactElement,
+  skipNoStreamsCheck?: boolean,
 };
 
-export default ({ children }: Props) => {
+export default ({ children, skipNoStreamsCheck = false }: Props) => {
   const streams = useContext(StreamsContext);
+
+  if (skipNoStreamsCheck) {
+    return children;
+  }
 
   return (streams && streams.length > 0 ? children : <UserHasNoStreamAccess />);
 };
