@@ -39,7 +39,7 @@ type ContainerProps = {
   setColor: ChangeColorFunction,
 };
 
-const Container: React.FC<ContainerProps> = () => <div>Hello!</div>;
+const Container = ({ colors: _colors, setColor: _setColor }: ContainerProps) => <div>Hello!</div>;
 
 describe('WidgetColorContext', () => {
   const colorRules: Array<ColorRule> = [

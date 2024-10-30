@@ -18,7 +18,6 @@ import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import Menu from 'components/bootstrap/Menu';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
@@ -92,7 +91,7 @@ type Props = {
   hoverTitle?: string,
 }
 
-const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret, children, hoverTitle }: React.PropsWithChildren<Props>) => {
+const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret = false, children, hoverTitle }: React.PropsWithChildren<Props>) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
   return (
@@ -113,20 +112,6 @@ const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret, children, ho
       </StyledMenuDropdown>
     </Menu>
   );
-};
-
-NavDropdown.propTypes = {
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-  inactiveTitle: PropTypes.string,
-  badge: PropTypes.func,
-  hoverTitle: PropTypes.string,
-};
-
-NavDropdown.defaultProps = {
-  inactiveTitle: undefined,
-  badge: undefined,
-  noCaret: false,
-  hoverTitle: undefined,
 };
 
 const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`

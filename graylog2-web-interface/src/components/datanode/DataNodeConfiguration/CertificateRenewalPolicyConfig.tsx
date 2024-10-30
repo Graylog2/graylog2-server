@@ -273,8 +273,4 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
   );
 };
 
-CertificateRenewalPolicyConfig.defaultProps = {
-  className: undefined,
-};
-
 export default CertificateRenewalPolicyConfig;

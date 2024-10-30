@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import useOutputs from 'hooks/useOutputs';
-import { Section, Spinner, Switch } from 'components/common';
+import { Section, Spinner } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 import type { AvailableOutputSummary } from 'components/streams/useAvailableOutputTypes';
@@ -26,15 +25,11 @@ import useAvailableOutputTypes from 'components/streams/useAvailableOutputTypes'
 import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
 import AddOutputButton from 'components/streams/StreamDetails/routing-destination/AddOutputButton';
 import OutputsList from 'components/streams/StreamDetails/routing-destination/OutputsList';
+import DestinationSwitch from 'components/streams/StreamDetails/routing-destination/DestinationSwitch';
 
 type Props = {
   stream: Stream
 };
-export const StyledSwitch = styled(Switch)`
-  > label {
-    margin-bottom: 0;
-  }
-`;
 
 const DestinationOutputs = ({ stream }: Props) => {
   const { data, isInitialLoading } = useStreamOutputs(stream.id);
@@ -70,11 +65,12 @@ const DestinationOutputs = ({ stream }: Props) => {
              disableCollapseButton={!hasAssignedOutput}
              headerLeftSection={(
                <>
-                 <StyledSwitch aria-label="Toggle Output"
-                               name="toggle-indexset"
-                               checked={hasAssignedOutput}
-                               onChange={(e) => e.preventDefault()}
-                               label={title} />
+                 <DestinationSwitch aria-label="Toggle Output"
+                                    name="toggle-indexset"
+                                    checked={hasAssignedOutput}
+                                    disabled
+                                    onChange={(e) => e.preventDefault()}
+                                    label={title} />
                  <SectionCountLabel>OUTPUTS {data.outputs.length}</SectionCountLabel>
                </>
              )}

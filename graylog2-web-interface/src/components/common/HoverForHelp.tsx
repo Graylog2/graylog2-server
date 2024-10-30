@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { OverlayTrigger } from 'components/common';
@@ -76,16 +75,16 @@ type Props = {
 
 const HoverForHelp = ({
   children,
-  className,
-  displayLeftMargin,
+  className = '',
+  displayLeftMargin = false,
   title,
-  id,
-  pullRight,
-  placement,
+  id = 'help-popover',
+  pullRight = true,
+  placement = 'bottom',
   testId,
-  type,
+  type = 'info',
   iconSize,
-  trigger,
+  trigger = ['hover', 'focus'],
 }: Props) => (
   <OverlayTrigger trigger={trigger}
                   placement={placement}
@@ -100,31 +99,6 @@ const HoverForHelp = ({
                 size={iconSize} />
   </OverlayTrigger>
 );
-
-HoverForHelp.propTypes = {
-  displayLeftMargin: PropTypes.bool,
-  children: PropTypes.any.isRequired,
-  className: PropTypes.string,
-  id: PropTypes.string,
-  placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-  pullRight: PropTypes.bool,
-  title: PropTypes.string,
-  testId: PropTypes.string,
-  trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'focus', 'hover'])) || PropTypes.oneOf(['click', 'focus', 'hover']),
-};
-
-HoverForHelp.defaultProps = {
-  id: 'help-popover',
-  className: '',
-  pullRight: true,
-  placement: 'bottom',
-  testId: undefined,
-  title: undefined,
-  type: 'info',
-  iconSize: undefined,
-  trigger: ['hover', 'focus'],
-  displayLeftMargin: false,
-};
 
 /** @component */
 export default HoverForHelp;

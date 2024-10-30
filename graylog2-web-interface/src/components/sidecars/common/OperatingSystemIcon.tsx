@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
@@ -29,7 +28,7 @@ const Container = styled.div`
 `;
 
 type Props = {
-  operatingSystem: string,
+  operatingSystem?: string
 };
 
 const matchIcon = (os: string) => {
@@ -77,14 +76,6 @@ const OperatingSystemIcon = ({ operatingSystem }: Props) => {
         : <Icon name={iconName} />}
     </Container>
   );
-};
-
-OperatingSystemIcon.propTypes = {
-  operatingSystem: PropTypes.string,
-};
-
-OperatingSystemIcon.defaultProps = {
-  operatingSystem: undefined,
 };
 
 export default OperatingSystemIcon;

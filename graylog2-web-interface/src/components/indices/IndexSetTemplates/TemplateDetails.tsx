@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -24,7 +23,6 @@ import { Section, Icon } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import { DataTieringSummary, DATA_TIERING_TYPE, prepareDataTieringInitialValues, DataTieringVisualisation } from 'components/indices/data-tiering';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 
 type Props = {
   template: IndexSetTemplate,
@@ -83,7 +81,7 @@ const formatRefreshInterval = (intervalInMs : number) => {
 
 const TemplateDetails = ({
   template,
-  showDescription,
+  showDescription = false,
 }: Props) => {
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
@@ -120,15 +118,15 @@ const TemplateDetails = ({
                 <dl>
                   <dt>Index Analyzer:</dt>
                   <dd>{template.index_set_config.index_analyzer}</dd>
-                  <dt>Shards:</dt>
+                  <dt>Index Shards:</dt>
                   <dd>{template.index_set_config.shards}</dd>
-                  <dt>Replicas:</dt>
+                  <dt>Index Replica:</dt>
                   <dd>{template.index_set_config.replicas}</dd>
-                  <dt>Max. number of segments:</dt>
+                  <dt>Maximum Number of Segments:</dt>
                   <dd>{template.index_set_config.index_optimization_max_num_segments}</dd>
-                  <dt>Index optimization after rotation:</dt>
+                  <dt>Index Optimization after Rotation:</dt>
                   <dd><Icon name={template.index_set_config.index_optimization_disabled ? 'cancel' : 'check_circle'} /></dd>
-                  <dt>Field type refresh interval:</dt>
+                  <dt>Field Type Refresh Interval:</dt>
                   <dd>{formatRefreshInterval(template.index_set_config.field_type_refresh_interval)}</dd>
                 </dl>
               </Section>
@@ -166,15 +164,6 @@ const TemplateDetails = ({
       </FlexWrapper>
     </Row>
   );
-};
-
-TemplateDetails.propTypes = {
-  template: indexSetTemplatePropType.isRequired,
-  showDescription: PropTypes.bool,
-};
-
-TemplateDetails.defaultProps = {
-  showDescription: false,
 };
 
 export default TemplateDetails;

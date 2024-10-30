@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -76,10 +75,10 @@ type ClusterOverview = {
 
 type Props = {
   node: NodeInfo,
-  plugins: Array<Plugin>,
-  inputStates: Array<InputState>,
-  inputDescriptions: Array<InputDescription>,
-  jvmInformation: JvmInformation,
+  plugins?: Array<Plugin>
+  inputStates?: Array<InputState>
+  inputDescriptions?: Array<InputDescription>
+  jvmInformation?: JvmInformation
   systemOverview: ClusterOverview,
 }
 
@@ -174,22 +173,6 @@ const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInform
       </Row>
     </div>
   );
-};
-
-NodeOverview.propTypes = {
-  node: PropTypes.object.isRequired,
-  systemOverview: PropTypes.object.isRequired,
-  jvmInformation: PropTypes.object,
-  plugins: PropTypes.array,
-  inputDescriptions: PropTypes.object,
-  inputStates: PropTypes.array,
-};
-
-NodeOverview.defaultProps = {
-  jvmInformation: undefined,
-  plugins: undefined,
-  inputDescriptions: undefined,
-  inputStates: undefined,
 };
 
 export default NodeOverview;

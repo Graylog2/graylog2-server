@@ -212,9 +212,9 @@ describe('Chart Layout Generators', () => {
         hovertemplate: '%{text}<br><extra>%{meta}</extra>',
         meta: 'Name2',
         text: [
-          '10.0 b',
-          '20.0 b',
-          '30.0 b',
+          '10.0 B',
+          '20.0 B',
+          '30.0 B',
         ],
       });
     });
@@ -272,9 +272,9 @@ describe('Chart Layout Generators', () => {
         textinfo: 'percent',
         meta: 'Name2',
         text: [
-          '10.0 b',
-          '20.0 b',
-          '30.0 b',
+          '10.0 B',
+          '20.0 B',
+          '30.0 B',
         ],
       });
     });

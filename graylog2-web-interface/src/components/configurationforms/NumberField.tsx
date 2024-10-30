@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import Input from 'components/bootstrap/Input';
@@ -29,10 +28,10 @@ type Props = {
   onChange: (title: string, value: number, dirty?: boolean) => void,
   title: string,
   typeName: string,
-  value: number,
+  value?: number
 };
 
-const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
+const NumberField = ({ autoFocus = false, field, onChange, title, typeName, value = 0 }: Props) => {
   const _getDefaultValidationSpecs = () => ({ min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER });
 
   const _mapValidationAttribute = (attribute) => {
@@ -81,20 +80,6 @@ const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Pro
            {...validationSpecs}
            autoFocus={autoFocus} />
   );
-};
-
-NumberField.propTypes = {
-  autoFocus: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.number,
-};
-
-NumberField.defaultProps = {
-  autoFocus: false,
-  value: 0,
 };
 
 export default NumberField;

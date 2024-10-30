@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Alert } from 'components/bootstrap';
@@ -52,16 +51,6 @@ const IndexMaintenanceStrategiesSummary = ({ config, pluginExports, rotationStra
   const element = React.createElement(strategy.summaryComponent, componentProps);
 
   return (<span key={strategy.type}>{element}</span>);
-};
-
-IndexMaintenanceStrategiesSummary.propTypes = {
-  config: PropTypes.object.isRequired,
-  pluginExports: PropTypes.array.isRequired,
-  rotationStrategyClass: PropTypes.string,
-};
-
-IndexMaintenanceStrategiesSummary.defaultProps = {
-  rotationStrategyClass: undefined,
 };
 
 export default IndexMaintenanceStrategiesSummary;

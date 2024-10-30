@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import styled, { css, useTheme } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
 import type { PlotLayout } from 'views/components/visualizations/GenericPlot';
@@ -150,16 +149,6 @@ const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
                    layout={trafficLayout} />
     </GraphWrapper>
   );
-};
-
-TrafficGraph.propTypes = {
-  traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
-  width: PropTypes.number.isRequired,
-  trafficLimit: PropTypes.number,
-};
-
-TrafficGraph.defaultProps = {
-  trafficLimit: undefined,
 };
 
 export default TrafficGraph;

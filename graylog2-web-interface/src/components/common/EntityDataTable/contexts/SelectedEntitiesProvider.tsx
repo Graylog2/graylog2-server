@@ -33,7 +33,7 @@ type Props<Entity extends EntityBase> = React.PropsWithChildren<{
   entities: Readonly<Array<Entity>>,
 }>
 
-const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initialSelection, onChangeSelection, entities }: Props<Entity>) => {
+const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initialSelection = [], onChangeSelection, entities }: Props<Entity>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection);
 
   const _setSelectedEntities = useCallback((setSelectedEntitiesArgument: SetStateAction<Array<Entity['id']>>) => {
@@ -83,10 +83,6 @@ const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initial
       {children}
     </SelectEntitiesContext.Provider>
   );
-};
-
-SelectedEntitiesProvider.defaultProps = {
-  initialSelection: [],
 };
 
 export default SelectedEntitiesProvider;

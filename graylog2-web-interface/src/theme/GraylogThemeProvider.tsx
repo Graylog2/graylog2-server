@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
 import type { ColorScheme } from '@graylog/sawmill';
 import { MantineProvider } from '@mantine/core';
@@ -23,13 +22,12 @@ import { MantineProvider } from '@mantine/core';
 import useThemes from 'theme/hooks/useThemes';
 
 import ColorSchemeContext from './ColorSchemeContext';
-import { COLOR_SCHEMES } from './constants';
 
 import 'material-symbols/rounded.css';
 
 type Props = {
   children: React.ReactNode,
-  initialThemeModeOverride: ColorScheme,
+  initialThemeModeOverride?: ColorScheme
   userIsLoggedIn: boolean,
 }
 
@@ -46,15 +44,6 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride, userIsLogged
       </MantineProvider>
     </ColorSchemeContext.Provider>
   );
-};
-
-GraylogThemeProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  initialThemeModeOverride: PropTypes.oneOf(COLOR_SCHEMES),
-};
-
-GraylogThemeProvider.defaultProps = {
-  initialThemeModeOverride: undefined,
 };
 
 export default GraylogThemeProvider;

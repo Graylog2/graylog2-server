@@ -58,10 +58,6 @@ const DashboardActions = ({ contextValue, ...props }: React.ComponentProps<typeo
   </TableFetchContext.Provider>
 );
 
-DashboardActions.defaultProps = {
-  contextValue: undefined,
-};
-
 describe('DashboardActions', () => {
   let oldWindowConfirm;
 

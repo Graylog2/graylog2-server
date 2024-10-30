@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 
 import { Row, Col, HelpBlock, Input, Alert } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
@@ -24,8 +23,8 @@ import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
 
 type Props = {
-  value: number,
-  onChange: (value: number) => void;
+  value?: number
+  onChange?: (value: number) => void
 };
 
 const _estimateUnit = (value: number): number => {
@@ -48,7 +47,7 @@ const _estimateUnit = (value: number): number => {
   return MS_SECOND;
 };
 
-const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
+const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Props) => {
   const [sessionTimeoutNever, setSessionTimeoutNever] = useState(propsValue === -1);
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
   const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
@@ -129,16 +128,6 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
       </>
     </Input>
   );
-};
-
-TimeoutInput.propTypes = {
-  value: PropTypes.number,
-  onChange: PropTypes.func,
-};
-
-TimeoutInput.defaultProps = {
-  value: MS_HOUR,
-  onChange: () => {},
 };
 
 export default TimeoutInput;

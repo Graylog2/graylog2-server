@@ -23,16 +23,18 @@ import type Parameter from 'views/logic/parameters/Parameter';
 
 const useCreateSavedSearch = ({
   streamId,
+  streamCategory,
   timeRange,
   queryString,
   parameters,
 }:{
   streamId?: string | string[],
+  streamCategory?: string | string[],
   timeRange?: TimeRange,
   queryString?: ElasticsearchQueryString,
   parameters?: Array<Parameter>,
 }) => useMemo(
-  () => ViewGenerator({ type: View.Type.Search, streamId, timeRange, queryString, parameters }),
+  () => ViewGenerator({ type: View.Type.Search, streamId, streamCategory, timeRange, queryString, parameters }),
   // eslint-disable-next-line react-hooks/exhaustive-deps
   [],
 );

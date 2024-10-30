@@ -31,12 +31,12 @@ import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.datanode.DatanodeStartType;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.GlobalMetricNames;
-import org.graylog2.plugin.Version;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
@@ -60,6 +60,7 @@ import java.util.stream.Collectors;
 
 public class MigrationActionsImpl implements MigrationActions {
     private static final Logger LOG = LoggerFactory.getLogger(MigrationActionsImpl.class);
+    private static final String FEATURE_FLAG_REMOTE_REINDEX_MIGRATION = "remote_reindex_migration";
 
     private final ClusterConfigService clusterConfigService;
     private final ClusterProcessingControlFactory clusterProcessingControlFactory;
@@ -77,8 +78,9 @@ public class MigrationActionsImpl implements MigrationActions {
     private final ElasticsearchVersionProvider searchVersionProvider;
     private final List<URI> elasticsearchHosts;
 
-    private final Version graylogVersion = Version.CURRENT_CLASSPATH;
     private final NotificationService notificationService;
+
+    private final FeatureFlags featureFlags;
 
     @Inject
     public MigrationActionsImpl(@Assisted MigrationStateMachineContext stateMachineContext,
@@ -91,7 +93,7 @@ public class MigrationActionsImpl implements MigrationActions {
                                 final DatanodeRestApiProxy datanodeProxy,
                                 ElasticsearchVersionProvider searchVersionProvider,
                                 @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
-                                NotificationService notificationService) {
+                                NotificationService notificationService, FeatureFlags featureFlags) {
         this.stateMachineContext = stateMachineContext;
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
@@ -105,6 +107,7 @@ public class MigrationActionsImpl implements MigrationActions {
         this.searchVersionProvider = searchVersionProvider;
         this.elasticsearchHosts = elasticsearchHosts;
         this.notificationService = notificationService;
+        this.featureFlags = featureFlags;
     }
 
 
@@ -118,8 +121,15 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean isOldClusterStopped() {
-        // TODO: add real test
-        return true;
+        final Map<String, OpensearchLockCheckResult> results = datanodeProxy.remoteInterface(DatanodeResolver.ALL_NODES_KEYWORD, DatanodeOpensearchClusterCheckResource.class, DatanodeOpensearchClusterCheckResource::checkLocks);
+        final boolean anyLocked = results.values().stream().anyMatch(v -> v.locks().stream().anyMatch(OpensearchNodeLock::locked));
+
+        if (anyLocked) {
+            results.forEach((key, value) -> value.locks().stream()
+                    .filter(OpensearchNodeLock::locked)
+                    .forEach(v -> LOG.info("Data directory of datanode {} is still locked by another Opensearch process. Lock file: {}", key, v.path().toAbsolutePath())));
+        }
+        return !anyLocked;
     }
 
     @Override
@@ -177,8 +187,7 @@ public class MigrationActionsImpl implements MigrationActions {
     public boolean compatibleDatanodesRunning() {
         Map<String, DataNodeDto> nodes = nodeService.allActive();
         return !nodes.isEmpty() && nodes.values().stream()
-                .allMatch(node -> node.getDatanodeVersion() != null &&
-                        graylogVersion.compareTo(new Version(com.github.zafarkhaja.semver.Version.valueOf(node.getDatanodeVersion()))) == 0);
+                .allMatch(DataNodeDto::isCompatibleWithVersion);
     }
 
     @Override
@@ -235,15 +244,18 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public boolean dataNodeStartupFinished() {
-        boolean dataNodesAvailable = nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
-        if (dataNodesAvailable) { // set preflight config to FINISHED to be sure that a Graylog restart will connect to the data nodes
-            var preflight = preflightConfigService.getPreflightConfigResult();
-            if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
-                preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
-            }
+    public boolean allDatanodesAvailable() {
+        final Map<String, DataNodeDto> activeNodes = nodeService.allActive();
+        return !activeNodes.isEmpty() && activeNodes.values()
+                .stream()
+                .allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
+    }
+
+    public void setPreflightFinished() {
+        var preflight = preflightConfigService.getPreflightConfigResult();
+        if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
+            preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
         }
-        return dataNodesAvailable;
     }
 
     @Override
@@ -328,5 +340,10 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public void finishRemoteReindexMigration() {
         notificationService.destroyAllByType(Notification.Type.REMOTE_REINDEX_FINISHED);
+    }
+
+    @Override
+    public boolean isRemoteReindexMigrationEnabled() {
+        return featureFlags.isOn(FEATURE_FLAG_REMOTE_REINDEX_MIGRATION);
     }
 }

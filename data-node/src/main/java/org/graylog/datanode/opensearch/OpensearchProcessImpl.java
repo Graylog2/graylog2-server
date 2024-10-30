@@ -25,7 +25,6 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog2.security.TrustManagerAggregator;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.cli.OpensearchCommandLineProcess;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
@@ -57,6 +56,7 @@ import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
+import org.graylog2.security.TrustManagerAggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +118,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @Inject
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager,
                           final Configuration configuration, final NodeService<DataNodeDto> nodeService,
-                          ObjectMapper objectMapper, OpensearchStateMachine processState, String nodeName, NodeId nodeId, EventBus eventBus) {
+                          ObjectMapper objectMapper, OpensearchStateMachine processState, NodeId nodeId, EventBus eventBus) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = processState;
         this.stdout = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
@@ -127,7 +127,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         this.nodeService = nodeService;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
-        this.nodeName = nodeName;
+        this.nodeName = configuration.getDatanodeNodeName();
         this.nodeId = nodeId;
         this.eventBus = eventBus;
     }
@@ -344,7 +344,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 final ClusterHealthResponse health = clusterClient
                         .health(new ClusterHealthRequest(), RequestOptions.DEFAULT);
                 if (health.getRelocatingShards() == 0) {
-                    stop(); // todo: fire state machine trigger instead of calling stop
+                    onEvent(OpensearchEvent.PROCESS_STOPPED);
                     executorService.shutdown();
                     eventBus.post(DataNodeLifecycleEvent.create(nodeId.getNodeId(), DataNodeLifecycleTrigger.REMOVED));
                 }

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useRef } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 import type { Moment } from 'moment';
@@ -194,7 +193,13 @@ const fieldUpdate = (value: string, toUserTimezone: (date: Date) => Moment) => {
   };
 };
 
-const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
+type Props = {
+  onChange?: (newTime: string) => void,
+  dateTime: string,
+  range: string,
+}
+
+const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
   const hourIcon = useRef<IconName>(TIME_ICON_MID);
   const { toUserTimezone } = useUserDateTime();
 
@@ -279,16 +284,6 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
       </FormGroupGrid>
     </SetTimeOption>
   );
-};
-
-AbsoluteTimeInput.propTypes = {
-  dateTime: PropTypes.string.isRequired,
-  range: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-};
-
-AbsoluteTimeInput.defaultProps = {
-  onChange: () => {},
 };
 
 export default AbsoluteTimeInput;

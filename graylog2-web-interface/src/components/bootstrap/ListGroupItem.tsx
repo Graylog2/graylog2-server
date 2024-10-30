@@ -143,6 +143,7 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
 `);
 
 type Props = React.PropsWithChildren<{
+  id?: string,
   active?: boolean
   bsStyle?: string,
   className?: string,
@@ -151,23 +152,13 @@ type Props = React.PropsWithChildren<{
   header?: React.ReactNode,
   href?: string,
   onClick?:() => void
+  onKeyDown?: React.ComponentProps<typeof StyledListGroupItem>['onKeyDown'],
 }>
 
-const ListGroupItem = forwardRef<HTMLElement, Props>(({ containerProps, ...rest }, ref) => (
+const ListGroupItem = forwardRef<HTMLElement, Props>(({ containerProps = {}, ...rest }, ref) => (
   <RefContainer ref={ref} {...containerProps}>
     <StyledListGroupItem {...rest} />
   </RefContainer>
 ));
-
-ListGroupItem.defaultProps = {
-  active: undefined,
-  bsStyle: undefined,
-  className: undefined,
-  containerProps: {},
-  disabled: undefined,
-  header: undefined,
-  href: undefined,
-  onClick: undefined,
-};
 
 export default ListGroupItem;

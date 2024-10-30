@@ -41,7 +41,7 @@ type Props = {
 const WidgetModeConfiguration = ({ name, onChange: onChangeProp, options }: Props) => (
   <Field name={name}>
     {({ field: { value, onChange, onBlur }, meta: { error } }) => {
-      const handleChange = (event: React.ChangeEvent<Input>) => {
+      const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         onChangeProp(event.target.value);
         onChange(event);
       };

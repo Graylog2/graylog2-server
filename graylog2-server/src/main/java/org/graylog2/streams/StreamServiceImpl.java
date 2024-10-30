@@ -17,6 +17,9 @@
 package org.graylog2.streams;
 
 import com.google.common.base.Strings;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -26,6 +29,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.WriteResult;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
@@ -61,6 +65,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -70,6 +75,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.streams.StreamImpl.FIELD_ID;
 import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
 import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
@@ -83,6 +89,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
     private final Set<StreamDeletionGuard> streamDeletionGuards;
+    private final CacheLoader<String, String> streamTitleLoader;
+    private final LoadingCache<String, String> streamTitleCache;
 
     @Inject
     public StreamServiceImpl(MongoConnection mongoConnection,
@@ -101,6 +109,24 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
         this.streamDeletionGuards = streamDeletionGuards;
+
+        this.streamTitleLoader = new CacheLoader<String, String>() {
+            @Nonnull
+            @Override
+            public String load(@Nonnull String streamId) throws NotFoundException {
+                String title = loadStreamTitles(List.of(streamId)).get(streamId);
+                if (title != null) {
+                    return title;
+                } else {
+                    throw new NotFoundException(f("Couldn't find stream %s", streamId));
+                }
+            }
+        };
+
+        this.streamTitleCache = CacheBuilder.newBuilder()
+                .expireAfterAccess(10, TimeUnit.SECONDS)
+                .build(streamTitleLoader);
+
     }
 
     @Nullable
@@ -193,6 +219,16 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         try (cursor) {
             return cursorToList(cursor).stream()
                     .collect(Collectors.toMap(i -> i.get("_id").toString(), i -> i.get("title").toString()));
+        }
+    }
+
+    @Override
+    @Nullable
+    public String streamTitleFromCache(String streamId) {
+        try {
+            return streamTitleCache.get(streamId);
+        } catch (Exception e) {
+            return null;
         }
     }
 

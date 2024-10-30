@@ -91,11 +91,11 @@ type Props = {
  */
 const Icon = ({
   name,
-  type,
+  type = 'solid',
   size,
   className,
-  rotation,
-  spin,
+  rotation = 0,
+  spin = false,
   flip,
   style,
   'data-testid': testId,
@@ -123,22 +123,5 @@ const Icon = ({
     {name}
   </StyledSpan>
 );
-
-Icon.defaultProps = {
-  className: undefined,
-  'data-testid': undefined,
-  flip: undefined,
-  rotation: 0,
-  size: undefined,
-  spin: false,
-  style: undefined,
-  type: 'solid',
-  onClick: undefined,
-  onMouseEnter: undefined,
-  onMouseLeave: undefined,
-  onFocus: undefined,
-  tabIndex: undefined,
-  title: undefined,
-};
 
 export default Icon;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import type { SyntheticEvent } from 'react';
 
@@ -23,7 +22,7 @@ type Props = {
   children: React.ReactNode,
   minWidth?: number
   onMenuItemSelect?: (e: SyntheticEvent) => void,
-  show: boolean,
+  show?: boolean
   zIndex?: number,
 };
 
@@ -99,7 +98,7 @@ function closeOnChildrenSelect(children: React.ReactNode, updateDepth: number, o
   );
 }
 
-const DropdownMenu = ({ show, children, zIndex, onMenuItemSelect, minWidth, ...restProps }: Props) => {
+const DropdownMenu = ({ show = false, children, zIndex = 1050, onMenuItemSelect = () => {}, minWidth, ...restProps }: Props) => {
   const mappedChildren = closeOnChildrenSelect(children, 0, onMenuItemSelect);
 
   return (
@@ -107,20 +106,6 @@ const DropdownMenu = ({ show, children, zIndex, onMenuItemSelect, minWidth, ...r
       {mappedChildren}
     </StyledDropdownMenu>
   );
-};
-
-DropdownMenu.propTypes = {
-  children: PropTypes.node.isRequired,
-  zIndex: PropTypes.number,
-  show: PropTypes.bool,
-  minWidth: PropTypes.number,
-};
-
-DropdownMenu.defaultProps = {
-  show: false,
-  zIndex: 1050,
-  minWidth: undefined,
-  onMenuItemSelect: () => {},
 };
 
 export default DropdownMenu;

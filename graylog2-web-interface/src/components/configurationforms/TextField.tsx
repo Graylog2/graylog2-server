@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
@@ -24,16 +23,16 @@ import { getValueFromInput } from 'util/FormsUtils';
 import type { TextField as TextFieldType, EncryptedFieldValue } from './types';
 
 type Props = {
-  autoFocus: boolean,
+  autoFocus?: boolean
   field: TextFieldType,
-  dirty: boolean,
+  dirty?: boolean
   onChange: (title: string, value: string | EncryptedFieldValue<string>, dirty?: boolean) => void,
   title: string,
   typeName: string,
   value?: string | EncryptedFieldValue<string>,
 };
 
-const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }: Props) => {
+const TextField = ({ field, title, typeName, dirty = false, onChange, value = '', autoFocus = false }: Props) => {
   const isRequired = !field.is_optional;
   const showReadOnlyEncrypted = field.is_encrypted && !dirty && typeof value !== 'string' && value.is_set;
   const fieldType = (!hasAttribute(field.attributes, 'textarea') && (hasAttribute(field.attributes, 'is_password') || showReadOnlyEncrypted) ? 'password' : 'text');
@@ -122,22 +121,6 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }
            buttonAfter={buttonAfter()}
            autoFocus={autoFocus} />
   );
-};
-
-TextField.propTypes = {
-  autoFocus: PropTypes.bool,
-  dirty: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-};
-
-TextField.defaultProps = {
-  autoFocus: false,
-  dirty: false,
-  value: '',
 };
 
 export default TextField;

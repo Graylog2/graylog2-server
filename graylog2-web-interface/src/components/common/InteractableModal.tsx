@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Rnd } from 'react-rnd';
 import styled, { css } from 'styled-components';
 import debounce from 'lodash/debounce';
@@ -24,6 +23,7 @@ import { Button } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 const DEFAULT_SIZE = { width: 450, height: 400 };
+const DEFAULT_STRING_SIZE = { width: DEFAULT_SIZE.width.toString(), height: DEFAULT_SIZE.height.toString() };
 const halfWidth = Math.ceil((window.innerWidth / 2) - (DEFAULT_SIZE.width / 2));
 const halfHeight = Math.ceil((window.innerHeight / 2) - (DEFAULT_SIZE.height / 2));
 const stayOnScreenHeight = halfHeight < 0 ? 55 : halfHeight;
@@ -100,26 +100,26 @@ type Props = {
   className?: string,
   minHeight?: number,
   minWidth?: number,
-  onClose: () => void,
-  onDrag: (newCoords: Coords) => void,
-  onResize: (newSize: Size) => void,
-  position: Coords,
-  size: Size,
-  title: string,
+  onClose?: () => void
+  onDrag?: (newCoords: Coords) => void
+  onResize?: (newSize: Size) => void
+  position?: Coords
+  size?: Size
+  title?: string
   wrapperClassName?: string,
 };
 
 const InteractableModal = ({
   children,
   className,
-  minHeight,
-  minWidth,
-  onClose,
-  onDrag,
-  onResize,
-  position,
-  size,
-  title,
+  minHeight = DEFAULT_SIZE.height,
+  minWidth = DEFAULT_SIZE.width,
+  onClose = () => {},
+  onDrag = () => {},
+  onResize = () => {},
+  position = DEFAULT_POSITION,
+  size = DEFAULT_STRING_SIZE,
+  title = '',
   wrapperClassName,
 }: React.PropsWithChildren<Props>) => {
   const dragHandleRef = useRef(null);
@@ -238,50 +238,6 @@ const InteractableModal = ({
       </StyledRnd>
     </InteractableModalWrapper>
   );
-};
-
-InteractableModal.propTypes = {
-  /** className that will be applied to `react-rnd` */
-  className: PropTypes.string,
-  /** Content of the InteractableModal modal */
-  children: PropTypes.node.isRequired,
-  /** Minimum height that modal can be reduced to */
-  minHeight: PropTypes.number,
-  /** Minimum width that modal can be reduced to */
-  minWidth: PropTypes.number,
-  /** Function that is called when InteractableModal is closed */
-  onClose: PropTypes.func,
-  /** Function that is called when InteractableModal has finished being dragged */
-  onDrag: PropTypes.func,
-  /** Function that is called when InteractableModal has finished being resized */
-  onResize: PropTypes.func,
-  /** If you want to control InteractableModal you can pass specific position */
-  position: PropTypes.shape({
-    x: PropTypes.number,
-    y: PropTypes.number,
-  }),
-  /** If you want to control InteractableModal you can pass specific size */
-  size: PropTypes.shape({
-    height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  }),
-  /** Title that appears at the top of the window */
-  title: PropTypes.string,
-  /** Used to style wrapping component */
-  wrapperClassName: PropTypes.string,
-};
-
-InteractableModal.defaultProps = {
-  className: undefined,
-  minHeight: DEFAULT_SIZE.height,
-  minWidth: DEFAULT_SIZE.width,
-  onClose: () => {},
-  onDrag: () => {},
-  onResize: () => {},
-  position: DEFAULT_POSITION,
-  size: DEFAULT_SIZE,
-  title: '',
-  wrapperClassName: undefined,
 };
 
 export default InteractableModal;

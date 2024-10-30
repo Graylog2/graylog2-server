@@ -71,16 +71,17 @@ export const syncWithQueryParameters = (viewType: ViewType, query: string, searc
       .reduce((prev, [key, value]) => prev.setSearch(key, String(value)), baseUri);
     const currentStreams = filtersToStreamSet(filter);
     const currentStreamCategories = filtersToStreamCategorySet(filter);
+
     const uriWithStreams = currentStreams.isEmpty()
       ? uriWithTimerange.removeSearch('streams')
       : uriWithTimerange.setSearch('streams', currentStreams.join(','));
 
     const uri = currentStreamCategories.isEmpty()
-      ? uriWithStreams.removeSearch('stream_categories').toString()
-      : uriWithStreams.setSearch('stream_categories', currentStreamCategories.join(',')).toString();
+      ? uriWithStreams.removeSearch('stream_categories')
+      : uriWithStreams.setSearch('stream_categories', currentStreamCategories.join(','));
 
-    if (query !== uri) {
-      action(uri);
+    if (query !== uri.toString()) {
+      action(uri.toString());
     }
   }
 };

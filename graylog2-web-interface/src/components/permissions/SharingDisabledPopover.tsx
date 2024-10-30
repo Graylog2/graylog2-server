@@ -33,8 +33,4 @@ const SharingDisabledPopover = ({ type, description }: Props) => {
   );
 };
 
-SharingDisabledPopover.defaultProps = {
-  description: undefined,
-};
-
 export default SharingDisabledPopover;

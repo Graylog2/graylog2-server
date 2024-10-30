@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Dropdown, MenuItem } from 'components/bootstrap';
 
 type Props = {
   children: React.ReactNode,
-  left: boolean,
-  title: string,
+  left?: boolean
+  title?: string
 };
 
 /* stylelint-disable-next-line property-no-unknown */
@@ -69,7 +68,7 @@ const StyledSubmenu: React.ComponentType<StyledSubmenuProps> = styled(Dropdown)<
   }
 `);
 
-const DropdownSubmenu = ({ children, left, title }: Props) => (
+const DropdownSubmenu = ({ children, left = false, title }: Props) => (
   <MenuItem>
     <StyledSubmenu $left={left} as="div">
       {title} <Caret />
@@ -80,16 +79,5 @@ const DropdownSubmenu = ({ children, left, title }: Props) => (
     </StyledSubmenu>
   </MenuItem>
 );
-
-DropdownSubmenu.propTypes = {
-  children: PropTypes.node.isRequired,
-  left: PropTypes.bool,
-  title: PropTypes.string,
-};
-
-DropdownSubmenu.defaultProps = {
-  left: false,
-  title: undefined,
-};
 
 export default DropdownSubmenu;

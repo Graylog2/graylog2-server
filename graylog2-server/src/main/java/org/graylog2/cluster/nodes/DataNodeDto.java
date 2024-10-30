@@ -27,6 +27,7 @@ import jakarta.annotation.Nullable;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.graylog2.plugin.Version;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -60,22 +61,27 @@ public abstract class DataNodeDto extends NodeDto {
     @JsonProperty("action_queue")
     public abstract DataNodeLifecycleTrigger getActionQueue();
 
-    @jakarta.annotation.Nullable
+    @Nullable
     @JsonProperty(FIELD_CERT_VALID_UNTIL)
     public abstract Date getCertValidUntil();
 
-    @jakarta.annotation.Nullable
+    @Nullable
     @JsonProperty(FIELD_DATANODE_VERSION)
     public abstract String getDatanodeVersion();
 
+    @JsonProperty("version_compatible")
+    public boolean isCompatibleWithVersion() {
+        return getDatanodeVersion() != null &&
+                Version.CURRENT_CLASSPATH.compareTo(new Version(com.github.zafarkhaja.semver.Version.valueOf(getDatanodeVersion()))) == 0;
+    }
 
     @Nullable
     @JsonUnwrapped
     public CertRenewalService.ProvisioningInformation getProvisioningInformation() {
         DataNodeProvisioningConfig.State state = switch (getDataNodeStatus()) {
             case AVAILABLE -> DataNodeProvisioningConfig.State.CONNECTED;
-            case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
-            case PREPARED -> DataNodeProvisioningConfig.State.STARTUP_PREPARED;
+            case STARTING -> DataNodeProvisioningConfig.State.STARTING;
+            case PREPARED -> DataNodeProvisioningConfig.State.PROVISIONED;
             default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
         };
 

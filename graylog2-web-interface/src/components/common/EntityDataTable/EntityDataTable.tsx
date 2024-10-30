@@ -204,10 +204,10 @@ const EntityDataTable = <Entity extends EntityBase>({
     onChangeSelection,
     initialSelection,
     isEntitySelectable,
-  },
+  } = {},
   columnDefinitions,
   columnRenderers: customColumnRenderers,
-  columnsOrder,
+  columnsOrder = [],
   entities,
   expandedSectionsRenderer,
   onColumnsChange,
@@ -305,18 +305,6 @@ const EntityDataTable = <Entity extends EntityBase>({
     </SelectedEntitiesProvider>
 
   );
-};
-
-EntityDataTable.defaultProps = {
-  actionsCellWidth: undefined,
-  activeSort: undefined,
-  columnRenderers: undefined,
-  columnsOrder: [],
-  expandedSectionsRenderer: undefined,
-  onPageSizeChange: undefined,
-  pageSize: undefined,
-  entityActions: undefined,
-  bulkSelection: {},
 };
 
 export default EntityDataTable;
