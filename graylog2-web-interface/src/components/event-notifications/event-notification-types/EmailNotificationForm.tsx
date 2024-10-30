@@ -310,7 +310,6 @@ class EmailNotificationForm extends React.Component<EmailNotificationFormProps, 
 
   ccLookupFormGroup = () => {
     const { config, validation } = this.props;
-    // eslint-disable-next-line no-template-curly-in-string
 
     const customKeyField = (
       <Input id="cc-emails-table-key"
