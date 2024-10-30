@@ -222,6 +222,8 @@ const ToolsStore = {
     start: number,
     end: number,
     string: string,
+    successful: boolean,
+    cut: string,
   }> {
     const { url } = ApiRoutes.ToolsApiController.substringTest();
     const payload = {
