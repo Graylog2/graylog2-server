@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {useContext} from 'react';
+import { useContext } from 'react';
 
 import StreamsContext from 'contexts/StreamsContext';
 import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
