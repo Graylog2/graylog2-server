@@ -144,7 +144,7 @@ export const InputStatesStore = singletonStore(
     },
 
     setup(input) {
-      const url = URLUtils.qualifyUrl(ApiRoutes.InputStatesController.setup(input.id).url);
+      const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.setup(input.id).url);
 
       return fetch('PUT', url)
         .then(
