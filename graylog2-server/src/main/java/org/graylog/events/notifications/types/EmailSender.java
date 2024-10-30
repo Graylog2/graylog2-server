@@ -101,6 +101,26 @@ public class EmailSender {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
 
+        final List<InternetAddress> recipientAddresses = stringsToInternetAddresses(recipients, "TO", notificationId);
+        if (config.singleEmail()) {
+            LOG.debug("Sending mail to {}",
+                    String.join(", ", recipientAddresses.stream().map(InternetAddress::getAddress).toList()));
+            final Email email = createEmailWithoutRecipients(config, model, sender, replyTo, ccEmails, bccEmails, notificationId);
+            email.setTo(recipientAddresses);
+            email.send();
+        } else {
+            for (InternetAddress recipient : recipientAddresses) {
+                LOG.debug("Sending mail to {}", recipient.getAddress());
+                final Email email = createEmailWithoutRecipients(config, model, sender, replyTo, ccEmails, bccEmails, notificationId);
+                email.setTo(List.of(recipient));
+                email.send();
+            }
+        }
+    }
+
+    private Email createEmailWithoutRecipients(EmailEventNotificationConfig config, Map<String, Object> model, String sender,
+                                               String replyTo, Set<String> ccEmails, Set<String> bccEmails,
+                                               String notificationId) throws EmailException, TransportConfigurationException {
         final Email email = createEmailWithBody(config, model);
 
         if (!isNullOrEmpty(sender)) {
@@ -124,19 +144,8 @@ public class EmailSender {
         }
 
         email.setSubject(buildSubject(config, model));
-        final List<InternetAddress> recipientAddresses = stringsToInternetAddresses(recipients, "TO", notificationId);
-        if (config.singleEmail()) {
-            LOG.debug("Sending mail to {}",
-                    String.join(", ", recipientAddresses.stream().map(InternetAddress::getAddress).toList()));
-            email.setTo(recipientAddresses);
-            email.send();
-        } else {
-            for (InternetAddress recipient : recipientAddresses) {
-                LOG.debug("Sending mail to {}", recipient.getAddress());
-                email.setTo(List.of(recipient));
-                email.send();
-            }
-        }
+
+        return email;
     }
 
     private List<InternetAddress> stringsToInternetAddresses(Set<String> addresses, String line, String notificationId) {
