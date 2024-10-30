@@ -17,6 +17,12 @@
 import Immutable from 'immutable';
 
 export default class EntityIndex {
+  private _value: {
+    id: string,
+    title: string,
+    type: string,
+  };
+
   constructor(id, title, type) {
     this._value = { id, title, type };
   }
@@ -75,6 +81,8 @@ export default class EntityIndex {
 }
 
 class Builder {
+  private readonly value: Immutable.Map<any, any>;
+
   constructor(value = Immutable.Map()) {
     this.value = value;
   }

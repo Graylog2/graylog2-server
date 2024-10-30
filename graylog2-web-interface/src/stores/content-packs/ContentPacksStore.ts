@@ -21,16 +21,12 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import type {
-  ContentPackVersionsType,
-  ContentPackMetadata,
-  ContentPackInstallation,
-} from 'components/content-packs/Types';
+import type { ContentPackMetadata, ContentPackInstallation } from 'components/content-packs/Types';
 
 type Actions = {
   create: (pack: string) => Promise<unknown>,
   list: () => Promise<unknown>,
-  get: (id: string) => Promise<unknown>,
+  get: (id: string) => Promise<{ contentPackRevisions: ContentPackRevisions }>,
   getRev: () => Promise<unknown>,
   delete: (id: string) => Promise<unknown>,
   deleteRev: (id: string, revision: number) => Promise<unknown>,
@@ -61,7 +57,7 @@ type StoreState = {
   contentPacks: Array<ContentPackInstallation>,
   installations: Array<ContentPackInstallation>,
   uninstallEntities: unknown,
-  contentPackRevisions: ContentPackVersionsType,
+  contentPackRevisions: ContentPackRevisions,
   selectedVersion: unknown,
   constraints: unknown,
 }

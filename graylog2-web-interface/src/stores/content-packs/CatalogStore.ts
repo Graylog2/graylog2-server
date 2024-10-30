@@ -23,17 +23,25 @@ import fetch from 'logic/rest/FetchProvider';
 import EntityIndex from 'logic/content-packs/EntityIndex';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
+type RequestedEntities = { entities: Array<{ id: string, type: string }> };
+type Actions = {
+  showEntityIndex: () => Promise<unknown>,
+  getSelectedEntities: (requestedEntities: RequestedEntities) => Promise<{ entities: Array<unknown> }>,
+}
 export const CatalogActions = singletonActions(
   'core.Catalog',
-  () => Reflux.createActions({
+  () => Reflux.createActions<Actions>({
     showEntityIndex: { asyncResult: true },
     getSelectedEntities: { asyncResult: true },
   }),
 );
 
+type StoreState = {
+  entityIndex: { [category: string]: Array<EntityIndex> },
+}
 export const CatalogStore = singletonStore(
   'core.Catalog',
-  () => Reflux.createStore({
+  () => Reflux.createStore<StoreState>({
     listenables: [CatalogActions],
 
     getInitialState() {

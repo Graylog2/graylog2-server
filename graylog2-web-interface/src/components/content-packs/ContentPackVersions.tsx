@@ -18,12 +18,13 @@ import React from 'react';
 
 import { DataTable } from 'components/common';
 import ContentPackVersionItem from 'components/content-packs/components/ContentPackVersionItem';
-import type { ContentPackVersionsType, ContentPackInstallation } from 'components/content-packs/Types';
+import type { ContentPackInstallation } from 'components/content-packs/Types';
 
 import './ContentPackVersions.css';
+import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 
 type Props = {
-  contentPackRevisions: ContentPackVersionsType,
+  contentPackRevisions: ContentPackRevisions,
   onDeletePack?: (id: string) => void
   onChange?: (id: string) => void
   onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void

@@ -19,6 +19,8 @@ import max from 'lodash/max';
 import ContentPack from 'logic/content-packs/ContentPack';
 
 export default class ContentPackRevisions {
+  private _value = {};
+
   constructor(contentPackRevision) {
     this._value = Object.keys(contentPackRevision).reduce((acc, rev) => {
       const contentPack = contentPackRevision[rev];
