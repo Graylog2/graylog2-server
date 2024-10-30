@@ -67,6 +67,7 @@ const INITIAL_DATA = {
   pagination: { total: 0 },
   list: [],
   attributes: [],
+  meta: null,
 };
 
 /*
@@ -75,7 +76,7 @@ const INITIAL_DATA = {
  * It contains all the required logic to e.g. sync the URL query params.
  * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
  */
-const PaginatedEntityTable = <T extends EntityBase>({
+const PaginatedEntityTable = <T extends EntityBase, M = any>({
   actionsCellWidth = 160, columnsOrder, entityActions, tableLayout, fetchEntities, keyFn,
   humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
   expandedSectionsRenderer, bulkSelection, additionalAttributes = [],
@@ -99,7 +100,7 @@ const PaginatedEntityTable = <T extends EntityBase>({
     data: paginatedEntities = INITIAL_DATA,
     isInitialLoading: isLoadingEntities,
     refetch,
-  } = useFetchEntities<T>({ fetchKey, searchParams: fetchOptions, enabled: !isLoadingLayoutPreferences, fetchEntities, humanName, fetchOptions: reactQueryOptions });
+  } = useFetchEntities<T, M>({ fetchKey, searchParams: fetchOptions, enabled: !isLoadingLayoutPreferences, fetchEntities, humanName, fetchOptions: reactQueryOptions });
 
   const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
     paginationQueryParameter.resetPage();
@@ -128,7 +129,7 @@ const PaginatedEntityTable = <T extends EntityBase>({
     return <Spinner />;
   }
 
-  const { list, pagination: { total }, attributes } = paginatedEntities;
+  const { list, meta, pagination: { total }, attributes } = paginatedEntities;
 
   return (
     <TableFetchContextProvider refetch={refetch} searchParams={fetchOptions} attributes={attributes}>
@@ -154,21 +155,22 @@ const PaginatedEntityTable = <T extends EntityBase>({
           {list?.length === 0 ? (
             <NoSearchResult>No {humanName} have been found.</NoSearchResult>
           ) : (
-            <EntityDataTable<T> entities={list}
-                                visibleColumns={layoutConfig.displayedAttributes}
-                                columnsOrder={columnsOrder}
-                                expandedSectionsRenderer={expandedSectionsRenderer}
-                                bulkSelection={bulkSelection}
-                                onColumnsChange={onColumnsChange}
-                                onSortChange={onSortChange}
-                                onPageSizeChange={onPageSizeChange}
-                                pageSize={layoutConfig.pageSize}
-                                activeSort={layoutConfig.sort}
-                                entityActions={entityActions}
-                                actionsCellWidth={actionsCellWidth}
-                                columnRenderers={columnRenderers}
-                                columnDefinitions={columnDefinitions}
-                                entityAttributesAreCamelCase={entityAttributesAreCamelCase} />
+            <EntityDataTable<T, M> entities={list}
+                                   visibleColumns={layoutConfig.displayedAttributes}
+                                   columnsOrder={columnsOrder}
+                                   expandedSectionsRenderer={expandedSectionsRenderer}
+                                   bulkSelection={bulkSelection}
+                                   onColumnsChange={onColumnsChange}
+                                   onSortChange={onSortChange}
+                                   onPageSizeChange={onPageSizeChange}
+                                   pageSize={layoutConfig.pageSize}
+                                   activeSort={layoutConfig.sort}
+                                   entityActions={entityActions}
+                                   actionsCellWidth={actionsCellWidth}
+                                   columnRenderers={columnRenderers}
+                                   columnDefinitions={columnDefinitions}
+                                   entityAttributesAreCamelCase={entityAttributesAreCamelCase}
+                                   meta={meta} />
           )}
         </div>
       </PaginatedList>
