@@ -119,7 +119,7 @@ type Props = {
     perPage: number;
   },
   onPageChange: (currentPage: number, pageSize: number) => void,
-  onFilter: (collectorIds?: string[], callback?: () => void) => void,
+  onFilter: (name?: string, value?: string) => void,
   onQueryChange: (query?: string, callback?: () => void) => void,
   onConfigurationChange: (pairs: SidecarCollectorPairType[], configs: Configuration[], callback: () => void) => void,
   onProcessAction: (action: string, collectorDict: { [sidecarId: string]: string[] }, callback: () => void) => void,

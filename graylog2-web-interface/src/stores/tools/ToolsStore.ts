@@ -79,6 +79,7 @@ const ToolsStore = {
     key_whitespace_replacement: string,
     key_prefix: string,
     string: string,
+    matches: { [key: string]: string }
   }> {
     const { url } = ApiRoutes.ToolsApiController.jsonTest();
     const payload = {
@@ -221,6 +222,8 @@ const ToolsStore = {
     start: number,
     end: number,
     string: string,
+    successful: boolean,
+    cut: string,
   }> {
     const { url } = ApiRoutes.ToolsApiController.substringTest();
     const payload = {
