@@ -29,9 +29,9 @@ type PipelinesActionsType = {
   delete: (id: string) => Promise<unknown>,
   list: () => Promise<unknown>,
   listPaginated: (pagination: Pagination) => Promise<PaginatedPipelines>,
-  get: () => Promise<unknown>,
-  save: () => Promise<unknown>,
-  update: () => Promise<unknown>,
+  get: (id: string) => Promise<unknown>,
+  save: (pipeline: PipelineType) => Promise<unknown>,
+  update: (pipeline: PipelineType) => Promise<unknown>,
   parse: () => Promise<unknown>,
 }
 export const PipelinesActions = singletonActions(
@@ -81,9 +81,12 @@ const listFailCallback = (error: Error) => {
     'Could not retrieve processing pipelines');
 };
 
+type StoreState = {
+  pipelines: Array<PipelineType>,
+}
 export const PipelinesStore = singletonStore(
   'core.Pipelines',
-  () => Reflux.createStore({
+  () => Reflux.createStore<StoreState>({
     listenables: [PipelinesActions],
     pipelines: undefined,
 
