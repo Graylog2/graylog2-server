@@ -92,7 +92,7 @@ public abstract class MessageInput implements Stoppable {
     protected String persistId;
     protected DateTime createdAt;
     protected Boolean global = false;
-    protected IOState.Type desiredState = IOState.Type.SETUP;
+    protected IOState.Type desiredState = IOState.Type.RUNNING;
     protected String contentPack;
 
     protected final Configuration configuration;

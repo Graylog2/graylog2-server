@@ -124,8 +124,7 @@ public class InputRegistry {
     }
 
     public void setup(IOState<MessageInput> inputState) {
-        final IOState<MessageInput> stopped = stop(inputState.getStoppable());
-        remove(stopped);
+        remove(inputState);
         inputState.setState(IOState.Type.SETUP);
         inputStates.add(inputState);
     }
