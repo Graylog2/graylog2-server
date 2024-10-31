@@ -76,7 +76,7 @@ const INITIAL_DATA = {
  * It contains all the required logic to e.g. sync the URL query params.
  * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
  */
-const PaginatedEntityTable = <T extends EntityBase, M = any>({
+const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   actionsCellWidth = 160, columnsOrder, entityActions, tableLayout, fetchEntities, keyFn,
   humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
   expandedSectionsRenderer, bulkSelection, additionalAttributes = [],
