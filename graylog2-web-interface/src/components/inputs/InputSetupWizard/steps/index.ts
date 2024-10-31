@@ -15,5 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export { default as SelectCategoryStep } from './SelectCategoryStep';
+import TestInputStep from './TestInputStep';
+
 export { default as TestInputStep } from './TestInputStep';
+
+export default TestInputStep;

@@ -23,7 +23,7 @@ import { Wizard } from 'components/common';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 
-import { SelectCategoryStep, TestInputStep } from './steps';
+import { TestInputStep } from './steps';
 
 const InputSetupWizard = () => {
   const { activeStep, setActiveStep, show, closeWizard, wizardData } = useInputSetupWizard();
@@ -33,17 +33,6 @@ const InputSetupWizard = () => {
 
   const steps = useMemo(() => {
     const defaultSteps = {
-      [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
-        key: INPUT_WIZARD_STEPS.SELECT_CATEGORY,
-        title: (
-          <>
-            Select Category
-          </>
-        ),
-        component: (
-          <SelectCategoryStep />
-        ),
-      },
       [INPUT_WIZARD_STEPS.TEST_INPUT]: {
         key: INPUT_WIZARD_STEPS.TEST_INPUT,
         title: (
@@ -63,8 +52,15 @@ const InputSetupWizard = () => {
 
   const determineFirstStep = useCallback(() => {
     if (!category || !subcategory) {
-      setActiveStep(INPUT_WIZARD_STEPS.SELECT_CATEGORY);
-      setOrderedSteps([INPUT_WIZARD_STEPS.SELECT_CATEGORY]);
+      if (steps[INPUT_WIZARD_STEPS.SELECT_CATEGORY]) {
+        setActiveStep(INPUT_WIZARD_STEPS.SELECT_CATEGORY);
+        setOrderedSteps([INPUT_WIZARD_STEPS.SELECT_CATEGORY]);
+
+        return;
+      }
+
+      setActiveStep(INPUT_WIZARD_STEPS.TEST_INPUT);
+      setOrderedSteps([INPUT_WIZARD_STEPS.TEST_INPUT]);
 
       return;
     }
