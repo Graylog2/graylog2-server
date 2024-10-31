@@ -195,9 +195,9 @@ export interface ExportFormat {
   formatSpecificFileDownloader?: (format: string, widget: Widget, view: View, executionState: SearchExecutionState, currentUser: User, currentQuery: Query, exportPayload: ExportPayload,) => Promise<void>
 }
 
-export interface SystemConfigurationComponentProps {
-  config: any,
-  updateConfig: (newConfig: any) => any,
+export interface SystemConfigurationComponentProps<T = unknown> {
+  config: T,
+  updateConfig: (newConfig: T) => any,
 }
 
 export interface SystemConfiguration {
