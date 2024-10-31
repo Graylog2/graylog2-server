@@ -99,4 +99,4 @@ const TableRow = <Entity extends EntityBase, Meta>({
   );
 };
 
-export default React.memo(TableRow);
+export default React.memo(TableRow) as typeof TableRow;
