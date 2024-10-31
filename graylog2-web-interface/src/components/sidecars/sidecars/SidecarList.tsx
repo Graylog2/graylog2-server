@@ -36,7 +36,7 @@ export const PAGE_SIZES = [10, 25, 50, 100];
 
 type SidecarListProps = {
   sidecars: any[];
-  onlyActive: boolean;
+  onlyActive: boolean | string;
   pagination: any;
   query: string;
   sort: any;
@@ -49,7 +49,7 @@ type SidecarListProps = {
 class SidecarList extends React.Component<SidecarListProps, {
   [key: string]: any;
 }> {
-  formatSidecarList = (sidecars) => {
+  formatSidecarList = (sidecars: React.ReactElement[]) => {
     const { onSortChange, sort } = this.props;
     const sidecarCollection = {
       node_name: 'Name',

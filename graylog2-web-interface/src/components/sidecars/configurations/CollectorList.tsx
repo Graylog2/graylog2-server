@@ -38,7 +38,7 @@ type CollectorListProps = {
   onDelete: (...args: any[]) => void,
   onPageChange: (...args: any[]) => void,
   onQueryChange: (...args: any[]) => void,
-  validateCollector: (...args: any[]) => void,
+  validateCollector: (collector: Collector) => Promise<{ errors: { name: string[] } }>,
 }
 
 class CollectorList extends React.Component<CollectorListProps> {
