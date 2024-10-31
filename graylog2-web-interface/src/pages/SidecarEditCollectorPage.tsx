@@ -25,11 +25,12 @@ import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavig
 import DocsHelper from 'util/DocsHelper';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
+import type { Collector } from 'components/sidecars/types';
 
 const SidecarEditCollectorPage = () => {
   const history = useHistory();
   const { collectorId } = useParams();
-  const [collector, setCollector] = useState();
+  const [collector, setCollector] = useState<Collector>();
 
   const _reloadCollector = useCallback(() => {
     CollectorsActions.getCollector(collectorId).then(

@@ -31,7 +31,7 @@ import { useStore } from 'stores/connect';
 
 const CreateContentPackPage = () => {
   const history = useHistory();
-  const { entityIndex } = useStore<{ entityIndex: string | undefined }>(CatalogStore);
+  const { entityIndex } = useStore(CatalogStore);
   const [contentPackState, setContentPackState] = useState({
     contentPack: ContentPack.builder().build(),
     appliedParameter: {},
@@ -76,7 +76,7 @@ const CreateContentPackPage = () => {
       );
   };
 
-  const _getEntities = (selectedEntities: unknown) => {
+  const _getEntities = (selectedEntities) => {
     const { contentPack } = contentPackState;
 
     CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
