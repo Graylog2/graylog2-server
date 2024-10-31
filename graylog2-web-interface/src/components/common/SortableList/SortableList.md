@@ -1,10 +1,10 @@
 ```js
-import createReactClass from 'create-react-class';
 import SortableList from './SortableList'
 
-const SortableListExample = createReactClass({
-  getInitialState() {
-    return {
+class SortableListExample extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       list: [
         { id: 'one', title: 'One' },
         { id: 'two', title: 'Two' },
@@ -14,11 +14,11 @@ const SortableListExample = createReactClass({
       ],
       sortedList: [],
     };
-  },
+  }
 
-  onSortList(nextSortedList) {
+  onSortList = (nextSortedList) => {
     this.setState({ sortedList: nextSortedList });
-  },
+  };
 
   render() {
     const { list, sortedList } = this.state;
@@ -29,8 +29,8 @@ const SortableListExample = createReactClass({
         <SortableList items={list} onMoveItem={this.onSortList} />
       </div>
     );
-  },
-});
+  }
+}
 
 <SortableListExample />
 ```

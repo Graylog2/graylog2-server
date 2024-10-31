@@ -1,18 +1,16 @@
 ```js
-import createReactClass from 'create-react-class';
-
-const TimeUnitInputExample = createReactClass({
-  getInitialState() {
-    return {
+class TimeUnitInputExample extends React.Component {
+  constructor() {
+    this.state = {
       value: undefined,
       unit: 'MINUTES',
       enabled: false,
     };
-  },
+  }
 
-  onChange(value, unit, checked) {
+  onChange = (value, unit, checked) => {
     this.setState({ value: value, unit: unit, enabled: checked });
-  },
+  };
 
   render() {
     const { value, unit, enabled } = this.state;
@@ -27,8 +25,8 @@ const TimeUnitInputExample = createReactClass({
                        defaultValue={7} />
       </div>
     );
-  },
-});
+  }
+}
 
 <TimeUnitInputExample />
 ```

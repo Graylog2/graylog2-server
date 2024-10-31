@@ -1,16 +1,15 @@
 ```js
-import createReactClass from 'create-react-class';
-
-const TypeAheadInputExample = createReactClass({
-  getInitialState() {
-    return {
+class TypeAheadInputExample extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       selectedNumber: undefined,
     };
-  },
+  }
 
-  onChange(event, selectedNumber) {
+  onChange = (event, selectedNumber) => {
     this.setState({ selectedNumber: selectedNumber.number });
-  },
+  }
 
   render() {
     const { selectedNumber } = this.state;
@@ -27,8 +26,8 @@ const TypeAheadInputExample = createReactClass({
                         onSuggestionSelected={this.onChange} />
       </div>
     );
-  },
-});
+  }
+}
 
 <TypeAheadInputExample />
 ```

@@ -1,21 +1,20 @@
 Simple option input:
 ```js
-import createReactClass from 'create-react-class';
-
-const SimpleSelect = createReactClass({
-  getInitialState() {
-    return {
+class SimpleSelect extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       options: [
         { label: 'Option 1', value: 'one' },
         { label: 'Option 2', value: 'two' },
       ],
       selectedOption: '',
     };
-  },
+  }
 
-  onChange(nextValue) {
+  onChange = (nextValue) => {
     this.setState({selectedOption: nextValue});
-  },
+  };
 
   render() {
     const { options, selectedOption } = this.state;
@@ -27,20 +26,20 @@ const SimpleSelect = createReactClass({
                   options={options}/>
       </div>
     );
-  },
-});
+  }
+}
 
 <SimpleSelect />
 ```
 
 Multi select input:
 ```js
-import createReactClass from 'create-react-class';
 import { MultiSelect } from 'components/common';
 
-const SimpleSelect = createReactClass({
-  getInitialState() {
-    return {
+class SimpleSelect extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       options: [
         { spanish: 'uno', english: 'one' },
         { spanish: 'dos', english: 'two' },
@@ -50,11 +49,11 @@ const SimpleSelect = createReactClass({
       ],
       selectedOptions: 'one;three;five',
     };
-  },
+  }
 
-  onChange(nextValue) {
+  onChange = (nextValue) => {
     this.setState({selectedOptions: nextValue});
-  },
+  };
 
   render() {
     const { options, selectedOptions } = this.state;
@@ -70,8 +69,8 @@ const SimpleSelect = createReactClass({
                        allowCreate />
       </div>
     );
-  },
-});
+  }
+}
 
 <SimpleSelect />
 ```
