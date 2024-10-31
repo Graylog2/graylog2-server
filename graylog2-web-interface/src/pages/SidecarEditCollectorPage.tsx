@@ -25,7 +25,7 @@ import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavig
 import DocsHelper from 'util/DocsHelper';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
-import {Collector} from 'components/sidecars/types';
+import type { Collector } from 'components/sidecars/types';
 
 const SidecarEditCollectorPage = () => {
   const history = useHistory();

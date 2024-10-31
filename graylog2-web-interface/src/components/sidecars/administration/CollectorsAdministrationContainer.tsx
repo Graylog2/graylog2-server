@@ -27,25 +27,26 @@ import { CollectorConfigurationsActions, CollectorConfigurationsStore } from 'st
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
 import { SidecarsAdministrationActions, SidecarsAdministrationStore } from 'stores/sidecars/SidecarsAdministrationStore';
+import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
+import { useStore } from 'stores/connect';
+import type { SidecarCollectorPairType, Configuration } from 'components/sidecars/types';
 
 import CollectorsAdministration, { PAGE_SIZES } from './CollectorsAdministration';
-import {PaginationQueryParameterResult} from 'hooks/usePaginationQueryParameter';
-import {useStore} from 'stores/connect';
-import type {SidecarCollectorPairType, Configuration} from 'components/sidecars/types';
 
 type Props = {
   nodeId?: string,
   paginationQueryParameter: PaginationQueryParameterResult,
 }
+
 const CollectorsAdministrationContainer = (props: Props) => {
   const collectors = useStore(CollectorsStore);
   const sidecars = useStore(SidecarsAdministrationStore);
   const configurations = useStore(CollectorConfigurationsStore);
 
   const reloadSidecars = () => {
-      if (sidecars) {
-        SidecarsAdministrationActions.refreshList();
-      }
+    if (sidecars) {
+      SidecarsAdministrationActions.refreshList();
+    }
   };
 
   const loadData = (nodeId: string) => {
@@ -63,9 +64,9 @@ const CollectorsAdministrationContainer = (props: Props) => {
 
   useEffect(() => {
     const interval = setInterval(reloadSidecars, 5000);
+
     return () => clearInterval(interval);
   }, []);
-
 
   const handlePageChange = (page: number, pageSize: number) => {
     const { filters, query } = sidecars;
@@ -119,44 +120,43 @@ const CollectorsAdministrationContainer = (props: Props) => {
     });
   };
 
+  if (!collectors?.collectors || !sidecars?.sidecars || !configurations?.configurations) {
+    return <Spinner text="Loading collector list..." />;
+  }
 
-    if (!collectors?.collectors || !sidecars?.sidecars || !configurations?.configurations) {
-      return <Spinner text="Loading collector list..." />;
-    }
+  const sidecarCollectors = [];
 
-    const sidecarCollectors = [];
+  sidecars.sidecars
+    .sort((s1, s2) => naturalSortIgnoreCase(s1.node_name, s2.node_name))
+    .forEach((sidecar) => {
+      const compatibleCollectorIds = sidecar.collectors;
 
-    sidecars.sidecars
-      .sort((s1, s2) => naturalSortIgnoreCase(s1.node_name, s2.node_name))
-      .forEach((sidecar) => {
-        const compatibleCollectorIds = sidecar.collectors;
+      if (isEmpty(compatibleCollectorIds)) {
+        sidecarCollectors.push({ collector: {}, sidecar: sidecar });
 
-        if (isEmpty(compatibleCollectorIds)) {
-          sidecarCollectors.push({ collector: {}, sidecar: sidecar });
+        return;
+      }
 
-          return;
-        }
+      compatibleCollectorIds
+        .map((id) => find(collectors.collectors, { id: id }))
+        .forEach((compatibleCollector) => {
+          sidecarCollectors.push({ collector: compatibleCollector, sidecar: sidecar });
+        });
+    });
 
-        compatibleCollectorIds
-          .map((id) => find(collectors.collectors, { id: id }))
-          .forEach((compatibleCollector) => {
-            sidecarCollectors.push({ collector: compatibleCollector, sidecar: sidecar });
-          });
-      });
-
-    return (
-      <CollectorsAdministration sidecarCollectorPairs={sidecarCollectors}
-                                collectors={collectors.collectors}
-                                configurations={configurations.configurations}
-                                pagination={sidecars.pagination}
-                                query={sidecars.query}
-                                filters={sidecars.filters}
-                                onPageChange={handlePageChange}
-                                onFilter={handleFilter}
-                                onQueryChange={handleQueryChange}
-                                onConfigurationChange={handleConfigurationChange}
-                                onProcessAction={handleProcessAction} />
-    );
-  };
+  return (
+    <CollectorsAdministration sidecarCollectorPairs={sidecarCollectors}
+                              collectors={collectors.collectors}
+                              configurations={configurations.configurations}
+                              pagination={sidecars.pagination}
+                              query={sidecars.query}
+                              filters={sidecars.filters}
+                              onPageChange={handlePageChange}
+                              onFilter={handleFilter}
+                              onQueryChange={handleQueryChange}
+                              onConfigurationChange={handleConfigurationChange}
+                              onProcessAction={handleProcessAction} />
+  );
+};
 
 export default withPaginationQueryParameter(CollectorsAdministrationContainer, { pageSizes: PAGE_SIZES });

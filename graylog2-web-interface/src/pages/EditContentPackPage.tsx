@@ -31,12 +31,12 @@ import { CatalogActions, CatalogStore } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
-import {useStore} from 'stores/connect';
+import { useStore } from 'stores/connect';
 
 const EditContentPackPage = () => {
   const { entityIndex } = useStore(CatalogStore);
   const {} = useStore(ContentPacksStore);
-  const {contentPackId, contentPackRev} = useParams<{ contentPackId: string, contentPackRev: string }>();
+  const { contentPackId, contentPackRev } = useParams<{ contentPackId: string, contentPackRev: string }>();
   const history = useHistory();
   const [selectedEntities, setSelectedEntities] = useState({});
   const [appliedParameter, setAppliedParameter] = useState({});
@@ -46,7 +46,7 @@ const EditContentPackPage = () => {
 
   useEffect(() => {
     ContentPacksActions.get(contentPackId).then((result) => {
-      const { contentPackRevisions} = result;
+      const { contentPackRevisions } = result;
       const originContentPackRev = contentPackRev;
       const newContentPack = contentPackRevisions.createNewVersionFromRev(originContentPackRev);
 
@@ -100,6 +100,7 @@ const EditContentPackPage = () => {
     if (!contentPack) {
       return;
     }
+
     const newAppliedParameter = contentPack.entities.reduce((result, entity) => {
       const entityData = new ValueReferenceData(entity.data);
       const configPaths = entityData.getPaths();
@@ -118,9 +119,9 @@ const EditContentPackPage = () => {
   }, [contentPack]);
 
   const _onStateChanged = (newState) => {
-    setContentPack( newState.contentPack || contentPack);
-    setSelectedEntities( newState.selectedEntities || selectedEntities);
-    setAppliedParameter( newState.appliedParameter || appliedParameter);
+    setContentPack(newState.contentPack || contentPack);
+    setSelectedEntities(newState.selectedEntities || selectedEntities);
+    setAppliedParameter(newState.appliedParameter || appliedParameter);
   };
 
   const _onSave = () => {
@@ -159,7 +160,6 @@ const EditContentPackPage = () => {
       setFetchedEntities(builtContentPack.entities);
     });
   };
-
 
   return (
     <DocumentTitle title="Content packs">

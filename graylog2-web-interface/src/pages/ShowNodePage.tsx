@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
@@ -45,6 +46,7 @@ const ShowNodePage = () => {
         filteredInputStates.push(inputObject);
       }
     });
+
     return filteredInputStates;
   }));
 

@@ -19,7 +19,8 @@ import { useCallback, useEffect } from 'react';
 
 import { Spinner } from 'components/common';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import {SidecarsActions, SidecarsStore, PaginationOptions} from 'stores/sidecars/SidecarsStore';
+import type { PaginationOptions } from 'stores/sidecars/SidecarsStore';
+import { SidecarsActions, SidecarsStore } from 'stores/sidecars/SidecarsStore';
 import { useStore } from 'stores/connect';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 

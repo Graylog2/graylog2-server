@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
-import {useStore} from 'stores/connect';
-import { useQuery } from '@tanstack/react-query';
+import { useStore } from 'stores/connect';
 
 const ProcessBufferDumpPage = () => {
   const { nodeId } = useParams<{ nodeId: string }>();
@@ -30,33 +30,33 @@ const ProcessBufferDumpPage = () => {
   const { data: processbufferDump } = useQuery(['processBufferDump', nodeId], () => ClusterOverviewStore.processbufferDump(nodeId));
 
   const node = nodes?.[nodeId];
-    if (!node) {
-      return <Spinner />;
-    }
 
+  if (!node) {
+    return <Spinner />;
+  }
 
-    const title = (
-      <span>
-        Process-buffer dump of node {node.short_node_id} / {node.hostname}
+  const title = (
+    <span>
+      Process-buffer dump of node {node.short_node_id} / {node.hostname}
         &nbsp;
-        <small>Taken at <Timestamp dateTime={new Date()} /> </small>
-      </span>
-    );
+      <small>Taken at <Timestamp dateTime={new Date()} /> </small>
+    </span>
+  );
 
-    const content = processbufferDump ? <pre className="processbufferdump">{JSON.stringify(processbufferDump, null, 2)}</pre> : <Spinner />;
+  const content = processbufferDump ? <pre className="processbufferdump">{JSON.stringify(processbufferDump, null, 2)}</pre> : <Spinner />;
 
-    return (
-      <DocumentTitle title={`Process-buffer dump of node ${node.short_node_id} / ${node.hostname}`}>
-        <div>
-          <PageHeader title={title} />
-          <Row className="content">
-            <Col md={12}>
-              {content}
-            </Col>
-          </Row>
-        </div>
-      </DocumentTitle>
-    );
-  };
+  return (
+    <DocumentTitle title={`Process-buffer dump of node ${node.short_node_id} / ${node.hostname}`}>
+      <div>
+        <PageHeader title={title} />
+        <Row className="content">
+          <Col md={12}>
+            {content}
+          </Col>
+        </Row>
+      </div>
+    </DocumentTitle>
+  );
+};
 
 export default ProcessBufferDumpPage;
