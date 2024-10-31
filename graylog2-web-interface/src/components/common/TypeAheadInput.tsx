@@ -204,8 +204,7 @@ class TypeAheadInput extends React.Component<TypeAheadInputProps, {
 
   _updateTypeahead = ({ suggestions, displayKey, suggestionText, onTypeaheadLoaded, onSuggestionSelected }) => {
     this.fieldInput = this.fieldInputElem.getInputDOMNode();
-    // eslint-disable-next-line react/no-find-dom-node
-    this.fieldFormGroup = ReactDOM.findDOMNode(this.fieldInputElem);
+    this.fieldFormGroup = this.fieldInputElem.getInputDOMNode();
 
     const $fieldInput = $(this.fieldInput);
 

@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
 import { act } from 'react';
 
 import ContentPack from 'logic/content-packs/ContentPack';

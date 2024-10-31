@@ -59,9 +59,7 @@ type TypeAheadFieldInputProps = {
  * Component that renders an input offering auto-completion for message fields.
  * Fields are loaded from the Graylog server in the background.
  */
-class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
-  [key: string]: any;
-}> {
+class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps> {
   static defaultProps = {
     valueLink: undefined,
     autoFocus: false,
@@ -103,8 +101,7 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
           },
         );
 
-      // eslint-disable-next-line react/no-find-dom-node
-      const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
+      const fieldFormGroup = this.fieldInput.getInputDOMNode();
 
       $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {
         if (onChange) {
@@ -125,8 +122,7 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps, {
       // @ts-ignore
       fieldInput.typeahead('destroy');
 
-      // eslint-disable-next-line react/no-find-dom-node
-      const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
+      const fieldFormGroup = this.fieldInput.getInputDOMNode();
 
       $(fieldFormGroup).off('typeahead:change typeahead:selected');
     }
