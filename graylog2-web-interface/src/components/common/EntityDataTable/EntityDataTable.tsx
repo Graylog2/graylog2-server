@@ -102,14 +102,14 @@ const filterVisibleColumns = (
   .find(({ id }) => id === columnId))
   .filter((column) => !!column);
 
-const useElementsWidths = <Entity extends EntityBase>({
+const useElementsWidths = <Entity extends EntityBase, Meta>({
   columns,
   columnRenderersByAttribute,
   displayBulkSelectCol,
   fixedActionsCellWidth,
 }: {
   columns: Array<Column>,
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>,
   displayBulkSelectCol: boolean
   fixedActionsCellWidth: number | undefined
 }) => {
@@ -131,7 +131,7 @@ const useElementsWidths = <Entity extends EntityBase>({
   return { tableRef, actionsRef, columnsWidths, actionsColWidth };
 };
 
-const mergeColumnsRenderers = <Entity extends EntityBase>(columns: Array<Column>, customColumnRenderers: ColumnRenderers<Entity>) => {
+const mergeColumnsRenderers = <Entity extends EntityBase, Meta = unknown>(columns: Array<Column>, customColumnRenderers: ColumnRenderers<Entity, Meta>) => {
   const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
 
   return Object.fromEntries(columns.map(({ id, type }) => {
@@ -244,9 +244,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     [accessibleColumns, visibleColumns],
   );
 
-  const columnRenderersByAttribute = useMemo(() => mergeColumnsRenderers<Entity>(columns, customColumnRenderers), [columns, customColumnRenderers]);
+  const columnRenderersByAttribute = useMemo(() => mergeColumnsRenderers<Entity, Meta>(columns, customColumnRenderers), [columns, customColumnRenderers]);
 
-  const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths<Entity>({
+  const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths<Entity, Meta>({
     columns,
     columnRenderersByAttribute,
     displayBulkSelectCol,

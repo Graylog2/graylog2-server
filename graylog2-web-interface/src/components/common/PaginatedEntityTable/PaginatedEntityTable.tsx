@@ -43,7 +43,7 @@ const SearchRow = styled.div`
 
 type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
 
-type Props<T> = {
+type Props<T, M> = {
   actionsCellWidth?: EntityDataTableProps['actionsCellWidth'],
   additionalAttributes?: Array<Attribute>,
   bulkSelection?: EntityDataTableProps['bulkSelection'],
@@ -52,7 +52,7 @@ type Props<T> = {
   entityActions: EntityDataTableProps['entityActions'],
   entityAttributesAreCamelCase: boolean,
   expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'],
-  fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T>>,
+  fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>,
   fetchOptions?: FetchOptions,
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'],
   humanName: string,
@@ -81,7 +81,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
   expandedSectionsRenderer, bulkSelection, additionalAttributes = [],
   entityAttributesAreCamelCase, topRightCol, searchPlaceholder, fetchOptions: reactQueryOptions,
-}: Props<T>) => {
+}: Props<T, M>) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout(tableLayout);
