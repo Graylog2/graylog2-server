@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import $ from 'jquery';
 import 'typeahead.js';
