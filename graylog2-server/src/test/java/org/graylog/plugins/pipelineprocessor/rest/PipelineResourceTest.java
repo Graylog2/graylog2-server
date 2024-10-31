@@ -32,7 +32,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.ws.rs.BadRequestException;
+import jakarta.ws.rs.BadRequestException;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;

@@ -20,6 +20,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.fields.DropdownField;
@@ -49,6 +51,7 @@ import static org.mockito.Mockito.when;
 
 public class SyslogCodecTest {
     private static final int YEAR = Tools.nowUTC().getYear();
+    private static final String FORTIGATE = "<45>date=2017-03-06 time=12:53:10 devname=DEVICENAME devid=DEVICEID logid=0000000013 type=traffic subtype=forward level=notice vd=ALIAS srcip=IP srcport=45748 srcintf=\"IF\" dstip=IP dstport=443 dstintf=\"IF\" sessionid=1122686199 status=close policyid=77 dstcountry=\"COUNTRY\" srccountry=\"COUNTRY\" trandisp=dnat tranip=IP tranport=443 service=HTTPS proto=6 appid=41540 app=\"SSL_TLSv1.2\" appcat=\"Network.Service\" applist=\"ACLNAME\" appact=detected duration=1 sentbyte=2313 rcvdbyte=14883 sentpkt=19 rcvdpkt=19 utmaction=passthrough utmevent=app-ctrl attack=\"SSL\" hostname=\"HOSTNAME\"";
     private static String STRUCTURED = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
     private static String STRUCTURED_ISSUE_845 = "<190>1 2015-01-06T20:56:33.287Z app-1 app - - [mdc@18060 ip=\"::ffff:132.123.15.30\" logger=\"{c.corp.Handler}\" session=\"4ot7\" user=\"user@example.com\" user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11\"] User page 13 requested";
     private static String STRUCTURED_ISSUE_845_EMPTY = "<128>1 2015-01-11T16:35:21.335797+01:00 s000000.example.com - - - - tralala";
@@ -67,13 +70,14 @@ public class SyslogCodecTest {
     private Timer mockedTimer;
 
     private SyslogCodec codec;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
         when(metricRegistry.timer(any(String.class))).thenReturn(mockedTimer);
         when(mockedTimer.time()).thenReturn(mock(Timer.Context.class));
 
-        codec = new SyslogCodec(configuration, metricRegistry);
+        codec = new SyslogCodec(configuration, metricRegistry, messageFactory);
     }
 
     @Test
@@ -116,7 +120,7 @@ public class SyslogCodecTest {
     public void testDecodeStructuredIssue845WithExpandStructuredData() throws Exception {
         when(configuration.getBoolean(SyslogCodec.CK_EXPAND_STRUCTURED_DATA)).thenReturn(true);
 
-        final SyslogCodec codec = new SyslogCodec(configuration, metricRegistry);
+        final SyslogCodec codec = new SyslogCodec(configuration, metricRegistry, messageFactory);
         final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845));
 
         assertNotNull(message);
@@ -423,8 +427,18 @@ public class SyslogCodecTest {
     }
 
     @Test
-    public void testFortiGateFirewall() {
-        final RawMessage rawMessage = buildRawMessage("<45>date=2017-03-06 time=12:53:10 devname=DEVICENAME devid=DEVICEID logid=0000000013 type=traffic subtype=forward level=notice vd=ALIAS srcip=IP srcport=45748 srcintf=\"IF\" dstip=IP dstport=443 dstintf=\"IF\" sessionid=1122686199 status=close policyid=77 dstcountry=\"COUNTRY\" srccountry=\"COUNTRY\" trandisp=dnat tranip=IP tranport=443 service=HTTPS proto=6 appid=41540 app=\"SSL_TLSv1.2\" appcat=\"Network.Service\" applist=\"ACLNAME\" appact=detected duration=1 sentbyte=2313 rcvdbyte=14883 sentpkt=19 rcvdpkt=19 utmaction=passthrough utmevent=app-ctrl attack=\"SSL\" hostname=\"HOSTNAME\"");
+    public void testFortiGate() {
+        doTestFortigate(FORTIGATE);
+    }
+
+    @Test
+    public void testFortiGateTrimLineBreaks() {
+        // Ensure that trailing line breaks are trimmed for Fortigate messages to avoid parsing error.
+        doTestFortigate(FORTIGATE + "\r\n ");
+    }
+
+    private void doTestFortigate(String fortigateMessage) {
+        final RawMessage rawMessage = buildRawMessage(fortigateMessage);
         final Message message = codec.decode(rawMessage);
 
         assertThat(message).isNotNull();
@@ -442,7 +456,7 @@ public class SyslogCodecTest {
     public void testDefaultTimezoneConfig() {
         when(configuration.getString("timezone")).thenReturn("MST");
 
-        SyslogCodec codec = new SyslogCodec(configuration, metricRegistry);
+        SyslogCodec codec = new SyslogCodec(configuration, metricRegistry, messageFactory);
         final Message msgWithoutTimezone = codec.decode(buildRawMessage(UNSTRUCTURED));
         final Message msgWithUTCTimezone = codec.decode(buildRawMessage(STRUCTURED));
         final Message msgWithTimezoneOffset = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845_EMPTY));
@@ -456,7 +470,7 @@ public class SyslogCodecTest {
     public void testDefaultTimezoneConfigNotConfiguredStillUsesSystemTime() {
         when(configuration.getString("timezone")).thenReturn(DropdownField.NOT_CONFIGURED);
 
-        SyslogCodec codec = new SyslogCodec(configuration, metricRegistry);
+        SyslogCodec codec = new SyslogCodec(configuration, metricRegistry, messageFactory);
         final Message msgWithoutTimezone = codec.decode(buildRawMessage(UNSTRUCTURED));
         final Message msgWithUTCTimezone = codec.decode(buildRawMessage(STRUCTURED));
         final Message msgWithTimezoneOffset = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845_EMPTY));

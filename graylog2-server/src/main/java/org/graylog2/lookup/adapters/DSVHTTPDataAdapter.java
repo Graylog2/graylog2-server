@@ -41,10 +41,12 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.inject.Inject;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
@@ -67,9 +69,9 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
 
     @Inject
     public DSVHTTPDataAdapter(@Assisted("id") String id, @Assisted("name") String name,
-            @Assisted LookupDataAdapterConfiguration config, MetricRegistry metricRegistry,
-            HTTPFileRetriever httpFileRetriever, UrlWhitelistService whitelistService,
-            UrlWhitelistNotificationService urlWhitelistNotificationService) {
+                              @Assisted LookupDataAdapterConfiguration config, MetricRegistry metricRegistry,
+                              HTTPFileRetriever httpFileRetriever, UrlWhitelistService whitelistService,
+                              UrlWhitelistNotificationService urlWhitelistNotificationService) {
         super(id, name, config, metricRegistry);
         this.config = (DSVHTTPDataAdapter.Config) config;
         this.httpFileRetriever = httpFileRetriever;
@@ -324,7 +326,7 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
     private void publishSystemNotificationForWhitelistFailure() {
         final String description =
                 "A \"DSV File from HTTP\" lookup adapter is trying to access a URL which is not whitelisted. Please " +
-                        "check your configuration. [adapter name: \"" + name() + "\", url: \"" + config.url() +"\"]";
+                        "check your configuration. [adapter name: \"" + name() + "\", url: \"" + config.url() + "\"]";
         urlWhitelistNotificationService.publishWhitelistFailure(description);
     }
 }

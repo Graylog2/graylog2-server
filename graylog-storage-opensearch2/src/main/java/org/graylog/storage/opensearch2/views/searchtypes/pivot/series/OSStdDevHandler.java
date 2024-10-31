@@ -18,26 +18,26 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
-import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStats;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.SeriesAggregationBuilder;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class OSStdDevHandler extends OSPivotSeriesSpecHandler<StdDev, ExtendedStats> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder stddev = AggregationBuilders.extendedStats(name).field(stddevSpec.field());
         record(queryContext, pivot, stddevSpec, name, ExtendedStats.class);
-        return Optional.of(stddev);
+        return List.of(SeriesAggregationBuilder.metric(stddev));
     }
 
     @Override

@@ -50,8 +50,9 @@ import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -173,6 +174,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
             final ClusterHealthResponse result = client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions));
             return result.getNumberOfDataNodes() > 0;
         } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException e) {
+            LOG.error("Check for connectivity failed with exception '{}' - enable debug level for this class to see the stack trace.", e.getMessage());
             if (LOG.isDebugEnabled()) {
                 LOG.error(e.getMessage(), e);
             }

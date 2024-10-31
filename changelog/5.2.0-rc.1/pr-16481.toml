@@ -1,0 +1,4 @@
+type = "f"
+message = "Indexer cluster checker thread start is delayed by 5s to avoid potential deadlock."
+
+pulls = ["16481"]

@@ -1,0 +1,49 @@
+{
+  "users": [{
+    "_id" : { "$oid": "5ffdbca8eeae7f4edf068822" },
+    "service_account" : false,
+    "preferences" : {
+      "updateUnfocussed" : false,
+      "themeMode" : "noir",
+      "enableSmartSearch" : true
+    },
+    "timezone" : null,
+    "auth_service_id" : null,
+    "roles" : [
+      { "$oid": "5fdc9606b5a58587301c6a7a" },
+    ],
+    "auth_service_uid" : null,
+    "account_status" : "enabled",
+    "password" : "...",
+    "full_name" : "Gary the Goat",
+    "session_timeout_ms" : 10800000,
+    "startpage" : {},
+    "permissions" : [],
+    "external_user" : false,
+    "email" : "gary@graylog.com",
+    "username" : "gary"
+  }, {
+    "_id" : { "$oid": "5ffdbca8eeae7f4edf068823" },
+    "service_account" : false,
+    "preferences" : {
+      "updateUnfocussed" : false,
+      "themeMode" : "teint",
+      "enableSmartSearch" : true
+    },
+    "timezone" : null,
+    "auth_service_id" : null,
+    "roles" : [
+      { "$oid": "5fdc9606b5a58587301c6a7a" },
+    ],
+    "auth_service_uid" : null,
+    "account_status" : "enabled",
+    "password" : "...",
+    "full_name" : "Gary the Goat (light)",
+    "session_timeout_ms" : 10800000,
+    "startpage" : {},
+    "permissions" : [],
+    "external_user" : false,
+    "email" : "gary@graylog.com",
+    "username" : "lightgary"
+  }]
+}

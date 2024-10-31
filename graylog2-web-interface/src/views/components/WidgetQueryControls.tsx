@@ -23,13 +23,13 @@ import isEmpty from 'lodash/isEmpty';
 import { useIsFetching } from '@tanstack/react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
+import type { Stream } from 'views/stores/StreamsStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import connect, { useStore } from 'stores/connect';
+import connect from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
 import type { SearchBarFormValues } from 'views/Constants';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
@@ -60,13 +60,21 @@ import { updateWidget } from 'views/logic/slices/widgetActions';
 import { execute, setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
 import useAppDispatch from 'stores/useAppDispatch';
 import useHandlerContext from 'views/components/useHandlerContext';
+import useView from 'views/hooks/useView';
+import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
+import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
+import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
+import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import { defaultCompare } from 'logic/DefaultCompare';
+import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
-import TimeRangeInput from './searchbar/TimeRangeInput';
+import TimeRangeFilter from './searchbar/time-range-filter';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
-import QueryInput from './searchbar/queryinput/AsyncQueryInput';
-import SearchBarForm, { normalizeSearchBarFormValues } from './searchbar/SearchBarForm';
+import ViewsQueryInput from './searchbar/ViewsQueryInput';
+import SearchBarForm from './searchbar/SearchBarForm';
 import WidgetQueryOverride from './WidgetQueryOverride';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 
@@ -82,19 +90,20 @@ const SearchInputAndValidation = styled.div`
 `;
 
 type Props = {
-  availableStreams: Array<{ key: string, value: string }>,
+  availableStreams: Array<Stream>,
 };
 
-export const updateWidgetSearchControls = (widget, { timerange, streams, queryString }) => widget.toBuilder()
+export const updateWidgetSearchControls = (widget, { timerange, streams, streamCategories, queryString }) => widget.toBuilder()
   .timerange(timerange)
   .query(createElasticsearchQueryString(queryString))
   .streams(streams)
+  .streamCategories(streamCategories)
   .build();
 
 const onSubmit = async (dispatch: AppDispatch, values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, widget: Widget) => {
-  const { timerange, streams, queryString } = values;
+  const { timerange, streams, streamCategories, queryString } = values;
   const widgetWithPluginData = await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls, widget);
-  const newWidget = updateWidgetSearchControls(widgetWithPluginData, { timerange, streams, queryString });
+  const newWidget = updateWidgetSearchControls(widgetWithPluginData, { timerange, streams, streamCategories, queryString });
 
   if (!widget.equals(newWidget)) {
     return dispatch(updateWidget(widget.id, newWidget));
@@ -115,10 +124,13 @@ const useBindApplySearchControlsChanges = (formRef) => {
   useEffect(() => {
     bindApplySearchControlsChanges((newWidget: Widget) => {
       if (formRef.current) {
-        const { dirty, values, isValid } = formRef.current;
+        const { dirty, values: { timerange, ...rest }, isValid } = formRef.current;
 
         if (dirty && isValid) {
-          const normalizedFormValues = normalizeSearchBarFormValues(values, userTimezone);
+          const normalizedFormValues = {
+            timerange: isNoTimeRangeOverride(timerange) ? undefined : normalizeFromSearchBarForBackend(timerange, userTimezone),
+            ...rest,
+          };
 
           return updateWidgetSearchControls(newWidget, normalizedFormValues);
         }
@@ -130,12 +142,12 @@ const useBindApplySearchControlsChanges = (formRef) => {
 };
 
 const useInitialFormValues = (widget: Widget) => {
-  const { streams } = widget;
+  const { streams, streamCategories } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
   const initialValuesFromPlugins = usePluggableInitialValues(widget);
 
-  return useMemo(() => ({ timerange, streams, queryString, ...initialValuesFromPlugins }), [timerange, streams, queryString, initialValuesFromPlugins]);
+  return useMemo(() => ({ timerange, streams, streamCategories, queryString, ...initialValuesFromPlugins }), [timerange, streams, streamCategories, queryString, initialValuesFromPlugins]);
 };
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
@@ -146,6 +158,7 @@ const _validateQueryString = (values: SearchBarFormValues, globalOverride: Globa
     timeRange: !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange,
     filter: globalOverride?.query ? globalOverride.query : undefined,
     streams: values?.streams,
+    streamCategories: values?.streamCategories,
     ...pluggableValidationPayload(values, context, pluggableSearchBarControls),
   };
 
@@ -153,15 +166,17 @@ const _validateQueryString = (values: SearchBarFormValues, globalOverride: Globa
 };
 
 const WidgetQueryControls = ({ availableStreams }: Props) => {
+  const editorRef = useRef<Editor>(null);
+  const view = useView();
   const globalOverride = useGlobalOverride();
   const widget = useContext(WidgetContext);
   const { userTimezone } = useUserDateTime();
-  const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
+  const { config } = useSearchConfiguration();
   const isValidatingQuery = !!useIsFetching(['validateSearchQuery']);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;
-  const hasQueryOverride = globalOverride?.query !== undefined;
+  const hasQueryOverride = !!globalOverride?.query?.query_string;
   const formRef = useRef(null);
   const { parameters } = useParameters();
   const handlerContext = useHandlerContext();
@@ -172,6 +187,17 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const _onSubmit = useCallback((values: CombinedSearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, widget), [dispatch, pluggableSearchBarControls, widget]);
   const _resetTimeRangeOverride = useCallback(() => dispatch(resetTimeRangeOverride), [dispatch]);
   const _resetQueryOverride = useCallback(() => dispatch(resetQueryOverride), [dispatch]);
+  const allStreams = availableStreams.map((stream) => ({
+    key: stream.title,
+    value: stream.id,
+  }));
+  const availableStreamCategories = availableStreams.reduce((acc, stream: Stream) => {
+    stream.categories?.forEach((category: string) => {
+      if (!acc.find((option: { value: string }) => option.value === category)) acc.push({ key: category, value: category });
+    });
+
+    return acc;
+  }, []).sort((a, b) => defaultCompare(a.value, b.value));
 
   useBindApplySearchControlsChanges(formRef);
 
@@ -191,12 +217,11 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
               <ValidateOnParameterChange parameters={parameters} />
               <TimeRangeRow>
                 {!hasTimeRangeOverride && (
-                <TimeRangeInput disabled={hasTimeRangeOverride}
-                                limitDuration={limitDuration}
-                                onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                value={values?.timerange}
-                                hasErrorOnMount={!!errors.timerange}
-                                position="right" />
+                  <TimeRangeFilter disabled={hasTimeRangeOverride}
+                                   limitDuration={limitDuration}
+                                   onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                   value={values?.timerange}
+                                   hasErrorOnMount={!!errors.timerange} />
                 )}
                 {hasTimeRangeOverride && (
                   <TimeRangeOverrideInfo value={globalOverride?.timerange}
@@ -206,8 +231,20 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                 <Field name="streams">
                   {({ field: { name, value, onChange } }) => (
                     <StreamsFilter value={value}
-                                   streams={availableStreams}
+                                   streams={allStreams}
                                    onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                  )}
+                </Field>
+                <Field name="streamCategories">
+                  {({ field: { name, value, onChange } }) => (
+                    <StreamCategoryFilter value={value}
+                                          streamCategories={availableStreamCategories}
+                                          onChange={(newCategories) => onChange({
+                                            target: {
+                                              value: newCategories,
+                                              name,
+                                            },
+                                          })} />
                   )}
                 </Field>
               </TimeRangeRow>
@@ -223,19 +260,21 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                         {({ warnings }) => (
                           <PluggableCommands usage="widget_query">
                             {(customCommands) => (
-                              <QueryInput value={value}
-                                          timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
-                                          streams={values?.streams}
-                                          placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                          error={error}
-                                          disableExecution={disableSearchSubmit}
-                                          isValidating={isValidatingQuery}
-                                          warning={warnings.queryString}
-                                          validate={validateForm}
-                                          name={name}
-                                          onChange={onChange}
-                                          onExecute={handleSubmit as () => void}
-                                          commands={customCommands} />
+                              <ViewsQueryInput value={value}
+                                               view={view}
+                                               timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
+                                               streams={values?.streams}
+                                               placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                               error={error}
+                                               ref={editorRef}
+                                               disableExecution={disableSearchSubmit}
+                                               isValidating={isValidatingQuery}
+                                               warning={warnings.queryString}
+                                               validate={validateForm}
+                                               name={name}
+                                               onChange={onChange}
+                                               onExecute={handleSubmit as () => void}
+                                               commands={customCommands} />
                             )}
                           </PluggableCommands>
                         )}
@@ -244,6 +283,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                   </Field>
 
                   <QueryValidation />
+                  <QueryHistoryButton editorRef={editorRef} />
                 </SearchInputAndValidation>
 
                 {hasQueryOverride && (
@@ -260,8 +300,6 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   );
 };
 
-WidgetQueryControls.propTypes = {};
-
 export default connect(
   WidgetQueryControls,
   {
@@ -269,6 +307,6 @@ export default connect(
   },
   ({ availableStreams: { streams = [] }, ...rest }) => ({
     ...rest,
-    availableStreams: streams.map((stream) => ({ key: stream.title, value: stream.id })),
+    availableStreams: streams,
   }),
 );

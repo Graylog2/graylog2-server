@@ -26,7 +26,8 @@ import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.inputs.MessageInputFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;

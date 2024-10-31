@@ -30,14 +30,14 @@ jest.mock('hooks/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 type SUTProps = {
-  // eslint-disable-next-line react/require-default-props
+
   error?: QueryValidationState,
-  // eslint-disable-next-line react/require-default-props
+
   warning?: QueryValidationState,
 }
 
 describe('QueryValidation', () => {
-  const validationErrorIconTitle = 'Toggle validation error explanation';
+  const validationErrorIconTitle = /Toggle validation/;
 
   const openExplanation = async () => {
     const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);
@@ -86,7 +86,7 @@ describe('QueryValidation', () => {
     await openExplanation();
 
     await screen.findByText('Parse Exception');
-    await screen.findByTitle('Parse Exception documentation');
+    await screen.findByTitle('Query error documentation');
   });
 
   it('renders pluggable validation explanation', async () => {
@@ -105,10 +105,16 @@ describe('QueryValidation', () => {
     const multipleValidationErrors: QueryValidationState = {
       status: 'ERROR',
       explanations: [validationErrorExplanation, { ...validationErrorExplanation, id: 'validation-explanation-id-2' }],
+      context: {
+        searched_index_ranges: [],
+      },
     };
     const singleValidationError: QueryValidationState = {
       status: 'ERROR',
       explanations: [validationErrorExplanation],
+      context: {
+        searched_index_ranges: [],
+      },
     };
 
     const { rerender } = render(<SUT error={multipleValidationErrors} />);
@@ -145,6 +151,9 @@ describe('QueryValidation', () => {
         errorMessage: 'Query contains unknown field: TargetFilename',
         relatedProperty: 'TargetFilename',
       }],
+      context: {
+        searched_index_ranges: [],
+      },
     };
     render(<SUT error={validationErrorForUnknownField} />);
 

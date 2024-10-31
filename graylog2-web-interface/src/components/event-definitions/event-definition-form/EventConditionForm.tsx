@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import defaultTo from 'lodash/defaultTo';
 import get from 'lodash/get';
@@ -25,6 +24,10 @@ import { Select } from 'components/common';
 import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { HelpPanel } from 'components/event-definitions/common/HelpPanel';
 import type User from 'logic/users/User';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
 
 import styles from './EventConditionForm.css';
 
@@ -33,8 +36,8 @@ import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  action: 'create' | 'edit',
-  entityTypes: any,
+  action?: 'create' | 'edit'
+  entityTypes?: any
   eventDefinition: EventDefinition,
   validation: {
     errors: {
@@ -44,15 +47,19 @@ type Props = {
   },
   currentUser: User,
   onChange: (name: string, newConfig: EventDefinition['config']) => void,
+  canEdit: boolean,
 }
 
-const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange }: Props) => {
-  const getConditionPlugin = (type): any => {
+const EventConditionForm = ({ action = 'create', entityTypes, eventDefinition, validation, currentUser, onChange, canEdit }: Props) => {
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
+  const getConditionPlugin = (type: string) => {
     if (type === undefined) {
-      return {};
+      return undefined;
     }
 
-    return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === type) || {};
+    return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === type);
   };
 
   const sortedEventDefinitionTypes = (): any => (PluginStore.exports('eventDefinitionTypes') as any).sort((eventDefinitionType1, eventDefinitionType2) => {
@@ -75,6 +82,13 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
     .map((type) => ({ label: type.displayName, value: type.type }));
 
   const handleEventDefinitionTypeChange = (nextType: string) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.TYPE_SELECTED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-condition',
+      app_action_value: 'type-select',
+      condition_type: nextType,
+    });
+
     const conditionPlugin = getConditionPlugin(nextType);
     const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
 
@@ -94,18 +108,21 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
   };
 
   const disabledSelect = () => !formattedEventDefinitionTypes().some((edt) => eventDefinition.config.type === edt.value) && action === 'edit';
+  const onlyFilters = () => eventDefinition._scope === 'ILLUMINATE' && action === 'edit';
+  const isSigma = () => eventDefinition.config.type === 'sigma-v1' && action === 'edit';
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
   const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
+  const canEditCondition = canEdit && !isSystemEventDefinition;
 
   const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
-    ? React.createElement<React.ComponentProps<any>>(eventDefinitionType.formComponent, {
-      action: action,
-      entityTypes: entityTypes,
-      currentUser: currentUser,
-      validation: validation,
-      eventDefinition: eventDefinition,
-      onChange: onChange,
+    ? React.createElement(eventDefinitionType.formComponent, {
+      action,
+      entityTypes,
+      currentUser,
+      validation,
+      eventDefinition,
+      onChange,
       key: eventDefinition.id,
     })
     : null;
@@ -115,9 +132,9 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
       <Col md={7} lg={6}>
         <h2 className={commonStyles.title}>Event Condition</h2>
 
-        {isSystemEventDefinition ? (
+        {!canEditCondition ? (
           <p>
-            The conditions of system notification event definitions cannot be edited.
+            The conditions of this event definition type cannot be edited.
           </p>
         ) : (
           <>
@@ -125,14 +142,15 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
               Configure how Graylog should create Events of this kind. You can later use those Events as input on other
               Conditions, making it possible to build powerful Conditions based on others.
             </p>
-            <FormGroup controlId="event-definition-priority" validationState={validation.errors.config ? 'error' : null}>
-              <ControlLabel>Condition Type</ControlLabel>
+            <FormGroup validationState={validation.errors.config ? 'error' : null}>
+              <ControlLabel htmlFor="event-condition-type-select">Condition Type</ControlLabel>
               <Select placeholder="Select a Condition Type"
+                      inputId="event-condition-type-select"
                       options={formattedEventDefinitionTypes()}
                       value={eventDefinition.config.type}
                       onChange={handleEventDefinitionTypeChange}
                       clearable={false}
-                      disabled={disabledSelect()}
+                      disabled={disabledSelect() || onlyFilters() || isSigma()}
                       required />
               <HelpBlock>
                 {get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
@@ -142,7 +160,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
         )}
       </Col>
 
-      {!isSystemEventDefinition && !disabledSelect() && (
+      {canEditCondition && !disabledSelect() && (
         <>
           <Col md={5} lg={5} lgOffset={1}>
             <HelpPanel className={styles.conditionTypesInfo}
@@ -164,20 +182,6 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
       )}
     </Row>
   );
-};
-
-EventConditionForm.defaultProps = {
-  action: 'create',
-  entityTypes: undefined,
-};
-
-EventConditionForm.propTypes = {
-  action: PropTypes.oneOf(['create', 'edit']),
-  entityTypes: PropTypes.object,
-  eventDefinition: PropTypes.object.isRequired,
-  currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
-  validation: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
 };
 
 export default EventConditionForm;

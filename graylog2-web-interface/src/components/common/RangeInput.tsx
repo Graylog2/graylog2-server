@@ -18,10 +18,9 @@ import * as React from 'react';
 import ReactSlider from 'react-slider';
 import type { ReactSliderProps } from 'react-slider';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 
-import { Input, Tooltip } from 'components/bootstrap';
-import OverlayTrigger from 'components/common/OverlayTrigger';
+import { Input } from 'components/bootstrap';
+import Tooltip from 'components/common/Tooltip';
 
 type Props = {
   id: string,
@@ -33,13 +32,13 @@ type Props = {
   wrapperClassName?: string,
 } & ReactSliderProps<Array<number> | number>;
 
-const StyledSlider = styled(ReactSlider)(({ theme }: { theme: DefaultTheme }) => css`
+const StyledSlider = styled(ReactSlider)(({ theme }) => css`
   width: 100%;
   height: 10px;
   margin: ${theme.spacings.md} 0;
 `);
 
-const StyledThumb = styled.div(({ theme }: { theme: DefaultTheme }) => css`
+const StyledThumb = styled.div(({ theme }) => css`
   height: auto;
   min-height: 25px;
   line-height: 25px;
@@ -53,26 +52,22 @@ const StyledThumb = styled.div(({ theme }: { theme: DefaultTheme }) => css`
   top: -5px;
 `);
 
-const Thumb = (props, state) => {
-  const tooltip = <Tooltip id={`${state.valueNow}-tooltip`} show>{state.valueNow}</Tooltip>;
+const Thumb = (props: React.ComponentProps<typeof StyledThumb>, state: { valueNow: number }) => (
+  <StyledThumb {...props} className={`${state.valueNow}-tooltip`}>
+    <Tooltip label={state.valueNow}>
+      <span className="value">{state.valueNow}</span>
+    </Tooltip>
+  </StyledThumb>
+);
 
-  return (
-    <StyledThumb {...props} className={`${state.valueNow}-tooltip`}>
-      <OverlayTrigger placement="top" trigger="hover" overlay={tooltip} rootClose>
-        <span className="value">{state.valueNow}</span>
-      </OverlayTrigger>
-    </StyledThumb>
-  );
-};
-
-const StyledTrack = styled.div(({ theme }: { theme: DefaultTheme }) => css`
+const StyledTrack = styled.div<{ $index: number }>(({ theme, $index }) => css`
   top: ${theme.spacings.xxs};
   bottom: 0;
-  background: ${(props: any) => (props.index === 1 ? '#5082bc' : theme.colors.variant.default)};
+  background: ${$index === 1 ? '#5082bc' : theme.colors.variant.default};
   border-radius: 999px;
 `);
 
-const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
+const Track = (props, state) => <StyledTrack {...props} $index={state.index} />;
 
 const RangeInput = ({
   id,
@@ -97,14 +92,5 @@ const RangeInput = ({
                   {...otherProps} />
   </Input>
 );
-
-RangeInput.defaultProps = {
-  label: undefined,
-  help: undefined,
-  error: undefined,
-  bsStyle: undefined,
-  labelClassName: undefined,
-  wrapperClassName: undefined,
-};
 
 export default RangeInput;

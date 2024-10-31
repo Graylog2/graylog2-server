@@ -26,6 +26,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,6 +93,86 @@ public class JobScheduleStrategiesTest {
                     assertThat(dateTime.getZone()).isEqualTo(DateTimeZone.forID("-05:00"));
                     assertThat(dateTime.toString(DATE_FORMAT)).isEqualTo("14/06/2022 01:00:00");
                 });
+    }
+
+    @Test
+    public void cronNextTimeAfter() {
+        final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
+                .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
+                .schedule(CronJobSchedule.builder()
+                        .cronExpression("0 0 * ? * * *")
+                        .timezone("UTC")
+                        .build())
+                .build();
+
+        DateTime date = DateTime.parse("2024-01-01T0:00:00.000Z");
+
+        DateTime nextTime = strategies.nextTime(trigger, date).orElse(null);
+
+        assertThat(nextTime)
+                .isNotNull()
+                .satisfies(dateTime -> {
+                    assertThat(dateTime.getZone()).isEqualTo(DateTimeZone.forID("UTC"));
+                    assertThat(dateTime.toString(DATE_FORMAT)).isEqualTo("01/01/2024 01:00:00");
+                });
+
+        date = DateTime.parse("2024-02-01T0:00:00.000Z");
+        nextTime = strategies.nextTime(trigger, date).orElse(null);
+        assertThat(nextTime)
+                .isNotNull()
+                .satisfies(dateTime -> {
+                    assertThat(dateTime.getZone()).isEqualTo(DateTimeZone.forID("UTC"));
+                    assertThat(dateTime.toString(DATE_FORMAT)).isEqualTo("01/02/2024 01:00:00");
+                });
+    }
+
+    @Test
+    public void intervalNextTimeAfter() {
+        final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
+                .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
+                .build();
+
+        DateTime date = DateTime.parse("2024-01-01T0:00:00.000Z");
+        DateTime nextTime = strategies.nextTime(trigger, date).orElse(null);
+        assertThat(nextTime)
+                .isNotNull()
+                .satisfies(dateTime -> {
+                    assertThat(dateTime.getZone()).isEqualTo(DateTimeZone.forID("UTC"));
+                    assertThat(dateTime.toString(DATE_FORMAT)).isEqualTo("01/01/2024 00:00:01");
+                });
+
+        date = DateTime.parse("2024-02-01T0:00:00.000Z");
+        nextTime = strategies.nextTime(trigger, date).orElse(null);
+        assertThat(nextTime)
+                .isNotNull()
+                .satisfies(dateTime -> {
+                    assertThat(dateTime.getZone()).isEqualTo(DateTimeZone.forID("UTC"));
+                    assertThat(dateTime.toString(DATE_FORMAT)).isEqualTo("01/02/2024 00:00:01");
+                });
+    }
+
+    @Test
+    public void emptyNextTimeCron() {
+        final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
+                .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
+                .schedule(CronJobSchedule.builder()
+                        // At every hour in 2024
+                        .cronExpression("0 0 * ? * * 2024")
+                        .build())
+                .build();
+
+        // Last execution for the expression
+        final DateTime date = DateTime.parse("2024-12-31T23:00:00.000Z");
+        final Optional<DateTime> nextTime = strategies.nextTime(trigger, date);
+
+        assertThat(nextTime).isEmpty();
     }
 
     @Test

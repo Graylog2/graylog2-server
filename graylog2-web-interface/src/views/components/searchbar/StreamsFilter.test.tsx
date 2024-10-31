@@ -15,28 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
-
-import Select from 'components/common/Select';
+import { render, screen } from 'wrappedTestingLibrary';
+import selectEvent from 'react-select-event';
 
 import StreamsFilter from './StreamsFilter';
 
 describe('StreamsFilter', () => {
-  it('sorts stream names', () => {
+  it('sorts stream names', async () => {
     const streams = [
       { key: 'One Stream', value: 'streamId1' },
       { key: 'another Stream', value: 'streamId2' },
       { key: 'Yet another Stream', value: 'streamId3' },
       { key: '101 Stream', value: 'streamId4' },
     ];
-    const wrapper = mount(<StreamsFilter streams={streams} onChange={() => {}} />);
-    const { options }: { options?: React.ComponentProps<typeof Select>['options'] } = wrapper.find(Select).first().props();
+    render(<StreamsFilter streams={streams} onChange={() => {}} />);
 
-    expect(options).toEqual([
-      { key: '101 Stream', value: 'streamId4' },
-      { key: 'another Stream', value: 'streamId2' },
-      { key: 'One Stream', value: 'streamId1' },
-      { key: 'Yet another Stream', value: 'streamId3' },
-    ]);
+    const select = await screen.findByLabelText(/select streams/i);
+
+    selectEvent.openMenu(select);
+
+    await screen.findByText('101 Stream');
+    await screen.findByText('another Stream');
+    await screen.findByText('One Stream');
+    await screen.findByText('Yet another Stream');
   });
 });

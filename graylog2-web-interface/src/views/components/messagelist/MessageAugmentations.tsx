@@ -16,24 +16,23 @@
  */
 import * as React from 'react';
 import Sticky from 'react-sticky-el';
-import type { DefaultTheme } from 'styled-components';
-import styled, { withTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useContext } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { Message } from 'views/components/messagelist/Types';
 import WindowDimensionsContext from 'contexts/WindowDimensionsContext';
 
-const StyledSticky = styled(Sticky)`
+const StyledSticky: typeof Sticky = styled(Sticky)`
   position: static !important;
 `;
 
 type Props = {
   message: Message,
-  theme: DefaultTheme
 }
 
-const MessageAugmentations = ({ message, theme }: Props) => {
+const MessageAugmentations = ({ message }: Props) => {
+  const theme = useTheme();
   const augmentations = usePluginEntities('messageAugmentations');
   const windowDimensions = useContext(WindowDimensionsContext);
   const isSticky = windowDimensions.width >= theme.breakpoints.px.max.md;
@@ -54,4 +53,4 @@ const MessageAugmentations = ({ message, theme }: Props) => {
   );
 };
 
-export default withTheme(MessageAugmentations);
+export default MessageAugmentations;

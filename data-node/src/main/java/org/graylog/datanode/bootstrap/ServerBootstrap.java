@@ -16,10 +16,9 @@
  */
 package org.graylog.datanode.bootstrap;
 
-import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.rvesse.airline.annotations.Option;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -30,17 +29,22 @@ import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.DatanodeConfigurationBindings;
 import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
+import org.graylog.datanode.bindings.OpensearchProcessBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
+import org.graylog.datanode.bootstrap.preflight.PreflightClusterConfigurationModule;
+import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
-import org.graylog2.configuration.PathConfiguration;
+import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.FreshInstallDetectionModule;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.jsoftbiz.utils.OS;
@@ -55,7 +59,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -99,8 +102,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Override
-    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
-        super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
+    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, Configuration configuration) {
+        super.beforeStart(tlsProtocolsConfiguration, configuration);
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
@@ -111,8 +114,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         applySecuritySettings(tlsProtocolsConfiguration);
 
         // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults(pathConfiguration);
-
+        setNettyNativeDefaults(configuration);
     }
 
     @Override
@@ -126,7 +128,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
             return;
         }
 
-       runMongoPreflightCheck();
+        runMongoPreflightCheck();
 
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
@@ -155,7 +157,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getMongoPreFlightInjector() {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new DatanodeConfigurationBindings()
 
@@ -163,25 +165,25 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
-        final Injector injector = Guice.createInjector(
+        return Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new PreflightClusterConfigurationModule(chainingClassLoader),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new PreflightChecksBindings(),
                 new DatanodeConfigurationBindings(),
-                new Module() {
+        new Module() {
                     @Override
                     public void configure(Binder binder) {
                         preflightCheckModules.forEach(binder::install);
                     }
                 });
-        return injector;
     }
 
-    private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
+    private void setNettyNativeDefaults(Configuration configuration) {
         // Give netty a better spot than /tmp to unpack its tcnative libraries
         if (System.getProperty("io.netty.native.workdir") == null) {
-            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
+            System.setProperty("io.netty.native.workdir", configuration.getNativeLibDir().toAbsolutePath().toString());
         }
         // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
         if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
@@ -192,10 +194,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
     @Override
     protected void startCommand() {
         final String systemInformation = Tools.getSystemInformation();
-        final Map<String, Object> auditEventContext = ImmutableMap.of(
-                "version", version.toString(),
-                "java", systemInformation
-        );
 
         final OS os = OS.getOs();
 
@@ -204,6 +202,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
+
+        startNodeRegistration(injector);
 
         final ActivityWriter activityWriter;
         final ServiceManager serviceManager;
@@ -224,8 +224,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         Runtime.getRuntime().addShutdownHook(new Thread(injector.getInstance(shutdownHook())));
 
         // Start services.
-//        final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
-//        serviceManager.addListener(serviceManagerListener, MoreExecutors.directExecutor());
         try {
             serviceManager.startAsync().awaitHealthy();
         } catch (Exception e) {
@@ -246,7 +244,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             Thread.currentThread().join();
         } catch (InterruptedException e) {
-            return;
         }
     }
 
@@ -276,13 +273,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<Module> result = super.getSharedBindingsModules();
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
-//        result.add(new SecurityBindings());
-//        result.add(new ValidatorModule());
-//        result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
+        result.add(new OpensearchProcessBindings());
         result.add(new DatanodeConfigurationBindings());
-//        result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
 
         return result;
     }

@@ -1,0 +1,2 @@
+type = "security"
+message = "Always create new sessions for authentication attempts to fix a potential session fixation vulnerability. [GHSA-3xf8-g8gr-g7rh](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-3xf8-g8gr-g7rh)"

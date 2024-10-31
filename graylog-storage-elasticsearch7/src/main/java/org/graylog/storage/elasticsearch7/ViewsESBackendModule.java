@@ -41,6 +41,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
@@ -54,9 +55,9 @@ import org.graylog.storage.elasticsearch7.views.export.RequestStrategy;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESEventList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESDateRangeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESValuesHandler;
@@ -66,6 +67,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESCount
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESLatestHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESMaxHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESMinHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESPercentageHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESPercentilesHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESStdDevHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESSumHandler;
@@ -100,6 +102,7 @@ public class ViewsESBackendModule extends ViewsModule {
         registerPivotSeriesHandler(Sum.NAME, ESSumHandler.class);
         registerPivotSeriesHandler(SumOfSquares.NAME, ESSumOfSquaresHandler.class);
         registerPivotSeriesHandler(Variance.NAME, ESVarianceHandler.class);
+        registerPivotSeriesHandler(Percentage.NAME, ESPercentageHandler.class);
         registerPivotSeriesHandler(Percentile.NAME, ESPercentilesHandler.class);
         registerPivotSeriesHandler(Latest.NAME, ESLatestHandler.class);
 

@@ -22,14 +22,15 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.graylog2.indexer.cluster.Cluster;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Optional;
 
 @Singleton
 public class NodeInfoCache {
     private static final Duration EXPIRE_DURATION = Duration.minutes(1L);
-    
+
     private final LoadingCache<String, Optional<String>> nodeNameCache;
     private final LoadingCache<String, Optional<String>> hostNameCache;
 

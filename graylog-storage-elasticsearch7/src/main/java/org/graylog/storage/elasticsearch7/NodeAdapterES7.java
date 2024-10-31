@@ -20,10 +20,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog2.indexer.cluster.NodeAdapter;
+import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
 
-import javax.inject.Inject;
-import java.util.Locale;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 public class NodeAdapterES7 implements NodeAdapter {
@@ -47,7 +48,7 @@ public class NodeAdapterES7 implements NodeAdapter {
         final Optional<String> version = resp.map(r -> r.path("version")).map(r -> r.path("number")).map(JsonNode::textValue);
 
         final SearchVersion.Distribution distribution = resp.map(r -> r.path("version")).map(r -> r.path("distribution")).map(JsonNode::textValue)
-                .map(d -> d.toUpperCase(Locale.ROOT))
+                .map(StringUtils::toUpperCase)
                 .map(SearchVersion.Distribution::valueOf)
                 .orElse(SearchVersion.Distribution.ELASTICSEARCH);
 

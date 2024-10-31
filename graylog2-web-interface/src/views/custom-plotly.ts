@@ -19,6 +19,7 @@ import Bar from 'plotly.js/lib/bar';
 import Pie from 'plotly.js/lib/pie';
 import Heatmap from 'plotly.js/lib/heatmap';
 import Scatter from 'plotly.js/lib/scatter';
+import Scatterpolar from 'plotly.js/lib/scatterpolar';
 
 // @ts-ignore
 Plotly.register([
@@ -26,6 +27,7 @@ Plotly.register([
   Pie,
   Scatter,
   Heatmap,
+  Scatterpolar,
 ]);
 
 export default Plotly;

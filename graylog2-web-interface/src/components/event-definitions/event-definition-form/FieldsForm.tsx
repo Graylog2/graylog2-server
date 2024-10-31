@@ -16,21 +16,17 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 
-import { OverlayTrigger, Icon } from 'components/common';
-import { Alert, Col, Row, Button } from 'components/bootstrap';
+import { Alert, Col, Row } from 'components/bootstrap';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 import type User from 'logic/users/User';
+import HoverForHelp from 'components/common/HoverForHelp';
 
 import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
-
-// Import built-in Field Value Providers
-import './field-value-providers';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
@@ -44,9 +40,10 @@ type Props = {
     }
   },
   onChange: (name: string, value: unknown) => void,
+  canEdit: boolean,
 }
 
-const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Props) => {
+const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdit }: Props) => {
   const [editField, setEditField] = useState<string | undefined>(undefined);
   const [showFieldForm, setShowFieldForm] = useState<boolean>(false);
 
@@ -90,6 +87,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
   };
 
   const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
+  const canEditCondition = canEdit && !isSystemEventDefinition;
 
   if (showFieldForm) {
     return (
@@ -111,9 +109,9 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
       <Col md={12}>
         <h2 className={commonStyles.title}>Event Fields <small>(optional)</small></h2>
 
-        {isSystemEventDefinition ? (
+        {!canEditCondition ? (
           <p>
-            The event fields of system notification event definitions cannot be edited.
+            The event fields of this event definition type cannot be edited.
           </p>
         ) : (
           <>
@@ -123,8 +121,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
             </p>
 
             {errors.length > 0 && (
-              <Alert bsStyle="danger" className={commonStyles.validationSummary}>
-                <h4>Fields with errors</h4>
+              <Alert bsStyle="danger" className={commonStyles.validationSummary} title="Fields with errors">
                 <p>Please correct the following errors before saving this Event Definition:</p>
                 <ul>
                   {errors.map((error) => <li key={error}>{error}</li>)}
@@ -136,11 +133,9 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
               <dl>
                 <dt>
                   Keys
-                  <OverlayTrigger placement="right"
-                                  trigger={['click', 'hover']}
-                                  overlay={<EventKeyHelpPopover id="key-header-popover" />}>
-                    <Button bsStyle="link" bsSize="xsmall"><Icon name="question-circle" /></Button>
-                  </OverlayTrigger>
+                  <HoverForHelp title="More about Event Keys" trigger={['click', 'hover']} placement="right">
+                    <EventKeyHelpPopover />
+                  </HoverForHelp>
                 </dt>
                 <dd>{eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : 'No Keys configured yet.'}</dd>
               </dl>
@@ -156,13 +151,6 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
       </Col>
     </Row>
   );
-};
-
-FieldsForm.propTypes = {
-  currentUser: PropTypes.object.isRequired,
-  eventDefinition: PropTypes.object.isRequired,
-  validation: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
 };
 
 export default FieldsForm;

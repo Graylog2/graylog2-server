@@ -24,59 +24,6 @@ import { updateViewState } from 'views/logic/slices/viewSlice';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 import type { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
-export const addHighlightingRule = (rule: HighlightingRule) => async (dispatch: AppDispatch, getState: GetState) => {
-  const activeQuery = selectActiveQuery(getState());
-  const activeViewState = selectActiveViewState(getState());
-  const { formatting = FormattingSettings.empty() } = activeViewState;
-  const newFormatting = formatting.toBuilder()
-    .highlighting([...formatting.highlighting, rule])
-    .build();
-
-  const newViewState = activeViewState
-    .toBuilder()
-    .formatting(newFormatting)
-    .build();
-
-  return dispatch(updateViewState(activeQuery, newViewState));
-};
-
-export const addHighlightingRules = (rules: Array<HighlightingRule>) => async (dispatch: AppDispatch, getState: GetState) => {
-  const activeQuery = selectActiveQuery(getState());
-  const activeViewState = selectActiveViewState(getState());
-  const { formatting = FormattingSettings.empty() } = activeViewState;
-  const newFormatting = formatting.toBuilder()
-    .highlighting([...formatting.highlighting, ...rules])
-    .build();
-
-  const newViewState = activeViewState
-    .toBuilder()
-    .formatting(newFormatting)
-    .build();
-
-  return dispatch(updateViewState(activeQuery, newViewState));
-};
-
-export const createHighlightingRule = (field: string, value: any) => async (dispatch: AppDispatch) => {
-  const newRule = HighlightingRule.builder()
-    .field(field)
-    .value(value)
-    .color(randomColor())
-    .build();
-
-  return dispatch(addHighlightingRule(newRule));
-};
-
-export const createHighlightingRules = (rules: Array<{field: string, value: any, condition?: Condition, color?: StaticColor}>) => async (dispatch: AppDispatch) => {
-  const newRules = rules.map(({ field, value, color, condition }) => HighlightingRule.builder()
-    .field(field)
-    .value(value)
-    .condition(condition || 'equal')
-    .color(color || randomColor())
-    .build());
-
-  return dispatch(addHighlightingRules(newRules));
-};
-
 export const updateHighlightingRules = (rules: Array<HighlightingRule>) => async (dispatch: AppDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
   const currentViewState = selectActiveViewState(getState());
@@ -102,6 +49,41 @@ export const updateHighlightingRule = (rule: HighlightingRule, payload: Partial<
   const newHighlightingRules = highlightingRules.map((currentRule) => (currentRule === rule ? newRule : currentRule));
 
   return dispatch(updateHighlightingRules(newHighlightingRules));
+};
+
+export const addHighlightingRule = (rule: HighlightingRule) => async (dispatch: AppDispatch, getState: GetState) => {
+  const activeViewState = selectActiveViewState(getState());
+  const { formatting = FormattingSettings.empty() } = activeViewState;
+
+  return dispatch(updateHighlightingRules([...formatting.highlighting, rule]));
+};
+
+export const addHighlightingRules = (rules: Array<HighlightingRule>) => async (dispatch: AppDispatch, getState: GetState) => {
+  const activeViewState = selectActiveViewState(getState());
+  const { formatting = FormattingSettings.empty() } = activeViewState;
+
+  return dispatch(updateHighlightingRules([...formatting.highlighting, ...rules]));
+};
+
+export const createHighlightingRule = (field: string, value: any) => async (dispatch: AppDispatch) => {
+  const newRule = HighlightingRule.builder()
+    .field(field)
+    .value(value)
+    .color(randomColor())
+    .build();
+
+  return dispatch(addHighlightingRule(newRule));
+};
+
+export const createHighlightingRules = (rules: Array<{field: string, value: any, condition?: Condition, color?: StaticColor}>) => async (dispatch: AppDispatch) => {
+  const newRules = rules.map(({ field, value, color, condition }) => HighlightingRule.builder()
+    .field(field)
+    .value(value)
+    .condition(condition || 'equal')
+    .color(color || randomColor())
+    .build());
+
+  return dispatch(addHighlightingRules(newRules));
 };
 
 export const removeHighlightingRule = (rule: HighlightingRule) => async (dispatch: AppDispatch, getState: GetState) => {

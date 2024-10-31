@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import jQuery from 'jquery';
 import styled, { css } from 'styled-components';
@@ -57,15 +56,6 @@ type State = {
 };
 
 class AddDecoratorButton extends React.Component<Props, State> {
-  static propTypes = {
-    decoratorTypes: PropTypes.object.isRequired,
-    nextOrder: PropTypes.number.isRequired,
-    stream: PropTypes.string,
-    disabled: PropTypes.bool,
-    onCreate: PropTypes.func.isRequired,
-    showHelp: PropTypes.bool,
-  };
-
   static defaultProps = {
     disabled: false,
     showHelp: true,
@@ -131,7 +121,7 @@ class AddDecoratorButton extends React.Component<Props, State> {
                                                 title={`Create new ${typeDefinition.name}`}
                                                 typeName={typeName}
                                                 includeTitleField={false}
-                                                wrapperComponent={wrapperComponent}
+                                                wrapperComponent={wrapperComponent as React.ComponentProps<typeof ConfigurationForm>['wrapperComponent']}
                                                 submitAction={this._handleSubmit}
                                                 cancelAction={this._handleCancel} />
       ) : null);

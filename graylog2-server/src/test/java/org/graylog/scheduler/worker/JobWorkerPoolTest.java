@@ -19,29 +19,23 @@ package org.graylog.scheduler.worker;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.assertj.core.api.AbstractThrowableAssert;
-import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class JobWorkerPoolTest {
 
-    @Mock
-    Runnable shutdownCallback;
-
     @Test
     public void testExecute() throws Exception {
-        final JobWorkerPool pool = new JobWorkerPool("test", 2, shutdownCallback, new GracefulShutdownService(), new MetricRegistry());
+        final JobWorkerPool pool = new JobWorkerPool("test", 2, new MetricRegistry());
 
         final CountDownLatch latch1 = new CountDownLatch(1);
         final CountDownLatch latch2 = new CountDownLatch(1);
@@ -54,7 +48,7 @@ public class JobWorkerPoolTest {
 
         // Execute the first task
         assertThat(pool.execute(() -> {
-            Uninterruptibles.awaitUninterruptibly(task1Latch, 60, TimeUnit.SECONDS);
+            var ignored = Uninterruptibles.awaitUninterruptibly(task1Latch, 60, TimeUnit.SECONDS);
             latch1.countDown();
         })).isTrue();
 
@@ -64,7 +58,7 @@ public class JobWorkerPoolTest {
 
         // Execute the second task
         assertThat(pool.execute(() -> {
-            Uninterruptibles.awaitUninterruptibly(task2Latch, 60, TimeUnit.SECONDS);
+            var ignored = Uninterruptibles.awaitUninterruptibly(task2Latch, 60, TimeUnit.SECONDS);
             latch2.countDown();
         })).isTrue();
 
@@ -83,9 +77,8 @@ public class JobWorkerPoolTest {
         task2Latch.countDown();
         assertThat(latch2.await(60, TimeUnit.SECONDS)).isTrue();
 
-        pool.doGracefulShutdown();
+        pool.shutdown(Duration.ofSeconds(30));
         assertThat(pool.anySlotsUsed()).isFalse();
-        verify(shutdownCallback, times(1)).run();
     }
 
     @Test
@@ -102,6 +95,6 @@ public class JobWorkerPoolTest {
     }
 
     private AbstractThrowableAssert<?, ? extends Throwable> assertName(String name) {
-        return assertThatCode(() -> new JobWorkerPool(name, 1, shutdownCallback, new GracefulShutdownService(), new MetricRegistry()));
+        return assertThatCode(() -> new JobWorkerPool(name, 1, new MetricRegistry()));
     }
 }

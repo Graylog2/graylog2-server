@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import type { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
@@ -23,8 +22,8 @@ import type HighlightingColor from 'views/logic/views/formatting/highlighting/Hi
 import scaleForGradient from 'views/components/sidebar/highlighting/Scale';
 
 const ColorPreviewBase = styled.div`
-  height: 2rem;
-  width: 2rem;
+  height: 25px;
+  width: 25px;
   margin-right: 0.4rem;
 
   border-radius: 4px;
@@ -37,8 +36,8 @@ const StaticColorPreview = styled(ColorPreviewBase)(({ color }) => css`
 
 const colorsForGradient = (gradient: string, count = 5): Array<string> => scaleForGradient(gradient).colors(count);
 
-export const GradientColorPreview = styled(ColorPreviewBase)(({ gradient }: { gradient: string }) => {
-  const colors = colorsForGradient(gradient);
+export const GradientColorPreview = styled(ColorPreviewBase)<{ $gradient: string }>(({ $gradient }) => {
+  const colors = colorsForGradient($gradient);
 
   return css`
       border: none;
@@ -51,25 +50,19 @@ type ColorPreviewProps = {
   onClick?: () => void,
 };
 
-const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ color, onClick = () => {} }, ref) => {
+const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({
+  color,
+  onClick = () => {},
+}, ref) => {
   if (color.type === 'static') {
     return <StaticColorPreview ref={ref} data-testid="static-color-preview" onClick={onClick} color={(color as StaticColor).color} />;
   }
 
   if (color.type === 'gradient') {
-    return <GradientColorPreview ref={ref} onClick={onClick} gradient={(color as GradientColor).gradient} />;
+    return <GradientColorPreview ref={ref} onClick={onClick} $gradient={(color as GradientColor).gradient} />;
   }
 
   throw new Error(`Invalid highlighting color type: ${color}`);
 });
-
-ColorPreview.propTypes = {
-  color: PropTypes.any.isRequired,
-  onClick: PropTypes.func,
-};
-
-ColorPreview.defaultProps = {
-  onClick: () => {},
-};
 
 export default ColorPreview;

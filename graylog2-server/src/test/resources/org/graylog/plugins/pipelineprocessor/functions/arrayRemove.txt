@@ -1,0 +1,11 @@
+rule "array_remove"
+when
+    true
+then
+    set_field("remove_number", array_remove([1, 2, 3], 2));
+    set_field("remove_string", array_remove(["one", "two", "three"], "two"));
+    set_field("remove_missing", array_remove([1, 2, 3], 4));
+    set_field("remove_only_one", array_remove([1, 2, 2], 2));
+    set_field("remove_all", array_remove([1, 2, 2], 2, true));
+    trigger_test();
+end

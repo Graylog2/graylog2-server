@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
@@ -27,11 +28,13 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesReques
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamService;
 
-import javax.inject.Inject;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class SearchRequestSpecToSearchMapper {
 
@@ -39,19 +42,22 @@ public class SearchRequestSpecToSearchMapper {
 
     private final AggregationSpecToPivotMapper pivotCreator;
     private final MessagesSpecToMessageListMapper messageListCreator;
+    private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
 
     @Inject
     public SearchRequestSpecToSearchMapper(final AggregationSpecToPivotMapper pivotCreator,
-                                           final MessagesSpecToMessageListMapper messageListCreator) {
+                                           final MessagesSpecToMessageListMapper messageListCreator,
+                                           StreamService streamService) {
         this.pivotCreator = pivotCreator;
         this.messageListCreator = messageListCreator;
+        this.streamCategoryMapper = (categories) -> streamService.mapCategoriesToIds(categories).stream();
     }
 
     public Search mapToSearch(MessagesRequestSpec messagesRequestSpec, SearchUser searchUser) {
         return mapToSearch(messagesRequestSpec, searchUser, messageListCreator);
     }
 
-    public  Search mapToSearch(AggregationRequestSpec aggregationRequestSpec, SearchUser searchUser) {
+    public Search mapToSearch(AggregationRequestSpec aggregationRequestSpec, SearchUser searchUser) {
         return mapToSearch(aggregationRequestSpec, searchUser, pivotCreator);
     }
 
@@ -64,13 +70,17 @@ public class SearchRequestSpecToSearchMapper {
                 .timerange(getTimerange(searchRequestSpec))
                 .build();
 
-        if (!searchRequestSpec.streams().isEmpty()) {
-            query = query.addStreamsToFilter(new HashSet<>(searchRequestSpec.streams()));
+        if (!(searchRequestSpec.streams().isEmpty() && searchRequestSpec.streamCategories().isEmpty())) {
+            query = query.orStreamAndStreamCategoryFilters(
+                    new HashSet<>(searchRequestSpec.streams()),
+                    new HashSet<>(searchRequestSpec.streamCategories())
+            );
         }
 
         return Search.builder()
                 .queries(ImmutableSet.of(query))
                 .build()
+                .addStreamsToQueriesWithCategories(streamCategoryMapper, searchUser)
                 .addStreamsToQueriesWithoutStreams(() -> searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams()));
     }
 

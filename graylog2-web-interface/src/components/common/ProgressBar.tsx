@@ -15,20 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css, keyframes } from 'styled-components';
 import chroma from 'chroma-js';
+import type { ColorVariant } from '@graylog/sawmill';
 
 type StyledBarProps = {
-  animated?: boolean,
-  bsStyle?: string,
-  striped?: boolean,
+  $animated?: boolean,
+  $striped?: boolean,
+  $bsStyle?: ColorVariant,
   value: number,
   label?: string,
 };
 
 type ProgressBarProps = {
-  bars: Array<StyledBarProps>,
+  bars?: Array<{
+    animated?: boolean,
+    striped?: boolean,
+    bsStyle?: ColorVariant,
+    value: number,
+    label?: string,
+  }>
   className?: string,
 };
 
@@ -38,7 +44,7 @@ const DEFAULT_BAR = {
   label: undefined,
   striped: false,
   value: 0,
-};
+} as const;
 
 const boxShadow = (meta) => css`
   box-shadow: ${meta} ${({ theme }) => chroma(theme.colors.brand.secondary).alpha(0.1).css()};
@@ -54,15 +60,15 @@ const animatedStripes = keyframes`
   }
 `;
 
-const progressBarVariants = css<StyledBarProps>(({ bsStyle, theme }) => {
-  if (!bsStyle) {
+const progressBarVariants = css<StyledBarProps>(({ $bsStyle, theme }) => {
+  if (!$bsStyle) {
     return undefined;
   }
 
-  return `
-    background-color: ${theme.colors.variant[bsStyle]};
-    color: ${theme.utils.readableColor(theme.colors.variant[bsStyle])};
-  `;
+  return css`
+    background-color: ${theme.colors.variant[$bsStyle]};
+    color: ${theme.utils.readableColor(theme.colors.variant[$bsStyle])};
+`;
 });
 
 const ProgressWrap = styled.div(({ theme }) => css`
@@ -76,7 +82,7 @@ const ProgressWrap = styled.div(({ theme }) => css`
   align-items: center;
 `);
 
-const Bar = styled.div<StyledBarProps>(({ animated, striped, theme, value }) => {
+const Bar = styled.div<StyledBarProps>(({ $animated, $striped, theme, value }) => {
   const defaultStripColor = chroma(theme.colors.global.contentBackground).alpha(0.25).css();
 
   return css`
@@ -88,7 +94,7 @@ const Bar = styled.div<StyledBarProps>(({ animated, striped, theme, value }) => 
     width: ${value}%;
     max-width: 100%;
     text-shadow: 0 1px 2px ${chroma(theme.colors.gray[10]).alpha(0.4).css()}, 2px -1px 3px ${chroma(theme.colors.gray[100]).alpha(0.5).css()};
-    ${(animated || striped) && css`
+    ${($animated || $striped) && css`
       background-image: linear-gradient(
         45deg,
         ${defaultStripColor} 25%,
@@ -100,15 +106,15 @@ const Bar = styled.div<StyledBarProps>(({ animated, striped, theme, value }) => 
         transparent
       );
       background-size: 40px 40px;
-    `}
-    ${animated && css`
+`}
+    ${$animated && css`
       animation: ${animatedStripes} 2s linear infinite;
-    `}
+`}
     ${progressBarVariants}
 `;
 });
 
-const ProgressBar = ({ bars, className }: ProgressBarProps) => (
+const ProgressBar = ({ bars = [DEFAULT_BAR], className }: ProgressBarProps) => (
   <ProgressWrap className={className}>
     {bars.map((bar, index) => {
       const { label, animated, bsStyle, striped, value } = { ...DEFAULT_BAR, ...bar };
@@ -120,9 +126,9 @@ const ProgressBar = ({ bars, className }: ProgressBarProps) => (
              aria-valuemax={100}
              aria-valuetext={label}
              key={`bar-${index}`} // eslint-disable-line react/no-array-index-key
-             animated={animated}
-             bsStyle={bsStyle}
-             striped={striped}
+             $animated={animated}
+             $bsStyle={bsStyle}
+             $striped={striped}
              value={value}>
           {label}
         </Bar>
@@ -130,22 +136,6 @@ const ProgressBar = ({ bars, className }: ProgressBarProps) => (
     })}
   </ProgressWrap>
 );
-
-ProgressBar.propTypes = {
-  bars: PropTypes.arrayOf(PropTypes.shape({
-    animated: PropTypes.bool,
-    bsStyle: PropTypes.string,
-    label: PropTypes.string,
-    striped: PropTypes.bool,
-    value: PropTypes.number,
-  })),
-  className: PropTypes.string,
-};
-
-ProgressBar.defaultProps = {
-  bars: [DEFAULT_BAR],
-  className: undefined,
-};
 
 export default ProgressBar;
 export { Bar };

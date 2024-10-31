@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
+import jakarta.inject.Provider;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
@@ -37,25 +38,27 @@ import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Messages;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.streams.StreamService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import javax.inject.Provider;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -63,13 +66,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class MessageCreationLoopPreventionTest extends BaseParserTest {
+class MessageCreationLoopPreventionTest extends BaseParserTest {
 
-
-    final CloneMessage cloneMessage = spy(new CloneMessage());
+    private MessageFactory messageFactory = new TestMessageFactory();
+    final CloneMessage cloneMessage = spy(new CloneMessage(messageFactory));
     PipelineInterpreter pipelineInterpreter;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Allow using default thread factory")
     public void createPipelineInterpreter() {
         // load rule from resource file
@@ -80,7 +83,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
                         "description",
                         ruleForTest(),
                         Tools.nowUTC(),
-                        null)
+                        null, null, null)
         ));
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
@@ -127,12 +130,14 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
         final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
+        final MetricRegistry metricRegistry = new MetricRegistry();
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
+                (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
-                new MetricRegistry(),
+                metricRegistry,
                 Executors.newScheduledThreadPool(1),
                 eventBus,
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
@@ -145,7 +150,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // make sure a naive call to clone_message() will not cause a loop
     @Test
-    public void loopPreventionBasic() {
+    void loopPreventionBasic() {
         Message msg = messageInDefaultStream();
         final Messages processed = pipelineInterpreter.process(msg);
 
@@ -156,7 +161,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // make sure a call to clone_message() with 'preventLoops' set will stop after cloning once
     @Test
-    public void loopPreventionParam() {
+    void loopPreventionParam() {
         Message msg = messageInDefaultStream();
         final Messages processed = pipelineInterpreter.process(msg);
 
@@ -167,7 +172,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // make sure possible existing workarounds for loop prevention will still work
     @Test
-    public void loopPreventionWorkaround1() {
+    void loopPreventionWorkaround1() {
         Message msg = messageInDefaultStream();
         final Messages processed = pipelineInterpreter.process(msg);
 
@@ -178,7 +183,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // make sure possible existing workarounds for loop prevention will still work
     @Test
-    public void loopPreventionWorkaround2() {
+    void loopPreventionWorkaround2() {
         Message msg = messageInDefaultStream();
         final Messages processed = pipelineInterpreter.process(msg);
 
@@ -189,7 +194,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // make sure possible existing recursive calls of clone message will still work
     @Test
-    public void loopPreventionRecursive() {
+    void loopPreventionRecursive() {
         Message msg = messageInDefaultStream();
         msg.addField("cycle", 5);
         final Messages processed = pipelineInterpreter.process(msg);
@@ -201,7 +206,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // possible existing recursive calls which exceed MAX_CLONES will stop creating clones with an error
     @Test
-    public void loopPreventionRecursiveFail() {
+    void loopPreventionRecursiveFail() {
         Message msg = messageInDefaultStream();
         msg.addField("cycle", 110);
         final Messages processed = pipelineInterpreter.process(msg);
@@ -213,7 +218,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // recursive calls of clone message can exceed MAX_CLONES if preventLoops is explicitly set to 'false'
     @Test
-    public void loopPreventionRecursiveParam() {
+    void loopPreventionRecursiveParam() {
         Message msg = messageInDefaultStream();
         msg.addField("cycle", 110);
         final Messages processed = pipelineInterpreter.process(msg);
@@ -224,7 +229,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
     }
 
     private Message messageInDefaultStream() {
-        final Message msg = new Message("original message", "test", Tools.nowUTC());
+        final Message msg = messageFactory.createMessage("original message", "test", Tools.nowUTC());
         msg.addStream(defaultStream);
         return msg;
     }

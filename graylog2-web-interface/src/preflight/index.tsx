@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Notifications } from '@mantine/notifications';
 
 import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
@@ -25,7 +25,14 @@ import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 
 import App from './App';
 
-ReactDOM.render((
+import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
+import '@mantine/dropzone/styles.css';
+
+const appContainer = document.querySelector('div#app-root');
+const root = createRoot(appContainer);
+
+root.render((
   <PreflightThemeProvider>
     <GlobalThemeStyles />
     <DefaultQueryClientProvider>
@@ -37,12 +44,4 @@ ReactDOM.render((
       </ThemeWrapper>
     </DefaultQueryClientProvider>
   </PreflightThemeProvider>
-),
-document.getElementById('app-root'),
-);
-
-// @ts-ignore
-if (import.meta.webpackHot) {
-  // @ts-ignore
-  import.meta.webpackHot.accept();
-}
+));

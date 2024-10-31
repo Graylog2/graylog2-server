@@ -19,6 +19,7 @@ import React from 'react';
 import { screen, render } from 'wrappedTestingLibrary';
 import Immutable from 'immutable';
 import { defaultUser } from 'defaultMockValues';
+import userEvent from '@testing-library/user-event';
 
 import { adminUser } from 'fixtures/users';
 import MockAction from 'helpers/mocking/MockAction';
@@ -61,7 +62,7 @@ describe('<URLWhiteListFormModal>', () => {
 
     expect(addButton).toBeInTheDocument();
 
-    addButton.click();
+    await userEvent.click(addButton);
 
     expect(await screen.findByText('Whitelist URLs')).toBeInTheDocument();
     expect(screen.getByDisplayValue('http://graylog.com')).toBeInTheDocument();
@@ -110,7 +111,7 @@ describe('<URLWhiteListFormModal>', () => {
 
     expect(addButton).toBeInTheDocument();
 
-    addButton.click();
+    await userEvent.click(addButton);
 
     expect(await screen.findByText('Whitelist URLs')).toBeInTheDocument();
     expect(screen.getByDisplayValue('http://localhost(:\\d+)?')).toBeInTheDocument();

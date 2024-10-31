@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -28,19 +30,36 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Variance.NAME)
 @JsonDeserialize(builder = Variance.Builder.class)
-public abstract class Variance implements SeriesSpec {
+public abstract class Variance implements SeriesSpec, HasField {
     public static final String NAME = "variance";
+
     @Override
     public abstract String type();
 
     @Override
     public abstract String id();
 
-    @Override
     @JsonProperty
     public abstract String field();
 
-    public static Variance.Builder builder() {
+    @Override
+    public String literal() {
+        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+    }
+
+    @Override
+    public Optional<String> statsSubfieldName() {
+        return Optional.of(NAME);
+    }
+
+    public abstract Builder toBuilder();
+
+    @Override
+    public Variance withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
+    public static Builder builder() {
         return new AutoValue_Variance.Builder().type(NAME);
     }
 
@@ -55,7 +74,6 @@ public abstract class Variance implements SeriesSpec {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -65,7 +83,7 @@ public abstract class Variance implements SeriesSpec {
 
         @Override
         public Variance build() {
-            if (!id().isPresent()) {
+            if (id().isEmpty()) {
                 id(NAME + "(" + field() + ")");
             }
             return autoBuild();

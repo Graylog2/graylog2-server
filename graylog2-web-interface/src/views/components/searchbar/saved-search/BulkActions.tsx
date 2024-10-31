@@ -24,18 +24,14 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 const VIEWS_BULK_DELETE_API_ROUTE = '/views/bulk_delete';
 
-type Props = {
-  selectedSavedSearchIds: Array<string>,
-  setSelectedSavedSearchIds: (savedSearchIds: Array<string>) => void,
-}
-
-const BulkActions = ({ selectedSavedSearchIds, setSelectedSavedSearchIds }: Props) => {
+const BulkActions = () => {
   const queryClient = useQueryClient();
-
-  const selectedItemsAmount = selectedSavedSearchIds?.length;
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+  const selectedItemsAmount = selectedEntities?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'saved search', 'saved searches');
 
   const onDelete = useCallback(() => {
@@ -44,14 +40,14 @@ const BulkActions = ({ selectedSavedSearchIds, setSelectedSavedSearchIds }: Prop
       fetch(
         'POST',
         qualifyUrl(VIEWS_BULK_DELETE_API_ROUTE),
-        { entity_ids: selectedSavedSearchIds },
+        { entity_ids: selectedEntities },
       ).then(({ failures }) => {
         if (failures?.length) {
           const notDeletedSavedSearchIds = failures.map(({ entity_id }) => entity_id);
-          setSelectedSavedSearchIds(notDeletedSavedSearchIds);
+          setSelectedEntities(notDeletedSavedSearchIds);
           UserNotification.error(`${notDeletedSavedSearchIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted.`);
         } else {
-          setSelectedSavedSearchIds([]);
+          setSelectedEntities([]);
           UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
         }
       }).catch((error) => {
@@ -60,10 +56,10 @@ const BulkActions = ({ selectedSavedSearchIds, setSelectedSavedSearchIds }: Prop
         queryClient.invalidateQueries(['saved-searches', 'overview']);
       });
     }
-  }, [descriptor, queryClient, selectedItemsAmount, selectedSavedSearchIds, setSelectedSavedSearchIds]);
+  }, [descriptor, queryClient, selectedItemsAmount, selectedEntities, setSelectedEntities]);
 
   return (
-    <BulkActionsDropdown selectedEntities={selectedSavedSearchIds} setSelectedEntities={setSelectedSavedSearchIds}>
+    <BulkActionsDropdown>
       <MenuItem onSelect={onDelete}>Delete</MenuItem>
     </BulkActionsDropdown>
   );

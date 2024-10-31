@@ -16,33 +16,41 @@
  */
 package org.graylog2.configuration;
 
+import com.github.joschi.jadconfig.util.Duration;
 import org.assertj.core.api.Assertions;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
+import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioner;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.TestNodeService;
-import org.graylog2.plugin.database.ValidationException;
-import org.jetbrains.annotations.NotNull;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
+import org.graylog2.cluster.nodes.NodeService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static org.mockito.Mockito.when;
 
 class IndexerDiscoveryProviderTest {
+
+    public static final GraylogCertificateProvisioner NOOP_CERT_PROVISIONER = () -> {};
 
     @Test
     void testAutomaticDiscovery() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 Collections.emptyList(),
+                1,
+                Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED),
-                nodes("http://localhost:9200", "http://other:9201")
+                nodes("http://localhost:9200", "http://other:9201"),
+                NOOP_CERT_PROVISIONER
         );
 
         Assertions.assertThat(provider.get())
@@ -53,11 +61,32 @@ class IndexerDiscoveryProviderTest {
 
 
     @Test
+    void testAutomaticDiscoveryOneUnconfigured() {
+        final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
+                Collections.emptyList(),
+                1,
+                Duration.seconds(1),
+                preflightConfig(PreflightConfigResult.FINISHED),
+                nodes("http://localhost:9200", ""), // the second node is not configured yet, has no transport address
+                NOOP_CERT_PROVISIONER
+        );
+
+        Assertions.assertThat(provider.get())
+                .hasSize(1)
+                .extracting(URI::toString)
+                .contains("http://localhost:9200");
+    }
+
+
+    @Test
     void testPreconfiguredIndexers() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 List.of(URI.create("http://my-host:9200")),
+                1,
+                Duration.seconds(1),
                 preflightConfig(null),
-                nodes()
+                nodes(),
+                NOOP_CERT_PROVISIONER
         );
 
         Assertions.assertThat(provider.get())
@@ -70,8 +99,11 @@ class IndexerDiscoveryProviderTest {
     void testSkippedConfigWithDefaultIndexer() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 Collections.emptyList(),
+                1,
+                Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.SKIPPED),
-                nodes()
+                nodes(),
+                NOOP_CERT_PROVISIONER
         );
 
         Assertions.assertThat(provider.get())
@@ -84,39 +116,61 @@ class IndexerDiscoveryProviderTest {
     void testFailedAutodiscovery() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 Collections.emptyList(), // no configured indexers
+                1,
+                Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED), // preflight correctly finished
-                nodes() // but still no nodes discovered
+                nodes(), // but still no nodes discovered
+                NOOP_CERT_PROVISIONER
         );
 
         Assertions.assertThatThrownBy(provider::get)
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageStartingWith("No Datanode available");
+                .hasMessageStartingWith("Unable to retrieve Datanode connection");
     }
 
-    private NodeService nodes(String... transportAddress) {
-        final NodeService service = new TestNodeService(Node.Type.DATANODE);
-        Arrays.stream(transportAddress)
-                .map(URI::create)
-                .forEach(address -> service.registerServer(UUID.randomUUID().toString(), false, address, "localhost"));
+    @Test
+    void testProvisioningWillBeTriggered() {
+        final GraylogCertificateProvisioner provisioner = Mockito.mock(GraylogCertificateProvisioner.class);
+        final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
+                Collections.emptyList(),
+                10,
+                Duration.milliseconds(1),
+                preflightConfig(PreflightConfigResult.FINISHED),
+                nodes(),
+                provisioner
+        );
+
+        Assertions.assertThatThrownBy(provider::get)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Unable to retrieve Datanode connection");
+
+        Mockito.verify(provisioner, Mockito.times(10)).runProvisioning();
+
+    }
+
+    private NodeService<DataNodeDto> nodes(String... transportAddress) {
+
+        final NodeService<DataNodeDto> service = Mockito.mock(NodeService.class);
+        final Map<String, DataNodeDto> map = Arrays.stream(transportAddress)
+                .map(address -> DataNodeDto.Builder.builder()
+                        .setId(UUID.randomUUID().toString())
+                        .setLeader(false)
+                        .setTransportAddress(address)
+                        .setHostname("localhost")
+                        .setDataNodeStatus(DataNodeStatus.AVAILABLE)
+                        .build())
+                .collect(Collectors.toMap(
+                        DataNodeDto::getId,
+                        obj -> obj
+                ));
+
+        when(service.allActive()).thenReturn(map);
         return service;
     }
 
     private PreflightConfigService preflightConfig(@Nullable PreflightConfigResult result) {
-        return new PreflightConfigService() {
-            @Override
-            public Optional<PreflightConfig> getPersistedConfig() {
-                return Optional.of(resultToConfig(result));
-            }
-
-            @Override
-            public PreflightConfig saveConfiguration() throws ValidationException {
-                throw new IllegalStateException("Should not be called here!");
-            }
-        };
-    }
-
-    @NotNull
-    private PreflightConfig resultToConfig(PreflightConfigResult result) {
-        return () -> result;
+        final DummyPreflightConfigService service = new DummyPreflightConfigService();
+        service.setConfigResult(result);
+        return service;
     }
 }

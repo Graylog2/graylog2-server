@@ -26,6 +26,7 @@ import java.util.Map;
 
 public interface NativeEntityConverter<T> {
     T toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities);
+
     default void resolveForInstallation(EntityV1 entity,
                                         Map<String, ValueReference> parameters,
                                         Map<EntityDescriptor, Entity> entities,

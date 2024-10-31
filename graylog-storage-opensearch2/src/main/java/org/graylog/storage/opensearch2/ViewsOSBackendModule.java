@@ -22,6 +22,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
@@ -41,21 +42,25 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.OpenSearchBackend;
 import org.graylog.storage.opensearch2.views.export.OpenSearchExportBackend;
 import org.graylog.storage.opensearch2.views.export.RequestStrategy;
-import org.graylog.storage.opensearch2.views.searchtypes.OSEventList;
+import org.graylog.storage.opensearch2.views.export.SearchAfter;
+import org.graylog.storage.opensearch2.views.searchtypes.EventListStrategy;
+import org.graylog.storage.opensearch2.views.searchtypes.OSEventListDelegate;
 import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSDateRangeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSValuesHandler;
@@ -65,14 +70,13 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSCountHan
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSLatestHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSMaxHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSMinHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSPercentageHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSPercentilesHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSStdDevHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSSumHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSSumOfSquaresHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSVarianceHandler;
-import org.graylog.storage.opensearch2.views.export.SearchAfter;
 import org.graylog2.storage.SearchVersion;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 
 public class ViewsOSBackendModule extends ViewsModule {
     private final SearchVersion supportedSearchVersion;
@@ -89,7 +93,8 @@ public class ViewsOSBackendModule extends ViewsModule {
                 .to(OpenSearchBackend.class);
 
         registerOSSearchTypeHandler(MessageList.NAME, OSMessageList.class);
-        registerOSSearchTypeHandler(EventList.NAME, OSEventList.class);
+        registerOSSearchTypeHandler(EventList.NAME, OSEventListDelegate.class);
+        OptionalBinder.newOptionalBinder(binder(), EventListStrategy.class);
         registerOSSearchTypeHandler(Pivot.NAME, OSPivot.class).in(Scopes.SINGLETON);
 
         registerPivotSeriesHandler(Average.NAME, OSAverageHandler.class);
@@ -101,6 +106,7 @@ public class ViewsOSBackendModule extends ViewsModule {
         registerPivotSeriesHandler(Sum.NAME, OSSumHandler.class);
         registerPivotSeriesHandler(SumOfSquares.NAME, OSSumOfSquaresHandler.class);
         registerPivotSeriesHandler(Variance.NAME, OSVarianceHandler.class);
+        registerPivotSeriesHandler(Percentage.NAME, OSPercentageHandler.class);
         registerPivotSeriesHandler(Percentile.NAME, OSPercentilesHandler.class);
         registerPivotSeriesHandler(Latest.NAME, OSLatestHandler.class);
 

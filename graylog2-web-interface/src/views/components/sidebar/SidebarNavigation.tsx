@@ -17,27 +17,31 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import type { SidebarAction } from 'views/components/sidebar/sidebarActions';
+import type { IconName } from 'components/common/Icon';
+import usePluginEntities from 'hooks/usePluginEntities';
+import useLocation from 'routing/useLocation';
+
 import NavItem from './NavItem';
 import type { SidebarSection } from './sidebarSections';
 
-type Props = {
-  activeSection: SidebarSection | undefined | null,
-  sections: Array<SidebarSection>,
-  selectSidebarSection: (sectionKey: string) => void,
-  sidebarIsPinned: boolean,
-  toggleSidebar: () => void,
+export type SidebarPage = {
+  key: string,
+  title: string,
+  icon: IconName,
+  link: string,
 };
 
-const Container = styled.div<{ isOpen: boolean, sidebarIsPinned: boolean }>(({ isOpen, sidebarIsPinned, theme }) => css`
+export const Container = styled.div<{ $isOpen?: boolean, $sidebarIsPinned?: boolean }>(({ $isOpen, $sidebarIsPinned, theme }) => css`
   background: ${theme.colors.global.navigationBackground};
   color: ${theme.utils.contrastingColor(theme.colors.global.navigationBackground, 'AA')};
-  box-shadow: ${(sidebarIsPinned && isOpen) ? 'none' : `3px 3px 3px ${theme.colors.global.navigationBoxShadow}`};
+  box-shadow: ${($sidebarIsPinned && $isOpen) ? 'none' : `3px 3px 3px ${theme.colors.global.navigationBoxShadow}`};
   width: 50px;
   height: 100%;
   position: relative;
   z-index: 1031;
 
-  ::before {
+  &::before {
     content: '';
     position: absolute;
     top: 0;
@@ -51,11 +55,11 @@ const Container = styled.div<{ isOpen: boolean, sidebarIsPinned: boolean }>(({ i
   }
 `);
 
-const SectionList = styled.div`
+export const Section = styled.div`
   > * {
     margin-bottom: 5px;
 
-    :last-child {
+    &:last-child {
       margin-bottom: 0;
     }
   }
@@ -70,28 +74,58 @@ const HorizontalRuleWrapper = styled.div`
   }
 `;
 
-const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, sidebarIsPinned, toggleSidebar }: Props) => {
-  const toggleIcon = activeSection ? 'chevron-left' : 'chevron-right';
+type Props = {
+  activeSection: SidebarSection | undefined | null,
+  sections: Array<SidebarSection>,
+  actions: Array<SidebarAction>,
+  selectSidebarSection: (sectionKey: string) => void,
+  sidebarIsPinned: boolean,
+};
+
+const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, sidebarIsPinned, actions }: Props) => {
   const activeSectionKey = activeSection?.key;
+  const { pathname } = useLocation();
+  const links = usePluginEntities('views.searchDataSources');
+  const accessibleLinks = links.filter((link) => (link.useCondition ? !!link.useCondition() : true));
 
   return (
-    <Container sidebarIsPinned={sidebarIsPinned} isOpen={!!activeSection}>
-      <NavItem icon={toggleIcon}
-               onClick={toggleSidebar}
-               showTitleOnHover={false}
-               title={`${activeSection ? 'Close' : 'Open'} sidebar`}
-               sidebarIsPinned={sidebarIsPinned} />
+    <Container $sidebarIsPinned={sidebarIsPinned} $isOpen={!!activeSection}>
+      {accessibleLinks?.length > 0 && (
+        <>
+          <Section>
+            {accessibleLinks.map(({ icon, title, link, key }) => (
+              <NavItem isSelected={link === pathname}
+                       ariaLabel={`Open ${title}`}
+                       icon={icon}
+                       key={key}
+                       linkTarget={link}
+                       title={title} />
+            ))}
+          </Section>
+          <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
+        </>
+      )}
+      <Section>
+        {sections.map(({ key, icon, title }) => {
+          const isSelected = activeSectionKey === key;
+
+          return (
+            <NavItem isSelected={isSelected}
+                     ariaLabel={isSelected ? `Close ${title} section` : `Open ${title} section`}
+                     icon={icon}
+                     onClick={() => selectSidebarSection(key)}
+                     key={key}
+                     title={title}
+                     sidebarIsPinned={sidebarIsPinned} />
+          );
+        })}
+      </Section>
       <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
-      <SectionList>
-        {sections.map(({ key, icon, title }) => (
-          <NavItem isSelected={activeSectionKey === key}
-                   icon={icon}
-                   onClick={() => selectSidebarSection(key)}
-                   key={key}
-                   title={title}
-                   sidebarIsPinned={sidebarIsPinned} />
+      <Section>
+        {actions.map(({ key, Component }) => (
+          <Component key={key} sidebarIsPinned={sidebarIsPinned} />
         ))}
-      </SectionList>
+      </Section>
     </Container>
   );
 };

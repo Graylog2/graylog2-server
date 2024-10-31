@@ -24,6 +24,10 @@ import useViewType from 'views/hooks/useViewType';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewTitle from 'views/hooks/useViewTitle';
 import useViewMetadata from 'views/hooks/useViewMetadata';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import useViewsPlugin from 'views/test/testViewsPlugin';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 import Sidebar from './Sidebar';
 
@@ -31,12 +35,16 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   rootTimeZone: jest.fn(() => 'America/Chicago'),
   gl2ServerUrl: jest.fn(() => undefined),
+  isCloud: jest.fn(() => false),
+  isFeatureEnabled: jest.fn(() => false),
 }));
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/hooks/useViewType');
 jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/hooks/useViewTitle');
 jest.mock('views/hooks/useViewMetadata');
+jest.mock('views/hooks/useGlobalOverride');
 
 describe('<Sidebar />', () => {
   const queryId = '34efae1e-e78e-48ab-ab3f-e83c8611a683';
@@ -53,7 +61,7 @@ describe('<Sidebar />', () => {
     to: '2018-08-28T14:39:26.192Z',
   } as const;
   const duration = 64;
-  const timestamp = '2018-08-28T14:39:26.127Z';
+  const timestamp = '2018-08-28T14:39:27.127Z';
   const query = {
     filter: { type: 'or', filters: [] },
     id: queryId,
@@ -63,52 +71,44 @@ describe('<Sidebar />', () => {
   };
   const errors = [];
   const executionStats = { effective_timerange: effectiveTimerange, duration, timestamp };
-  const searchTypes = {};
+  const searchTypes = { 'search-type-id': { total: 12345, type: 'generic' } };
   const queryResult = new QueryResult({ execution_stats: executionStats, query, errors, search_types: searchTypes });
+
+  const openDescriptionSection = async () => fireEvent.click(await screen.findByRole('button', { name: /description/i }));
 
   const TestComponent = () => <div id="martian">Marc Watney</div>;
 
-  beforeEach(() => {
-    asMock(useActiveQueryId).mockReturnValue(queryId);
-    asMock(useViewMetadata).mockReturnValue(viewMetaData);
-  });
-
-  it('should render and open when clicking on header', async () => {
-    asMock(useViewTitle).mockReturnValue(viewMetaData.title);
-
-    render(
+  const renderSidebar = () => render(
+    <TestStoreProvider>
       <Sidebar results={queryResult}>
         <TestComponent />
-      </Sidebar>,
-    );
+      </Sidebar>
+    </TestStoreProvider>,
+  );
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+  useViewsPlugin();
 
-    await screen.findByText(viewMetaData.title);
+  beforeEach(() => {
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+    asMock(useActiveQueryId).mockReturnValue(queryId);
+    asMock(useViewMetadata).mockReturnValue(viewMetaData);
+    asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
   });
 
   it('should render with a description about the query results', async () => {
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
-    await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 16:39:26.'));
+    await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 16:39:27'));
   });
 
   it('should render summary and description of a view', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
-    render((
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
+    renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText(viewMetaData.summary);
     await screen.findByText(viewMetaData.description);
@@ -118,13 +118,9 @@ describe('<Sidebar />', () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
     asMock(useViewMetadata).mockReturnValue({ ...viewMetaData, description: undefined, summary: undefined });
 
-    render((
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
+    renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText(/This dashboard has no description/);
     await screen.findByText(/This dashboard has no summary/);
@@ -134,13 +130,9 @@ describe('<Sidebar />', () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
     asMock(useViewMetadata).mockReturnValue({ ...viewMetaData, description: undefined, summary: undefined });
 
-    render((
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
+    renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText(/This search has no description/);
     await screen.findByText(/This search has no summary/);
@@ -149,13 +141,9 @@ describe('<Sidebar />', () => {
   it('should render a summary and description, for a saved search', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
 
-    render((
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
+    renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText(viewMetaData.summary);
     await screen.findByText(viewMetaData.description);
@@ -164,13 +152,9 @@ describe('<Sidebar />', () => {
   it('should not render a summary and description, if the view is an ad hoc search', async () => {
     asMock(useViewMetadata).mockReturnValue({ ...viewMetaData, id: undefined });
 
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText('Save the search or export it to a dashboard to add a custom summary and description.');
 
@@ -178,40 +162,68 @@ describe('<Sidebar />', () => {
     expect(screen.queryByText(viewMetaData.description)).toBeNull();
   });
 
-  it('should render widget create options', async () => {
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+  it('should render the effective search execution time range for searches', async () => {
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+    renderSidebar();
 
-    fireEvent.click(await screen.findByLabelText('Create'));
+    await openDescriptionSection();
+
+    await screen.findByText('2018-08-28 16:34:26.192');
+    await screen.findByText('2018-08-28 16:39:26.192');
+    await screen.findByText(/total results *12,345/i);
+  });
+
+  it('should not render the effective search execution time range and total result for dashboards without global override', async () => {
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+    renderSidebar();
+
+    fireEvent.click(await screen.findByRole('button', { name: /description/i }));
+
+    await screen.findByText((_content, node) => (node.textContent === 'Effective time rangeVaries per widget'));
+    await screen.findByText((_content, node) => (node.textContent === 'Total resultsVaries per widget'));
+  });
+
+  it('should render the effective search execution time range for dashboards with global override', async () => {
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+
+    asMock(useGlobalOverride).mockReturnValue({
+      timerange: {
+        type: 'relative',
+        from: 300,
+      },
+    } as GlobalOverride);
+
+    renderSidebar();
+
+    fireEvent.click(await screen.findByRole('button', { name: /description/i }));
+
+    await screen.findByText('2018-08-28 16:34:26.192');
+    await screen.findByText('2018-08-28 16:39:26.192');
+  });
+
+  it('should render widget create options', async () => {
+    renderSidebar();
+
+    fireEvent.click(await screen.findByRole('button', { name: /open create section/i }));
 
     await screen.findByText('Predefined Aggregation');
   });
 
   it('should render passed children', async () => {
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
-    fireEvent.click(await screen.findByLabelText('Fields'));
+    fireEvent.click(await screen.findByRole('button', { name: /open fields section/i }));
 
     await screen.findByText('Marc Watney');
   });
 
   it('should close a section when clicking on its title', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
+    asMock(useViewTitle).mockReturnValue(viewMetaData.title);
 
-    render((
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
+    renderSidebar();
 
-    fireEvent.click(await screen.findByLabelText('Description'));
+    fireEvent.click(await screen.findByRole('button', { name: /open description section/i }));
 
     await screen.findByText('Execution');
 
@@ -221,17 +233,13 @@ describe('<Sidebar />', () => {
   });
 
   it('should close an active section when clicking on its navigation item', async () => {
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
-    fireEvent.click(await screen.findByLabelText('Fields'));
+    fireEvent.click(await screen.findByRole('button', { name: /open fields section/i }));
 
     await screen.findByText('Marc Watney');
 
-    fireEvent.click(await screen.findByLabelText('Fields'));
+    fireEvent.click(await screen.findByRole('button', { name: /close fields section/i }));
 
     expect(screen.queryByText('Marc Watney')).toBeNull();
   });

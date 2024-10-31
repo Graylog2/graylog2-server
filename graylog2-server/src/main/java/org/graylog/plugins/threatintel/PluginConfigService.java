@@ -19,6 +19,8 @@ package org.graylog.plugins.threatintel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
@@ -26,21 +28,20 @@ import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.events.DataAdaptersUpdated;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.shared.utilities.AutoValueUtils;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import static com.mongodb.client.model.Filters.eq;
 
 /**
  * Provides up to date access to this plugins' cluster config without forcing consumers to listen to updates manually.
@@ -96,8 +97,8 @@ public class PluginConfigService {
             // we request 10 per page, which is more than enough for the 4 that we potentially have to bounce
             final ImmutableList<Object> adapterNames = adaptersToLoad.build();
             final PaginatedList<DataAdapterDto> adapterDtos = dbDataAdapterService.findPaginated(
-                    DBQuery.in(DataAdapterDto.FIELD_NAME, adapterNames),
-                    DBSort.asc(DataAdapterDto.FIELD_ID),
+                    eq(DataAdapterDto.FIELD_NAME, adapterNames),
+                    SortOrder.ASCENDING.toBsonSort(DataAdapterDto.FIELD_ID),
                     1,
                     10);
 
@@ -113,6 +114,7 @@ public class PluginConfigService {
     /**
      * Used by {@link PluginConfigService} to return the previously observed and current configuration
      * so that clients can act on changes if they need to.
+     *
      * @param <T> the plugin cluster configuration class
      */
     public static class ConfigVersions<T> {

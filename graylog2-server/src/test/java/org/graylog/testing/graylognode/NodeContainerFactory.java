@@ -37,6 +37,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.StreamSupport;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -52,14 +53,13 @@ public class NodeContainerFactory {
     @SuppressWarnings("OctalInteger")
     private static final int EXECUTABLE_MODE = 0100755;
     // sha2 for password "admin"
-    private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
-
     private static final String GRAYLOG_HOME = "/usr/share/graylog";
+    public static final String ENV_GRAYLOG_ELASTICSEARCH_HOSTS = "GRAYLOG_ELASTICSEARCH_HOSTS";
 
     public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
         checkBinaries(config);
         if (!config.skipPackaging) {
-            MavenPackager.packageJarIfNecessary(config);
+            MavenPackager.packageJarIfNecessary(config.mavenProjectDirProvider);
         } else {
             LOG.info("Skipping packaging");
         }
@@ -123,14 +123,16 @@ public class NodeContainerFactory {
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withFileSystemBind(property("server_jar"), GRAYLOG_HOME + "/graylog.jar", BindMode.READ_ONLY)
                 .withNetwork(config.network)
+                .withEnv("GRAYLOG_DATA_DIR", "data")
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
-                .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", config.elasticsearchUri)
+                .withEnv(ENV_GRAYLOG_ELASTICSEARCH_HOSTS, config.elasticsearchUri)
                 // TODO: should we set this override search version or let graylog server to detect it from the search server itself?
                 .withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion.encode())
-                .withEnv("GRAYLOG_PASSWORD_SECRET", "M4lteserKreuzHerrStrack?")
+                .withEnv("GRAYLOG_ELASTICSEARCH_VERSION_PROBE_DELAY", "500ms")
+                .withEnv("GRAYLOG_PASSWORD_SECRET", config.passwordSecret)
                 .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
                 .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:" + API_PORT)
-                .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
+                .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", config.rootPasswordSha2)
                 .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")
                 .withEnv("GRAYLOG_VERSIONCHECKS", "false")
 
@@ -142,27 +144,10 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_FROM_EMAIL", "developers@graylog.com")
 
                 .withEnv("GRAYLOG_ENABLE_DEBUG_RESOURCES", "true") // see RestResourcesModule#addDebugResources
+                .withEnv(config.configParams)
+                .withExposedPorts(config.portsToExpose());
 
-                .waitingFor(new WaitAllStrategy()
-                        .withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailures(".*Graylog server up and running.*", ".*Exception while running migrations.*", ".*Graylog startup failed.*"))
-                        // To be able to search for data we need the index ranges to be computed. Since this is an async
-                        // background job, we need to wait until they have been created.
-                        .withStrategy(new HttpWaitStrategy()
-                                .forPort(API_PORT)
-                                .forPath("/api/system/indices/ranges")
-                                .withMethod("GET")
-                                .withBasicCredentials("admin", "admin")
-                                .forResponsePredicate(body -> {
-                                    try {
-                                        return StreamSupport.stream(OBJECT_MAPPER.readTree(body).path("ranges").spliterator(), false)
-                                                // With the default configuration, there should be a least one "graylog_" prefixed index
-                                                .anyMatch(range -> range.path("index_name").asText().startsWith("graylog_"));
-                                    } catch (IOException e) {
-                                        throw new RuntimeException("Couldn't extract response", e);
-                                    }
-                                })))
-                .withExposedPorts(config.portsToExpose())
-                .withStartupTimeout(Duration.of(600, SECONDS));
+        container.waitingFor(getWaitStrategy(container.getEnvMap())).withStartupTimeout(Duration.of(600, SECONDS));
 
         if (!includeFrontend) {
             container.withEnv("DEVELOPMENT", "true");
@@ -177,6 +162,12 @@ public class NodeContainerFactory {
             }
         });
 
+        config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
+            final Path originalPath = fileCopyBaseDir.resolve(filename);
+            final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
+            container.addFileSystemBind(originalPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
+        });
+
         addEnabledFeatureFlagsToContainerEnv(config, container);
 
         container.start();
@@ -185,16 +176,48 @@ public class NodeContainerFactory {
             LOG.info("Container debug port: " + container.getMappedPort(DEBUG_PORT));
         }
 
-        config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
-            final Path originalPath = fileCopyBaseDir.resolve(filename);
-            final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
-            container.copyFileToContainer(MountableFile.forHostPath(originalPath), containerPath);
-            if (!containerFileExists(container, containerPath)) {
-                LOG.error("Mandatory file {} does not exist in container at {}", filename, containerPath);
-            }
-        });
-
         return container;
+    }
+
+    private static WaitAllStrategy getWaitStrategy(Map<String, String> env) {
+        final WaitAllStrategy waitAllStrategy = new WaitAllStrategy().withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailures(
+                        List.of(
+                                ".*Graylog server up and running.*",
+                                ".*It seems you are starting Graylog for the first time. To set up a fresh install.*"
+                        ),
+                        List.of(
+                                ".*Exception while running migrations.*",
+                                ".*Graylog startup failed.*",
+                                ".*Guice/MissingImplementation.*"
+                        )));
+        if(indexerIsPredefined(env)) { // we have defined an indexer, no preflight will occur, let's wait for the full boot with index ranges
+            // To be able to search for data we need the index ranges to be computed. Since this is an async
+            // background job, we need to wait until they have been created.
+            waitAllStrategy.withStrategy(waitForIndexRangesStrategy());
+        }
+
+        return waitAllStrategy;
+    }
+
+    private static boolean indexerIsPredefined(Map<String, String> env) {
+        return !env.getOrDefault(ENV_GRAYLOG_ELASTICSEARCH_HOSTS, "").isBlank();
+    }
+
+    private static HttpWaitStrategy waitForIndexRangesStrategy() {
+        return new HttpWaitStrategy()
+                .forPort(API_PORT)
+                .forPath("/api/system/indices/ranges")
+                .withMethod("GET")
+                .withBasicCredentials("admin", "admin")
+                .forResponsePredicate(body -> {
+                    try {
+                        return StreamSupport.stream(OBJECT_MAPPER.readTree(body).path("ranges").spliterator(), false)
+                                // With the default configuration, there should be a least one "graylog_" prefixed index
+                                .anyMatch(range -> range.path("index_name").asText().startsWith("graylog_"));
+                    } catch (IOException e) {
+                        throw new RuntimeException("Couldn't extract response", e);
+                    }
+                });
     }
 
     private static void addEnabledFeatureFlagsToContainerEnv(NodeContainerConfig config, GenericContainer<?> container) {

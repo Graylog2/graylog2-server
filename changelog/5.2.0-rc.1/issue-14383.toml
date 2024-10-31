@@ -1,0 +1,5 @@
+type = "a"
+message = "Add log messages like in the old JEST client to show nodes arriving/dropping from an ES/OS cluster"
+
+issues = ["14383"]
+pulls = ["14898"]

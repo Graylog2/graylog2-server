@@ -19,8 +19,9 @@ package org.graylog2.security.hashing;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.regex.Pattern;
 
 public class SHA1HashPasswordAlgorithm implements PasswordAlgorithm {

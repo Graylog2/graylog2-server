@@ -20,7 +20,7 @@ import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEven
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class RuleMetricsConfigService {
     private final ClusterConfigService clusterConfigService;

@@ -21,7 +21,8 @@ import com.codahale.metrics.Timer;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -55,7 +56,7 @@ public class IndexFieldTypePoller {
      * Indices present in <code>existingIndexTypes</code> (except for the current write index) will not be polled
      * again to avoid Elasticsearch requests.
      *
-     * @param indexSet index set to poll
+     * @param indexSet           index set to poll
      * @param existingIndexTypes existing index field type data
      * @return the polled index field type data for the given index set
      */

@@ -16,15 +16,11 @@
  */
 package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.savedsearch;
 
-import com.google.common.collect.Streams;
-import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.JacksonDBCollection;
+import com.mongodb.client.MongoCollection;
+import jakarta.inject.Inject;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 
-import javax.inject.Inject;
 import java.util.stream.Stream;
 
 /**
@@ -33,19 +29,15 @@ import java.util.stream.Stream;
 @Deprecated
 public class SavedSearchService {
     private static final String COLLECTION_NAME = "saved_searches";
-    private final JacksonDBCollection<SavedSearch, ObjectId> db;
+    private final MongoCollection<SavedSearch> db;
 
     @Inject
-    public SavedSearchService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                SavedSearch.class,
-                ObjectId.class,
-                mapper.get());
+    public SavedSearchService(MongoCollections mongoCollections) {
+        this.db = mongoCollections.collection(COLLECTION_NAME, SavedSearch.class);
     }
 
     public Stream<SavedSearch> streamAll() {
-        final DBCursor<SavedSearch> cursor = db.find(DBQuery.empty());
-        return Streams.stream(cursor.iterator()).onClose(cursor::close);
+        return MongoUtils.stream(db.find());
     }
 }
 

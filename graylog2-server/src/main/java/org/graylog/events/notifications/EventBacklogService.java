@@ -28,7 +28,8 @@ import org.graylog2.plugin.MessageSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 public class EventBacklogService {
@@ -53,7 +54,7 @@ public class EventBacklogService {
                     eventDto.eventDefinitionType());
         }
         final EventDefinition eventDefinition = eventDefinitionService.get(eventDto.eventDefinitionId()).orElseThrow(() ->
-                new NotFoundException("Could not find event definintion <" +
+                new NotFoundException("Could not find event definition <" +
                         eventDto.eventDefinitionId() + ">"));
         final EventProcessor eventProcessor = factory.create(eventDefinition);
 

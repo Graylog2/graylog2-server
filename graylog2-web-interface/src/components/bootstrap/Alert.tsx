@@ -15,66 +15,71 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-// import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { Alert as BootstrapAlert } from 'react-bootstrap';
+import type { CSSProperties } from 'react';
+import type { ColorVariant } from '@graylog/sawmill';
+import { Alert as MantineAlert } from '@mantine/core';
 
-import type { ColorVariants } from 'theme/colors';
+import Icon from 'components/common/Icon';
 
-interface AlertProps {
-  $bsStyle: ColorVariants,
-  theme: DefaultTheme
-}
-
-interface Props {
-  bsStyle: ColorVariants,
+type Props = {
+  bsStyle?: ColorVariant,
   children: React.ReactNode,
+  className?: string,
   onDismiss?: () => void,
+  style?: CSSProperties,
+  title?: React.ReactNode,
+  noIcon?: boolean,
 }
 
-const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorVariants }) => ({
-  bsStyle: null,
-  $bsStyle: bsStyle || 'default',
-}))(({ $bsStyle, theme }: AlertProps) => {
-  const borderColor = theme.colors.variant.lighter[$bsStyle];
-  const backgroundColor = theme.colors.variant.lightest[$bsStyle];
+const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant }>(({ $bsStyle, theme }) => css`
+  margin: ${theme.spacings.md} 0;
+  border: 1px solid ${theme.colors.variant.lighter[$bsStyle]};
 
-  return css`
-    background-color: ${backgroundColor};
-    border-color: ${borderColor};
-    color: ${theme.utils.contrastingColor(backgroundColor)};
+  .mantine-Alert-message {
+    color: ${theme.colors.global.textDefault};
+    font-size: ${theme.fonts.size.body};
+  }
 
-    a:not(.btn) {
-      color: ${theme.utils.contrastingColor(backgroundColor, 'AA')};
-      font-weight: bold;
-      text-decoration: underline;
+  .mantine-Alert-title {
+    font-size: ${theme.fonts.size.body};
+    color: ${theme.colors.global.textDefault};
+  }
 
-      &:hover,
-      &:focus,
-      &:active {
-        color: ${theme.utils.contrastingColor(backgroundColor)};
-      }
+  .mantine-Alert-closeButton {
+    color: ${theme.colors.global.textDefault};
+  },
+`);
 
-      &:hover,
-      &:focus {
-        text-decoration: none;
-      }
-    }
+const iconNameForType = (bsStyle: ColorVariant) => {
+  switch (bsStyle) {
+    case 'warning':
+    case 'danger':
+      return 'error';
+    case 'success':
+      return 'check_circle';
+    default:
+      return 'info';
+  }
+};
 
-    &.alert-dismissible {
-      .close {
-        top: -9px;
-      }
-    }
-`;
-});
+const Alert = ({ children, bsStyle = 'default', title, style, className, onDismiss, noIcon = false }: Props) => {
+  const displayCloseButton = typeof onDismiss === 'function';
+  const iconName = iconNameForType(bsStyle);
 
-const Alert = ({ bsStyle, ...rest }: Props) => <StyledAlert bsStyle={bsStyle} {...rest} />;
-
-Alert.defaultProps = {
-  onDismiss: undefined,
+  return (
+    <StyledAlert $bsStyle={bsStyle}
+                 className={className}
+                 color={bsStyle}
+                 style={style}
+                 onClose={onDismiss}
+                 title={title}
+                 icon={noIcon ? null : <Icon name={iconName} />}
+                 closeButtonLabel={displayCloseButton && 'Close alert'}
+                 withCloseButton={displayCloseButton}>
+      {children}
+    </StyledAlert>
+  );
 };
 
 export default Alert;

@@ -1,0 +1,5 @@
+type = "added"
+message = "Add filtering to index field types page"
+
+issues = ["17285"]
+pulls = ["17326"]

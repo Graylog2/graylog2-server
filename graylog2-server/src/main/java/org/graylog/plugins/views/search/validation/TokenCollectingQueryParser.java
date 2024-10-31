@@ -90,8 +90,8 @@ public class TokenCollectingQueryParser extends QueryParser {
     }
 
     @Override
-    protected Query newSynonymQuery(TermAndBoost[] terms) {
-        return saveQueryLookupTokens(super.newSynonymQuery(terms));
+    protected Query newSynonymQuery(String field, TermAndBoost[] terms) {
+        return saveQueryLookupTokens(super.newSynonymQuery(field, terms));
     }
 
     @Override

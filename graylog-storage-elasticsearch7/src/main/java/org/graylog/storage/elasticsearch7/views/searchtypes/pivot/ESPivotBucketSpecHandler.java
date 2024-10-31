@@ -24,7 +24,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
@@ -64,7 +63,12 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                                     if (seriesSpec.literal().equals("count()")) {
                                         return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
                                     }
-                                    return BucketOrder.aggregation(esGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
+
+                                    String orderPath = seriesSpec.statsSubfieldName()
+                                            .map(subField -> esGeneratedQueryContext.seriesName(seriesSpec, pivot) + "." + subField)
+                                            .orElse(esGeneratedQueryContext.seriesName(seriesSpec, pivot));
+
+                                    return BucketOrder.aggregation(orderPath, sortSpec.direction().equals(SortSpec.Direction.Ascending));
                                 })
                                 .orElse(null);
                     }

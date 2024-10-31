@@ -32,8 +32,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;

@@ -18,6 +18,7 @@ package org.graylog.plugins.views.favorites;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.grn.GRN;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -36,7 +37,7 @@ public record FavoritesForUserDTO(
         @Nullable
         @JsonProperty(FIELD_ITEMS)
         List<GRN> items
-) {
+) implements MongoEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_USER_ID = "user_id";
     public static final String FIELD_ITEMS = "items";
@@ -46,13 +47,12 @@ public record FavoritesForUserDTO(
          * always have at least an empty list, avoid null
          * @Nullable is necessary to reduce problems if someone manually edits in MongoDB
          */
-        if(items == null) {
+        if (items == null) {
             items = new ArrayList<>();
         }
     }
 
-    public FavoritesForUserDTO(@JsonProperty(FIELD_USER_ID) String userId,
-                               @Nullable @JsonProperty(FIELD_ITEMS) List<GRN> items) {
+    public FavoritesForUserDTO(String userId, @Nullable List<GRN> items) {
         this(null, userId, items);
     }
 }

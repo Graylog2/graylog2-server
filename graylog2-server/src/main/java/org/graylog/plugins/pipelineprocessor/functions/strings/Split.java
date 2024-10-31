@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -47,7 +48,7 @@ public class Split extends AbstractFunction<List<String>> {
                 .transform(Pattern::compile)
                 .description("The regular expression to split by, uses Java regex syntax")
                 .build();
-        value = ParameterDescriptor.string("value")
+        value = ParameterDescriptor.string("value").ruleBuilderVariable()
                 .description("The string to be split")
                 .build();
         limit = ParameterDescriptor.integer("limit", Integer.class)
@@ -75,6 +76,10 @@ public class Split extends AbstractFunction<List<String>> {
                 .returnType(RETURN_TYPE)
                 .params(ImmutableList.of(pattern, value, limit))
                 .description("Split a string around matches of this pattern (Java syntax)")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Split string")
+                .ruleBuilderTitle("Split '${value}' around matches of pattern '${pattern}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }

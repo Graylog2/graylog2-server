@@ -16,9 +16,11 @@
  */
 package org.graylog2.indexer.results;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 public interface ChunkedResult {
+    @Nullable
     ResultChunk nextChunk() throws IOException;
 
     String getQueryHash();

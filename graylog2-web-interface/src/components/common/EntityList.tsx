@@ -14,13 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
-
-import Icon from './Icon';
 
 const StyledList = styled.ul`
   padding: 0;
@@ -38,11 +35,10 @@ type Props = {
  * action buttons, etc. You need to use this component alongside `EntityListItem` in order to get a similar
  * look and feel among different entities.
  */
-const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
+const EntityList = ({ bsNoItemsStyle, items, noItemsText = 'No items available' }: Props) => {
   if (items.length === 0) {
     return (
       <Alert bsStyle={bsNoItemsStyle}>
-        <Icon name="info-circle" />&nbsp;
         {noItemsText}
       </Alert>
     );
@@ -53,23 +49,6 @@ const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
       {items}
     </StyledList>
   );
-};
-
-EntityList.defaultProps = {
-  bsNoItemsStyle: 'info',
-  noItemsText: 'No items available',
-};
-
-EntityList.propTypes = {
-  /** bsStyle to use when there are no items in the list. */
-  bsNoItemsStyle: PropTypes.oneOf(['info', 'success', 'warning']),
-  /** Text to show when there are no items in the list. */
-  noItemsText: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]),
-  /** Array of `EntityListItem` that will be shown.  */
-  items: PropTypes.array.isRequired,
 };
 
 export default EntityList;

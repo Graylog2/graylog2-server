@@ -25,13 +25,13 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import io.krakens.grok.api.Grok;
 import io.krakens.grok.api.GrokCompiler;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -84,7 +84,7 @@ public class GrokPatternRegistry {
     }
 
     public boolean grokPatternExists(String patternName) {
-        return patterns.get().stream().anyMatch(pattern -> pattern.name().contains(patternName));
+        return patterns.get().stream().anyMatch(pattern -> pattern.name().equals(patternName));
     }
 
     public Grok cachedGrokForPattern(String pattern) {

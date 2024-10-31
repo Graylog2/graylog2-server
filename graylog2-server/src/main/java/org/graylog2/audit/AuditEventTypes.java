@@ -38,6 +38,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String CLUSTER_CONFIGURATION_CREATE = PREFIX + "cluster_configuration:create";
     public static final String CLUSTER_CONFIGURATION_DELETE = PREFIX + "cluster_configuration:delete";
     public static final String CLUSTER_CONFIGURATION_UPDATE = PREFIX + "cluster_configuration:update";
+    public static final String CERTIFICATE_RENEWAL_MANUALLY_INITIATED = PREFIX + "certificate_renewal:manual";
     public static final String CONTENT_PACK_CREATE = PREFIX + "content_pack:create";
     public static final String CONTENT_PACK_DELETE = PREFIX + "content_pack:delete";
     public static final String CONTENT_PACK_DELETE_REV = PREFIX + "content_pack:delete_rev";
@@ -50,6 +51,11 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DASHBOARD_WIDGET_DELETE = PREFIX + "dashboard_widget:delete";
     public static final String DASHBOARD_WIDGET_POSITIONS_UPDATE = PREFIX + "dashboard_widget_positions:update";
     public static final String DASHBOARD_WIDGET_UPDATE = PREFIX + "dashboard_widget:update";
+    public static final String DATANODE_API_REQUEST = PREFIX + "data_node:api_request";
+    public static final String DATANODE_REMOVE = PREFIX + "data_node:remove";
+    public static final String DATANODE_RESET = PREFIX + "data_node:reset";
+    public static final String DATANODE_STOP = PREFIX + "data_node:stop";
+    public static final String DATANODE_START = PREFIX + "data_node:start";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
@@ -68,6 +74,13 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_CREATE = PREFIX + "extractor:create";
     public static final String EXTRACTOR_DELETE = PREFIX + "extractor:delete";
     public static final String EXTRACTOR_ORDER_UPDATE = PREFIX + "extractor_order:update";
+    public static final String FIELD_TYPE_MAPPING_CREATE = PREFIX + "field_type_mapping:create";
+    public static final String FIELD_TYPE_MAPPING_DELETE = PREFIX + "field_type_mapping:delete";
+    public static final String FIELD_TYPE_POLLING_TRIGGERED = PREFIX + "field_type_polling:trigger";
+
+    public static final String INDEX_FIELD_TYPE_PROFILE_CREATE = PREFIX + "index_field_type_profile:create";
+    public static final String INDEX_FIELD_TYPE_PROFILE_UPDATE = PREFIX + "index_field_type_profile:update";
+    public static final String INDEX_FIELD_TYPE_PROFILE_DELETE = PREFIX + "index_field_type_profile:delete";
     public static final String EXTRACTOR_UPDATE = PREFIX + "extractor:update";
     public static final String GETTING_STARTED_GUIDE_OPT_OUT_CREATE = PREFIX + "getting_started_guide_opt_out:create";
     public static final String GRANTS_UPDATE = PREFIX + "grants:update";
@@ -78,6 +91,11 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String INDEX_SET_CREATE = PREFIX + "index_set:create";
     public static final String INDEX_SET_DELETE = PREFIX + "index_set:delete";
     public static final String INDEX_SET_UPDATE = PREFIX + "index_set:update";
+    public static final String INDEX_SET_DELETE_FAILED_SNAPSHOT = PREFIX + "index_set:delete_failed_snapshot";
+    public static final String INDEX_SET_TEMPLATE_CREATE = PREFIX + "index_set_template:create";
+    public static final String INDEX_SET_TEMPLATE_DELETE = PREFIX + "index_set_template:delete";
+    public static final String INDEX_SET_TEMPLATE_UPDATE = PREFIX + "index_set_template:update";
+    public static final String INDEX_SET_DEFAULT_TEMPLATE_UPDATE = PREFIX + "index_set_default_template:update";
     public static final String LOAD_BALANCER_STATUS_UPDATE = PREFIX + "load_balancer_status:update";
     public static final String LOG_LEVEL_UPDATE = PREFIX + "log_level:update";
     public static final String LOOKUP_ADAPTER_CREATE = PREFIX + "lut_adapter:create";
@@ -123,6 +141,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String SESSION_DELETE = PREFIX + "session:delete";
     public static final String STATIC_FIELD_CREATE = PREFIX + "static_field:create";
     public static final String STATIC_FIELD_DELETE = PREFIX + "static_field:delete";
+    public static final String STREAM_DESTINATION_FILTER_CREATE = PREFIX + "stream_destination_filter:create";
+    public static final String STREAM_DESTINATION_FILTER_DELETE = PREFIX + "stream_destination_filter:delete";
+    public static final String STREAM_DESTINATION_FILTER_UPDATE = PREFIX + "stream_destination_filter:update";
     public static final String STREAM_CREATE = PREFIX + "stream:create";
     public static final String STREAM_DELETE = PREFIX + "stream:delete";
     public static final String STREAM_OUTPUT_ASSIGNMENT_CREATE = PREFIX + "stream_output_assignment:create";
@@ -153,6 +174,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String USER_PREFERENCES_UPDATE = PREFIX + "user_preferences:update";
     public static final String USER_UPDATE = PREFIX + "user:update";
     public static final String TELEMETRY_USER_SETTINGS_UPDATE = PREFIX + "telemetry_user_settings:update";
+    public static final String CONTENT_STREAM_USER_SETTINGS_UPDATE = PREFIX + "content_stream_user_settings:update";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(ALARM_CALLBACK_CREATE)
@@ -181,6 +203,12 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DASHBOARD_WIDGET_DELETE)
             .add(DASHBOARD_WIDGET_POSITIONS_UPDATE)
             .add(DASHBOARD_WIDGET_UPDATE)
+            .add(DATANODE_API_REQUEST)
+            .add(DATANODE_REMOVE)
+            .add(DATANODE_RESET)
+            .add(DATANODE_STOP)
+            .add(DATANODE_START)
+            .add(DATANODE_API_REQUEST)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
             .add(ES_INDEX_DELETE)
@@ -200,15 +228,26 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(EXTRACTOR_DELETE)
             .add(EXTRACTOR_ORDER_UPDATE)
             .add(EXTRACTOR_UPDATE)
+            .add(FIELD_TYPE_MAPPING_CREATE)
+            .add(FIELD_TYPE_MAPPING_DELETE)
+            .add(FIELD_TYPE_POLLING_TRIGGERED)
             .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
             .add(GRANTS_UPDATE)
             .add(GROK_PATTERN_CREATE)
             .add(GROK_PATTERN_DELETE)
             .add(GROK_PATTERN_IMPORT_CREATE)
             .add(GROK_PATTERN_UPDATE)
+            .add(INDEX_FIELD_TYPE_PROFILE_CREATE)
+            .add(INDEX_FIELD_TYPE_PROFILE_DELETE)
+            .add(INDEX_FIELD_TYPE_PROFILE_UPDATE)
             .add(INDEX_SET_CREATE)
             .add(INDEX_SET_DELETE)
             .add(INDEX_SET_UPDATE)
+            .add(INDEX_SET_DELETE_FAILED_SNAPSHOT)
+            .add(INDEX_SET_TEMPLATE_CREATE)
+            .add(INDEX_SET_TEMPLATE_DELETE)
+            .add(INDEX_SET_TEMPLATE_UPDATE)
+            .add(INDEX_SET_DEFAULT_TEMPLATE_UPDATE)
             .add(LOAD_BALANCER_STATUS_UPDATE)
             .add(LOG_LEVEL_UPDATE)
             .add(LOOKUP_ADAPTER_CREATE)
@@ -258,6 +297,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(STREAM_DELETE)
             .add(STREAM_OUTPUT_ASSIGNMENT_CREATE)
             .add(STREAM_OUTPUT_ASSIGNMENT_DELETE)
+            .add(STREAM_DESTINATION_FILTER_CREATE)
+            .add(STREAM_DESTINATION_FILTER_DELETE)
+            .add(STREAM_DESTINATION_FILTER_UPDATE)
             .add(STREAM_RULE_CREATE)
             .add(STREAM_RULE_DELETE)
             .add(STREAM_RULE_UPDATE)
@@ -283,6 +325,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(USER_PREFERENCES_UPDATE)
             .add(USER_UPDATE)
             .add(TELEMETRY_USER_SETTINGS_UPDATE)
+            .add(CONTENT_STREAM_USER_SETTINGS_UPDATE)
+            .add(CERTIFICATE_RENEWAL_MANUALLY_INITIATED)
             .build();
 
     @Override

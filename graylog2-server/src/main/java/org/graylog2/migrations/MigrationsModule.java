@@ -30,11 +30,10 @@ public class MigrationsModule extends PluginModule {
         Multibinder.newSetBinder(binder(), V20201103145400_LegacyAuthServiceMigration.MigrationModule.class);
 
         addMigration(V19700101000000_GenerateClusterId.class);
-        addMigration(V20151210140600_ElasticsearchConfigMigration.class);
+        addMigration(V20151210140600_AddSearchesClusterConfigMigration.class);
         addMigration(V20161116172100_DefaultIndexSetMigration.class);
         addMigration(V20161116172200_CreateDefaultStreamMigration.class);
         addMigration(V20161122174500_AssignIndexSetsToStreamsMigration.class);
-        addMigration(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.class);
         addMigration(V20161215163900_MoveIndexSetDefaultConfig.class);
         addMigration(V20161216123500_DefaultIndexSetMigration.class);
         addMigration(V20170110150100_FixAlertConditionsMigration.class);
@@ -58,13 +57,19 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20220719130704_ImprovedDefaultProcessingOrderMigration.class);
         addMigration(V20220623125450_AddJobTypeToJobTrigger.class);
         addMigration(V20220818112023_AddStreamMatcherToProcessingOrderMigration.class);
-        addMigration(V202211021200_CreateDefaultIndexDefaultsConfig.class);
+        addMigration(V202211021200_CreateDefaultIndexTemplate.class);
         addMigration(V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews.class);
         addMigration(V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches.class);
         addMigration(V20230220095500_MigrateStartPageObjectReferencesToGRNbyRemoval.class);
         addMigration(V20230213160000_EncryptedInputConfigMigration.class);
         addMigration(V20230210102500_UniqueUserMigration.class);
+        addMigration(V202305221200_MigrateTimerangeOptionsToTimerangePresets.class);
         addMigration(V20230523160600_PopulateEventDefinitionState.class);
+        addMigration(V20230531135500_MigrateRemoveObsoleteItemsFromGrantsCollection.class);
         addMigration(V20230601104500_AddSourcesPageV2.class);
+        addMigration(V20230904073300_MigrateThemePreferences.class);
+        addMigration(V20240312140000_RemoveFieldTypeMappingsManagerRole.class);
+        addMigration(V202404170856_UpdateIndexSetTemplates.class);
+        addMigration(V20240927120300_DataNodeMigrationIndexSet.class);
     }
 }

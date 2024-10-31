@@ -18,11 +18,10 @@ package org.graylog2.contentpacks.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -33,11 +32,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
-import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
@@ -110,7 +105,8 @@ public abstract class PivotEntity implements SearchTypeEntity {
                 .columnGroups(of())
                 .filters(Collections.emptyList())
                 .sort(of())
-                .streams(Collections.emptySet());
+                .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet());
     }
 
     @AutoValue.Builder
@@ -120,7 +116,8 @@ public abstract class PivotEntity implements SearchTypeEntity {
             return builder()
                     .filters(Collections.emptyList())
                     .sort(Collections.emptyList())
-                    .streams(Collections.emptySet());
+                    .streams(Collections.emptySet())
+                    .streamCategories(Collections.emptySet());
         }
 
         @JsonProperty
@@ -160,13 +157,6 @@ public abstract class PivotEntity implements SearchTypeEntity {
         public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
-        @JsonSubTypes({
-                @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
-                @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),
-                @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class),
-                @JsonSubTypes.Type(name = OffsetRange.OFFSET, value = OffsetRange.class)
-        })
         public Builder timerange(@Nullable TimeRange timerange) {
             return timerange(timerange == null ? null : DerivedTimeRange.of(timerange));
         }
@@ -180,6 +170,10 @@ public abstract class PivotEntity implements SearchTypeEntity {
         public abstract Builder streams(Set<String> streams);
 
         @Override
+        @JsonProperty
+        public abstract Builder streamCategories(Set<String> streamCategories);
+
+        @Override
         public abstract PivotEntity build();
     }
 
@@ -189,6 +183,7 @@ public abstract class PivotEntity implements SearchTypeEntity {
         var columnGroups = columnLimit().map(columnLimit -> applyGroupLimit(columnGroups(), columnLimit)).orElse(columnGroups());
         return Pivot.builder()
                 .streams(mappedStreams(nativeEntities))
+                .streamCategories(streamCategories())
                 .name(name().orElse(null))
                 .sort(sort())
                 .timerange(timerange().orElse(null))
@@ -198,10 +193,18 @@ public abstract class PivotEntity implements SearchTypeEntity {
                 .rollup(rollup())
                 .query(query().orElse(null))
                 .filter(filter())
-                .filters(filters())
+                .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .type(type())
                 .id(id())
                 .build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        filters().forEach(filter -> filter.resolveForInstallation(entity, parameters, entities, graph));
     }
 
     private List<BucketSpec> applyGroupLimit(List<BucketSpec> bucketSpecs, int limit) {

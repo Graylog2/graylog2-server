@@ -21,7 +21,8 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.users.UserImpl;
 import org.mongojack.DBSort;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 
 public class V20230210102500_UniqueUserMigration extends Migration {

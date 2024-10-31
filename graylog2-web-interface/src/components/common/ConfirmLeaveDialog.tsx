@@ -14,26 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import type { Location } from 'react-router-dom';
-import { unstable_useBlocker as useBlocker } from 'react-router-dom';
+import { useBlocker } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';
 
 import AppConfig from 'util/AppConfig';
 
 /**
  * This component should be conditionally rendered if you have a form that is in a "dirty" state. It will confirm with the user that they want to navigate away, refresh, or in any way unload the component.
+ * The `ignoredRoutes` prop is an array of routes that should not trigger the confirmation dialog.
  */
 type Props = {
-  question: string,
+  question?: string,
+  ignoredRoutes?: Array<string>,
 };
 
-const locationHasChanged = (currentLocation: Location, newLocation: Location, question: string) => ((newLocation.pathname !== currentLocation.pathname)
-  // eslint-disable-next-line no-alert
-  ? !window.confirm(question)
-  : false);
+const locationHasChanged = (currentLocation: Location, newLocation: Location, question: string, ignoredRoutes: Array<string>) => (
+  (newLocation.pathname !== currentLocation.pathname && !ignoredRoutes.includes(newLocation.pathname))
+    // eslint-disable-next-line no-alert
+    ? !window.confirm(question)
+    : false);
 
-const ConfirmLeaveDialog = ({ question }: Props) => {
+const ConfirmLeaveDialog = ({ question = 'Are you sure?', ignoredRoutes = [] }: Props) => {
   const handleLeavePage = useCallback((e) => {
     if (AppConfig.gl2DevMode()) {
       return null;
@@ -52,18 +54,9 @@ const ConfirmLeaveDialog = ({ question }: Props) => {
     };
   }, [handleLeavePage]);
 
-  useBlocker((history) => !AppConfig.gl2DevMode() && locationHasChanged(history.currentLocation, history.nextLocation, question));
+  useBlocker((history) => !AppConfig.gl2DevMode() && locationHasChanged(history.currentLocation, history.nextLocation, question, ignoredRoutes));
 
   return null;
-};
-
-ConfirmLeaveDialog.propTypes = {
-  /** Phrase used in the confirmation dialog. */
-  question: PropTypes.string,
-};
-
-ConfirmLeaveDialog.defaultProps = {
-  question: 'Are you sure?',
 };
 
 /** @component */

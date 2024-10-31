@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.streams.Stream;
 
@@ -39,6 +38,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -76,6 +77,9 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
     @JsonProperty
     Set<String> streams();
 
+    @JsonProperty
+    Set<String> streamCategories();
+
     Builder toGenericBuilder();
 
     default Set<String> effectiveStreams() {
@@ -84,6 +88,8 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
 
     interface Builder {
         Builder streams(Set<String> streams);
+
+        Builder streamCategories(Set<String> streamCategories);
 
         SearchTypeEntity build();
     }
@@ -120,6 +126,9 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
 
         @JsonProperty
         private Set<String> streams;
+
+        @JsonProperty
+        private Set<String> streamCategories;
 
         @Override
         public String type() {
@@ -162,6 +171,11 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
         }
 
         @Override
+        public Set<String> streamCategories() {
+            return this.streamCategories == null ? Collections.emptySet() : this.streamCategories;
+        }
+
+        @Override
         public Builder toGenericBuilder() {
             return null;
         }
@@ -193,8 +207,7 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
 
     default Set<String> mappedStreams(Map<EntityDescriptor, Object> nativeEntities) {
         return streams().stream()
-                .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
-                .map(nativeEntities::get)
+                .map(id -> resolveStreamEntityObject(id, nativeEntities))
                 .map(object -> {
                     if (object == null) {
                         throw new ContentPackException("Missing Stream for event definition");

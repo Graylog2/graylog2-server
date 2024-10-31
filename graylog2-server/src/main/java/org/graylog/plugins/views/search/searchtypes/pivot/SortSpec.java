@@ -27,7 +27,7 @@ import java.util.Locale;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = SortSpec.TYPE_FIELD,
         visible = true)
 public interface SortSpec {

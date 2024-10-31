@@ -21,6 +21,8 @@ import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,6 +34,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 @ExtendWith(MockitoExtension.class)
 public class SupportBundleServiceTest {
@@ -94,5 +98,33 @@ public class SupportBundleServiceTest {
 
         assertThat(shrinkedList).hasSize(3);
         assertThat(shrinkedList).extracting(LogFile::id).contains("memory", "0", "1");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/tmp/safe_dir", "safe_dir", "../safe_dir"})
+    void ensureWithinBundleDir(String bundleDirString) throws Exception {
+        final var bundleDir = Path.of(bundleDirString);
+
+        assertThatNoException()
+                .isThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "file.zip"));
+        assertThatNoException()
+                .isThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "hello/file.zip"));
+        assertThatNoException()
+                .isThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "hello/world/file.zip"));
+        assertThatNoException()
+                .isThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "..file.zip"));
+
+        assertThatException()
+                .isThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "/etc/file.zip"));
+        assertThatException()
+                .isThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "/etc/hello/../world/../file.zip"));
+        assertThatException()
+                .isThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "../file.zip"));
+        assertThatException()
+                .isThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "../../file.zip"));
+        assertThatException() // See: https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-2q4p-f6gf-mqr5
+                .isThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "../safe_dir_insecure/file.zip"));
+        assertThatException()
+                .isThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "/safe_dir_insecure/file.zip"));
     }
 }

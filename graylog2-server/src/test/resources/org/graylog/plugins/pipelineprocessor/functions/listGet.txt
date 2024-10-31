@@ -1,0 +1,8 @@
+rule "mapSet"
+when
+  true
+then
+  let list = ["v1"];
+  set_field("idx0", list_get(list, 0));
+  set_field("idx1", list_get(list, 1));
+end

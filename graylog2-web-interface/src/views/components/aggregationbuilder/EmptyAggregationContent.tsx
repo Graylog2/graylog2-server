@@ -19,6 +19,8 @@ import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import { UPDATE_WIDGET_BTN_TEXT } from 'views/components/widgets/SaveOrCancelButtons';
+import { UPDATE_WIDGET_PREVIEW_BTN_TEXT } from 'views/components/aggregationwizard/ElementsConfigurationActions';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -51,9 +53,11 @@ const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
   const interactive = useContext(InteractiveContext);
   const text = editing
     ? (
-      <p>You are now editing the widget.<br />
+      <p>
+        You are now editing the widget.<br />
         To see results, add at least one metric. You can group data by adding rows/columns.<br />
-        To finish, click &quot;Save&quot; to save, &quot;Cancel&quot; to abandon changes.
+        You can preview widget search results by clicking on &quot;{UPDATE_WIDGET_PREVIEW_BTN_TEXT}&quot;.<br />
+        To finish, click &quot;{UPDATE_WIDGET_BTN_TEXT}&quot; to save, &quot;Cancel&quot; to abandon changes.
       </p>
     )
     : (<p>Please {interactive ? <Button bsStyle="info" onClick={toggleEdit}>Edit</Button> : 'edit'} the widget to see results here.</p>);

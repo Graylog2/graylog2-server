@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { Alert, Row, Col } from 'components/bootstrap';
-import { Icon, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
 import Notification from 'components/notifications/Notification';
 import type { NotificationType } from 'stores/notifications/NotificationsStore';
 import { NotificationsStore } from 'stores/notifications/NotificationsStore';
@@ -35,8 +35,7 @@ const getTitle = (count) => (count === 0 ? 'No notifications' : `There ${_format
 
 const getContent = (count: number, notificationsList: Array<NotificationType>) => (count === 0 ? (
   <Alert bsStyle="success" className="notifications-none">
-    <Icon name="check-circle" />{' '}
-      &nbsp;No notifications
+    No notifications
   </Alert>
 ) : (
   notificationsList?.map((notification) => <Notification key={`${notification.type}-${notification?.key}-${notification.timestamp}`} notification={notification} />)

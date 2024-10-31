@@ -1,0 +1,238 @@
+{
+  "event_definitions": [
+    {
+      "_id" : { "$oid": "649d74fba998cc5ee43c9a0a" },
+      "_scope" : "SYSTEM_NOTIFICATION_EVENT",
+      "title" : "System notification events",
+      "description" : "Reserved event definition for system notification events",
+      "updated_at" : { "$date": "2023-06-29T12:11:39.799Z" },
+      "priority" : 1,
+      "alert" : false,
+      "config" : {
+        "type" : "system-notifications-v1"
+      },
+      "field_spec" : {},
+      "key_spec" : [],
+      "notification_settings" : {
+        "grace_period_ms" : 0,
+        "backlog_size" : 0
+      },
+      "notifications" : [],
+      "storage" : [
+        {
+          "type" : "persist-to-streams-v1",
+          "streams" : [
+            "000000000000000000000003"
+          ]
+        }
+      ],
+      "state" : "DISABLED"
+    },
+    {
+      "_id" : { "$oid": "649d7571a998cc5ee43c9bdd" },
+      "_scope" : "DEFAULT",
+      "title" : "Foo",
+      "description" : "",
+      "updated_at" : { "$date": "2023-06-29T12:13:37.873Z" },
+      "priority" : 2,
+      "alert" : false,
+      "config" : {
+        "type" : "aggregation-v1",
+        "query" : "",
+        "query_parameters" : [],
+        "streams" : [],
+        "group_by" : [],
+        "series" : [
+          {
+            "id" : "avg-",
+            "function" : "avg",
+            "field" : "x"
+          },
+          {
+            "id" : "percentage-nf_bytes",
+            "function" : "percentage",
+            "field" : "nf_bytes",
+            "strategy": "SUM"
+          }
+        ],
+        "conditions" : {
+          "expression" : {
+            "expr" : ">",
+            "left" : {
+              "expr" : "number-ref",
+              "ref" : "avg-"
+            },
+            "right" : {
+              "expr" : "number",
+              "value" : 2000.0
+            }
+          }
+        },
+        "search_within_ms" : 300000,
+        "execute_every_ms" : 300000
+      },
+      "field_spec" : {},
+      "key_spec" : [],
+      "notification_settings" : {
+        "grace_period_ms" : 300000,
+        "backlog_size" : 0
+      },
+      "notifications" : [],
+      "storage" : [
+        {
+          "type" : "persist-to-streams-v1",
+          "streams" : [
+            "000000000000000000000002"
+          ]
+        }
+      ],
+      "state" : "ENABLED"
+    },
+    {
+      "_id" : { "$oid": "649d7587a998cc5ee43c9c71" },
+      "_scope" : "DEFAULT",
+      "title" : "Bar",
+      "description" : "",
+      "updated_at" : { "$date": "2023-06-29T12:13:59.831Z" },
+      "priority" : 2,
+      "alert" : false,
+      "config" : {
+        "type" : "aggregation-v1",
+        "query" : "",
+        "query_parameters" : [],
+        "streams" : [],
+        "group_by" : [],
+        "series" : [
+          {
+            "id" : "max-nf_bytes",
+            "function" : "max",
+            "field" : "nf_bytes"
+          }
+        ],
+        "conditions" : {
+          "expression" : {
+            "expr" : ">",
+            "left" : {
+              "expr" : "number-ref",
+              "ref" : "max-nf_bytes"
+            },
+            "right" : {
+              "expr" : "number",
+              "value" : 2000.0
+            }
+          }
+        },
+        "search_within_ms" : 300000,
+        "execute_every_ms" : 300000
+      },
+      "field_spec" : {},
+      "key_spec" : [],
+      "notification_settings" : {
+        "grace_period_ms" : 300000,
+        "backlog_size" : 0
+      },
+      "notifications" : [],
+      "storage" : [
+        {
+          "type" : "persist-to-streams-v1",
+          "streams" : [
+            "000000000000000000000002"
+          ]
+        }
+      ],
+      "state" : "ENABLED"
+    },
+    {
+      "_id" : { "$oid": "649d7593a998cc5ee43c9cda" },
+      "_scope" : "DEFAULT",
+      "title" : "Baz",
+      "description" : "",
+      "updated_at" : { "$date": "2023-06-29T12:14:11.973Z" },
+      "priority" : 2,
+      "alert" : false,
+      "config" : {
+        "type" : "aggregation-v1",
+        "query" : "",
+        "query_parameters" : [],
+        "streams" : [],
+        "group_by" : [],
+        "series" : [],
+        "conditions" : {
+          "expression" : null
+        },
+        "search_within_ms" : 300000,
+        "execute_every_ms" : 300000
+      },
+      "field_spec" : {},
+      "key_spec" : [],
+      "notification_settings" : {
+        "grace_period_ms" : 300000,
+        "backlog_size" : 0
+      },
+      "notifications" : [],
+      "storage" : [
+        {
+          "type" : "persist-to-streams-v1",
+          "streams" : [
+            "000000000000000000000002"
+          ]
+        }
+      ],
+      "state" : "ENABLED"
+    },
+    {
+      "_id" : { "$oid": "658ee55d69d2bd68430e0463" },
+      "_scope" : "DEFAULT",
+      "title" : "missing_field",
+      "description" : "illegal event definition",
+      "updated_at" : { "$date": "2023-12-29T15:27:25.628Z" },
+      "priority" : 2,
+      "alert" : false,
+      "config" : {
+        "type" : "aggregation-v1",
+        "query" : "",
+        "query_parameters" : [],
+        "streams" : [],
+        "group_by" : [],
+        "series" : [
+          {
+            "id" : "card-",
+            "function" : "card",
+            "field" : null
+          }
+        ],
+        "conditions" : {
+          "expression" : {
+            "expr" : "<",
+            "left" : {
+              "expr" : "number-ref",
+              "ref" : "card-"
+            },
+            "right" : {
+              "expr" : "number",
+              "value" : 0.0
+            }
+          }
+        },
+        "search_within_ms" : 300000,
+        "execute_every_ms" : 300000
+      },
+      "field_spec" : {},
+      "key_spec" : [],
+      "notification_settings" : {
+        "grace_period_ms" : 300000,
+        "backlog_size" : 0
+      },
+      "notifications" : [],
+      "storage" : [
+        {
+          "type" : "persist-to-streams-v1",
+          "streams" : [
+            "000000000000000000000002"
+          ]
+        }
+      ],
+      "state" : "ENABLED"
+    }
+  ]
+}

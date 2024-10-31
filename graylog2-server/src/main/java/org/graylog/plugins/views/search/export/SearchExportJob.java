@@ -23,7 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 @AutoValue
 @JsonAutoDetect

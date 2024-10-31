@@ -1,0 +1,69 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_1",
+            "indexType": "message",
+            "indexId": "0"
+          }
+        },
+        {
+          "data": {
+            "gl2_message_id": "0",
+            "source": "source-1",
+            "message": "Ha",
+            "timestamp": "2015-01-01 01:00:00.000",
+            "streams": [
+              "stream-01"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "1"
+          }
+        },
+        {
+          "data": {
+            "gl2_message_id": "1",
+            "source": "source-2",
+            "message": "This message has no gl2_second_sort_field alias",
+            "timestamp": "2015-01-01 01:59:59.999",
+            "streams": [
+              "stream-02"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_2",
+            "indexType": "message",
+            "indexId": "2"
+          }
+        },
+        {
+          "data": {
+            "source": "source-3",
+            "message": "This message will be ingested with a wrong timestamp field type to trigger a shard error during export",
+            "timestamp": "2015-01-01 02:00:00.000",
+            "streams": [
+              "stream-03"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

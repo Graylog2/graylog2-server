@@ -16,19 +16,22 @@
  */
 import Reflux from 'reflux';
 
+import type { ConfigurationField } from 'components/configurationforms';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { singletonStore } from 'logic/singleton';
 
-type Output = {
+export type Output = {
   id: string,
   title: string,
   type: string,
-};
+  configuration: {
+    [key: string]: ConfigurationField,
+  },
+}
 
-// eslint-disable-next-line import/prefer-default-export
 export const OutputsStore = singletonStore(
   'core.Outputs',
   () => Reflux.createStore({

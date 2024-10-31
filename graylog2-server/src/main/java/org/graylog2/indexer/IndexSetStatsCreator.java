@@ -20,7 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;

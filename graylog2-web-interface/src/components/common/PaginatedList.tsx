@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback, useState } from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import usePaginationQueryParameter, { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
@@ -110,16 +110,23 @@ const ListWithOwnState = ({
   pageSize: propPageSize,
   ...props
 }: Required<Props> & { activePage: number, pageSize: number }) => {
-  const [{ page: currentPage, pageSize: currentPageSize }, setPagination] = React.useState({
-    page: Math.max(activePage, INITIAL_PAGE),
-    pageSize: propPageSize,
-  });
+  const [currentPage, setCurrentPage] = useState<number>(Math.max(activePage, INITIAL_PAGE));
+  const [currentPageSize, setCurrentPageSize] = useState<number>(propPageSize);
 
   useEffect(() => {
-    if (activePage > 0 && activePage !== currentPage) {
-      setPagination((cur) => ({ ...cur, page: activePage }));
+    if (activePage > 0) {
+      setCurrentPage(activePage);
     }
-  }, [activePage, currentPage]);
+  }, [activePage]);
+
+  useEffect(() => {
+    setCurrentPageSize(propPageSize);
+  }, [propPageSize]);
+
+  const setPagination = useCallback(({ page, pageSize }) => {
+    setCurrentPageSize(pageSize);
+    setCurrentPage(page);
+  }, []);
 
   return (
     <ListBase {...props}
@@ -136,17 +143,17 @@ const ListWithOwnState = ({
  * the selected page is displayed on screen.
  */
 const PaginatedList = ({
-  activePage,
+  activePage = 1,
   children,
   className,
-  hideFirstAndLastPageLinks,
-  hidePreviousAndNextPageLinks,
+  hideFirstAndLastPageLinks = false,
+  hidePreviousAndNextPageLinks = false,
   onChange,
-  pageSize,
-  pageSizes,
-  showPageSizeSelect,
+  pageSize = DEFAULT_PAGE_SIZES[0],
+  pageSizes = DEFAULT_PAGE_SIZES,
+  showPageSizeSelect = true,
   totalItems,
-  useQueryParameter,
+  useQueryParameter = true,
 }: Props & {
   activePage?: number,
   pageSize?: number,
@@ -180,18 +187,6 @@ const PaginatedList = ({
       {children}
     </ListWithOwnState>
   );
-};
-
-PaginatedList.defaultProps = {
-  activePage: 1,
-  className: undefined,
-  hideFirstAndLastPageLinks: false,
-  hidePreviousAndNextPageLinks: false,
-  pageSizes: DEFAULT_PAGE_SIZES,
-  pageSize: DEFAULT_PAGE_SIZES[0],
-  showPageSizeSelect: true,
-  onChange: undefined,
-  useQueryParameter: true,
 };
 
 export default PaginatedList;

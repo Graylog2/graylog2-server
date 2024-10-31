@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
 import {
@@ -32,14 +32,24 @@ import {
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import EntityShareModal from 'components/permissions/EntityShareModal';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
+import UserNotification from 'util/UserNotification';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { MoreActions } from 'components/common/EntityDataTable';
+import usePluginEntities from 'hooks/usePluginEntities';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 import type { EventDefinition } from '../event-definitions-types';
 
+type SigmaEventDefinitionConfig = EventDefinition['config'] & {
+  sigma_rule_id: string,
+}
+
 type Props = {
   eventDefinition: EventDefinition,
-  refetchEventDefinitions: () => void,
 }
 
 const DIALOG_TYPES = {
@@ -68,19 +78,45 @@ const DIALOG_TEXT = {
   },
 };
 
-const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Props) => {
+const EventDefinitionActions = ({ eventDefinition }: Props) => {
+  const { refetch: refetchEventDefinitions } = useTableFetchContext();
+  const { deselectEntity } = useSelectedEntities();
   const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
   const [currentDefinition, setCurrentDefinition] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
+  const [showSigmaModal, setShowSigmaModal] = useState(false);
+  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const navigate = useNavigate();
 
   const showActions = (): boolean => scopePermissions?.is_mutable;
 
   const isSystemEventDefinition = (): boolean => eventDefinition?.config?.type === 'system-notifications-v1';
 
   const isAggregationEventDefinition = (): boolean => eventDefinition?.config?.type === 'aggregation-v1';
+
+  const isSigmaEventDefinition = (): boolean => eventDefinition?.config?.type === 'sigma-v1';
+
+  const getDeleteActionTitle = () => {
+    if (isSystemEventDefinition()) {
+      return 'System Event Definition cannot be deleted';
+    }
+
+    if (isSigmaEventDefinition()) {
+      return 'Sigma Rules must be deleted from the Sigma Rules page';
+    }
+
+    return undefined;
+  };
+
+  const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal')
+    .find((entity: { key: string }) => entity.key === 'coreSigmaModal');
+
+  const CoreSigmaModal = pluggableSigmaModal
+    ? pluggableSigmaModal.component as React.FC<{ ruleId: string, onCancel: () => void, onConfirm: () => void }>
+    : null;
 
   const updateState = ({ show, type, definition }) => {
     setShowDialog(show);
@@ -90,31 +126,60 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   };
 
   const handleAction = (action, definition) => {
-    sendTelemetry('click', {
-      app_pathname: 'event-definition',
-      app_action_value: `event-definition-action-${action}`,
-    });
-
     switch (action) {
       case DIALOG_TYPES.COPY:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_COPY_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-row',
+          app_action_value: 'copy-menuitem',
+        });
+
         updateState({ show: true, type: DIALOG_TYPES.COPY, definition });
 
         break;
       case DIALOG_TYPES.DELETE:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_DELETE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-row',
+          app_action_value: 'delete-menuitem',
+        });
+
         updateState({ show: true, type: DIALOG_TYPES.DELETE, definition });
 
         break;
       case DIALOG_TYPES.ENABLE:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_ENABLE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-row',
+          app_action_value: 'enable-menuitem',
+        });
+
         updateState({ show: true, type: DIALOG_TYPES.ENABLE, definition });
 
         break;
       case DIALOG_TYPES.DISABLE:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_DISABLE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-row',
+          app_action_value: 'disable-menuitem',
+        });
+
         updateState({ show: true, type: DIALOG_TYPES.DISABLE, definition });
 
         break;
       default:
         break;
     }
+  };
+
+  const handleShare = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_SHARE_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-list',
+      app_action_value: 'share-button',
+    });
+
+    setShowEntityShareModal(true);
   };
 
   const handleClearState = () => {
@@ -133,6 +198,8 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
       case 'delete':
         EventDefinitionsActions.delete(currentDefinition).then(
           () => {
+            deselectEntity(currentDefinition.id);
+
             UserNotification.success('Event Definition deleted successfully',
               `Event Definition "${eventDefinition.title}" was deleted successfully.`);
           },
@@ -164,6 +231,19 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
     }
   };
 
+  const onEditEventDefinition = () => {
+    if (isSigmaEventDefinition()) {
+      setShowSigmaModal(true);
+    } else {
+      navigate(Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id));
+    }
+  };
+
+  const onSigmaModalClose = () => {
+    refetchEventDefinitions();
+    setShowSigmaModal(false);
+  };
+
   const isEnabled = eventDefinition?.state === 'ENABLED';
 
   return (
@@ -171,37 +251,33 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
       <ButtonToolbar key={`actions-${eventDefinition.id}`}>
         <ShareButton entityId={eventDefinition.id}
                      entityType="event_definition"
-                     onClick={() => setShowEntityShareModal(true)}
+                     onClick={handleShare}
                      bsSize="xsmall" />
-        <OverlayDropdownButton title="More"
-                               bsSize="xsmall"
-                               dropdownZIndex={1000}>
-          {showActions() && (
-            <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-                <MenuItem data-testid="edit-button">
-                  Edit
-                </MenuItem>
-              </LinkContainer>
-            </IfPermitted>
+        <MoreActions>
+          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+            <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
+              Edit
+            </MenuItem>
+          </IfPermitted>
+          {!isSystemEventDefinition() && !isSigmaEventDefinition() && (
+            <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
           )}
-          {!isSystemEventDefinition() && (
-            <>
-              <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
-              <MenuItem divider />
-              <MenuItem onClick={() => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
-                {isEnabled ? 'Disable' : 'Enable'}
-              </MenuItem>
+          <MenuItem divider />
+          <MenuItem disabled={isSystemEventDefinition()}
+                    title={isSystemEventDefinition() ? 'System Event Definition cannot be disabled' : undefined}
+                    onClick={isSystemEventDefinition() ? undefined : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
+            {isEnabled ? 'Disable' : 'Enable'}
+          </MenuItem>
 
-              {showActions() && (
-                <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
-                  <MenuItem divider />
-                  <MenuItem onClick={() => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
-                            data-testid="delete-button">Delete
-                  </MenuItem>
-                </IfPermitted>
-              )}
-            </>
+          {showActions() && (
+            <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
+              <MenuItem divider />
+              <MenuItem disabled={isSystemEventDefinition() || isSigmaEventDefinition()}
+                        title={getDeleteActionTitle()}
+                        onClick={isSystemEventDefinition() || isSigmaEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
+                        data-testid="delete-button">Delete
+              </MenuItem>
+            </IfPermitted>
           )}
           {
             isAggregationEventDefinition() && (
@@ -216,7 +292,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
               </>
             )
           }
-        </OverlayDropdownButton>
+        </MoreActions>
       </ButtonToolbar>
       {showDialog && (
         <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
@@ -233,6 +309,11 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
                           entityTitle={eventDefinition.title}
                           description="Search for a User or Team to add as collaborator on this event definition."
                           onClose={() => setShowEntityShareModal(false)} />
+      )}
+      {showSigmaModal && CoreSigmaModal && (
+        <CoreSigmaModal ruleId={(eventDefinition.config as SigmaEventDefinitionConfig).sigma_rule_id}
+                        onCancel={onSigmaModalClose}
+                        onConfirm={onSigmaModalClose} />
       )}
     </>
   );

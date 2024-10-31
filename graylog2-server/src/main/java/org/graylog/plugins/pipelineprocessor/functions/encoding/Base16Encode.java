@@ -37,6 +37,18 @@ public class Base16Encode extends BaseEncodingSingleArgStringFunction {
         return ENCODING_NAME;
     }
 
+
+    @Override
+    protected String getRuleBuilderName() {
+        return "Encode " + ENCODING_NAME;
+    }
+
+    @Override
+    protected String getRuleBuilderTitle() {
+        return ENCODING_NAME + " encoding of '${value}'";
+    }
+
+
     @Override
     protected String getName() {
         return NAME;

@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.impl.Log4jLogEvent;
 import org.apache.logging.log4j.message.SimpleMessage;
-import org.bouncycastle.util.Strings;
 import org.graylog2.log4j.MemoryAppender;
 import org.junit.Test;
 
@@ -45,11 +44,11 @@ public class MemoryAppenderTest {
 
         for (int i = 1; i <= count; i++) {
             final LogEvent logEvent = Log4jLogEvent.newBuilder()
-                .setLevel(Level.INFO)
-                .setLoggerName("test")
-                .setLoggerFqcn("com.example.test")
-                .setMessage(new SimpleMessage(f("Message %d: %s", i, getRandomString())))
-                .build();
+                    .setLevel(Level.INFO)
+                    .setLoggerName("test")
+                    .setLoggerFqcn("com.example.test")
+                    .setMessage(new SimpleMessage(f("Message %d: %s", i, getRandomString())))
+                    .build();
 
             appender.append(logEvent);
         }
@@ -59,12 +58,12 @@ public class MemoryAppenderTest {
 
         var outStream = new ByteArrayOutputStream();
         appender.streamFormattedLogMessages(outStream, 0);
-        List<String> result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
+        List<String> result = List.of(outStream.toString(StandardCharsets.UTF_8).split("\n"));
 
         assertThat(result.stream().findFirst()).isNotEmpty();
         assertThat(result.stream().findFirst().get()).startsWith("Message ");
         assertThat(result.stream().findFirst().get()).doesNotContain("Message 1");
-        assertThat(result.get(result.size() -2)).startsWith("Message " + count);
+        assertThat(result.get(result.size() - 1)).startsWith("Message " + count);
     }
 
     @Test
@@ -73,11 +72,11 @@ public class MemoryAppenderTest {
         assertThat(appender).isNotNull();
 
         final LogEvent logEvent = Log4jLogEvent.newBuilder()
-            .setLevel(Level.INFO)
-            .setLoggerName("test")
-            .setLoggerFqcn("com.example.test")
-            .setMessage(new SimpleMessage("Message"))
-            .build();
+                .setLevel(Level.INFO)
+                .setLoggerName("test")
+                .setLoggerFqcn("com.example.test")
+                .setMessage(new SimpleMessage("Message"))
+                .build();
 
         final int threadCount = 48;
         final Thread[] threads = new Thread[threadCount];

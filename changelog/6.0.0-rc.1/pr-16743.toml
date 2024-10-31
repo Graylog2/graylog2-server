@@ -1,0 +1,12 @@
+type = "c"
+message = "Update io.prometheous:simpleclient to version 0.16.0."
+
+pulls = ["16743"]
+
+details.user = """
+This update contains a breaking change to the `jvm_classes_loaded` metric.
+Prometheus queries referencing `jvm_classes_loaded` need to be adapted to
+the new name `jvm_classes_currently_loaded`.
+
+See https://github.com/prometheus/client_java/pull/681.
+"""

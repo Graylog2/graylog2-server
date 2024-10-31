@@ -16,24 +16,27 @@
  */
 package org.graylog.plugins.views.search.export;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog2.database.filtering.HasAttributeFilter;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandFactory {
-    private final QueryStringDecorator queryStringDecorator;
+    private final QueryStringDecorators queryStringDecorator;
 
     @Inject
-    public CommandFactory(QueryStringDecorator queryStringDecorator) {
+    public CommandFactory(QueryStringDecorators queryStringDecorator) {
         this.queryStringDecorator = queryStringDecorator;
     }
 
@@ -57,6 +60,11 @@ public class CommandFactory {
         return builderFrom(resultFormat)
                 .timeRange(resultFormat.timerange().orElse(toAbsolute(query.timerange())))
                 .queryString(queryStringFrom(search, query))
+                .usedSearchFilters(search.queries().stream()
+                        .map(Query::filters)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList())
+                )
                 .streams(query.usedStreamIds())
                 .build();
     }
@@ -80,6 +88,8 @@ public class CommandFactory {
                 .timeRange(resultFormat.timerange().orElse(toAbsolute(timeRangeFrom(query, searchType))))
                 .queryString(queryStringFrom(search, query, searchType))
                 .streams(query.effectiveStreams(searchType))
+                .usedSearchFilters(query.filters())
+                .attributeFilters(searchType instanceof HasAttributeFilter hasAttributeFilter ? hasAttributeFilter.attributes() : List.of())
                 .decorators(decorators);
 
         return commandBuilder.build();
@@ -157,7 +167,7 @@ public class CommandFactory {
 
     private ElasticsearchQueryString decorateQueryString(Search search, Query query, ElasticsearchQueryString undecorated) {
         String queryString = undecorated.queryString();
-        String decorated = queryStringDecorator.decorateQueryString(queryString, search, query);
+        String decorated = queryStringDecorator.decorate(queryString, search, query);
         return ElasticsearchQueryString.of(decorated);
     }
 }

@@ -17,8 +17,10 @@
 import * as React from 'react';
 import { useFormikContext } from 'formik';
 
+import { Input } from 'components/bootstrap';
 import { FormikFormGroup, TimeUnitInput } from 'components/common';
 import type { LookupTableCache, LookupTableCacheConfig } from 'logic/lookup-tables/types';
+import { getValueFromInput } from 'util/FormsUtils';
 
 type Props = {
   config: LookupTableCacheConfig,
@@ -42,6 +44,14 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
   React.useImperativeHandle(ref, () => ({
     validate: () => (validateConfig()),
   }));
+
+  const handleIgnoreNullChange = (event) => {
+    const ignoreValue = getValueFromInput(event.target);
+
+    const valConfig = { ...values.config, ignore_null: ignoreValue };
+    setStateConfig(valConfig);
+    setValues({ ...values, config: valConfig });
+  };
 
   const handleUpdate = (name: string) => (value: number, unit: string, enabled: boolean) => {
     const auxConfig = { ...stateConfig };
@@ -83,6 +93,25 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
                      value={stateConfig.expire_after_write}
                      unit={stateConfig.expire_after_write_unit || 'SECONDS'}
                      defaultEnabled={config.expire_after_write > 0}
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" />
+      <Input type="checkbox"
+             id="ignore_null"
+             name="ignore_null"
+             label="Ignore empty results"
+             checked={stateConfig.ignore_null}
+             onChange={handleIgnoreNullChange}
+             help="When enabled, empty lookup results will be ignored and not cached."
+             wrapperClassName="col-md-offset-3 col-md-9" />
+      <TimeUnitInput label="TTL for empty results"
+                     help="Empty results are removed from the cache after the specified time."
+                     update={handleUpdate('ttl_empty')}
+                     name="config.ttl_empty"
+                     unitName="config.ttl_empty_unit"
+                     value={stateConfig.ttl_empty}
+                     unit={stateConfig.ttl_empty_unit || 'SECONDS'}
+                     enabled={!stateConfig.ignore_null}
+                     hideCheckbox
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" />
     </fieldset>

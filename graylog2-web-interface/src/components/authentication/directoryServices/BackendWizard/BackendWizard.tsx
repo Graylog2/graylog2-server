@@ -21,7 +21,6 @@ import camelCase from 'lodash/camelCase';
 import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 import type { $PropertyType } from 'utility-types';
-import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 
 import { validateField } from 'util/FormsUtils';
@@ -31,7 +30,7 @@ import { Spinner } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
-import type { Step, StepKey } from 'components/common/Wizard';
+import type { StepKey, StepType } from 'components/common/Wizard';
 import Wizard from 'components/common/Wizard';
 import type FetchError from 'logic/errors/FetchError';
 import type { LoadResponse as LoadBackendResponse } from 'stores/authentication/AuthenticationStore';
@@ -55,8 +54,7 @@ const FORMS_VALIDATION = {
 const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: string | null | undefined }) => (
   <Row>
     <Col xs={9} xsOffset={3}>
-      <Alert bsStyle="danger" style={{ wordBreak: 'break-word' }}>
-        <b>Failed to {backendId ? 'edit' : 'create'} authentication service</b><br />
+      <Alert bsStyle="danger" style={{ wordBreak: 'break-word' }} title={`Failed to ${backendId ? 'edit' : 'create'} authentication service`}>
         {error?.message && <>{error.message}<br /><br /></>}
         {error?.additional?.res?.text}
       </Alert>
@@ -226,10 +224,10 @@ const _setDefaultCreateRole = (roles, stepsState, setStepsState) => {
 
 type Props = {
   authBackendMeta: AuthBackendMeta,
-  initialStepKey: $PropertyType<Step, 'key'>,
+  initialStepKey?: $PropertyType<StepType, 'key'>
   initialValues: WizardFormValues,
-  excludedFields: { [inputName: string]: boolean },
-  help: { [inputName: string]: React.ReactElement | string | null | undefined },
+  excludedFields?: { [inputName: string]: boolean }
+  help?: { [inputName: string]: React.ReactElement | string | null | undefined }
   onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean) => Promise<LoadBackendResponse>,
 };
 
@@ -239,7 +237,7 @@ const _loadRoles = (setPaginatedRoles) => {
   AuthzRolesDomain.loadRolesPaginated(getUnlimited).then(setPaginatedRoles);
 };
 
-const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, help, excludedFields }: Props) => {
+const BackendWizard = ({ initialValues, initialStepKey = SERVER_CONFIG_KEY, onSubmit, authBackendMeta, help, excludedFields = {} }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
@@ -303,7 +301,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
 
   const _getSubmitPayload = _prepareSubmitPayload(stepsState, _getUpdatedFormsValues);
 
-  const _setActiveStepKey = (stepKey: $PropertyType<Step, 'key'>) => {
+  const _setActiveStepKey = (stepKey: $PropertyType<StepType, 'key'>) => {
     const formValues = _getUpdatedFormsValues();
     let invalidStepKeys = [...stepsState.invalidStepKeys];
 
@@ -365,25 +363,6 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
         : wizard}
     </BackendWizardContext.Provider>
   );
-};
-
-BackendWizard.defaultProps = {
-  initialStepKey: SERVER_CONFIG_KEY,
-  help: undefined,
-  excludedFields: {},
-};
-
-BackendWizard.propTypes = {
-  authBackendMeta: PropTypes.shape({
-    backendHasPassword: PropTypes.bool,
-    backendId: PropTypes.string,
-    serviceTitle: PropTypes.string.isRequired,
-    serviceType: PropTypes.string.isRequired,
-  }).isRequired,
-  help: PropTypes.object,
-  initialStepKey: PropTypes.string,
-  initialValues: PropTypes.object.isRequired,
-  excludedFields: PropTypes.object,
 };
 
 export default BackendWizard;

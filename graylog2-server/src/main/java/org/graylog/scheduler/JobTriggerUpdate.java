@@ -33,8 +33,20 @@ public abstract class JobTriggerUpdate {
 
     public abstract Optional<JobTriggerStatus> status();
 
+    public abstract boolean concurrencyReschedule();
+
     public static JobTriggerUpdate withNextTime(DateTime nextTime) {
         return builder().nextTime(nextTime).build();
+    }
+
+    /**
+     * Reschedule a trigger because of a concurrency rejection.
+     *
+     * @param nextTime the next time the trigger should be retried
+     * @return the job trigger update
+     */
+    public static JobTriggerUpdate withConcurrencyReschedule(DateTime nextTime) {
+        return builder().concurrencyReschedule(true).nextTime(nextTime).build();
     }
 
     /**
@@ -48,7 +60,7 @@ public abstract class JobTriggerUpdate {
     }
 
     public static JobTriggerUpdate withError(JobTriggerDto trigger) {
-        // On error we keep the previous nextTime
+        // On error, we keep the previous nextTime
         return builder().nextTime(trigger.nextTime()).status(JobTriggerStatus.ERROR).build();
     }
 
@@ -70,7 +82,7 @@ public abstract class JobTriggerUpdate {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_JobTriggerUpdate.Builder();
+            return new AutoValue_JobTriggerUpdate.Builder().concurrencyReschedule(false);
         }
 
         public abstract Builder nextTime(@Nullable DateTime nextTime);
@@ -78,6 +90,8 @@ public abstract class JobTriggerUpdate {
         public abstract Builder data(@Nullable JobTriggerData data);
 
         public abstract Builder status(@Nullable JobTriggerStatus status);
+
+        public abstract Builder concurrencyReschedule(boolean concurrencyReschedule);
 
         public abstract JobTriggerUpdate build();
     }

@@ -17,22 +17,21 @@
 package org.graylog2.plugin.rest.exceptionmappers;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import org.graylog2.plugin.rest.ApiError;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import org.graylog2.plugin.rest.RequestError;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class JsonProcessingExceptionMapperTest {
@@ -48,12 +47,12 @@ public class JsonProcessingExceptionMapperTest {
         final JsonMappingException exception = new JsonMappingException(jsonParser, "Boom!", new RuntimeException("rootCause"));
         final Response response = mapper.toResponse(exception);
 
-        assertEquals(Response.Status.BAD_REQUEST, response.getStatusInfo());
-        assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
-        assertTrue(response.hasEntity());
-        assertTrue(response.getEntity() instanceof ApiError);
+        assertThat(response.getStatusInfo()).isEqualTo(Response.Status.BAD_REQUEST);
+        assertThat(response.getMediaType()).isEqualTo(MediaType.APPLICATION_JSON_TYPE);
+        assertThat(response.hasEntity()).isTrue();
+        assertThat(response.getEntity()).isInstanceOf(RequestError.class);
 
-        final ApiError responseEntity = (ApiError) response.getEntity();
+        final var responseEntity = (RequestError) response.getEntity();
         assertTrue(responseEntity.message().startsWith("Boom!"));
     }
 }

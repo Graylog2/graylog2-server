@@ -16,17 +16,15 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
-import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.validation.SubstringMultilinePosition;
 
 import java.util.List;
 
-@AutoValue
-public abstract class QueryParam {
-    public abstract String name();
-    public abstract List<SubstringMultilinePosition> positions();
 
-    public static QueryParam create(final String name, final List<SubstringMultilinePosition> positions) {
-        return new AutoValue_QueryParam(name, positions);
+public record QueryParam(String name, List<SubstringMultilinePosition> positions) {
+
+    public static QueryParam create(final String name,
+                                    final List<SubstringMultilinePosition> positions) {
+        return new QueryParam(name, positions);
     }
 }

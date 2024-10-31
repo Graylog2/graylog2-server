@@ -17,11 +17,12 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useState, useCallback, forwardRef, useMemo } from 'react';
-import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
+import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -48,15 +49,20 @@ const DragHandle = styled.div`
 
 type ListItemProps = {
   item: { id: string, title: string },
-  draggableProps: DraggableProvidedDraggableProps,
-  dragHandleProps: DraggableProvidedDragHandleProps,
+  draggableProps: DraggableProps,
+  dragHandleProps: DragHandleProps,
   className: string,
   onChange: (fieldName: string) => void,
   onRemove: () => void,
   selectedFields: Array<string>,
   selectSize: 'normal' | 'small',
   testIdPrefix: string,
+  showUnit: boolean,
 }
+
+const Actions = styled.div`
+  display: flex;
+`;
 
 const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   selectSize,
@@ -68,6 +74,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   onRemove,
   selectedFields,
   testIdPrefix,
+  showUnit,
 }: ListItemProps, ref) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -96,13 +103,14 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
       {!isEditing && (
         <>
           <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-            <Icon name="bars" />
+            <Icon name="drag_indicator" />
           </DragHandle>
           <FieldTitle>{item.title}</FieldTitle>
-          <div>
-            <IconButton name="edit" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
-            <IconButton name="trash-alt" title={`Remove ${item.title} field`} onClick={onRemove} />
-          </div>
+          <Actions>
+            {showUnit && <FieldUnit field={item.title} />}
+            <IconButton name="edit_square" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
+            <IconButton name="delete" title={`Remove ${item.title} field`} onClick={onRemove} />
+          </Actions>
         </>
       )}
     </ListItemContainer>
@@ -114,10 +122,11 @@ type Props = {
   displayOverlayInPortal?: boolean,
   selectedFields: Array<string>
   testPrefix?: string,
-  selectSize?: 'normal' | 'small'
+  selectSize?: 'normal' | 'small',
+  showUnit?: boolean
 };
 
-const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, displayOverlayInPortal }: Props) => {
+const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, displayOverlayInPortal = false, showUnit = false }: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
@@ -142,8 +151,9 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, 
               dragHandleProps={dragHandleProps}
               draggableProps={draggableProps}
               className={className}
-              ref={ref} />
-  ), [selectSize, selectedFields, testPrefix, onChangeField, onRemoveField]);
+              ref={ref}
+              showUnit={showUnit} />
+  ), [selectSize, selectedFields, testPrefix, showUnit, onChangeField, onRemoveField]);
 
   const onSortChange = useCallback((newFieldsList: Array<{ id: string, title: string }>) => {
     onChange(newFieldsList.map(({ id }) => id));
@@ -154,17 +164,11 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, 
   }
 
   return (
-    <SortableList items={fieldsForList}
-                  onMoveItem={onSortChange}
-                  customListItemRender={SortableListItem}
-                  displayOverlayInPortal={displayOverlayInPortal} />
+    <SortableList<{id: string, title: string}> items={fieldsForList}
+                                               onMoveItem={onSortChange}
+                                               customListItemRender={SortableListItem}
+                                               displayOverlayInPortal={displayOverlayInPortal} />
   );
-};
-
-SelectedFieldsList.defaultProps = {
-  displayOverlayInPortal: false,
-  testPrefix: undefined,
-  selectSize: undefined,
 };
 
 export default SelectedFieldsList;

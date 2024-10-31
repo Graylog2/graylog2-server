@@ -1,0 +1,6 @@
+type = "c"
+message = "Display keyword in time range summary instead of from / to range. Display effective search execution time range in sidebar, which can be helpful for relative and keyword time ranges."
+
+issues = ["11401"]
+pulls = ["15961"]
+

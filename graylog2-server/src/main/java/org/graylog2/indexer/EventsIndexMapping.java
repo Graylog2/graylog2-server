@@ -18,24 +18,21 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
+import org.graylog2.indexer.indices.Template;
 
 import java.util.Map;
 
+import static org.graylog.schema.SecurityFields.FIELD_ASSOCIATED_ASSETS;
+
 public abstract class EventsIndexMapping implements IndexMappingTemplate {
     @Override
-    public Map<String, Object> toTemplate(IndexSetConfig indexSetConfig, String indexPattern, int order) {
-        final String indexPatternsField = "index_patterns";
+    public Template toTemplate(IndexSetMappingTemplate indexSetConfig, Long order) {
         final String indexRefreshInterval = "1s"; // TODO: Index refresh interval must be configurable
 
-        return map()
-                .put(indexPatternsField, indexPattern)
-                .put("order", order)
-                .put("settings", map()
-                        .put("index.refresh_interval", indexRefreshInterval)
-                        .build())
-                .put("mappings", buildMappings())
-                .build();
+        var mappings = new Template.Mappings(buildMappings());
+        var settings = new Template.Settings(Map.of("index.refresh_interval", indexRefreshInterval));
+        return Template.create(indexSetConfig.indexWildcard(), mappings, order, settings);
     }
 
     protected ImmutableMap<String, Object> buildMappings() {
@@ -60,6 +57,16 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                                         .put("path_match", "group_by_fields.*")
                                         .put("mapping", map()
                                                 .put("type", "keyword")
+                                                .put("doc_values", true)
+                                                .put("index", true)
+                                                .build())
+                                        .build())
+                                .build())
+                        .add(map()
+                                .put("scores", map()
+                                        .put("path_match", "scores.*")
+                                        .put("mapping", map()
+                                                .put("type", "double")
                                                 .put("doc_values", true)
                                                 .put("index", true)
                                                 .build())
@@ -188,6 +195,13 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                 .put("group_by_fields", map()
                         .put("type", "object")
                         .put("dynamic", true)
+                        .build())
+                .put("scores", map()
+                        .put("type", "object")
+                        .put("dynamic", true)
+                        .build())
+                .put(FIELD_ASSOCIATED_ASSETS, map()
+                        .put("type", "keyword")
                         .build())
                 /* TODO: Enable the typed fields once we decided if that's the way to go
                 .put("fields_typed", map()

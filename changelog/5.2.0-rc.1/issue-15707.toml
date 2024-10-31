@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fixes sorting with variance/stddev/sumofsquare metrics."
+
+issues = ["15707"]
+pulls = ["15878"]

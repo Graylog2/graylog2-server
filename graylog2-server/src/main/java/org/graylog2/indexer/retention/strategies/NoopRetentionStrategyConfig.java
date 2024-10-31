@@ -25,7 +25,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.rest.ValidationResult;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
+
 import java.util.Set;
 
 @JsonAutoDetect

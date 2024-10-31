@@ -21,6 +21,8 @@ import AppConfig from 'util/AppConfig';
 import { extendedSearchPath, viewsPath } from 'views/Constants';
 import type { TimeRangeTypes } from 'views/logic/queries/Query';
 
+export const SECURITY_PATH = '/security';
+
 type RoutesRelativeTimeRange = {
   relative: number
 };
@@ -40,6 +42,7 @@ type SearchQueryParams = {
   to?: string,
   keyword?: string,
   streams?: string,
+  stream_categories?: string,
 }
 
 const Routes = {
@@ -64,13 +67,21 @@ const Routes = {
       show: (notificationId: string) => `/alerts/notifications/${notificationId}`,
     },
   },
-  SECURITY: '/security',
+  SECURITY: {
+    OVERVIEW: `${SECURITY_PATH}/overview`,
+    USER_ACTIVITY: `${SECURITY_PATH}/user-activity`,
+    HOST_ACTIVITY: `${SECURITY_PATH}/host-activity`,
+    NETWORK_ACTIVITY: `${SECURITY_PATH}/network-activity`,
+    ANOMALIES: `${SECURITY_PATH}/anomalies`,
+    ACTIVITY: `${SECURITY_PATH}/activity`,
+  },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
     CONFIGURATIONS: '/system/configurations',
+    configurationsSection: (section: string, pluginSection?: string) => `/system/configurations/${section}${pluginSection ? `/${pluginSection}` : ''}`,
     CONTENTPACKS: {
       LIST: '/system/contentpacks',
       EXPORT: '/system/contentpacks/export',
@@ -82,6 +93,17 @@ const Routes = {
     INDICES: {
       LIST: '/system/indices',
       FAILURES: '/system/indices/failures',
+      TEMPLATES: {
+        view: (templateId: string) => `/system/indices/templates/${templateId}`,
+        OVERVIEW: '/system/indices/templates',
+        CREATE: '/system/indices/templates/create',
+        edit: (templateId: string) => `/system/indices/templates/edit/${templateId}`,
+      },
+      FIELD_TYPE_PROFILES: {
+        OVERVIEW: '/system/indices/field-type-profiles',
+        edit: (profileId: string) => `/system/indices/field-type-profiles/${profileId}`,
+        CREATE: '/system/indices/field-type-profiles/create',
+      },
     },
     INDEX_SETS: {
       CONFIGURATION: (indexSetId: string, from?: string) => {
@@ -92,6 +114,7 @@ const Routes = {
         return `/system/index_sets/${indexSetId}/configuration`;
       },
       SHOW: (indexSetId: string) => `/system/index_sets/${indexSetId}`,
+      FIELD_TYPES: (indexSetId: string) => `/system/index_sets/${indexSetId}/field-types`,
       CREATE: '/system/index_sets/create',
     },
     INPUTS: '/system/inputs',
@@ -100,6 +123,13 @@ const Routes = {
     NODES: {
       LIST: '/system/nodes',
       SHOW: (nodeId: string) => `/system/nodes/${nodeId}`,
+    },
+    DATANODES: {
+      LIST: '/system/datanodes',
+      SHOW: (dataNodeId: string) => `/system/datanodes/${dataNodeId}`,
+      CLUSTER: '/system/datanodes/cluster',
+      CONFIGURATION: '/system/datanodes/configuration',
+      MIGRATION: '/system/datanodes/migration',
     },
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
@@ -183,7 +213,8 @@ const Routes = {
     VIEWID: (id: string) => `${viewsPath}/${id}`,
   },
   EXTENDEDSEARCH: extendedSearchPath,
-  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange, streams?: string[]) => {
+  KEYBOARD_SHORTCUTS: '/keyboard-shortcuts',
+  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange, streams?: string[], streamCategories?: string[]) => {
     const route = new URI(Routes.SEARCH);
     const queryParams: SearchQueryParams = {
       q: query,
@@ -212,6 +243,10 @@ const Routes = {
       queryParams.streams = streams.join(',');
     }
 
+    if (streamCategories) {
+      queryParams.stream_categories = streamCategories.join(',');
+    }
+
     route.query(queryParams);
 
     return route.resource();
@@ -235,6 +270,7 @@ const Routes = {
   },
   search: (query: string, timeRange: RoutesTimeRange, resolution?: number) => Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution),
   message_show: (index: string, messageId: string) => `/messages/${index}/${messageId}`,
+  stream_view: (streamId: string) => `/streams/${streamId}/view`,
   stream_edit: (streamId: string) => `/streams/${streamId}/edit`,
   stream_edit_example: (streamId: string, index: string, messageId: string) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
   stream_outputs: (streamId: string) => `/streams/${streamId}/outputs`,
@@ -289,9 +325,26 @@ type RouteMap = { [routeName: string]: RouteMapEntry };
 const isLiteralRoute = (entry: RouteMapEntry): entry is string => (typeof entry === 'string');
 const isRouteFunction = (entry: RouteMapEntry): entry is RouteFunction<any> => (typeof entry === 'function');
 
-const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R => {
-  if (appPrefix === '/') {
-    return routes;
+declare const __brand: unique symbol;
+type Brand<B> = { [__brand]: B }
+export type Branded<T, B> = T & Brand<B>
+
+export type QualifiedUrl<T extends string> = Branded<T, 'Qualified URL'>;
+type QualifiedFunction<F extends (...args: Parameters<F>) => string> = (...args: Parameters<F>) => QualifiedUrl<string>;
+
+type QualifiedRoutes<T> = {
+  [K in keyof T]: T[K] extends string
+    ? QualifiedUrl<T[K]>
+    : T[K] extends (...args: any[]) => string
+      ? QualifiedFunction<T[K]>
+      : T[K] extends object
+        ? QualifiedRoutes<T[K]>
+        : never;
+};
+
+export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string = AppConfig.gl2AppPathPrefix()): QualifiedRoutes<R> => {
+  if (!appPrefix || appPrefix === '' || appPrefix === '/') {
+    return routes as QualifiedRoutes<R>;
   }
 
   return Object.fromEntries(Object.entries(routes).map(([routeName, routeValue]) => {
@@ -311,7 +364,15 @@ const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string): R => {
   }));
 };
 
-const qualifiedRoutes: typeof Routes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
+export const prefixUrl = <T extends string>(route: T): QualifiedUrl<T> => {
+  const appPrefix = AppConfig.gl2AppPathPrefix();
+
+  return ((!appPrefix || appPrefix === '' || appPrefix === '/')
+    ? route
+    : prefixUrlWithoutHostname(route, appPrefix)) as QualifiedUrl<T>;
+};
+
+const qualifiedRoutes = qualifyUrls(Routes);
 
 const unqualified = Routes;
 
@@ -357,7 +418,7 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
     pluginRoutes[key] = route.path;
   });
 
-  const route = (AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes)[routeKey];
+  const route = qualifyUrls(pluginRoutes)[routeKey];
 
   if (!route && throwError) {
     throw new Error(`Could not find plugin route '${routeKey}'.`);
@@ -369,7 +430,7 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
 const getPluginRoute = (routeKey: string) => pluginRoute(routeKey, false);
 
 /**
- * Exported constants for using strings to check if a plugin is registered by it's description.
+ * Exported constants for using strings to check if a plugin is registered by its description.
  *
  */
 export const ENTERPRISE_ROUTE_DESCRIPTION = 'Enterprise';

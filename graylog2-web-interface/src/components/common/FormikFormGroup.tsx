@@ -15,19 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { SyntheticEvent } from 'react';
-
-import type { Input } from 'components/bootstrap';
 
 import FormikInput from './FormikInput';
 
-type Props = {
+type Props = React.PropsWithChildren<{
   autoComplete?: string,
   buttonAfter?: React.ReactElement | string,
+  children?: React.ReactElement,
   disabled?: boolean,
   label: React.ReactElement | string,
   name: string,
-  onChange?: (event: SyntheticEvent<Input>) => void,
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void,
   labelClassName?: string,
   wrapperClassName?: string,
   formGroupClassName?: string,
@@ -35,6 +33,8 @@ type Props = {
   error?: React.ReactElement | string,
   placeholder?: string
   help?: React.ReactElement | string,
+  min?: number,
+  max?: number,
   minLength?: number,
   maxLength?: number,
   required?: boolean,
@@ -42,38 +42,23 @@ type Props = {
   validate?: (arg: any) => string | undefined,
   rows?: number,
   autoFocus?: boolean,
-};
+}>;
 
 /** Displays the FormikInput with a specific layout */
-const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChange, ...rest }: Props) => (
+const FormikFormGroup = ({ children, disabled = false, required = false, validate = () => undefined, autoFocus = false, labelClassName = 'col-sm-3', wrapperClassName = 'col-sm-9', label, name, onChange, ...rest }: Props) => (
   <FormikInput {...rest}
+               disabled={disabled}
+               required={required}
+               validate={validate}
+               autoFocus={autoFocus}
                label={label}
                id={name}
                onChange={onChange}
                name={name}
                labelClassName={labelClassName}
-               wrapperClassName={wrapperClassName} />
+               wrapperClassName={wrapperClassName}>
+    {children}
+  </FormikInput>
 );
-
-FormikFormGroup.defaultProps = {
-  autoComplete: undefined,
-  bsSize: undefined,
-  buttonAfter: undefined,
-  disabled: false,
-  onChange: undefined,
-  labelClassName: 'col-sm-3',
-  wrapperClassName: 'col-sm-9',
-  formGroupClassName: undefined,
-  type: undefined,
-  error: undefined,
-  placeholder: undefined,
-  help: undefined,
-  minLength: undefined,
-  maxLength: undefined,
-  required: false,
-  validate: () => undefined,
-  rows: undefined,
-  autoFocus: false,
-};
 
 export default FormikFormGroup;

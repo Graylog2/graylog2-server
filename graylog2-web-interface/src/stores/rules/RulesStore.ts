@@ -25,6 +25,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
 import type FetchError from 'logic/errors/FetchError';
+import type { RuleBuilderType } from 'components/rules/rule-builder/types';
 
 export type RuleType = {
   id?: string,
@@ -33,7 +34,9 @@ export type RuleType = {
   description: string,
   created_at: string,
   modified_at: string,
+  rule_builder: RuleBuilderType,
   errors?: [],
+  simulator_message?: string,
 };
 export type MetricsConfigType = {
   metrics_enabled: boolean,
@@ -68,15 +71,15 @@ export type RulesStoreState = {
 type RulesActionsType = {
   delete: (rule: RuleType) => Promise<unknown>,
   list: () => Promise<unknown>,
-  get: () => Promise<unknown>,
+  get: (ruleId: string) => Promise<unknown>,
   save: (rule: RuleType) => Promise<unknown>,
   update: (rule: RuleType) => Promise<unknown>,
   parse: (rule: RuleType, callback: () => void) => Promise<unknown>,
-  simulate: (messageString: string, rule: RuleType, callback: () => void) => Promise<unknown>,
+  simulate: (messageString: string, rule: RuleType, callback: React.Dispatch<any> | (() => void)) => Promise<unknown>,
   multiple: () => Promise<unknown>,
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
-  updateMetricsConfig: () => Promise<unknown>,
+  updateMetricsConfig: (nextConfig) => Promise<unknown>,
   listPaginated: (pagination: Pagination) => Promise<PaginatedRules>,
 };
 
@@ -100,7 +103,7 @@ export const RulesActions = singletonActions(
 
 export const RulesStore = singletonStore(
   'core.Rules',
-  () => Reflux.createStore<{ rules: RuleType[] }>({
+  () => Reflux.createStore<{ rules: RuleType[], metricsConfig: {} }>({
     listenables: [RulesActions],
     rules: undefined,
     rulesContext: undefined,
@@ -180,7 +183,7 @@ export const RulesStore = singletonStore(
       return promise;
     },
 
-    get(ruleId) {
+    get(ruleId: string) {
       const failCallback = (error: Error) => {
         UserNotification.error(`Fetching rule "${ruleId}" failed with status: ${error.message}`,
           `Could not retrieve processing rule "${ruleId}"`);
@@ -206,6 +209,7 @@ export const RulesStore = singletonStore(
         title: ruleSource.title,
         description: ruleSource.description,
         source: ruleSource.source,
+        simulator_message: ruleSource.simulator_message,
       };
       const promise = fetch('POST', url, rule);
 
@@ -233,6 +237,7 @@ export const RulesStore = singletonStore(
         title: ruleSource.title,
         description: ruleSource.description,
         source: ruleSource.source,
+        simulator_message: ruleSource.simulator_message,
       };
       const promise = fetch('PUT', url, rule);
 
@@ -256,7 +261,7 @@ export const RulesStore = singletonStore(
       const url = qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
 
       const promise = fetch('DELETE', url).then(() => {
-        this.rules = this.rules.filter((el) => el.id !== rule.id);
+        this.rules = this.rules?.filter((el) => el.id !== rule.id);
         this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
         UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
       }, failCallback);
@@ -288,22 +293,32 @@ export const RulesStore = singletonStore(
         },
       );
     },
-    simulate(message, ruleSource, callback) {
-      const url = qualifyUrl(ApiRoutes.RulesController.simulate().url);
+    simulate(message, ruleToSimulate, callback) {
+      const url = qualifyUrl(ruleToSimulate?.rule_builder ? ApiRoutes.RuleBuilderController.simulate().url : ApiRoutes.RulesController.simulate().url);
       const rule = {
-        rule_source: {
-          title: ruleSource.title,
-          description: ruleSource.description,
-          source: ruleSource.source,
-        },
         message,
+        rule_source: undefined,
+        rule_builder_dto: undefined,
       };
 
-      return fetch('POST', url, rule).then(callback,
-        (error) => {
-          UserNotification.error(`Couldn't load rule simulation result: ${error.message}`, "Couldn't load rule simulation result");
-        },
-      );
+      if (ruleToSimulate?.rule_builder) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { source, ...ruleBuilderRuleToSimulate } = ruleToSimulate;
+
+        rule.rule_builder_dto = {
+          title: ruleBuilderRuleToSimulate.title,
+          description: ruleBuilderRuleToSimulate.description,
+          rule_builder: ruleBuilderRuleToSimulate.rule_builder,
+        };
+      } else {
+        rule.rule_source = {
+          title: ruleToSimulate.title,
+          description: ruleToSimulate.description,
+          source: ruleToSimulate.source,
+        };
+      }
+
+      return fetch('POST', url, rule).then(callback, () => {});
     },
     multiple(ruleNames, callback) {
       const url = qualifyUrl(ApiRoutes.RulesController.multiple().url);

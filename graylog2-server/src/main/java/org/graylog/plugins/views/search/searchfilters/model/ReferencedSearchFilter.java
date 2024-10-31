@@ -21,4 +21,6 @@ public interface ReferencedSearchFilter extends UsedSearchFilter {
     String id();
 
     InlineQueryStringSearchFilter toInlineRepresentation();
+
+    ReferencedSearchFilter withId(String id);
 }

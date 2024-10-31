@@ -15,46 +15,40 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { IconName } from 'components/common/Icon';
 
 import Icon from './Icon';
 import Delayed from './Delayed';
 
-const StyledIcon = styled(Icon)(({ $displayMargin }: { $displayMargin: boolean }) => (
-  $displayMargin ? 'margin-right: 6px;' : ''
-));
+const Container = styled.span`
+  display: inline-flex;
+  align-items: center;
+  vertical-align: baseline;
+`;
+
+const StyledIcon = styled(Icon)<{ $displayMargin: boolean }>(({ $displayMargin }) => css`
+  ${$displayMargin ? 'margin-right: 6px;' : ''}
+`);
 
 type Props = {
   delay?: number,
   name?: IconName,
   text?: string,
+  size?: React.ComponentProps<typeof StyledIcon>['size'],
+  style?: React.ComponentProps<typeof StyledIcon>['style'],
 };
 
 /**
  * Simple spinner to use while waiting for something to load.
  */
-const Spinner = ({ name, text, delay, ...rest }: Props) => (
+const Spinner = ({ name = 'progress_activity', text = 'Loading...', delay = 200, ...rest }: Props) => (
   <Delayed delay={delay}>
-    <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />{text}
+    <Container>
+      <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />{text}
+    </Container>
   </Delayed>
 );
-
-Spinner.propTypes = {
-  /** Delay in ms before displaying the spinner */
-  delay: PropTypes.number,
-  /** Name of the Icon to use. */
-  name: PropTypes.string,
-  /** Text to show while loading. */
-  text: PropTypes.string,
-};
-
-Spinner.defaultProps = {
-  name: 'spinner',
-  text: 'Loading...',
-  delay: 200,
-};
 
 export default Spinner;

@@ -21,8 +21,7 @@ import { useState, useEffect } from 'react';
 const Container = styled.div`
   height: 100%;
   display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
+  flex-flow: column nowrap;
 `;
 
 const ScrollContainer = styled.div`
@@ -45,7 +44,7 @@ const Actions = styled.div<{ $scrolledToBottom: boolean, $alignAtBottom: boolean
   justify-content: ${$alignAtBottom ? 'flex-end' : 'space-between'};
   padding-top: 5px;
 
-  ::before {
+  &::before {
     box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
     content: ' ';
     display: ${$scrolledToBottom ? 'block' : 'none'};
@@ -99,7 +98,7 @@ type Props = {
   alignActionsAtBottom?: boolean,
 }
 
-const StickyBottomActions = ({ actions, children, className, alignActionsAtBottom }: Props) => {
+const StickyBottomActions = ({ actions, children, className, alignActionsAtBottom = false }: Props) => {
   const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();
 
   return (
@@ -115,11 +114,6 @@ const StickyBottomActions = ({ actions, children, className, alignActionsAtBotto
       </Actions>
     </Container>
   );
-};
-
-StickyBottomActions.defaultProps = {
-  className: undefined,
-  alignActionsAtBottom: false,
 };
 
 export default StickyBottomActions;

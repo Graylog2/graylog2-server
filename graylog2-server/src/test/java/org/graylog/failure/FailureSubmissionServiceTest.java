@@ -16,7 +16,7 @@
  */
 package org.graylog.failure;
 
-import org.graylog2.indexer.messages.Messages;
+import org.graylog2.indexer.messages.IndexingError;
 import org.graylog2.plugin.Message;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +26,8 @@ import org.mockito.Mockito;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.messages.IndexingError.Type.MappingError;
+import static org.graylog2.indexer.messages.IndexingError.Type.Unknown;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -49,9 +51,9 @@ public class FailureSubmissionServiceTest {
         when(msg2.getMessageId()).thenReturn("msg-2");
         when(msg2.supportsFailureHandling()).thenReturn(true);
 
-        final List<Messages.IndexingError> indexingErrors = List.of(
-                Messages.IndexingError.create(msg1, "index-1", Messages.IndexingError.ErrorType.MappingError, "Error"),
-                Messages.IndexingError.create(msg2, "index-2", Messages.IndexingError.ErrorType.Unknown, "Error2")
+        final List<IndexingError> indexingErrors = List.of(
+                IndexingError.create(msg1, "index-1", MappingError, "Error"),
+                IndexingError.create(msg2, "index-2", Unknown, "Error2")
         );
 
         // when
@@ -98,9 +100,9 @@ public class FailureSubmissionServiceTest {
         when(msg2.getMessageId()).thenReturn("msg-2");
         when(msg2.supportsFailureHandling()).thenReturn(false);
 
-        final List<Messages.IndexingError> indexingErrors = List.of(
-                Messages.IndexingError.create(msg1, "index-1", Messages.IndexingError.ErrorType.MappingError, "Error"),
-                Messages.IndexingError.create(msg2, "index-2", Messages.IndexingError.ErrorType.Unknown, "Error2")
+        final List<IndexingError> indexingErrors = List.of(
+                IndexingError.create(msg1, "index-1", MappingError, "Error"),
+                IndexingError.create(msg2, "index-2", Unknown, "Error2")
         );
 
         // when

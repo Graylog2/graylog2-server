@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
+import { useCallback, useContext, useMemo } from 'react';
 import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
 import isFunction from 'lodash/isFunction';
 
-import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
+import { onInitializingTimerange } from 'views/components/TimerangeForForm';
 import type { SearchBarFormValues } from 'views/Constants';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
@@ -29,6 +28,7 @@ import validate from 'views/components/searchbar/validate';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useHandlerContext from 'views/components/useHandlerContext';
+import useSearchBarSubmit from 'views/components/searchbar/useSearchBarSubmit';
 
 type FormRenderer = (props: FormikProps<SearchBarFormValues>) => React.ReactNode;
 type Props = {
@@ -43,18 +43,10 @@ type Props = {
 
 const _isFunction = (children: Props['children']): children is FormRenderer => isFunction(children);
 
-export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues, userTimezone: string) => ({ timerange: onSubmittingTimerange(timerange, userTimezone), ...rest });
-
-const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
-  const [enableReinitialize, setEnableReinitialize] = useState(true);
+const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount = true, formRef, validateQueryString }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
-  const _onSubmit = useCallback((values: SearchBarFormValues) => {
-    setEnableReinitialize(false);
-
-    return onSubmit(normalizeSearchBarFormValues(values, userTimezone)).finally(() => setEnableReinitialize(true));
-  }, [onSubmit, userTimezone]);
   const _initialValues = useMemo(() => {
     const { timerange, ...rest } = initialValues;
 
@@ -64,9 +56,18 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
     });
   }, [formatTime, initialValues]);
 
+  const { enableReinitialize, onSubmit: _onSubmit } = useSearchBarSubmit(_initialValues, onSubmit);
+
   const handlerContext = useHandlerContext();
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext),
-    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext]);
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values,
+    limitDuration,
+    setFieldWarning,
+    validateQueryString,
+    pluggableSearchBarControls,
+    formatTime,
+    handlerContext,
+    userTimezone,
+  ), [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext, userTimezone]);
 
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}
@@ -83,17 +84,6 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
       )}
     </Formik>
   );
-};
-
-SearchBarForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  limitDuration: PropTypes.number.isRequired,
-  validateOnMount: PropTypes.bool,
-};
-
-SearchBarForm.defaultProps = {
-  validateOnMount: true,
-  formRef: undefined,
 };
 
 export default SearchBarForm;

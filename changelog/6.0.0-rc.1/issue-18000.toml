@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixing UI runtime error when request for alerts overview returns an error."
+
+pulls=["18000"]
+issues=["17995"]

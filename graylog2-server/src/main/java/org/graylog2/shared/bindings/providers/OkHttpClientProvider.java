@@ -17,9 +17,7 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
 import okhttp3.Authenticator;
 import okhttp3.Challenge;
 import okhttp3.Credentials;
@@ -27,24 +25,20 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
-import org.graylog2.utilities.ProxyHostsPattern;
+import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.ProxySelector;
-import java.net.SocketAddress;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -69,19 +63,22 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
     protected final Duration readTimeout;
     protected final Duration writeTimeout;
     protected final URI httpProxyUri;
-    protected final ProxyHostsPattern nonProxyHostsPattern;
+    private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
+    private final ProxySelectorProvider proxySelectorProvider;
 
     @Inject
     public OkHttpClientProvider(@Named("http_connect_timeout") Duration connectTimeout,
                                 @Named("http_read_timeout") Duration readTimeout,
                                 @Named("http_write_timeout") Duration writeTimeout,
                                 @Named("http_proxy_uri") @Nullable URI httpProxyUri,
-                                @Named("http_non_proxy_hosts") @Nullable ProxyHostsPattern nonProxyHostsPattern) {
+                                TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
+                                ProxySelectorProvider proxySelectorProvider) {
         this.connectTimeout = requireNonNull(connectTimeout);
         this.readTimeout = requireNonNull(readTimeout);
         this.writeTimeout = requireNonNull(writeTimeout);
         this.httpProxyUri = httpProxyUri;
-        this.nonProxyHostsPattern = nonProxyHostsPattern;
+        this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
+        this.proxySelectorProvider = proxySelectorProvider;
     }
 
     @Override
@@ -92,38 +89,13 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                 .writeTimeout(writeTimeout.getQuantity(), writeTimeout.getUnit())
                 .readTimeout(readTimeout.getQuantity(), readTimeout.getUnit());
 
+        if (trustManagerAndSocketFactoryProvider != null) {
+            // always set our own CA, might be overriden in later code
+            clientBuilder.sslSocketFactory(trustManagerAndSocketFactoryProvider.getSslSocketFactory(), trustManagerAndSocketFactoryProvider.getTrustManager());
+        }
+
         if (httpProxyUri != null) {
-            final ProxySelector proxySelector = new ProxySelector() {
-                @Override
-                public List<Proxy> select(URI uri) {
-                    final String host = uri.getHost();
-                    if (nonProxyHostsPattern != null && nonProxyHostsPattern.matches(host)) {
-                        LOG.debug("Bypassing proxy server for {}", host);
-                        return ImmutableList.of(Proxy.NO_PROXY);
-                    }
-                    try {
-                        final InetAddress targetAddress = InetAddress.getByName(host);
-                        if (targetAddress.isLoopbackAddress()) {
-                            return ImmutableList.of(Proxy.NO_PROXY);
-                        } else if (nonProxyHostsPattern != null && nonProxyHostsPattern.matches(targetAddress.getHostAddress())) {
-                            LOG.debug("Bypassing proxy server for {}", targetAddress.getHostAddress());
-                            return ImmutableList.of(Proxy.NO_PROXY);
-                        }
-                    } catch (UnknownHostException e) {
-                        LOG.debug("Unable to resolve host name for proxy selection: ", e);
-                    }
-
-                    final Proxy proxy = new Proxy(Proxy.Type.HTTP, getProxyAddress());
-                    return ImmutableList.of(proxy);
-                }
-
-                @Override
-                public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-                    LOG.warn("Unable to connect to proxy: ", ioe);
-                }
-            };
-
-            clientBuilder.proxySelector(proxySelector);
+            clientBuilder.proxySelector(proxySelectorProvider.get());
 
             if (!isNullOrEmpty(httpProxyUri.getUserInfo())) {
                 final List<String> list = Splitter.on(":")
@@ -169,8 +141,4 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
         }
     }
 
-    @VisibleForTesting
-    public InetSocketAddress getProxyAddress() {
-        return new InetSocketAddress(httpProxyUri.getHost(), httpProxyUri.getPort());
-    }
 }

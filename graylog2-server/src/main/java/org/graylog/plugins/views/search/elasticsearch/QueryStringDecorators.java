@@ -21,7 +21,8 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -35,6 +36,13 @@ public class QueryStringDecorators {
 
     public String decorate(String queryString, ParameterProvider job, Query query) {
         return decorateWithPositions(queryString, job, query).getInterpolatedQuery();
+    }
+
+    public String decorate(String queryString, ParameterProvider params) {
+        Query dummyQuery = Query.builder()
+                .query(ElasticsearchQueryString.of(queryString))
+                .build();
+        return decorateWithPositions(queryString, params, dummyQuery).getInterpolatedQuery();
     }
 
     public PositionTrackingQuery decorateWithPositions(String queryString, ParameterProvider job, Query query) {

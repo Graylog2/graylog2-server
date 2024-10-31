@@ -16,4 +16,6 @@
  */
 import SortableList from './SortableList';
 
+export * from './types';
+
 export default SortableList;

@@ -15,14 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import numeral from 'numeral';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/common/router';
 import { Alert, Row, Col, Panel, Button, ButtonToolbar } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
-import { IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'components/indices';
+import {
+  IndicesConfigurationDropdown,
+  IndicesMaintenanceDropdown,
+  IndicesOverview,
+  IndexSetDetails,
+  IndicesPageNavigation,
+} from 'components/indices';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -42,7 +47,7 @@ const ElasticsearchUnavailableInformation = () => (
     <Col md={8} mdOffset={2}>
       <div className="top-margin">
         <Panel bsStyle="danger"
-               header={<span><Icon name="exclamation-triangle" /> Indices overview unavailable</span>}>
+               header={<span><Icon name="warning" /> Indices overview unavailable</span>}>
           <p>
             We could not get the indices overview information. This usually means there was a problem
             connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from Graylog</strong>.
@@ -75,16 +80,6 @@ type State = {
 };
 
 class IndexSetPage extends React.Component<Props, State> {
-  static propTypes = {
-    params: PropTypes.shape({
-      indexSetId: PropTypes.string,
-    }).isRequired,
-    indexSet: PropTypes.object,
-    indexerOverview: PropTypes.object,
-    indexerOverviewError: PropTypes.object,
-    indexDetails: PropTypes.object,
-  };
-
   static defaultProps = {
     indexerOverview: undefined,
     indexerOverviewError: undefined,
@@ -144,11 +139,6 @@ class IndexSetPage extends React.Component<Props, State> {
 
     const pageHeader = indexSet && (
       <PageHeader title={`Index Set: ${indexSet.title}`}
-                  topActions={(
-                    <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                      <Button bsStyle="info">Index sets overview</Button>
-                    </LinkContainer>
-                  )}
                   documentationLink={{
                     title: 'Index model documentation',
                     path: DocsHelper.PAGES.INDEX_MODEL,
@@ -159,6 +149,7 @@ class IndexSetPage extends React.Component<Props, State> {
                         <Button bsStyle="info">Edit Index Set</Button>
                       </LinkContainer>
                       <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
+                      <IndicesConfigurationDropdown indexSetId={indexSetId} />
                     </ButtonToolbar>
                   )}>
         <span>
@@ -186,7 +177,7 @@ class IndexSetPage extends React.Component<Props, State> {
       indicesInfo = (
         <span>
           <Alert bsStyle="success" style={{ marginTop: '10' }}>
-            <Icon name="th" /> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
+            {this._totalIndexCount()} indices with a total of{' '}
             {numeral(indexerOverview.counts.events).format('0,0')} messages under management,
             current write-active index is <i>{deflectorInfo.current_target}</i>.
           </Alert>
@@ -199,9 +190,7 @@ class IndexSetPage extends React.Component<Props, State> {
       indicesOverview = (
         <IndicesOverview indices={indexerOverview.indices}
                          indexDetails={indexDetailsIndices}
-                         indexSetId={indexSetId}
-                         closedIndices={indexDetailsClosedIndices}
-                         deflector={indexerOverview.deflector} />
+                         indexSetId={indexSetId} />
       );
     } else {
       indicesInfo = <Spinner />;
@@ -210,6 +199,7 @@ class IndexSetPage extends React.Component<Props, State> {
 
     return (
       <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
+        <IndicesPageNavigation />
         <div>
           {pageHeader}
 

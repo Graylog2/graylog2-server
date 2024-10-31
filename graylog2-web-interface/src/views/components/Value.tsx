@@ -21,17 +21,18 @@ import styled from 'styled-components';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
 import InteractiveContext from './contexts/InteractiveContext';
 
 type Props = {
-  children?: React.ReactNode,
   field: string,
   value: any,
   render?: ValueRenderer,
   type: FieldType,
+  unit?: FieldUnit,
 };
 
 const ValueActionTitle = styled.span`
@@ -40,14 +41,14 @@ const ValueActionTitle = styled.span`
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const InteractiveValue = ({ children, field, value, render, type }: Props) => {
+const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit }: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
   const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
-  const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
+  const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} unit={unit} />;
 
   return (
-    <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
+    <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
       <ValueActionTitle data-testid="value-actions-title">
         {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
       </ValueActionTitle>
@@ -55,22 +56,12 @@ const InteractiveValue = ({ children, field, value, render, type }: Props) => {
   );
 };
 
-InteractiveValue.defaultProps = {
-  children: null,
-  render: defaultRenderer,
-};
-
-const Value = ({ children, field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => (
+const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown, unit }: Props) => (
   <InteractiveContext.Consumer>
     {(interactive) => ((interactive)
-      ? <InteractiveValue field={field} value={value} render={render} type={type}>{children}</InteractiveValue>
-      : <span><TypeSpecificValue field={field} value={value} type={type} /></span>)}
+      ? <InteractiveValue field={field} value={value} render={render} type={type} unit={unit} />
+      : <span><TypeSpecificValue field={field} value={value} render={render} type={type} unit={unit} /></span>)}
   </InteractiveContext.Consumer>
 );
-
-Value.defaultProps = {
-  render: defaultRenderer,
-  children: null,
-};
 
 export default Value;

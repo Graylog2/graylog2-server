@@ -1,0 +1,4 @@
+type = "added"
+message = "Create time range quick access list for multiple time range types"
+
+pulls = ["15484"]

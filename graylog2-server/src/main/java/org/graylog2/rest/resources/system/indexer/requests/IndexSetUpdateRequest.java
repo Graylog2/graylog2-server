@@ -17,106 +17,65 @@
 package org.graylog2.rest.resources.system.indexer.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.SimpleIndexSetConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.validation.ValidObjectId;
 import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
-@AutoValue
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class IndexSetUpdateRequest {
-    @JsonProperty("title")
-    @NotBlank
-    public abstract String title();
+public record IndexSetUpdateRequest(@JsonProperty(FIELD_TITLE) @NotBlank String title,
+                                    @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
+                                    @JsonProperty(FIELD_WRITABLE) boolean isWritable,
+                                    @JsonProperty(FIELD_SHARDS) @Min(1) int shards,
+                                    @JsonProperty(FIELD_REPLICAS) @Min(0) int replicas,
+                                    @JsonProperty(FIELD_ROTATION_STRATEGY_CLASS) @Nullable String rotationStrategyClass,
+                                    @JsonProperty(FIELD_ROTATION_STRATEGY) @Nullable RotationStrategyConfig rotationStrategyConfig,
+                                    @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS) @Nullable String retentionStrategyClass,
+                                    @JsonProperty(FIELD_RETENTION_STRATEGY) @Nullable RetentionStrategyConfig retentionStrategyConfig,
+                                    @JsonProperty(FIELD_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS) @Min(1L) int indexOptimizationMaxNumSegments,
+                                    @JsonProperty(FIELD_INDEX_OPTIMIZATION_DISABLED) boolean indexOptimizationDisabled,
+                                    @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL) Duration fieldTypeRefreshInterval,
+                                    @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
+                                    @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTieringConfig,
+                                    @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) implements SimpleIndexSetConfig {
 
-    @JsonProperty("description")
-    @Nullable
-    public abstract String description();
 
-    @JsonProperty("writable")
-    public abstract boolean isWritable();
-
-    @JsonProperty("shards")
-    @Min(1)
-    public abstract int shards();
-
-    @JsonProperty("replicas")
-    @Min(0)
-    public abstract int replicas();
-
-    @JsonProperty("rotation_strategy_class")
-    @NotNull
-    public abstract String rotationStrategyClass();
-
-    @JsonProperty("rotation_strategy")
-    @NotNull
-    public abstract RotationStrategyConfig rotationStrategy();
-
-    @JsonProperty("retention_strategy_class")
-    @NotNull
-    public abstract String retentionStrategyClass();
-
-    @JsonProperty("retention_strategy")
-    @NotNull
-    public abstract RetentionStrategyConfig retentionStrategy();
-
-    @JsonProperty("index_optimization_max_num_segments")
-    @Min(1L)
-    public abstract int indexOptimizationMaxNumSegments();
-
-    @JsonProperty("index_optimization_disabled")
-    public abstract boolean indexOptimizationDisabled();
-
-    @JsonProperty("field_type_refresh_interval")
-    public abstract Duration fieldTypeRefreshInterval();
-
-    @JsonCreator
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static IndexSetUpdateRequest create(@JsonProperty("title") @NotBlank String title,
-                                               @JsonProperty("description") @Nullable String description,
-                                               @JsonProperty("writable") boolean isWritable,
-                                               @JsonProperty("shards") @Min(1) int shards,
-                                               @JsonProperty("replicas") @Min(0) int replicas,
-                                               @JsonProperty("rotation_strategy_class") @NotNull String rotationStrategyClass,
-                                               @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
-                                               @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
-                                               @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
-                                               @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
-                                               @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
-                                               @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval) {
-        return new AutoValue_IndexSetUpdateRequest(title, description, isWritable, shards, replicas,
-                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy,
-                indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval);
+    public Boolean useLegacyRotation() {
+        return Objects.isNull(useLegacyRotation) || useLegacyRotation;
     }
 
-    public static IndexSetUpdateRequest fromIndexSetConfig(IndexSetConfig indexSet) {
-        return create(
+    public static IndexSetUpdateRequest fromIndexSetConfig(final IndexSetConfig indexSet) {
+        return new IndexSetUpdateRequest(
                 indexSet.title(),
                 indexSet.description(),
                 indexSet.isWritable(),
                 indexSet.shards(),
                 indexSet.replicas(),
                 indexSet.rotationStrategyClass(),
-                indexSet.rotationStrategy(),
+                indexSet.rotationStrategyConfig(),
                 indexSet.retentionStrategyClass(),
-                indexSet.retentionStrategy(),
+                indexSet.retentionStrategyConfig(),
                 indexSet.indexOptimizationMaxNumSegments(),
                 indexSet.indexOptimizationDisabled(),
-                indexSet.fieldTypeRefreshInterval());
+                indexSet.fieldTypeRefreshInterval(),
+                indexSet.fieldTypeProfile(),
+                indexSet.dataTieringConfig(),
+                indexSet.dataTieringConfig() == null);
 
     }
 
-    public IndexSetConfig toIndexSetConfig(String id, IndexSetConfig oldConfig) {
+    public IndexSetConfig toIndexSetConfig(final String id, final IndexSetConfig oldConfig) {
         return IndexSetConfig.builder()
                 .id(id)
                 .title(title())
@@ -129,9 +88,9 @@ public abstract class IndexSetUpdateRequest {
                 .shards(shards())
                 .replicas(replicas())
                 .rotationStrategyClass(rotationStrategyClass())
-                .rotationStrategy(rotationStrategy())
+                .rotationStrategyConfig(rotationStrategyConfig())
                 .retentionStrategyClass(retentionStrategyClass())
-                .retentionStrategy(retentionStrategy())
+                .retentionStrategyConfig(retentionStrategyConfig())
                 .creationDate(oldConfig.creationDate())
                 .indexAnalyzer(oldConfig.indexAnalyzer())
                 .indexTemplateName(oldConfig.indexTemplateName())
@@ -139,6 +98,9 @@ public abstract class IndexSetUpdateRequest {
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
+                .fieldTypeProfile(fieldTypeProfile())
+                .customFieldMappings(oldConfig.customFieldMappings())
+                .dataTieringConfig(Boolean.FALSE.equals(useLegacyRotation()) ? dataTieringConfig() : null)
                 .build();
     }
 }

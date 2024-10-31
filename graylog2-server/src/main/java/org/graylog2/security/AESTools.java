@@ -16,7 +16,8 @@
  */
 package org.graylog2.security;
 
-import org.apache.shiro.codec.Hex;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.paddings.ISO10126d2Padding;
 import org.cryptomator.siv.SivMode;
@@ -63,7 +64,7 @@ public class AESTools {
             Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
             cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
-            return Hex.encodeToString(cipher.doFinal(plainText.getBytes(UTF_8)));
+            return Hex.encodeHexString(cipher.doFinal(plainText.getBytes(UTF_8)));
         } catch (Exception e) {
             LOG.error("Could not encrypt value.", e);
         }
@@ -111,7 +112,7 @@ public class AESTools {
             Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
             cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
-            return new String(cipher.doFinal(Hex.decode(cipherText)), UTF_8);
+            return new String(cipher.doFinal(Hex.decodeHex(cipherText)), UTF_8);
         } catch (Exception ignored) {
             // This is likely a BadPaddingException, but try to decrypt legacy secrets in any case
             return decryptLegacy(cipherText, encryptionKey, salt);
@@ -126,9 +127,13 @@ public class AESTools {
         Cipher cipher = Cipher.getInstance(CIPHER_NO_PADDING_TRANSFORMATION);
         SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
         cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
-        byte[] decrypted = cipher.doFinal(Hex.decode(cipherText));
-        final int padCount = new ISO10126d2Padding().padCount(decrypted);
-        return new String(Arrays.copyOf(decrypted, decrypted.length - padCount), UTF_8);
+        try {
+            byte[] decrypted = cipher.doFinal(Hex.decodeHex(cipherText));
+            final int padCount = new ISO10126d2Padding().padCount(decrypted);
+            return new String(Arrays.copyOf(decrypted, decrypted.length - padCount), UTF_8);
+        } catch (DecoderException e) {
+            throw new IllegalArgumentException("Unable to decode ciphertext", e);
+        }
     }
 
     /**
@@ -148,7 +153,7 @@ public class AESTools {
                     Arrays.copyOfRange(encryptionKey, 16, 32),
                     plainText.getBytes(UTF_8)
             );
-            return Hex.encodeToString(cipherBytes);
+            return Hex.encodeHexString(cipherBytes);
         } catch (Exception e) {
             LOG.error("Couldn't encrypt value", e);
         }
@@ -170,7 +175,7 @@ public class AESTools {
             final byte[] plainBytes = SIV_MODE.decrypt(
                     Arrays.copyOf(encryptionKey, 16),
                     Arrays.copyOfRange(encryptionKey, 16, 32),
-                    Hex.decode(cipherText.getBytes(UTF_8))
+                    Hex.decodeHex(cipherText)
             );
             return new String(plainBytes, UTF_8);
         } catch (Exception e) {
@@ -188,7 +193,7 @@ public class AESTools {
         final SecureRandom random = new SecureRandom();
         byte[] saltBytes = new byte[8];
         random.nextBytes(saltBytes);
-        return Hex.encodeToString(saltBytes);
+        return Hex.encodeHexString(saltBytes);
     }
 
     private static void validateTextAndEncryptionKey(String text, byte[] encryptionKey) {

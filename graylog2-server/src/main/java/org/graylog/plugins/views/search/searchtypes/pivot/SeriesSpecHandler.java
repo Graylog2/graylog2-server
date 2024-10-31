@@ -20,7 +20,7 @@ import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.SearchTypeHandler;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
+import java.util.List;
 
 /**
  * Implementations of this class contribute handlers for series to concrete implementations of {@link Pivot the pivot search type}.
@@ -35,12 +35,12 @@ public interface SeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_BUI
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    default Optional<AGGREGATION_BUILDER> createAggregation(String name, Pivot pivot, SeriesSpec seriesSpec, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
+    default List<AGGREGATION_BUILDER> createAggregation(String name, Pivot pivot, SeriesSpec seriesSpec, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
         return doCreateAggregation(name, pivot, (SPEC_TYPE) seriesSpec, (SEARCHTYPE_HANDLER) searchTypeHandler, (QUERY_CONTEXT) queryContext);
     }
 
     @Nonnull
-    Optional<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE seriesSpec, SEARCHTYPE_HANDLER searchTypeHandler, QUERY_CONTEXT queryContext);
+    List<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE seriesSpec, SEARCHTYPE_HANDLER searchTypeHandler, QUERY_CONTEXT queryContext);
 
     @SuppressWarnings("unchecked")
     default Object handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {

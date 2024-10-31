@@ -27,6 +27,7 @@ import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
+import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.contentpack.facade.EventDefinitionFacade;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.fields.FieldValueType;
@@ -36,11 +37,11 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.aggregation.AggregationConditions;
-import org.graylog.events.processor.aggregation.AggregationFunction;
-import org.graylog.events.processor.aggregation.AggregationSeries;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.views.DisplayModeSettings;
 import org.graylog.plugins.views.search.views.FormattingSettings;
 import org.graylog.plugins.views.search.views.Titles;
@@ -49,10 +50,12 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.scheduler.DBJobDefinitionService;
+import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
+import org.graylog2.contentpacks.facades.InputFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
 import org.graylog2.contentpacks.facades.SearchFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
@@ -66,18 +69,27 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.inputs.Input;
+import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.converters.ConverterFactory;
+import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.gelf.udp.GELFUDPInput;
+import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -86,6 +98,8 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
@@ -100,12 +114,14 @@ import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -115,6 +131,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ContentPackServiceTest {
@@ -155,6 +172,25 @@ public class ContentPackServiceTest {
     @Mock
     private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
 
+    @Mock
+    InputService inputService;
+    @Mock
+    InputRegistry inputRegistry;
+    @Mock
+    DBLookupTableService lookupTableService;
+    @Mock
+    GrokPatternService grokPatternService;
+    @Mock
+    MessageInputFactory messageInputFactory;
+    @Mock
+    ExtractorFactory extractorFactory;
+    @Mock
+    ConverterFactory converterFactory;
+    @Mock
+    ServerStatus serverStatus;
+    @Mock
+    Configuration configuration;
+
     private ContentPackService contentPackService;
     private Set<PluginMetaData> pluginMetaData;
     private Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
@@ -164,6 +200,7 @@ public class ContentPackServiceTest {
     private ContentPackInstallation contentPackInstallation;
     private GrokPattern grokPattern;
     private ImmutableSet<NativeEntityDescriptor> nativeEntityDescriptors;
+    private ImmutableMap<ModelId, Object> entityObjectMap;
 
     @Before
     public void setUp() throws Exception {
@@ -178,10 +215,11 @@ public class ContentPackServiceTest {
                 ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
                 ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService),
-                ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService)
+                ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService),
+                ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
+                        extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
                 );
-
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration);
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");
@@ -201,6 +239,7 @@ public class ContentPackServiceTest {
         NativeEntityDescriptor nativeEntityDescriptor = NativeEntityDescriptor
                 .create(ModelId.of("12345"), "dead-beef1", ModelTypes.GROK_PATTERN_V1, "NAME");
         nativeEntityDescriptors = ImmutableSet.of(nativeEntityDescriptor);
+        entityObjectMap = ImmutableMap.of(nativeEntityDescriptor.contentPackEntityId(), grokPattern);
         contentPack = ContentPackV1.builder()
                 .description("test")
                 .entities(entities)
@@ -245,6 +284,39 @@ public class ContentPackServiceTest {
         when(eventDefinitionHandler.create(any(), any())).thenReturn(createTestEventDefinitionDto());
 
         contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
+    }
+
+    @Test
+    public void installContentPackWithCloudCheck() throws Exception {
+        ImmutableSet<Entity> entities = ImmutableSet.of(createTestGelfUDPEntity());
+        ContentPackV1 contentPack = ContentPackV1.builder()
+                .description("test")
+                .entities(entities)
+                .name("test")
+                .revision(1)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        Input input = mock(Input.class);
+        GELFUDPInput gelfUDPInput = mock(GELFUDPInput.class);
+        when(messageInputFactory.create(any(), any())).thenReturn(gelfUDPInput);
+        when(inputService.find(any())).thenReturn(input);
+        when(input.getId()).thenReturn("id1");
+        when(input.getTitle()).thenReturn("myGelfUDP");
+
+        ArgumentCaptor<ContentPackInstallation> captor = ArgumentCaptor.forClass(ContentPackInstallation.class);
+        when(contentPackInstallService.insert(captor.capture())).thenReturn(null);
+
+        when(configuration.isCloud()).thenReturn(false);
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
+        assertThat(captor.getValue().entities()).hasSize(1);
+
+        when(configuration.isCloud()).thenReturn(true);
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
+        assertThat(captor.getValue().entities()).isEmpty();
     }
 
     @Test
@@ -312,6 +384,7 @@ public class ContentPackServiceTest {
                 .skippedEntities(ImmutableSet.of())
                 .failedEntities(ImmutableSet.of())
                 .entities(nativeEntityDescriptors)
+                .entityObjects(entityObjectMap)
                 .build();
 
         ContentPackUninstallation resultSuccess = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
@@ -323,6 +396,7 @@ public class ContentPackServiceTest {
                 .skippedEntities(nativeEntityDescriptors)
                 .failedEntities(ImmutableSet.of())
                 .entities(ImmutableSet.of())
+                .entityObjects(ImmutableMap.of())
                 .build();
         ContentPackUninstallation resultSkip = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
         assertThat(resultSkip).isEqualTo(expectSkip);
@@ -334,6 +408,7 @@ public class ContentPackServiceTest {
                 .skippedEntities(nativeEntityDescriptors)
                 .failedEntities(ImmutableSet.of())
                 .entities(ImmutableSet.of())
+                .entityObjects(ImmutableMap.of())
                 .build();
         ContentPackUninstallation resultSkip2 = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
         assertThat(resultSkip2).isEqualTo(expectSkip2);
@@ -346,6 +421,7 @@ public class ContentPackServiceTest {
                 .skippedEntities(ImmutableSet.of())
                 .failedEntities(ImmutableSet.of())
                 .entities(ImmutableSet.of())
+                .entityObjects(ImmutableMap.of())
                 .build();
 
         ContentPackUninstallation resultFailure = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
@@ -353,7 +429,7 @@ public class ContentPackServiceTest {
     }
 
     @Test
-    public void getUninstallDetails() throws NotFoundException {
+    public void getUninstallDetails() {
         /* Test will be uninstalled */
         when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("dead-beef1"))).thenReturn((long) 1);
         ContentPackUninstallDetails expect = ContentPackUninstallDetails.create(nativeEntityDescriptors);
@@ -373,7 +449,7 @@ public class ContentPackServiceTest {
                 .providers(ImmutableList.of())
                 .build();
         final Expr.Greater trueExpr = Expr.Greater.create(Expr.NumberValue.create(2), Expr.NumberValue.create(1));
-        final AggregationSeries series = AggregationSeries.create("id-deef", AggregationFunction.COUNT, "field");
+        final SeriesSpec series = Count.builder().id("id-deef").field("field").build();
         final AggregationConditions condition = AggregationConditions.builder()
                 .expression(Expr.And.create(trueExpr, trueExpr))
                 .build();
@@ -381,7 +457,7 @@ public class ContentPackServiceTest {
                 .query(ValueReference.of("author: \"Jane Hopper\""))
                 .streams(Stream.ALL_SYSTEM_STREAM_IDS)
                 .groupBy(ImmutableList.of("project"))
-                .series(ImmutableList.of(series))
+                .series(ImmutableList.of(series).stream().map(SeriesSpecEntity::fromNativeEntity).toList())
                 .conditions(condition)
                 .executeEveryMs(122200000L)
                 .searchWithinMs(1231312123L)
@@ -413,7 +489,7 @@ public class ContentPackServiceTest {
                 .build();
     }
 
-    private EntityV1 createTestViewEntity() throws Exception {
+    private EntityV1 createTestViewEntity() {
         final QueryEntity query = QueryEntity.builder()
                 .id("dead-beef")
                 .timerange(KeywordRange.create("last 5 minutes", "Etc/UTC"))
@@ -462,6 +538,22 @@ public class ContentPackServiceTest {
         return EntityV1.builder()
                 .id(ModelId.of("1"))
                 .type(ModelTypes.SEARCH_V1)
+                .data(objectMapper.convertValue(entity, JsonNode.class))
+                .constraints(ImmutableSet.of())
+                .build();
+    }
+
+    private Entity createTestGelfUDPEntity() {
+        final InputEntity entity = InputEntity.create(
+                ValueReference.of("myGelfUDP"),
+                new ReferenceMap(),
+                ImmutableMap.of(),
+                ValueReference.of("org.graylog2.inputs.gelf.udp.GELFUDPInput"),
+                ValueReference.of(true),
+                new ArrayList<>());
+        return EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.INPUT_V1)
                 .data(objectMapper.convertValue(entity, JsonNode.class))
                 .constraints(ImmutableSet.of())
                 .build();

@@ -15,27 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState, useCallback, useMemo } from 'react';
-import styled from 'styled-components';
-import { Overlay, RootCloseWrapper } from 'react-overlays';
+import { useContext, useCallback, useMemo, useState } from 'react';
+import styled, { css } from 'styled-components';
 import chunk from 'lodash/chunk';
 
 import ColorPicker from 'components/common/ColorPicker';
 import Value from 'views/components/Value';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ChartColorContext from 'views/components/visualizations/ChartColorContext';
-import { Popover } from 'components/bootstrap';
+import Popover from 'components/common/Popover';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import WidgetRenderingContext from 'views/components/widgets/WidgetRenderingContext';
 
-const ColorHint = styled.div(({ color }) => `
+const ColorHint = styled.div(({ color }) => css`
   cursor: pointer;
   background-color: ${color} !important; /* Needed for report generation */
   -webkit-print-color-adjust: exact !important; /* Needed for report generation */
@@ -43,12 +45,21 @@ const ColorHint = styled.div(({ color }) => `
   height: 12px;
 `);
 
-const Container = styled.div`
+const FixedContainer = styled.div<{ $height: number, $width: number }>`
   display: grid;
   grid-template: 4fr auto / 1fr;
   grid-template-areas: '.' '.';
   height: 100%;
 `;
+
+const VariableContainer = styled.div<{ $height: number, $width: number }>(({ $height, $width }) => css`
+  display: grid;
+  width: ${$width}px;
+  grid-template-columns: ${$width}px;
+  grid-template-rows: ${$height}px auto;
+  grid-gap: 0;
+  justify-content: center;
+`);
 
 const LegendContainer = styled.div`
   padding: 5px;
@@ -70,13 +81,13 @@ const LegendCell = styled.div`
   display: table-cell;
 `;
 
-const LegendEntry = styled.div`
+const LegendEntryContainer = styled.div`
   display: flex;
   align-items: center;
 `;
 
 const ValueContainer = styled.div`
-  margin-left: 8px;
+  margin-left: 5px;
   line-height: 1;
 `;
 
@@ -87,15 +98,14 @@ type Props = {
   labelFields?: (config: Props['config']) => Array<string>,
   labelMapper?: (data: Array<any>) => Array<string> | undefined | null,
   neverHide?: boolean,
+  height: number,
+  width: number,
 };
 
-type ColorPickerConfig = {
-  name: string,
-  label: string,
-  target: EventTarget,
-};
-
-const defaultLabelMapper = (data: Array<Pick<ChartDefinition, 'name' | 'originalName'>>) => data.map(({ name, originalName }) => originalName ?? name);
+const defaultLabelMapper = (data: Array<Pick<ChartDefinition, 'name' | 'originalName'>>) => data.map(({
+  name,
+  originalName,
+}) => originalName ?? name);
 
 const stringLenSort = (s1: string, s2: string) => {
   if (s1.length < s2.length) {
@@ -111,96 +121,164 @@ const stringLenSort = (s1: string, s2: string) => {
 
 const columnPivotsToFields = (config: Props['config']) => config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
-const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper, labelFields = columnPivotsToFields, neverHide }: Props) => {
-  const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
-  const { columnPivots, series } = config;
-  const labels: Array<string> = labelMapper(chartData);
+type TableCellProps = {
+  value: string,
+  fieldTypes: FieldTypes,
+  activeQuery: string,
+  labelFields: string[],
+}
+
+type LegendEntryProps = Pick<TableCellProps, 'value'> & {
+  labelsWithField: Array<{ label: string, field: string, type: FieldType }>,
+};
+
+const LegendEntry = ({ value, labelsWithField }: LegendEntryProps) => {
   const { colors, setColor } = useContext(ChartColorContext);
-  const { focusedWidget } = useContext(WidgetFocusContext);
-  const fieldTypes = useContext(FieldTypesContext);
-  const activeQuery = useActiveQueryId();
+  const interactive = useContext(InteractiveContext);
   const mapKeys = useMapKeys();
+  const [showPopover, setShowPopover] = useState(false);
+  const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
+  const val = labelsWithField.map(({ label, field, type }) => (field
+    ? <Value key={`${field}:${label}`} type={type} value={label} field={field} />
+    : label));
+  const humanLabel = Object.values(labelsWithField).map(({
+    label,
+    field,
+  }) => mapKeys(label, field)).join(humanSeparator);
 
-  const _onCloseColorPicker = useCallback(() => setColorPickerConfig(undefined), [setColorPickerConfig]);
+  const _onColorSelect = useCallback((color: string) => {
+    setColor(value, color);
+    setShowPopover(false);
+  }, [setColor, value]);
 
-  const _onOpenColorPicker = useCallback((field: string, label: string) => (event) => {
-    setColorPickerConfig({ name: field, label, target: event.currentTarget });
-  }, [setColorPickerConfig]);
-
-  const _onColorSelect = useCallback((field: string, color: string) => {
-    setColor(field, color);
-    setColorPickerConfig(undefined);
-  }, [setColor]);
-
-  const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
-
-  if (!neverHide && (!focusedWidget || !focusedWidget.editing) && series.length <= 1 && columnPivots.length <= 0) {
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    return <>{children}</>;
-  }
-
-  const tableCells = labels.sort(stringLenSort).map((value) => {
-    const labelsWithField = value.split(keySeparator).map((label, idx) => {
-      const field = _labelFields[idx];
-      const fieldType = fieldTypes?.queryFields?.get(activeQuery)?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
-
-      return { label, field, type: fieldType };
-    });
-    const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
-    const val = labelsWithField.map(({ label, field, type }) => (field
-      ? <Value key={`${field}:${label}`} type={type} value={label} field={field} />
-      : label));
-    const humanLabel = Object.values(labelsWithField).map(({ label, field }) => mapKeys(label, field)).join(humanSeparator);
-
-    return (
-      <LegendCell key={value}>
-        <LegendEntry>
-          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value, humanLabel)} color={colors.get(value, defaultColor)} />
-          <ValueContainer>
-            {val}
-          </ValueContainer>
-        </LegendEntry>
-      </LegendCell>
-    );
-  });
-
-  const result = chunk(tableCells, 5).map((cells, index) => (
-    // eslint-disable-next-line react/no-array-index-key
-    <LegendRow key={index}>
-      {cells}
-    </LegendRow>
-  ));
+  const togglePopover = useMemo(() => (interactive ? () => setShowPopover((show) => !show) : () => {}), [interactive]);
 
   return (
-    <Container>
-      {children}
-      <LegendContainer>
-        <Legend>{result}</Legend>
-      </LegendContainer>
-      {colorPickerConfig && (
-        <RootCloseWrapper event="mousedown"
-                          onRootClose={_onCloseColorPicker}>
-          <Overlay show
-                   placement="top"
-                   target={colorPickerConfig.target}>
-            <Popover id="legend-config"
-                     title={`Configuration for ${colorPickerConfig.label}`}
-                     data-event-element="Plot Legend">
-              <ColorPicker color={colors.get(colorPickerConfig.name)}
-                           colors={defaultColors}
-                           onChange={(newColor) => _onColorSelect(colorPickerConfig.name, newColor)} />
-            </Popover>
-          </Overlay>
-        </RootCloseWrapper>
-      )}
-    </Container>
+    <LegendEntryContainer>
+      <Popover position="top" withArrow opened={showPopover}>
+        <Popover.Target>
+          <ColorHint aria-label="Color Hint"
+                     onClick={togglePopover}
+                     color={colors.get(value, defaultColor)} />
+        </Popover.Target>
+        <Popover.Dropdown title={`Configuration for ${humanLabel}`}>
+          <ColorPicker color={colors.get(value, defaultColor)}
+                       colors={defaultColors}
+                       onChange={_onColorSelect} />
+        </Popover.Dropdown>
+      </Popover>
+      <ValueContainer>
+        {val}
+      </ValueContainer>
+    </LegendEntryContainer>
+
   );
 };
 
-PlotLegend.defaultProps = {
-  labelFields: columnPivotsToFields,
-  labelMapper: defaultLabelMapper,
-  neverHide: false,
+const TableCell = ({ value, fieldTypes, activeQuery, labelFields }: TableCellProps) => {
+  const labelsWithField = value.split(keySeparator).map((label, idx) => {
+    const field = labelFields[idx];
+    const fieldType = fieldTypes?.queryFields?.get(activeQuery)?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
+
+    return { label, field, type: fieldType };
+  });
+
+  return (
+    <LegendCell key={value}>
+      <LegendEntry labelsWithField={labelsWithField} value={value} />
+    </LegendCell>
+  );
+};
+
+type LegendComponentProps = Pick<Props, 'config' | 'labelFields'> & {
+  activeQuery: string,
+  fieldTypes: FieldTypes,
+  labels: Array<string>,
+};
+
+const InteractiveLegend = ({ activeQuery, config, fieldTypes, labelFields, labels }: LegendComponentProps) => {
+  const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
+  const tableCells = labels.sort(stringLenSort).map((value) => (
+    <TableCell key={value}
+               value={value}
+               labelFields={_labelFields}
+               fieldTypes={fieldTypes}
+               activeQuery={activeQuery} />
+  ));
+
+  const result = chunk(tableCells, 5).map((cells, index) => (
+
+    (
+      <LegendRow key={index}>
+        {cells}
+      </LegendRow>
+    )
+  ));
+
+  return (
+    <LegendContainer>
+      <Legend>{result}</Legend>
+    </LegendContainer>
+  );
+};
+
+const FlexLegendContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+const NoninteractiveLegend = ({ activeQuery, config, fieldTypes, labels, labelFields }: LegendComponentProps) => {
+  const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
+
+  return (
+    <FlexLegendContainer>
+      {labels.map((value) => {
+        const labelsWithField = value.split(keySeparator).map((label, idx) => {
+          const field = _labelFields[idx];
+          const fieldType = fieldTypes?.queryFields?.get(activeQuery)?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
+
+          return { label, field, type: fieldType };
+        });
+
+        return <LegendEntry labelsWithField={labelsWithField} value={value} />;
+      })}
+    </FlexLegendContainer>
+  );
+};
+
+const PlotLegend = ({
+  children,
+  config,
+  chartData,
+  labelMapper = defaultLabelMapper,
+  labelFields = columnPivotsToFields,
+  neverHide = false,
+  height,
+  width,
+}: Props) => {
+  const { columnPivots, series } = config;
+  const { focusedWidget } = useContext(WidgetFocusContext);
+  const interactive = useContext(InteractiveContext);
+  const fieldTypes = useContext(FieldTypesContext);
+  const { limitHeight } = useContext(WidgetRenderingContext);
+
+  const labels = labelMapper(chartData);
+  const activeQuery = useActiveQueryId();
+  const Container = limitHeight ? FixedContainer : VariableContainer;
+
+  if (!neverHide && !focusedWidget?.editing && series.length <= 1 && columnPivots.length <= 0) {
+    return <Container $height={height} $width={width}>{children}</Container>;
+  }
+
+  const LegendComponent = interactive ? InteractiveLegend : NoninteractiveLegend;
+
+  return (
+    <Container $height={height} $width={width}>
+      {children}
+      <LegendComponent activeQuery={activeQuery} config={config} fieldTypes={fieldTypes} labelFields={labelFields} labels={labels} />
+    </Container>
+  );
 };
 
 export default PlotLegend;

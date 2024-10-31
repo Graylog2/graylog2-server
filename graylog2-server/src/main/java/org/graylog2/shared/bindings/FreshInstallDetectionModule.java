@@ -20,7 +20,7 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 /**
  * This Module binds a {@link Named } boolean that can be used to detect whether a fresh installation

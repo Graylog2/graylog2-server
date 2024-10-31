@@ -29,10 +29,11 @@ import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -85,6 +86,12 @@ public class EntityDependencyResolver {
                     final Set<ModelType> ignoredDeps = IGNORED_DEPENDENCIES.getOrDefault(entity.grnType(), ImmutableSet.of());
                     return !ignoredDeps.contains(dep.type());
                 })
+                // TODO: Work around from using the content pack dependency resolver:
+                //  We've added stream_title content pack entities in https://github.com/Graylog2/graylog2-server/pull/17089,
+                //  but in this context we want to return the actual dependent Stream to add additional permissions to.
+                .map(descriptor -> ModelTypes.STREAM_REF_V1.equals(descriptor.type())
+                        ? org.graylog2.contentpacks.model.entities.EntityDescriptor.create(descriptor.id(), ModelTypes.STREAM_V1)
+                        : descriptor)
                 .map(descriptor -> grnRegistry.newGRN(descriptor.type().name(), descriptor.id().id()))
                 .filter(dependency -> !entity.equals(dependency)) // Don't include the given entity in dependencies
                 .collect(ImmutableSet.toImmutableSet());

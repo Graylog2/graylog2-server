@@ -26,7 +26,7 @@ import { Row, Col } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useIsLoading from 'views/hooks/useIsLoading';
 
-const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
+const StyledRow = styled(Row)<{ $hasFocusedWidget: boolean }>(({ $hasFocusedWidget }) => css`
   height: ${$hasFocusedWidget ? '100%' : 'auto'};
   overflow: ${$hasFocusedWidget ? 'auto' : 'visible'};
   position: relative;

@@ -26,7 +26,9 @@ import org.graylog2.security.encryption.EncryptedValue;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Map;
 
 @AutoValue
@@ -57,7 +59,7 @@ public abstract class ValueReference implements Reference {
         switch (valueType()) {
             case DOUBLE:
                 if (value() instanceof Number) {
-                    return ((Number)value()).doubleValue();
+                    return ((Number) value()).doubleValue();
                 }
                 throw new IllegalStateException("Expected value reference of type DOUBLE but got " + value().getClass());
             case PARAMETER:
@@ -71,7 +73,7 @@ public abstract class ValueReference implements Reference {
         switch (valueType()) {
             case FLOAT:
                 if (value() instanceof Number) {
-                    return ((Number)value()).floatValue();
+                    return ((Number) value()).floatValue();
                 }
                 throw new IllegalStateException("Expected value reference of type FLOAT but got " + value().getClass());
             case PARAMETER:
@@ -96,7 +98,7 @@ public abstract class ValueReference implements Reference {
         switch (valueType()) {
             case LONG:
                 if (value() instanceof Number) {
-                    return ((Number)value()).longValue();
+                    return ((Number) value()).longValue();
                 }
                 throw new IllegalStateException("Expected value reference of type LONG but got " + value().getClass());
             case PARAMETER:

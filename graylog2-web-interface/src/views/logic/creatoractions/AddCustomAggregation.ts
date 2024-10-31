@@ -17,7 +17,7 @@
 import View from 'views/logic/views/View';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import type { CreatorProps } from 'views/components/sidebar/create/AddWidgetButton';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import type { AppDispatch } from 'stores/useAppDispatch';

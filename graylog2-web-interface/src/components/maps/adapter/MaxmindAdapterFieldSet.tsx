@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import AppConfig from 'util/AppConfig';
 import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
 import { Select, TimeUnitInput } from 'components/common';
+import type { ValidationState } from 'components/common/types';
 
 export type Config = {
   path: string,
@@ -32,7 +32,7 @@ type MaxmindAdapterFieldSetProps = {
   config: Config;
   updateConfig: (newConfig: object) => void,
   handleFormEvent: (e: { target: { name: string; value?: string } }) => void;
-  validationState: (key: string) => string | undefined,
+  validationState: (key: string) => ValidationState,
   validationMessage: (key: string, message: string) => string | undefined,
 };
 
@@ -58,7 +58,7 @@ const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validat
   if (isCloud) {
     databaseTypes = ipInfoDatabaseTypes;
   } else {
-    databaseTypes.concat(ipInfoDatabaseTypes);
+    databaseTypes = databaseTypes.concat(ipInfoDatabaseTypes);
   }
 
   const update = (value: number, unit: string, enabled: boolean, name: string) => {
@@ -124,14 +124,6 @@ const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validat
                      wrapperClassName="col-sm-9" />
     </fieldset>
   );
-};
-
-MaxmindAdapterFieldSet.propTypes = {
-  config: PropTypes.object.isRequired,
-  updateConfig: PropTypes.func.isRequired,
-  handleFormEvent: PropTypes.func.isRequired,
-  validationState: PropTypes.func.isRequired,
-  validationMessage: PropTypes.func.isRequired,
 };
 
 export default MaxmindAdapterFieldSet;

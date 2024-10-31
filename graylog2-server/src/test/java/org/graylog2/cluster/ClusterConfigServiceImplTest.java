@@ -30,6 +30,8 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.graylog2.security.RestrictedChainingClassLoader;
+import org.graylog2.security.SafeClasses;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.joda.time.DateTime;
@@ -78,7 +80,8 @@ public class ClusterConfigServiceImplTest {
                 provider,
                 mongodb.mongoConnection(),
                 nodeId,
-                new ChainingClassLoader(getClass().getClassLoader()),
+                new RestrictedChainingClassLoader(new ChainingClassLoader(getClass().getClassLoader()),
+                        SafeClasses.allGraylogInternal()),
                 clusterEventBus
         );
     }
@@ -401,7 +404,7 @@ public class ClusterConfigServiceImplTest {
                 .add("last_updated_by", "ID")
                 .get());
         collection.save(new BasicDBObjectBuilder()
-                .add("type", "invalid.ClassName")
+                .add("type", "org.graylog.invalid.ClassName")
                 .add("payload", Collections.emptyMap())
                 .add("last_updated", TIME.toString())
                 .add("last_updated_by", "ID")
@@ -411,6 +414,21 @@ public class ClusterConfigServiceImplTest {
         assertThat(clusterConfigService.list())
                 .hasSize(1)
                 .containsOnly(CustomConfig.class);
+    }
+
+    @Test
+    public void listIgnoresUnsafeClasses() throws Exception {
+        @SuppressWarnings("deprecation")
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        collection.save(new BasicDBObjectBuilder()
+                .add("type", "java.io.File")
+                .add("payload", "/etc/passwd")
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get());
+
+        assertThat(collection.count()).isOne();
+        assertThat(clusterConfigService.list()).hasSize(0);
     }
 
     public static class ClusterConfigChangedEventHandler {

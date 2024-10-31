@@ -16,10 +16,10 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import jakarta.inject.Inject;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
-
-import javax.inject.Inject;
 
 public class DashboardService {
     private final ViewService viewService;
@@ -30,7 +30,7 @@ public class DashboardService {
     }
 
     public long count() {
-        final PaginatedList<ViewDTO> result = viewService.searchPaginatedByType(ViewDTO.Type.DASHBOARD, new SearchQuery(""), dashboard -> true, "ASC", ViewDTO.FIELD_ID, 1, 0);
+        final PaginatedList<ViewDTO> result = viewService.searchPaginatedByType(ViewDTO.Type.DASHBOARD, new SearchQuery(""), dashboard -> true, SortOrder.ASCENDING, ViewDTO.FIELD_ID, 1, 0);
         return result.grandTotal().orElseThrow(() -> new IllegalStateException("Missing grand total in response when counting dashboards!"));
     }
 }

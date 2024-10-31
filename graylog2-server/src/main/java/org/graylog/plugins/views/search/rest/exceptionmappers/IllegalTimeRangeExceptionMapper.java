@@ -16,12 +16,10 @@
  */
 package org.graylog.plugins.views.search.rest.exceptionmappers;
 
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
-import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog2.plugin.rest.ApiError;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 
 public class IllegalTimeRangeExceptionMapper implements ExceptionMapper<IllegalTimeRangeException> {
     @Override

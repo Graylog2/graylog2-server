@@ -22,20 +22,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.MutableGraph;
+import jakarta.validation.constraints.NotBlank;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.DbEntity;
+import org.graylog2.database.MongoEntity;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -46,7 +50,13 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonDeserialize(builder = ViewDTO.Builder.class)
 @WithBeanGetter
-public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike {
+/* We do store both saved searches and dashboards in a single collection. Therefore we cannot use the `@DbEntity`-annotation
+   on this collection if we just want to retrieve one of them. To enable this for dashboards, a view is created, matching
+   only documents which have the corresponding type.
+ */
+@DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ)
+public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, MongoEntity {
+    public static final String COLLECTION_NAME = "views";
     public enum Type {
         SEARCH,
         DASHBOARD
@@ -62,10 +72,11 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     public static final String FIELD_REQUIRES = "requires";
     public static final String FIELD_STATE = "state";
     public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_LAST_UPDATED_AT = "last_updated_at";
     public static final String FIELD_OWNER = "owner";
     public static final String FIELD_FAVORITE = "favorite";
 
-    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
+    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT, FIELD_LAST_UPDATED_AT, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
     public static final ImmutableSet<String> STRING_SORT_FIELDS = ImmutableSet.of(FIELD_TITLE, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
     public static final String SECONDARY_SORT = FIELD_TITLE;
 
@@ -110,6 +121,9 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
 
+    @JsonProperty(FIELD_LAST_UPDATED_AT)
+    public abstract DateTime lastUpdatedAt();
+
     @JsonProperty(FIELD_FAVORITE)
     @MongoIgnore
     public abstract boolean favorite();
@@ -119,10 +133,6 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     }
 
     public abstract Builder toBuilder();
-
-    public static Set<String> idsFrom(Collection<ViewDTO> views) {
-        return views.stream().map(ViewDTO::id).collect(Collectors.toSet());
-    }
 
     public Optional<ViewStateDTO> findQueryContainingWidgetId(String widgetId) {
         return state()
@@ -201,6 +211,9 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);
 
+        @JsonProperty(FIELD_LAST_UPDATED_AT)
+        public abstract Builder lastUpdatedAt(DateTime lastUpdatedAt);
+
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(Map<String, ViewStateDTO> state);
 
@@ -217,6 +230,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
                     .properties(ImmutableSet.of())
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC))
+                    .lastUpdatedAt(DateTime.now(DateTimeZone.UTC))
                     .favorite(false);
         }
 
@@ -247,5 +261,10 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         }
 
         return viewEntityBuilder;
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        state().entrySet().forEach(state -> state.getValue().resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

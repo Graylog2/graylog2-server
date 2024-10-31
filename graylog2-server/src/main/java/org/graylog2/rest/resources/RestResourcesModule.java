@@ -16,7 +16,14 @@
  */
 package org.graylog2.rest.resources;
 
+import org.graylog.plugins.views.search.engine.monitoring.data.histogram.rest.HistogramResponseWriter;
+import org.graylog.plugins.views.storage.migration.RemoteReindexResource;
+import org.graylog.security.rest.CAClientResource;
+import org.graylog.security.rest.CAResource;
+import org.graylog.security.rest.CertificateRenewalResource;
+import org.graylog.security.rest.CertificatesResource;
 import org.graylog2.Configuration;
+import org.graylog2.contentstream.rest.ContentStreamResource;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.resources.cluster.ClusterDeflectorResource;
 import org.graylog2.rest.resources.cluster.ClusterInputStatesResource;
@@ -31,6 +38,10 @@ import org.graylog2.rest.resources.cluster.ClusterSystemPluginResource;
 import org.graylog2.rest.resources.cluster.ClusterSystemProcessingResource;
 import org.graylog2.rest.resources.cluster.ClusterSystemResource;
 import org.graylog2.rest.resources.cluster.ClusterSystemShutdownResource;
+import org.graylog2.rest.resources.datanodes.DataNodeApiProxyResource;
+import org.graylog2.rest.resources.datanodes.DataNodeManagementResource;
+import org.graylog2.rest.resources.datanodes.DataNodeRestApiProxyResource;
+import org.graylog2.rest.resources.datanodes.DatanodeResource;
 import org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource;
 import org.graylog2.rest.resources.messages.MessageResource;
 import org.graylog2.rest.resources.roles.RolesResource;
@@ -39,6 +50,8 @@ import org.graylog2.rest.resources.search.DecoratorResource;
 import org.graylog2.rest.resources.search.KeywordSearchResource;
 import org.graylog2.rest.resources.search.RelativeSearchResource;
 import org.graylog2.rest.resources.streams.StreamResource;
+import org.graylog2.rest.resources.streams.destinations.filters.StreamDestinationFilterBuilderResource;
+import org.graylog2.rest.resources.streams.destinations.filters.StreamDestinationFiltersResource;
 import org.graylog2.rest.resources.streams.outputs.StreamOutputResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleInputsResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleResource;
@@ -70,7 +83,10 @@ import org.graylog2.rest.resources.system.debug.DebugStreamsResource;
 import org.graylog2.rest.resources.system.debug.bundle.SupportBundleClusterResource;
 import org.graylog2.rest.resources.system.debug.bundle.SupportBundleResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
+import org.graylog2.rest.resources.system.indexer.IndexFieldTypeProfileResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
+import org.graylog2.rest.resources.system.indexer.IndexSetTemplateResource;
+import org.graylog2.rest.resources.system.indexer.IndexSetsMappingResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsResource;
 import org.graylog2.rest.resources.system.indexer.IndexTemplatesResource;
 import org.graylog2.rest.resources.system.indexer.IndexerClusterResource;
@@ -86,6 +102,7 @@ import org.graylog2.rest.resources.system.jobs.ServiceManagerResource;
 import org.graylog2.rest.resources.system.jobs.SystemJobResource;
 import org.graylog2.rest.resources.system.logs.LoggersResource;
 import org.graylog2.rest.resources.system.lookup.LookupTableResource;
+import org.graylog2.rest.resources.system.monitoring.MonitoringResource;
 import org.graylog2.rest.resources.system.outputs.OutputResource;
 import org.graylog2.rest.resources.system.processing.ClusterProcessingStatusResource;
 import org.graylog2.rest.resources.system.processing.SystemProcessingStatusResource;
@@ -104,7 +121,7 @@ import org.graylog2.telemetry.rest.TelemetryResource;
 public class RestResourcesModule extends Graylog2Module {
     private final Configuration configuration;
 
-    public RestResourcesModule(Configuration configuration) {
+    public RestResourcesModule(final Configuration configuration) {
         this.configuration = configuration;
     }
 
@@ -134,6 +151,9 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(JournalResource.class);
         addSystemRestResource(LoggersResource.class);
         addSystemRestResource(MessagesResource.class);
+        if (configuration.isQueryLatencyMonitoringEnabled()) {
+            addMonitoringResources();
+        }
         addSystemRestResource(NotificationsResource.class);
         addSystemRestResource(StatsResource.class);
         addSystemRestResource(SystemShutdownResource.class);
@@ -141,10 +161,20 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(SearchVersionResource.class);
         addSystemRestResource(EntityListPreferencesResource.class);
         addSystemRestResource(TelemetryResource.class);
+        addSystemRestResource(ContentStreamResource.class);
+        addSystemRestResource(CertificateRenewalResource.class);
+        addSystemRestResource(DatanodeResource.class);
+        addSystemRestResource(DataNodeApiProxyResource.class);
+        addSystemRestResource(DataNodeRestApiProxyResource.class);
+        addSystemRestResource(DataNodeManagementResource.class);
+        addSystemRestResource(RemoteReindexResource.class);
+        addSystemRestResource(CAResource.class);
+        addSystemRestResource(CAClientResource.class);
+        addSystemRestResource(CertificatesResource.class);
     }
 
     private void addDebugResources() {
-        if(Boolean.parseBoolean(System.getenv("GRAYLOG_ENABLE_DEBUG_RESOURCES"))) {
+        if (Boolean.parseBoolean(System.getenv("GRAYLOG_ENABLE_DEBUG_RESOURCES"))) {
             // TODO: move the DebugEventsResource under this env property check as well?
             addSystemRestResource(DebugStreamsResource.class);
         }
@@ -182,7 +212,10 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(FailuresResource.class);
         addSystemRestResource(IndexerClusterResource.class);
         addSystemRestResource(IndexerOverviewResource.class);
+        addSystemRestResource(IndexFieldTypeProfileResource.class);
+        addSystemRestResource(IndexSetTemplateResource.class);
         addSystemRestResource(IndexSetsResource.class);
+        addSystemRestResource(IndexSetsMappingResource.class);
         addSystemRestResource(IndexSetDefaultsResource.class);
         addSystemRestResource(IndexTemplatesResource.class);
         addSystemRestResource(IndicesResource.class);
@@ -231,5 +264,12 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StreamRuleResource.class);
         addSystemRestResource(StreamResource.class);
         addSystemRestResource(StreamRuleInputsResource.class);
+        addSystemRestResource(StreamDestinationFiltersResource.class);
+        addSystemRestResource(StreamDestinationFilterBuilderResource.class);
+    }
+
+    private void addMonitoringResources() {
+        jerseyAdditionalComponentsBinder().addBinding().toInstance(HistogramResponseWriter.class);
+        addSystemRestResource(MonitoringResource.class);
     }
 }

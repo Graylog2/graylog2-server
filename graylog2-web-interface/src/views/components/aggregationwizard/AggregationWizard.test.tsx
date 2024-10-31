@@ -17,17 +17,14 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
-import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import userEvent from '@testing-library/user-event';
 
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import dataTable from 'views/components/datatable/bindings';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import viewsReducers from 'views/viewsReducers';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import AggregationWizard from './AggregationWizard';
 
@@ -39,8 +36,6 @@ const widgetConfig = AggregationWidgetConfig
 jest.mock('views/hooks/useAggregationFunctions');
 
 const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
-
-const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable], 'views.reducers': viewsReducers } };
 
 describe('AggregationWizard', () => {
   const renderSUT = (props: Partial<React.ComponentProps<typeof AggregationWizard>> = {}) => render((
@@ -61,9 +56,7 @@ describe('AggregationWizard', () => {
     </TestStoreProvider>
   ));
 
-  beforeAll(() => PluginStore.register(plugin));
-
-  afterAll(() => PluginStore.unregister(plugin));
+  useViewsPlugin();
 
   it('should render visualization passed as children', async () => {
     renderSUT();
@@ -79,8 +72,8 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config });
 
-    const addElementSection = await screen.findByTestId('add-element-section');
-    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+    await userEvent.click(await screen.findByRole('button', { name: /add an element/i }));
+    const addElementMenu = await screen.findByRole('menu');
     const notConfiguredElements = [
       'Metric',
       'Grouping',
@@ -88,7 +81,7 @@ describe('AggregationWizard', () => {
     ];
 
     notConfiguredElements.forEach((elementTitle) => {
-      expect(within(addElementSection).getByText(elementTitle)).toBeInTheDocument();
+      expect(within(addElementMenu).getByText(elementTitle)).toBeInTheDocument();
     });
   });
 
@@ -99,11 +92,10 @@ describe('AggregationWizard', () => {
 
     expect(within(metricsSection).queryByText('Function')).not.toBeInTheDocument();
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
-
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'Metric' }));
+    await userEvent.click(await screen.findByRole('button', { name: /add a metric/i }));
 
     await waitFor(() => within(metricsSection).findByText('Function'));
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   });
 
   it('should call onSubmit', async () => {

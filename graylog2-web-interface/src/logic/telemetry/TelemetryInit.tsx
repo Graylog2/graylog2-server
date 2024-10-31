@@ -38,9 +38,7 @@ const getPostHogSettings = (): PostHogSettings => {
   };
 };
 
-const init = () => {
-  const { host, key } = getPostHogSettings();
-
+const init = (key: string, host: string) => {
   posthog.init(
     key,
     {
@@ -48,6 +46,8 @@ const init = () => {
       api_host: host,
       capture_pageview: false,
       capture_pageleave: false,
+      cross_subdomain_cookie: false,
+      persistence: 'cookie',
     },
   );
 
@@ -70,7 +70,7 @@ const TelemetryInit = ({ children }: { children: React.ReactElement }) => {
   }
 
   return (
-    <PostHogProvider client={init()}>
+    <PostHogProvider client={init(key, host)}>
       {children}
     </PostHogProvider>
   );

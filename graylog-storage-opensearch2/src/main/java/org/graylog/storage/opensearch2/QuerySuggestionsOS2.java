@@ -42,7 +42,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSug
 import org.graylog.storage.errors.ResponseError;
 import org.graylog2.plugin.Message;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -79,7 +80,7 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
             final ParsedTerms fieldValues = result.getAggregations().get("fieldvalues");
             final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
 
-            if(!entries.isEmpty()) {
+            if (!entries.isEmpty()) {
                 return SuggestionResponse.forSuggestions(req.field(), req.input(), entries, fieldValues.getSumOfOtherDocCounts());
             } else {
                 TermSuggestion suggestion = result.getSuggest().getSuggestion("corrections");

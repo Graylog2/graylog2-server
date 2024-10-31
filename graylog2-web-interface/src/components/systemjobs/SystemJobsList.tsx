@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { SystemJob } from 'components/systemjobs';
 import { Alert } from 'components/bootstrap';
-import { Icon } from 'components/common';
 
 const SystemJobWrap = styled.div(({ theme }) => css`
   margin-top: 10px;
@@ -45,7 +43,13 @@ const StyledAlert = styled(Alert)`
   margin-top: 10px;
 `;
 
-const SystemJobsList = ({ jobs }): React.ReactElement => {
+type SystemJobsListProps = {
+  jobs: any[];
+};
+
+const SystemJobsList = ({
+  jobs,
+}: SystemJobsListProps): React.ReactElement => {
   const formatSystemJob = (job) => (
     <SystemJobWrap key={`job-${job.id}`}>
       <SystemJob job={job} />
@@ -58,8 +62,7 @@ const SystemJobsList = ({ jobs }): React.ReactElement => {
     (formattedJobs.length === 0)
       ? (
         <StyledAlert bsStyle="info">
-          <Icon name="info-circle" />{' '}
-          &nbsp;No active system jobs.
+          No active system jobs.
         </StyledAlert>
       )
       : (
@@ -68,10 +71,6 @@ const SystemJobsList = ({ jobs }): React.ReactElement => {
         </span>
       )
   );
-};
-
-SystemJobsList.propTypes = {
-  jobs: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default SystemJobsList;

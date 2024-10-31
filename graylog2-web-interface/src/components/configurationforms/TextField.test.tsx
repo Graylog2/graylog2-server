@@ -44,7 +44,7 @@ describe('<TextField>', () => {
     expect(fieldLabel).toBeInTheDocument();
     expect(optionalMarker).toBeInTheDocument();
     expect(formField).toBeInTheDocument();
-    expect(formField).not.toHaveValue();
+    expect(formField).not.toHaveValue(undefined);
     expect(formField).not.toHaveAttribute('required');
     expect(formField).toHaveAttribute('type', 'text');
   });
@@ -68,7 +68,7 @@ describe('<TextField>', () => {
     expect(fieldLabel).toBeInTheDocument();
     expect(optionalMarker).not.toBeInTheDocument();
     expect(formField).toBeInTheDocument();
-    expect(formField).not.toHaveValue();
+    expect(formField).not.toHaveValue(undefined);
     expect(formField).toHaveAttribute('required');
   });
 

@@ -24,7 +24,7 @@ import org.graylog2.lookup.LookupTableService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.graylog.plugins.threatintel.functions.otx.OTXLookupResult.MESSAGE;
 

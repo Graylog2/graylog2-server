@@ -158,13 +158,13 @@ class MaxMindIpLocationResolverTest {
         Map<String, String> names = new HashMap<>();
         names.put("en", "Mali");
 
-        return new Country(Collections.singletonList("en"), null, 1, false, "US", names);
+        return new Country(Collections.singletonList("en"), null, 1L, false, "US", names);
     }
 
     private static City createCity() {
         final HashMap<String, String> names = new HashMap<>();
         names.put("en", "Timbuktu");
-        return new City(Collections.singletonList("en"), 1, 1, names);
+        return new City(Collections.singletonList("en"), 1, 1L, names);
     }
 
     private static Location createLocation() {

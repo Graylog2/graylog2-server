@@ -19,6 +19,8 @@ import * as Immutable from 'immutable';
 import isDeepEqual from 'stores/isDeepEqual';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
+import type { UnitsConfigJson } from 'views/logic/aggregationbuilder/UnitsConfig';
+import UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 
 import Pivot, { DateType } from './Pivot';
 import Series from './Series';
@@ -43,6 +45,7 @@ type InternalState = {
   visualization: string,
   visualizationConfig: VisualizationConfig | undefined | null,
   eventAnnotation: boolean,
+  units: UnitsConfig,
 };
 
 type AggregationWidgetConfigJson = {
@@ -55,6 +58,7 @@ type AggregationWidgetConfigJson = {
   visualization: string,
   visualization_config: VisualizationConfigJson,
   event_annotation: boolean,
+  units: UnitsConfigJson,
 };
 
 export default class AggregationWidgetConfig extends WidgetConfig {
@@ -68,9 +72,11 @@ export default class AggregationWidgetConfig extends WidgetConfig {
     rollup: boolean,
     visualizationConfig: VisualizationConfig,
     formattingSettings: WidgetFormattingSettings,
-    eventAnnotation: boolean = false) {
+    eventAnnotation: boolean = false,
+    units: UnitsConfig = UnitsConfig.empty(),
+  ) {
     super();
-    this._value = { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig, formattingSettings, eventAnnotation };
+    this._value = { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig, formattingSettings, eventAnnotation, units };
   }
 
   get rowPivots() {
@@ -118,13 +124,17 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   get isEmpty(): boolean {
-    const empty = (arr) => !arr.length;
+    const empty = (arr: Array<unknown>) => !arr.length;
 
     return empty(this.rowPivots) && empty(this.columnPivots) && empty(this.series);
   }
 
   get rollupForBackendQuery(): boolean {
     return this.columnPivots.length > 0 ? this.rollup : true;
+  }
+
+  get units() {
+    return this._value.units;
   }
 
   static builder() {
@@ -135,6 +145,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       .series([])
       .sort([])
       .eventAnnotation(false)
+      .units(UnitsConfig.empty())
       .rollup(false);
   }
 
@@ -154,6 +165,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       visualization,
       visualizationConfig,
       eventAnnotation,
+      units,
     } = this._value;
 
     return {
@@ -166,6 +178,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       visualization,
       visualization_config: visualizationConfig,
       event_annotation: eventAnnotation,
+      units,
     };
   }
 
@@ -181,6 +194,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
         'visualizationConfig',
         'visualization',
         'formattingSettings',
+        'units',
       ]
         .every((key) => isDeepEqual(this[key], other[key]));
     }
@@ -208,6 +222,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       visualization,
       visualization_config,
       event_annotation,
+      units,
     } = value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -218,9 +233,10 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       .sort(sort.map(SortConfig.fromJSON))
       .visualization(visualization)
       .rollup(rollup)
-      .visualizationConfig(visualization_config !== null ? VisualizationConfig.fromJSON(visualization, visualization_config) : null)
-      .formattingSettings(formatting_settings === null ? undefined : WidgetFormattingSettings.fromJSON(formatting_settings))
+      .visualizationConfig(visualization_config ? VisualizationConfig.fromJSON(visualization, visualization_config) : null)
+      .formattingSettings(formatting_settings ? WidgetFormattingSettings.fromJSON(formatting_settings) : undefined)
       .eventAnnotation(event_annotation)
+      .units(UnitsConfig.fromJSON(units))
       .build();
   }
 }
@@ -270,6 +286,10 @@ class Builder {
     return new Builder(this.value.set('eventAnnotation', value));
   }
 
+  units(value: UnitsConfig) {
+    return new Builder(this.value.set('units', value));
+  }
+
   build() {
     const {
       rowPivots,
@@ -281,6 +301,7 @@ class Builder {
       visualizationConfig,
       formattingSettings,
       eventAnnotation,
+      units,
     } = this.value.toObject();
 
     const availableSorts = [].concat(rowPivots, columnPivots, series);
@@ -297,6 +318,7 @@ class Builder {
       visualizationConfig,
       formattingSettings,
       eventAnnotation,
+      units,
     );
   }
 }

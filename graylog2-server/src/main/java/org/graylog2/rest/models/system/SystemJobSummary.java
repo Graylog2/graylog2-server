@@ -23,8 +23,10 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 
 @JsonAutoDetect
 @AutoValue
@@ -49,6 +51,10 @@ public abstract class SystemJobSummary {
     @Nullable
     public abstract DateTime startedAt();
 
+    @JsonProperty("execution_duration")
+    @Nullable
+    public abstract Duration executionDuration();
+
     @JsonProperty("percent_complete")
     public abstract int percentComplete();
 
@@ -70,7 +76,12 @@ public abstract class SystemJobSummary {
                                           @JsonProperty("percent_complete") int percentComplete,
                                           @JsonProperty("is_cancelable") boolean isCancelable,
                                           @JsonProperty("provides_progress") boolean providesProgress) {
-        return create(id, description, name, info, nodeId, startedAt,
+        Duration executionDuration = null;
+        if (startedAt != null) {
+            var duration = new org.joda.time.Duration(startedAt, DateTime.now(DateTimeZone.UTC));
+            executionDuration = Duration.ofMillis(duration.getMillis());
+        }
+        return create(id, description, name, info, nodeId, startedAt, executionDuration,
                 percentComplete, isCancelable, providesProgress, JobTriggerStatus.RUNNING);
     }
 
@@ -81,11 +92,16 @@ public abstract class SystemJobSummary {
                                           @JsonProperty("info") String info,
                                           @JsonProperty("node_id") String nodeId,
                                           @JsonProperty("started_at") @Nullable DateTime startedAt,
+                                          @JsonProperty("execution_duration") @Nullable Duration executionDuration,
                                           @JsonProperty("percent_complete") int percentComplete,
                                           @JsonProperty("is_cancelable") boolean isCancelable,
                                           @JsonProperty("provides_progress") boolean providesProgress,
                                           @JsonProperty("job_status") JobTriggerStatus jobStatus) {
-        return new AutoValue_SystemJobSummary(id, description, name, info, nodeId, startedAt,
+        if (executionDuration == null && startedAt != null) {
+            var duration = new org.joda.time.Duration(startedAt, DateTime.now(DateTimeZone.UTC));
+            executionDuration = Duration.ofMillis(duration.getMillis());
+        }
+        return new AutoValue_SystemJobSummary(id, description, name, info, nodeId, startedAt, executionDuration,
                 percentComplete, isCancelable, providesProgress, jobStatus);
     }
 }

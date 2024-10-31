@@ -16,41 +16,40 @@
  */
 package org.graylog.plugins.views.search.export;
 
-import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 
-import javax.inject.Inject;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class ExportJobService {
-    protected final JacksonDBCollection<ExportJob, ObjectId> db;
+    protected final MongoCollection<ExportJob> db;
+    private final MongoUtils<ExportJob> mongoUtils;
 
     @Inject
-    public ExportJobService(MongoConnection mongoConnection,
-                            MongoJackObjectMapperProvider mapper) {
-        db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("export_jobs"),
-                ExportJob.class,
-                ObjectId.class,
-                mapper.get());
+    public ExportJobService(MongoCollections mongoCollections) {
+        db = mongoCollections.collection("export_jobs", ExportJob.class);
 
-        db.createIndex(new BasicDBObject(ExportJob.FIELD_CREATED_AT, 1), new BasicDBObject("expireAfterSeconds", TimeUnit.HOURS.toSeconds(1L)));
+        db.createIndex(Indexes.ascending(ExportJob.FIELD_CREATED_AT), new IndexOptions().expireAfter(1L, TimeUnit.HOURS));
+
+        this.mongoUtils = mongoCollections.utils(db);
     }
 
     public Optional<ExportJob> get(String id) {
         if (!ObjectId.isValid(id)) {
             return Optional.empty();
         }
-        return Optional.ofNullable(db.findOneById(new ObjectId(id)));
+        return mongoUtils.getById(id);
     }
 
     public String save(ExportJob exportJob) {
-        final WriteResult<ExportJob, ObjectId> save = db.insert(exportJob);
+        final var save = db.insertOne(exportJob);
 
-        return save.getSavedId().toHexString();
+        return MongoUtils.insertedIdAsString(save);
     }
 }

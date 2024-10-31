@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import type FetchError from 'logic/errors/FetchError';
 import { Icon, ClipboardButton } from 'components/common';
@@ -41,8 +40,8 @@ type Props = {
   title?: string,
 };
 
-const UnauthorizedErrorPage = ({ error, errorDetails, title, description, location: { pathname } }: Props) => {
-  const errorMessage = error?.message || JSON.stringify(error);
+const UnauthorizedErrorPage = ({ error, errorDetails, title = 'Missing Permissions', description, location: { pathname } }: Props) => {
+  const errorMessage = error?.message ?? JSON.stringify(error);
   const pageDetails = `The permissions check for the following request failed,\nwhile trying to access ${pathname}.`;
   const defaultDescription = (
     <>
@@ -58,7 +57,7 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
         <dd>
           <pre className="content">
             <div className="pull-right">
-              <ClipboardButton title={<Icon name="copy" fixedWidth />}
+              <ClipboardButton title={<Icon name="content_copy" />}
                                bsSize="sm"
                                text={errorMessageString}
                                buttonTitle="Copy error details to clipboard" />
@@ -79,18 +78,6 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
       </dl>
     </ErrorPage>
   );
-};
-
-UnauthorizedErrorPage.propTypes = {
-  description: PropTypes.element,
-  errorDetails: PropTypes.string,
-  title: PropTypes.string,
-};
-
-UnauthorizedErrorPage.defaultProps = {
-  description: undefined,
-  errorDetails: undefined,
-  title: 'Missing Permissions',
 };
 
 export default withLocation(UnauthorizedErrorPage);

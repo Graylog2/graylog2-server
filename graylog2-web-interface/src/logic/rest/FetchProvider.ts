@@ -164,6 +164,25 @@ export class Builder {
     return this;
   }
 
+  blobFile(body, mimeType) {
+    this.body = { body: maybeStringify(body), mimeType: 'application/json' };
+    this.accept = mimeType;
+
+    this.responseHandler = (resp: { ok: boolean, blob: () => Blob }) => {
+      if (resp.ok) {
+        reportServerSuccess();
+
+        return resp.blob();
+      }
+
+      throw resp;
+    };
+
+    this.errorHandler = (error: Response) => onServerError(error);
+
+    return this;
+  }
+
   plaintext(body) {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'application/json';
@@ -247,7 +266,19 @@ export default function fetch<T = any>(method: Method, url: string, body?: any, 
   return promise();
 }
 
-export function fetchPlainText(method, url, body) {
+export function fetchMultiPartFormData<T = any>(url: string, body?: any, requireSession: boolean = true): Promise<T> {
+  const promise = () => new Builder('POST', url)
+    .formData(body)
+    .build();
+
+  if (requireSession) {
+    return queuePromiseIfNotLoggedin(promise)();
+  }
+
+  return promise();
+}
+
+export function fetchPlainText(method: Method, url: string, body?: any) {
   const promise = () => new Builder(method, url)
     .plaintext(body)
     .build();
@@ -255,7 +286,7 @@ export function fetchPlainText(method, url, body) {
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchStreamingPlainText(method, url, body) {
+export function fetchStreamingPlainText(method: Method, url: string, body?: any) {
   const promise = () => new Builder(method, url)
     .streamingplaintext(body)
     .build();
@@ -263,7 +294,7 @@ export function fetchStreamingPlainText(method, url, body) {
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchPeriodically(method, url, body?) {
+export function fetchPeriodically<T = unknown>(method: Method, url: string, body?: any): Promise<T> {
   const promise = () => new Builder(method, url)
     .noSessionExtension()
     .json(body)
@@ -275,6 +306,14 @@ export function fetchPeriodically(method, url, body?) {
 export function fetchFile(method, url, body, mimeType = 'text/csv') {
   const promise = () => new Builder(method, url)
     .file(body, mimeType)
+    .build();
+
+  return queuePromiseIfNotLoggedin(promise)();
+}
+
+export function fetchBlobFile(method, url, body, mimeType = 'text/csv') {
+  const promise = () => new Builder(method, url)
+    .blobFile(body, mimeType)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();

@@ -38,8 +38,10 @@ import org.graylog2.database.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
+import jakarta.inject.Inject;
+
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;

@@ -15,14 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import type { StyledComponent } from 'styled-components';
 import styled from 'styled-components';
 
 import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 
-const StyledForm: StyledComponent<'form', {}> = styled.form`
+const StyledForm = styled.form`
   margin-top: 10px;
 
   &.form-inline > .form-group {
@@ -35,14 +33,15 @@ const StyledForm: StyledComponent<'form', {}> = styled.form`
 `;
 
 type Props = {
-  creatingToken: boolean,
+  creatingToken?: boolean
+  disableForm?: boolean
   onCreate: (tokenName: string) => void,
 };
 
-const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
+const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate }: Props) => {
   const [tokenName, setTokenName] = useState('');
 
-  const createToken = (event) => {
+  const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
     onCreate(tokenName);
     setTokenName('');
@@ -53,27 +52,19 @@ const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
       <FormGroup controlId="create-token-input">
         <ControlLabel>Token Name</ControlLabel>
         <FormControl type="text"
+                     disabled={disableForm}
                      placeholder="What is this token for?"
                      value={tokenName}
-                     onChange={(event) => setTokenName(event.target.value)} />
+                     onChange={(event) => setTokenName((event.target as HTMLInputElement).value)} />
       </FormGroup>
       <Button id="create-token"
-              disabled={tokenName === '' || creatingToken}
+              disabled={disableForm || tokenName === '' || creatingToken}
               type="submit"
               bsStyle="primary">
         {(creatingToken ? <Spinner text="Creating..." /> : 'Create Token')}
       </Button>
     </StyledForm>
   );
-};
-
-CreateTokenForm.propTypes = {
-  creatingToken: PropTypes.bool,
-  onCreate: PropTypes.func.isRequired,
-};
-
-CreateTokenForm.defaultProps = {
-  creatingToken: false,
 };
 
 export default CreateTokenForm;

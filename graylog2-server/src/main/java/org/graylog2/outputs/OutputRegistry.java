@@ -27,7 +27,6 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -37,6 +36,7 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.events.StreamsChangedEvent;
@@ -44,9 +44,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
@@ -59,10 +61,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class OutputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(OutputRegistry.class);
-    private static final Logger RATE_LIMITED_LOG = RateLimitedLog.withRateLimit(LOG)
-            .maxRate(1)
-            .every(Duration.ofSeconds(5))
-            .build();
+    private static final Logger RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(LOG, 1, Duration.ofSeconds(5));
 
     private final Cache<String, MessageOutput> runningMessageOutputs;
     private final MessageOutput defaultMessageOutput;

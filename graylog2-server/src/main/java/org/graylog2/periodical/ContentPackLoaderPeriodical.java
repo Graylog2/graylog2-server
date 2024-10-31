@@ -29,8 +29,9 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -117,9 +118,9 @@ public class ContentPackLoaderPeriodical extends Periodical {
     @Override
     public void doRun() {
         if (!Files.exists(contentPacksDir.toAbsolutePath())) {
-           LOG.warn("Could not find content packs directory {}. Please check your graylog configuration",
-                   contentPacksDir.toAbsolutePath());
-           return;
+            LOG.warn("Could not find content packs directory {}. Please check your graylog configuration",
+                    contentPacksDir.toAbsolutePath());
+            return;
         }
 
         final List<Path> files = getFiles(contentPacksDir);
@@ -177,7 +178,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
 
             if (contentPacksAutoInstall.contains(fileName)) {
                 if (!contentPackInstallationPersistenceService.
-                        findByContentPackIdAndRevision(contentPack.id(),contentPack.revision()).isEmpty()) {
+                        findByContentPackIdAndRevision(contentPack.id(), contentPack.revision()).isEmpty()) {
                     LOG.debug("Content pack {}/{} ({}) already applied. Skipping.", contentPack.id(), contentPack.revision(), fileName);
                     continue;
                 }

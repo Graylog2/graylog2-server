@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Include parameters when replaying search for dashboard widget."
+
+issues = ["graylog-plugin-enterprise#4576"]
+pulls = ["16051"]

@@ -15,26 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
+import { useContext, useState, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import CustomPropTypes from 'views/components/CustomPropTypes';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
-import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
-
-import InteractiveContext from '../contexts/InteractiveContext';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import { TableHeaderCell, TableHead } from 'views/components/datatable';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 const Table = styled.table(({ theme }) => css`
   position: relative;
@@ -43,6 +40,10 @@ const Table = styled.table(({ theme }) => css`
   border-collapse: collapse;
   width: 100%;
   word-break: break-all;
+
+  > tbody > tr > td {
+    border-color: ${theme.colors.table.row.divider};
+  }
 
   @media print {
     font-size: ${theme.fonts.size.body};
@@ -62,7 +63,6 @@ const Table = styled.table(({ theme }) => css`
       left: 0;
       padding: 5px !important;
       position: static;
-      min-width: 0 !important;
     }
   }
 `);
@@ -82,27 +82,6 @@ const TableWrapper = styled.div(({ theme }) => css`
   }
 `);
 
-const TableHead = styled.thead(({ theme }) => css`
-  background-color: ${theme.colors.gray[90]};
-  color: ${theme.utils.readableColor(theme.colors.gray[90])};
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  
-  && > tr > th {
-    min-width: 50px;
-    height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
-    padding: 0 5px;
-    vertical-align: center;
-    border: 0;
-    font-size: ${theme.fonts.size.small};
-    font-weight: normal;
-    white-space: nowrap;
-    background-color: ${theme.colors.gray[90]};
-    color: ${theme.utils.readableColor(theme.colors.gray[90])};
-  }
-`);
-
 type Props = {
   activeQueryId: string,
   config: MessagesWidgetConfig,
@@ -116,7 +95,7 @@ type Props = {
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) => ((fields
   && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
 
-const _getFormattedMessages = (messages): Array<Message> => messages.map((m) => ({
+const _getFormattedMessages = (messages: Array<BackendMessage>): Array<Message> => messages.map((m) => ({
   fields: m.message,
   formatted_fields: MessageFieldsFilter.filterFields(m.message),
   id: m.message._id,
@@ -125,25 +104,31 @@ const _getFormattedMessages = (messages): Array<Message> => messages.map((m) => 
   decoration_stats: m.decoration_stats,
 }));
 
-const _toggleMessageDetail = (id: string, expandedMessages: Immutable.Set<string>, setExpandedMessages: (newValue: Immutable.Set<string>) => void) => {
+const _toggleMessageDetail = (
+  id: string,
+  expandedMessages: Immutable.Set<string>,
+  setExpandedMessages: (newValue: Immutable.Set<string>) => void,
+  stopAutoRefresh: () => void,
+) => {
   let newSet;
 
   if (expandedMessages.contains(id)) {
     newSet = expandedMessages.delete(id);
   } else {
     newSet = expandedMessages.add(id);
-    RefreshActions.disable();
+    stopAutoRefresh();
   }
 
   setExpandedMessages(newSet);
 };
 
 const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, setLoadingState, scrollContainerRef }: Props) => {
+  const { stopAutoRefresh } = useAutoRefresh();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
   const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
   const selectedFields = useMemo(() => Immutable.OrderedSet<string>(config?.fields ?? []), [config?.fields]);
-
-  const toggleDetail = useCallback((id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages), [expandedMessages]);
+  const interactive = useContext(InteractiveContext);
+  const toggleDetail = useMemo(() => (interactive ? (id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages, stopAutoRefresh) : () => {}), [expandedMessages, interactive, stopAutoRefresh]);
 
   return (
     <MessageTableProviders>
@@ -151,23 +136,26 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
         <Table className="table table-condensed">
           <TableHead>
             <tr>
-              {selectedFields.toSeq().map((selectedFieldName) => (
-                <th key={selectedFieldName}>
-                  <Field type={_fieldTypeFor(selectedFieldName, fields)}
-                         name={selectedFieldName}
-                         queryId={activeQueryId}>
-                    {selectedFieldName}
-                  </Field>
-                  <InteractiveContext.Consumer>
-                    {(interactive) => (interactive && (
-                      <FieldSortIcon fieldName={selectedFieldName}
-                                     onSortChange={onSortChange}
-                                     setLoadingState={setLoadingState}
-                                     config={config} />
+              {selectedFields.toSeq().map((selectedFieldName) => {
+                const type = _fieldTypeFor(selectedFieldName, fields);
+                const isCompound = type.isCompound();
+
+                return (
+                  <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
+                    <Field type={type}
+                           name={selectedFieldName}
+                           queryId={activeQueryId}>
+                      {selectedFieldName}
+                    </Field>
+                    {(interactive && !isCompound && (
+                    <FieldSortIcon fieldName={selectedFieldName}
+                                   onSortChange={onSortChange}
+                                   setLoadingState={setLoadingState}
+                                   config={config} />
                     ))}
-                  </InteractiveContext.Consumer>
-                </th>
-              )).toArray()}
+                  </TableHeaderCell>
+                );
+              }).toArray()}
             </tr>
           </TableHead>
           {formattedMessages.map((message) => {
@@ -189,15 +177,6 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
       </TableWrapper>
     </MessageTableProviders>
   );
-};
-
-MessageTable.propTypes = {
-  activeQueryId: PropTypes.string.isRequired,
-  config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-  fields: CustomPropTypes.FieldListType.isRequired,
-  messages: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onSortChange: PropTypes.func.isRequired,
-  setLoadingState: PropTypes.func.isRequired,
 };
 
 export default React.memo(MessageTable);

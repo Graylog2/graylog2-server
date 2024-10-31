@@ -20,23 +20,20 @@ import type { Matcher } from 'wrappedTestingLibrary';
 import { render, within, screen, waitFor, fireEvent, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
-import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import dataTable from 'views/components/datatable/bindings';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
-import viewsReducers from 'views/viewsReducers';
 import TestStoreProvider from 'views/test/TestStoreProvider';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -50,8 +47,8 @@ const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
-const pivot0 = Pivot.create([fieldTypeMapping1.name], 'values', { limit: 15 });
-const pivot1 = Pivot.create([fieldTypeMapping2.name], 'values', { limit: 15 });
+const pivot0 = Pivot.createValues([fieldTypeMapping1.name]);
+const pivot1 = Pivot.createValues([fieldTypeMapping2.name]);
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -62,18 +59,15 @@ const widgetConfig = AggregationWidgetConfig
 
 const selectEventConfig = { container: document.body };
 
-const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable], 'views.reducers': viewsReducers } };
-
 const addSortElement = async () => {
-  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
-  await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
+  await userEvent.click(await screen.findByRole('button', { name: /add a sort/i }));
 };
 
 const findWidgetConfigFormSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await findWidgetConfigFormSubmitButton();
-  fireEvent.click(applyButton);
+  await userEvent.click(applyButton);
 };
 
 const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string = 'took_ms') => {
@@ -83,10 +77,17 @@ const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string 
 
   await act(async () => {
     await selectEvent.openMenu(sortFieldSelect);
-    await selectEvent.select(sortFieldSelect, option, selectEventConfig);
-    await selectEvent.openMenu(sortDirectionSelect);
-    await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
   });
+
+  await selectEvent.select(sortFieldSelect, option, selectEventConfig);
+
+  await act(async () => {
+    await selectEvent.openMenu(sortDirectionSelect);
+  });
+
+  await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
+
+  await within(httpMethodSortContainer).findByText('Descending');
 };
 
 const renderSUT = (props = {}) => render((
@@ -108,9 +109,7 @@ const renderSUT = (props = {}) => render((
 ));
 
 describe('AggregationWizard', () => {
-  beforeAll(() => PluginStore.register(plugin));
-
-  afterAll(() => PluginStore.unregister(plugin));
+  useViewsPlugin();
 
   it('should display sort element form with values from config', async () => {
     const config = widgetConfig
@@ -185,8 +184,7 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const addSortButton = await screen.findByRole('button', { name: 'Add a Sort' });
-    userEvent.click(addSortButton);
+    await addSortElement();
 
     await sortByTookMsDesc('sort-element-1', 'max(took_ms)');
     await submitWidgetConfigForm();
@@ -214,7 +212,7 @@ describe('AggregationWizard', () => {
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
     await waitFor(() => expect(applyButton).toBeDisabled());
-  });
+  }, extendedTimeout);
 
   it('should require direction when creating a sort element', async () => {
     renderSUT();
@@ -225,7 +223,7 @@ describe('AggregationWizard', () => {
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
     await waitFor(() => expect(applyButton).toBeDisabled());
-  });
+  }, extendedTimeout);
 
   it('should remove all sorts', async () => {
     const onChangeMock = jest.fn();
@@ -236,8 +234,8 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const removeSortElementButton = screen.getByRole('button', { name: 'Remove Sort' });
-    userEvent.click(removeSortElementButton);
+    const removeSortElementButton = await screen.findByRole('button', { name: 'Remove Sort' });
+    await userEvent.click(removeSortElementButton);
 
     await submitWidgetConfigForm();
 
@@ -249,7 +247,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should correctly update sort of sort elements', async () => {
     const sort1 = new SortConfig('pivot', 'http_method', Direction.Ascending);

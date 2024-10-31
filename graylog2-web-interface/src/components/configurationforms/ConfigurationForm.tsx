@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
+import type { ForwardedRef } from 'react';
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -25,42 +25,51 @@ import { FIELD_TYPES_WITH_ENCRYPTION_SUPPORT } from './types';
 import type { ConfigurationFormData, ConfigurationField, ConfigurationFieldValue, EncryptedFieldValue, FieldValue, ConfigurationFieldWithEncryption } from './types';
 
 type Props<Configuration extends object> = {
-  cancelAction: () => void,
+  cancelAction?: () => void,
   configFields?: {
     [key: string]: ConfigurationField,
   },
   children?: React.ReactNode,
   titleHelpText?: string,
-  includeTitleField: boolean,
+  includeTitleField?: boolean,
   submitAction: (data: ConfigurationFormData<Configuration>) => void,
-  title: string | React.ReactNode | null,
-  titleValue: string,
+  title?: string | React.ReactNode | null
+  titleValue?: string,
   typeName?: string,
-  values: { [key:string]: any },
-  wrapperComponent: React.ComponentType<React.PropsWithChildren<{
+  values?: { [key:string]: any },
+  wrapperComponent?: React.ComponentType<React.PropsWithChildren<{
     show: boolean,
     title: string | React.ReactNode | null,
     onCancel: () => void,
     onSubmitForm: () => void,
     submitButtonText: string
   }>>,
-  submitButtonText: string,
+  submitButtonText?: string,
 }
 
+export type RefType<Configuration extends object> = {
+  open: () => void,
+  getValue: () => ConfigurationFormData<Configuration>,
+}
+
+const defaultConfigFields = {};
+const defaultCancelAction = () => {};
+const defaultInitialValues = {};
+
 const ConfigurationForm = forwardRef(<Configuration extends object>({
-  cancelAction,
-  configFields,
-  children,
-  titleHelpText,
-  includeTitleField,
+  cancelAction = defaultCancelAction,
+  configFields = defaultConfigFields,
+  children = null,
+  titleHelpText = '',
+  includeTitleField = true,
   submitAction,
-  title,
-  titleValue: initialTitleValue,
+  title = null,
+  titleValue: initialTitleValue = '',
   typeName,
-  values: initialValues,
-  wrapperComponent: WrapperComponent,
+  values: initialValues = defaultInitialValues,
+  wrapperComponent: WrapperComponent = BootstrapModalForm as Props<Configuration>['wrapperComponent'],
   submitButtonText,
-} : Props<Configuration>, ref: typeof ConfigurationForm) => {
+} : Props<Configuration>, ref: React.ForwardedRef<RefType<Configuration>>) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
   const [titleValue, setTitleValue] = useState(undefined);
   const [values, setValues] = useState<{[key:string]: any} | undefined>(undefined);
@@ -241,32 +250,6 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
   );
 });
 
-ConfigurationForm.propTypes = {
-  cancelAction: PropTypes.func,
-  configFields: PropTypes.object,
-  children: PropTypes.node,
-  titleHelpText: PropTypes.string,
-  includeTitleField: PropTypes.bool,
-  submitAction: PropTypes.func.isRequired,
-  title: PropTypes.node,
-  titleValue: PropTypes.string,
-  typeName: PropTypes.string,
-  values: PropTypes.object,
-  wrapperComponent: PropTypes.elementType,
-  submitButtonText: PropTypes.string.isRequired,
-};
-
-ConfigurationForm.defaultProps = {
-  cancelAction: () => {},
-  configFields: {},
-  children: null,
-  titleHelpText: '',
-  title: null,
-  includeTitleField: true,
-  titleValue: '',
-  typeName: undefined,
-  values: {},
-  wrapperComponent: BootstrapModalForm,
-};
-
-export default ConfigurationForm;
+export default ConfigurationForm as <T extends object>(
+  props: Props<T> & { ref?: ForwardedRef<RefType<T>> },
+) => ReturnType<typeof ConfigurationForm>;

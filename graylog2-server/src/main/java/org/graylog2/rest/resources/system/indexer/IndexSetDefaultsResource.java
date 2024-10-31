@@ -20,90 +20,56 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.configuration.IndexSetsDefaultConfiguration;
-import org.graylog2.indexer.IndexSetValidator;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplate;
+import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.joda.time.Duration;
 
-import javax.inject.Inject;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
+import java.util.Optional;
 
 @RequiresAuthentication
 @Api(value = "System/IndexSetDefaults", description = "Index set defaults")
 @Path("/system/indices/index_set_defaults")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetDefaultsResource extends RestResource {
-    private final IndexSetValidator indexSetValidator;
-    private final ClusterConfigService clusterConfigService;
-    private final Validator validator;
+    private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
 
     @Inject
-    public IndexSetDefaultsResource(IndexSetValidator indexSetValidator, ClusterConfigService clusterConfigService, Validator validator) {
-        this.indexSetValidator = indexSetValidator;
-        this.clusterConfigService = clusterConfigService;
-        this.validator = validator;
+    public IndexSetDefaultsResource(IndexSetDefaultTemplateService indexSetDefaultTemplateService) {
+        this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
     }
 
-    /**
-     * Save new {@link IndexSetsDefaultConfiguration} cluster configuration object. This method exists to allow additional validation
-     * before saving with the {@link ClusterConfigService}.
-     */
     @PUT
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update index set defaults configuration")
+    @ApiOperation(value = "Set index set default template")
     @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
-    @AuditEvent(type = AuditEventTypes.CLUSTER_CONFIGURATION_UPDATE)
-    public Response update(@ApiParam(name = "body", value = "The payload of the index set defaults configuration", required = true)
-                           @NotNull IndexSetsDefaultConfiguration config) throws IOException {
-        // Validate scalar fields.
-        validator.validate(config).forEach(v -> {
-            throw new BadRequestException(buildFieldError(v.getPropertyPath().toString(), v.getMessage()));
-        });
-
-        // Perform common refresh interval and retention period validations.
-        IndexSetValidator.Violation violation =
-                indexSetValidator.validateRefreshInterval(Duration.standardSeconds(
-                        config.fieldTypeRefreshIntervalUnit().toSeconds(config.fieldTypeRefreshInterval())));
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.FIELD_TYPE_REFRESH_INTERVAL, violation.message()));
+    @NoAuditEvent("event is handled in service class")
+    public Response update(@ApiParam(name = "body", value = "Index set default template id.", required = true)
+                           @NotNull IndexSetDefaultTemplate defaultTemplate) throws IOException {
+        try {
+            indexSetDefaultTemplateService.setDefault(defaultTemplate, Optional.ofNullable(getCurrentUser())
+                    .map(User::getName)
+                    .orElse("unknown"));
+        } catch (NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
-
-        violation = indexSetValidator.validateRotation(config.rotationStrategyConfig());
-
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.ROTATION_STRATEGY_CONFIG, violation.message()));
-        }
-
-        violation = indexSetValidator.validateRetentionPeriod(config.rotationStrategyConfig(),
-                config.retentionStrategyConfig());
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.RETENTION_STRATEGY_CONFIG, violation.message()));
-        }
-
-
-        clusterConfigService.write(config);
-        return Response.ok(config).build();
-    }
-
-    private static String buildFieldError(String field, String message) {
-        return f("Invalid value for field [%s]: %s", field, message);
+        return Response.ok().build();
     }
 }

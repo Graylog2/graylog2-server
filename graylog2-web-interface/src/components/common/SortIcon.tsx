@@ -27,6 +27,10 @@ const StyledSortIcon = styled.button(({ theme }) => css`
   cursor: pointer;
   position: relative;
   color: ${theme.colors.gray[70]};
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
 
   &.active {
     color: ${theme.colors.gray[20]};
@@ -54,16 +58,14 @@ type Props<AscDirection extends string, DescDirection extends string> = {
 const SortIcon = <AscDirection extends string, DescDirection extends string>({
   activeDirection,
   onChange,
-  title,
+  title = 'Sort',
   order,
-  ascId,
-  descId,
-  className,
+  ascId = 'Ascending',
+  descId = 'Descending',
+  className = '',
 }: Props<AscDirection, DescDirection>) => {
   const handleSortChange = useCallback(() => onChange(activeDirection), [activeDirection, onChange]);
-  const iconName = activeDirection === ascId && activeDirection !== descId
-    ? 'arrow-up-short-wide'
-    : 'arrow-down-wide-short';
+  const isAscSort = activeDirection === ascId && activeDirection !== descId;
 
   const sortActive = !!activeDirection;
 
@@ -73,18 +75,10 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
                     type="button"
                     aria-label={title}
                     onClick={handleSortChange}>
-      <Icon name={iconName} data-testid="sort-icon-svg" />
+      <Icon name="sort" data-testid="sort-icon-svg" flip={isAscSort ? 'horizontal' : undefined} className={`sort-icon-${isAscSort ? 'asc' : 'desc'}`} />
       {order && <Bulb>{order}</Bulb>}
     </StyledSortIcon>
   );
-};
-
-SortIcon.defaultProps = {
-  title: 'Sort',
-  order: undefined,
-  ascId: 'Ascending',
-  descId: 'Descending',
-  className: '',
 };
 
 export default SortIcon;

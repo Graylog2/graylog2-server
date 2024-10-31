@@ -57,6 +57,12 @@ type WidgetResults = {
   error: SearchError[],
 };
 
+const _getErrorsForQuery = (currentQueryId: string, currentQueryErrors: SearchError[] | undefined) => {
+  const queryError = currentQueryErrors?.find((searchError) => searchError.queryId === currentQueryId);
+
+  return { widgetData: undefined, error: queryError ? [queryError] : [] };
+};
+
 const selectWidgetResults = (widgetId: string) => createSelector(
   selectSearchExecutionResult,
   selectActiveQuery,
@@ -64,10 +70,11 @@ const selectWidgetResults = (widgetId: string) => createSelector(
   (searchExecutionResult, currentQueryId, widget) => {
     const { result, widgetMapping } = searchExecutionResult ?? {};
     const currentQueryResults = result?.results?.[currentQueryId];
+    const currentQueryErrors = result?.errors;
 
     return (currentQueryResults
       ? _getDataAndErrors(widget, widgetMapping, currentQueryResults)
-      : { widgetData: undefined, error: [] }) as WidgetResults;
+      : _getErrorsForQuery(currentQueryId, currentQueryErrors)) as WidgetResults;
   },
 );
 

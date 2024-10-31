@@ -32,6 +32,7 @@ import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @AutoValue
 @WithBeanGetter
@@ -54,6 +55,8 @@ public abstract class StreamDTO {
     public static final String FIELD_INDEX_SET_ID = "index_set_id";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
     public static final String FIELD_IS_EDITABLE = "is_editable";
+    public static final String FIELD_CATEGORIES = "categories";
+    public static final Stream.MatchingType DEFAULT_MATCHING_TYPE = Stream.MatchingType.AND;
 
     @JsonProperty("id")
     public abstract String id();
@@ -113,6 +116,10 @@ public abstract class StreamDTO {
     @JsonProperty(FIELD_IS_EDITABLE)
     public abstract boolean isEditable();
 
+    @JsonProperty(FIELD_CATEGORIES)
+    @Nullable
+    public abstract List<String> categories();
+
     public abstract Builder toBuilder();
 
     static Builder builder() {
@@ -124,10 +131,11 @@ public abstract class StreamDTO {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamDTO.Builder()
-                    .matchingType(Stream.MatchingType.AND.toString())
+                    .matchingType(DEFAULT_MATCHING_TYPE.toString())
                     .isDefault(false)
                     .isEditable(false)
-                    .removeMatchesFromDefaultStream(false);
+                    .removeMatchesFromDefaultStream(false)
+                    .categories(List.of());
         }
 
         @JsonProperty(FIELD_ID)
@@ -180,6 +188,9 @@ public abstract class StreamDTO {
         @JsonProperty(FIELD_IS_EDITABLE)
         public abstract Builder isEditable(boolean isEditable);
 
+        @JsonProperty(FIELD_CATEGORIES)
+        public abstract Builder categories(List<String> categories);
+
         public abstract String id();
 
         public abstract StreamDTO autoBuild();
@@ -195,7 +206,7 @@ public abstract class StreamDTO {
                 .id(document.getObjectId(FIELD_ID).toHexString())
                 .title(document.getString(FIELD_TITLE))
                 .description(document.getString(FIELD_DESCRIPTION))
-                .matchingType(document.getString(FIELD_MATCHING_TYPE))
+                .matchingType(document.get(FIELD_MATCHING_TYPE, DEFAULT_MATCHING_TYPE.toString()))
                 .createdAt(document.getDate(FIELD_CREATED_AT))
                 .contentPack(document.getString(FIELD_CONTENT_PACK))
                 .isEditable(document.getBoolean(FIELD_IS_EDITABLE, true))
@@ -205,6 +216,7 @@ public abstract class StreamDTO {
                 .creatorUserId(document.getString(FIELD_CREATOR_USER_ID))
                 .indexSetId(document.getString(FIELD_INDEX_SET_ID))
                 .outputs(document.getList(FIELD_OUTPUTS, ObjectId.class))
+                .categories(document.getList(FIELD_CATEGORIES, String.class))
                 .build();
     }
 }

@@ -38,7 +38,8 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -115,6 +116,6 @@ public class DashboardV1Facade extends ViewFacade {
 
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
         final ViewEntity viewEntity = entityConverter.convert(dashboardEntity, parameters);
-        return resolveViewEntity(entity, viewEntity, entities);
+        return resolveViewEntity(entity, viewEntity, parameters, entities);
     }
 }

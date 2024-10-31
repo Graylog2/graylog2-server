@@ -36,8 +36,9 @@ export type FieldTypes = { all: FieldIndex, query: FieldIndex };
 type FieldIndex = { [fieldName: string]: FieldTypeMapping };
 
 export type CompleterContext = Readonly<{
+  commandArgs?: unknown,
   currentToken: Token | undefined | null,
-  lastToken: Token | undefined | null,
+  prevToken: Token | undefined | null,
   prefix: string,
   tokens: Array<Token>,
   currentTokenIdx: number,
@@ -59,6 +60,42 @@ const onCompleterError = (error: Error) => {
   console.warn('Exception thrown in completer: ', error);
 };
 
+const getCurrentTokenIdx = (session: Session, pos: Position) => {
+  let idx = 0;
+
+  for (let rowIdx = 0; rowIdx <= pos.row; rowIdx += 1) {
+    const row = session.getTokens(rowIdx);
+
+    if (rowIdx === pos.row) {
+      const currentToken = session.getTokenAt(pos.row, pos.column);
+      const idxInActiveLine = row.findIndex((t) => (t === currentToken));
+      idx += idxInActiveLine;
+    } else {
+      idx += row.length;
+    }
+  }
+
+  return idx;
+};
+
+const formatTokens = (session: Session, pos: Position) => {
+  const rowAmount = session.getLength();
+  const allTokens = [...Array(rowAmount).keys()]
+    .map((_, index) => session.getTokens(index))
+    .filter((line) => !!line?.length)
+    .flat();
+  const currentTokenIdx = getCurrentTokenIdx(session, pos);
+  const currentToken = allTokens[currentTokenIdx];
+  const prevToken = allTokens[currentTokenIdx - 1] ?? null;
+
+  return {
+    tokens: allTokens,
+    currentTokenIdx,
+    currentToken,
+    prevToken,
+  };
+};
+
 export default class SearchBarAutoCompletions implements AutoCompleter {
   private readonly completers: Array<Completer>;
 
@@ -70,7 +107,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
   private readonly userTimezone: string;
 
-  private readonly view: View;
+  private readonly view: View | undefined;
 
   constructor(
     completers: Array<Completer>,
@@ -78,7 +115,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     streams: Array<string>,
     fieldTypes: FieldTypes,
     userTimezone: string,
-    view: View,
+    view?: View,
   ) {
     this.completers = completers;
     this.timeRange = timeRange;
@@ -89,11 +126,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
   }
 
   getCompletions = async (editor: Editor, _session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
-    const tokens = editor.session.getTokens(pos.row);
-    const currentToken = editor.session.getTokenAt(pos.row, pos.column);
-    const currentTokenIdx = tokens.findIndex((t) => (t === currentToken));
-
-    const lastToken: Token | undefined | null = currentTokenIdx > 0 ? tokens[currentTokenIdx - 1] : null;
+    const { tokens, currentToken, currentTokenIdx, prevToken } = formatTokens(editor.session, pos);
 
     const results = await Promise.all(
       this.completers
@@ -101,10 +134,11 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
           try {
             return await completer.getCompletions({
               currentToken,
-              lastToken,
+              prevToken,
               prefix,
               tokens,
               currentTokenIdx,
+              commandArgs: _session?.curOp?.args,
               timeRange: this.timeRange,
               streams: this.streams,
               fieldTypes: this.fieldTypes,
@@ -122,18 +156,6 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
     callback(null, uniqResults);
   };
-
-  shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => this.completers.some((completer) => {
-    if (typeof completer.shouldShowCompletions === 'function') {
-      try {
-        return completer.shouldShowCompletions(currentLine, lines);
-      } catch (e) {
-        onCompleterError(e);
-      }
-    }
-
-    return false;
-  });
 
   get identifierRegexps() { return this.completers.map((completer) => completer.identifierRegexps ?? []).flat(); }
 }

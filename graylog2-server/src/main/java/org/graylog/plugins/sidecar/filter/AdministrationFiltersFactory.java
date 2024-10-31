@@ -19,7 +19,8 @@ package org.graylog.plugins.sidecar.filter;
 
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;

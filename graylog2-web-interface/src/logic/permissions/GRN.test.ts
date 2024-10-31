@@ -14,9 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Routes from 'routing/Routes';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
 
-import { createGRN, getValuesFromGRN, getShowRouteFromGRN } from './GRN';
+import Routes from 'routing/Routes';
+import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
+
+import { createGRN, getValuesFromGRN } from './GRN';
 
 describe('GRN', () => {
   it('createGRN should generate GRN with correct format', () => {
@@ -40,7 +43,9 @@ describe('GRN', () => {
       ${'user'}       | ${'grn::::user:user-id'}            | ${Routes.SYSTEM.USERS.show('user-id')}
       ${'stream'}     | ${'grn::::stream:stream-id'}        | ${Routes.stream_search('stream-id')}
     `('type $type with grn $grn', ({ grn, entityShowURL }) => {
-      expect(getShowRouteFromGRN(grn)).toBe(entityShowURL);
+      const { result } = renderHook(() => useShowRouteFromGRN(grn));
+
+      expect(result.current).toBe(entityShowURL);
     });
   });
 });

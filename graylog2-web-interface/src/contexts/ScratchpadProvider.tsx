@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { createContext, useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
 
 import Store from 'logic/local-storage/Store';
+import useHotkey from 'hooks/useHotkey';
 
 export const ScratchpadContext = createContext(undefined);
 
@@ -58,14 +58,17 @@ export const ScratchpadProvider = ({ children, loginName }: Props) => {
     localStorageItem,
   ]);
 
+  useHotkey({
+    actionKey: 'show-scratchpad-modal',
+    callback: () => {
+      setVisibility(true);
+    },
+    scope: 'general',
+  });
+
   return (
     <ScratchpadContext.Provider value={scratchpadContextValue}>
       {children}
     </ScratchpadContext.Provider>
   );
-};
-
-ScratchpadProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  loginName: PropTypes.string.isRequired,
 };

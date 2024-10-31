@@ -20,12 +20,14 @@ import { useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Formik, Form, Field } from 'formik';
 
-import fetch from 'logic/rest/FetchProvider';
+import Icon from 'components/common/Icon';
+import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
-import { Input, Icon, Dropzone, FormikInput, Button, Space } from 'preflight/components/common';
+import { Input, FormikInput, Button, Space } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
+import Dropzone from 'components/common/Dropzone';
 
 type FormValues = {
   files?: Array<File>,
@@ -60,17 +62,36 @@ const File = styled.div`
 const DeleteIcon = styled(Icon)`
   cursor: pointer;
 `;
-const submitUpload = (formValues: FormValues) => fetch('POST', qualifyUrl('/api/ca/upload'), formValues, false);
+
+const submitUpload = (formValues: FormValues) => {
+  const formData = new FormData();
+
+  if (formValues.password !== undefined) {
+    formData.append('password', formValues.password);
+  }
+
+  formValues.files.forEach((file) => formData.append('files', file));
+
+  return fetchMultiPartFormData(qualifyUrl('/api/ca/upload'), formData, false);
+};
 
 const validate = (formValues: FormValues) => {
   let errors = {};
 
   if (!formValues.files?.length) {
-    errors = { ...errors, files: 'A CA file is required' };
+    errors = { ...errors, files: 'Please upload a file.' };
+  }
+
+  if (formValues.files?.length > 1) {
+    errors = { ...errors, files: 'Please upload only a single file.' };
   }
 
   return errors;
 };
+
+const Explanation = styled.p`
+  margin-bottom: 10px;
+`;
 
 const CAUpload = () => {
   const queryClient = useQueryClient();
@@ -78,7 +99,7 @@ const CAUpload = () => {
     UserNotification.error('CA upload failed');
   }, []);
 
-  const { mutate: onProcessUpload, isLoading } = useMutation(submitUpload, {
+  const { mutateAsync: onProcessUpload, isLoading } = useMutation(submitUpload, {
     onSuccess: () => {
       UserNotification.success('CA uploaded successfully');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
@@ -88,10 +109,17 @@ const CAUpload = () => {
     },
   });
 
+  const onSubmit = useCallback((formValues: FormValues) => onProcessUpload(formValues).catch(() => {}), [onProcessUpload]);
+
   return (
-    <Formik<FormValues> initialValues={{}} onSubmit={(formValues: FormValues) => onProcessUpload(formValues)} validate={validate}>
+    <Formik<FormValues> initialValues={{}} onSubmit={onSubmit} validate={validate}>
       {({ isSubmitting, isValid }) => (
         <Form>
+          <Explanation>
+            Here you can upload your existing CA. You need to upload a single file containing both private key
+            (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in PEM
+            or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.
+          </Explanation>
           <Field name="files">
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
@@ -102,13 +130,13 @@ const CAUpload = () => {
                             loading={isLoading}>
                   <DropzoneInner>
                     <Dropzone.Accept>
-                      <Icon name="file" type="solid" size="2x" />
+                      <Icon name="draft" type="solid" size="2x" />
                     </Dropzone.Accept>
                     <Dropzone.Reject>
-                      <Icon name="triangle-exclamation" size="2x" />
+                      <Icon name="warning" size="2x" />
                     </Dropzone.Reject>
                     <Dropzone.Idle>
-                      <Icon name="file" type="regular" size="2x" />
+                      <Icon name="draft" type="regular" size="2x" />
                     </Dropzone.Idle>
                     <div>
                       Drag CA here or click to select file
@@ -116,14 +144,13 @@ const CAUpload = () => {
                   </DropzoneInner>
                 </CADropzone>
                 <Files>
-                  {value?.map(({ name: fileName }, index) => (
+                  {value?.filter((file) => !!file).map(({ name: fileName }, index) => (
                     <File key={fileName}>
-                      <Icon name="file" /> {fileName} <DeleteIcon name="xmark"
-                                                                  onClick={() => {
-                                                                    const newValue = [...value];
-                                                                    delete newValue[index];
-                                                                    onChange({ target: { name, value: newValue } });
-                                                                  }} />
+                      <Icon name="draft" /> {fileName} <DeleteIcon name="cancel"
+                                                                   onClick={() => {
+                                                                     const newValue = value.filter((_ignored, idx) => idx !== index);
+                                                                     onChange({ target: { name, value: newValue } });
+                                                                   }} />
                     </File>
                   ))}
                 </Files>
@@ -137,7 +164,7 @@ const CAUpload = () => {
                        type="password"
                        label="Password" />
           <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
-          <Button disabled={isSubmitting || !isValid} type="submit">
+          <Button disabled={!isValid} type="submit">
             {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
           </Button>
         </Form>

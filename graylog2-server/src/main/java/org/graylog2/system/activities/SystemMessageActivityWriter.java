@@ -25,7 +25,8 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 /**
@@ -42,7 +43,7 @@ public class SystemMessageActivityWriter implements ActivityWriter {
         this.systemMessageService = systemMessageService;
         this.serverStatus = serverStatus;
     }
-    
+
     @Override
     public void write(Activity activity) {
         try {
@@ -58,5 +59,5 @@ public class SystemMessageActivityWriter implements ActivityWriter {
             LOG.error("Could not write activity.", e);
         }
     }
-    
+
 }

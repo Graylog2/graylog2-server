@@ -17,11 +17,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useContext, useState, useEffect, useCallback, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import type { WidgetComponentProps, MessageResult } from 'views/types';
 import { Messages } from 'views/Constants';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import { PaginatedList } from 'components/common';
@@ -36,6 +34,7 @@ import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSea
 import useAppDispatch from 'stores/useAppDispatch';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
 import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -99,14 +98,15 @@ const MessageList = ({
   config,
   data: { id: searchTypeId, messages, total: totalMessages },
   fields,
-  onConfigChange,
-  pageSize,
+  onConfigChange = () => Promise.resolve(),
+  pageSize = Messages.DEFAULT_LIMIT,
   setLoadingState,
 }: Props) => {
   const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
     pageErrors: [],
     currentPage: 1,
   });
+  const { stopAutoRefresh } = useAutoRefresh();
   const activeQueryId = useActiveQueryId();
   const searchTypes = useCurrentSearchTypesResults();
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
@@ -127,7 +127,7 @@ const MessageList = ({
         },
       };
 
-    RefreshActions.disable();
+    stopAutoRefresh();
     setLoadingState(true);
 
     dispatch(reexecuteSearchTypes(searchTypePayload, effectiveTimerange)).then((response) => {
@@ -139,7 +139,7 @@ const MessageList = ({
         currentPage: pageNo,
       });
     });
-  }, [dispatch, pageSize, searchTypeId, searchTypes, setLoadingState]);
+  }, [dispatch, pageSize, searchTypeId, searchTypes, setLoadingState, stopAutoRefresh]);
 
   const onSortChange = useCallback((newSort: SortConfig[]) => {
     const newConfig = config.toBuilder().sort(newSort).build();
@@ -169,16 +169,6 @@ const MessageList = ({
       </Wrapper>
     </WindowDimensionsContextProvider>
   );
-};
-
-MessageList.propTypes = {
-  onConfigChange: PropTypes.func,
-  pageSize: PropTypes.number,
-};
-
-MessageList.defaultProps = {
-  onConfigChange: () => Promise.resolve(),
-  pageSize: Messages.DEFAULT_LIMIT,
 };
 
 export default MessageList;

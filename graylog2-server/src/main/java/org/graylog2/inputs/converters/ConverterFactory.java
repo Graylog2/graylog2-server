@@ -20,7 +20,8 @@ import org.graylog2.ConfigurationException;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.inputs.Converter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 public class ConverterFactory {

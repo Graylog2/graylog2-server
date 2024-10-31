@@ -30,10 +30,12 @@ import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -56,6 +58,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_max_total_connections_per_route") int maxTotalConnectionsPerRoute,
             @Named("elasticsearch_max_retries") int elasticsearchMaxRetries,
             @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled,
+            @Named("elasticsearch_node_activity_logger_enabled") boolean nodeActivity,
             @Named("elasticsearch_discovery_filter") @Nullable String discoveryFilter,
             @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
@@ -70,35 +73,36 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     maxTotalConnectionsPerRoute,
                     useExpectContinue,
                     muteElasticsearchDeprecationWarnings,
-                credentialsProvider);
+                    credentialsProvider);
+
+            var sniffer = SnifferWrapper.create(
+                    client.getLowLevelClient(),
+                    TimeUnit.SECONDS.toMillis(5),
+                    discoveryFrequency,
+                    mapDefaultScheme(defaultSchemeForDiscoveredNodes)
+            );
 
             if (discoveryEnabled) {
-                final Sniffer sniffer = createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter);
-                shutdownService.register(sniffer::close);
+                sniffer.add(FilteredElasticsearchNodesSniffer.create(discoveryFilter));
             }
+            if (nodeActivity) {
+                sniffer.add(NodeListSniffer.create());
+            }
+
+            sniffer.build().ifPresent(s -> shutdownService.register(s::close));
 
             return client;
         });
     }
 
-    private Sniffer createNodeDiscoverySniffer(RestClient restClient, Duration discoveryFrequency, String defaultSchemeForDiscoveredNodes, String discoveryFilter) {
-        final NodesSniffer nodesSniffer = FilteredElasticsearchNodesSniffer.create(
-                restClient,
-                TimeUnit.SECONDS.toMillis(5),
-                mapDefaultScheme(defaultSchemeForDiscoveredNodes),
-                discoveryFilter
-        );
-        return Sniffer.builder(restClient)
-                .setSniffIntervalMillis(Math.toIntExact(discoveryFrequency.toMilliseconds()))
-                .setNodesSniffer(nodesSniffer)
-                .build();
-    }
-
     private ElasticsearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {
         switch (defaultSchemeForDiscoveredNodes.toUpperCase(Locale.ENGLISH)) {
-            case "HTTP": return ElasticsearchNodesSniffer.Scheme.HTTP;
-            case "HTTPS": return ElasticsearchNodesSniffer.Scheme.HTTPS;
-            default: throw new IllegalArgumentException("Invalid default scheme for discovered ES nodes: " + defaultSchemeForDiscoveredNodes);
+            case "HTTP":
+                return ElasticsearchNodesSniffer.Scheme.HTTP;
+            case "HTTPS":
+                return ElasticsearchNodesSniffer.Scheme.HTTPS;
+            default:
+                throw new IllegalArgumentException("Invalid default scheme for discovered ES nodes: " + defaultSchemeForDiscoveredNodes);
         }
     }
 
@@ -127,11 +131,11 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 )
                 .setHttpClientConfigCallback(httpClientConfig -> {
                     httpClientConfig
-                        .setMaxConnTotal(maxTotalConnections)
-                        .setMaxConnPerRoute(maxTotalConnectionsPerRoute)
-                        .setDefaultCredentialsProvider(credentialsProvider);
+                            .setMaxConnTotal(maxTotalConnections)
+                            .setMaxConnPerRoute(maxTotalConnectionsPerRoute)
+                            .setDefaultCredentialsProvider(credentialsProvider);
 
-                    if(muteElasticsearchDeprecationWarnings) {
+                    if (muteElasticsearchDeprecationWarnings) {
                         httpClientConfig.addInterceptorFirst(new ElasticsearchFilterDeprecationWarningsInterceptor());
                     }
 

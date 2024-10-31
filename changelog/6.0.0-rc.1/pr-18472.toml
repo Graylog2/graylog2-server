@@ -1,0 +1,4 @@
+type = "changed"
+message = "Consider `http_external_uri`when setting the cookie path."
+
+pulls = ["18472"]

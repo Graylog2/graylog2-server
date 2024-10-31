@@ -17,25 +17,19 @@
 package org.graylog.plugins.views.search.db;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Streams;
-import com.mongodb.BasicDBObject;
-import org.bson.types.ObjectId;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReplaceOptions;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchSummary;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedList;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 import org.joda.time.Instant;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -51,31 +45,26 @@ import java.util.stream.Stream;
  * </p>
  */
 public class SearchDbService {
-    protected final JacksonDBCollection<Search, ObjectId> db;
-    protected final JacksonDBCollection<SearchSummary, ObjectId> summarydb;
+    protected final MongoCollection<Search> db;
+    protected final MongoCollection<SearchSummary> summarydb;
     private final SearchRequirements.Factory searchRequirementsFactory;
     private final SearchFiltersReFetcher searchFiltersRefetcher;
+    private final MongoUtils<Search> mongoUtils;
 
     @Inject
-    protected SearchDbService(MongoConnection mongoConnection,
-                              MongoJackObjectMapperProvider mapper,
+    protected SearchDbService(MongoCollections mongoCollections,
                               SearchRequirements.Factory searchRequirementsFactory,
                               SearchFiltersReFetcher searchFiltersRefetcher) {
         this.searchRequirementsFactory = searchRequirementsFactory;
-        db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
-                Search.class,
-                ObjectId.class,
-                mapper.get());
-        db.createIndex(new BasicDBObject("created_at", 1), new BasicDBObject("unique", false));
-        summarydb = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
-                SearchSummary.class,
-                ObjectId.class,
-                mapper.get());
+        db = mongoCollections.collection("searches", Search.class);
+        db.createIndex(Indexes.ascending(Search.FIELD_CREATED_AT));
+        summarydb = mongoCollections.collection("searches", SearchSummary.class);
         this.searchFiltersRefetcher = searchFiltersRefetcher;
+        this.mongoUtils = mongoCollections.utils(db);
     }
 
     public Optional<Search> get(String id) {
-        return Optional.ofNullable(db.findOneById(new ObjectId(id)))
+        return mongoUtils.getById(id)
                 .map(this::getSearchWithRefetchedFilters)
                 .map(this::requirementsForSearch);
     }
@@ -106,58 +95,40 @@ public class SearchDbService {
     public Search save(Search search) {
         final Search searchToSave = requirementsForSearch(search);
         if (searchToSave.id() != null) {
-            db.update(
-                    DBQuery.is("_id", search.id()),
+            db.replaceOne(
+                    MongoUtils.idEq(search.id()),
                     searchToSave,
-                    true,
-                    false
+                    new ReplaceOptions().upsert(true)
             );
 
             return searchToSave;
         }
 
-        final WriteResult<Search, ObjectId> save = db.insert(searchToSave);
+        final var save = db.insertOne(searchToSave);
 
-        return save.getSavedObject();
-    }
-
-    public PaginatedList<Search> findPaginated(DBQuery.Query search, DBSort.SortBuilder sort, int page, int perPage) {
-
-        final DBCursor<Search> cursor = db.find(search)
-                .sort(sort)
-                .limit(perPage)
-                .skip(perPage * Math.max(0, page - 1));
-
-        return new PaginatedList<>(
-                Streams.stream((Iterable<Search>) cursor)
-                        .map(this::getSearchWithRefetchedFilters)
-                        .map(this::requirementsForSearch)
-                        .collect(Collectors.toList()),
-                cursor.count(),
-                page,
-                perPage
-        );
+        return get(MongoUtils.insertedIdAsString(save)).orElseThrow(() -> new IllegalStateException("Unable to retrieve saved search!"));
     }
 
     /**
      * Searches should only be deleted directly by {@link SearchesCleanUpJob} if they are no longer referenced
      * by any views. Do not directly delete searches when deleting views. The searches might still be referenced by
      * other view copies (until those copies are modified, at which time a new search would be created).
+     *
      * @param id A Search ID.
      */
     void delete(String id) {
-        db.removeById(new ObjectId(id));
+        mongoUtils.getById(id);
     }
 
     public Collection<Search> findByIds(Set<String> idSet) {
-        return Streams.stream((Iterable<Search>) db.find(DBQuery.in("_id", idSet.stream().map(ObjectId::new).collect(Collectors.toList()))))
+        return MongoUtils.stream(db.find(MongoUtils.stringIdsIn(idSet)))
                 .map(this::getSearchWithRefetchedFilters)
                 .map(this::requirementsForSearch)
                 .collect(Collectors.toList());
     }
 
     public Stream<Search> streamAll() {
-        return Streams.stream((Iterable<Search>) db.find())
+        return MongoUtils.stream(db.find())
                 .map(this::getSearchWithRefetchedFilters)
                 .map(this::requirementsForSearch);
     }
@@ -168,13 +139,13 @@ public class SearchDbService {
     }
 
     Stream<SearchSummary> findSummaries() {
-        return Streams.stream((Iterable<SearchSummary>) summarydb.find());
+        return MongoUtils.stream(summarydb.find());
     }
 
-    public Set<String> getExpiredSearches(final Set<String> neverDeleteIds, final Instant mustNotBeOlderThan) {
+    public Set<String> getExpiredSearches(final Set<String> neverDeleteIds, final Instant mustBeOlderThan) {
         return this.findSummaries()
-                .filter(search -> !neverDeleteIds.contains(search.id()) && search.createdAt().isBefore(mustNotBeOlderThan))
-                .map(search -> search.id())
+                .filter(search -> !neverDeleteIds.contains(search.id()) && search.createdAt().isBefore(mustBeOlderThan))
+                .map(SearchSummary::id)
                 .collect(Collectors.toSet());
     }
 }

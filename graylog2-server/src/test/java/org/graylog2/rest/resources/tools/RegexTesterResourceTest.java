@@ -25,7 +25,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import javax.ws.rs.BadRequestException;
+import jakarta.ws.rs.BadRequestException;
+
 import java.util.Collections;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;

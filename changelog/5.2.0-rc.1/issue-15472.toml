@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix problem with search bar submit button incorrectly indicating changes for keyword time range."
+
+issues = ["15472"]
+pulls = ["15938"]

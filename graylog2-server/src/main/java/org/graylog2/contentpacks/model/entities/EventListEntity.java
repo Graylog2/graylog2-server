@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -62,7 +63,8 @@ public abstract class EventListEntity implements SearchTypeEntity {
         return new AutoValue_EventListEntity.Builder()
                 .type(NAME)
                 .filters(Collections.emptyList())
-                .streams(Collections.emptySet());
+                .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet());
     }
 
     public abstract EventListEntity.Builder toBuilder();
@@ -78,7 +80,8 @@ public abstract class EventListEntity implements SearchTypeEntity {
         public static Builder createDefault() {
             return builder()
                     .filters(Collections.emptyList())
-                    .streams(Collections.emptySet());
+                    .streams(Collections.emptySet())
+                    .streamCategories(Collections.emptySet());
         }
 
         @JsonProperty
@@ -107,6 +110,10 @@ public abstract class EventListEntity implements SearchTypeEntity {
         public abstract Builder streams(Set<String> streams);
 
         @Override
+        @JsonProperty
+        public abstract Builder streamCategories(Set<String> streamCategories);
+
+        @Override
         public abstract EventListEntity build();
     }
 
@@ -115,12 +122,21 @@ public abstract class EventListEntity implements SearchTypeEntity {
         return EventList.builder()
                 .type(type())
                 .streams(mappedStreams(nativeEntities))
+                .streamCategories(streamCategories())
                 .id(id())
                 .filter(filter())
-                .filters(filters())
+                .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .query(query().orElse(null))
                 .timerange(timerange().orElse(null))
                 .name(name().orElse(null))
                 .build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        filters().forEach(filter -> filter.resolveForInstallation(entity, parameters, entities, graph));
     }
 }

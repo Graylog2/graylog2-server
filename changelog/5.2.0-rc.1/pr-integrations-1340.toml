@@ -1,0 +1,11 @@
+type = "d"
+message = "GreyNoise Data Adapter functionality has been limited to only use with non-community GreyNoise subscriptions."
+
+issues = ["Graylog2/graylog-plugin-enterprise#5157"]
+pulls = ["Graylog2/graylog-plugin-integrations#1340", "Graylog2/graylog-plugin-enterprise-integrations#1059", "Graylog2/graylog2-server#15592"]
+details.user = """
+- GreyNoise Community IP Lookup Data Adapters have been marked as deprecated. Existing Data Adapters can no longer be
+  started or lookups performed.
+- GreyNoise Full IP Lookup [Enterprise] Data Adapter can no longer be used with a free GreyNoise Community API tokens.
+- GreyNoise Quick IP Lookup Data Adapter can no longer be used with a free GreyNoise Community API tokens.
+"""

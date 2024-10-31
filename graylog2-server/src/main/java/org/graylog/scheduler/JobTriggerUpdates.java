@@ -19,7 +19,8 @@ package org.graylog.scheduler;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.concurrent.TimeUnit;
 
 /**

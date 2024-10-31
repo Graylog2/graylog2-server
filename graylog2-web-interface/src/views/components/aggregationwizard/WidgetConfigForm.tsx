@@ -20,7 +20,7 @@ import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
 import styled from 'styled-components';
 
-import type { ConfigurationField } from 'views/types';
+import type { ConfigurationField, FieldUnitsFormValues } from 'views/types';
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import PropagateDisableSubmissionState from 'views/components/aggregationwizard/PropagateDisableSubmissionState';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
@@ -41,6 +41,7 @@ export type MetricFormValues = {
   field: string | undefined,
   name?: string | undefined,
   percentile?: number | undefined,
+  strategy?: string,
 };
 
 export type GroupingDirection = 'row' | 'column';
@@ -59,6 +60,7 @@ export type DateGrouping = Required<BaseGrouping, 'id'> & {
 export type ValuesGrouping = Required<BaseGrouping, 'id'> & {
   type: typeof ValuesType,
   limit: number,
+  skipEmptyValues?: boolean,
 };
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
@@ -98,13 +100,14 @@ export interface WidgetConfigFormValues {
   sort?: Array<SortFormValues>,
   rowLimit?: string,
   columnLimit?: string,
+  units?: FieldUnitsFormValues,
 }
-
+export type GroupingValidationErrors = {
+  groupings?: Array<{ [key: string]: string }>,
+}
 export interface WidgetConfigValidationErrors {
   metrics?: Array<{ [key: string]: string }>,
-  groupBy?: {
-    groupings?: Array<{ [key: string]: string }>,
-  },
+  groupBy?: GroupingValidationErrors | string,
   visualization?: { [key: string]: string | any },
   sort?: Array<{ [key: string]: string }>,
 }

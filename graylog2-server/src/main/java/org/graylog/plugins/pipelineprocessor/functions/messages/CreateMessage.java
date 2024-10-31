@@ -16,12 +16,15 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
@@ -41,8 +44,11 @@ public class CreateMessage extends AbstractFunction<Message> {
     private final ParameterDescriptor<String, String> messageParam;
     private final ParameterDescriptor<String, String> sourceParam;
     private final ParameterDescriptor<DateTime, DateTime> timestampParam;
+    private final MessageFactory messageFactory;
 
-    public CreateMessage() {
+    @Inject
+    public CreateMessage(MessageFactory messageFactory) {
+        this.messageFactory = messageFactory;
         messageParam = string(MESSAGE_ARG).optional().description("The 'message' field of the new message, defaults to '$message.message'").build();
         sourceParam = string(SOURCE_ARG).optional().description("The 'source' field of the new message, defaults to '$message.source'").build();
         timestampParam = type(TIMESTAMP_ARG, DateTime.class).optional().description("The 'timestamp' field of the message, defaults to 'now'").build();
@@ -59,7 +65,7 @@ public class CreateMessage extends AbstractFunction<Message> {
         final Optional<DateTime> optTimestamp = timestampParam.optional(args, context);
         final DateTime timestamp = optTimestamp.isPresent() ? optTimestamp.get() : Tools.nowUTC();
 
-        final Message newMessage = new Message(message, source, timestamp);
+        final Message newMessage = messageFactory.createMessage(message, source, timestamp);
 
         // register in context so the processor can inject it later on
         context.addCreatedMessage(newMessage);
@@ -76,7 +82,11 @@ public class CreateMessage extends AbstractFunction<Message> {
                         sourceParam,
                         timestampParam
                 ))
-                .description("Creates a new message")
+                .description("Creates a new message which will be evaluated by the entire processing pipeline. Any omitted parameters (message, source, timestamp) will inherit their values from the currently processed message. The timestamp will inherit the current timestamp.")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Create message")
+                .ruleBuilderTitle("Create a new message")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

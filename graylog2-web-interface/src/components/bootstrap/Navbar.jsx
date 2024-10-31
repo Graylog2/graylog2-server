@@ -139,7 +139,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       border-color 150ms ease-in-out;
     position: relative;
 
-    :not(.collapsed) {
+    &:not(.collapsed) {
       .icon-bar:nth-last-child(1),
       .icon-bar:nth-last-child(3) {
         transition: transform 150ms ease-in 150ms,
@@ -161,7 +161,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
     }
 
     .icon-bar {
-      background-color: ${theme.colors.variant.default};
+      background-color: ${theme.colors.global.textDefault};
       transition: background-color 150ms ease-in-out,
         transform 150ms ease-in 0s,
         opacity 300ms ease-in 0s;
@@ -172,12 +172,12 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
     &:hover,
     &:focus,
-    :not(.collapsed) {
+    &:not(.collapsed) {
       background-color: ${theme.colors.variant.lighter.default};
       border-color: ${theme.colors.variant.default};
       
       .icon-bar {
-        background-color: ${theme.colors.variant.dark.default};
+        background-color: ${theme.colors.global.textDefault};
       }
     }
   }

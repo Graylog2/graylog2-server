@@ -40,14 +40,14 @@ type Props = {
 const _iconName = (type) => {
   switch (type) {
     case 'global':
-      return 'building';
+      return 'apartment';
     case 'team':
-      return 'users';
+      return 'group';
     case 'error':
-      return 'exclamation';
+      return 'error';
     case 'user':
     default:
-      return 'user';
+      return 'person';
   }
 };
 

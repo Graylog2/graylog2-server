@@ -32,28 +32,28 @@ const Container = styled(ButtonToolbar)`
 const StyledButton = styled(Button)(({ theme }) => css`
   font-family: ${theme.fonts.family.navigation};
   font-size: ${theme.fonts.size.navigation};
-
-  &&&& {
-    color: ${theme.colors.variant.darker.default};
-    
-    :hover,
-    :focus {
-      text-decoration: none;
-    }
-
-    :hover {
-      ${hoverIndicatorStyles(theme)}
-    }
-
-    &.active {
-      color: ${theme.colors.global.textDefault};
-
-      ${activeIndicatorStyles(theme)}
-      :hover, :focus {
-        ${activeIndicatorStyles(theme)}
-      }
-    }
+  color: ${theme.colors.variant.darker.default};
+  
+  &:hover,
+  &:focus {
+    background: inherit;
+    text-decoration: none;
   }
+
+  &:hover {
+    color: inherit;
+    ${hoverIndicatorStyles(theme)}
+  }
+
+  &.active {
+    color: ${theme.colors.global.textDefault};
+
+    ${activeIndicatorStyles(theme)}
+
+    &:hover,
+    &:focus {
+      ${activeIndicatorStyles(theme)}
+    }
 `);
 
 StyledButton.displayName = 'Button';
@@ -85,7 +85,7 @@ const PageNavigation = ({ items }: Props) => (
       return (
         <IfPermitted permissions={permissions ?? []} key={path}>
           <LinkContainer to={path} relativeActive={!exactPathMatch}>
-            <StyledButton bsStyle="link">
+            <StyledButton bsStyle="transparent">
               <NavItemStateIndicator>
                 {title}
               </NavItemStateIndicator>

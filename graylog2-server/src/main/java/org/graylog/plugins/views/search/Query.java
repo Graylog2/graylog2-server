@@ -26,12 +26,16 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.filter.AndFilter;
+import org.graylog.plugins.views.search.filter.OrFilter;
+import org.graylog.plugins.views.search.filter.StreamCategoryFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
@@ -40,26 +44,33 @@ import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSortedSet.of;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.getStreamEntityIdOrThrow;
 
 @AutoValue
 @JsonAutoDetect
@@ -125,15 +136,23 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
             return this;
         }
 
-        if (state.timerange().isPresent() || state.query().isPresent() || !state.searchTypes().isEmpty() || !state.keepSearchTypes().isEmpty() || !state.keepQueries().isEmpty()) {
+        if (state.timerange().isPresent()
+                || state.query().isPresent()
+                || !state.searchTypes().isEmpty()
+                || !state.keepSearchTypes().isEmpty()
+                || !state.keepQueries().isEmpty()
+                || state.now().isPresent()) {
             final Builder builder = toBuilder();
 
             if (state.timerange().isPresent() || state.query().isPresent()) {
                 final GlobalOverride.Builder globalOverrideBuilder = globalOverride().map(GlobalOverride::toBuilder)
                         .orElseGet(GlobalOverride::builder);
                 state.timerange().ifPresent(timeRange -> {
-                    globalOverrideBuilder.timerange(timeRange);
-                    builder.timerange(timeRange);
+                    final var timerangeWithNow = state.now()
+                            .map(timeRange::withReferenceDate)
+                            .orElse(timeRange);
+                    globalOverrideBuilder.timerange(timerangeWithNow);
+                    builder.timerange(timerangeWithNow);
                 });
 
                 state.query().ifPresent(query -> {
@@ -153,6 +172,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
 
                 builder.searchTypes(ImmutableSet.copyOf(searchTypesWithOverrides));
             }
+
             return builder.build();
         }
         return this;
@@ -198,6 +218,20 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                 .orElse(Collections.emptySet());
     }
 
+    @SuppressWarnings("UnstableApiUsage")
+    public Set<String> usedStreamCategories() {
+        return Optional.ofNullable(filter())
+                .map(optFilter -> {
+                    final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
+                    return StreamSupport.stream(filterTraverser.breadthFirst(optFilter).spliterator(), false)
+                            .filter(filter -> filter instanceof StreamCategoryFilter)
+                            .map(streamFilter -> ((StreamCategoryFilter) streamFilter).category())
+                            .filter(Objects::nonNull)
+                            .collect(toSet());
+                })
+                .orElse(Collections.emptySet());
+    }
+
     public Set<String> streamIdsForPermissionsCheck() {
         final Set<String> searchTypeStreamIds = searchTypes().stream()
                 .map(SearchType::streams)
@@ -207,7 +241,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
     }
 
     public boolean hasStreams() {
-        return !usedStreamIds().isEmpty();
+        return !(usedStreamIds().isEmpty() && usedStreamCategories().isEmpty());
     }
 
     public boolean hasReferencedStreamFilters() {
@@ -217,6 +251,55 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
     public Query addStreamsToFilter(Set<String> streamIds) {
         final Filter newFilter = addStreamsTo(filter(), streamIds);
         return toBuilder().filter(newFilter).build();
+    }
+
+    // This is a very specific call to set a flat OrFilter of a set of streamIds and categories when replaying a search.
+    // It is unlikely that it would need to be called outside the context of recreating a top-level search.
+    public Query orStreamAndStreamCategoryFilters(Set<String> streamIds, Set<String> categories) {
+        List<Filter> combinedFilters = new ArrayList<>();
+        if (streamIds != null && !streamIds.isEmpty()) {
+            combinedFilters.add(StreamFilter.anyIdOf(streamIds.toArray(new String[]{})));
+        }
+
+        if (categories != null && !categories.isEmpty()) {
+            categories.forEach(category -> {
+                combinedFilters.add(StreamCategoryFilter.ofCategory(category));
+            });
+        }
+        return toBuilder().filter(OrFilter.or(combinedFilters.toArray(new Filter[]{}))).build();
+    }
+
+    public Query replaceStreamCategoryFilters(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                              StreamPermissions streamPermissions) {
+        if (filter() == null) {
+            return this;
+        }
+        return toBuilder()
+                .filter(streamCategoryToStreamFiltersRecursively(filter(), categoryMappingFunction, streamPermissions))
+                .build();
+    }
+
+    private Filter streamCategoryToStreamFiltersRecursively(Filter filter,
+                                                            Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                                            StreamPermissions streamPermissions) {
+        if (filter.filters() == null || filter.filters().isEmpty()) {
+            return filter;
+        }
+        Set<Filter> mappedFilters = new HashSet<>();
+        for (Filter f : filter.filters()) {
+            Filter mappedFilter = f;
+            if (f instanceof StreamCategoryFilter scf) {
+                mappedFilter = scf.toStreamFilter(categoryMappingFunction, streamPermissions);
+            }
+            if (mappedFilter != null) {
+                mappedFilter = streamCategoryToStreamFiltersRecursively(mappedFilter, categoryMappingFunction, streamPermissions);
+                mappedFilters.add(mappedFilter);
+            }
+        }
+        if (mappedFilters.isEmpty()) {
+            return null;
+        }
+        return filter.toGenericBuilder().filters(mappedFilters.stream().filter(Objects::nonNull).collect(toSet())).build();
     }
 
     private Filter addStreamsTo(Filter filter, Set<String> streamIds) {
@@ -231,6 +314,15 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
         return searchTypes().stream()
                 .map(SearchType::id)
                 .anyMatch(id -> id.equals(searchTypeId));
+    }
+
+    public Query withReferenceDate(DateTime now) {
+        return toBuilder()
+                .timerange(timerange().withReferenceDate(now))
+                .searchTypes(searchTypes().stream()
+                        .map(s -> s.withReferenceDate(now))
+                        .collect(toSet()))
+                .build();
     }
 
     @AutoValue.Builder
@@ -290,9 +382,11 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                             .map(filter -> {
                                 if (filter.type().equals(StreamFilter.NAME)) {
                                     final StreamFilter streamFilter = (StreamFilter) filter;
-                                    final String streamId = entityDescriptorIds.
-                                            getOrThrow(streamFilter.streamId(), ModelTypes.STREAM_V1);
+                                    final String streamId = getStreamEntityIdOrThrow(streamFilter.streamId(), entityDescriptorIds);
                                     return streamFilter.toBuilder().streamId(streamId).build();
+                                } else if (filter.type().equals(StreamCategoryFilter.NAME)) {
+                                    final StreamCategoryFilter streamFilter = (StreamCategoryFilter) filter;
+                                    return streamFilter.toBuilder().category(streamFilter.category()).build();
                                 }
                                 return filter;
                             }).collect(toSet());
@@ -307,11 +401,16 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                 .searchTypes(searchTypes().stream().map(s -> s.toContentPackEntity(entityDescriptorIds))
                         .collect(Collectors.toSet()))
                 .filter(shallowMappedFilter(entityDescriptorIds))
-                .filters(filters())
+                .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .query(query())
                 .id(id())
                 .globalOverride(globalOverride().orElse(null))
                 .timerange(timerange())
                 .build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

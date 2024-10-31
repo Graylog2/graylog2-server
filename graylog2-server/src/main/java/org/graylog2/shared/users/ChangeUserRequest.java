@@ -25,9 +25,11 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.rest.models.users.requests.Startpage;
 
 import javax.annotation.Nullable;
-import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+
 import java.util.List;
 
 @JsonAutoDetect

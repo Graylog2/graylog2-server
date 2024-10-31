@@ -76,7 +76,7 @@ describe('FieldValueCompletion', () => {
   describe('getCompletions', () => {
     const requestDefaults = {
       currentToken: null,
-      lastToken: null,
+      prevToken: null,
       prefix: '',
       tokens: [],
       currentTokenIdx: -1,
@@ -111,7 +111,7 @@ describe('FieldValueCompletion', () => {
 
     it('returns suggestions, when current token is a term and last token is a keyword', async () => {
       const currentToken = createCurrentToken('term', 'P', 1, 12);
-      const lastToken = {
+      const prevToken = {
         type: 'keyword',
         value: 'http_method:',
       };
@@ -120,10 +120,45 @@ describe('FieldValueCompletion', () => {
       const suggestions = await completer.getCompletions({
         ...requestDefaults,
         currentToken,
-        lastToken,
+        prevToken,
         prefix: 'P',
-        tokens: [lastToken, currentToken],
+        tokens: [prevToken, currentToken],
         currentTokenIdx: 1,
+      });
+
+      expect(suggestions).toEqual(expectedSuggestions);
+    });
+
+    it('returns suggestions for field name which is in the middle of the query', async () => {
+      const currentToken = createCurrentToken('keyword', 'http_method:', 2, 8);
+      const prevToken = {
+        type: 'text',
+        value: ' ',
+      };
+
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions({
+        ...requestDefaults,
+        currentToken,
+        prevToken,
+        tokens: [
+          {
+            type: 'term',
+            value: 'example',
+          },
+          prevToken,
+          currentToken,
+          {
+            type: 'text',
+            value: ' ',
+          },
+          {
+            type: 'term',
+            value: 'query',
+          },
+        ],
+        currentTokenIdx: 2,
       });
 
       expect(suggestions).toEqual(expectedSuggestions);
@@ -131,7 +166,7 @@ describe('FieldValueCompletion', () => {
 
     it('returns suggestions, field value is a quoted string', async () => {
       const currentToken = createCurrentToken('string', '"P"', 1, 12);
-      const lastToken = {
+      const prevToken = {
         type: 'keyword',
         value: 'http_method:',
       };
@@ -140,9 +175,9 @@ describe('FieldValueCompletion', () => {
       const suggestions = await completer.getCompletions({
         ...requestDefaults,
         currentToken,
-        lastToken,
+        prevToken,
         prefix: 'P',
-        tokens: [lastToken, currentToken],
+        tokens: [prevToken, currentToken],
         currentTokenIdx: 1,
       });
 
@@ -151,7 +186,7 @@ describe('FieldValueCompletion', () => {
 
     it('returns suggestions, field value is an empty quoted string', async () => {
       const currentToken = createCurrentToken('string', '""', 1, 12);
-      const lastToken = {
+      const prevToken = {
         type: 'keyword',
         value: 'http_method:',
       };
@@ -160,9 +195,9 @@ describe('FieldValueCompletion', () => {
       const suggestions = await completer.getCompletions({
         ...requestDefaults,
         currentToken,
-        lastToken,
+        prevToken,
         prefix: '',
-        tokens: [lastToken, currentToken],
+        tokens: [prevToken, currentToken],
         currentTokenIdx: 1,
       });
 
@@ -244,7 +279,7 @@ describe('FieldValueCompletion', () => {
         error: undefined,
       };
       const currentToken = createCurrentToken('term', 'PSOT', 1, 12);
-      const lastToken = {
+      const prevToken = {
         type: 'keyword',
         value: 'http_method:',
       };
@@ -255,9 +290,9 @@ describe('FieldValueCompletion', () => {
       const suggestions = await completer.getCompletions({
         ...requestDefaults,
         currentToken,
-        lastToken,
+        prevToken,
         prefix: 'PSOT',
-        tokens: [lastToken, currentToken],
+        tokens: [prevToken, currentToken],
         currentTokenIdx: 1,
       });
 
@@ -279,7 +314,7 @@ describe('FieldValueCompletion', () => {
         error: undefined,
       };
       const currentToken = createCurrentToken('term', '', 1, 12);
-      const lastToken = {
+      const prevToken = {
         type: 'keyword',
         value: 'process:',
       };
@@ -290,8 +325,8 @@ describe('FieldValueCompletion', () => {
       const suggestions = await completer.getCompletions({
         ...requestDefaults,
         currentToken,
-        lastToken,
-        tokens: [lastToken, currentToken],
+        prevToken,
+        tokens: [prevToken, currentToken],
         currentTokenIdx: 1,
       });
 
@@ -308,7 +343,7 @@ describe('FieldValueCompletion', () => {
 
     describe('refetching suggestions', () => {
       const currentToken = createCurrentToken('term', 'a', 1, 8);
-      const lastToken = {
+      const prevToken = {
         type: 'keyword',
         value: 'action:',
       };
@@ -337,9 +372,9 @@ describe('FieldValueCompletion', () => {
         const firstSuggestions = await completer.getCompletions({
           ...requestDefaults,
           currentToken,
-          lastToken,
+          prevToken,
           prefix: 'a',
-          tokens: [lastToken, currentToken],
+          tokens: [prevToken, currentToken],
           currentTokenIdx: 1,
         });
 
@@ -360,9 +395,9 @@ describe('FieldValueCompletion', () => {
         const secondSuggestions = await completer.getCompletions({
           ...requestDefaults,
           currentToken,
-          lastToken,
+          prevToken,
           prefix: 'ac',
-          tokens: [lastToken, currentToken],
+          tokens: [prevToken, currentToken],
           currentTokenIdx: 1,
         });
 
@@ -380,9 +415,9 @@ describe('FieldValueCompletion', () => {
         const firstSuggestions = await completer.getCompletions({
           ...requestDefaults,
           currentToken,
-          lastToken,
+          prevToken,
           prefix: 'a',
-          tokens: [lastToken, currentToken],
+          tokens: [prevToken, currentToken],
           currentTokenIdx: 1,
         });
 
@@ -391,80 +426,14 @@ describe('FieldValueCompletion', () => {
         const secondSuggestions = await completer.getCompletions({
           ...requestDefaults,
           currentToken,
-          lastToken,
+          prevToken,
           prefix: 'ac',
-          tokens: [lastToken, currentToken],
+          tokens: [prevToken, currentToken],
           currentTokenIdx: 1,
         });
 
         expect(secondSuggestions).toEqual(expectedFirstSuggestions);
       });
     });
-  });
-
-  describe('shouldShowCompletions', () => {
-    it('returns false by default', async () => {
-      const completer = new FieldValueCompletion();
-      const result = completer.shouldShowCompletions(1, [[], null]);
-
-      expect(result).toEqual(false);
-    });
-
-    it('returns false if current token is a keyword which does not end with :', async () => {
-      const completer = new FieldValueCompletion();
-      const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method', index: 0, start: 0 }, null]]);
-
-      expect(result).toEqual(false);
-    });
-
-    it('returns true if current token is a keyword and ends with ":"', async () => {
-      const completer = new FieldValueCompletion();
-      const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:', index: 0, start: 0 }, null]]);
-
-      expect(result).toEqual(true);
-    });
-
-    it('returns true if current token is a string and consists only of ""', async () => {
-      const completer = new FieldValueCompletion();
-      const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:' }, { type: 'string', value: '""', index: 1, start: 12 }, null]]);
-
-      expect(result).toEqual(true);
-    });
-
-    it('returns false if current token is a keyword that ends with ":" which is already followed by a term', async () => {
-      const completer = new FieldValueCompletion();
-      const result = completer.shouldShowCompletions(1, [[
-        { type: 'keyword', value: 'http_method:', index: 0, start: 0 },
-        { type: 'term', value: 'POST' }, null]]);
-
-      expect(result).toEqual(false);
-    });
-
-    it('returns true if current token is a keyword in a complex query and ends with :', async () => {
-      const completer = new FieldValueCompletion();
-      const result = completer.shouldShowCompletions(
-        1,
-        [
-          [
-            { type: 'keyword', value: 'source:' },
-            { type: 'term', value: 'example' },
-            { type: 'text', value: '.' },
-            { type: 'term', value: 'org' },
-            { type: 'text', value: ' ' },
-            { type: 'term', value: 'and' },
-            { type: 'text', value: ' ' },
-            {
-              type: 'keyword',
-              value: 'http_method:',
-              index: 7,
-              start: 23,
-            },
-          ],
-          null,
-        ],
-      );
-
-      expect(result).toEqual(true);
-    });
-  });
+  });/**/
 });

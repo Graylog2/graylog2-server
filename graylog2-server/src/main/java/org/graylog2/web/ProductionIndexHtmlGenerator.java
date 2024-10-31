@@ -22,8 +22,10 @@ import com.google.common.io.Resources;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.core.MultivaluedMap;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;

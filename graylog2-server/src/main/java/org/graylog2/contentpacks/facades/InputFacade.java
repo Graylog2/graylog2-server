@@ -74,7 +74,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -545,7 +546,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     public Graph<Entity> resolveForInstallation(Entity entity,
                                                 Map<String, ValueReference> parameters,
                                                 Map<EntityDescriptor, Entity> entities) {
-        if(entity instanceof EntityV1) {
+        if (entity instanceof EntityV1) {
             return resolveForInstallationV1((EntityV1) entity, parameters, entities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
@@ -567,10 +568,10 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     private void resolveForInstallationV1GrokPattern(EntityV1 entity,
-                                                InputEntity input,
-                                                Map<String, ValueReference> parameters,
-                                                Map<EntityDescriptor, Entity> entities,
-                                                MutableGraph<Entity> graph) {
+                                                     InputEntity input,
+                                                     Map<String, ValueReference> parameters,
+                                                     Map<EntityDescriptor, Entity> entities,
+                                                     MutableGraph<Entity> graph) {
         input.extractors().stream()
                 .filter(e -> e.type().asString(parameters).equals(Extractor.Type.GROK.toString()))
                 .map(ExtractorEntity::configuration)

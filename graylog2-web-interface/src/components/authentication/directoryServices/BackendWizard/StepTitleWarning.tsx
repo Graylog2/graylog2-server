@@ -26,7 +26,7 @@ type Props = {
 
 const StepTitleWarning = ({ invalidStepKeys = [], stepKey }: Props) => {
   if (invalidStepKeys.includes(stepKey)) {
-    return <><Icon name="exclamation-triangle" />{' '}</>;
+    return <><Icon name="warning" />{' '}</>;
   }
 
   return null;

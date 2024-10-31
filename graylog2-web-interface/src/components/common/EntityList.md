@@ -37,7 +37,7 @@ const items = entities.map(entity => {
                     actions={[
                       <Button key={1} bsStyle="info">Edit</Button>,
                       <DropdownButton key={2} id="more-dropdown" title="More" pullRight>
-                        <MenuItem>Delete</MenuItem>
+                        <MenuItem variant="danger">Delete</MenuItem>
                       </DropdownButton>,
                     ]}
                     contentRow={

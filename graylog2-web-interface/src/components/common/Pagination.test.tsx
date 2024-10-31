@@ -39,10 +39,11 @@ describe('<Pagination />', () => {
   it('should not render Pagination if only 1 page', () => {
     const currentPage = 1;
     const totalPages = 1;
-    const { container } = render(<Pagination currentPage={currentPage}
-                                             totalPages={totalPages} />);
 
-    expect(container.firstChild).toBeNull();
+    render(<Pagination currentPage={currentPage}
+                       totalPages={totalPages} />);
+
+    expect(screen.queryByTitle('Active page')).not.toBeInTheDocument();
   });
 
   it('should return proper page to `onChange`', () => {

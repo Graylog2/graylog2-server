@@ -40,7 +40,8 @@ import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;

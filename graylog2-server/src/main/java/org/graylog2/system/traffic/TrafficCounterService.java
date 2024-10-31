@@ -20,56 +20,50 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
-import com.mongodb.BasicDBObject;
-import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
+import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.DBUpdate;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
-import org.mongojack.internal.update.SingleUpdateOperationValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
-public class TrafficCounterService {
+public class TrafficCounterService implements TrafficUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(TrafficCounterService.class);
     private static final String BUCKET = "bucket";
+    private static final String FIELD_DECODED = "decoded";
+    private static final String FIELD_OUTPUT = "output";
+    private static final String FIELD_INPUT = "input";
 
-    private final JacksonDBCollection<TrafficDto, ObjectId> db;
+    private final MongoCollection<TrafficDto> collection;
 
     @Inject
-    public TrafficCounterService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper) {
-        db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("traffic"),
-                TrafficDto.class,
-                ObjectId.class,
-                mapper.get());
-        db.createIndex(new BasicDBObject(BUCKET, 1), new BasicDBObject("unique", true));
+    public TrafficCounterService(final MongoCollections mongoCollections) {
+        collection = mongoCollections.collection("traffic", TrafficDto.class);
+        collection.createIndex(Indexes.ascending(BUCKET), new IndexOptions().unique(true));
     }
 
-    private static DateTime getDayBucketStart(DateTime observationTime) {
-        return observationTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-    }
-
-    private static DateTime getHourBucketStart(DateTime observationTime) {
-        return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-    }
-
-    public void updateTraffic(DateTime observationTime, NodeId nodeId, long inLastMinute, long outLastMinute, long decodedLastMinute) {
+    @Override
+    public void updateTraffic(DateTime observationTime,
+                              NodeId nodeId,
+                              long inLastMinute,
+                              long outLastMinute,
+                              long decodedLastMinute) {
         // we bucket traffic data by the hour and aggregate it to a day bucket for reporting
-        final DateTime dayBucket = getHourBucketStart(observationTime);
+        final DateTime dayBucket = TrafficUpdater.getHourBucketStart(observationTime);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Updating traffic for node {} at {}:  in/decoded/out {}/{}/{} bytes",
@@ -77,19 +71,19 @@ public class TrafficCounterService {
         }
 
         final String escapedNodeId = nodeId.toEscapedString();
-        final WriteResult<TrafficDto, ObjectId> update = db.update(DBQuery.is(BUCKET, dayBucket),
-                // sigh DBUpdate.inc only takes integers, but we have a long.
-                new DBUpdate.Builder()
-                        .addOperation("$inc", "input." + escapedNodeId,
-                                new SingleUpdateOperationValue(false, false, inLastMinute))
-                        .addOperation("$inc", "output." + escapedNodeId,
-                                new SingleUpdateOperationValue(false, false, outLastMinute))
-                        .addOperation("$inc", "decoded." + escapedNodeId,
-                                new SingleUpdateOperationValue(false, false, decodedLastMinute)),
-                true, false);
-        if (update.getN() == 0) {
-            LOG.warn("Unable to update traffic of node {}: {}", nodeId, update);
+        UpdateResult update = collection.updateOne(Filters.eq(BUCKET, dayBucket), Updates.combine(
+                incUpdate(FIELD_INPUT, escapedNodeId, inLastMinute),
+                incUpdate(FIELD_OUTPUT, escapedNodeId, outLastMinute),
+                incUpdate(FIELD_DECODED, escapedNodeId, decodedLastMinute)
+        ), new UpdateOptions().upsert(true));
+
+        if (!update.wasAcknowledged()) {
+            LOG.warn("Unable to update traffic of node {} with bucket {}", nodeId, dayBucket);
         }
+    }
+
+    public static Bson incUpdate(String fieldInput, String escapedNodeId, long inLastMinute) {
+        return Updates.inc("%s.%s".formatted(fieldInput, escapedNodeId), inLastMinute);
     }
 
     /**
@@ -111,56 +105,87 @@ public class TrafficCounterService {
      * end of the previous day will be used.
      */
     public TrafficHistogram clusterTrafficOfLastDays(Duration daysToIncludeDuration, Interval interval, boolean includeToday) {
-        final ImmutableMap.Builder<DateTime, Long> inputBuilder = ImmutableMap.builder();
-        final ImmutableMap.Builder<DateTime, Long> outputBuilder = ImmutableMap.builder();
-        final ImmutableMap.Builder<DateTime, Long> decodedBuilder = ImmutableMap.builder();
+        TrafficCounterService.TrafficHistograms trafficHistograms = createTrafficHistograms(daysToIncludeDuration, includeToday);
 
-        final DateTime now = Tools.nowUTC();
+        collection.find(createQuery(trafficHistograms.getTo(), trafficHistograms.getFrom())).forEach(trafficDto -> {
+            trafficHistograms.add(FIELD_INPUT, trafficDto.bucket(), sumTraffic(trafficDto.input()));
+            trafficHistograms.add(FIELD_OUTPUT, trafficDto.bucket(), sumTraffic(trafficDto.output()));
+            trafficHistograms.add(FIELD_DECODED, trafficDto.bucket(), sumTraffic(trafficDto.decoded()));
+        });
 
-        // Include traffic up until the current timestamp if includeToday is true.
-        // Otherwise, default to the end of the previous day.
-        final DateTime to = includeToday ? now : getDayBucketStart(now).minusMillis(1);
-        // Make sure to include the full first day
-        final DateTime from = getDayBucketStart(now).minus(daysToIncludeDuration);
+        if (interval == TrafficCounterService.Interval.DAILY) {
+            trafficHistograms.aggregateToDaily();
+        }
 
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.lessThanEquals(BUCKET, to),
-                DBQuery.greaterThanEquals(BUCKET, from)
+        return TrafficHistogram.create(
+                trafficHistograms.getFrom(),
+                trafficHistograms.getTo(),
+                trafficHistograms.getHistogramOrEmpty(FIELD_INPUT),
+                trafficHistograms.getHistogramOrEmpty(FIELD_OUTPUT),
+                trafficHistograms.getHistogramOrEmpty(FIELD_DECODED)
         );
 
-        try (DBCursor<TrafficDto> cursor = db.find(query)) {
-            cursor.forEach(trafficDto -> {
-                inputBuilder.put(trafficDto.bucket(), trafficDto.input().values().stream().mapToLong(Long::valueOf).sum());
-                outputBuilder.put(trafficDto.bucket(), trafficDto.output().values().stream().mapToLong(Long::valueOf).sum());
-                decodedBuilder.put(trafficDto.bucket(), trafficDto.decoded().values().stream().mapToLong(Long::valueOf).sum());
-            });
-            Map<DateTime, Long> inputHistogram = inputBuilder.build();
-            Map<DateTime, Long> outputHistogram = outputBuilder.build();
-            Map<DateTime, Long> decodedHistogram = decodedBuilder.build();
-
-            // we might need to aggregate the hourly database values to their UTC daily buckets
-            if (interval == Interval.DAILY) {
-                inputHistogram = aggregateToDaily(inputHistogram);
-                outputHistogram = aggregateToDaily(outputHistogram);
-                decodedHistogram = aggregateToDaily(decodedHistogram);
-            }
-            return TrafficHistogram.create(from, to, inputHistogram, outputHistogram, decodedHistogram);
-        } catch (Exception e) {
-            // TODO: remove this diagnostic logging after fixing https://github.com/Graylog2/graylog2-server/issues/9559
-            LOG.error("Unable to load traffic data range {} to {}", from, to);
-            throw e;
-        }
     }
 
-    private TreeMap<DateTime, Long> aggregateToDaily(Map<DateTime, Long> histogram) {
-        return histogram.entrySet().stream()
-                .collect(Collectors.groupingBy(entry -> entry.getKey().withTimeAtStartOfDay(),
-                        TreeMap::new,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.summingLong(Long::valueOf))));
+    public static TrafficHistograms createTrafficHistograms(Duration daysToIncludeDuration, boolean includeToday) {
+        final DateTime now = Tools.nowUTC();
+        final DateTime to = includeToday ? now : TrafficUpdater.getDayBucketStart(now).minusMillis(1);
+        // Make sure to include the full first day
+        final DateTime from = TrafficUpdater.getDayBucketStart(now).minus(daysToIncludeDuration);
+        return new TrafficHistograms(from, to);
+    }
+
+    public static Bson createQuery(DateTime to, DateTime from) {
+        return Filters.and(
+                Filters.lte(BUCKET, to),
+                Filters.gte(BUCKET, from)
+        );
+    }
+
+    public static long sumTraffic(Map<String, Long> sumTraffic) {
+        return sumTraffic.values().stream().mapToLong(Long::valueOf).sum();
     }
 
     public enum Interval {
         HOURLY, DAILY
+    }
+
+    public static class TrafficHistograms {
+        private final Map<String, Map<DateTime, Long>> histograms = new HashMap<>();
+
+        private final DateTime from;
+        private final DateTime to;
+
+        public TrafficHistograms(DateTime from, DateTime to) {
+            this.from = from;
+            this.to = to;
+        }
+
+        public void add(String name, DateTime bucket, long value) {
+            histograms.computeIfAbsent(name, k -> new HashMap<>()).put(bucket, value);
+        }
+
+        public Map<DateTime, Long> getHistogramOrEmpty(String name) {
+            return histograms.computeIfAbsent(name, k -> new HashMap<>());
+        }
+
+        public long sumTraffic(String name) {
+            return Optional.ofNullable(histograms.get(name))
+                    .map(traffic -> traffic.values().stream().mapToLong(Long::longValue).sum())
+                    .orElse(0L);
+        }
+
+        public void aggregateToDaily() {
+            histograms.forEach((key, value) -> histograms.put(key, TrafficUpdater.aggregateToDaily(value)));
+        }
+
+        public DateTime getFrom() {
+            return from;
+        }
+
+        public DateTime getTo() {
+            return to;
+        }
     }
 
     @AutoValue
@@ -169,9 +194,9 @@ public class TrafficCounterService {
         @JsonCreator
         public static TrafficHistogram create(@JsonProperty("from") DateTime from,
                                               @JsonProperty("to") DateTime to,
-                                              @JsonProperty("input") Map<DateTime, Long> input,
-                                              @JsonProperty("output") Map<DateTime, Long> output,
-                                              @JsonProperty("decoded") Map<DateTime, Long> decoded) {
+                                              @JsonProperty(FIELD_INPUT) Map<DateTime, Long> input,
+                                              @JsonProperty(FIELD_OUTPUT) Map<DateTime, Long> output,
+                                              @JsonProperty(FIELD_DECODED) Map<DateTime, Long> decoded) {
             return new AutoValue_TrafficCounterService_TrafficHistogram(from, to, input, output, decoded);
         }
 

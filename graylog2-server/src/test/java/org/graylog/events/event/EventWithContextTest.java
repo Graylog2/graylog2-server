@@ -17,6 +17,8 @@
 package org.graylog.events.event;
 
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -25,6 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class EventWithContextTest {
+    private MessageFactory messageFactory = new TestMessageFactory();
+
     @Test
     public void createWithoutMessageAndEventContext() {
         final Event event = new TestEvent();
@@ -40,7 +44,7 @@ public class EventWithContextTest {
     @Test
     public void createWithMessageAndWithoutEventContext() {
         final Event event = new TestEvent();
-        final Message message = new Message("", "", DateTime.now(DateTimeZone.UTC));
+        final Message message = messageFactory.createMessage("", "", DateTime.now(DateTimeZone.UTC));
         final EventWithContext withContext = EventWithContext.builder()
                 .event(event)
                 .messageContext(message)
@@ -69,7 +73,7 @@ public class EventWithContextTest {
     @Test
     public void addMessageContext() {
         final Event event = new TestEvent();
-        final Message message = new Message("", "", DateTime.now(DateTimeZone.UTC));
+        final Message message = messageFactory.createMessage("", "", DateTime.now(DateTimeZone.UTC));
         final EventWithContext withContext = EventWithContext.builder()
                 .event(event)
                 .build();

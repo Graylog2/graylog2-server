@@ -16,27 +16,31 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
+import org.graylog.testing.ObjectMapperExtension;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.security.RestrictedChainingClassLoader;
+import org.graylog2.security.SafeClasses;
 import org.graylog2.shared.plugins.ChainingClassLoader;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -45,31 +49,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(MongoDBExtension.class)
+@ExtendWith(ObjectMapperExtension.class)
 public class ViewServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
     private ViewService dbService;
-    private ClusterConfigServiceImpl clusterConfigService;
 
     private SearchUser searchUser;
+    private MongoDBTestService mongodb;
 
-    @Before
-    public void setUp() throws Exception {
-        final var mapper = new ObjectMapperProvider();
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(mapper.get());
-        final MongoCollections mongoCollections = new MongoCollections(new CommonMongoJackObjectMapperProvider(mapper),
-                mongodb.mongoConnection());
-        this.clusterConfigService = new ClusterConfigServiceImpl(
+    @BeforeEach
+    public void setUp(MongoDBTestService mongodb, ObjectMapper objectMapper) throws Exception {
+        this.mongodb = mongodb;
+        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
+        ClusterConfigServiceImpl clusterConfigService = new ClusterConfigServiceImpl(
                 objectMapperProvider,
                 mongodb.mongoConnection(),
                 new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"),
-                new ChainingClassLoader(getClass().getClassLoader()),
+                new RestrictedChainingClassLoader(
+                        new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 new ClusterEventBus()
         );
         this.dbService = new ViewService(
-                mongodb.mongoConnection(),
-                objectMapperProvider,
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
                 mock(EntityOwnershipService.class),
@@ -78,7 +79,7 @@ public class ViewServiceTest {
         this.searchUser = TestSearchUser.builder().build();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         mongodb.mongoConnection().getMongoDatabase().drop();
     }
@@ -150,7 +151,7 @@ public class ViewServiceTest {
         final PaginatedList<ViewDTO> result1 = dbService.searchPaginated(
                 searchUser,
                 queryParser.parse("A B D"),
-                view -> true, "desc",
+                view -> true, SortOrder.DESCENDING,
                 "title",
                 1,
                 5
@@ -166,7 +167,7 @@ public class ViewServiceTest {
         final PaginatedList<ViewDTO> result2 = dbService.searchPaginated(
                 searchUser,
                 queryParser.parse("A B D"),
-                view -> view.title().contains("B") || view.title().contains("D"), "desc",
+                view -> view.title().contains("B") || view.title().contains("D"), SortOrder.DESCENDING,
                 "title",
                 1,
                 5
@@ -201,7 +202,7 @@ public class ViewServiceTest {
                 searchUser,
                 queryParser.parse(""),
                 view -> true,
-                "desc",
+                SortOrder.DESCENDING,
                 "owner",
                 1,
                 3
@@ -219,7 +220,7 @@ public class ViewServiceTest {
                 searchUser,
                 queryParser.parse(""),
                 view -> true,
-                "asc",
+                SortOrder.ASCENDING,
                 "owner",
                 1,
                 3
@@ -253,7 +254,7 @@ public class ViewServiceTest {
         final PaginatedList<ViewDTO> result1 = dbService.searchPaginatedByType(
                 ViewDTO.Type.DASHBOARD,
                 queryParser.parse("A B D"),
-                view -> true, "desc",
+                view -> true, SortOrder.DESCENDING,
                 "title",
                 1,
                 5
@@ -269,7 +270,7 @@ public class ViewServiceTest {
         final PaginatedList<ViewDTO> result2 = dbService.searchPaginatedByType(
                 ViewDTO.Type.DASHBOARD,
                 queryParser.parse("A B D"),
-                view -> view.title().contains("B") || view.title().contains("D"), "desc",
+                view -> view.title().contains("B") || view.title().contains("D"), SortOrder.DESCENDING,
                 "title",
                 1,
                 5
@@ -285,7 +286,7 @@ public class ViewServiceTest {
         final PaginatedList<ViewDTO> result3 = dbService.searchPaginatedByType(
                 ViewDTO.Type.SEARCH,
                 queryParser.parse(""),
-                view -> true, "asc",
+                view -> true, SortOrder.ASCENDING,
                 "title",
                 1,
                 5

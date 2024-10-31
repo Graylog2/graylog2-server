@@ -17,13 +17,16 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indices.Template;
 
 import java.util.Map;
 
 public class IndexMapping7 extends IndexMapping {
     @Override
-    protected Map<String, Object> mapping(String analyzer) {
-        return messageMapping(analyzer);
+    protected Template.Mappings mapping(String analyzer,
+                                          final CustomFieldMappings customFieldMappings) {
+        return new Template.Mappings(messageMapping(analyzer, customFieldMappings));
     }
 
     @Override
@@ -31,16 +34,6 @@ public class IndexMapping7 extends IndexMapping {
         return ImmutableMap.of(
                 "match_mapping_type", "string",
                 "mapping", notAnalyzedString()
-        );
-    }
-
-    @Override
-    Map<String, Object> createTemplate(String template, int order, Map<String, Object> settings, Map<String, Object> mappings) {
-        return ImmutableMap.of(
-                "index_patterns", template,
-                "order", order,
-                "settings", settings,
-                "mappings", mappings
         );
     }
 

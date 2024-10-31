@@ -1,0 +1,6 @@
+type = "a"
+message = "Add Sidecar Reader and Sidecar Manager roles to read and manage sidecars."
+
+issues = ["12044"]
+pulls = ["15380"]
+

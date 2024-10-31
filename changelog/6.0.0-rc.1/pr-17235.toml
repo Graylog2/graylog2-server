@@ -1,0 +1,5 @@
+type = "a"
+message = "Added support for POST and PUT requests for 'JSON path value from HTTP API' Input."
+
+issues = ["Graylog2/graylog-plugin-enterprise#6040"]
+pulls = ["17235"]

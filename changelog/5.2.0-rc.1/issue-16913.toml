@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed error where only most recent revision of a content pack could be installed."
+
+issues = ["16913"]
+pulls = ["16943"]

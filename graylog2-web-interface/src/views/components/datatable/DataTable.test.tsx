@@ -26,7 +26,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import Widget from 'views/logic/widgets/Widget';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
@@ -34,7 +34,7 @@ import Direction from 'views/logic/aggregationbuilder/Direction';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import { createViewWithWidgets } from 'fixtures/searches';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
@@ -110,7 +110,7 @@ describe('DataTable', () => {
       }],
   };
 
-  const columnPivot = Pivot.create(['source'], 'values', { limit: 15 });
+  const columnPivot = Pivot.createValues(['source']);
   const rowPivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } });
   const series = new Series('count()');
 
@@ -133,10 +133,9 @@ describe('DataTable', () => {
                            to: '2020-01-10T14:23:42.000Z',
                            type: 'absolute',
                          }}
-                         toggleEdit={() => {
-                         }}
-                         onChange={() => {
-                         }}
+                         setLoadingState={() => {}}
+                         toggleEdit={() => {}}
+                         onChange={() => {}}
                          height={200}
                          width={300}
                          {...props} />
@@ -147,9 +146,7 @@ describe('DataTable', () => {
     );
   };
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('should render with empty data', () => {
     const config = AggregationWidgetConfig.builder()
@@ -215,7 +212,7 @@ describe('DataTable', () => {
   });
 
   it('renders column pivot header without offset when rollup is disabled', () => {
-    const protocolPivot = Pivot.create(['nf_proto_name'], 'values', { limit: 15 });
+    const protocolPivot = Pivot.createValues(['nf_proto_name']);
     const protocolData = {
       chart:
         [{

@@ -1,0 +1,2 @@
+type = "security"
+message = "Fix stale session cache after logout. [GHSA-3fqm-frhg-7c85](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-3fqm-frhg-7c85)"

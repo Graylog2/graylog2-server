@@ -17,7 +17,7 @@
 import Immutable from 'immutable';
 
 import type { Event } from 'components/events/events/types';
-import type { EventDefinition } from 'logic/alerts/types';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
 import Search from 'views/logic/search/Search';
@@ -31,7 +31,11 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import { allMessagesTable, resultHistogram } from 'views/logic/Widgets';
+import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
+const mock_color = StaticColor.create('#ffffff');
 export const mockEventData = {
   event: {
     alert: true,
@@ -46,6 +50,9 @@ export const mockEventData = {
     streams: [
       '002',
     ],
+    stream_categories: [
+      'firewall',
+    ],
     source_streams: [
       '001',
     ],
@@ -53,14 +60,17 @@ export const mockEventData = {
     source: '',
     key_tuple: [],
     key: null,
-    priority: '2',
-    fields: [{}],
+    priority: 2,
+    fields: {},
     replay_info: {
       timerange_start: '2023-03-02T13:42:21.266Z',
       timerange_end: '2023-03-02T13:43:21.266Z',
       query: 'http_method: GET',
       streams: [
         '001',
+      ],
+      stream_categories: [
+        'firewall',
       ],
     },
     group_by_fields: { field4: 'value4' },
@@ -77,11 +87,16 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
   priority: 2,
   alert: true,
   config: {
+    event_limit: 1000,
     type: 'aggregation-v1',
     query: 'http_method: GET',
     query_parameters: [],
+    _is_scheduled: true,
     streams: [
       '001',
+    ],
+    stream_categories: [
+      'firewall',
     ],
     group_by: [
       'field1',
@@ -90,15 +105,16 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
     series: [
       {
         id: 'count-field1',
-        function: 'count',
+        type: 'count',
         field: 'field1',
       },
       {
         id: 'count-field2',
-        function: 'count',
+        type: 'count',
         field: 'field2',
       },
     ],
+    filters: [],
     conditions: {
       expression: {
         expr: '||',
@@ -159,7 +175,7 @@ export const mockEventDefinitionOneAggregation = {
     series: [
       {
         id: 'count-field1',
-        function: 'count',
+        type: 'count',
         field: 'field1',
       },
     ],
@@ -207,7 +223,7 @@ export const mockedMappedAggregationNoField: Array<EventDefinitionAggregation> =
   },
 ];
 const eventData = mockEventData.event;
-const query = QueryGenerator(eventData.replay_info.streams, 'query-id', {
+const query = QueryGenerator(eventData.replay_info.streams, eventData.replay_info.stream_categories, 'query-id', {
   type: 'absolute',
   from: eventData?.replay_info?.timerange_start,
   to: eventData?.replay_info?.timerange_end,
@@ -225,7 +241,7 @@ const field1Widget = AggregationWidget.builder()
   .config(
     AggregationWidgetConfig.builder()
       .columnPivots([])
-      .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
+      .rowPivots([Pivot.createValues(['field1', 'field2'])])
       .series([Series.forFunction('count(field1)')])
       .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field1)', Direction.Descending)])
       .visualization('table')
@@ -255,7 +271,7 @@ const field2Widget = AggregationWidget.builder()
   .config(
     AggregationWidgetConfig.builder()
       .columnPivots([])
-      .rowPivots([Pivot.create(['field2', 'field1'], 'values', { limit: 15 })])
+      .rowPivots([Pivot.createValues(['field2', 'field1'])])
       .series([Series.forFunction('count(field2)')])
       .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field2)', Direction.Ascending)])
       .visualization('table')
@@ -270,7 +286,7 @@ const summaryWidget = AggregationWidget.builder()
   .config(
     AggregationWidgetConfig.builder()
       .columnPivots([])
-      .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
+      .rowPivots([Pivot.createValues(['field1', 'field2'])])
       .series([Series.forFunction('count(field1)'), Series.forFunction('count(field2)')])
       .sort([])
       .visualization('table')
@@ -301,6 +317,11 @@ const searchTwoAggregations = Search.create().toBuilder().id('search-id').querie
     .toBuilder()
     .searchTypes(Array(5).fill({
       filters: [],
+      id: undefined,
+      query: undefined,
+      stream_categories: undefined,
+      streams: undefined,
+      timerange: undefined,
       type: 'AGGREGATION',
       typeDefinition: {},
     })).build()])
@@ -332,6 +353,10 @@ export const mockedViewWithTwoAggregations = View.create()
         'allm-widget-id': new WidgetPosition(1, 12, 6, Infinity),
         'summary-widget-id': new WidgetPosition(1, 1, 3, Infinity),
       })
+      .formatting(FormattingSettings.create([
+        HighlightingRule.create('count(field1)', 500, 'greater', mock_color),
+        HighlightingRule.create('count(field2)', 8000, 'less', mock_color),
+      ]))
       .build(),
   })
   .search(searchTwoAggregations)
@@ -366,6 +391,9 @@ export const mockedViewWithOneAggregation = View.create()
         'mc-widget-id': new WidgetPosition(1, 4, 2, Infinity),
         'allm-widget-id': new WidgetPosition(1, 6, 6, Infinity),
       })
+      .formatting(FormattingSettings.create([
+        HighlightingRule.create('count(field1)', 500, 'greater', mock_color),
+      ]))
       .build(),
   })
   .search(searchOneAggregation)
@@ -394,12 +422,15 @@ export const mockedViewWithOneAggregationNoField = View.create()
         'mc-widget-id': new WidgetPosition(1, 4, 2, Infinity),
         'allm-widget-id': new WidgetPosition(1, 6, 6, Infinity),
       })
+      .formatting(FormattingSettings.create([
+        HighlightingRule.create('count()', 500, 'greater', mock_color),
+      ]))
       .build(),
   })
   .search(searchOneAggregation)
   .build();
 
-const queryED = QueryGenerator(eventData.replay_info.streams, 'query-id', {
+const queryED = QueryGenerator(eventData.replay_info.streams, eventData.replay_info.stream_categories, 'query-id', {
   type: 'relative',
   range: 60,
 }, {

@@ -18,6 +18,7 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 import one.util.streamex.StreamEx;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -26,7 +27,6 @@ import org.graylog2.database.PaginatedList;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto> {
     public static final String COLLECTION_NAME = "scheduler_job_definitions";
@@ -58,8 +59,23 @@ public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto>
      * @return the job definition with the given config field, or an empty optional
      */
     public Optional<JobDefinitionDto> getByConfigField(String configField, Object value) {
+        return Optional.ofNullable(db.findOne(buildConfigFieldQuery(configField, value)));
+    }
+
+    /**
+     * Returns a stream of job definitions that have the given config field value.
+     *
+     * @param configField the config field
+     * @param value       the value of the config field
+     * @return a stream of job definitions with the given config field.
+     */
+    public Stream<JobDefinitionDto> streamByConfigField(String configField, Object value) {
+        return streamQuery(buildConfigFieldQuery(configField, value));
+    }
+
+    private static DBQuery.Query buildConfigFieldQuery(String configField, Object value) {
         final String field = String.format(Locale.US, "%s.%s", JobDefinitionDto.FIELD_CONFIG, configField);
-        return Optional.ofNullable(db.findOne(DBQuery.is(field, value)));
+        return DBQuery.is(field, value);
     }
 
     public List<JobDefinitionDto> getByQuery(DBQuery.Query query) {

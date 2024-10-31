@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix ineffective search query after exporting search to dashboard"
+
+issues = ["17619"]
+pulls = ["17621"]

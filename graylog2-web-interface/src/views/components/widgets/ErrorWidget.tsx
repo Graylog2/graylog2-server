@@ -15,12 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon, Center } from 'components/common';
 
-import { WidgetErrorsList } from './WidgetPropTypes';
 import styles from './MessageWidgets.css';
 
 type WidgetError = {
@@ -43,14 +41,14 @@ const ErrorList = styled.ul`
 const Row = styled.div`
   margin-bottom: 5px;
 
-  :last-child {
+  &:last-child {
     margin-bottom: 0;
   }
 `;
 
-const ErrorWidget = ({ errors, title }: Props) => (
+const ErrorWidget = ({ errors, title = 'While retrieving data for this widget, the following error(s) occurred:' }: Props) => (
   <Center>
-    <Icon name="exclamation-triangle" size="3x" className={styles.iconMargin} />
+    <Icon name="warning" size="3x" className={styles.iconMargin} />
     <Description>
       <Row>
         <strong>{title}</strong>
@@ -61,14 +59,5 @@ const ErrorWidget = ({ errors, title }: Props) => (
     </Description>
   </Center>
 );
-
-ErrorWidget.propTypes = {
-  errors: WidgetErrorsList.isRequired,
-  title: PropTypes.string,
-};
-
-ErrorWidget.defaultProps = {
-  title: 'While retrieving data for this widget, the following error(s) occurred:',
-};
 
 export default ErrorWidget;

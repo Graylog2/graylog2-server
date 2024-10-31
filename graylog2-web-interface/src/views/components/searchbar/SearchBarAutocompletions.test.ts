@@ -51,6 +51,7 @@ class AsyncCompleter implements Completer {
 const EditorMock = {
   completer: {},
   session: {
+    getLength: () => 1,
     getTokens: () => ([{ type: 'term', value: 's', index: 0, start: 0 }]),
     getTokenAt: () => ({ type: 'term', value: 's', index: 0, start: 0 }),
   },
@@ -94,71 +95,6 @@ describe('SearchAutoCompletions', () => {
       );
 
       expect(callback).toHaveBeenCalledWith(null, [sourceIpCompletion, sourceCompletion]);
-    });
-  });
-
-  describe('shouldShowCompletions', () => {
-    it('should not show completions manually when no Completer provides `shouldShowCompletions`', async () => {
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES, 'Europe/Berlin', view);
-
-      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{
-        type: 'keyword',
-        value: 'http_method:',
-        index: 0,
-        start: 0,
-      }], null]);
-
-      expect(result).toBe(false);
-    });
-
-    it('should not show completions manually when a Completer provides `shouldShowCompletions` which returns false', async () => {
-      class ExampleCompleter implements Completer {
-        // eslint-disable-next-line class-methods-use-this
-        getCompletions = () => ([sourceIpCompletion]);
-
-        // eslint-disable-next-line class-methods-use-this
-        shouldShowCompletions = () => false;
-      }
-
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES, 'Europe/Berlin', view);
-      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{
-        type: 'keyword',
-        value: 'http_method:',
-        index: 0,
-        start: 0,
-      }], null]);
-
-      expect(result).toBe(false);
-    });
-
-    it('should consider a Completer when deciding if it should show completions', async () => {
-      const mockShouldShowCompletions = jest.fn(() => true);
-
-      class ExampleCompleter implements Completer {
-        // eslint-disable-next-line class-methods-use-this
-        getCompletions = () => ([sourceIpCompletion]);
-
-        shouldShowCompletions = mockShouldShowCompletions;
-      }
-
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new ExampleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES, 'Europe/Berlin', view);
-      const result = searchBarAutoCompletions.shouldShowCompletions(1, [[{
-        type: 'keyword',
-        value: 'http_method:',
-        index: 0,
-        start: 0,
-      }], null]);
-
-      expect(mockShouldShowCompletions).toHaveBeenCalledTimes(1);
-
-      expect(mockShouldShowCompletions).toHaveBeenCalledWith(1, [[{
-        type: 'keyword',
-        value: 'http_method:',
-        index: 0,
-        start: 0,
-      }], null]);
-
-      expect(result).toBe(true);
     });
   });
 });

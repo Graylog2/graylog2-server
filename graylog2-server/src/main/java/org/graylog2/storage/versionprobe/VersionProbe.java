@@ -24,12 +24,17 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Strings;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
-import org.graylog2.plugin.Version;
+import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
@@ -39,36 +44,47 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
+    private final VersionProbeListener loggingListener = new VersionProbeLogger(LOG);
     private final ObjectMapper objectMapper;
     private final OkHttpClient okHttpClient;
     private final int connectionAttempts;
     private final Duration delayBetweenAttempts;
+    private final boolean isJwtAuthentication;
+    private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
 
     @Inject
     public VersionProbe(ObjectMapper objectMapper,
                         OkHttpClient okHttpClient,
                         @Named("elasticsearch_version_probe_attempts") int elasticsearchVersionProbeAttempts,
-                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay) {
+                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay,
+                        @RunsWithDataNode Boolean runsWithDataNode,
+                        @Named("indexer_use_jwt_authentication") boolean opensearchUseJwtAuthentication,
+                        IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
         this.connectionAttempts = elasticsearchVersionProbeAttempts;
         this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
+        this.isJwtAuthentication = runsWithDataNode || opensearchUseJwtAuthentication;
+        this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
     }
 
     public Optional<SearchVersion> probe(final Collection<URI> hosts) {
+        return probe(hosts, this.loggingListener);
+    }
+
+    public Optional<SearchVersion> probe(final Collection<URI> hosts, VersionProbeListener probeListener) {
         try {
             return RetryerBuilder.<Optional<SearchVersion>>newBuilder()
                     .retryIfResult(input -> !input.isPresent())
@@ -83,32 +99,36 @@ public class VersionProbe {
                                     return;
                                 }
                             }
-                            if (connectionAttempts == 0) {
-                                LOG.info("Elasticsearch is not available. Retry #{}", attempt.getAttemptNumber());
-                            } else {
-                                LOG.info("Elasticsearch is not available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
-                            }
+                            probeListener.onRetry(attempt.getAttemptNumber(), connectionAttempts, getAttemptException(attempt));
                         }
                     })
                     .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
                     .withStopStrategy((connectionAttempts == 0) ? StopStrategies.neverStop() : StopStrategies.stopAfterAttempt(connectionAttempts))
-                    .build().call(() -> this.probeAllHosts(hosts));
+                    .build().call(() -> this.probeAllHosts(hosts, probeListener));
         } catch (ExecutionException | RetryException e) {
-            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+            probeListener.onError("Unable to retrieve version from indexer node: ", e);
         }
         return Optional.empty();
     }
 
-    private Optional<SearchVersion> probeAllHosts(final Collection<URI> hosts) {
+    @Nullable
+    private static Throwable getAttemptException(Attempt attempt) {
+        return Optional.of(attempt)
+                .filter(Attempt::hasException)
+                .map(Attempt::getExceptionCause)
+                .orElse(null);
+    }
+
+    private Optional<SearchVersion> probeAllHosts(final Collection<URI> hosts, VersionProbeListener listener) {
         return hosts
                 .stream()
-                .map(this::probeSingleHost)
+                .map(host -> probeSingleHost(host, listener))
                 .filter(Optional::isPresent)
                 .findFirst()
                 .orElse(Optional.empty());
     }
 
-    private Optional<SearchVersion> probeSingleHost(URI host) {
+    private Optional<SearchVersion> probeSingleHost(URI host, VersionProbeListener listener) {
         final Retrofit retrofit;
         try {
             retrofit = new Retrofit.Builder()
@@ -117,7 +137,7 @@ public class VersionProbe {
                     .client(addAuthenticationIfPresent(host, okHttpClient))
                     .build();
         } catch (MalformedURLException e) {
-            LOG.error("Elasticsearch node URL is invalid: " + host.toString(), e);
+            listener.onError("Indexer node URL is invalid: " + host, e);
             return Optional.empty();
         }
 
@@ -127,29 +147,39 @@ public class VersionProbe {
         final Consumer<ResponseBody> errorLogger = (responseBody) -> {
             try {
                 final ErrorResponse errorResponse = errorResponseConverter.convert(responseBody);
-                LOG.error("Unable to retrieve version from Elasticsearch node {}:{}: {}", host.getHost(), host.getPort(), errorResponse);
+                final String message = String.format(Locale.ROOT, "Unable to retrieve version from indexer node %s:%s: %s", host.getHost(), host.getPort(), errorResponse);
+                listener.onError(message, null);
             } catch (IOException e) {
-                LOG.error("Unable to retrieve version from Elasticsearch node {}:{}: unknown error - an exception occurred while deserializing error response: {}", host.getHost(), host.getPort(), e);
+                final String message = String.format(Locale.ROOT, "Unable to retrieve version from indexer node %s:%s: unknown error - an exception occurred while deserializing error response: {}", host.getHost(), host.getPort());
+                listener.onError(message, e);
             }
         };
 
 
-        return rootResponse(root, errorLogger)
+        return rootResponse(root, errorLogger, listener)
                 .map(RootResponse::version)
-                .flatMap(this::parseVersion);
+                .flatMap(versionResponse -> parseVersion(versionResponse, listener));
     }
 
-    private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
+    private Optional<String> getAuthToken(final URI host) {
         if (Strings.emptyToNull(host.getUserInfo()) != null) {
             final String[] credentials = host.getUserInfo().split(":");
             final String username = credentials[0];
             final String password = credentials[1];
-            final String authToken = Credentials.basic(username, password);
+            return Optional.of(Credentials.basic(username, password));
+        }
 
+        return Optional.empty();
+    }
+
+    private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
+        final Optional<String> authToken = getAuthToken(host);
+
+        if (isJwtAuthentication || authToken.isPresent()) {
             return okHttpClient.newBuilder()
                     .addInterceptor(chain -> {
                         final Request originalRequest = chain.request();
-                        final Request.Builder builder = originalRequest.newBuilder().header("Authorization", authToken);
+                        final Request.Builder builder = originalRequest.newBuilder().header("Authorization", isJwtAuthentication ? indexerJwtAuthTokenProvider.get() : authToken.get());
                         final Request newRequest = builder.build();
                         return chain.proceed(newRequest);
                     })
@@ -159,17 +189,17 @@ public class VersionProbe {
         return okHttpClient;
     }
 
-    private Optional<SearchVersion> parseVersion(VersionResponse versionResponse) {
+    private Optional<SearchVersion> parseVersion(VersionResponse versionResponse, VersionProbeListener probeListener) {
         try {
-            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionResponse.number());
+            final com.github.zafarkhaja.semver.Version version = Version.parse(versionResponse.number());
             return Optional.of(SearchVersion.create(versionResponse.distribution(), version));
         } catch (Exception e) {
-            LOG.error("Unable to parse version retrieved from Elasticsearch node: <{}>", versionResponse.number(), e);
+            probeListener.onError(String.format(Locale.ROOT, "Unable to parse version retrieved from indexer node: <%s>", versionResponse.number()), e);
             return Optional.empty();
         }
     }
 
-    private Optional<RootResponse> rootResponse(final RootRoute rootRoute, Consumer<ResponseBody> errorLogger) {
+    private Optional<RootResponse> rootResponse(final RootRoute rootRoute, Consumer<ResponseBody> errorLogger, VersionProbeListener listener) {
         try {
             final Response<RootResponse> response = rootRoute.root().execute();
             if (response.isSuccessful()) {
@@ -180,7 +210,8 @@ public class VersionProbe {
         } catch (IOException e) {
             final String error = ExceptionUtils.formatMessageCause(e);
             final String rootCause = ExceptionUtils.formatMessageCause(ExceptionUtils.getRootCause(e));
-            LOG.error("Unable to retrieve version from Elasticsearch node: {} - {}", error, rootCause);
+            final String message = String.format(Locale.ROOT, "Unable to retrieve version from indexer node: %s - %s", error, rootCause);
+            listener.onError(message, null);
             LOG.debug("Complete exception for version probe error: ", e);
         }
         return Optional.empty();

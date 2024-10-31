@@ -33,6 +33,7 @@ public class EventFields {
     public static final String EVENT_REPORTER = "event_reporter";
     public static final String EVENT_SOURCE = "event_source";
     public static final String EVENT_SOURCE_API_VERSION = "event_source_api_version";
+    public static final String EVENT_SOURCE_INPUT = "event_source_input";
     public static final String EVENT_SOURCE_PRODUCT = "event_source_product";
     public static final String EVENT_START = "event_start";
     public static final String EVENT_UID = "event_uid";

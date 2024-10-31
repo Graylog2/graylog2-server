@@ -16,10 +16,14 @@
  */
 package org.graylog2.periodical;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
@@ -35,20 +39,19 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
 import java.util.Map;
 
 public class IndexRotationThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRotationThread.class);
-
-    private NotificationService notificationService;
     private final IndexSetRegistry indexSetRegistry;
     private final Cluster cluster;
     private final ActivityWriter activityWriter;
     private final Indices indices;
     private final NodeId nodeId;
     private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
+    private final DataTieringOrchestrator dataTieringOrchestrator;
+    private final NotificationService notificationService;
+    private final DatanodeMigrationLockService migrationLockService;
 
     @Inject
     public IndexRotationThread(NotificationService notificationService,
@@ -57,7 +60,8 @@ public class IndexRotationThread extends Periodical {
                                Cluster cluster,
                                ActivityWriter activityWriter,
                                NodeId nodeId,
-                               Map<String, Provider<RotationStrategy>> rotationStrategyMap) {
+                               Map<String, Provider<RotationStrategy>> rotationStrategyMap,
+                               DataTieringOrchestrator dataTieringOrchestrator, DatanodeMigrationLockService migrationLockService) {
         this.notificationService = notificationService;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -65,6 +69,8 @@ public class IndexRotationThread extends Periodical {
         this.indices = indices;
         this.nodeId = nodeId;
         this.rotationStrategyMap = rotationStrategyMap;
+        this.dataTieringOrchestrator = dataTieringOrchestrator;
+        this.migrationLockService = migrationLockService;
     }
 
     @Override
@@ -87,8 +93,10 @@ public class IndexRotationThread extends Periodical {
             indexSetRegistry.forEach((indexSet) -> {
                 try {
                     if (indexSet.getConfig().isWritable()) {
-                        checkAndRepair(indexSet);
-                        checkForRotation(indexSet);
+                        migrationLockService.tryRun(indexSet, IndexRotationThread.class, () -> {
+                            checkAndRepair(indexSet);
+                            checkForRotation(indexSet);
+                        });
                     } else {
                         LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
                     }
@@ -97,7 +105,7 @@ public class IndexRotationThread extends Periodical {
                 }
             });
         } else {
-            LOG.debug("Elasticsearch cluster isn't healthy. Skipping index rotation.");
+            LOG.warn("Elasticsearch cluster isn't healthy. Skipping index rotation.");
         }
     }
 
@@ -108,23 +116,27 @@ public class IndexRotationThread extends Periodical {
 
     protected void checkForRotation(IndexSet indexSet) {
         final IndexSetConfig config = indexSet.getConfig();
-        final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategyClass());
+        if (indexSet.getConfig().dataTieringConfig() != null) {
+            dataTieringOrchestrator.rotate(indexSet);
+        } else {
+            final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategyClass());
 
-        if (rotationStrategyProvider == null) {
-            LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.rotationStrategyClass());
-            rotationProblemNotification("Index Rotation Problem!",
-                    "Index rotation strategy " + config.rotationStrategyClass() + " not found! Please fix your index rotation configuration!");
-            return;
+            if (rotationStrategyProvider == null) {
+                LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.rotationStrategyClass());
+                rotationProblemNotification("Index Rotation Problem!",
+                        "Index rotation strategy " + config.rotationStrategyClass() + " not found! Please fix your index rotation configuration!");
+                return;
+            }
+
+            final RotationStrategy rotationStrategy = rotationStrategyProvider.get();
+
+            if (rotationStrategy == null) {
+                LOG.warn("No rotation strategy found, not running index rotation!");
+                return;
+            }
+
+            rotationStrategy.rotate(indexSet);
         }
-
-        final RotationStrategy rotationStrategy = rotationStrategyProvider.get();
-
-        if (rotationStrategy == null) {
-            LOG.warn("No rotation strategy found, not running index rotation!");
-            return;
-        }
-
-        rotationStrategy.rotate(indexSet);
     }
 
     private void rotationProblemNotification(String title, String description) {

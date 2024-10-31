@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fix TLS compatibility with older operating systems. (e.g. Win Server 2019)."
+
+issues = ["16076"]
+pulls = [""]
+

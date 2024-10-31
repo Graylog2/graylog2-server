@@ -25,7 +25,7 @@ import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPr
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.USER_ID_SUB_FIELD;
 
@@ -41,8 +41,7 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(ENTITY_LIST_PREFERENCES_MONGO_COLLECTION_NAME),
                 StoredEntityListPreferences.class,
                 StoredEntityListPreferencesId.class,
-                mapper.get(),
-                null);
+                mapper.get());
 
     }
 
@@ -54,7 +53,7 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
     @Override
     public boolean save(final StoredEntityListPreferences preferences) {
         final WriteResult<StoredEntityListPreferences, StoredEntityListPreferencesId> save = db.save(preferences);
-        return save.getWriteResult().getN() > 0;
+        return save.getN() > 0;
     }
 
     @Override

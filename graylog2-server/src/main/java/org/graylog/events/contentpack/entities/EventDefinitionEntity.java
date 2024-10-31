@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.MutableGraph;
+import jakarta.annotation.Nullable;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -39,7 +40,6 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 public abstract class EventDefinitionEntity extends ScopedContentPackEntity implements NativeEntityConverter<EventDefinitionDto> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_REMEDIATION_STEPS = "remediation_steps";
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_ALERT = "alert";
     private static final String FIELD_CONFIG = "config";
@@ -59,6 +60,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     private static final String FIELD_STORAGE = "storage";
     private static final String FIELD_IS_SCHEDULED = "is_scheduled";
     private static final String UPDATED_AT = "updated_at";
+    private static final String MATCHED_AT = "matched_at";
 
     @JsonProperty(FIELD_TITLE)
     public abstract ValueReference title();
@@ -67,8 +69,16 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     public abstract ValueReference description();
 
     @Nullable
+    @JsonProperty(FIELD_REMEDIATION_STEPS)
+    public abstract ValueReference remediationSteps();
+
+    @Nullable
     @JsonProperty(UPDATED_AT)
     public abstract DateTime updatedAt();
+
+    @Nullable
+    @JsonProperty(MATCHED_AT)
+    public abstract DateTime matchedAt();
 
     @JsonProperty(FIELD_PRIORITY)
     public abstract ValueReference priority();
@@ -116,8 +126,14 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(ValueReference description);
 
+        @JsonProperty(FIELD_REMEDIATION_STEPS)
+        public abstract Builder remediationSteps(ValueReference remediationSteps);
+
         @JsonProperty(UPDATED_AT)
         public abstract Builder updatedAt(DateTime updatedAt);
+
+        @JsonProperty(MATCHED_AT)
+        public abstract Builder matchedAt(DateTime matchedAt);
 
         @JsonProperty(FIELD_PRIORITY)
         public abstract Builder priority(ValueReference priority);
@@ -150,10 +166,10 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     }
 
     @Override
-    public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> natvieEntities) {
+    public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         final ImmutableList<EventNotificationHandler.Config> notificationList = ImmutableList.copyOf(
                 notifications().stream()
-                        .map(notification -> notification.toNativeEntity(parameters, natvieEntities))
+                        .map(notification -> notification.toNativeEntity(parameters, nativeEntities))
                         .collect(Collectors.toList())
         );
         return EventDefinitionDto.builder()
@@ -161,9 +177,10 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
                 .title(title().asString(parameters))
                 .updatedAt(updatedAt())
                 .description(description().asString(parameters))
+                .remediationSteps(remediationSteps() != null ? remediationSteps().asString(parameters): null)
                 .priority(priority().asInteger(parameters))
                 .alert(alert().asBoolean(parameters))
-                .config(config().toNativeEntity(parameters, natvieEntities))
+                .config(config().toNativeEntity(parameters, nativeEntities))
                 .fieldSpec(fieldSpec())
                 .keySpec(keySpec())
                 .notificationSettings(notificationSettings())

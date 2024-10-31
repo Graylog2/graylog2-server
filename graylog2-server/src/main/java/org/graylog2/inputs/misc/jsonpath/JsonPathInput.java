@@ -19,19 +19,29 @@ package org.graylog2.inputs.misc.jsonpath;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import jakarta.inject.Inject;
 import org.graylog2.inputs.codecs.JsonPathCodec;
 import org.graylog2.inputs.transports.HttpPollTransport;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.inputs.MessageInput;
 
-import javax.inject.Inject;
+import static org.graylog2.inputs.transports.HttpPollTransport.CK_CONTENT_TYPE;
+import static org.graylog2.inputs.transports.HttpPollTransport.CK_HTTP_BODY;
+import static org.graylog2.inputs.transports.HttpPollTransport.CK_HTTP_METHOD;
+import static org.graylog2.inputs.transports.HttpPollTransport.POST;
+import static org.graylog2.inputs.transports.HttpPollTransport.PUT;
 
+@CloudCompatible
 public class JsonPathInput extends MessageInput {
 
     private static final String NAME = "JSON path value from HTTP API";
+
+    private final Configuration configuration;
 
     @AssistedInject
     public JsonPathInput(@Assisted Configuration configuration,
@@ -40,7 +50,8 @@ public class JsonPathInput extends MessageInput {
                          MetricRegistry metricRegistry,
                          LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry, configuration, transport.create(configuration), localRegistry, codec.create(configuration), config,
-              descriptor, serverStatus);
+                descriptor, serverStatus);
+        this.configuration = configuration;
     }
 
     public interface Factory extends MessageInput.Factory<JsonPathInput> {
@@ -60,7 +71,6 @@ public class JsonPathInput extends MessageInput {
             super(NAME, false, DocsHelper.PAGE_SENDING_JSONPATH.toString());
         }
 
-        @Override
         public boolean isCloudCompatible() {
             return true;
         }
@@ -77,5 +87,20 @@ public class JsonPathInput extends MessageInput {
     @Override
     public boolean onlyOnePerCluster() {
         return true;
+    }
+
+    @Override
+    public void checkConfiguration() throws ConfigurationException {
+        super.checkConfiguration();
+
+        if (configuration.stringIsSet(CK_HTTP_METHOD)
+                && (PUT.equals(configuration.getString(CK_HTTP_METHOD)) || POST.equals(configuration.getString(CK_HTTP_METHOD)))) {
+            if (!configuration.stringIsSet(CK_CONTENT_TYPE)) {
+                throw new ConfigurationException("HTTP content type must be selected if using POST or PUT.");
+            }
+            if (!configuration.stringIsSet(CK_HTTP_BODY)) {
+                throw new ConfigurationException("HTTP body must be filled if using POST or PUT.");
+            }
+        }
     }
 }

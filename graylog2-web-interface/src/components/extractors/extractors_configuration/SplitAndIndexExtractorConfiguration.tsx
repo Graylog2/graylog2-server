@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -32,7 +31,7 @@ const _getEffectiveConfiguration = (configuration) => ExtractorUtils.getEffectiv
 type Configuration = { [key: string]: string };
 type Props = {
   configuration: Configuration,
-  exampleMessage: string,
+  exampleMessage?: string
   onChange: (newConfig: Configuration) => void,
   onExtractorPreviewLoad: (preview: React.ReactNode | string) => void,
 }
@@ -113,23 +112,12 @@ const SplitAndIndexExtractorConfiguration = ({ configuration: initialConfigurati
       <Row>
         <Col mdOffset={2} md={10}>
           <Button bsStyle="info" onClick={_onTryClick} disabled={isTryButtonDisabled}>
-            {trying ? <Icon name="spinner" spin /> : 'Try'}
+            {trying ? <Icon name="progress_activity" spin /> : 'Try'}
           </Button>
         </Col>
       </Row>
     </div>
   );
-};
-
-SplitAndIndexExtractorConfiguration.propTypes = {
-  configuration: PropTypes.object.isRequired,
-  exampleMessage: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  onExtractorPreviewLoad: PropTypes.func.isRequired,
-};
-
-SplitAndIndexExtractorConfiguration.defaultProps = {
-  exampleMessage: undefined,
 };
 
 export default SplitAndIndexExtractorConfiguration;

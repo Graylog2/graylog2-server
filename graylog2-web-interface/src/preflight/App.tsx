@@ -21,14 +21,20 @@ import { useState } from 'react';
 import Navigation from 'preflight/navigation/Navigation';
 import Setup from 'preflight/components/Setup';
 import WaitingForStartup from 'preflight/components/WaitingForStartup';
+import ErrorBoundary from 'preflight/components/ErrorBoundary';
 
 const App = () => {
   const [isWaitingForStartup, setIsWaitingForStartup] = useState(false);
 
   return (
-    <AppShell padding="md" header={<Navigation />}>
-      {!isWaitingForStartup && <Setup setIsWaitingForStartup={setIsWaitingForStartup} />}
-      {isWaitingForStartup && <WaitingForStartup />}
+    <AppShell padding="md" header={{ height: 80 }}>
+      <Navigation />
+      <AppShell.Main>
+        <ErrorBoundary>
+          {!isWaitingForStartup && <Setup setIsWaitingForStartup={setIsWaitingForStartup} />}
+          {isWaitingForStartup && <WaitingForStartup />}
+        </ErrorBoundary>
+      </AppShell.Main>
     </AppShell>
   );
 };

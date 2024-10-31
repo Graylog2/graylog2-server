@@ -21,11 +21,12 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoDBUpsertRetryer;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
@@ -36,8 +37,6 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.List;
 import java.util.Optional;
 
@@ -131,14 +130,14 @@ public class DBProcessingStatusService {
         // TODO: Using a timestamp provided by the node for "updated_at" can be bad if the node clock is skewed.
         //       Ideally we would use MongoDB's "$currentDate" but there doesn't seem to be a way to use that
         //       with mongojack.
-        return MongoDBUpsertRetryer.run(() -> db.findAndModify(
+        return db.findAndModify(
                 DBQuery.is(ProcessingStatusDto.FIELD_NODE_ID, nodeId),
                 null,
                 null,
                 false,
                 ProcessingStatusDto.of(nodeId, processingStatusRecorder, updatedAt, baseConfiguration.isMessageJournalEnabled()),
                 true, // We want to return the updated document to the caller
-                true));
+                true);
     }
 
     /**

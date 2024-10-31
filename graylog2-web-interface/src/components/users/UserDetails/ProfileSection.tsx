@@ -35,6 +35,7 @@ const ProfileSection = ({
     lastActivity,
     sessionActive,
     accountStatus,
+    authServiceEnabled,
   },
 }: Props) => {
   const isOldUser = () => fullName && (!firstName && !lastName);
@@ -49,7 +50,9 @@ const ProfileSection = ({
       <ReadOnlyFormGroup label="Client Address" value={clientAddress} />
       <ReadOnlyFormGroup label="Last Activity" value={lastActivity} />
       <ReadOnlyFormGroup label="Logged In" value={sessionActive} />
-      <ReadOnlyFormGroup label="Enabled" value={accountStatus === 'enabled'} />
+      <ReadOnlyFormGroup label="Enabled"
+                         value={accountStatus === 'enabled'}
+                         help={(!authServiceEnabled && accountStatus === 'enabled') ? 'Authentication service is disabled, user cannot log in' : ''} />
     </SectionComponent>
   );
 };

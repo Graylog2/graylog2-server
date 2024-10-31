@@ -16,25 +16,32 @@
  */
 package org.graylog.plugins.pipelineprocessor.parser;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FunctionRegistry {
 
     private final Map<String, Function<?>> functions;
+    private final Map<String, Function<?>> internalFunctions;
 
     @Inject
-    public FunctionRegistry(Map<String, Function<?>> functions) {
+    public FunctionRegistry(Map<String, Function<?>> functions,
+                            @InternalPipelineFunctions Map<String, Function<?>> internalFunctions) {
         this.functions = functions;
+        this.internalFunctions = internalFunctions;
     }
 
+    public FunctionRegistry(Map<String, Function<?>> functions) {
+        this(functions, Map.of());
+    }
 
     public Function<?> resolve(String name) {
-        return functions.get(name);
+        return functions.getOrDefault(name, internalFunctions.get(name));
     }
 
     public Function<?> resolveOrError(String name) {
@@ -45,7 +52,24 @@ public class FunctionRegistry {
         return function;
     }
 
+    /**
+     * Returns all registered public functions.
+     *
+     * @return a collection of functions
+     */
     public Collection<Function<?>> all() {
         return functions.values().stream().collect(Collectors.toList());
     }
+
+    /**
+     * Returns all registered public and internal functions.
+     *
+     * @return a collection of functions
+     */
+    public Collection<Function<?>> allWithInternal() {
+        return Stream.of(functions.values(), internalFunctions.values())
+                .flatMap(Collection::stream)
+                .toList();
+    }
 }
+

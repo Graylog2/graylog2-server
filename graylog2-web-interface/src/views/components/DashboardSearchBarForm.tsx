@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useState } from 'react';
-import PropTypes from 'prop-types';
+import { useCallback, useContext } from 'react';
 import { Form, Formik } from 'formik';
 import isFunction from 'lodash/isFunction';
 import type { FormikProps } from 'formik';
@@ -29,8 +28,9 @@ import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useHandlerContext from 'views/components/useHandlerContext';
+import useSearchBarSubmit from 'views/components/searchbar/useSearchBarSubmit';
 
-import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
+import { onInitializingTimerange } from './TimerangeForForm';
 
 export type DashboardFormValues = {
   timerange: TimeRange | undefined | null | NoTimeRangeOverride,
@@ -50,17 +50,8 @@ const _isFunction = (children: Props['children']): children is (props: FormikPro
 const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQueryString, children }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const { setFieldWarning } = useContext(FormWarningsContext);
-  const [enableReinitialize, setEnableReinitialize] = useState(true);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
 
-  const _onSubmit = useCallback(({ timerange, ...rest }: DashboardFormValues) => {
-    setEnableReinitialize(false);
-
-    return onSubmit({
-      timerange: isNoTimeRangeOverride(timerange) ? undefined : onSubmittingTimerange(timerange, userTimezone),
-      ...rest,
-    }).then(() => setEnableReinitialize(true));
-  }, [onSubmit, userTimezone]);
   const { timerange, ...rest } = initialValues;
   const initialTimeRange = timerange && !isNoTimeRangeOverride(timerange) ? onInitializingTimerange(timerange, formatTime) : {} as TimeRange;
   const _initialValues = {
@@ -68,9 +59,19 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
     ...rest,
   };
 
+  const { enableReinitialize, onSubmit: _onSubmit } = useSearchBarSubmit(_initialValues, onSubmit);
+
   const handlerContext = useHandlerContext();
-  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext),
-    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext]);
+  const _validate = useCallback((values: DashboardFormValues) => validate(
+    values,
+    limitDuration,
+    setFieldWarning,
+    validateQueryString,
+    pluggableSearchBarControls,
+    formatTime,
+    handlerContext,
+    userTimezone,
+  ), [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext, userTimezone]);
 
   return (
     <Formik<DashboardFormValues> initialValues={_initialValues}
@@ -85,15 +86,6 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
       )}
     </Formik>
   );
-};
-
-DashboardSearchForm.propTypes = {
-  initialValues: PropTypes.shape({
-    timerange: PropTypes.object,
-    queryString: PropTypes.string,
-  }).isRequired,
-  limitDuration: PropTypes.number.isRequired,
-  onSubmit: PropTypes.func.isRequired,
 };
 
 export default DashboardSearchForm;

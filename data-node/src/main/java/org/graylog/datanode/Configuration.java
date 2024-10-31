@@ -23,15 +23,19 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.converters.StringSetConverter;
+import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.net.HostAndPort;
 import com.google.common.net.InetAddresses;
-import org.graylog.datanode.configuration.BaseConfiguration;
+import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog2.Configuration.SafeClassesValidator;
+import org.graylog2.configuration.Documentation;
 import org.graylog2.plugin.Tools;
-import org.joda.time.DateTimeZone;
+import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,93 +46,269 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
- * Helper class to hold configuration of Graylog
+ * Helper class to hold configuration of DataNode
  */
 @SuppressWarnings("FieldMayBeFinal")
-public class Configuration extends BaseConfiguration {
+public class Configuration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+    public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
+    public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";
 
-    @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
+    public static final int DATANODE_DEFAULT_PORT = 8999;
+    public static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
+
+    @Documentation(visible = false)
+    @Parameter(value = "installation_source", validators = StringNotBlankValidator.class)
     private String installationSource = "unknown";
 
+    @Deprecated
+    @Documentation(visible = false)
+    @Parameter(value = "insecure_startup")
+    private boolean insecureStartup = false;
+
+    @Documentation("Do not perform any preflight checks when starting Datanode.")
     @Parameter(value = "skip_preflight_checks")
     private boolean skipPreflightChecks = false;
 
-    @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
+    @Documentation("How many milliseconds should datanode wait for termination of all tasks during the shutdown.")
+    @Parameter(value = "shutdown_timeout", validators = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
 
-    @Parameter(value = "is_leader")
-    private boolean isLeader = true;
-
-    @Parameter("disable_native_system_stats_collector")
-    private boolean disableNativeSystemStatsCollector = false;
-
+    @Documentation("Directory where Datanode will search for an opensearch distribution.")
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_data_location")
-    private String opensearchDataLocation = "data";
+    @Documentation("Data directory of the embedded opensearch. Contains indices of the opensearch. May be pointed to an existing" +
+            "opensearch directory during in-place migration to Datanode")
+    @Parameter(value = "opensearch_data_location", required = true)
+    private Path opensearchDataLocation = Path.of("datanode/data");
 
-    @Parameter(value = "opensearch_logs_location")
-    private String opensearchLogsLocation = "logs";
+    @Documentation("Logs directory of the embedded opensearch")
+    @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchLogsLocation = Path.of("datanode/logs");
 
-    @Parameter(value = "opensearch_config_location")
-    private String opensearchConfigLocation = "config";
+    @Documentation("Configuration directory of the embedded opensearch. This is the directory where the opensearch" +
+            "process will store its configuration files. Caution, each start of the Datanode will regenerate the complete content of the directory!")
+    @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchConfigLocation = Path.of("datanode/config");
 
-    @Parameter(value = "config_location")
-    private String configLocation;
+    @Documentation("Source directory of the additional configuration files for the Datanode. Additional certificates can be provided here.")
+    @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)
+    private Path configLocation = null;
 
+    @Documentation(visible = false)
+    @Parameter(value = "native_lib_dir", required = true)
+    private Path nativeLibDir = Path.of("native_libs");
+
+    @Documentation("How many log entries of the opensearch process should Datanode hold in memory and make accessible via API calls.")
     @Parameter(value = "process_logs_buffer_size")
     private Integer opensearchProcessLogsBufferSize = 500;
 
 
+    @Documentation("Unique name of this Datanode instance. use this, if your node name should be different from the hostname that's found by programmatically looking it up")
     @Parameter(value = "node_name")
-    private String datanodeNodeName = "node1";
+    private String datanodeNodeName;
 
+
+    @Documentation("Comma separated list of opensearch nodes that are eligible as manager nodes.")
+    @Parameter(value = "initial_cluster_manager_nodes")
+    private String initialClusterManagerNodes;
+
+    @Documentation("Opensearch heap memory. Initial and maxmium heap must be identical for OpenSearch, otherwise the boot fails. So it's only one config option")
+    @Parameter(value = "opensearch_heap")
+    private String opensearchHeap = "1g";
+
+    @Documentation("HTTP port on which the embedded opensearch listens")
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
 
-
+    @Documentation("Transport port on which the embedded opensearch listens")
     @Parameter(value = "opensearch_transport_port", converter = IntegerConverter.class)
     private int opensearchTransportPort = 9300;
 
+    @Documentation("Provides a list of the addresses of the master-eligible nodes in the cluster.")
     @Parameter(value = "opensearch_discovery_seed_hosts", converter = StringListConverter.class)
     private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
 
+    @Documentation("Binds an OpenSearch node to an address. Use 0.0.0.0 to include all available network interfaces, or specify an IP address assigned to a specific interface. ")
     @Parameter(value = "opensearch_network_host")
-    private String opensearchNetworkHostHost = null;
+    private String opensearchNetworkHost = null;
 
+    @Documentation("Relative path (to config_location) to a keystore used for opensearch transport layer TLS")
     @Parameter(value = "transport_certificate")
-    private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
+    private String datanodeTransportCertificate = null;
 
-    @Parameter(value = "transport_certificate_password")
+    @Documentation("Password for a keystore defined in transport_certificate")
+    @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
+    @Documentation("Relative path (to config_location) to a keystore used for opensearch REST layer TLS")
     @Parameter(value = "http_certificate")
-    private String datanodeHttpCertificate = "datanode-http-certificates.p12";
+    private String datanodeHttpCertificate = null;
 
-    @Parameter(value = "http_certificate_password")
+    @Documentation("Password for a keystore defined in http_certificate")
+    @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
 
-    @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
-    private Integer staleLeaderTimeout = 2000;
+    @Documentation("You MUST set a secret to secure/pepper the stored user passwords here. Use at least 16 characters." +
+            "Generate one by using for example: pwgen -N 1 -s 96 \n" +
+            "ATTENTION: This value must be the same on all Graylog and Datanode nodes in the cluster. " +
+            "Changing this value after installation will render all user sessions and encrypted values in the database invalid. (e.g. encrypted access tokens)")
+    @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
+    private String passwordSecret;
 
-    @Parameter(value = "user_password_default_algorithm")
-    private String userPasswordDefaultAlgorithm = "bcrypt";
+    @Documentation("communication between Graylog and OpenSearch is secured by JWT. This configuration defines interval between token regenerations.")
+    @Parameter(value = "indexer_jwt_auth_token_caching_duration")
+    Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
 
-    @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
-    private int userPasswordBCryptSaltSize = 10;
+    @Documentation("communication between Graylog and OpenSearch is secured by JWT. This configuration defines validity interval of JWT tokens.")
+    @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
+    Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 
-    public Integer getStaleLeaderTimeout() {
-        return staleLeaderTimeout;
+    @Documentation("The auto-generated node ID will be stored in this file and read after restarts. It is a good idea " +
+            "to use an absolute file path here if you are starting Graylog DataNode from init scripts or similar.")
+    @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
+    private String nodeIdFile = "data/node-id";
+
+    @Documentation("HTTP bind address. The network interface used by the Graylog DataNode to bind all services.")
+    @Parameter(value = "bind_address", required = true)
+    private String bindAddress = DEFAULT_BIND_ADDRESS;
+
+
+    @Documentation("HTTP port. The port where the DataNode REST api is listening")
+    @Parameter(value = "datanode_http_port", required = true)
+    private int datanodeHttpPort = DATANODE_DEFAULT_PORT;
+
+    @Documentation(visible = false)
+    @Parameter(value = "hostname")
+    private String hostname = null;
+
+    @Documentation("Name of the cluster that the embedded opensearch will form. Should be the same for all Datanodes in one cluster.")
+    @Parameter(value = "clustername")
+    private String clustername = "datanode-cluster";
+
+    @Documentation("This configuration should be used if you want to connect to this Graylog DataNode's REST API and it is available on " +
+            "another network interface than $http_bind_address, " +
+            "for example if the machine has multiple network interfaces or is behind a NAT gateway.")
+    @Parameter(value = "http_publish_uri", validators  = URIAbsoluteValidator.class)
+    private URI httpPublishUri;
+
+
+    @Documentation("Enable GZIP support for HTTP interface. This compresses API responses and therefore helps to reduce " +
+            " overall round trip times.")
+    @Parameter(value = "http_enable_gzip")
+    private boolean httpEnableGzip = true;
+
+    @Documentation("The maximum size of the HTTP request headers in bytes")
+    @Parameter(value = "http_max_header_size", required = true, validator = PositiveIntegerValidator.class)
+    private int httpMaxHeaderSize = 8192;
+
+    @Documentation("The size of the thread pool used exclusively for serving the HTTP interface.")
+    @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    private int httpThreadPoolSize = 64;
+
+    @Documentation(visible = false, value = "The Grizzly default value is equal to `Runtime.getRuntime().availableProcessors()` which doesn't make " +
+            "sense for Graylog because we are not mainly a web server. " +
+            "See \"Selector runners count\" at https://grizzly.java.net/bestpractices.html for details.")
+    @Parameter(value = "http_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
+    private int httpSelectorRunnersCount = 1;
+
+    @Documentation(visible = false, value = "TODO: do we need this configuration? We control the decision based on preflight and CA configurations")
+    @Parameter(value = "http_enable_tls")
+    private boolean httpEnableTls = false;
+
+
+    @Documentation(visible = false, value = "Classes considered safe to load by name. A set of prefixes matched against the fully qualified class name.")
+    @Parameter(value = org.graylog2.Configuration.SAFE_CLASSES, converter = StringSetConverter.class, validators = SafeClassesValidator.class)
+    private Set<String> safeClasses = Set.of("org.graylog.", "org.graylog2.");
+
+    @Documentation(visible = false)
+    @Parameter(value = "metrics_timestamp")
+    private String metricsTimestamp = "timestamp";
+
+    @Documentation(visible = false)
+    @Parameter(value = "metrics_stream")
+    private String metricsStream = "gl-datanode-metrics";
+
+    @Documentation(visible = false)
+    @Parameter(value = "metrics_retention", validators = PositiveDurationValidator.class)
+    private Duration metricsRetention = Duration.days(14);
+
+    @Documentation(visible = false)
+    @Parameter(value = "metrics_daily_retention", validators = PositiveDurationValidator.class)
+    private Duration metricsDailyRetention = Duration.days(365);
+
+    @Documentation(visible = false)
+    @Parameter(value = "metrics_daily_index")
+    private String metricsDailyIndex = "gl-datanode-metrics-daily";
+
+    @Documentation(visible = false)
+    @Parameter(value = "metrics_policy")
+    private String metricsPolicy = "gl-datanode-metrics-ism";
+
+    @Documentation(value = "Cache size for searchable snaphots")
+    @Parameter(value = "node_search_cache_size")
+    private String searchCacheSize = "10gb";
+
+    /**
+     * <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system">See snapshot documentation</a>
+     */
+    @Documentation("Filesystem path where searchable snapshots should be stored")
+    @Parameter(value = "path_repo", converter = StringListConverter.class)
+    private List<String> pathRepo;
+
+    @Documentation("This setting limits the number of clauses a Lucene BooleanQuery can have.")
+    @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
+    private Integer indicesQueryBoolMaxClauseCount = 32768;
+
+    @Documentation("The list of the opensearch node’s roles.")
+    @Parameter(value = "node_roles", converter = StringListConverter.class)
+    private List<String> nodeRoles = List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search");
+
+    @Documentation(visible = false)
+    @Parameter(value = "async_eventbus_processors")
+    private int asyncEventbusProcessors = 2;
+
+    public int getAsyncEventbusProcessors() {
+        return asyncEventbusProcessors;
+    }
+
+
+    public Integer getIndicesQueryBoolMaxClauseCount() {
+        return indicesQueryBoolMaxClauseCount;
+    }
+
+    @Documentation("Configures verbosity of embedded opensearch logs. Possible values OFF, FATAL, ERROR, WARN, INFO, DEBUG, and TRACE, default is INFO")
+    @Parameter(value = "opensearch_logger_org_opensearch")
+    private String opensearchDebug;
+
+    public String getOpensearchDebug() {
+        return opensearchDebug;
+    }
+
+    @Documentation("Configures opensearch audit log storage type. See https://opensearch.org/docs/2.13/security/audit-logs/storage-types/")
+    @Parameter(value = "opensearch_plugins_security_audit_type")
+    private String opensearchAuditLog;
+
+    public String getOpensearchAuditLog() {
+        return opensearchAuditLog;
+    }
+
+     /**
+     * The insecure flag causes problems on many places. We should replace it with autosecurity option, that would
+     * configure all the CA and certs automatically.
+     */
+    @Deprecated
+    public boolean isInsecureStartup() {
+        return insecureStartup;
     }
 
     public String getInstallationSource() {
@@ -143,31 +323,39 @@ public class Configuration extends BaseConfiguration {
         return shutdownTimeout;
     }
 
-    public boolean isDisableNativeSystemStatsCollector() {
-        return disableNativeSystemStatsCollector;
-    }
-
-    public boolean isLeader() {
-        return isLeader;
-    }
-
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
     }
 
-    public String getOpensearchConfigLocation() {
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    public Path getOpensearchConfigLocation() {
         return opensearchConfigLocation;
     }
 
-    public String getConfigLocation() {
+
+    /**
+     * This is a pointer to a directory holding configuration files (and certificates) for the datanode itself.
+     * We treat it as read only for the datanode and should never persist anything in it.
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    @Nullable
+    public Path getDatanodeConfigurationLocation() {
         return configLocation;
     }
 
-    public String getOpensearchDataLocation() {
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    public Path getOpensearchDataLocation() {
         return opensearchDataLocation;
     }
 
-    public String getOpensearchLogsLocation() {
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    public Path getOpensearchLogsLocation() {
         return opensearchLogsLocation;
     }
 
@@ -175,11 +363,9 @@ public class Configuration extends BaseConfiguration {
         return opensearchProcessLogsBufferSize;
     }
 
-    @Parameter(value = "rest_api_username")
-    private String restApiUsername;
-
-    @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
-    private String passwordSecret;
+    public String getPasswordSecret() {
+        return passwordSecret;
+    }
 
     @ValidatorMethod
     @SuppressWarnings("unused")
@@ -189,42 +375,12 @@ public class Configuration extends BaseConfiguration {
         }
     }
 
-    @Parameter(value = "rest_api_password")
-    private String restApiPassword;
-
-    @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
-    private String nodeIdFile = "data/node-id";
-
-    @Parameter(value = "root_username")
-    private String rootUsername = "admin";
-
-    @Parameter(value = "root_timezone")
-    private DateTimeZone rootTimeZone = DateTimeZone.UTC;
-
-    @Parameter(value = "root_email")
-    private String rootEmail = "";
-
-    @Parameter(value = "single_node_only")
-    private boolean singleNodeOnly = false;
-
-    public String getNodeIdFile() {
-        return nodeIdFile;
-    }
-
-    public String getRootUsername() {
-        return rootUsername;
-    }
-
-    public DateTimeZone getRootTimeZone() {
-        return rootTimeZone;
-    }
-
-    public String getRootEmail() {
-        return rootEmail;
-    }
-
     public String getDatanodeNodeName() {
-        return datanodeNodeName;
+        return datanodeNodeName != null && !datanodeNodeName.isBlank() ? datanodeNodeName : getHostname();
+    }
+
+    public String getInitialClusterManagerNodes() {
+        return initialClusterManagerNodes;
     }
 
     public int getOpensearchHttpPort() {
@@ -255,22 +411,45 @@ public class Configuration extends BaseConfiguration {
         return datanodeHttpCertificatePassword;
     }
 
-
-    public String getRestApiUsername() {
-        return restApiUsername;
+    public Optional<String> getOpensearchNetworkHost() {
+        return Optional.ofNullable(opensearchNetworkHost);
     }
 
-    public String getRestApiPassword() {
-        return restApiPassword;
+    public String getBindAddress() {
+        return bindAddress;
+    }
+
+    public int getDatanodeHttpPort() {
+        return datanodeHttpPort;
+    }
+
+    public String getClustername() {
+        return clustername;
     }
 
 
-    public Optional<String> getOpensearchNetworkHostHost() {
-        return Optional.ofNullable(opensearchNetworkHostHost);
+    public String getMetricsTimestamp() {
+        return metricsTimestamp;
     }
 
-    public boolean isSingleNodeOnly() {
-        return singleNodeOnly;
+    public String getMetricsStream() {
+        return metricsStream;
+    }
+
+    public Duration getMetricsRetention() {
+        return metricsRetention;
+    }
+
+    public String getMetricsDailyIndex() {
+        return metricsDailyIndex;
+    }
+
+    public String getMetricsPolicy() {
+        return metricsPolicy;
+    }
+
+    public Path getNativeLibDir() {
+        return nativeLibDir;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
@@ -312,68 +491,17 @@ public class Configuration extends BaseConfiguration {
             }
             final boolean empty = file.length() == 0;
             if (!writable && readable && empty) {
-                if (b.length() > 0) {
+                if (!b.isEmpty()) {
                     b.append(", ");
                 }
                 b.append("writable, but it is empty");
             }
-            if (b.length() == 0) {
+            if (b.isEmpty()) {
                 // all good
                 return;
             }
             throw new ValidationException("Node ID file at path " + path + " isn't " + b + ". Please specify the correct path or change the permissions");
         }
-    }
-
-    private static final int GRAYLOG_DEFAULT_PORT = 8999;
-
-    public static final String OVERRIDE_HEADER = "X-Graylog-Server-URL";
-    public static final String PATH_WEB = "";
-    public static final String PATH_API = "api/";
-
-    @Parameter(value = "http_bind_address", required = true)
-    private HostAndPort httpBindAddress = HostAndPort.fromParts("127.0.0.1", GRAYLOG_DEFAULT_PORT);
-
-    @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
-    private URI httpPublishUri;
-
-    @Parameter(value = "http_enable_cors")
-    private boolean httpEnableCors = false;
-
-    @Parameter(value = "http_enable_gzip")
-    private boolean httpEnableGzip = true;
-
-    @Parameter(value = "http_max_header_size", required = true, validator = PositiveIntegerValidator.class)
-    private int httpMaxHeaderSize = 8192;
-
-    @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
-    private int httpThreadPoolSize = 64;
-
-    @Parameter(value = "http_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
-    private int httpSelectorRunnersCount = 1;
-
-    @Parameter(value = "http_enable_tls")
-    private boolean httpEnableTls = false;
-
-    @Parameter(value = "http_tls_cert_file")
-    private Path httpTlsCertFile;
-
-    @Parameter(value = "http_tls_key_file")
-    private Path httpTlsKeyFile;
-
-    @Parameter(value = "http_tls_key_password")
-    private String httpTlsKeyPassword;
-
-    @Parameter(value = "http_external_uri")
-    private URI httpExternalUri;
-
-    @Parameter(value = "http_allow_embedding")
-    private boolean httpAllowEmbedding = false;
-
-    public HostAndPort getHttpBindAddress() {
-        return httpBindAddress
-                .requireBracketsForIPv6()
-                .withDefaultPort(GRAYLOG_DEFAULT_PORT);
     }
 
     public String getUriScheme() {
@@ -402,7 +530,7 @@ public class Configuration extends BaseConfiguration {
                 LOG.warn("\"{}\" is not a valid setting for \"http_publish_uri\". Using default <{}>.", httpPublishUri, defaultHttpUri);
                 return defaultHttpUri;
             } else {
-                return Tools.normalizeURI(httpPublishUri, httpPublishUri.getScheme(), GRAYLOG_DEFAULT_PORT, httpPublishUri.getPath());
+                return Tools.normalizeURI(httpPublishUri, httpPublishUri.getScheme(), DATANODE_DEFAULT_PORT, httpPublishUri.getPath());
             }
         }
     }
@@ -413,11 +541,9 @@ public class Configuration extends BaseConfiguration {
     }
 
     private URI getDefaultHttpUri(String path) {
-        final HostAndPort bindAddress = getHttpBindAddress();
-
         final URI publishUri;
-        final InetAddress inetAddress = toInetAddress(bindAddress.getHost());
-        if (inetAddress != null && Tools.isWildcardInetAddress(inetAddress)) {
+        final InetAddress inetAddress = toInetAddress(bindAddress);
+        if (Tools.isWildcardInetAddress(inetAddress)) {
             final InetAddress guessedAddress;
             try {
                 guessedAddress = Tools.guessPrimaryNetworkAddress(inetAddress instanceof Inet4Address);
@@ -435,7 +561,7 @@ public class Configuration extends BaseConfiguration {
                         getUriScheme(),
                         null,
                         guessedAddress.getHostAddress(),
-                        bindAddress.getPort(),
+                        datanodeHttpPort,
                         path,
                         null,
                         null
@@ -448,8 +574,8 @@ public class Configuration extends BaseConfiguration {
                 publishUri = new URI(
                         getUriScheme(),
                         null,
-                        getHttpBindAddress().getHost(),
-                        getHttpBindAddress().getPort(),
+                        bindAddress,
+                        datanodeHttpPort,
                         path,
                         null,
                         null
@@ -462,9 +588,6 @@ public class Configuration extends BaseConfiguration {
         return publishUri;
     }
 
-    public boolean isHttpEnableCors() {
-        return httpEnableCors;
-    }
 
     public boolean isHttpEnableGzip() {
         return httpEnableGzip;
@@ -486,66 +609,47 @@ public class Configuration extends BaseConfiguration {
         return httpEnableTls;
     }
 
-    public Path getHttpTlsCertFile() {
-        return httpTlsCertFile;
-    }
-
-    public Path getHttpTlsKeyFile() {
-        return httpTlsKeyFile;
-    }
-
-    public String getHttpTlsKeyPassword() {
-        return httpTlsKeyPassword;
-    }
-
-    public URI getHttpExternalUri() {
-        return httpExternalUri == null ? getHttpPublishUri() : httpExternalUri;
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateHttpBindAddress() throws ValidationException {
-        try {
-            final String host = getHttpBindAddress().getHost();
-            if (!InetAddresses.isInetAddress(host)) {
-                final InetAddress inetAddress = InetAddress.getByName(host);
-            }
-        } catch (IllegalArgumentException | UnknownHostException e) {
-            throw new ValidationException(e);
+    @SuppressForbidden("Deliberate invocation of DNS lookup")
+    public String getHostname() {
+        if (hostname != null && !hostname.isBlank()) {
+            // config setting always takes precedence
+            return hostname;
         }
-    }
 
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateHttpPublishUriPathEndsWithSlash() throws ValidationException {
-        if (!getHttpPublishUri().getPath().endsWith("/")) {
-            throw new ValidationException("\"http_publish_uri\" must end with a slash (\"/\")");
+        if (DEFAULT_BIND_ADDRESS.equals(bindAddress)) {
+            // no hostname is set, bind address is to 0.0.0.0 -> return host name, the OS finds
+            return Tools.getLocalCanonicalHostname();
         }
-    }
 
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateHttpExternalUriPathEndsWithSlash() throws ValidationException {
-        if (!getHttpExternalUri().getPath().endsWith("/")) {
-            throw new ValidationException("\"http_external_uri\" must end with a slash (\"/\")");
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateTlsConfig() throws ValidationException {
-        if (isHttpEnableTls()) {
-            if (!isRegularFileAndReadable(getHttpTlsKeyFile())) {
-                throw new ValidationException("Unreadable or missing HTTP private key: " + getHttpTlsKeyFile());
-            }
-
-            if (!isRegularFileAndReadable(getHttpTlsCertFile())) {
-                throw new ValidationException("Unreadable or missing HTTP X.509 certificate: " + getHttpTlsCertFile());
+        if (InetAddresses.isInetAddress(bindAddress)) {
+            // bindaddress is a real IP, resolving the hostname
+            try {
+                InetAddress addr = InetAddress.getByName(bindAddress);
+                return addr.getHostName();
+            } catch (UnknownHostException e) {
+                final var hostname = Tools.getLocalCanonicalHostname();
+                LOG.error("Could not resolve {} to hostname, check your DNS. Using {} instead.", bindAddress, hostname);
+                return hostname;
             }
         }
+
+        // bindaddress is configured as the hostname
+        return bindAddress;
     }
 
-    private boolean isRegularFileAndReadable(Path path) {
-        return path != null && Files.isRegularFile(path) && Files.isReadable(path);
+    public String getNodeSearchCacheSize() {
+        return searchCacheSize;
+    }
+
+    public List<String> getPathRepo() {
+        return pathRepo;
+    }
+
+    public List<String> getNodeRoles() {
+        return nodeRoles;
+    }
+
+    public String getOpensearchHeap() {
+        return opensearchHeap;
     }
 }

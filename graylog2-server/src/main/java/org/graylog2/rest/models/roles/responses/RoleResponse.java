@@ -22,8 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Optional;
 import java.util.Set;
 
@@ -47,9 +48,9 @@ public abstract class RoleResponse {
     public abstract boolean readOnly();
 
     @JsonCreator
-    public static RoleResponse create(@JsonProperty("name") @NotBlank String name,
+    public static RoleResponse create(@JsonProperty(value = "name", required = true) @NotBlank String name,
                                       @JsonProperty("description") Optional<String> description,
-                                      @JsonProperty("permissions") @NotNull Set<String> permissions,
+                                      @JsonProperty(value = "permissions", required = true) @NotNull Set<String> permissions,
                                       @JsonProperty("read_only") boolean readOnly) {
         return new AutoValue_RoleResponse(name, description, permissions, readOnly);
     }

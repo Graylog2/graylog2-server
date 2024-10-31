@@ -32,7 +32,7 @@ public interface UserService extends PersistedService {
     @Nullable
     User load(String username);
 
-    public List<User> loadAllByName(final String username);
+    List<User> loadAllByName(final String username);
 
     @Nullable
     User loadById(String id);

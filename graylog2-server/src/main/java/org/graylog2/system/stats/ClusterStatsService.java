@@ -27,8 +27,8 @@ import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.graylog2.system.stats.mongo.MongoProbe;
 import org.graylog2.system.stats.mongo.MongoStats;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class ClusterStatsService {

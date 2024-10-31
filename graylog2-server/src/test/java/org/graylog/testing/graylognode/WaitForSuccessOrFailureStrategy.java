@@ -24,14 +24,15 @@ import org.testcontainers.containers.output.WaitingConsumer;
 import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 public class WaitForSuccessOrFailureStrategy extends AbstractWaitStrategy {
 
-    private String success;
-    private String[] failures;
+    private Collection<String> success;
+    private Collection<String> failures;
 
     @Override
     protected void waitUntilReady() {
@@ -53,23 +54,23 @@ public class WaitForSuccessOrFailureStrategy extends AbstractWaitStrategy {
 
             Predicate<OutputFrame> waitPredicate = outputFrame -> {
                 // (?s) enables line terminator matching (equivalent to Pattern.DOTALL)
-                for(final String failure: failures) {
+                for (final String failure : failures) {
                     if (outputFrame.getUtf8String().matches("(?s)" + failure)) {
                         throw new ContainerLaunchException("Container startup failed. Was looking for: '" + failure + "'");
                     }
                 }
-                return outputFrame.getUtf8String().matches("(?s)" + success);
+                return success.stream().anyMatch(s -> outputFrame.getUtf8String().matches("(?s)" + s));
             };
             waitingConsumer.waitUntil(waitPredicate, startupTimeout.getSeconds(), TimeUnit.SECONDS, 1);
 
         } catch (IOException iox) {
             throw new ContainerLaunchException("Failed with Exception: " + iox.getMessage());
         } catch (TimeoutException e) {
-            throw new ContainerLaunchException("Timed out waiting for log output matching '" + success + "'");
+            throw new ContainerLaunchException("Timed out waiting for log output matching any of '" + String.join(",", success) + "'");
         }
     }
 
-    public WaitForSuccessOrFailureStrategy withSuccessAndFailures(final String success, final String... failures) {
+    public WaitForSuccessOrFailureStrategy withSuccessAndFailures(final Collection<String> success, final Collection<String> failures) {
         this.success = success;
         this.failures = failures;
         return this;

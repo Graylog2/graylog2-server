@@ -34,9 +34,10 @@ import org.graylog2.security.MongoDbSessionDAO;
 import org.graylog2.security.OrderedAuthenticatingRealms;
 import org.graylog2.shared.security.ThrowingFirstSuccessfulStrategy;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
         List<Realm> authorizingRealms = new ArrayList<>();
         authorizingRealms.addAll(authorizingOnlyRealms.values());
         // root account realm might be deactivated and won't be present in that case
-        orderedAuthenticatingRealms.getRootAccountRealm().map(authorizingRealms::add);
+        orderedAuthenticatingRealms.getRootAccountRealm().ifPresent(authorizingRealms::add);
 
         final ModularRealmAuthorizer authorizer = new ModularRealmAuthorizer(authorizingRealms);
 

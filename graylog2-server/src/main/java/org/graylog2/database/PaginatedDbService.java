@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.client.model.Sorts;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.mongojack.DBCursor;
@@ -61,40 +63,28 @@ public abstract class PaginatedDbService<DTO> {
                                  MongoJackObjectMapperProvider mapper,
                                  Class<DTO> dtoClass,
                                  String collectionName) {
-        this(mongoConnection, mapper, dtoClass, collectionName, null);
-    }
-
-    protected PaginatedDbService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper,
-                                 Class<DTO> dtoClass,
-                                 String collectionName,
-                                 Class<?> view) {
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(collectionName),
                 dtoClass,
                 ObjectId.class,
-                mapper.get(),
-                view);
+                mapper.get());
     }
 
     protected PaginatedDbService(MongoConnection mongoConnection,
                                  MongoJackObjectMapperProvider mapper,
                                  Class<DTO> dtoClass,
                                  String collectionName,
-                                 @Nullable DBObject dbOptions,
-                                 @Nullable Class<?> view) {
+                                 @Nullable DBObject dbOptions) {
         DBCollection dbCollection;
         if (!mongoConnection.getDatabase().collectionExists(collectionName)) {
             dbCollection = mongoConnection.getDatabase().createCollection(collectionName, dbOptions);
-        }
-        else {
+        } else {
             dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         }
 
         this.db = JacksonDBCollection.wrap(dbCollection,
                 dtoClass,
                 ObjectId.class,
-                mapper.get(),
-                view);
+                mapper.get());
     }
 
     /**
@@ -140,7 +130,7 @@ public abstract class PaginatedDbService<DTO> {
      * @param perPage the number of entries per page, 0 is unlimited
      * @return the paginated list
      */
-    protected PaginatedList<DTO> findPaginatedWithQueryAndSort(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
+    protected PaginatedList<DTO> findPaginatedWithQueryAndSort(Bson query, Bson sort, int page, int perPage) {
         try (final DBCursor<DTO> cursor = db.find(query)
                 .sort(sort)
                 .limit(perPage)
@@ -160,10 +150,10 @@ public abstract class PaginatedDbService<DTO> {
      * Since the database cannot execute the filter function directly, this method streams over the result cursor
      * and executes the filter function for each database object. <strong>This increases memory consumption and should only be
      * used if necessary.</strong> Use the
-     * {@link PaginatedDbService#findPaginatedWithQueryFilterAndSort(DBQuery.Query, Predicate, DBSort.SortBuilder, int, int) #findPaginatedWithQueryAndSort()}
+     * {@link PaginatedDbService#findPaginatedWithQueryFilterAndSort(Bson, Predicate, Bson, int, int) #findPaginatedWithQueryAndSort()}
      * method if possible.
      * <p>
-     * This method is only accessible by subclasses to avoid exposure of the {@link DBQuery} and {@link DBSort}
+     * This method is only accessible by subclasses to avoid exposure of the query and sort
      * interfaces to consumers.
      *
      * @param query   the query to execute
@@ -173,9 +163,9 @@ public abstract class PaginatedDbService<DTO> {
      * @param perPage the number of entries per page, 0 is unlimited
      * @return the paginated list
      */
-    protected PaginatedList<DTO> findPaginatedWithQueryFilterAndSort(DBQuery.Query query,
+    protected PaginatedList<DTO> findPaginatedWithQueryFilterAndSort(Bson query,
                                                                      Predicate<DTO> filter,
-                                                                     DBSort.SortBuilder sort,
+                                                                     Bson sort,
                                                                      int page,
                                                                      int perPage) {
         return findPaginatedWithQueryFilterAndSortWithGrandTotal(
@@ -188,12 +178,12 @@ public abstract class PaginatedDbService<DTO> {
     }
 
 
-    protected PaginatedList<DTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(DBQuery.Query query,
-                                                                     Predicate<DTO> filter,
-                                                                     DBSort.SortBuilder sort,
-                                                                     DBQuery.Query grandTotalQuery,
-                                                                     int page,
-                                                                     int perPage) {
+    protected PaginatedList<DTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(Bson query,
+                                                                                   Predicate<DTO> filter,
+                                                                                   Bson sort,
+                                                                                   Bson grandTotalQuery,
+                                                                                   int page,
+                                                                                   int perPage) {
         // Calculate the total amount of items matching the query/filter, but before pagination
         final long total;
         try (final Stream<DTO> cursor = streamQueryWithSort(query, sort)) {
@@ -248,7 +238,7 @@ public abstract class PaginatedDbService<DTO> {
      * @param query the query to execute
      * @return stream of database entries that match the query
      */
-    protected Stream<DTO> streamQuery(DBQuery.Query query) {
+    protected Stream<DTO> streamQuery(Bson query) {
         final DBCursor<DTO> cursor = db.find(query);
         return Streams.stream((Iterable<DTO>) cursor).onClose(cursor::close);
     }
@@ -262,7 +252,7 @@ public abstract class PaginatedDbService<DTO> {
      * @param sort  the sort order for the query
      * @return stream of database entries that match the query
      */
-    protected Stream<DTO> streamQueryWithSort(DBQuery.Query query, DBSort.SortBuilder sort) {
+    protected Stream<DTO> streamQueryWithSort(Bson query, Bson sort) {
         final DBCursor<DTO> cursor = db.find(query).sort(sort);
         return Streams.stream((Iterable<DTO>) cursor).onClose(cursor::close);
     }
@@ -273,7 +263,9 @@ public abstract class PaginatedDbService<DTO> {
      * @param order the order. either "asc" or "desc"
      * @param field the field to sort on
      * @return the sort builder
+     * @deprecated {@link DBSort} is deprecated. Consider using {@link Sorts} instead.
      */
+    @Deprecated
     protected DBSort.SortBuilder getSortBuilder(String order, String field) {
         DBSort.SortBuilder sortBuilder;
         if ("desc".equalsIgnoreCase(order)) {
@@ -284,6 +276,9 @@ public abstract class PaginatedDbService<DTO> {
         return sortBuilder;
     }
 
+    /**
+     * @deprecated {@link DBSort} is deprecated. Consider using {@link Sorts} instead.
+     */
     protected DBSort.SortBuilder getMultiFieldSortBuilder(String order, List<String> fields) {
         if (fields == null || fields.isEmpty()) {
             return DBSort.asc("_id");
@@ -320,12 +315,12 @@ public abstract class PaginatedDbService<DTO> {
      * @return
      */
     public static <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
-        if(pageSize <= 0 || page <= 0) {
+        if (pageSize <= 0 || page <= 0) {
             throw new IllegalArgumentException("invalid page size: " + pageSize);
         }
 
         int fromIndex = (page - 1) * pageSize;
-        if(sourceList == null || sourceList.size() <= fromIndex){
+        if (sourceList == null || sourceList.size() <= fromIndex) {
             return Collections.emptyList();
         }
 

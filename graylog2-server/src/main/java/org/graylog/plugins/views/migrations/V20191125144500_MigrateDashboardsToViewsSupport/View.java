@@ -18,13 +18,14 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotBlank;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +33,7 @@ import java.util.Set;
 
 @AutoValue
 @WithBeanGetter
-abstract class View {
+abstract class View implements MongoEntity {
     enum Type {
         SEARCH,
         DASHBOARD
@@ -54,7 +55,7 @@ abstract class View {
     @Id
     @Nullable
     @JsonProperty(FIELD_ID)
-    abstract String id();
+    public abstract String id();
 
     @JsonProperty(FIELD_TYPE)
     abstract Type type();

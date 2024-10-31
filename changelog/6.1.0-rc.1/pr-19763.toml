@@ -1,0 +1,9 @@
+# PLEASE REMOVE COMMENTS AND OPTIONAL FIELDS! THANKS!
+
+# Entry type according to https://keepachangelog.com/en/1.0.0/
+# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+type = "added"
+message = "Add archive, outputs, pipelines, dataWarehouse column to stream overview."
+
+issues = [""]
+pulls = ["19763"]

@@ -26,6 +26,6 @@ export default (fieldName: string | Array<string>, type: FieldType) => {
     case 'date':
       return Pivot.create(fields, 'time', { interval: { type: 'auto', scaling: 1.0 } });
     default:
-      return Pivot.create(fields, 'values', { limit: 15 });
+      return Pivot.createValues(fields);
   }
 };

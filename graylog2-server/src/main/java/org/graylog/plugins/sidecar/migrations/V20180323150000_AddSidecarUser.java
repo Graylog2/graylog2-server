@@ -24,7 +24,8 @@ import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationHelpers;
 import org.graylog2.users.RoleService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.UUID;
 

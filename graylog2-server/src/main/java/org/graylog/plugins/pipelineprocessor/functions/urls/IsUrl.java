@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
@@ -30,13 +31,16 @@ public class IsUrl extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsUrl() {
-        valueParam = object("value").description("Value to check").build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to check").build();
     }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
         final Object value = valueParam.required(args, context);
-        return value instanceof URL;
+        if (value instanceof URL url) {
+            return url.hasParsedUrl();
+        }
+        return false;
     }
 
     @Override
@@ -46,6 +50,10 @@ public class IsUrl extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(valueParam)
                 .description("Checks whether a value is a URL")
+                .ruleBuilderEnabled(false)
+                .ruleBuilderName("Check if URL")
+                .ruleBuilderTitle("Check whether '${value}' is a URL")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }
 }

@@ -30,24 +30,31 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
+export const KEY_PREFIX = ['dashboards', 'overview'];
+export const keyFn = (searchParams: SearchParams) => [...KEY_PREFIX, searchParams];
+
+const dashboardsUrl = qualifyUrl('/dashboards');
+
 type PaginatedDashboardsResponse = PaginatedListJSON & {
   elements: Array<ViewJson>,
   attributes: Array<Attribute>,
 };
 
 type Options = {
-  enabled: boolean,
+  enabled?: boolean,
 }
 
-const dashboardsUrl = qualifyUrl('/dashboards');
+type SearchParamsForDashboards = SearchParams & {
+  scope: 'read' | 'update',
+}
 
-const fetchDashboards = (searchParams: SearchParams) => {
+export const fetchDashboards = (searchParams: SearchParamsForDashboards) => {
   const url = PaginationURL(
     dashboardsUrl,
     searchParams.page,
     searchParams.pageSize,
     searchParams.query,
-    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction, scope: searchParams.scope });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
     ({ elements, total, count, page, per_page: perPage, attributes }) => ({
@@ -58,7 +65,7 @@ const fetchDashboards = (searchParams: SearchParams) => {
   );
 };
 
-const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
+const useDashboards = (searchParams: SearchParamsForDashboards, { enabled }: Options = { enabled: true }): {
   data: {
     list: Readonly<Array<View>>,
     pagination: { total: number },
@@ -68,7 +75,7 @@ const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enab
   isInitialLoading: boolean,
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
-    ['dashboards', 'overview', searchParams],
+    keyFn(searchParams),
     () => fetchDashboards(searchParams),
     {
       onError: (errorThrown) => {

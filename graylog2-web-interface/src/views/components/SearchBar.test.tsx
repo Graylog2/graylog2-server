@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import MockQuery from 'views/logic/queries/Query';
@@ -23,14 +23,15 @@ import type { WidgetEditingState, WidgetFocusingState } from 'views/components/c
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useAppDispatch from 'stores/useAppDispatch';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import OriginalSearchBar from './SearchBar';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
@@ -38,12 +39,7 @@ jest.mock('stores/streams/StreamsStore', () => MockStore(
   'availableStreams',
 ));
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(),
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-}));
+jest.mock('hooks/useSearchConfiguration');
 
 jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () => jest.fn(() => (
   <div>Saved Search Controls</div>
@@ -57,6 +53,7 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('stores/useAppDispatch');
+jest.mock('views/hooks/useAutoRefresh');
 
 const query = MockQuery.builder()
   .timerange({ type: 'relative', from: 300 })
@@ -71,13 +68,10 @@ const SearchBar = () => (
 );
 
 describe('SearchBar', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
-    SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
-
+    asMock(useSearchConfiguration).mockReturnValue({ config: mockSearchesClusterConfig, refresh: () => {} });
     asMock(useCurrentQuery).mockReturnValue(query);
   });
 
@@ -110,14 +104,14 @@ describe('SearchBar', () => {
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
-    asMock(SearchConfigStore.getInitialState).mockReturnValue({ searchesClusterConfig: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' } });
+    asMock(useSearchConfiguration).mockReturnValue({ config: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' }, refresh: () => {} });
     render(<SearchBar />);
 
-    const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
+    const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
     await waitFor(() => expect(searchButton.classList).toContain('disabled'));
-    await waitFor(() => expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle'));
+    within(timeRangePickerButton).getByText('warning');
   });
 
   it('should hide the save load controls if editing the widget', async () => {

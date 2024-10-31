@@ -16,9 +16,15 @@
  */
 package org.graylog.testing.elasticsearch;
 
+import org.graylog2.indexer.indices.Template;
+
 import java.util.Map;
+import java.util.Optional;
 
 public interface Client {
+
+    Optional<Map<String, Object>> findMessage(String index, String query);
+
     default void createIndex(String index) {
         createIndex(index, 1, 0);
     }
@@ -46,7 +52,7 @@ public interface Client {
 
     boolean templateExists(String templateName);
 
-    void putTemplate(String templateName, Map<String, Object> source);
+    void putTemplate(String templateName, Template source);
 
     void deleteTemplates(String... templates);
 
@@ -70,4 +76,12 @@ public interface Client {
 
     void updateMapping(String index, Map<String, Object> mapping);
     Map<String, Object> getMapping(String index);
+
+    String getClusterSetting(String setting);
+
+    void putFieldMapping(final String index, final String field, final String type);
+
+    IndexState getStatus(String indexName);
+
+    void openIndex(String indexName);
 }

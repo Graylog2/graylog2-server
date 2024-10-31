@@ -16,31 +16,42 @@
  */
 package org.graylog.plugins.views.search.engine.normalization;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
+import org.graylog2.plugin.Tools;
+import org.graylog2.streams.StreamService;
+import org.joda.time.DateTime;
 
-import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class PluggableSearchNormalization implements SearchNormalization {
     private final Set<SearchNormalizer> pluggableNormalizers;
     private final Set<SearchNormalizer> postValidationNormalizers;
+    private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
 
     @Inject
     public PluggableSearchNormalization(Set<SearchNormalizer> pluggableNormalizers,
-                                        @PostValidation Set<SearchNormalizer> postValidationNormalizers) {
+                                        @PostValidation Set<SearchNormalizer> postValidationNormalizers,
+                                        StreamService streamService) {
         this.pluggableNormalizers = pluggableNormalizers;
         this.postValidationNormalizers = postValidationNormalizers;
+        this.streamCategoryMapper = (categories) -> streamService.mapCategoriesToIds(categories).stream();
     }
 
-    public PluggableSearchNormalization(Set<SearchNormalizer> pluggableNormalizers) {
-        this(pluggableNormalizers, Collections.emptySet());
+    public PluggableSearchNormalization(Set<SearchNormalizer> pluggableNormalizers, StreamService streamService) {
+        this(pluggableNormalizers, Collections.emptySet(), streamService);
     }
 
     private Search normalize(Search search, Set<SearchNormalizer> normalizers) {
@@ -64,10 +75,22 @@ public class PluggableSearchNormalization implements SearchNormalization {
 
     @Override
     public Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
-        Search normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()));
+        final Search searchWithStreams = search
+                .addStreamsToQueriesWithCategories(streamCategoryMapper, searchUser)
+                .addStreamsToSearchTypesWithCategories(streamCategoryMapper, searchUser)
+                .addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadMessageStreamsWithFallback());
+        final var now = referenceDateFromOverrideOrNow(executionState);
+        final var normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()))
+                .withReferenceDate(now);
 
         return normalize(normalizedSearch, pluggableNormalizers);
+    }
+
+    private DateTime referenceDateFromOverrideOrNow(ExecutionState executionState) {
+        return Optional.ofNullable(executionState)
+                .map(ExecutionState::globalOverride)
+                .flatMap(ExecutionStateGlobalOverride::now)
+                .orElse(Tools.nowUTC());
     }
 
     @Override
@@ -79,7 +102,9 @@ public class PluggableSearchNormalization implements SearchNormalization {
     public Query preValidation(final Query query, final ParameterProvider parameterProvider, SearchUser searchUser, ExecutionState executionState) {
         Query normalizedQuery = query;
         if (!query.hasStreams()) {
-            normalizedQuery = query.addStreamsToFilter(searchUser.streams().loadAll());
+            normalizedQuery = query.addStreamsToFilter(searchUser.streams().loadMessageStreamsWithFallback());
+        } else if (!query.usedStreamCategories().isEmpty()) {
+            normalizedQuery = query.replaceStreamCategoryFilters(streamCategoryMapper, searchUser);
         }
 
         if (!executionState.equals(ExecutionState.empty())) {
@@ -93,4 +118,6 @@ public class PluggableSearchNormalization implements SearchNormalization {
     public Query postValidation(final Query query, final ParameterProvider parameterProvider) {
         return normalize(query, parameterProvider, postValidationNormalizers);
     }
+
+
 }

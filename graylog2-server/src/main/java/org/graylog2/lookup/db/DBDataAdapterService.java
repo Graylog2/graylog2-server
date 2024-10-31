@@ -16,55 +16,85 @@
  */
 package org.graylog2.lookup.db;
 
-import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
-import org.graylog2.database.entities.ScopedDbService;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.events.DataAdaptersDeleted;
 import org.graylog2.lookup.events.DataAdaptersUpdated;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public class DBDataAdapterService extends ScopedDbService<DataAdapterDto> {
+import static com.mongodb.client.model.Filters.eq;
+import static org.graylog2.database.utils.MongoUtils.idEq;
+import static org.graylog2.database.utils.MongoUtils.stream;
+import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
+
+public class DBDataAdapterService {
     public static final String COLLECTION_NAME = "lut_data_adapters";
 
     private final ClusterEventBus clusterEventBus;
+    private final MongoCollection<DataAdapterDto> collection;
+    private final MongoUtils<DataAdapterDto> mongoUtils;
+    private final ScopedEntityMongoUtils<DataAdapterDto> scopedEntityMongoUtils;
+    private final MongoPaginationHelper<DataAdapterDto> paginationHelper;
 
     @Inject
-    public DBDataAdapterService(MongoConnection mongoConnection,
-                                MongoJackObjectMapperProvider mapper,
+    public DBDataAdapterService(MongoCollections mongoCollections,
                                 EntityScopeService entityScopeService,
                                 ClusterEventBus clusterEventBus) {
-        super(mongoConnection, mapper, DataAdapterDto.class, COLLECTION_NAME, entityScopeService);
         this.clusterEventBus = clusterEventBus;
-
-        db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
+        this.collection = mongoCollections.collection(COLLECTION_NAME, DataAdapterDto.class);
+        this.mongoUtils = mongoCollections.utils(collection);
+        this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
+        this.paginationHelper = mongoCollections.paginationHelper(collection);
+        collection.createIndex(Indexes.ascending("name"), new IndexOptions().unique(true));
     }
 
-    @Override
     public Optional<DataAdapterDto> get(String idOrName) {
         if (ObjectId.isValid(idOrName)) {
-            return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
+            return mongoUtils.getById(idOrName);
         } else {
             // not an ObjectId, try with name
-            return Optional.ofNullable(db.findOne(DBQuery.is("name", idOrName)));
+            return Optional.ofNullable(collection.find(eq("name", idOrName)).first());
         }
     }
 
-    public DataAdapterDto saveAndPostEvent(DataAdapterDto table) {
-        final DataAdapterDto savedDataAdapter = super.save(table);
+    // Purposely bypass ScopedEntityMongoUtils checks and save the adapter. Only call this method internally and never
+    // from user initiated API requests.
+    public void forceSave(DataAdapterDto dataAdapter) {
+        if (dataAdapter.id() == null) {
+            collection.insertOne(dataAdapter);
+        } else {
+            collection.replaceOne(idEq(dataAdapter.id()), dataAdapter);
+        }
+    }
+
+    public DataAdapterDto save(DataAdapterDto dataAdapter) {
+        final DataAdapterDto savedDataAdapter;
+        if (dataAdapter.id() == null) {
+            final String id = scopedEntityMongoUtils.create(dataAdapter);
+            savedDataAdapter = dataAdapter.toBuilder().id(id).build();
+        } else {
+            savedDataAdapter = scopedEntityMongoUtils.update(dataAdapter);
+        }
+        return savedDataAdapter;
+    }
+
+    public DataAdapterDto saveAndPostEvent(DataAdapterDto dataAdapter) {
+        final DataAdapterDto savedDataAdapter = save(dataAdapter);
         clusterEventBus.post(DataAdaptersUpdated.create(savedDataAdapter.id()));
 
         return savedDataAdapter;
@@ -74,38 +104,32 @@ public class DBDataAdapterService extends ScopedDbService<DataAdapterDto> {
         clusterEventBus.post(DataAdaptersUpdated.create(updatedAdapterIds));
     }
 
-    public PaginatedList<DataAdapterDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
-        try (DBCursor<DataAdapterDto> cursor = db.find(query)
-                .sort(sort)
-                .limit(perPage)
-                .skip(perPage * Math.max(0, page - 1))) {
-
-            return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
-        }
+    public PaginatedList<DataAdapterDto> findPaginated(Bson query, Bson sort, int page, int perPage) {
+        return paginationHelper.filter(query).sort(sort).perPage(perPage).page(page);
     }
 
     public void deleteAndPostEvent(String idOrName) {
         final Optional<DataAdapterDto> dataAdapterDto = get(idOrName);
-        super.delete(idOrName);
-        dataAdapterDto.ifPresent(dataAdapter -> clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id())));
+        dataAdapterDto.ifPresent(dataAdapter -> {
+            scopedEntityMongoUtils.deleteById(dataAdapter.id());
+            clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id()));
+        });
     }
 
     public void deleteAndPostEventImmutable(String idOrName) {
         final Optional<DataAdapterDto> dataAdapterDto = get(idOrName);
-        super.forceDelete(idOrName);
-        dataAdapterDto.ifPresent(dataAdapter -> clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id())));
+        dataAdapterDto.ifPresent(dataAdapter -> {
+            scopedEntityMongoUtils.forceDelete(dataAdapter.id());
+            clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id()));
+        });
     }
 
     public Collection<DataAdapterDto> findByIds(Set<String> idSet) {
-        final DBQuery.Query query = DBQuery.in("_id", idSet.stream().map(ObjectId::new).collect(Collectors.toList()));
-        try (DBCursor<DataAdapterDto> cursor = db.find(query)) {
-            return asImmutableList(cursor);
-        }
+        return stream(collection.find(stringIdsIn(idSet))).toList();
+
     }
 
     public Collection<DataAdapterDto> findAll() {
-        try (DBCursor<DataAdapterDto> cursor = db.find()) {
-            return asImmutableList(cursor);
-        }
+        return stream(collection.find()).toList();
     }
 }

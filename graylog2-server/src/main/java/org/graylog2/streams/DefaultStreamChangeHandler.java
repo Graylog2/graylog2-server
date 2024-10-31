@@ -24,8 +24,8 @@ import org.graylog2.streams.events.StreamsChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 /**
  * This class subscribes to all {@link StreamsChangedEvent} events and reloads the default stream if it has changed.

@@ -21,34 +21,30 @@ import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
-import MockStore from 'helpers/mocking/StoreMock';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import FormikInput from 'components/common/FormikInput';
-import { viewSliceReducer } from 'views/logic/slices/viewSlice';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import useViewsPlugin from 'views/test/testViewsPlugin';
+import asMock from 'helpers/mocking/AsMock';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
-
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-}));
+jest.mock('views/hooks/useAutoRefresh');
 
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
   status: 'OK',
   explanations: [],
 })));
+
+jest.mock('hooks/useSearchConfiguration');
 
 const DashboardSearchBar = () => (
   <TestStoreProvider>
@@ -66,12 +62,10 @@ describe('DashboardSearchBar pluggable controls', () => {
   const mockOnSubmit = jest.fn((_values, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
+  useViewsPlugin();
+
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, {
-      'views.reducers': [
-        { key: 'view', reducer: viewSliceReducer },
-        { key: 'searchExecution', reducer: searchExecutionSliceReducer },
-      ],
       'views.components.searchBar': [
         () => ({
           id: 'pluggable-search-bar-control',
@@ -98,7 +92,7 @@ describe('DashboardSearchBar pluggable controls', () => {
   });
 
   beforeEach(() => {
-    SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
+    asMock(useSearchConfiguration).mockReturnValue(({ config: mockSearchesClusterConfig, refresh: () => {} }));
   });
 
   it('should render and have initial values', async () => {

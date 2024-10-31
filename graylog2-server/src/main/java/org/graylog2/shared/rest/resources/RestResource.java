@@ -18,9 +18,17 @@ package org.graylog2.shared.rest.resources;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
-import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
-import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
+import com.fasterxml.jackson.jakarta.rs.cfg.EndpointConfigBase;
+import com.fasterxml.jackson.jakarta.rs.cfg.ObjectWriterInjector;
+import com.fasterxml.jackson.jakarta.rs.cfg.ObjectWriterModifier;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.indexer.IndexSet;
@@ -32,20 +40,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
+
+import jakarta.inject.Inject;
+
 import java.net.URI;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class RestResource {

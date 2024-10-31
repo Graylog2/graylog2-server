@@ -25,7 +25,9 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotEmpty;
+
 import java.util.Collections;
 import java.util.List;
 

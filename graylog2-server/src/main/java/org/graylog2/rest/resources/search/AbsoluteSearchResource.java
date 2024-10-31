@@ -22,6 +22,17 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
@@ -41,19 +52,9 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 
+import static org.graylog2.rest.RestTools.respondWithFile;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -73,8 +74,8 @@ public class AbsoluteSearchResource extends SearchResource {
     @GET
     @Timed
     @ApiOperation(value = "Message search with absolute timerange.",
-            notes = "Search for messages using an absolute timerange, specified as from/to " +
-                    "with format yyyy-MM-ddTHH:mm:ss.SSSZ (e.g. 2014-01-23T15:34:49.000Z) or yyyy-MM-dd HH:mm:ss.")
+                  notes = "Search for messages using an absolute timerange, specified as from/to " +
+                          "with format yyyy-MM-ddTHH:mm:ss.SSSZ (e.g. 2014-01-23T15:34:49.000Z) or yyyy-MM-dd HH:mm:ss.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
@@ -139,8 +140,8 @@ public class AbsoluteSearchResource extends SearchResource {
     @Path("/export")
     @Timed
     @ApiOperation(value = "Export message search with absolute timerange.",
-            notes = "Search for messages using an absolute timerange, specified as from/to " +
-                    "with format yyyy-MM-ddTHH:mm:ss.SSSZ (e.g. 2014-01-23T15:34:49.000Z) or yyyy-MM-dd HH:mm:ss.")
+                  notes = "Search for messages using an absolute timerange, specified as from/to " +
+                          "with format yyyy-MM-ddTHH:mm:ss.SSSZ (e.g. 2014-01-23T15:34:49.000Z) or yyyy-MM-dd HH:mm:ss.")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
@@ -160,10 +161,8 @@ public class AbsoluteSearchResource extends SearchResource {
             @QueryParam("fields") @NotEmpty String fields) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
         final String filename = "graylog-search-result-absolute-" + from + "-" + to + ".csv";
-        return Response
-            .ok(searchAbsoluteChunked(query, from, to, limit, offset, batchSize, filter, fields))
-            .header("Content-Disposition", "attachment; filename=" + filename)
-            .build();
+        return respondWithFile(filename, searchAbsoluteChunked(query, from, to, limit, offset, batchSize, filter, fields))
+                .build();
     }
 
     private TimeRange buildAbsoluteTimeRange(String from, String to) {

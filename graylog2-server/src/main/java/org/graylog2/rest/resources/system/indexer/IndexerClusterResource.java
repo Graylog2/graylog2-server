@@ -19,28 +19,35 @@ package org.graylog2.rest.resources.system.indexer;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
+import org.graylog2.rest.models.system.indexer.responses.ClusterInfo;
 import org.graylog2.rest.models.system.indexer.responses.ClusterName;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 
 @RequiresAuthentication
 @Api(value = "Indexer/Cluster", description = "Indexer cluster information")
 @Path("/system/indexer/cluster")
 public class IndexerClusterResource extends RestResource {
 
+    private final Cluster cluster;
+    private final ElasticsearchVersionProvider elasticsearchVersionProvider;
+
     @Inject
-    private Cluster cluster;
+    public IndexerClusterResource(Cluster cluster, ElasticsearchVersionProvider elasticsearchVersionProvider) {
+        this.cluster = cluster;
+        this.elasticsearchVersionProvider = elasticsearchVersionProvider;
+    }
 
     @GET
     @Timed
@@ -52,6 +59,18 @@ public class IndexerClusterResource extends RestResource {
         final String clusterName = cluster.clusterName()
                 .orElseThrow(() -> new InternalServerErrorException("Couldn't read Elasticsearch cluster health"));
         return ClusterName.create(clusterName);
+    }
+
+    @GET
+    @Timed
+    @Path("/info")
+    @RequiresPermissions(RestPermissions.INDEXERCLUSTER_READ)
+    @ApiOperation(value = "Get cluster name and distribution")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ClusterInfo clusterInfo() {
+        final String clusterName = cluster.clusterName()
+                .orElseThrow(() -> new InternalServerErrorException("Couldn't read indexer cluster info"));
+        return new ClusterInfo(clusterName, elasticsearchVersionProvider.get().distribution().toString());
     }
 
     @GET

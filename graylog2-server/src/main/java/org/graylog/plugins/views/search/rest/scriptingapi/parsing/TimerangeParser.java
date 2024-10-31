@@ -20,7 +20,8 @@ import org.apache.commons.lang.StringUtils;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 public class TimerangeParser {

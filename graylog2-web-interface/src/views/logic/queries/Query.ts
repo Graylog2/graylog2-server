@@ -18,7 +18,8 @@ import * as Immutable from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
 import generateId from 'logic/generateId';
-import type { FiltersType } from 'views/types';
+import type { FiltersType, SearchFilter } from 'views/types';
+import type { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 
 import type { SearchType } from './SearchType';
 
@@ -42,8 +43,8 @@ export type QueryJson = {
   id: QueryId,
   query: any,
   timerange: any,
-  filter?: FilterType,
-  filters?: FiltersType,
+  filter?: { [key: string]: any },
+  filters?: Array<SearchFilter>,
   search_types: any,
 };
 
@@ -57,7 +58,8 @@ export const createElasticsearchQueryString = (query = ''): ElasticsearchQuerySt
   query_string: query,
 });
 
-const _streamFilters = (selectedStreams: Array<string>) => Immutable.List(selectedStreams.map((stream) => Immutable.Map({ type: 'stream', id: stream })));
+const _streamFilters = (selectedStreams: Array<string>) => Immutable.List(selectedStreams?.map((stream) => Immutable.Map({ type: 'stream', id: stream })));
+const _streamCategoryFilters = (selectedCategories: Array<string>) => Immutable.List(selectedCategories?.map((category) => Immutable.Map({ type: 'stream_category', category: category })));
 
 export const filtersForQuery = (streams: Array<string> | null | undefined): FilterType | null | undefined => {
   if (!streams || streams.length === 0) {
@@ -70,6 +72,33 @@ export const filtersForQuery = (streams: Array<string> | null | undefined): Filt
     type: 'or',
     filters: streamFilters,
   });
+};
+
+export const categoryFiltersForQuery = (categories: Array<string> | null | undefined): FilterType | null | undefined => {
+  if (!categories || categories.length === 0) {
+    return null;
+  }
+
+  const categoryFilters = _streamCategoryFilters(categories);
+
+  return Immutable.Map({
+    type: 'or',
+    filters: categoryFilters,
+  });
+};
+
+export const newFiltersForQuery = (streams: Array<string> | null | undefined, categories: Array<string> | null | undefined): FilterType | null | undefined => {
+  const streamFilter: Immutable.List<FilterType> = _streamFilters(streams);
+  const categoryFilter: Immutable.List<FilterType> = _streamCategoryFilters(categories);
+
+  if (streamFilter.size > 0 && categoryFilter.size > 0) {
+    return Immutable.Map({
+      type: 'or',
+      filters: Immutable.List([...streamFilter.toArray(), ...categoryFilter.toArray()].map((filter: FilterType) => filter)),
+    });
+  }
+
+  return filtersForQuery(streams) || categoryFiltersForQuery(categories);
 };
 
 export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {
@@ -86,6 +115,22 @@ export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | u
   const filters = filter.get('filters', Immutable.List());
 
   return filters.map(filtersToStreamSet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
+};
+
+export const filtersToStreamCategorySet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {
+  if (!filter) {
+    return Immutable.Set();
+  }
+
+  const type = filter.get('type');
+
+  if (type === 'stream_category') {
+    return Immutable.Set([filter.get('category')]);
+  }
+
+  const filters = filter.get('filters', Immutable.List());
+
+  return filters.map(filtersToStreamCategorySet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
 };
 
 export type QueryString = ElasticsearchQueryString;
@@ -121,7 +166,7 @@ export type KeywordTimeRange = {
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
 
-export type NoTimeRangeOverride = {};
+export type NoTimeRangeOverride = typeof NO_TIMERANGE_OVERRIDE;
 
 const isNullish = (o: any) => (o === null || o === undefined);
 
@@ -199,7 +244,7 @@ export default class Query {
       query,
       timerange,
       filter,
-      filters,
+      filters: filters?.toArray(),
       search_types: searchTypes,
     };
   }
@@ -213,7 +258,7 @@ export default class Query {
   static fromJSON(value: QueryJson): Query {
     const { id, query, timerange, filter, filters, search_types } = value;
 
-    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types, filters ? Immutable.List(filters) : filters);
+    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types, filters ? Immutable.List(filters) : undefined);
   }
 }
 

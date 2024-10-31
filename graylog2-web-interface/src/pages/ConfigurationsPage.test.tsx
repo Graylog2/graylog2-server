@@ -44,7 +44,7 @@ describe('ConfigurationsPage', () => {
 
     render(<ConfigurationsPage />);
 
-    const sidecarNavItem = await screen.findByRole('button', {
+    const sidecarNavItem = await screen.findByRole('link', {
       name: /sidecar/i,
     });
 
@@ -60,7 +60,7 @@ describe('ConfigurationsPage', () => {
 
     render(<ConfigurationsPage />);
 
-    const sidecarNavItem = await screen.findByRole('button', {
+    const sidecarNavItem = await screen.findByRole('link', {
       name: /sidecar/i,
     });
 

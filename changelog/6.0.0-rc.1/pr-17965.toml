@@ -1,0 +1,4 @@
+type = "added"
+message = "Adding `hooks.logout` hook which is called when the user logs out"
+
+pulls = ["17965"]

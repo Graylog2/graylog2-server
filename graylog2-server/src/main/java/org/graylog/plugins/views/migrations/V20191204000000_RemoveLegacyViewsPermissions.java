@@ -22,7 +22,8 @@ import org.bson.Document;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 
 import static com.mongodb.client.model.Filters.eq;

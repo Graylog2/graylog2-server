@@ -21,7 +21,7 @@ import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.services.CollectorService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class CollectorAdministrationFilter implements AdministrationFilter {
     private final Collector collector;

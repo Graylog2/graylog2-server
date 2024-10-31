@@ -25,7 +25,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class EventProcessorEventFactory implements EventFactory {
     private final String source;

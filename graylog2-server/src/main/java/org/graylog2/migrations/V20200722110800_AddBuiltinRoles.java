@@ -18,7 +18,8 @@ package org.graylog2.migrations;
 
 import org.graylog2.plugin.security.PluginPermissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.Set;
 
@@ -40,7 +41,7 @@ public class V20200722110800_AddBuiltinRoles extends Migration {
 
     @Override
     public void upgrade() {
-        for (PluginPermissions permission: pluginPermissions) {
+        for (PluginPermissions permission : pluginPermissions) {
             permission.builtinRoles().forEach(r -> helpers.ensureBuiltinRole(r.name(), r.description(), r.permissions()));
         }
     }

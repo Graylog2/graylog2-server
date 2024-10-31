@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -37,16 +36,14 @@ const StreamAlertHeader = styled(Panel.Heading)`
   font-weight: bold;
 `;
 
-const MatchIcon = styled(({ empty: _empty, matches: _matches, ...props }) => <Icon {...props} />)(
-  ({ empty, matches, theme }) => {
-    const matchColor = matches ? theme.colors.variant.success : theme.colors.variant.danger;
+const MatchIcon = styled(Icon)<{ $empty?: boolean, $matches?: boolean }>(({ theme, $empty, $matches }) => {
+  const matchColor = $matches ? theme.colors.variant.success : theme.colors.variant.danger;
 
-    return css`
-      color: ${empty ? theme.colors.variant.info : matchColor};
+  return css`
+      color: ${$empty ? theme.colors.variant.info : matchColor};
       margin-right: 3px;
 `;
-  },
-);
+});
 
 const StyledSpinner = styled(Spinner)`
   margin-left: 10px;
@@ -56,11 +53,11 @@ const getListClassName = (matchData) => (matchData.matches ? 'success' : 'danger
 
 type Props = {
   streamId: string,
-  messageId: string | undefined,
-  index: string,
+  messageId?: string | undefined
+  index?: string
 }
 
-const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
+const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [message, setMessage] = useState<{ [fieldName: string]: unknown } | undefined>();
   const [matchData, setMatchData] = useState<MatchData | undefined>();
@@ -141,19 +138,19 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
           <StreamAlertHeader>
             {matchData?.matches && (
               <>
-                <MatchIcon matches name="check" /> This message would be routed to this stream!
+                <MatchIcon $matches name="check" /> This message would be routed to this stream!
               </>
             )}
 
             {(matchData && !matchData.matches) && (
               <>
-                <MatchIcon name="times" /> This message would not be routed to this stream.
+                <MatchIcon name="close" /> This message would not be routed to this stream.
               </>
             )}
 
             {!matchData && (
               <>
-                <MatchIcon empty name="exclamation-circle" /> Please load a message in Step 1 above to check if it would match against these rules.
+                <MatchIcon $empty name="error" /> Please load a message in Step 1 above to check if it would match against these rules.
               </>
             )}
           </StreamAlertHeader>
@@ -169,17 +166,6 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
       </Col>
     </Row>
   );
-};
-
-StreamRulesEditor.propTypes = {
-  streamId: PropTypes.string.isRequired,
-  messageId: PropTypes.string,
-  index: PropTypes.string,
-};
-
-StreamRulesEditor.defaultProps = {
-  messageId: '',
-  index: '',
 };
 
 export default StreamRulesEditor;

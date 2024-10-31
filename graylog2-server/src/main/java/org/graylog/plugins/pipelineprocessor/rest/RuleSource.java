@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -64,6 +65,14 @@ public abstract class RuleSource {
     @Nullable
     public abstract Set<ParseError> errors();
 
+    @JsonProperty
+    @Nullable
+    public abstract RuleBuilder ruleBuilder();
+
+    @JsonProperty
+    @Nullable
+    public abstract String simulatorMessage();
+
     public static Builder builder() {
         return new AutoValue_RuleSource.Builder();
     }
@@ -72,9 +81,10 @@ public abstract class RuleSource {
 
     @JsonCreator
     public static RuleSource create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
-                                    @JsonProperty("title")  String title,
+                                    @JsonProperty("title") String title,
                                     @JsonProperty("description") @Nullable String description,
                                     @JsonProperty("source") String source,
+                                    @JsonProperty("simulator_message") @Nullable String simulatorMessage,
                                     @JsonProperty("created_at") @Nullable DateTime createdAt,
                                     @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
         return builder()
@@ -84,6 +94,7 @@ public abstract class RuleSource {
                 .description(description)
                 .createdAt(createdAt)
                 .modifiedAt(modifiedAt)
+                .simulatorMessage(simulatorMessage)
                 .build();
     }
 
@@ -104,6 +115,8 @@ public abstract class RuleSource {
                 .createdAt(dao.createdAt())
                 .modifiedAt(dao.modifiedAt())
                 .errors(errors)
+                .ruleBuilder(dao.ruleBuilder())
+                .simulatorMessage(dao.simulatorMessage())
                 .build();
     }
 
@@ -124,5 +137,10 @@ public abstract class RuleSource {
         public abstract Builder modifiedAt(DateTime modifiedAt);
 
         public abstract Builder errors(Set<ParseError> errors);
+
+        public abstract Builder ruleBuilder(RuleBuilder ruleBuilder);
+
+        public abstract Builder simulatorMessage(String simulatorMessage);
+
     }
 }

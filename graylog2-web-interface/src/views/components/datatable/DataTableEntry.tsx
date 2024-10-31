@@ -19,8 +19,6 @@ import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
 import get from 'lodash/get';
-import type { DefaultTheme } from 'styled-components';
-import styled, { css } from 'styled-components';
 
 import Value from 'views/components/Value';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
@@ -31,14 +29,13 @@ import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
+
+import TableDataCell from './TableDataCell';
 
 import CustomHighlighting from '../highlighting/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
-
-const StyledTd = styled.td(({ isNumeric, theme }: { isNumeric: boolean, theme: DefaultTheme }) => css`
-  ${isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
-  ${isNumeric ? 'text-align: right' : ''}
-`);
 
 type Field = {
   field: string,
@@ -52,21 +49,22 @@ type Props = {
   series: Array<Series>,
   types: FieldTypeMappingsList,
   valuePath: ValuePath,
+  units: UnitsConfig,
 };
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-type ColumnProps = { field: string, value: any, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
+type ColumnProps = { field: string, value: any, type: FieldType, valuePath: ValuePath, source: string | undefined | null, unit: FieldUnit };
 
 const flattenValuePath = (valuePath: ValuePath) => valuePath.flatMap((path) => Object.entries(path))
   .map(([key, value]) => `${key}:${value}`)
   .join('-');
 
-const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
+const Column = ({ field, value, type, valuePath, source, unit }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
-    <StyledTd isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
+    <TableDataCell $isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
           {value !== null && value !== undefined
@@ -74,11 +72,12 @@ const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
               <Value field={source ?? field}
                      type={type}
                      value={value}
+                     unit={unit}
                      render={DecoratedValue} />
             ) : null}
         </CustomHighlighting>
       </AdditionalContext.Provider>
-    </StyledTd>
+    </TableDataCell>
   );
 };
 
@@ -94,18 +93,18 @@ const columnNameToField = (column, series = []) => {
   return currentSeries ? currentSeries.function : column;
 };
 
-const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
+const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, valuePath, item, types, units }: Props) => {
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
 
-  const fieldColumns = fields.toSeq().toJS().map(({ field: fieldName, source }, i) => _c(
+  const fieldColumns = fields.toArray().map(({ field: fieldName, source }, i) => _c(
     fieldName,
     item[fieldName],
     fullValuePathForField(fieldName, valuePath).slice(0, i + 1),
     source,
   ));
-  const columnPivotFields = flatten(columnPivotValues.map((columnPivotValueKeys) => {
-    const translatedPath = flatten(columnPivotValueKeys.map((value, idx) => [columnPivots[idx], value]));
+  const columnPivotFields = columnPivotValues.flatMap((columnPivotValueKeys) => {
+    const translatedPath = columnPivotValueKeys.flatMap((value, idx) => [columnPivots[idx], value]);
     const parentValuePath = [...valuePath];
 
     for (let i = 0; i < translatedPath.length; i += 2) {
@@ -119,27 +118,29 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
 
       return _c(effectiveName, value, fullValuePathForField(fn, parentValuePath), fn);
     });
-  }));
+  });
 
   const columns = flatten([fieldColumns, columnPivotFields]);
 
   return (
-    (
-      <tr className={`fields-row ${classes}`}>
-        {columns.map(({ field, value, path, source }, idx) => {
-          const key = `${activeQuery}-${field}=${value}-${idx}`;
+    <tr className={`fields-row ${classes}`}>
+      {columns.map(({ field, value, path, source }, idx) => {
+        const key = `${activeQuery}-${field}=${value}-${idx}`;
+        const nameForField = columnNameToField(field, series);
+        const fieldNameForUnit = parseSeries(nameForField)?.field ?? nameForField;
+        const unit = units.getFieldUnit(fieldNameForUnit);
 
-          return (
-            <Column key={key}
-                    field={field}
-                    value={value}
-                    type={fieldTypeFor(columnNameToField(field, series), types)}
-                    valuePath={path.slice()}
-                    source={source} />
-          );
-        })}
-      </tr>
-    )
+        return (
+          <Column key={key}
+                  field={field}
+                  value={value}
+                  type={fieldTypeFor(nameForField, types)}
+                  valuePath={path.slice()}
+                  source={source}
+                  unit={unit} />
+        );
+      })}
+    </tr>
   );
 };
 

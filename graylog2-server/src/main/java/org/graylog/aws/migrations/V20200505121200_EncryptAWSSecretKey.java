@@ -28,7 +28,8 @@ import org.graylog2.security.AESTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 
 public class V20200505121200_EncryptAWSSecretKey extends Migration {
@@ -102,6 +103,7 @@ public class V20200505121200_EncryptAWSSecretKey extends Migration {
             );
         }
     }
+
     @JsonAutoDetect
     @AutoValue
     static abstract class LegacyAWSPluginConfiguration {
@@ -122,10 +124,10 @@ public class V20200505121200_EncryptAWSSecretKey extends Migration {
 
         @JsonCreator
         static LegacyAWSPluginConfiguration create(@JsonProperty("lookups_enabled") boolean lookupsEnabled,
-                                                          @JsonProperty("lookup_regions") String lookupRegions,
-                                                          @JsonProperty("access_key") String accessKey,
-                                                          @JsonProperty("secret_key") String secretKey,
-                                                          @JsonProperty("proxy_enabled") boolean proxyEnabled) {
+                                                   @JsonProperty("lookup_regions") String lookupRegions,
+                                                   @JsonProperty("access_key") String accessKey,
+                                                   @JsonProperty("secret_key") String secretKey,
+                                                   @JsonProperty("proxy_enabled") boolean proxyEnabled) {
             return new AutoValue_V20200505121200_EncryptAWSSecretKey_LegacyAWSPluginConfiguration(
                     lookupsEnabled,
                     lookupRegions,

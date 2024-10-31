@@ -15,15 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 
 import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { SystemJobsActions } from 'stores/systemjobs/SystemJobsStore';
 import UserNotification from 'util/UserNotification';
-import { StyledBadge } from 'components/bootstrap/Badge';
+import Badge from 'components/bootstrap/Badge';
 
 enum JobStatus {
   Cancelled = 'cancelled',
@@ -34,7 +32,7 @@ enum JobStatus {
   Running = 'running',
 }
 
-const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
+const StatusBadge = styled(Badge)<{ status: string }>(({ status, theme }) => {
   const {
     primary,
     success,
@@ -67,17 +65,34 @@ const JobWrap = styled.div`
   margin-bottom: 5px;
 `;
 
-const AcknowledgeButton = styled(Button)(({ theme }: { theme: DefaultTheme }) => css`
+const AcknowledgeButton = styled(Button)(({ theme }) => css`
   && {
-    color: ${theme.colors.variant.light.default};
+    color: ${theme.colors.global.textDefault};
     
-    :hover {
+    &:hover {
       color: ${theme.colors.variant.default};
     }
   }
 `);
 
-const SystemJob = ({ job }) => {
+type SystemJobProps = {
+  job: {
+    info?: string;
+    id?: string;
+    percent_complete?: number;
+    is_cancelable?: boolean;
+    name?: string;
+    node_id?: string;
+    started_at?: string;
+    execution_duration?: string;
+    job_status?: string;
+    provides_progress?: boolean,
+  };
+};
+
+const SystemJob = ({
+  job,
+}: SystemJobProps) => {
   const jobIsOver = job.job_status === JobStatus.Complete
                     || job.percent_complete === 100
                     || job.job_status === JobStatus.Cancelled
@@ -106,32 +121,21 @@ const SystemJob = ({ job }) => {
   return (
     <div>
       <JobWrap>
-        <Icon name="cog" />{' '}
+        <Icon name="settings" />{' '}
         <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
         - on <LinkToNode nodeId={job.node_id} />{' '}
         <RelativeTime dateTime={job.started_at} />{' '}
-        <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>
+        <span data-toggle="tooltip" title={`runtime: ${job.execution_duration}`}>
+          <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>
+        </span>
         {!jobIsOver && job.is_cancelable
           ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel</Button>)
-          : (<AcknowledgeButton type="button" bsStyle="link" onClick={_onAcknowledge()} bsSize="xs" className="pull-right" title="Acknowledge"><Icon name="x" /></AcknowledgeButton>)}
+          : (<AcknowledgeButton type="button" bsStyle="link" onClick={_onAcknowledge()} bsSize="xs" className="pull-right" title="Acknowledge"><Icon name="close" /></AcknowledgeButton>)}
       </JobWrap>
 
-      {!jobIsOver && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
+      {!jobIsOver && job.provides_progress && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
     </div>
   );
-};
-
-SystemJob.propTypes = {
-  job: PropTypes.shape({
-    info: PropTypes.string,
-    id: PropTypes.string,
-    percent_complete: PropTypes.number,
-    is_cancelable: PropTypes.bool,
-    name: PropTypes.string,
-    node_id: PropTypes.string,
-    started_at: PropTypes.string,
-    job_status: PropTypes.oneOf(Object.values(JobStatus)),
-  }).isRequired,
 };
 
 export default SystemJob;

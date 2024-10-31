@@ -139,14 +139,14 @@ public class ContainerMatrixClassSelectorResolver implements SelectorResolver {
 
     private boolean preImportLicense(Class<?> aClass) {
         Optional<ContainerMatrixTestsConfiguration> annotation = AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class);
-        return annotation.isPresent() ? annotation.get().importLicenses() : ContainerMatrixTestsConfiguration.defaultImportLicenses;
+        return annotation.map(ContainerMatrixTestsConfiguration::importLicenses).orElse(ContainerMatrixTestsConfiguration.defaultImportLicenses);
     }
 
     private ClassBasedTestDescriptor newClassTestDescriptor(TestDescriptor parent, Class<?> testClass) {
         Optional<ContainerMatrixTestsDescriptor> containerMatrixTestsDescriptor = findContainerMatrixTestsDescriptor(parent);
 
         if (containerMatrixTestsDescriptor.isPresent()) {
-            final SearchVersion esVersion = containerMatrixTestsDescriptor.get().getEsVersion();
+            final SearchVersion esVersion = containerMatrixTestsDescriptor.get().getSearchVersion();
             final MongodbServer mongoVersion = containerMatrixTestsDescriptor.get().getMongoVersion();
 
             return new ContainerMatrixTestClassDescriptor(

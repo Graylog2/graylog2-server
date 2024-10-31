@@ -1,0 +1,5 @@
+type = "a"
+message = "AMQP input improvements: retry connection with configurable interval and encrypt password."
+
+issues = ["12447"]
+pulls = ["15401"]

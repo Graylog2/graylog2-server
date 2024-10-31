@@ -17,6 +17,10 @@
 package org.graylog2.storage;
 
 import com.github.zafarkhaja.semver.Version;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ResourceInfo;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 import org.junit.Before;
 import org.junit.Rule;
@@ -25,10 +29,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ResourceInfo;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -49,9 +49,9 @@ public class SupportedSearchVersionFilterTest {
     @Mock
     private ContainerRequestContext requestContext;
 
-    private final SearchVersion openSearchV1 = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.forIntegers(1, 0));
-    private final SearchVersion elasticSearchV6 = SearchVersion.create(SearchVersion.Distribution.ELASTICSEARCH, Version.forIntegers(6, 0));
-    private final SearchVersion elasticSearchV7 = SearchVersion.create(SearchVersion.Distribution.ELASTICSEARCH, Version.forIntegers(7, 0));
+    private final SearchVersion openSearchV1 = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.of(1, 0));
+    private final SearchVersion elasticSearchV6 = SearchVersion.create(SearchVersion.Distribution.ELASTICSEARCH, Version.of(6, 0));
+    private final SearchVersion elasticSearchV7 = SearchVersion.create(SearchVersion.Distribution.ELASTICSEARCH, Version.of(7, 0));
     private SupportedSearchVersionFilter filter;
 
     @Before

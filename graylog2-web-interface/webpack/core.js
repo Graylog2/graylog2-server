@@ -20,6 +20,7 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const { EsbuildPlugin } = require('esbuild-loader');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
 
 const UniqueChunkIdPlugin = require('./UniqueChunkIdPlugin');
 
@@ -159,7 +160,11 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
         new webpack.DefinePlugin({
           DEVELOPMENT: true,
         }),
-        new ForkTsCheckerWebpackPlugin(),
+        new ForkTsCheckerWebpackPlugin({
+          typescript: {
+            memoryLimit: 4096,
+          },
+        }),
       ],
     });
   }
@@ -198,6 +203,15 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
       plugins: [
         new webpack.DefinePlugin({
           'process.env.NODE_ENV': JSON.stringify('production'),
+        }),
+        // Create SBOM files for graylog-server frontend dependencies.
+        new CycloneDxWebpackPlugin({
+          specVersion: '1.5',
+          rootComponentAutodetect: false,
+          rootComponentType: 'application',
+          rootComponentName: 'graylog-server',
+          outputLocation: '../cyclonedx-core',
+          includeWellknown: false,
         }),
       ],
     });

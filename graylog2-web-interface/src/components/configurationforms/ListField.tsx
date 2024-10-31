@@ -16,7 +16,6 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import type { ListField as ListFieldType } from 'components/configurationforms/types';
 import { MultiSelect } from 'components/common';
@@ -29,10 +28,10 @@ type Props = {
   onChange: (title: string, value: Array<string>, dirty?: boolean) => void,
   title: string,
   typeName: string,
-  value: Array<string> | string,
+  value?: Array<string> | string
 };
 
-const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
+const ListField = ({ autoFocus = false, field, onChange, title, typeName, value }: Props) => {
   const handleChange = (nextValue) => {
     const values = (nextValue === '' ? [] : nextValue.split(','));
 
@@ -57,6 +56,7 @@ const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props
                    name={`configuration[${title}]`}
                    required={isRequired}
                    autoFocus={autoFocus}
+                   className="list-field-select"
                    options={formattedOptions}
                    value={selectValue}
                    placeholder={`${allowCreate ? 'Add' : 'Select'} ${field.human_name}`}
@@ -64,20 +64,6 @@ const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props
                    allowCreate={allowCreate} />
     </Input>
   );
-};
-
-ListField.propTypes = {
-  autoFocus: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-};
-
-ListField.defaultProps = {
-  autoFocus: false,
-  value: undefined,
 };
 
 export default ListField;

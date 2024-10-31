@@ -1,0 +1,10 @@
+type = "r"
+message = "Remove web interface plugin `systemnavigation`."
+
+pulls = ["17309"]
+
+details.user = """
+Before this change it was possible to register options for the system dropdown in the navigation, by using the `systemnavigation` plugin.
+Now this can be achieved by registering a `navigation` plugin. The plugin entity needs the `description` `System` and `children`.
+Each children represents a dropdown option and needs a `path` and `description` attribute.
+"""

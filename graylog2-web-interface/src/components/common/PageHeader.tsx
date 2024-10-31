@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
 import styled, { css } from 'styled-components';
 
-import { Col, Label, Tooltip } from 'components/bootstrap';
+import { Col, Label } from 'components/bootstrap';
 import { OverlayTrigger } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ContentHeadRow from 'components/common/ContentHeadRow';
@@ -87,11 +86,10 @@ const LifecycleIndicator = ({
 
   const label = upperFirst(lifecycle);
   const defaultMessage = lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
-  const tooltip = <Tooltip id={lifecycle}>{lifecycleMessage || defaultMessage}</Tooltip>;
 
   return (
     <LifecycleIndicatorContainer>
-      <OverlayTrigger placement="bottom" overlay={tooltip}>
+      <OverlayTrigger placement="bottom" overlay={lifecycleMessage || defaultMessage}>
         <Label bsStyle="primary">{label}</Label>
       </OverlayTrigger>
     </LifecycleIndicatorContainer>
@@ -100,12 +98,12 @@ const LifecycleIndicator = ({
 
 type Props = {
   title: React.ReactNode,
-  children: React.ReactElement | Array<React.ReactElement>,
+  children?: React.ReactElement | Array<React.ReactElement>
   actions?: React.ReactElement,
   topActions?: React.ReactElement,
   lifecycle?: 'experimental' | 'legacy',
   lifecycleMessage?: React.ReactNode,
-  subpage: boolean,
+  subpage?: boolean
   documentationLink?: { title: string, path: string }
 };
 
@@ -114,7 +112,7 @@ type Props = {
  * This ensures all pages look and feel the same way across the product, so
  * please use it in your pages.
  */
-const PageHeader = ({ children, subpage, title, actions, topActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
+const PageHeader = ({ children = [], subpage = false, title, actions, topActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
   const topLevelClassNames = subpage ? '' : 'content';
 
   return (
@@ -150,33 +148,6 @@ const PageHeader = ({ children, subpage, title, actions, topActions, lifecycle, 
       </Col>
     </ContentHeadRow>
   );
-};
-
-PageHeader.propTypes = {
-  /** Page header heading. */
-  title: PropTypes.node.isRequired,
-  /** Provide a page description */
-  children: PropTypes.node,
-  /** Section for actions like create or edit */
-  actions: PropTypes.node,
-  /** Indicates the lifecycle of the current page, which will display an indicator right next to the page title. */
-  lifecycle: PropTypes.oneOf(['experimental', 'legacy']),
-  /** Text to customize the default message for the given lifecycle. */
-  lifecycleMessage: PropTypes.node,
-  /** Specifies if the page header is children of a content `Row` or not. */
-  subpage: PropTypes.bool,
-  /** Specifies a specific link for the documentation. The title should be short. */
-  documentationLink: PropTypes.object,
-};
-
-PageHeader.defaultProps = {
-  children: [],
-  lifecycle: undefined,
-  lifecycleMessage: undefined,
-  topActions: undefined,
-  actions: undefined,
-  subpage: false,
-  documentationLink: undefined,
 };
 
 export default PageHeader;

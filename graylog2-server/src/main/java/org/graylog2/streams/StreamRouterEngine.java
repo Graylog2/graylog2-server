@@ -27,18 +27,20 @@ import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.TimeLimiter;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.streams.matchers.StreamRuleMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Stream routing engine to select matching streams for a message.
@@ -186,7 +189,7 @@ public class StreamRouterEngine {
             final StreamRuleType streamRuleType = streamRule.getType();
             final Stream.MatchingType matchingType = rule.getMatchingType();
             if (!ruleTypesNotNeedingFieldPresence.contains(streamRuleType)
-                && !message.hasField(streamRule.getField())) {
+                    && !message.hasField(streamRule.getField())) {
                 if (matchingType == Stream.MatchingType.AND) {
                     result.remove(rule.getStream());
                     // blacklist stream because it can't match anymore
@@ -221,7 +224,6 @@ public class StreamRouterEngine {
         final Stream defaultStream = defaultStreamProvider.get();
         boolean alreadyRemovedDefaultStream = false;
         for (Stream stream : result) {
-            streamMetrics.markIncomingMeter(stream.getId());
             if (stream.getRemoveMatchesFromDefaultStream()) {
                 if (alreadyRemovedDefaultStream || message.removeStream(defaultStream)) {
                     alreadyRemovedDefaultStream = true;
@@ -239,11 +241,6 @@ public class StreamRouterEngine {
                     }
                 }
             }
-        }
-        // either the message stayed on the default stream, in which case we mark that stream's throughput,
-        // or someone removed it, in which case we don't mark it.
-        if (!alreadyRemovedDefaultStream) {
-            streamMetrics.markIncomingMeter(defaultStream.getId());
         }
 
         return ImmutableList.copyOf(result);
@@ -309,10 +306,14 @@ public class StreamRouterEngine {
                     return null;
                 }
             } catch (Exception e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Error matching stream rule <" + rule.getType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
-                }
                 streamMetrics.markExceptionMeter(streamId);
+                final String error = f("Error matching stream rule <%s> %s <%s/%s> for stream %s",
+                        streamRuleId, rule.getDescription(), rule.getType(), rule.getValue(), stream.getTitle());
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(error + ": " + e.getMessage(), e);
+                }
+                message.addProcessingError(new Message.ProcessingError(
+                        ProcessingFailureCause.StreamMatchException, error, ExceptionUtils.getRootCauseMessage(e)));
                 return null;
             }
         }
@@ -331,8 +332,12 @@ public class StreamRouterEngine {
             } catch (UncheckedTimeoutException e) {
                 streamFaultManager.registerFailure(stream);
             } catch (Exception e) {
-                LOG.warn("Unexpected error during stream matching", e);
                 streamMetrics.markExceptionMeter(streamId);
+                final String error = f("Error matching stream rule <%s> %s <%s/%s> for stream %s",
+                        streamRuleId, rule.getDescription(), rule.getType(), rule.getValue(), stream.getTitle());
+                LOG.warn(error, e);
+                message.addProcessingError(new Message.ProcessingError(
+                        ProcessingFailureCause.StreamMatchException, error, ExceptionUtils.getRootCauseMessage(e)));
             }
 
             return matchedStream;

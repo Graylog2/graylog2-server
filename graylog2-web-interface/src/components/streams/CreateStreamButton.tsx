@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useCallback, useState } from 'react';
 
 import { Button } from 'components/bootstrap';
@@ -22,24 +21,26 @@ import StreamModal from 'components/streams/StreamModal';
 import type { Stream } from 'stores/streams/StreamsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { BsSize } from 'components/bootstrap/types';
+import type { StyleProps } from 'components/bootstrap/Button';
 
 type Props = {
-  bsSize?: string
-  bsStyle?: string,
+  bsSize?: BsSize,
+  bsStyle?: StyleProps,
   buttonText?: string,
   className?: string,
   indexSets: Array<IndexSet>
   onCreate: (values: Partial<Stream>) => Promise<void>
 }
 
-const CreateStreamButton = ({ bsSize, bsStyle, buttonText, className, indexSets, onCreate }: Props) => {
+const CreateStreamButton = ({ bsSize, bsStyle, buttonText = 'Create stream', className, indexSets, onCreate }: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const sendTelemetry = useSendTelemetry();
 
   const toggleCreateModal = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.CREATE_FORM_MODAL_OPENED, {
       app_pathname: 'streams',
-      app_action_value: 'stream-create-button',
     });
 
     return setShowCreateModal((cur) => !cur);
@@ -63,22 +64,6 @@ const CreateStreamButton = ({ bsSize, bsStyle, buttonText, className, indexSets,
       )}
     </>
   );
-};
-
-CreateStreamButton.propTypes = {
-  buttonText: PropTypes.string,
-  bsStyle: PropTypes.string,
-  bsSize: PropTypes.string,
-  className: PropTypes.string,
-  onCreate: PropTypes.func.isRequired,
-  indexSets: PropTypes.array.isRequired,
-};
-
-CreateStreamButton.defaultProps = {
-  buttonText: 'Create stream',
-  bsSize: undefined,
-  bsStyle: undefined,
-  className: undefined,
 };
 
 export default CreateStreamButton;

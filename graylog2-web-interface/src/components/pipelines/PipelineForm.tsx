@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -28,14 +27,26 @@ import { FormSubmit } from 'components/common';
 import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
 
 type Props = {
-  pipeline: PipelineType,
-  create: boolean,
-  modal: boolean,
+  pipeline?: PipelineType
+  create?: boolean
+  modal?: boolean
   save: (pipeline: PipelineType, callback: () => void) => void,
   onCancel?: () => void,
 };
 
-const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
+const emptyPipeline: PipelineType = {
+  id: undefined,
+  title: '',
+  description: '',
+  stages: [{ stage: 0, rules: [], match: '' }],
+  source: '',
+  created_at: '',
+  modified_at: '',
+};
+
+const PipelineForm = ({
+  pipeline = emptyPipeline, create = false, modal = true, save, onCancel = () => {},
+}: Props) => {
   const currentUser = useCurrentUser();
   const [nextPipeline, setNextPipeline] = useState<PipelineType>(cloneDeep(pipeline));
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -44,7 +55,7 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
     setShowModal(true);
   };
 
-  const _onChange = ({ target }) => {
+  const _onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setNextPipeline((currentPipeline) => ({ ...currentPipeline, [target.name]: getValueFromInput(target) }));
   };
 
@@ -60,7 +71,7 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
     }
   };
 
-  const _handleSubmit = (event) => {
+  const _handleSubmit = (event: React.FormEvent) => {
     if (event) {
       event.preventDefault();
     }
@@ -120,26 +131,6 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
       </Row>
     </form>
   );
-};
-
-PipelineForm.propTypes = {
-  pipeline: PropTypes.object,
-  create: PropTypes.bool,
-  modal: PropTypes.bool,
-  save: PropTypes.func.isRequired,
-  onCancel: PropTypes.func,
-};
-
-PipelineForm.defaultProps = {
-  modal: true,
-  create: false,
-  pipeline: {
-    id: undefined,
-    title: '',
-    description: '',
-    stages: [{ stage: 0, rules: [] }],
-  },
-  onCancel: () => {},
 };
 
 export default PipelineForm;

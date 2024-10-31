@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
@@ -52,14 +51,14 @@ const StyledLastAccess = styled.div`
 `;
 
 type Props = {
-  creatingToken: boolean,
+  creatingToken?: boolean
   deletingToken?: string,
-  onCreate: (tokenName: string) => Promise<Token>,
-  onDelete: (tokenId: string, tokenName: string) => void,
-  tokens: TokenSummary[],
+  onCreate: (tokenName: string) => Promise<Token>
+  onDelete: (tokenId: string, tokenName: string) => void
+  tokens?: TokenSummary[]
 };
 
-const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }: Props) => {
+const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, tokens = [] }: Props) => {
   const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
 
@@ -71,7 +70,7 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
       .sort((token1, token2) => sortByDate(token1.last_access, token2.last_access, 'desc'));
   }, [query, tokens]);
 
-  const handleTokenCreation = (tokenName) => {
+  const handleTokenCreation = (tokenName: string) => {
     const promise = onCreate(tokenName);
 
     promise.then((token) => {
@@ -81,7 +80,7 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
     });
   };
 
-  const deleteToken = (token) => () => {
+  const deleteToken = (token: TokenSummary) => () => {
     onDelete(token.id, token.name);
   };
 
@@ -99,7 +98,7 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
             <p>This is your new token. Make sure to copy it now, you will not be able to see it again.</p>
             <pre>
               {createdToken.token}
-              <StyledCopyTokenButton title={<Icon name="clipboard" fixedWidth />} text={createdToken.token} bsSize="xsmall" />
+              <StyledCopyTokenButton title={<Icon name="content_copy" />} text={createdToken.token} bsSize="xsmall" />
             </pre>
             <Button bsStyle="primary" onClick={() => setCreatedToken(undefined)}>Done</Button>
           </Panel.Body>
@@ -133,7 +132,7 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
                 <Col md={3} className="text-right">
                   <Button bsSize="xsmall"
                           disabled={deletingToken === token.id}
-                          bsStyle="primary"
+                          bsStyle="danger"
                           onClick={deleteToken(token)}>
                     {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
                   </Button>
@@ -145,22 +144,6 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
       </ControlledTableList>
     </span>
   );
-};
-
-TokenList.propTypes = {
-  tokens: PropTypes.arrayOf(PropTypes.object),
-  onDelete: PropTypes.func,
-  onCreate: PropTypes.func,
-  creatingToken: PropTypes.bool,
-  deletingToken: PropTypes.string,
-};
-
-TokenList.defaultProps = {
-  tokens: [],
-  onDelete: () => {},
-  onCreate: () => {},
-  creatingToken: false,
-  deletingToken: undefined,
 };
 
 export default TokenList;

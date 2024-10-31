@@ -28,19 +28,12 @@ const mockedTelemetryConfig = {
   host: 'http://localhost',
   enabled: true,
 };
-const posthogMock = { client: true };
 
 jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: jest.fn(() => {
     'http://localhost';
   }),
   telemetry: jest.fn(() => mockedTelemetryConfig),
-}));
-
-jest.mock('posthog-js', () => ({
-  ...posthogMock,
-  init: jest.fn(),
-  debug: jest.fn(),
 }));
 
 jest.mock('stores/telemetry/TelemetrySettingsStore', () => ({
@@ -58,28 +51,15 @@ const Wrapper = ({ children }: { children: React.ReactElement }) => (
 
 describe('<TelemetryInit>', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
-  it('should render Telemetry and make usePosthog available', () => {
-    asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
-      telemetrySetting: {
-        telemetry_permission_asked: false,
-        telemetry_enabled: true,
-      },
-    });
-
-    const { result } = renderHook(() => usePostHog(), { wrapper: Wrapper });
-
-    expect(result.current).toBeDefined();
-  });
-
-  it('should not render PosthogContext when config is not present', () => {
-    asMock(AppConfig.telemetry).mockReturnValue({
+  it('should not render PosthogContext when config is not present', async () => {
+    asMock(AppConfig.telemetry).mockImplementation(() => ({
       api_key: undefined,
       host: undefined,
       enabled: false,
-    });
+    }));
 
     asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
       telemetrySetting: {
@@ -90,6 +70,25 @@ describe('<TelemetryInit>', () => {
 
     const { result } = renderHook(() => usePostHog(), { wrapper: Wrapper });
 
-    expect(result.current).toBeUndefined();
+    expect(result.current.__loaded).toBeFalsy();
+  });
+
+  it('should render Telemetry and make usePosthog available', () => {
+    asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
+      telemetrySetting: {
+        telemetry_permission_asked: false,
+        telemetry_enabled: true,
+      },
+    });
+
+    asMock(AppConfig.telemetry).mockImplementation(() => ({
+      api_key: 'key',
+      host: 'http://localhost',
+      enabled: true,
+    }));
+
+    const { result } = renderHook(() => usePostHog(), { wrapper: Wrapper });
+
+    expect(result.current.__loaded).toBeTruthy();
   });
 });

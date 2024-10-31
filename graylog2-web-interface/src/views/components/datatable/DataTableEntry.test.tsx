@@ -22,6 +22,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
+import UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 
 import DataTableEntry from './DataTableEntry';
 
@@ -76,6 +77,7 @@ describe('DataTableEntry', () => {
                         series={series}
                         types={List([])}
                         valuePath={valuePath}
+                        units={UnitsConfig.empty()}
                         {...props} />
       </tbody>
     </table>
@@ -109,12 +111,11 @@ describe('DataTableEntry', () => {
   });
 
   it('provides valuePath in context for each value', () => {
-    const wrapper = mount((
-      <SUT />
-    ));
+    const wrapper = mount(<SUT />);
 
     expect(wrapper.find('Provider')
-      .map((p) => p.props().value))
+      .map((p) => p.props().value as {})
+      .filter((value) => ('valuePath' in value)))
       .toMatchSnapshot();
   });
 

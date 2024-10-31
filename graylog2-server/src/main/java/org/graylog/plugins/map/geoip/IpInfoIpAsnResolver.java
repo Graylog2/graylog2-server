@@ -20,12 +20,14 @@ package org.graylog.plugins.map.geoip;
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
-import javax.inject.Inject;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Locale;
 import java.util.Optional;
+
+import static org.graylog.plugins.map.config.GeoIpProcessorConfig.DISABLE_IPINFO_DB_TYPE_CHECK;
 
 /**
  * A {@link GeoIpResolver} to load IP ASN data from {@link org.graylog.plugins.map.config.DatabaseVendorType#IPINFO}.
@@ -35,8 +37,9 @@ public class IpInfoIpAsnResolver extends IpInfoIpResolver<GeoAsnInformation> {
     @Inject
     public IpInfoIpAsnResolver(@Assisted Timer timer,
                                @Assisted String configPath,
-                               @Assisted boolean enabled) {
-        super(timer, configPath, enabled);
+                               @Assisted boolean enabled,
+                               @Named(DISABLE_IPINFO_DB_TYPE_CHECK) boolean disableIpInfoDbTypeCheck) {
+        super(timer, configPath, enabled, disableIpInfoDbTypeCheck);
     }
 
     @Override
@@ -46,7 +49,7 @@ public class IpInfoIpAsnResolver extends IpInfoIpResolver<GeoAsnInformation> {
         try (Timer.Context ignored = resolveTime.time()) {
             final IPinfoASN ipInfoASN = adapter.ipInfoASN(address);
             info = GeoAsnInformation.create(ipInfoASN.name(), ipInfoASN.type(), ipInfoASN.asn());
-        } catch (IOException | AddressNotFoundException | UnsupportedOperationException e) {
+        } catch (Exception e) {
             info = null;
             if (!(e instanceof AddressNotFoundException)) {
                 String error = String.format(Locale.US, "Error getting ASN for IP Address '%s'. %s", address, e.getMessage());

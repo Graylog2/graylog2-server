@@ -40,8 +40,10 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.constraints.Min;
+import jakarta.inject.Inject;
+
+import jakarta.validation.constraints.Min;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -171,10 +173,10 @@ public class SpamhausEDROPDataAdapter extends LookupDataAdapter {
         final Optional<Map.Entry<SubnetUtils.SubnetInfo, String>> match;
         try {
             match = subnets.get().values()
-                           .stream()
-                           .flatMap(list -> list.entrySet().stream())
-                           .filter(entry -> entry.getKey().isInRange(ip))
-                           .findFirst();
+                    .stream()
+                    .flatMap(list -> list.entrySet().stream())
+                    .filter(entry -> entry.getKey().isInRange(ip))
+                    .findFirst();
         } catch (IllegalArgumentException e) {
             // Gracefully handle the case when a blank or invalid IP is supplied.
             LOG.debug("[{}] is an invalid IP address. Lookup aborted. {}", ip, ExceptionUtils.getRootCauseMessage(e));

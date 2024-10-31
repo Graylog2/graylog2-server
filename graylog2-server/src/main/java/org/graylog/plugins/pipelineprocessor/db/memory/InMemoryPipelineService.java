@@ -17,14 +17,13 @@
 package org.graylog.plugins.pipelineprocessor.db.memory;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
-import org.mongojack.DBQuery;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -106,10 +105,5 @@ public class InMemoryPipelineService implements PipelineService {
 
     private String createId() {
         return String.valueOf(idGen.incrementAndGet());
-    }
-
-    @Override
-    public long count(DBQuery.Query query) {
-        return store.size();
     }
 }

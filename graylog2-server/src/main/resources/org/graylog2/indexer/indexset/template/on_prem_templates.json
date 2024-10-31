@@ -1,0 +1,128 @@
+[
+  {
+    "title": "7 Days Hot, 90 Days Total",
+    "description": "Use case: minimal need for historical searches. This configuration has low memory and storage usage. Logs will be searchable for a minimum of 90 days.",
+    "built_in": true,
+    "index_set_config": {
+      "index_analyzer": "standard",
+      "shards": 1,
+      "replicas": 0,
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "field_type_refresh_interval": 5000,
+      "data_tiering": {
+        "type": "hot_warm",
+        "index_lifetime_min": "P90D",
+        "index_lifetime_max": "P93D",
+        "warm_tier_enabled": true,
+        "index_hot_lifetime_min": "P7D",
+        "warm_tier_repository_name": null,
+        "archive_before_deletion": false
+      },
+      "use_legacy_rotation": false
+    }
+  },
+  {
+    "title": "14 Days Hot, 90 Days Total.",
+    "description": "Use case: regular need for historical searches. Logs will be searchable for a minimum of 90 days.",
+    "built_in": true,
+    "index_set_config": {
+      "index_analyzer": "standard",
+      "shards": 1,
+      "replicas": 0,
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "field_type_refresh_interval": 5000,
+      "data_tiering": {
+        "type": "hot_warm",
+        "index_lifetime_min": "P90D",
+        "index_lifetime_max": "P96D",
+        "warm_tier_enabled": true,
+        "index_hot_lifetime_min": "P14D",
+        "warm_tier_repository_name": null,
+        "archive_before_deletion": false
+      },
+      "use_legacy_rotation": false
+    }
+  },
+  {
+    "title": "30 days Hot, 90 Days Total",
+    "description": "Use case: need for frequent and deep historical searches. This configuration has high memory and storage usage. Logs will be searchable for a minimum of 90 days.",
+    "built_in": true,
+    "index_set_config": {
+      "index_analyzer": "standard",
+      "shards": 1,
+      "replicas": 0,
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "field_type_refresh_interval": 5000,
+      "data_tiering": {
+        "type": "hot_warm",
+        "index_lifetime_min": "P90D",
+        "index_lifetime_max": "P100D",
+        "warm_tier_enabled": true,
+        "index_hot_lifetime_min": "P30D",
+        "warm_tier_repository_name": null,
+        "archive_before_deletion": false
+      },
+      "use_legacy_rotation": false
+    }
+  },
+  {
+    "title": "7 Days Hot",
+    "description": "Use case: rare historical searches. This configuration maintains a minimum of 7 days of logs in the Hot Tier.",
+    "built_in": true,
+    "index_set_config": {
+      "index_analyzer": "standard",
+      "shards": 1,
+      "replicas": 0,
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "field_type_refresh_interval": 5000,
+      "data_tiering": {
+        "type": "hot_only",
+        "index_lifetime_min": "P7D",
+        "index_lifetime_max": "P9D"
+      },
+      "use_legacy_rotation": false
+    }
+  },
+  {
+    "title": "14 Days Hot",
+    "description": "Use case: some historical searches. This configuration maintains a minimum of 14 days of logs in the Hot Tier.",
+    "built_in": true,
+    "index_set_config": {
+      "index_analyzer": "standard",
+      "shards": 1,
+      "replicas": 0,
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "field_type_refresh_interval": 5000,
+      "data_tiering": {
+        "type": "hot_only",
+        "index_lifetime_min": "P14D",
+        "index_lifetime_max": "P18D"
+      },
+      "use_legacy_rotation": false
+    }
+  },
+  {
+    "title": "30 Days Hot",
+    "description": "Use case: frequent historical searches. This configuration maintains a minimum of 30 days of logs in the Hot Tier.",
+    "built_in": true,
+    "index_set_config": {
+      "index_analyzer": "standard",
+      "shards": 1,
+      "replicas": 0,
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "field_type_refresh_interval": 5000,
+      "data_tiering": {
+        "type": "hot_only",
+        "index_lifetime_min": "P30D",
+        "index_lifetime_max": "P40D"
+      },
+      "use_legacy_rotation": false
+    }
+  }
+]

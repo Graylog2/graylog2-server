@@ -23,6 +23,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 export type TestResult = {
   isLoading: boolean,
@@ -30,22 +31,22 @@ export type TestResult = {
   error?: boolean,
   message?: string,
 };
+
 export type TestResults ={
     [key: string]: TestResult
 };
+
 export type EventNotification = {
   id: string,
   title: string,
   description: string,
-  config: {
-    type?: string
-  },
-}
+  config: Record<string, any | any[]>,
+};
 
 export type LegacyEventNotification = {
   name: string,
-  configuration: {}
-}
+  configuration: { [key: string]: { human_name: string } }
+};
 
 type EventNotificationsActionsType = {
   listAll: () => Promise<{ notifications: Array<EventNotification> }>,
@@ -56,9 +57,10 @@ type EventNotificationsActionsType = {
   create: (eventNotification: EventNotification) => Promise<void>,
   update: (id: string, eventNotification: EventNotification) => Promise<void>,
   delete: (eventNotification: EventNotification) => Promise<void>,
-  test: (eventNotification: EventNotification) => Promise<void>,
+  test: (eventNotification: EventNotification) => CancellablePromise<void>,
   testPersisted: (eventNotification: EventNotification) => Promise<void>,
-}
+};
+
 export const EventNotificationsActions = singletonActions(
   'core.EventNotifications',
   () => Reflux.createActions<EventNotificationsActionsType>({
@@ -87,7 +89,8 @@ type EventNotificationsStoreState = {
     total: number,
     grandTotal: number,
   }
-}
+};
+
 export const EventNotificationsStore = singletonStore(
   'core.EventNotifications',
   () => Reflux.createStore<EventNotificationsStoreState>({
@@ -297,7 +300,7 @@ export const EventNotificationsStore = singletonStore(
     test(notification) {
       const promise = fetch('POST', this.eventNotificationsUrl({ segments: ['test'] }), notification);
 
-      EventNotificationsActions.test.promise(promise);
+      EventNotificationsActions.test.promise(promise as CancellablePromise<any>);
     },
 
     testPersisted(notification) {

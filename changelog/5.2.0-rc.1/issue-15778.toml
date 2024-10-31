@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Render values consistently between normal and full screen mode."
+
+issues = ["15778"]
+pulls = ["15864"]
+

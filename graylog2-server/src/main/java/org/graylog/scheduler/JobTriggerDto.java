@@ -17,12 +17,14 @@
 package org.graylog.scheduler;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -33,7 +35,8 @@ import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = JobTriggerDto.Builder.class)
-public abstract class JobTriggerDto {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class JobTriggerDto implements MongoEntity {
     public static final String FIELD_ID = "id";
 
     public static final String FIELD_JOB_DEFINITION_TYPE = "job_definition_type";
@@ -41,6 +44,7 @@ public abstract class JobTriggerDto {
     static final String FIELD_START_TIME = "start_time";
     static final String FIELD_END_TIME = "end_time";
     static final String FIELD_NEXT_TIME = "next_time";
+    static final String FIELD_EXECUTION_DURATION = "execution_duration";
     private static final String FIELD_CREATED_AT = "created_at";
     static final String FIELD_UPDATED_AT = "updated_at";
     static final String FIELD_TRIGGERED_AT = "triggered_at";
@@ -50,6 +54,7 @@ public abstract class JobTriggerDto {
     public static final String FIELD_DATA = "data";
     static final String FIELD_CONSTRAINTS = "constraints";
     public static final String FIELD_IS_CANCELLED = "is_cancelled";
+    public static final String FIELD_CONCURRENCY_RESCHEDULE_COUNT = "concurrency_reschedule_count";
 
     @Id
     @ObjectId
@@ -59,6 +64,7 @@ public abstract class JobTriggerDto {
 
     @JsonProperty(FIELD_JOB_DEFINITION_TYPE)
     public abstract String jobDefinitionType();
+
     @JsonProperty(FIELD_JOB_DEFINITION_ID)
     public abstract String jobDefinitionId();
 
@@ -80,6 +86,9 @@ public abstract class JobTriggerDto {
     @JsonProperty(FIELD_TRIGGERED_AT)
     public abstract Optional<DateTime> triggeredAt();
 
+    @JsonProperty(FIELD_EXECUTION_DURATION)
+    public abstract Optional<Long> executionDurationMs();
+
     @JsonProperty(FIELD_STATUS)
     public abstract JobTriggerStatus status();
 
@@ -97,6 +106,10 @@ public abstract class JobTriggerDto {
 
     @JsonProperty(FIELD_IS_CANCELLED)
     public abstract boolean isCancelled();
+
+    @JsonProperty(FIELD_CONCURRENCY_RESCHEDULE_COUNT)
+    public abstract int concurrencyRescheduleCount();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -108,6 +121,7 @@ public abstract class JobTriggerDto {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
@@ -124,6 +138,7 @@ public abstract class JobTriggerDto {
                     .nextTime(now)
                     .status(JobTriggerStatus.RUNNABLE)
                     .isCancelled(false)
+                    .concurrencyRescheduleCount(0)
                     .constraints(ImmutableSet.of())
                     .lock(JobTriggerLock.empty());
         }
@@ -157,6 +172,9 @@ public abstract class JobTriggerDto {
         @JsonProperty(FIELD_TRIGGERED_AT)
         public abstract Builder triggeredAt(@Nullable DateTime triggeredAt);
 
+        @JsonProperty(FIELD_EXECUTION_DURATION)
+        public abstract Builder executionDurationMs(@Nullable Long executionDurationMs);
+
         @JsonProperty(FIELD_STATUS)
         public abstract Builder status(JobTriggerStatus status);
 
@@ -174,6 +192,9 @@ public abstract class JobTriggerDto {
 
         @JsonProperty(FIELD_IS_CANCELLED)
         public abstract Builder isCancelled(boolean isCancelled);
+
+        @JsonProperty(FIELD_CONCURRENCY_RESCHEDULE_COUNT)
+        public abstract Builder concurrencyRescheduleCount(int timesRescheduled);
 
         public abstract JobTriggerDto build();
     }

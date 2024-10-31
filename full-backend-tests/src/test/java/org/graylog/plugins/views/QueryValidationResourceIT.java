@@ -30,7 +30,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, mongoVersions = MongodbServer.MONGO5, searchVersions = SearchServer.OS1)
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = SearchServer.OS1)
 public class QueryValidationResourceIT {
 
     private final GraylogApis api;

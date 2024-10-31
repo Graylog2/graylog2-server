@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
+import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 export const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
@@ -99,7 +99,7 @@ type IndicesActionsType = {
   close: (indexName: string) => Promise<unknown>,
   delete: (indexName: string) => Promise<unknown>,
   multiple: () => Promise<unknown>,
-  reopen: () => Promise<unknown>,
+  reopen: (indexName: string) => Promise<unknown>,
   subscribe: (indexName: string) => Promise<unknown>,
   unsubscribe: (indexName: string) => Promise<unknown>,
 }
@@ -163,7 +163,7 @@ export const IndicesStore = singletonStore(
 
       const urlList = qualifyUrl(ApiRoutes.IndicesApiController.multiple().url);
       const request = { indices: indexNames };
-      const promise = fetch('POST', urlList, request).then((response: Indices) => {
+      const promise = fetchPeriodically('POST', urlList, request).then((response: Indices) => {
         this.indices = [...this.indices, ...response];
         this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
 

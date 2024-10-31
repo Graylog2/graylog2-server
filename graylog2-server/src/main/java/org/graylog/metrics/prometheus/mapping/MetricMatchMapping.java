@@ -27,7 +27,8 @@ import com.google.inject.assistedinject.Assisted;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 import org.graylog2.plugin.system.NodeId;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;

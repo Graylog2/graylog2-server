@@ -1,0 +1,5 @@
+type = "a"
+message = "Add action to cleanup & rebuild index ranges of all index sets."
+
+issues = ["11919"]
+pulls = ["15808"]

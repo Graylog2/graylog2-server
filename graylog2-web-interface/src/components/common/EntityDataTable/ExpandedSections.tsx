@@ -64,27 +64,28 @@ const ExpandedSections = <Entity extends EntityBase>({
   return (
     <Container>
       <td colSpan={1000}>
-        {Object.entries(expandedSectionsRenderer ?? {}).map(([sectionName, section]) => {
-          if (!expandedEntitySections.includes(sectionName)) {
-            return null;
-          }
+        {Object.entries(expandedSectionsRenderer ?? {})
+          .filter(([sectionName]) => expandedEntitySections.includes(sectionName))
+          .map(([sectionName, section]) => {
+            const hideSection = () => toggleSection(entity.id, sectionName);
+            const actions = section.actions?.(entity);
 
-          const hideSection = () => toggleSection(entity.id, sectionName);
-          const actions = section.actions?.(entity);
-
-          return (
-            <div key={`${sectionName}-${entity.id}`}>
-              <Header>
-                <h3>{section.title}</h3>
-                <Actions>
-                  {actions}
-                  <HideSectionButton name="times" onClick={hideSection} title="Hide section" />
-                </Actions>
-              </Header>
-              {section.content(entity)}
-            </div>
-          );
-        })}
+            return (
+              <div key={`${sectionName}-${entity.id}`}>
+                {section.disableHeader !== true
+                  ? (
+                    <Header>
+                      <h3>{section.title}</h3>
+                      <Actions>
+                        {actions}
+                        <HideSectionButton name="close" onClick={hideSection} title="Hide section" />
+                      </Actions>
+                    </Header>
+                  ) : null}
+                {section.content(entity)}
+              </div>
+            );
+          })}
       </td>
     </Container>
   );

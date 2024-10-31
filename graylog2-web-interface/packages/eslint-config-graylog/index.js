@@ -63,6 +63,7 @@ module.exports = {
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
         'react/jsx-no-constructed-context-values': 'off',
+        'testing-library/await-async-events': 'off',
         'testing-library/no-debugging-utils': 'warn',
         'testing-library/prefer-screen-queries': 'off',
         'testing-library/render-result-naming-convention': 'off',
@@ -130,11 +131,14 @@ module.exports = {
     'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
     'react/jsx-first-prop-new-line': ['warn', 'never'],
     'react/jsx-indent-props': ['error', 'first'],
+    'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }],
     'react/jsx-one-expression-per-line': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
+    'react/prop-types': ['off'],
     'react/static-property-placement': 'off',
+    'react/require-default-props': ['warn', { functions: 'defaultArguments' }],
 
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',

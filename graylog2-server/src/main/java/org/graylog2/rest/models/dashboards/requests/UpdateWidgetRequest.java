@@ -23,7 +23,8 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
+
+import jakarta.validation.constraints.Min;
 
 @JsonAutoDetect
 @AutoValue

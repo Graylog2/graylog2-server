@@ -23,6 +23,26 @@ import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
@@ -58,32 +78,13 @@ import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
@@ -148,7 +149,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                                                       value = "The field to sort the result on",
                                                       required = true,
                                                       allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
-                                            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
+                                            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
                                             @ApiParam(name = "query") @QueryParam("query") String query,
                                             @Context SearchUser searchUser) {
 
@@ -204,6 +205,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             if (viewResolver != null) {
                 ViewDTO view = viewResolver.get(decoder.getViewId()).orElseThrow(() -> new NotFoundException("Failed to resolve view:" + id));
                 if (searchUser.canReadView(view)) {
+                    startPageService.addLastOpenedFor(view, searchUser);
                     return view;
                 } else {
                     throw viewNotFoundException(id);
@@ -212,9 +214,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 throw new NotFoundException("Failed to find view resolver: " + decoder.getResolverName());
             }
         } else {
-            ViewDTO view =  loadViewIncludingFavorite(searchUser, id);
+            ViewDTO view = loadViewIncludingFavorite(searchUser, id);
             if (searchUser.canReadView(view)) {
-                // Only register normal views in LastOpened, for ViewResolvers, a more global solution has to be found because of the catalog
                 startPageService.addLastOpenedFor(view, searchUser);
                 return view;
             } else {
@@ -238,7 +239,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         final User user = userContext.getUser();
         var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
-        recentActivityService.create(result.id(),result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        recentActivityService.create(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
         return result;
     }
 
@@ -304,7 +305,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
 
-        if(!searchTypes.containsAll(stateTypes)) {
+        if (!searchTypes.containsAll(stateTypes)) {
             final Sets.SetView<String> diff = Sets.difference(stateTypes, searchTypes);
             final String message = String.format(Locale.ROOT,
                     "Search types do not correspond to view/search types, missing searches %s; search types: %s; state types: %s",

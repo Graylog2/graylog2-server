@@ -1,0 +1,6 @@
+type = "f"
+message = "Fixing text alignment of highlighted numbers in data tables."
+
+pulls = ["17678"]
+
+

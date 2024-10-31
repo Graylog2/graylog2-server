@@ -14,13 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-// eslint-disable-next-line no-restricted-imports
-import { MenuItem as BootstrapMenuItem } from 'react-bootstrap';
-import styled from 'styled-components';
+import * as React from 'react';
+import { useCallback } from 'react';
+import styled, { css } from 'styled-components';
+import { Link } from 'react-router-dom';
 
 import Icon from 'components/common/Icon';
+
+import Menu from './Menu';
+
+const StyledMenuItem = styled(Menu.Item)<{ $variant: 'danger' | undefined }>(({ $variant, theme }) => css`
+  ${$variant ? `color: ${theme.colors.variant.danger};` : ''}
+`);
 
 const IconWrapper = styled.div`
   display: inline-flex;
@@ -30,29 +35,66 @@ const IconWrapper = styled.div`
   align-items: center;
 `;
 
-type Props = React.ComponentProps<typeof BootstrapMenuItem> & {
+type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void
+
+type Props<T = undefined> = React.PropsWithChildren<{
+  active?: boolean,
+  className?: string,
+  component?: 'a',
+  'data-tab-id'?: string,
+  disabled?: boolean,
+  divider?: boolean,
+  eventKey?: T,
+  header?: boolean,
+  href?: string,
   icon?: React.ComponentProps<typeof Icon>['name'],
-}
+  id?: string,
+  onClick?: Callback<T>,
+  onSelect?: Callback<T>,
+  rel?: 'noopener noreferrer',
+  target?: '_blank',
+  title?: string,
+  variant?: 'danger'
+  closeMenuOnClick?: boolean,
+}>;
 
-const CustomMenuItem = ({ className, children, icon, ...props } : Props) => (
-  <BootstrapMenuItem bsClass={className} {...props}>
-    {children && (
-      <>
-        {icon && <IconWrapper><Icon name={icon} /></IconWrapper>}
+const CustomMenuItem = <T, >({ children, className, disabled = false, divider = false, eventKey, header = false, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component, variant, closeMenuOnClick }: Props<T>) => {
+  const callback = onClick ?? onSelect;
+  const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
+
+  if (divider) {
+    return <Menu.Divider role="separator" className={className} id={id} />;
+  }
+
+  if (header) {
+    return <Menu.Label role="heading" className={className} id={id}>{children}</Menu.Label>;
+  }
+
+  const sharedProps = {
+    $variant: variant,
+    className,
+    'data-tab-id': dataTabId,
+    disabled,
+    icon: icon ? <IconWrapper><Icon name={icon} /></IconWrapper> : null,
+    id,
+    onClick: _onClick,
+    title,
+    closeMenuOnClick,
+  };
+
+  if (href) {
+    return (
+      <StyledMenuItem component={Link} to={href} rel={rel} target={target} {...sharedProps}>
         {children}
-      </>
-    )}
-  </BootstrapMenuItem>
-);
+      </StyledMenuItem>
+    );
+  }
 
-CustomMenuItem.propTypes = {
-  className: PropTypes.string,
-  icon: PropTypes.string,
-};
-
-CustomMenuItem.defaultProps = {
-  className: undefined,
-  icon: undefined,
+  return (
+    <StyledMenuItem component={component} {...sharedProps}>
+      {children}
+    </StyledMenuItem>
+  );
 };
 
 /** @component */

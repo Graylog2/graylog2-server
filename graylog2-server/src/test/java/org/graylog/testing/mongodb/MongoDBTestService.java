@@ -43,33 +43,6 @@ public class MongoDBTestService implements AutoCloseable {
     private MongoConnectionImpl mongoConnection;
 
     /**
-     * Create service instance with default settings.
-     *
-     * @return the service instance
-     */
-    public static MongoDBTestService create() {
-        return new MongoDBTestService(MongoDBContainer.create());
-    }
-
-    /**
-     * Create service instance with the given version.
-     *
-     * @return the service instance
-     */
-    public static MongoDBTestService create(MongodbServer version) {
-        return new MongoDBTestService(MongoDBContainer.create(version));
-    }
-
-    /**
-     * Create service instance with the given network.
-     *
-     * @return the service instance
-     */
-    public static MongoDBTestService create(Network network) {
-        return new MongoDBTestService(MongoDBContainer.create(network));
-    }
-
-    /**
      * Create service instance with the given version and network.
      *
      * @return the service instance
@@ -143,8 +116,10 @@ public class MongoDBTestService implements AutoCloseable {
      * Drops the configured database.
      */
     public void dropDatabase() {
-        LOG.debug("Dropping database {}", mongoDatabase().getName());
-        mongoDatabase().drop();
+        if (container.isRunning()) {
+            LOG.debug("Dropping database {}", mongoDatabase().getName());
+            mongoDatabase().drop();
+        }
     }
 
     /**

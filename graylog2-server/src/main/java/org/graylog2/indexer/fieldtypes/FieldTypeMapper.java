@@ -20,7 +20,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.plugin.Message;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -62,7 +63,7 @@ public class FieldTypeMapper {
     /**
      * A map from Elasticsearch types to Graylog logical types.
      */
-    private static final ImmutableMap<String, FieldTypes.Type> TYPE_MAP = ImmutableMap.<String, FieldTypes.Type>builder()
+    public static final Map<String, FieldTypes.Type> TYPE_MAP = ImmutableMap.<String, FieldTypes.Type>builder()
             .put("keyword", STRING_TYPE) // since ES 5.x
             .put("text", STRING_FTS_TYPE) // since ES 5.x
             .put("long", LONG_TYPE)
@@ -82,6 +83,7 @@ public class FieldTypeMapper {
 
     private static final Map<String, FieldTypes.Type> FIELD_MAP = Map.of(
             Message.FIELD_STREAMS, STREAMS_TYPE,
+            Message.FIELD_FAILED_MESSAGE_STREAMS, STREAMS_TYPE,
             Message.FIELD_GL2_SOURCE_INPUT, INPUT_TYPE,
             Message.FIELD_GL2_SOURCE_NODE, NODE_TYPE
     );

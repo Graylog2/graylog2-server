@@ -62,33 +62,25 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
-        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
+
+        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
 
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
     }
 
-    private FiltersAggregationBuilder createFilter(String name, List<String> fields) {
+    private FiltersAggregationBuilder createFilter(String name, List<String> fields, boolean skipEmptyValues) {
         final BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         fields.stream()
                 .map(QueryBuilders::existsQuery)
-                .forEach(queryBuilder::filter);
+                .forEach(skipEmptyValues ? queryBuilder::must : queryBuilder::should);
         return AggregationBuilders.filters(name, queryBuilder)
                 .otherBucket(true);
     }
 
 
     private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
-        return valueBuckets.size() > 1
-                ? createScriptedTerms(valueBuckets, ordering, limit)
-                : createSimpleTerms(valueBuckets.get(0), ordering, limit);
-    }
-
-    private TermsAggregationBuilder createSimpleTerms(String field, List<BucketOrder> ordering, int limit) {
-        return AggregationBuilders.terms(AGG_NAME)
-                .field(field)
-                .order(ordering)
-                .size(limit);
+        return createScriptedTerms(valueBuckets, ordering, limit);
     }
 
     private TermsAggregationBuilder createScriptedTerms(List<String> buckets, List<BucketOrder> ordering, int limit) {
@@ -101,7 +93,11 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     private Script scriptForPivots(Collection<String> pivots) {
         final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
                 .map(bucket -> """
-                        String.valueOf((doc.containsKey('%1$s') && doc['%1$s'].size() > 0) ? doc['%1$s'].value : "%2$s")
+                        (doc.containsKey('%1$s') && doc['%1$s'].size() > 0
+                        ? doc['%1$s'].size() > 1
+                            ? doc['%1$s']
+                            : String.valueOf(doc['%1$s'].value)
+                        : "%2$s")
                         """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
@@ -109,18 +105,37 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
     @Override
     public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket) {
+        var values = (Values) bucketSpec;
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
+        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpec.fields(), pivot.sort());
+
         final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
         if (!(aggregation instanceof final ParsedFilters filterAggregation)) {
             // This happens when the other bucket is passed for column value extraction
             return Stream.of(initialBucket);
         }
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
-        final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
+        if (values.skipEmptyValues()) {
+            return extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
+        } else {
 
-        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpec.fields(), pivot.sort());
-        final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets()
+            final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
+
+            final Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
+
+            if (otherBucket.getDocCount() > 0) {
+                final MultiBucketsAggregation otherTermsAggregations = otherBucket.getAggregations().get(AGG_NAME);
+                final var otherStream = extractTermsBuckets(previousKeys, reorderKeys, otherTermsAggregations);
+                return Stream.concat(bucketStream, otherStream);
+            } else {
+                return bucketStream;
+            }
+        }
+    }
+
+    private Stream<PivotBucket> extractTermsBuckets(ImmutableList<String> previousKeys, Function<List<String>, List<String>> reorderKeys, MultiBucketsAggregation termsAggregation) {
+        return termsAggregation.getBuckets()
                 .stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
@@ -130,17 +145,6 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
                     return PivotBucket.create(keys, bucket, false);
                 });
-
-        return otherBucket.getDocCount() > 0
-                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
-                    ImmutableList.<String>builder()
-                        .addAll(previousKeys)
-                        .addAll(MISSING_BUCKET_KEYS)
-                        .build(),
-                    otherBucket,
-                    true
-                )))
-                : bucketStream;
     }
 
     private ImmutableList<String> splitKeys(String keys) {

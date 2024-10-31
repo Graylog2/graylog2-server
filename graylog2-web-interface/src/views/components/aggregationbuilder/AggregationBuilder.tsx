@@ -28,7 +28,6 @@ import type { OnVisualizationConfigChange } from 'views/components/aggregationwi
 import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
-import FullSizeContainer from './FullSizeContainer';
 
 const defaultVisualizationType = 'table';
 
@@ -55,8 +54,9 @@ export type VisualizationComponentProps = {
   fields: FieldTypeMappingsList,
   height: number,
   onChange: OnVisualizationConfigChange,
-  width: number,
+  setLoadingState: (loading: boolean) => void,
   toggleEdit: () => void,
+  width: number,
 };
 
 export type VisualizationComponent<T extends string> =
@@ -92,6 +92,9 @@ const AggregationBuilder = ({
   editing = false,
   fields,
   toggleEdit,
+  setLoadingState,
+  height,
+  width,
 }: WidgetComponentProps<AggregationWidgetConfig>) => {
   const onVisualizationConfigChange = useContext(OnVisualizationConfigChangeContext);
 
@@ -111,19 +114,16 @@ const AggregationBuilder = ({
   ) as VisualizationResult;
 
   return (
-    <FullSizeContainer>
-      {({ height, width }) => (
-        <VisComponent config={config}
-                      data={rows}
-                      effectiveTimerange={effectiveTimerange}
-                      editing={editing}
-                      fields={fields}
-                      height={height}
-                      width={width}
-                      toggleEdit={toggleEdit}
-                      onChange={onVisualizationConfigChange} />
-      )}
-    </FullSizeContainer>
+    <VisComponent config={config}
+                  data={rows}
+                  setLoadingState={setLoadingState}
+                  effectiveTimerange={effectiveTimerange}
+                  editing={editing}
+                  fields={fields}
+                  height={height}
+                  width={width}
+                  toggleEdit={toggleEdit}
+                  onChange={onVisualizationConfigChange} />
   );
 };
 

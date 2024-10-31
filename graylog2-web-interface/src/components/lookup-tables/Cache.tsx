@@ -64,7 +64,7 @@ const Cache = ({ cache }: Props) => {
           <Button bsStyle="success"
                   onClick={handleEdit(cache.name)}
                   role="button"
-                  name="edit">
+                  name="edit_square">
             Edit
           </Button>
         )}

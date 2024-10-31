@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.views.formatting.highlighting;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -25,5 +26,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 public interface HighlightingColor {
+    @JsonProperty("type")
     String type();
 }

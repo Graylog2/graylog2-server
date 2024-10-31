@@ -43,11 +43,6 @@ const exampleEntityScopeMutable: getPermissionsByScopeReturnType = {
   scopePermissions: { is_mutable: true },
 };
 
-const exampleEntityScopeImmutable: getPermissionsByScopeReturnType = {
-  loadingScopePermissions: false,
-  scopePermissions: { is_mutable: false },
-};
-
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: jest.fn(() => ({
@@ -83,12 +78,5 @@ describe('<EditEventDefinitionPage />', () => {
     render(<EditEventDefinitionPage />);
 
     await screen.findByText(/Event Definition 1/);
-  });
-
-  it('should display message component', async () => {
-    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeImmutable);
-    render(<EditEventDefinitionPage />);
-
-    await screen.findByText(/cannot be edited/);
   });
 });

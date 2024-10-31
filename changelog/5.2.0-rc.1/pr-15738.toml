@@ -1,0 +1,5 @@
+type = "a"
+message = "Implementing `percentage` metric for aggregations."
+
+pulls = ["15738"]
+issues = ["6763"]

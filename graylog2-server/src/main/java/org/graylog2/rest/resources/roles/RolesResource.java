@@ -24,6 +24,8 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.security.authservice.AuthServiceBackendDTO;
+import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -43,29 +45,33 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static javax.ws.rs.core.Response.status;
+import static jakarta.ws.rs.core.Response.status;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -77,16 +83,18 @@ public class RolesResource extends RestResource {
     private static final Logger log = LoggerFactory.getLogger(RolesResource.class);
 
     private final RoleService roleService;
+    private final GlobalAuthServiceConfig globalAuthServiceConfig;
 
     @Inject
-    public RolesResource(RoleService roleService) {
+    public RolesResource(RoleService roleService, GlobalAuthServiceConfig globalAuthServiceConfig) {
         this.roleService = roleService;
+        this.globalAuthServiceConfig = globalAuthServiceConfig;
     }
 
     @GET
     @RequiresPermissions(RestPermissions.ROLES_READ)
     @ApiOperation("List all roles")
-    public RolesResponse listAll() throws NotFoundException {
+    public RolesResponse listAll() {
         final Set<Role> roles = roleService.loadAll();
         Set<RoleResponse> roleResponses = Sets.newHashSetWithExpectedSize(roles.size());
         for (Role role : roles) {
@@ -192,6 +200,7 @@ public class RolesResource extends RestResource {
         final Collection<User> users = userService.loadAllForRole(role);
 
         Set<UserSummary> userSummaries = Sets.newHashSetWithExpectedSize(users.size());
+        final Optional<AuthServiceBackendDTO> activeAuthService = globalAuthServiceConfig.getActiveBackendConfig();
         for (User user : users) {
             final Set<String> roleNames = userService.getRoleNames(user);
 
@@ -204,6 +213,12 @@ public class RolesResource extends RestResource {
                 wildcardPermissions = ImmutableList.of();
                 grnPermissions = ImmutableList.of();
             }
+
+            boolean authServiceEnabled =
+                    Objects.isNull(user.getAuthServiceId()) ||
+                            (activeAuthService.isPresent() && user.getAuthServiceId().equals(activeAuthService.get().id())
+                            );
+
             userSummaries.add(UserSummary.create(
                     user.getId(),
                     user.getName(),
@@ -225,7 +240,8 @@ public class RolesResource extends RestResource {
                     null,
                     null,
                     user.getAccountStatus(),
-                    user.isServiceAccount()));
+                    user.isServiceAccount(),
+                    authServiceEnabled));
         }
 
         return RoleMembershipResponse.create(role.getName(), userSummaries);

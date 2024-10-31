@@ -19,7 +19,6 @@ package org.graylog2.shared.system.stats.fs;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog2.Configuration;
-import org.graylog2.bootstrap.preflight.DiskJournalPreflightCheck;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.shared.system.stats.OshiService;
 import org.slf4j.Logger;
@@ -34,10 +33,16 @@ import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 import oshi.util.tuples.Pair;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class OshiFsProbe implements FsProbe {
@@ -112,7 +117,7 @@ public class OshiFsProbe implements FsProbe {
                     HWDiskStore diskStore = it.getValue().getB();
                     OSFileStore fileStore = it.getValue().getA();
                     return FsStats.Filesystem.create(it.getKey().toString(), fileStore.getMount(),
-                            Optional.of(fileStore.getLogicalVolume()).orElse(fileStore.getVolume()),
+                            Optional.ofNullable(fileStore.getLogicalVolume()).orElse(fileStore.getVolume()),
                             fileStore.getDescription(), fileStore.getType(), fileStore.getTotalSpace(), fileStore.getUsableSpace(),
                             fileStore.getUsableSpace(), fileStore.getTotalSpace() - fileStore.getUsableSpace(),
                             safePercentage(fileStore.getTotalSpace() - fileStore.getUsableSpace(), fileStore.getTotalSpace(), 0),

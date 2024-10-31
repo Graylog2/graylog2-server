@@ -37,7 +37,7 @@ const PlaceholderBox = styled.div(({ theme }) => css`
   color: ${theme.colors.gray[30]};
   margin-bottom: ${theme.spacings.xs};
   
-  :hover {
+  &:hover {
     opacity: 1;
   }
 
@@ -60,7 +60,7 @@ type Props = {
   component: React.ComponentType<ChildProps>,
 }
 
-const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style, position, component: Component }, ref) => {
+const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style = {}, position, component: Component }, ref) => {
   const [show, setShow] = useState(false);
   const onCancel = useCallback(() => setShow(false), []);
   const onClick = useCallback(() => setShow(true), []);
@@ -73,16 +73,12 @@ const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style, p
   return (
     <div style={containerStyle} ref={ref}>
       <PlaceholderBox onClick={onClick}>
-        <HugeIcon name="circle-plus" />
+        <HugeIcon name="add_circle" />
         Create a new widget here
       </PlaceholderBox>
       {show && <Component onCancel={onCancel} position={position} />}
     </div>
   );
 });
-
-NewWidgetPlaceholder.defaultProps = {
-  style: {},
-};
 
 export default NewWidgetPlaceholder;

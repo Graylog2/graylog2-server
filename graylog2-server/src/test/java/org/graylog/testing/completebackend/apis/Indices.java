@@ -16,7 +16,11 @@
  */
 package org.graylog.testing.completebackend.apis;
 
-import io.restassured.specification.RequestSpecification;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
+import io.restassured.response.ValidatableResponse;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -25,6 +29,9 @@ import org.joda.time.Period;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
@@ -84,9 +91,101 @@ public class Indices implements GraylogRestApi {
                 1,
                 false,
                 Duration.standardSeconds(5L),
+                null,
+                null,
+                null,
+                true,
                 null
         );
 
         return createIndexSet(indexSetSummary);
+    }
+
+    public GraylogApiResponse listOpenIndices(String indexSetId) {
+        final ValidatableResponse response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/indices/" + indexSetId + "/open")
+                .then()
+                .log().ifError()
+                .log()
+                .ifValidationFails()
+                .statusCode(200);
+        return new GraylogApiResponse(response);
+    }
+
+    public List<String> waitForIndexNames(String indexSetId) throws ExecutionException, RetryException {
+        return RetryerBuilder.<List<String>>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(30))
+                .retryIfResult(List::isEmpty)
+                .build()
+                .call(() -> listOpenIndices(indexSetId).properJSONPath().read("indices.*.index_name"));
+    }
+
+    public void rotateIndexSet(String indexSetId) {
+        given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .post("/system/deflector/" + indexSetId + "/cycle")
+                .then()
+                .log().ifError()
+                .log()
+                .ifValidationFails()
+                .statusCode(204);
+    }
+
+    public void deleteIndexSet(String indexSetId, boolean deleteIndices) {
+        given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .param("delete_indices", deleteIndices)
+                .delete("/system/indices/index_sets/" + indexSetId)
+                .then()
+                .log().ifError()
+                .log().ifValidationFails()
+                .statusCode(204);
+    }
+
+    public void deleteIndex(String index) {
+        given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .delete("/system/indexer/indices/" + index)
+                .then()
+                .log().ifError()
+                .log().ifValidationFails()
+                .statusCode(204);
+    }
+
+    public GraylogApiResponse listIndexRanges() {
+        final ValidatableResponse response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indices/ranges")
+                .then()
+                .log().ifError()
+                .log()
+                .ifValidationFails()
+                .statusCode(200);
+        return new GraylogApiResponse(response);
+    }
+
+    public void rebuildIndexRanges() {
+        given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .post("/system/indices/ranges/rebuild")
+                .then()
+                .log().ifError()
+                .log()
+                .ifValidationFails()
+                .statusCode(202);
     }
 }

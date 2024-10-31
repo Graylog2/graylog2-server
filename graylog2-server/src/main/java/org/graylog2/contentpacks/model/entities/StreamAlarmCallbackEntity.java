@@ -23,8 +23,8 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @AutoValue
 @WithBeanGetter
@@ -43,6 +43,7 @@ public abstract class StreamAlarmCallbackEntity {
     @JsonProperty("configuration")
     @NotNull
     public abstract ReferenceMap configuration();
+
     @JsonCreator
     public static StreamAlarmCallbackEntity create(@JsonProperty("type") @NotBlank String type,
                                                    @JsonProperty("title") @NotBlank ValueReference title,

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import type QueryResult from 'views/logic/QueryResult';
 import { Icon } from 'components/common';
@@ -37,15 +36,14 @@ const ViewDescription = ({ results }: Props) => {
   const isAdHocSearch = !viewMetadata.id;
   const viewType = useViewType();
   const viewTypeLabel = viewType ? ViewTypeLabel({ type: viewType }) : '';
+
   const resultsSection = (
     <>
       <SectionSubheadline>
         Execution
       </SectionSubheadline>
-      <p>
 
-        <SearchResultOverview results={results} />
-      </p>
+      <SearchResultOverview results={results} />
     </>
   );
 
@@ -62,7 +60,7 @@ const ViewDescription = ({ results }: Props) => {
     <>
       {(!viewMetadata.summary || !viewMetadata.description) && (
         <SectionInfo>
-          To add a description and summary for this {viewTypeLabel} click on the <Icon name="ellipsis-h" /> icon in the search bar to open its action menu. The action menu includes the option &quot;Edit metadata&quot;.
+          To add a description and summary for this {viewTypeLabel} click on the <Icon name="more_horiz" /> icon in the search bar to open its action menu. The action menu includes the option &quot;Edit metadata&quot;.
         </SectionInfo>
       )}
       {resultsSection}
@@ -77,10 +75,6 @@ const ViewDescription = ({ results }: Props) => {
       </p>
     </>
   );
-};
-
-ViewDescription.propTypes = {
-  results: PropTypes.object.isRequired,
 };
 
 export default ViewDescription;

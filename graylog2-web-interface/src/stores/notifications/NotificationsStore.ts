@@ -46,7 +46,7 @@ type NotificationsStoreType = {
 };
 
 type NotificationMessageOptions ={
-  values: {
+  values?: {
     [key: string]: string,
   }
 }

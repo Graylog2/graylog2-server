@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Make sure that `boolean` fields are returned as `true`|`false` in aggregations on Opensearch 2.4+."
+
+issues = ["14661"]
+pulls = ["15809"]

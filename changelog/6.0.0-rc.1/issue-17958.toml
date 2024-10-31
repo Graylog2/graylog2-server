@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix issue where enabled event definitions would be incorrectly set to disabled through the REST API."
+
+issues = ["17958"]
+pulls = ["17959"]

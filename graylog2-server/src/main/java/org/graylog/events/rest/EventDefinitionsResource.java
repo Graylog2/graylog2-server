@@ -24,6 +24,27 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -31,8 +52,10 @@ import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinition;
+import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
@@ -40,6 +63,7 @@ import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog.events.processor.EventResolver;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -54,6 +78,7 @@ import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
@@ -66,27 +91,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -95,6 +99,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Api(value = "Events/Definitions", description = "Event definition management", tags = {CLOUD_VISIBLE})
 @Path("/events/definitions")
@@ -125,6 +130,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventDefinitionHandler eventDefinitionHandler;
     private final EventDefinitionContextService contextService;
     private final EventProcessorEngine engine;
+    private final EventDefinitionConfiguration eventDefinitionConfiguration;
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkDeletionExecutor;
@@ -140,12 +146,14 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     RecentActivityService recentActivityService,
                                     AuditEventSender auditEventSender,
                                     ObjectMapper objectMapper,
-                                    EventResolver eventResolver
+                                    EventResolver eventResolver,
+                                    EventDefinitionConfiguration eventDefinitionConfiguration
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.contextService = contextService;
         this.engine = engine;
+        this.eventDefinitionConfiguration = eventDefinitionConfiguration;
         this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.recentActivityService = recentActivityService;
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
@@ -169,7 +177,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                                   allowableValues = "title,description,priority,status")
                                                         @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                        @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+                                                        @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
         try {
@@ -180,9 +188,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if ("status".equals(sort)) {
             sort = "alert";
         }
-        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
-            return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-        }, sort, order, page, perPage);
+        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
+                searchQuery,
+                event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
+                order.toBsonSort(sort),
+                page,
+                perPage);
         PaginatedList<EventDefinitionDto> definitionDtos = new PaginatedList<>(
                 result.delegate(), result.pagination().total(), result.pagination().page(), result.pagination().perPage()
         );
@@ -213,9 +224,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
-            return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-        }, "title", "asc", page, perPage);
+        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
+                searchQuery,
+                event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
+                SortOrder.ASCENDING.toBsonSort("title"),
+                page,
+                perPage);
         final ImmutableMap<String, Object> context = contextService.contextFor(result.delegate());
         return PaginatedResponse.create("event_definitions", result, query, context);
     }
@@ -237,7 +251,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         return dbService.get(definitionId)
                 .map(eventDefinition -> ImmutableMap.of(
                         "event_definition", eventDefinition,
-                        "context", contextService.contextFor(eventDefinition)
+                        "context", contextService.contextFor(eventDefinition),
+                        "is_mutable", dbService.isMutable(eventDefinition)
                 ))
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
     }
@@ -251,11 +266,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                            @ApiParam(name = "JSON Body") EventDefinitionDto dto, @Context UserContext userContext) {
         checkEventDefinitionPermissions(dto, "create");
 
-        final ValidationResult result = dto.validate();
+        final ValidationResult result = dto.validate(null, eventDefinitionConfiguration);
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
-        final EventDefinitionDto entity = schedule ? eventDefinitionHandler.create(dto, Optional.of(userContext.getUser())) : eventDefinitionHandler.createWithoutSchedule(dto, Optional.of(userContext.getUser()));
+        final EventDefinitionDto entity = schedule ?
+                eventDefinitionHandler.create(dto, Optional.of(userContext.getUser())) :
+                eventDefinitionHandler.createWithoutSchedule(dto.toBuilder().state(EventDefinition.State.DISABLED).build(), Optional.of(userContext.getUser()));
         recentActivityService.create(entity.id(), GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(entity).build();
     }
@@ -274,7 +291,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
         checkProcessorConfig(oldDto, dto);
 
-        final ValidationResult result = dto.validate();
+        final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration);
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
@@ -282,6 +299,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
+
+        dto = dto.toBuilder().state(schedule ? EventDefinition.State.ENABLED : EventDefinition.State.DISABLED).build();
         recentActivityService.update(definitionId, GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(eventDefinitionHandler.update(dto, schedule)).build();
     }
@@ -303,8 +322,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             String msg = "Unable to delete event definition <" + dependencyTitle
                     + "> - please remove all references from event definitions: " + StringUtils.join(dependenciesTitles, ",");
             ValidationResult validationResult = new ValidationResult()
-                .addError("dependency", msg)
-                .addContext("dependency_ids", dependenciesIds);
+                    .addError("dependency", msg)
+                    .addContext("dependency_ids", dependenciesIds);
             throw new ValidationFailureException(validationResult, msg);
         }
 
@@ -342,7 +361,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                        @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
-                new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to enable", definitionId)));
+                new BadRequestException(f("Unable to find event definition '%s' to enable", definitionId)));
         eventDefinitionHandler.schedule(definitionId);
         return eventDefinitionDto.toBuilder().state(EventDefinition.State.ENABLED).build();
     }
@@ -373,7 +392,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                          @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
-                new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to disable", definitionId)));
+                new BadRequestException(f("Unable to find event definition '%s' to disable", definitionId)));
         eventDefinitionHandler.unschedule(definitionId);
         return eventDefinitionDto.toBuilder().state(EventDefinition.State.DISABLED).build();
     }
@@ -424,13 +443,46 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     }
 
     @POST
+    @ApiOperation("Duplicate an event definition")
+    @Path("{definitionId}/duplicate")
+    @Consumes(MediaType.WILDCARD)
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
+    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
+    public Response duplicate(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId, @Context UserContext userContext) {
+        final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
+                new BadRequestException(f("Unable to find event definition '%s' to duplicate", definitionId)));
+        checkEventDefinitionPermissions(eventDefinitionDto, "create");
+
+        final EventDefinitionDto saved = eventDefinitionHandler.duplicate(eventDefinitionDto, Optional.of(userContext.getUser()));
+        return Response.ok().entity(saved).build();
+    }
+
+    @POST
     @Path("/validate")
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate an event definition")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public ValidationResult validate(@ApiParam(name = "JSON body", required = true)
                                      @Valid @NotNull EventDefinitionDto toValidate) {
-        return toValidate.config().validate();
+        EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(eventDefinitionDto -> eventDefinitionDto.config()).orElse(null);
+        ValidationResult validationResult = toValidate.config().validate();
+        validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
+        return validationResult;
+    }
+
+    @POST
+    @Path("/validate/cron_expression")
+    @NoAuditEvent("Validation only")
+    @ApiOperation(value = "Validate a cron expression")
+    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
+    public CronValidationResponse validate(@ApiParam(name = "JSON body", required = true)
+                                           @Valid @NotNull CronValidationRequest toValidate) {
+        try {
+            CronUtils.validateExpression(toValidate.expression());
+            return new CronValidationResponse(null, CronUtils.describeExpression(toValidate.expression()));
+        } catch (IllegalArgumentException e) {
+            return new CronValidationResponse(e.getMessage(), null);
+        }
     }
 
     private void checkEventDefinitionPermissions(EventDefinitionDto dto, String action) {
@@ -446,7 +498,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     /**
      * Check that if this Event Definitions Processor Config is being modified, it is allowed to be.
-     * @param oldEventDefinition - The Existing Event Definition
+     *
+     * @param oldEventDefinition     - The Existing Event Definition
      * @param updatedEventDefinition - The Event Definition with pending updates
      */
     @VisibleForTesting

@@ -184,6 +184,14 @@ const validateGrouping = (grouping: GroupByFormValues): GroupByError => {
   return validateValuesGrouping(grouping);
 };
 
+const validateGroupBy = ({ values }: { values: WidgetConfigFormValues }) => {
+  if (values?.visualization?.type === 'numeric' && values?.groupBy?.groupings?.length > 0) {
+    return { groupBy: 'Single Number widget does not support Group By' };
+  }
+
+  return {};
+};
+
 const validateGroupings = (values: WidgetConfigFormValues): WidgetConfigValidationErrors => {
   const emptyErrors = {};
 
@@ -192,9 +200,15 @@ const validateGroupings = (values: WidgetConfigFormValues): WidgetConfigValidati
   }
 
   const { groupings } = values.groupBy;
-  const groupingErrors = groupings.map(validateGrouping);
 
-  return hasErrors(groupingErrors) ? { groupBy: { groupings: groupingErrors } } : emptyErrors;
+  const groupingErrors = groupings.map(validateGrouping);
+  const groupByErrors = validateGroupBy({ values });
+
+  if (hasErrors([groupByErrors])) return groupByErrors;
+
+  if (hasErrors(groupingErrors)) return ({ groupBy: { groupings: groupingErrors } });
+
+  return emptyErrors;
 };
 
 const addRandomId = <GroupingType extends GroupByFormValues>(baseGrouping: Omit<GroupingType, 'id'>) => ({
@@ -217,13 +231,14 @@ const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGr
 
 const valuesPivotToGrouping = (pivot: Pivot, direction: GroupingDirection): ValuesGrouping => {
   const { fields, config } = pivot;
-  const { limit } = config as ValuesConfigType;
+  const { limit, skip_empty_values } = config as ValuesConfigType;
 
   return addRandomId<ValuesGrouping>({
     direction,
     fields,
     type: ValuesType,
     limit,
+    skipEmptyValues: skip_empty_values,
   });
 };
 
@@ -247,7 +262,7 @@ const pivotsToGrouping = (config: AggregationWidgetConfig) => {
 };
 
 const groupingToPivot = (grouping: GroupByFormValues) => {
-  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: parseNumber(grouping.limit) };
+  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: parseNumber(grouping.limit), skip_empty_values: grouping.skipEmptyValues };
 
   return Pivot.create(grouping.fields, grouping.type, pivotConfig);
 };
@@ -275,7 +290,7 @@ const GroupByElement: AggregationElement<'groupBy'> = {
   title: 'Grouping',
   key: 'groupBy',
   order: 1,
-  allowCreate: () => true,
+  allowCreate: (formValues : WidgetConfigFormValues) => !(formValues.visualization.type === 'numeric'),
   onCreate: (formValues: WidgetConfigFormValues) => ({
     ...formValues,
     groupBy: {

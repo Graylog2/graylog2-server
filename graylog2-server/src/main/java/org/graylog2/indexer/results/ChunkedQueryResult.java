@@ -16,10 +16,11 @@
  */
 package org.graylog2.indexer.results;
 
-import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 
@@ -52,12 +53,12 @@ public abstract class ChunkedQueryResult<C, R> extends IndexQueryResult implemen
         this.initialResult = initialResult;
         this.fields = fields;
 
-        final Md5Hash md5Hash = new Md5Hash(getOriginalQuery());
-        queryHash = md5Hash.toHex();
+        queryHash = DigestUtils.md5Hex(getOriginalQuery());
         LOG.debug("[{}] Starting {} request for query {}", queryHash, getChunkingMethodName(), getOriginalQuery());
     }
 
     @Override
+    @Nullable
     public ResultChunk nextChunk() throws IOException {
         if (limitReached()) {
             LOG.debug("[{}] Reached limit for query {}", queryHash, getOriginalQuery());
@@ -70,7 +71,7 @@ public abstract class ChunkedQueryResult<C, R> extends IndexQueryResult implemen
 
         final List<ResultMessage> resultMessages = result != null ? collectMessagesFromResult(result) : List.of();
 
-        if (resultMessages.size() == 0) {
+        if (resultMessages.isEmpty()) {
             // chunking exhausted
             LOG.debug("[{}] Reached end of {} results for query {}", queryHash, getChunkingMethodName(), getOriginalQuery());
             return null;
@@ -89,6 +90,7 @@ public abstract class ChunkedQueryResult<C, R> extends IndexQueryResult implemen
 
     protected abstract List<ResultMessage> collectMessagesFromResult(R result);
 
+    @Nullable
     protected abstract R nextSearchResult() throws IOException;
 
     protected abstract String getChunkingMethodName();

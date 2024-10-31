@@ -30,15 +30,17 @@ import org.graylog2.plugin.Message;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+
 import java.util.Map;
 import java.util.Set;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -57,7 +59,7 @@ public class SystemFieldsResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get list of message fields that exist",
-            notes = "This operation is comparably fast because it reads directly from the indexer mapping.")
+                  notes = "This operation is comparably fast because it reads directly from the indexer mapping.")
     @RequiresPermissions(RestPermissions.FIELDNAMES_READ)
     @Produces(APPLICATION_JSON)
     public Map<String, Set<String>> fields(@ApiParam(name = "limit", value = "Maximum number of fields to return. Set to 0 for all fields.", required = false)

@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Add permission check for displaying content pack uninstall details."
+
+pulls = ["18177"]

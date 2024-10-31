@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
@@ -46,6 +47,10 @@ public class SyslogLevelConversion extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(valueParam)
                 .description("Converts a syslog level number to its string representation")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Convert syslog level")
+                .ruleBuilderTitle("Converts a syslog level number in '${value}' to string")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.SYSLOG)
                 .build();
     }
 }

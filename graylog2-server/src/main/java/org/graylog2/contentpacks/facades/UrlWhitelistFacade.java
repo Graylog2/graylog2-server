@@ -34,7 +34,8 @@ import org.graylog2.plugin.Version;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.graylog2.system.urlwhitelist.WhitelistEntry;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -69,7 +70,7 @@ public class UrlWhitelistFacade implements EntityFacade<WhitelistEntry> {
 
     @Override
     public NativeEntity<WhitelistEntry> createNativeEntity(Entity entity, Map<String, ValueReference> parameters,
-            Map<EntityDescriptor, Object> nativeEntities, String username) {
+                                                           Map<EntityDescriptor, Object> nativeEntities, String username) {
 
         if (!(entity instanceof EntityV1)) {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());

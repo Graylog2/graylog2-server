@@ -15,18 +15,59 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import type Immutable from 'immutable';
+
 import type { Sort } from 'stores/PaginationTypes';
 
-export const ENTITY_TABLE_ID = 'streams';
-export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'index_set_title', 'rules', 'throughput', 'disabled'],
-  columnsOrder: ['title', 'description', 'index_set_title', 'rules', 'throughput', 'disabled', 'created_at'],
+const getStreamDataWarehouseTableElements = PluginStore.exports('dataWarehouse')?.[0]?.getStreamDataWarehouseTableElements;
+
+const getStreamTableElements = (permissions: Immutable.List<string>, isPipelineColumnPermitted: boolean) => {
+  const streamDataWarehouseTableElements = getStreamDataWarehouseTableElements?.(permissions);
+
+  const defaultLayout = {
+    entityTableId: 'streams',
+    defaultPageSize: 20,
+    defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
+    defaultDisplayedAttributes: [
+      'title',
+      'index_set_title',
+      'archiving',
+      ...(streamDataWarehouseTableElements?.attributeName ? [streamDataWarehouseTableElements.attributeName] : []),
+      'rules',
+      ...(isPipelineColumnPermitted ? ['pipelines'] : []),
+      'outputs',
+      'throughput',
+      'disabled',
+    ],
+  };
+  const columnOrder = [
+    'title',
+    'index_set_title',
+    'archiving',
+    ...(streamDataWarehouseTableElements?.attributeName ? [streamDataWarehouseTableElements.attributeName] : []),
+    'rules',
+    ...(isPipelineColumnPermitted ? ['pipelines'] : []),
+    'outputs',
+    'throughput',
+    'disabled',
+    'created_at',
+  ];
+  const additionalAttributes = [
+    { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
+    { id: 'throughput', title: 'Throughput' },
+    { id: 'rules', title: 'Rules' },
+    ...(isPipelineColumnPermitted ? [{ id: 'pipelines', title: 'Pipelines' }] : []),
+    { id: 'outputs', title: 'Outputs' },
+    { id: 'archiving', title: 'Archiving' },
+    ...(streamDataWarehouseTableElements?.attributes || []),
+  ];
+
+  return {
+    defaultLayout,
+    columnOrder,
+    additionalAttributes,
+  };
 };
 
-export const ADDITIONAL_ATTRIBUTES = [
-  { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
-  { id: 'throughput', title: 'Throughput' },
-  { id: 'rules', title: 'Rules' },
-];
+export default getStreamTableElements;

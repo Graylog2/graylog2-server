@@ -20,7 +20,9 @@ import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.users.DefaultPasswordAlgorithm;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 public class PasswordAlgorithmFactory {

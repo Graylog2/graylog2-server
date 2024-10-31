@@ -19,83 +19,92 @@ package org.graylog.plugins.views.favorites;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
-import org.bson.types.ObjectId;
-import org.graylog.grn.GRN;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
+import jakarta.inject.Inject;
 import org.graylog.grn.GRNRegistry;
-import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityEvent;
-import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.lookup.Catalog;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.users.events.UserDeletedEvent;
-import org.mongojack.DBQuery;
-import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
+public class FavoritesService {
     public static final String COLLECTION_NAME = "favorites";
 
-    private final EntityOwnershipService entityOwnerShipService;
-    private final Catalog catalog;
+    private final StartPageItemTitleRetriever startPageItemTitleRetriever;
     private final GRNRegistry grnRegistry;
+    private final MongoCollection<FavoritesForUserDTO> db;
+    private final MongoUtils<FavoritesForUserDTO> mongoUtils;
 
     @Inject
-    protected FavoritesService(final MongoConnection mongoConnection,
-                               EventBus eventBus,
-                               final MongoJackObjectMapperProvider mapper,
-                               final EntityOwnershipService entityOwnerShipService,
-                               final Catalog catalog,
+    protected FavoritesService(final MongoCollections mongoCollections,
+                               final EventBus eventBus,
+                               final StartPageItemTitleRetriever startPageItemTitleRetriever,
                                final GRNRegistry grnRegistry) {
-        super(mongoConnection, mapper, FavoritesForUserDTO.class, COLLECTION_NAME);
+        this.db = mongoCollections.collection(COLLECTION_NAME, FavoritesForUserDTO.class);
         eventBus.register(this);
-        this.entityOwnerShipService = entityOwnerShipService;
-        this.catalog = catalog;
+        this.startPageItemTitleRetriever = startPageItemTitleRetriever;
         this.grnRegistry = grnRegistry;
+        this.mongoUtils = mongoCollections.utils(this.db);
 
-        db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_USER_ID, 1));
-        db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS, 1));
+        db.createIndex(Indexes.ascending(FavoritesForUserDTO.FIELD_USER_ID));
+        db.createIndex(Indexes.ascending(FavoritesForUserDTO.FIELD_ITEMS));
     }
 
     public PaginatedResponse<Favorite> findFavoritesFor(final SearchUser searchUser, final Optional<String> type, final int page, final int perPage) {
         var items = this.findForUser(searchUser)
                 .orElse(new FavoritesForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
-                .stream().filter(i -> type.isPresent() ? i.type().equals(type.get()) : true)
-                .map(i -> new Favorite(i, catalog.getTitle(i)))
+                .stream().filter(i -> type.isEmpty() || i.type().equals(type.get()))
+                .map(i -> startPageItemTitleRetriever
+                        .retrieveTitle(i, searchUser)
+                        .map(title -> new Favorite(i, title))
+                )
+                .flatMap(Optional::stream)
                 .toList();
 
-        return PaginatedResponse.create("favorites", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
+        return PaginatedResponse.create("favorites", new PaginatedList<>(PaginatedDbService.getPage(items, page, perPage), items.size(), page, perPage));
+    }
+
+    public void save(FavoritesForUserDTO favorite) {
+        if (favorite.id() == null) {
+            create(favorite);
+        } else {
+            this.db.replaceOne(MongoUtils.idEq(favorite.id()), favorite);
+        }
     }
 
     public void addFavoriteItemFor(final String in, final SearchUser searchUser) {
         var grn = grnRegistry.parse(in);
         final var favorites = this.findForUser(searchUser);
-        if(favorites.isPresent()) {
+        if (favorites.isPresent()) {
             var fi = favorites.get();
-            fi.items().add(grn);
-            this.save(fi);
+            if (fi.items() != null && fi.items().stream().noneMatch(g -> g.toString().equalsIgnoreCase(in))) {
+                fi.items().add(0, grn);
+                this.save(fi);
+            }
         } else {
             var items = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(grn));
-            this.create(items, searchUser);
+            this.create(items);
         }
     }
 
     public void removeFavoriteItemFor(final String in, final SearchUser searchUser) {
         var grn = grnRegistry.parse(in);
         var favorites = this.findForUser(searchUser);
-        if(favorites.isPresent() && favorites.get().items() != null) {
+        if (favorites.isPresent() && favorites.get().items() != null) {
             var fi = favorites.get();
             var items = fi.items().stream().filter(i -> !i.equals(grn)).toList();
             fi.items().clear();
@@ -109,17 +118,17 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
     }
 
     Optional<FavoritesForUserDTO> findForUser(final String userId) {
-        return streamQuery(DBQuery.is(FavoritesForUserDTO.FIELD_USER_ID, userId)).findAny();
+        return MongoUtils.stream(db.find(Filters.eq(FavoritesForUserDTO.FIELD_USER_ID, userId))).findAny();
     }
 
-    public Optional<FavoritesForUserDTO> create(final FavoritesForUserDTO favorite, final SearchUser searchUser) {
+    public Stream<FavoritesForUserDTO> streamAll() {
+        return MongoUtils.stream(db.find());
+    }
+
+    public Optional<FavoritesForUserDTO> create(final FavoritesForUserDTO favorite) {
         try {
-            final WriteResult<FavoritesForUserDTO, ObjectId> result = db.insert(favorite);
-            final FavoritesForUserDTO savedObject = result.getSavedObject();
-            if (savedObject != null) {
-                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.FAVORITE);
-            }
-            return Optional.ofNullable(savedObject);
+            final var result = db.insertOne(favorite);
+            return mongoUtils.getById(MongoUtils.insertedId(result));
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to create a Favorites collection, collection with this id already exists : " + favorite.id());
         }
@@ -132,12 +141,12 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
             final var grn = event.grn().toString();
             final var query = new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS, grn);
             final var modifications = new BasicDBObject("$pull", new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS, grn));
-            db.updateMulti(query, modifications);
+            db.updateMany(query, modifications);
         }
     }
 
     @Subscribe
     public void removeFavoriteEntityOnUserDeletion(final UserDeletedEvent event) {
-        db.remove(DBQuery.is(FavoritesForUserDTO.FIELD_USER_ID, event.userId()));
+        db.deleteOne(Filters.eq(FavoritesForUserDTO.FIELD_USER_ID, event.userId()));
     }
 }

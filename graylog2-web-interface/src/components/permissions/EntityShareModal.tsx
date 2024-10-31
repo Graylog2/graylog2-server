@@ -17,8 +17,7 @@
 import * as React from 'react';
 import { useRef, useEffect, useState } from 'react';
 import type { FormikProps } from 'formik';
-import PropTypes from 'prop-types';
-import type { $PropertyType } from 'utility-types';
+import upperCase from 'lodash/upperCase';
 
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { createGRN } from 'logic/permissions/GRN';
@@ -28,25 +27,36 @@ import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { FormValues as GranteesSelectFormValues } from './GranteesSelector';
 import EntityShareSettings from './EntityShareSettings';
 
 type Props = {
   description: string,
-  entityId: $PropertyType<SharedEntity, 'id'>,
-  entityTitle: $PropertyType<SharedEntity, 'title'>,
-  entityType: $PropertyType<SharedEntity, 'type'>,
-  entityTypeTitle: string | null | undefined,
+  entityId: SharedEntity['id'],
+  entityTitle: SharedEntity['title'],
+  entityType: SharedEntity['type'],
+  entityTypeTitle?: string | null | undefined
   onClose: () => void,
   showShareableEntityURL?: boolean
 };
 
-const EntityShareModal = ({ description, entityId, entityType, entityTitle, entityTypeTitle, onClose, showShareableEntityURL }: Props) => {
+const EntityShareModal = ({
+  description,
+  entityId,
+  entityType,
+  entityTitle,
+  entityTypeTitle,
+  onClose,
+  showShareableEntityURL = true,
+}: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const entityGRN = createGRN(entityType, entityId);
   const granteesSelectFormRef = useRef<FormikProps<GranteesSelectFormValues>>();
+  const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
@@ -69,6 +79,10 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
         return;
       }
     }
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITYSHARE?.[`ENTITY_${upperCase(entityType)}_SHARED`], {
+      app_pathname: entityType,
+    });
 
     EntityShareDomain.update(entityType, entityTitle, entityGRN, payload).then(() => {
       setDisableSubmit(true);
@@ -98,21 +112,6 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
       )}
     </BootstrapModalConfirm>
   );
-};
-
-EntityShareModal.propTypes = {
-  description: PropTypes.string.isRequired,
-  entityId: PropTypes.string.isRequired,
-  entityTitle: PropTypes.string.isRequired,
-  entityType: PropTypes.string.isRequired,
-  entityTypeTitle: PropTypes.string,
-  onClose: PropTypes.func.isRequired,
-  showShareableEntityURL: PropTypes.bool,
-};
-
-EntityShareModal.defaultProps = {
-  entityTypeTitle: undefined,
-  showShareableEntityURL: true,
 };
 
 export default EntityShareModal;

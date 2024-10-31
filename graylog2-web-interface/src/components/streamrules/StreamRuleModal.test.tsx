@@ -104,9 +104,7 @@ describe('StreamRuleModal', () => {
     selectEvent.openMenu(ruleTypeSelect);
     await selectEvent.select(ruleTypeSelect, 'match input');
 
-    userEvent.click(submitBtn);
-
-    expect(submit).not.toHaveBeenCalled();
+    expect(submitBtn).toBeDisabled();
 
     const inputSelect = await screen.findByLabelText('Input');
     selectEvent.openMenu(inputSelect);

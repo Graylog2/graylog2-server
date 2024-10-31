@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor, screen, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
@@ -25,7 +25,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Store from 'logic/local-storage/Store';
 import type ViewState from 'views/logic/views/ViewState';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -92,19 +92,17 @@ const MigrateFieldCharts = () => {
   );
 };
 
-const renderAndMigrate = () => {
-  const { queryByText, getByText } = render(<MigrateFieldCharts />);
-  const migrateButton = getByText('Migrate');
+const renderAndMigrate = async () => {
+  render(<MigrateFieldCharts />);
+  const migrateButton = await screen.findByText('Migrate');
 
   fireEvent.click(migrateButton);
 
-  return { queryByText };
+  await waitForElementToBeRemoved(migrateButton);
 };
 
 describe('MigrateFieldCharts', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(createSearch).mockImplementation(async (s) => s);
@@ -114,18 +112,18 @@ describe('MigrateFieldCharts', () => {
     jest.clearAllMocks();
   });
 
-  it('should be visible if migration never got executed', () => {
+  it('should be visible if migration never got executed', async () => {
     Store.get.mockImplementation(mockStoreGet());
-    const { getByText } = render(<MigrateFieldCharts />);
+    render(<MigrateFieldCharts />);
 
-    expect(getByText('Migrate existing search page charts')).not.toBeNull();
+    expect(await screen.findByText('Migrate existing search page charts')).not.toBeNull();
   });
 
-  it('should not be visible if migration already got executed', () => {
+  it('should not be visible if migration already got executed', async () => {
     Store.get.mockImplementation(mockStoreGet(undefined, true));
-    const { queryByText } = render(<MigrateFieldCharts />);
+    render(<MigrateFieldCharts />);
 
-    expect(queryByText('Migrate existing search page charts')).toBeNull();
+    expect(screen.queryByText('Migrate existing search page charts')).toBeNull();
   });
 
   describe('migration should', () => {
@@ -137,9 +135,9 @@ describe('MigrateFieldCharts', () => {
 
     it('hide alert, when finished', async () => {
       Store.get.mockImplementation(mockStoreGet());
-      const { queryByText } = renderAndMigrate();
+      renderAndMigrate();
 
-      await waitFor(() => expect(queryByText('Migrate existing search page charts')).toBeNull());
+      await waitFor(() => expect(screen.queryByText('Migrate existing search page charts')).toBeNull());
 
       expect(Store.set).toHaveBeenCalledWith('pinned-field-charts-migrated', 'finished');
     });

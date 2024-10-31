@@ -23,7 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 @JsonAutoDetect
 @AutoValue

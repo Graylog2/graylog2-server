@@ -42,7 +42,7 @@ type Props = {
 };
 
 const StyledReadOnlyFormGroup = styled(ReadOnlyFormGroup)`
-  :not(:last-child) {
+  &:not(:last-child) {
     margin-bottom: 15px;
   }
 `;

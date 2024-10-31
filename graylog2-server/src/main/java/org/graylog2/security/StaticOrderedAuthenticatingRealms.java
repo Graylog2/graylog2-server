@@ -27,8 +27,10 @@ import org.graylog2.security.realm.SessionAuthenticator;
 import org.graylog2.security.realm.UsernamePasswordRealm;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.AbstractCollection;
 import java.util.Iterator;
 import java.util.List;

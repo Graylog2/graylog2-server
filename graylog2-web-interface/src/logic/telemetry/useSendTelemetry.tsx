@@ -14,14 +14,39 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
+import type { Optional } from 'utility-types';
+import { UNSAFE_DataRouterContext as DataRouterContext, matchRoutes } from 'react-router-dom';
+import type { DataRouterContextObject } from 'react-router/dist/lib/context';
 
+import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
+import { currentPathnameWithoutPrefix } from 'util/URLUtils';
+
+const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
+  if (!dataRouterContext?.router?.routes) {
+    return undefined;
+  }
+
+  const { router: { routes } } = dataRouterContext;
+  const pathname = currentPathnameWithoutPrefix();
+  const matches = matchRoutes(routes, pathname);
+
+  return matches.at(-1).route.path;
+};
 
 const useSendTelemetry = () => {
   const { sendTelemetry } = useContext(TelemetryContext);
+  const dataRouterContext = useContext(DataRouterContext);
 
-  return sendTelemetry;
+  return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
+    const route = retrieveCurrentRoute(dataRouterContext);
+
+    return sendTelemetry(
+      eventType,
+      { app_path_pattern: route, ...event },
+    );
+  }, [dataRouterContext, sendTelemetry]);
 };
 
 export default useSendTelemetry;

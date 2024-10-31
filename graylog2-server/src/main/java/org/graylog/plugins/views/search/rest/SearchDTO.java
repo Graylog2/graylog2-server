@@ -90,7 +90,7 @@ public abstract class SearchDTO {
         }
     }
 
-    Search toSearch() {
+    public Search toSearch() {
         final ImmutableSet<Query> queries = queries().stream()
                 .map(QueryDTO::toQuery)
                 .collect(ImmutableSet.toImmutableSet());

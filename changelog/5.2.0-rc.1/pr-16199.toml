@@ -1,0 +1,6 @@
+type = "c"
+message = "Introduce a cache configuration setting to avoid caching empty values."
+
+issues = ["13579", "15200"]
+pulls = ["16199"]
+

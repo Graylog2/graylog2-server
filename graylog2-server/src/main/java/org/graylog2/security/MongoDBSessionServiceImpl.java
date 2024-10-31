@@ -27,18 +27,25 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.database.Persisted;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Collection;
 import java.util.List;
 
 @Singleton
 public class MongoDBSessionServiceImpl extends PersistedServiceImpl implements MongoDBSessionService {
+    private final ClusterEventBus eventBus;
+
     @Inject
-    public MongoDBSessionServiceImpl(MongoConnection mongoConnection) {
+    public MongoDBSessionServiceImpl(MongoConnection mongoConnection, ClusterEventBus clusterEventBus) {
         super(mongoConnection);
+        this.eventBus = clusterEventBus;
 
         final MongoDatabase database = mongoConnection.getMongoDatabase();
         final MongoCollection<Document> sessions = database.getCollection(MongoDbSession.COLLECTION_NAME);
@@ -84,4 +91,12 @@ public class MongoDBSessionServiceImpl extends PersistedServiceImpl implements M
         return session;
     }
 
+    @Override
+    public <T extends Persisted> int destroy(T model) {
+        int affectedDocs = super.destroy(model);
+        if (affectedDocs != 0 && model instanceof MongoDbSession session) {
+            eventBus.post(new SessionDeletedEvent(session.getSessionId()));
+        }
+        return affectedDocs;
+    }
 }

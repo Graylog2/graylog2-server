@@ -33,7 +33,6 @@ import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.searches.IndexRangeStats;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -257,8 +256,6 @@ public class MongoIndexRangeServiceTest {
     @Test
     @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void testHandleIndexDeletion() throws Exception {
-        when(indexSetRegistry.isManagedIndex("graylog_1")).thenReturn(true);
-
         assertThat(indexRangeService.findAll()).hasSize(2);
 
         localEventBus.post(IndicesDeletedEvent.create(Collections.singleton("graylog_1")));
@@ -308,5 +305,18 @@ public class MongoIndexRangeServiceTest {
 
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
         assertThat(indexRanges).isEmpty();
+    }
+
+    @Test
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
+    public void testIndexRename() {
+        assertThat(indexRangeService.renameIndex("graylog_2", "graylog_warm_2")).isTrue();
+
+        final SortedSet<IndexRange> indexRange = indexRangeService.findAll();
+        assertThat(indexRange).satisfies(r -> {
+            assertThat(r.stream().anyMatch(s -> s.indexName().equals("graylog_1"))).isTrue();
+            assertThat(r.stream().anyMatch(s -> s.indexName().equals("graylog_2"))).isFalse();
+            assertThat(r.stream().anyMatch(s -> s.indexName().equals("graylog_warm_2"))).isTrue();
+        });
     }
 }

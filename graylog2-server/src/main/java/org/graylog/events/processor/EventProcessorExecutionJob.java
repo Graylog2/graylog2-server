@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
@@ -36,7 +37,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -115,8 +115,12 @@ public class EventProcessorExecutionJob implements Job {
             eventProcessorEngine.execute(config.eventDefinitionId(), parameters);
 
             // By using the processingWindowSize and the processingHopSize we can implement hopping and tumbling
-            // windows. (a tumbling window is simply a hopping window where windowSize and hopSize are the same)
-            DateTime nextTo = to.plus(config.processingHopSize());
+            // windows. (a tumbling window is simply a hopping window where windowSize and hopSize are the same).
+            // If the job uses cron scheduling, we need to instead calculate the nextTo field based on the current to
+            // field as it is possible to skip contiguous time ranges with cron scheduling.
+            DateTime nextTo = config.isCron() ?
+                    scheduleStrategies.nextTime(ctx.trigger(), to).orElse(to.plus(config.processingHopSize())) :
+                    to.plus(config.processingHopSize());
             DateTime nextFrom = nextTo.minus(config.processingWindowSize());
 
             // If the event processor is catching up on old data (e.g. the server was shut down for a significant time),
@@ -126,8 +130,8 @@ public class EventProcessorExecutionJob implements Job {
             // If an event processor was configured with a processingHopSize greater than the processingWindowSize
             // we can't use the catchup mode.
             final long catchUpSize = configurationProvider.get().eventCatchupWindow();
-            if (catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now) &&
-                config.processingHopSize() <= config.processingWindowSize()) {
+            if (!config.isCron() && catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now) &&
+                    config.processingHopSize() <= config.processingWindowSize()) {
                 final long chunkCount = catchUpSize / config.processingWindowSize();
 
                 // Align to multiples of the processingWindowSize
@@ -208,6 +212,7 @@ public class EventProcessorExecutionJob implements Job {
         private static final String FIELD_PARAMETERS = "parameters";
         private static final String FIELD_PROCESSING_WINDOW_SIZE = "processing_window_size";
         private static final String FIELD_PROCESSING_HOP_SIZE = "processing_hop_size";
+        private static final String FIELD_IS_CRON = "is_cron";
 
         @JsonProperty(FIELD_EVENT_DEFINITION_ID)
         public abstract String eventDefinitionId();
@@ -220,6 +225,9 @@ public class EventProcessorExecutionJob implements Job {
 
         @JsonProperty(FIELD_PROCESSING_HOP_SIZE)
         public abstract long processingHopSize();
+
+        @JsonProperty(FIELD_IS_CRON)
+        public abstract boolean isCron();
 
         public static Builder builder() {
             return Builder.create();
@@ -236,7 +244,7 @@ public class EventProcessorExecutionJob implements Job {
         public static abstract class Builder implements JobDefinitionConfig.Builder<Builder> {
             @JsonCreator
             public static Builder create() {
-                return new AutoValue_EventProcessorExecutionJob_Config.Builder().type(TYPE_NAME);
+                return new AutoValue_EventProcessorExecutionJob_Config.Builder().type(TYPE_NAME).isCron(false);
             }
 
             @JsonProperty(FIELD_EVENT_DEFINITION_ID)
@@ -250,6 +258,9 @@ public class EventProcessorExecutionJob implements Job {
 
             @JsonProperty(FIELD_PROCESSING_HOP_SIZE)
             public abstract Builder processingHopSize(long hopSize);
+
+            @JsonProperty(FIELD_IS_CRON)
+            public abstract Builder isCron(boolean isCron);
 
             abstract Config autoBuild();
 

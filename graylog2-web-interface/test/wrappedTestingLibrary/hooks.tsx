@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom/jest-globals';
 import '@testing-library/jest-dom';
 import 'jest-styled-components';
 import type { RenderHookResult, RenderHookOptions } from '@testing-library/react-hooks';

@@ -64,14 +64,14 @@ describe('UrlWhitelistForm', () => {
     jest.useRealTimers();
   });
 
-  it('should show allow list toggle and url table', () => {
+  it('should show allow list toggle and url table', async () => {
     const onUpdate = jest.fn();
 
     render(<UrlWhiteListForm urls={config.entries}
                              disabled={config.disabled}
                              onUpdate={onUpdate} />);
 
-    expect(screen.getByRole('checkbox', { name: /disable whitelist/i })).toBeInTheDocument();
+    await screen.findByRole('checkbox', { name: /disable whitelist/i });
 
     config.entries.forEach(({ title }) => {
       expect(screen.getByDisplayValue(title)).toBeInTheDocument();
@@ -117,8 +117,8 @@ describe('UrlWhitelistForm', () => {
                              disabled={config.disabled}
                              onUpdate={onUpdate} />);
 
-    const row = screen.getByRole('row', { name: /3/i, exact: true });
-    const select = within(row).getByText(/exact match/i);
+    const row = await screen.findByRole('row', { name: /3/i });
+    const select = await within(row).findByText(/exact match/i);
 
     await selectEvent.openMenu(select);
     await selectEvent.select(select, 'Regex');
@@ -138,16 +138,16 @@ describe('UrlWhitelistForm', () => {
     );
   });
 
-  it('should add a new row to the form', () => {
+  it('should add a new row to the form', async () => {
     const onUpdate = jest.fn();
 
     render(<UrlWhiteListForm urls={config.entries}
                              disabled={config.disabled}
                              onUpdate={onUpdate} />);
 
-    expect(screen.queryByRole('cell', { name: String(config.entries.length + 1) })).not.toBeInTheDocument();
+    const button = (await screen.findAllByRole('button', { name: /add url/i }))[0];
 
-    const button = screen.getAllByRole('button', { name: /add url/i })[0];
+    expect(screen.queryByRole('cell', { name: String(config.entries.length + 1) })).not.toBeInTheDocument();
 
     expect(button).toBeInTheDocument();
 
@@ -155,7 +155,9 @@ describe('UrlWhitelistForm', () => {
 
     expect(screen.getByRole('cell', { name: String(config.entries.length + 1) })).toBeInTheDocument();
 
-    expect(onUpdate).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(onUpdate).toHaveBeenCalled();
+    });
   });
 
   it('should delete a row', async () => {
@@ -167,7 +169,7 @@ describe('UrlWhitelistForm', () => {
 
     expect(screen.getByDisplayValue(config.entries[0].title)).toBeInTheDocument();
 
-    const row = screen.getByRole('row', { name: /1/i, exact: true });
+    const row = screen.getByRole('row', { name: /1/i });
     const deleteButton = within(row).getByRole('button', { name: /delete entry/i });
 
     expect(deleteButton).toBeInTheDocument();
@@ -244,10 +246,11 @@ describe('UrlWhitelistForm', () => {
                                disabled={config.disabled}
                                onUpdate={onUpdate} />);
 
-      const row = screen.getByRole('row', { name: /3/i, exact: true });
+      const row = screen.getByRole('row', { name: /3/i });
       const select = within(row).getByText(/exact match/i);
 
       await selectEvent.openMenu(select);
+
       await selectEvent.select(select, 'Regex');
 
       await screen.findByText(/not a valid java regular expression/i);

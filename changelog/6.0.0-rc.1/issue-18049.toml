@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix index set defaults not being reflected in the form without reload."
+
+issues = ["18049"]
+pulls = ["18098"]

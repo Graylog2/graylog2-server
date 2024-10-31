@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.apache.logging.log4j.util.Strings;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -33,12 +33,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refres
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchType;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Requests;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
@@ -46,10 +44,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexR
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplatesExistRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.BulkByScrollResponse;
@@ -65,24 +62,29 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.storage.opensearch2.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cluster.ClusterStateApi;
+import org.graylog.storage.opensearch2.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch2.stats.StatsApi;
+import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.ShardsInfo;
+import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.Message;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -103,18 +105,24 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterOS2.class);
     private final OpenSearchClient client;
     private final StatsApi statsApi;
+    private final ClusterStatsApi clusterStatsApi;
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
+    private final IndexTemplateAdapter indexTemplateAdapter;
 
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
                              StatsApi statsApi,
+                             ClusterStatsApi clusterStatsApi,
                              CatApi catApi,
-                             ClusterStateApi clusterStateApi) {
+                             ClusterStateApi clusterStateApi,
+                             IndexTemplateAdapter indexTemplateAdapter) {
         this.client = client;
         this.statsApi = statsApi;
+        this.clusterStatsApi = clusterStatsApi;
         this.catApi = catApi;
         this.clusterStateApi = clusterStateApi;
+        this.indexTemplateAdapter = indexTemplateAdapter;
     }
 
     @Override
@@ -151,13 +159,28 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public void create(String index, IndexSettings indexSettings) {
+        executeCreateIndexRequest(index, createIndexRequest(index, indexSettings, null));
+    }
+
+    @Override
+    public void create(String index, IndexSettings indexSettings, @Nullable Map<String, Object> mapping) {
+        executeCreateIndexRequest(index, createIndexRequest(index, indexSettings, mapping));
+    }
+
+    private CreateIndexRequest createIndexRequest(String index,
+                                                   IndexSettings indexSettings,
+                                                   @Nullable Map<String, Object> mapping) {
         final Map<String, Object> settings = new HashMap<>();
         settings.put("number_of_shards", indexSettings.shards());
         settings.put("number_of_replicas", indexSettings.replicas());
+        CreateIndexRequest request = new CreateIndexRequest(index).settings(settings);
+        if (mapping != null) {
+            request = request.mapping(mapping);
+        }
+        return request;
+    }
 
-        final CreateIndexRequest request = new CreateIndexRequest(index)
-                .settings(settings);
-
+    private void executeCreateIndexRequest(String index, CreateIndexRequest request) {
         client.execute((c, requestOptions) -> c.indices().create(request, requestOptions),
                 "Unable to create index " + index);
     }
@@ -175,6 +198,18 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
+    public Map<String, Object> getIndexMapping(@Nonnull String index) {
+        final GetMappingsRequest request = new GetMappingsRequest()
+                .indices(index)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+
+        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+                "Couldn't read mapping of index " + index);
+
+        return result.mappings().get(index).sourceAsMap();
+    }
+
+    @Override
     public void updateIndexMetaData(@Nonnull String index, @Nonnull Map<String, Object> metadata, boolean mergeExisting) {
         Map<String, Object> metaUpdate = new HashMap<>();
         if (mergeExisting) {
@@ -187,14 +222,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public Map<String, Object> getIndexMetaData(@Nonnull String index) {
-        final GetMappingsRequest request = new GetMappingsRequest()
-                .indices(index)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
-
-        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
-                "Couldn't read mapping of index " + index);
-
-        final Object metaData = result.mappings().get(index).sourceAsMap().get("_meta");
+        final Object metaData = getIndexMapping(index).get("_meta");
         //noinspection rawtypes
         if (metaData instanceof Map map) {
             //noinspection unchecked
@@ -204,27 +232,25 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public boolean ensureIndexTemplate(String templateName, Map<String, Object> template) {
-        final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName)
-                .source(template);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
-                "Unable to create index template " + templateName);
-
-        return result.isAcknowledged();
+    public boolean ensureIndexTemplate(String templateName, Template template) {
+        return indexTemplateAdapter.ensureIndexTemplate(templateName, template);
     }
 
     @Override
     public boolean indexTemplateExists(String templateName) {
-        return client.execute((c, requestOptions) -> c.indices().existsTemplate(new IndexTemplatesExistRequest(templateName),
-                requestOptions), "Unable to verify index template existence " + templateName);
+        return indexTemplateAdapter.indexTemplateExists(templateName);
+    }
+
+    @Override
+    public boolean deleteIndexTemplate(String templateName) {
+        return indexTemplateAdapter.deleteIndexTemplate(templateName);
     }
 
     @Override
     public Optional<DateTime> indexCreationDate(String index) {
         final GetSettingsRequest request = new GetSettingsRequest()
                 .indices(index)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
         final GetSettingsResponse result = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Couldn't read settings of index " + index);
@@ -320,7 +346,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     private GetSettingsResponse settingsFor(String indexOrAlias) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(indexOrAlias)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, true));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
         return client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Unable to retrieve settings for index/alias " + indexOrAlias);
     }
@@ -339,15 +365,6 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
                         Map.Entry::getKey,
                         entry -> entry.getValue().stream().map(AliasMetadata::alias).collect(Collectors.toSet())
                 ));
-    }
-
-    @Override
-    public boolean deleteIndexTemplate(String templateName) {
-        final DeleteIndexTemplateRequest request = new DeleteIndexTemplateRequest(templateName);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().deleteTemplate(request, requestOptions),
-                "Unable to delete index template " + templateName);
-        return result.isAcknowledged();
     }
 
     @Override
@@ -394,6 +411,16 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
+    public IndexSetStats getIndexSetStats() {
+        return clusterStatsApi.clusterStats();
+    }
+
+    @Override
+    public List<ShardsInfo> getShardsInfo(String indexName) {
+        return catApi.getShardsInfo(indexName);
+    }
+
+    @Override
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
         if (indices == null || indices.isEmpty()) {
             throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
@@ -401,7 +428,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
                 .indices(indices.toArray(new String[]{}))
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names(Strings.EMPTY_ARRAY);
+                .names(new String[]{});
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
@@ -512,10 +539,10 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         }
 
         final Min minAgg = f.getAggregations().get("ts_min");
-        final long minUnixTime = new Double(minAgg.getValue()).longValue();
+        final long minUnixTime = Double.valueOf(minAgg.getValue()).longValue();
         final DateTime min = new DateTime(minUnixTime, DateTimeZone.UTC);
         final Max maxAgg = f.getAggregations().get("ts_max");
-        final long maxUnixTime = new Double(maxAgg.getValue()).longValue();
+        final long maxUnixTime = Double.valueOf(maxAgg.getValue()).longValue();
         final DateTime max = new DateTime(maxUnixTime, DateTimeZone.UTC);
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.
@@ -588,9 +615,29 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Override
     public String getIndexId(String index) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(index)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, true));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
         final GetSettingsResponse response = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Unable to retrieve settings for index/alias " + index);
         return response.getSetting(index, "index.uuid");
+    }
+
+    @Override
+    public Optional<WarmIndexInfo> getWarmIndexInfo(String index) {
+        final GetSettingsResponse settingsResponse = client.execute((c, options) ->
+                c.indices().getSettings(new GetSettingsRequest().indices(index), options));
+        Map<String, Settings> indexToSettings = settingsResponse.getIndexToSettings();
+
+        return Optional.ofNullable(indexToSettings.get(index))
+                .filter(settings -> "remote_snapshot".equals(settings.get("index.store.type")))
+                .map(settings -> mapIndexSettingsToSearchableSnapshot(index, settings));
+    }
+
+    private WarmIndexInfo mapIndexSettingsToSearchableSnapshot(String index, Settings settings) {
+        String initialIndexName = settings.get("index.provided_name");
+        Settings searchableSnapshotSettings = settings.getAsSettings("index.searchable_snapshot");
+        String repository = searchableSnapshotSettings.get("repository");
+        String snapshotName = searchableSnapshotSettings.get("snapshot_id.name");
+
+        return new WarmIndexInfo(index, initialIndexName, repository, snapshotName);
     }
 }

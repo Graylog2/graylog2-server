@@ -16,7 +16,7 @@
  */
 
 import React from 'react';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import type { QueryClientConfig } from '@tanstack/react-query';
 
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';

@@ -24,9 +24,10 @@ type Props = {
   receivedBy: React.ReactElement,
   index: string,
   streams: Immutable.Set<React.ReactElement>,
+  assets: React.ReactElement,
 };
 
-const MessageMetadata = ({ timestamp, receivedBy, index, streams }: Props) => (
+const MessageMetadata = ({ timestamp, receivedBy, index, streams, assets }: Props) => (
   <MessageDetailsDefinitionList>
     {timestamp}
     {receivedBy}
@@ -44,6 +45,8 @@ const MessageMetadata = ({ timestamp, receivedBy, index, streams }: Props) => (
         </dd>
       </>
     )}
+
+    {assets}
   </MessageDetailsDefinitionList>
 );
 

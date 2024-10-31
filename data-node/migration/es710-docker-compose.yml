@@ -1,0 +1,287 @@
+# based on files in:
+# https://github.com/Graylog2/docker-compose
+# https://opensearch.org/docs/latest/security/configuration/generate-certificates/
+# see additional cert.sh for certificate creation and custom-opensearch.yml for opensearch configuration
+
+version: "3.8"
+
+services:
+  mongodb:
+    hostname: "mongodb"
+    image: "mongo:5.0"
+    ports:
+      - "27017:27017"
+    volumes:
+      - "mongodb-data:/data/db"
+
+  elasticsearch1:
+    image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
+    hostname: "opensearch1"
+    environment:
+      node.name: "opensearch1"
+      cluster.name: "datanode-cluster"
+      discovery.seed_hosts: "opensearch2,opensearch3"
+      cluster.initial_master_nodes: "opensearch1,opensearch2,opensearch3"
+      bootstrap.memory_lock: "true"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true"
+    ports:
+      - "9200:9200"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - "opensearch-data-01:/usr/share/elasticsearch/data"
+
+  elasticsearch2:
+    image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
+    hostname: "opensearch2"
+    environment:
+      node.name: "opensearch2"
+      cluster.name: "datanode-cluster"
+      discovery.seed_hosts: "opensearch1,opensearch3"
+      cluster.initial_master_nodes: "opensearch1,opensearch2,opensearch3"
+      bootstrap.memory_lock: "true"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - "opensearch-data-02:/usr/share/elasticsearch/data"
+
+  elasticsearch3:
+    image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
+    hostname: "opensearch3"
+    environment:
+      node.name: "opensearch3"
+      cluster.name: "datanode-cluster"
+      discovery.seed_hosts: "opensearch1,opensearch2"
+      cluster.initial_master_nodes: "opensearch1,opensearch2,opensearch3"
+      bootstrap.memory_lock: "true"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - "opensearch-data-03:/usr/share/elasticsearch/data"
+
+  opensearch1:
+    image: "opensearchproject/opensearch:1.3.1"
+    hostname: "opensearch1"
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "network.host=opensearch1"
+      - "node.name=opensearch1"
+      - "cluster.name=datanode-cluster"
+      - "network.bind_host=_site_"
+      - "discovery.seed_hosts=opensearch2,opensearch3"
+      - "cluster.initial_master_nodes=opensearch1,opensearch2,opensearch3"
+      - "bootstrap.memory_lock=true"
+      - "action.auto_create_index=false"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "plugins.security.allow_unsafe_democertificates=true"
+        #      - "plugins.security.ssl.transport.enforce_hostname_verification=false"
+        #      - "plugins.security.ssl.transport.resolve_hostname=false"
+    ports:
+      - "9200:9200"
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - "opensearch-data-01:/usr/share/opensearch/data"
+      - "./root-ca.pem:/usr/share/opensearch/config/root-ca.pem"
+      - "./node1.pem:/usr/share/opensearch/config/node.pem"
+      - "./node1-key.pem:/usr/share/opensearch/config/node-key.pem"
+      - "./admin.pem:/usr/share/opensearch/config/admin.pem"
+      - "./admin-key.pem:/usr/share/opensearch/config/admin-key.pem"
+      - "./custom-opensearch.yml:/usr/share/opensearch/config/opensearch.yml"
+#      - "./opensearch-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
+      - "./datanode-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
+      - "./keystore.jks:/usr/share/opensearch/config/keystore.jks"
+
+  opensearch2:
+    image: "opensearchproject/opensearch:1.3.1"
+    hostname: "opensearch2"
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "network.host=opensearch2"
+      - "node.name=opensearch2"
+      - "cluster.name=datanode-cluster"
+      - "network.bind_host=_site_"
+      - "discovery.seed_hosts=opensearch1,opensearch3"
+      - "cluster.initial_master_nodes=opensearch1,opensearch2,opensearch3"
+      - "bootstrap.memory_lock=true"
+      - "action.auto_create_index=false"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "plugins.security.allow_unsafe_democertificates=true"
+        #      - "plugins.security.ssl.transport.enforce_hostname_verification=false"
+        #      - "plugins.security.ssl.transport.resolve_hostname=false"
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - "opensearch-data-02:/usr/share/opensearch/data"
+      - "./root-ca.pem:/usr/share/opensearch/config/root-ca.pem"
+      - "./node2.pem:/usr/share/opensearch/config/node.pem"
+      - "./node2-key.pem:/usr/share/opensearch/config/node-key.pem"
+      - "./admin.pem:/usr/share/opensearch/config/admin.pem"
+      - "./admin-key.pem:/usr/share/opensearch/config/admin-key.pem"
+      - "./custom-opensearch.yml:/usr/share/opensearch/config/opensearch.yml"
+#      - "./opensearch-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
+      - "./datanode-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
+      - "./keystore.jks:/usr/share/opensearch/config/keystore.jks"
+
+  opensearch3:
+    image: "opensearchproject/opensearch:1.3.1"
+    hostname: "opensearch3"
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "network.host=opensearch3"
+      - "node.name=opensearch3"
+      - "cluster.name=datanode-cluster"
+      - "network.bind_host=_site_"
+      - "discovery.seed_hosts=opensearch1,opensearch2"
+      - "cluster.initial_master_nodes=opensearch1,opensearch2,opensearch3"
+      - "bootstrap.memory_lock=true"
+      - "action.auto_create_index=false"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "plugins.security.allow_unsafe_democertificates=true"
+        #      - "plugins.security.ssl.transport.enforce_hostname_verification=false"
+        #      - "plugins.security.ssl.transport.resolve_hostname=false"
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - "opensearch-data-03:/usr/share/opensearch/data"
+      - "./root-ca.pem:/usr/share/opensearch/config/root-ca.pem"
+      - "./node3.pem:/usr/share/opensearch/config/node.pem"
+      - "./node3-key.pem:/usr/share/opensearch/config/node-key.pem"
+      - "./admin.pem:/usr/share/opensearch/config/admin.pem"
+      - "./admin-key.pem:/usr/share/opensearch/config/admin-key.pem"
+      - "./custom-opensearch.yml:/usr/share/opensearch/config/opensearch.yml"
+#      - "./opensearch-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
+      - "./datanode-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
+      - "./keystore.jks:/usr/share/opensearch/config/keystore.jks"
+
+  datanode1:
+    image: "${DATANODE_IMAGE:-graylog/graylog-datanode:5.2.0}"
+    hostname: opensearch1
+    depends_on:
+      - "mongodb"
+    environment:
+      GRAYLOG_DATANODE_NODE_ID_FILE: "/var/lib/graylog-datanode/node-id"
+      GRAYLOG_DATANODE_PASSWORD_SECRET: "${GRAYLOG_PASSWORD_SECRET:?Please configure GRAYLOG_PASSWORD_SECRET in the .env file}"
+      GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2: "${GRAYLOG_ROOT_PASSWORD_SHA2:?Please configure GRAYLOG_ROOT_PASSWORD_SHA2 in the .env file}"
+      GRAYLOG_DATANODE_MONGODB_URI: "mongodb://mongodb:27017/graylog"
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "8999:8999/tcp"   # DataNode API
+      - "9200:9200"
+    volumes:
+      - "graylog-datanode-01:/var/lib/graylog-datanode"
+      - "opensearch-data-01:/var/lib/graylog-datanode/opensearch/data"
+
+  datanode2:
+    image: "${DATANODE_IMAGE:-graylog/graylog-datanode:5.2.0}"
+    hostname: opensearch2
+    depends_on:
+      - "mongodb"
+    environment:
+      GRAYLOG_DATANODE_NODE_ID_FILE: "/var/lib/graylog-datanode/node-id"
+      GRAYLOG_DATANODE_PASSWORD_SECRET: "${GRAYLOG_PASSWORD_SECRET:?Please configure GRAYLOG_PASSWORD_SECRET in the .env file}"
+      GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2: "${GRAYLOG_ROOT_PASSWORD_SHA2:?Please configure GRAYLOG_ROOT_PASSWORD_SHA2 in the .env file}"
+      GRAYLOG_DATANODE_MONGODB_URI: "mongodb://mongodb:27017/graylog"
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "8998:8999/tcp"   # DataNode API
+    volumes:
+      - "graylog-datanode-02:/var/lib/graylog-datanode"
+      - "opensearch-data-02:/var/lib/graylog-datanode/opensearch/data"
+
+  datanode3:
+    image: "${DATANODE_IMAGE:-graylog/graylog-datanode:5.2.0}"
+    hostname: opensearch3
+    depends_on:
+      - "mongodb"
+    environment:
+      GRAYLOG_DATANODE_NODE_ID_FILE: "/var/lib/graylog-datanode/node-id"
+      GRAYLOG_DATANODE_PASSWORD_SECRET: "${GRAYLOG_PASSWORD_SECRET:?Please configure GRAYLOG_PASSWORD_SECRET in the .env file}"
+      GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2: "${GRAYLOG_ROOT_PASSWORD_SHA2:?Please configure GRAYLOG_ROOT_PASSWORD_SHA2 in the .env file}"
+      GRAYLOG_DATANODE_MONGODB_URI: "mongodb://mongodb:27017/graylog"
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "8997:8999/tcp"   # DataNode API
+    volumes:
+      - "graylog-datanode-03:/var/lib/graylog-datanode"
+      - "opensearch-data-03:/var/lib/graylog-datanode/opensearch/data"
+
+  graylog1:
+    image: "${GRAYLOG_IMAGE:-graylog/graylog:5.2.0}"
+    hostname: "graylog1"
+    depends_on:
+      - "mongodb"
+    entrypoint: "/docker-entrypoint.sh"
+    environment:
+      GRAYLOG_NODE_ID_FILE: "/usr/share/graylog/data/data/node-id"
+      GRAYLOG_PASSWORD_SECRET: "${GRAYLOG_PASSWORD_SECRET:?Please configure GRAYLOG_PASSWORD_SECRET in the .env file}"
+      GRAYLOG_ROOT_PASSWORD_SHA2: "${GRAYLOG_ROOT_PASSWORD_SHA2:?Please configure GRAYLOG_ROOT_PASSWORD_SHA2 in the .env file}"
+      GRAYLOG_HTTP_EXTERNAL_URI: "http://127.0.0.1:9000/"
+      GRAYLOG_MONGODB_URI: "mongodb://mongodb:27017/graylog"
+      GRAYLOG_REPORT_DISABLE_SANDBOX: "true"
+#      GRAYLOG_CA_KEYSTORE_FILE: "/usr/share/graylog/data/keystore.jks"
+#      GRAYLOG_CA_PASSWORD: "password"
+#      GRAYLOG_ELASTICSEARCH_HOSTS: "https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200"
+      GRAYLOG_ENABLE_PREFLIGHT_WEB: "true"
+    ports:
+      - "9000:9000"        # Graylog web interface and REST API
+      - "1514:1514"        # Syslog TCP
+      - "1514:1514/udp"    # Syslog UDP
+      - "12201:12201"      # GELF TCP
+      - "12201:12201/udp"  # GELF UDP
+    volumes:
+      - "graylog-data-01:/usr/share/graylog/data/data"
+      - "graylog-journal-01:/usr/share/graylog/data/journal"
+      - "./keystore.jks:/usr/share/graylog/data/keystore.jks"
+
+volumes:
+  graylog-datanode-01:
+  graylog-datanode-02:
+  graylog-datanode-03:
+  graylog-data-01:
+  graylog-journal-01:
+  mongodb-data:
+  opensearch-data-01:
+  opensearch-data-02:
+  opensearch-data-03:

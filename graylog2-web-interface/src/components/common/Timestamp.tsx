@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import type { Moment } from 'moment';
 
@@ -22,11 +21,13 @@ import type { DateTimeFormats } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { adjustFormat } from 'util/DateTime';
 
+type RenderProps = { value: string, field: string | undefined };
+
 type Props = {
-  dateTime?: string | number | Date | Moment,
+  dateTime?: string | number | Date | Moment | undefined
   field?: string,
   format?: DateTimeFormats,
-  render?: React.ComponentType<{ value: string, field: string | undefined }>,
+  render?: React.ComponentType<RenderProps>,
   tz?: string,
   className?: string,
 }
@@ -34,16 +35,21 @@ type Props = {
 /**
  * Component that renders a given date time based on the user time zone in a `time` HTML element.
  * It is capable of render date times in different formats, accepting ISO 8601
- * strings, JS native Date objects, and Moment.js Date objects.
+ * strings, JS native Date objects, and Moment.js Date objects. On hover the component displays the time in UTC.
  *
  * While the component is using the user time zone by default, it is also possible
  * to change the time zone for the given date, something that helps, for instance, to display a local time
  * from a UTC time that was used in the server.
  *
  */
-const Timestamp = ({ dateTime: dateTimeProp, field, format, render: Component, tz, className }: Props) => {
+const Timestamp = ({ dateTime, field, format = 'default', render: Component = ({ value }: RenderProps) => <>{value}</>, tz, className }: Props) => {
   const { formatTime: formatWithUserTz } = useUserDateTime();
-  const dateTime = dateTimeProp ?? new Date();
+
+  if (!dateTime) {
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    return <></>;
+  }
+
   const formattedDateTime = tz ? adjustFormat(dateTime, format, tz) : formatWithUserTz(dateTime, format);
   const dateTimeString = adjustFormat(dateTime, 'internal');
 
@@ -52,39 +58,6 @@ const Timestamp = ({ dateTime: dateTimeProp, field, format, render: Component, t
       <Component value={formattedDateTime} field={field} />
     </time>
   );
-};
-
-Timestamp.propTypes = {
-  /**
-   * Date time to be displayed in the component. You can provide an ISO
-   * 8601 string, a JS native `Date` object, a moment `Date` object, or
-   * a number containing seconds after UNIX epoch.
-   */
-  dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]),
-  /**
-   * Format to represent the date time.
-   */
-  format: PropTypes.string,
-  /** Provides field prop for the render function. */
-  field: PropTypes.string,
-  /**
-   * Specifies the time zone to convert `dateTime` to.
-   * If not defined the user zone will be used.
-   */
-  tz: PropTypes.string,
-  /**
-   * Override render default function to add a decorator.
-   */
-  render: PropTypes.func,
-};
-
-Timestamp.defaultProps = {
-  dateTime: undefined,
-  field: undefined,
-  format: 'default',
-  render: ({ value }) => value,
-  tz: undefined,
-  className: undefined,
 };
 
 export default Timestamp;

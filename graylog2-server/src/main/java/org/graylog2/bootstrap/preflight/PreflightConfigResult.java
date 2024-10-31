@@ -19,5 +19,6 @@ package org.graylog2.bootstrap.preflight;
 public enum PreflightConfigResult {
     UNKNOWN,
     SKIPPED,
+    PREPARED,
     FINISHED
 }

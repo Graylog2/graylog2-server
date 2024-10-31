@@ -17,40 +17,50 @@
 // We need to set the app prefix before doing anything else, so it applies to styles too.
 import 'webpack-entry';
 
-import React from 'react';
-import ReactDOM from 'react-dom';
+import * as React from 'react';
+import { createRoot } from 'react-dom/client';
 import Reflux from 'reflux';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppFacade from 'routing/AppFacade';
-import GraylogThemeProvider from 'theme/GraylogThemeProvider';
-import CustomizationProvider from 'contexts/CustomizationProvider';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import AwsBindings from 'aws/bindings';
-import GlobalThemeStyles from 'theme/GlobalThemeStyles';
+import IntegrationsBindings from 'integrations/bindings';
+import EventDefinitionsBindings from 'components/event-definitions/event-definition-types/bindings';
+import EventNotificationsBindings from 'components/event-notifications/event-notification-types/bindings';
+import FieldValueProvidersBindings from 'components/event-definitions/event-definition-form/field-value-providers/bindings';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import TelemetryInit from 'logic/telemetry/TelemetryInit';
+import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
+import PerspectivesBindings from 'components/perspectives/bindings';
+import NavigationBindings from 'components/navigation/bindings';
+import SecurityBindings from 'components/security/bindings';
+
+import '@graylog/sawmill/fonts';
+import '@mantine/core/styles.css';
+import '@mantine/dropzone/styles.css';
 
 Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));
 PluginStore.register(new PluginManifest({}, ThreatIntelBindings));
 PluginStore.register(new PluginManifest({}, AwsBindings));
-
-function renderAppContainer(appContainer) {
-  ReactDOM.render(
-    <CustomizationProvider>
-      <TelemetryInit>
-        <GraylogThemeProvider>
-          <GlobalThemeStyles />
-          <AppFacade />
-        </GraylogThemeProvider>
-      </TelemetryInit>
-    </CustomizationProvider>,
-    appContainer,
-  );
-}
+PluginStore.register(new PluginManifest({}, IntegrationsBindings));
+PluginStore.register(new PluginManifest({}, EventDefinitionsBindings));
+PluginStore.register(new PluginManifest({}, EventNotificationsBindings));
+PluginStore.register(new PluginManifest({}, FieldValueProvidersBindings));
+PluginStore.register(new PluginManifest({}, PerspectivesBindings));
+PluginStore.register(new PluginManifest({}, NavigationBindings));
+PluginStore.register(new PluginManifest({}, SecurityBindings));
 
 const appContainer = document.querySelector('div#app-root');
-renderAppContainer(appContainer);
+const root = createRoot(appContainer);
+
+root.render((
+  <TelemetryInit>
+    <LoginQueryClientProvider>
+      <AppFacade />
+    </LoginQueryClientProvider>
+  </TelemetryInit>
+));

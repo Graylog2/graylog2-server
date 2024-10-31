@@ -1,0 +1,5 @@
+type = "f"
+message = "Updating title of dashboard is now properly saved."
+
+issues = ["16440"]
+pulls = ["16441"]

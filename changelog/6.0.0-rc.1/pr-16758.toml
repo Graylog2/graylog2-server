@@ -1,0 +1,5 @@
+type = "a"
+message = "Added customizable HTTP notification that supports multiple methods and content types."
+
+issues = ["graylog-plugin-enterprise#3879", "graylog-plugin-enterprise#5577"]
+pulls = ["16758"]

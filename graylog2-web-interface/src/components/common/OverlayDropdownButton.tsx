@@ -19,16 +19,18 @@ import { useState } from 'react';
 
 import Button from 'components/bootstrap/Button';
 import OverlayDropdown from 'components/common/OverlayDropdown';
+import type { BsSize } from 'components/bootstrap/types';
+import { Icon } from 'components/common/index';
 
 type Props = {
-  bsSize?: string,
+  alwaysShowCaret?: boolean,
+  bsSize?: BsSize,
   buttonTitle?: string,
   children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode),
   closeOnSelect?: boolean,
   disabled?: boolean
-  dropdownMinWidth?: number
   dropdownZIndex?: number,
-  onToggle?: () => void,
+  onToggle?: (isOpen: boolean) => void,
   title: React.ReactNode,
 };
 
@@ -36,12 +38,12 @@ type Props = {
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
  */
 const OverlayDropdownButton = ({
+  alwaysShowCaret = false,
   bsSize,
   buttonTitle,
   children,
-  closeOnSelect,
-  disabled,
-  dropdownMinWidth,
+  closeOnSelect = true,
+  disabled = false,
   dropdownZIndex,
   onToggle: onToggleProp,
   title,
@@ -50,7 +52,7 @@ const OverlayDropdownButton = ({
 
   const _onToggle = () => {
     if (typeof onToggleProp === 'function') {
-      onToggleProp();
+      onToggleProp(!show);
     }
 
     setShowDropdown((cur) => !cur);
@@ -60,17 +62,15 @@ const OverlayDropdownButton = ({
     <OverlayDropdown show={show}
                      closeOnSelect={closeOnSelect}
                      dropdownZIndex={dropdownZIndex}
-                     dropdownMinWidth={dropdownMinWidth}
-                     renderToggle={({ onToggle, toggleTarget }) => (
+                     alwaysShowCaret={alwaysShowCaret}
+                     toggleChild={(
                        <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
                          <Button bsSize={bsSize}
                                  className="dropdown-toggle"
-                                 ref={toggleTarget}
                                  aria-label={buttonTitle}
                                  title={buttonTitle}
-                                 disabled={disabled}
-                                 onClick={onToggle}>
-                           {title} <span className="caret" />
+                                 disabled={disabled}>
+                           {title} <Icon name="arrow_drop_down" />
                          </Button>
                        </div>
                      )}
@@ -79,16 +79,6 @@ const OverlayDropdownButton = ({
       {typeof children === 'function' ? children({ toggleDropdown: _onToggle }) : children}
     </OverlayDropdown>
   );
-};
-
-OverlayDropdownButton.defaultProps = {
-  bsSize: undefined,
-  buttonTitle: undefined,
-  closeOnSelect: true,
-  disabled: false,
-  dropdownMinWidth: undefined,
-  dropdownZIndex: undefined,
-  onToggle: undefined,
 };
 
 export default OverlayDropdownButton;

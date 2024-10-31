@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.bindings.providers;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 public class IsDevelopmentServerProvider implements Provider<Boolean> {
     private final boolean isDevelopmentServer;

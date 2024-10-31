@@ -23,7 +23,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
 import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
@@ -39,6 +38,7 @@ import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -80,21 +80,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO5)
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
             .id("index-set-1")
             .title("Index set 1")
             .description("For testing")
-            .indexPrefix("graylog")
+            .indexPrefix("test_index_set")
             .creationDate(ZonedDateTime.now())
             .shards(1)
             .replicas(0)
             .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-            .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+            .rotationStrategyConfig(MessageCountRotationStrategyConfig.createDefault())
             .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-            .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+            .retentionStrategyConfig(DeletionRetentionStrategyConfig.createDefault())
             .indexAnalyzer("standard")
             .indexTemplateName("template-1")
             .indexOptimizationMaxNumSegments(1)
@@ -103,7 +103,6 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     protected static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
     private final Set<String> indicesToCleanUp = new HashSet<>();
     protected Indices indices;
-    @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus;
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
@@ -111,17 +110,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
         super(elasticsearch);
     }
 
-    protected Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> mapping) {
-        return ImmutableMap.of(
-                "template", indexWildcard,
-                "mappings", mapping
-        );
-
-    }
-
     @BeforeEach
     public void setUp() {
-        //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
         final Node node = new Node(searchServer().adapters().nodeAdapter());
         final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node,
@@ -131,7 +121,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                searchServer().adapters().indicesAdapter()
+                searchServer().adapters().indicesAdapter(),
+                mock(IndexFieldTypeProfileService.class)
         );
     }
 
@@ -274,9 +265,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
 
     @ContainerMatrixTest
     public void indexRangeStatsThrowsExceptionIfIndexDoesNotExists() {
-        assertThrows(IndexNotFoundException.class, () -> {
-            indices.indexRangeStatsOfIndex("does-not-exist");
-        });
+        assertThrows(IndexNotFoundException.class, () -> indices.indexRangeStatsOfIndex("does-not-exist"));
     }
 
     @ContainerMatrixTest
@@ -306,7 +295,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 "properties", ImmutableMap.of("message",
                         ImmutableMap.of("type", "text")));
 
-        final Map<String, Object> templateSource = createTemplateFor(indexSet.getIndexWildcard(), beforeMapping);
+        var templateSource = Template.create(indexSet.getIndexWildcard(), new Template.Mappings(beforeMapping), 1L, new Template.Settings(Map.of()));
 
         client().putTemplate(templateName, templateSource);
 
@@ -387,7 +376,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                searchServer().adapters().indicesAdapter());
+                searchServer().adapters().indicesAdapter(),
+                mock(IndexFieldTypeProfileService.class));
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
 
@@ -409,7 +399,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
 
         try {
             indices.deleteIndexTemplate(indexSet);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         assertThat(client().templateExists(templateName)).isFalse();
@@ -419,7 +409,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                searchServer().adapters().indicesAdapter());
+                searchServer().adapters().indicesAdapter(),
+                mock(IndexFieldTypeProfileService.class));
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
@@ -651,7 +642,21 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
         assertThat(indices.exists(index1)).isTrue();
     }
 
-    @SuppressWarnings("UnstableApiUsage")
+    @ContainerMatrixTest
+    public void getIndexShardsInfo() {
+        client().createIndex("1shard1replica", 1, 1);
+        List<ShardsInfo> shardsInfo = indices.getShardsInfo("1shard1replica");
+        assertThat(shardsInfo.size()).isEqualTo(2);
+        assertThat(shardsInfo.stream()
+                .filter(info -> info.shardType() == ShardsInfo.ShardType.PRIMARY)
+                .findFirst())
+                .isNotEmpty();
+        assertThat(shardsInfo.stream()
+                .filter(info -> info.shardType() == ShardsInfo.ShardType.REPLICA)
+                .findFirst())
+                .isNotEmpty();
+    }
+
     public static final class IndicesEventListener {
         final List<IndicesClosedEvent> indicesClosedEvents = Collections.synchronizedList(new ArrayList<>());
         final List<IndicesDeletedEvent> indicesDeletedEvents = Collections.synchronizedList(new ArrayList<>());

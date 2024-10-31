@@ -22,7 +22,8 @@ import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,10 +35,11 @@ public class IndexedAccessExpressionTest {
 
     public static final Token START = new CommonToken(-1);
     private EvaluationContext context;
+    private MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setup() {
-        context = new EvaluationContext(new Message("test message", "test", DateTime.parse("2010-07-30T16:03:25Z")));
+        context = new EvaluationContext(messageFactory.createMessage("test message", "test", DateTime.parse("2010-07-30T16:03:25Z")));
     }
 
     @Test

@@ -16,10 +16,8 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
+import type { Layout } from 'plotly.js';
 
-import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
-import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import useChartData from 'views/components/visualizations/useChartData';
@@ -28,31 +26,20 @@ import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import type { Generator } from 'views/components/visualizations/ChartData';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
+import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
+import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 
 import XYPlot from '../XYPlot';
-
-const seriesGenerator = (mapKeys: (labels: string[]) => string[]): Generator => ({
-  type,
-  name,
-  labels,
-  values,
-  originalName,
-}) => ({
-  type,
-  name,
-  x: mapKeys(labels),
-  y: values,
-  mode: 'markers',
-  originalName,
-});
 
 const ScatterVisualization = makeVisualization(({
   config,
   data,
   effectiveTimerange,
   height,
+  width,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
+  const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
   const _mapKeys = useCallback((labels: string[]) => labels
@@ -61,15 +48,28 @@ const ScatterVisualization = makeVisualization(({
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
   const rows = useMemo(() => retrieveChartData(data), [data]);
+  const seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName, fullPath }) => ({
+    type,
+    name,
+    x: _mapKeys(labels),
+    y: values,
+    mode: 'markers',
+    originalName,
+    ...getChartDataSettingsWithCustomUnits({ name, fullPath: fullPath, values }),
+  }), [_mapKeys, getChartDataSettingsWithCustomUnits]);
   const _chartDataResult = useChartData(rows, {
     widgetConfig: config,
     chartType: 'scatter',
-    generator: seriesGenerator(_mapKeys),
+    generator: seriesGenerator,
   });
   const { eventChartData, shapes } = useEvents(config, data.events);
+  const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
+  const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({ config, chartData: chartDataResult });
+  const layout = useMemo<Partial<Layout>>(() => {
+    const _layouts = shapes ? { shapes } : {};
 
-  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
+    return ({ ..._layouts, ...getChartLayoutSettingsWithCustomUnits() });
+  }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
   return (
     <XYPlot config={config}
@@ -77,14 +77,9 @@ const ScatterVisualization = makeVisualization(({
             chartData={chartDataResult}
             plotLayout={layout}
             height={height}
+            width={width}
             effectiveTimerange={effectiveTimerange} />
   );
 }, 'scatter');
-
-ScatterVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-  height: PropTypes.number,
-};
 
 export default ScatterVisualization;

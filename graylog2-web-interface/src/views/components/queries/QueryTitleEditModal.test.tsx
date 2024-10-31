@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { act, render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 
 import QueryTitleEditModal from './QueryTitleEditModal';
 
@@ -25,7 +25,9 @@ describe('QueryTitleEditModal', () => {
 
   const openModal = (modalRef, currentTitle = 'CurrentTitle') => {
     if (modalRef) {
-      modalRef.open(currentTitle);
+      act(() => {
+        modalRef.open(currentTitle);
+      });
     }
   };
 

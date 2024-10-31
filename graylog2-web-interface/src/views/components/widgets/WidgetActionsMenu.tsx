@@ -19,11 +19,11 @@ import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
-import { loadDashboard } from 'views/logic/views/Actions';
+import { loadAsDashboard, loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -39,17 +39,20 @@ import useView from 'views/hooks/useView';
 import createSearch from 'views/logic/slices/createSearch';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
-import { selectQuery, loadView } from 'views/logic/slices/viewSlice';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { selectQuery, updateView } from 'views/logic/slices/viewSlice';
 import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
 import fetchSearch from 'views/logic/views/fetchSearch';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import useParameters from 'views/hooks/useParameters';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
+import ExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
 
 import ReplaySearchButton from './ReplaySearchButton';
-import ExtraWidgetActions from './ExtraWidgetActions';
+import ExtraDropdownWidgetActions from './ExtraDropdownWidgetActions';
 import CopyToDashboard from './CopyToDashboardForm';
 import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetActionDropdown from './WidgetActionDropdown';
@@ -93,6 +96,12 @@ const _onCopyToDashboard = async (
   setShowCopyToDashboard(false);
 };
 
+const _onCreateNewDashboard = async (view: View, widgetId: string, history: HistoryFunction) => {
+  const newView = ExtractWidgetIntoNewView(view, widgetId);
+
+  loadAsDashboard(history, newView);
+};
+
 const _onMoveWidgetToPage = async (
   dispatch: AppDispatch,
   view: View,
@@ -110,10 +119,9 @@ const _onMoveWidgetToPage = async (
   if (newDashboard) {
     const searchResponse = await createSearch(newDashboard.search);
     const updatedDashboard = newDashboard.toBuilder().search(searchResponse).build();
-    await dispatch(loadView(updatedDashboard));
+    await dispatch(updateView(updatedDashboard, true));
     setShowMoveWidgetToTab(false);
     await dispatch(selectQuery(queryId));
-    await dispatch(execute());
   }
 };
 
@@ -147,7 +155,7 @@ const WidgetActionsMenu = ({
 }: Props) => {
   const widget = useContext(WidgetContext);
   const view = useView();
-  const { query, timerange, streams } = useContext(DrilldownContext);
+  const { query, timerange, streams, streamCategories } = useContext(DrilldownContext);
   const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
@@ -156,10 +164,11 @@ const WidgetActionsMenu = ({
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const { parameters, parameterBindings } = useParameters();
 
   const onDuplicate = useCallback(() => {
-    sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-duplicate-button',
     });
@@ -167,17 +176,28 @@ const WidgetActionsMenu = ({
     return dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title));
   }, [sendTelemetry, pathname, dispatch, widget.id, unsetWidgetFocusing, title]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => {
-    sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_DASHBOARD, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-copy-to-dashboard-button',
     });
 
     return _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history);
   }, [history, pathname, sendTelemetry, view]);
+
+  const onCreateNewDashboard = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CREATE_NEW_DASHBOARD, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'search-widget',
+      app_action_value: 'widget-create-new-dashboard-button',
+    });
+
+    return _onCreateNewDashboard(view, widget.id, history);
+  }, [sendTelemetry, pathname, view, widget.id, history]);
+
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => {
-    sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.MOVE, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-move-button',
     });
@@ -185,8 +205,8 @@ const WidgetActionsMenu = ({
     return _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy);
   }, [dispatch, pathname, sendTelemetry, view]);
   const onDelete = useCallback(() => {
-    sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DELETED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-delete-button',
     });
@@ -194,8 +214,8 @@ const WidgetActionsMenu = ({
     return dispatch(_onDelete(widget, view, title));
   }, [dispatch, pathname, sendTelemetry, title, view, widget]);
   const focusWidget = useCallback(() => {
-    sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.FOCUSED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-focus-button',
     });
@@ -204,15 +224,19 @@ const WidgetActionsMenu = ({
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
-    <Container>
+    <Container className="widget-actions-menu">
       <IfInteractive>
         <IfDashboard>
           <ReplaySearchButton queryString={query.query_string}
                               timerange={timerange}
-                              streams={streams} />
+                              streams={streams}
+                              streamCategories={streamCategories}
+                              parameterBindings={parameterBindings}
+                              parameters={parameters} />
         </IfDashboard>
+        <ExtraMenuWidgetActions widget={widget} />
         {isFocused && (
-          <IconButton name="compress-arrows-alt"
+          <IconButton name="fullscreen_exit"
                       title="Un-focus widget"
                       onClick={unsetWidgetFocusing} />
         )}
@@ -222,14 +246,15 @@ const WidgetActionsMenu = ({
                                      widgetType={widget.type}
                                      onStretch={onPositionsChange}
                                      position={position} />
-            <IconButton name="expand-arrows-alt"
+            <IconButton name="fullscreen"
                         title="Focus this widget"
                         onClick={focusWidget} />
           </>
         )}
 
-        <IconButton name="edit"
+        <IconButton name="edit_square"
                     title="Edit"
+                    iconType="regular"
                     onClick={toggleEdit} />
 
         <WidgetActionDropdown>
@@ -241,15 +266,12 @@ const WidgetActionsMenu = ({
               Copy to Dashboard
             </MenuItem>
           </IfSearch>
-          {widget.isExportable && <MenuItem onSelect={() => setShowExport(true)}>Export</MenuItem>}
           <IfDashboard>
             <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>
               Move to Page
             </MenuItem>
           </IfDashboard>
-          <ExtraWidgetActions widget={widget}
-                              onSelect={() => {
-                              }} />
+          <ExtraDropdownWidgetActions widget={widget} />
           <MenuItem divider />
           <MenuItem onSelect={onDelete}>
             Delete
@@ -257,10 +279,11 @@ const WidgetActionsMenu = ({
         </WidgetActionDropdown>
 
         {showCopyToDashboard && (
-          <CopyToDashboard onSubmit={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
+          <CopyToDashboard onCopyToDashboard={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
                            onCancel={() => setShowCopyToDashboard(false)}
                            submitLoadingText="Copying widget..."
-                           submitButtonText="Copy widget" />
+                           submitButtonText="Copy widget"
+                           onCreateNewDashboard={onCreateNewDashboard} />
         )}
 
         {showExport && (

@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import isEqual from 'lodash/isEqual';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Table, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
-import { SearchForm, Icon } from 'components/common';
+import { SearchForm, Icon, ModalSubmit } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import { Link } from 'components/common/router';
@@ -59,7 +58,7 @@ const SecondaryText = styled.div`
   margin-bottom: -2px;
 `;
 
-const TableRow = styled.tr(({ disabled = false }: {disabled?: boolean}) => css`
+const TableRow = styled.tr<{ disabled?: boolean }>(({ disabled = false }) => css`
   cursor: ${disabled ? 'auto' : 'pointer'};
   background-color: ${disabled ? '#E8E8E8 !important' : 'initial'};
   border-bottom: 1px solid lightgray;
@@ -190,7 +189,7 @@ const CollectorConfigurationModal = ({
                 }}>
         <IconTableCell>
           {selected && <Icon name="check" title={`${configName} is selected`} />}
-          {partiallySelected && <Icon type="regular" name="square-minus" title={`${configName} is selected`} />}
+          {partiallySelected && <Icon type="regular" name="radio_button_partial" title={`${configName} is selected`} />}
         </IconTableCell>
         <IconTableCell><ColorLabel color={configuration.color} size="xsmall" /></IconTableCell>
         <ConfigurationTableCell>
@@ -209,16 +208,16 @@ const CollectorConfigurationModal = ({
               : <em>Unknown collector</em>}
           </small>
         </CollectorTableCell>
-        <UnselectTableCell>{(selected || partiallySelected) && !isAssignedFromTags && <Icon name="times" title={`Remove ${configName}`} />}</UnselectTableCell>
+        <UnselectTableCell>{(selected || partiallySelected) && !isAssignedFromTags
+          && <Icon name="close" title={`Remove ${configName}`} />}
+        </UnselectTableCell>
       </TableRow>
     );
   });
 
   return (
     <BootstrapModalWrapper showModal={show}
-                           onHide={onCancel}
-                           data-app-section="collectors_administration_assign_configurations"
-                           data-event-element={`Edit ${selectedCollectorName} Configurations`}>
+                           onHide={onCancel}>
       <Modal.Header>
         <ModalTitle>
           Edit <b>{selectedCollectorName}</b> Configurations
@@ -236,7 +235,8 @@ const CollectorConfigurationModal = ({
                           topMargin={0} />
         {(rows.length > 0) && (
           <InfoContainer bsStyle="info">
-            Collector configurations that have a lock icon &nbsp;<Icon name="lock" size="xs" />&nbsp; have been assigned using tags and cannot be changed here.
+            Collector configurations that have a lock icon &nbsp;<Icon name="lock" size="xs" />&nbsp; have been assigned
+            using tags and cannot be changed here.
           </InfoContainer>
         )}
         <ConfigurationContainer>
@@ -245,7 +245,9 @@ const CollectorConfigurationModal = ({
               {(rows.length === 0) ? (
                 <TableRow>
                   <td colSpan={6}>
-                    <NoConfigurationMessage>No configurations available for the selected log collector.</NoConfigurationMessage>
+                    <NoConfigurationMessage>No configurations available for the selected log
+                      collector.
+                    </NoConfigurationMessage>
                   </td>
                 </TableRow>
               ) : (
@@ -254,7 +256,9 @@ const CollectorConfigurationModal = ({
               <StickyTableRowFooter>
                 <td colSpan={6}>
                   <AddNewConfiguration>
-                    <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}><Icon name="add" />&nbsp;Add a new configuration</Link>
+                    <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}><Icon name="add" />&nbsp;Add a new
+                      configuration
+                    </Link>
                   </AddNewConfiguration>
                 </td>
               </StickyTableRowFooter>
@@ -263,24 +267,14 @@ const CollectorConfigurationModal = ({
         </ConfigurationContainer>
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" onClick={onCancel}>Cancel</Button>
-        <Button type="button" onClick={onReset}>Reset</Button>
-        <Button type="submit" bsStyle="primary" disabled={isNotDirty} onClick={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}>Save</Button>
+        <ModalSubmit submitButtonText="Save"
+                     disabledSubmit={isNotDirty}
+                     onSubmit={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}
+                     onCancel={onCancel}
+                     leftCol={<Button type="button" onClick={onReset}>Reset</Button>} />
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
-};
-
-CollectorConfigurationModal.propTypes = {
-  show: PropTypes.bool.isRequired,
-  selectedCollectorName: PropTypes.string.isRequired,
-  selectedSidecarNames: PropTypes.array.isRequired,
-  initialAssignedConfigs: PropTypes.array.isRequired,
-  initialPartiallyAssignedConfigs: PropTypes.array.isRequired,
-  unassignedConfigs: PropTypes.array.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-  getRowData: PropTypes.func.isRequired,
 };
 
 export default CollectorConfigurationModal;

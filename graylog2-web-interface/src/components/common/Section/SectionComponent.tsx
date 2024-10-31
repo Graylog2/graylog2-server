@@ -16,9 +16,12 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useDisclosure } from '@mantine/hooks';
+import { Collapse } from '@mantine/core';
 
 import Spinner from 'components/common/Spinner';
-import { Row, Col } from 'components/bootstrap';
+import { Row, Col, Button } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
 
 type Props = {
   children: React.ReactNode,
@@ -26,6 +29,9 @@ type Props = {
   showLoading?: boolean,
   headerActions?: React.ReactElement,
   className?: string,
+  collapsible?: boolean,
+  defaultClosed?: boolean,
+  disableCollapseButton?: boolean,
 };
 
 const Header = styled.div`
@@ -39,7 +45,7 @@ const Header = styled.div`
 `;
 
 export const Headline = styled.h2`
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   display: inline;
 `;
 
@@ -48,25 +54,46 @@ const LoadingSpinner = styled(Spinner)(({ theme }) => css`
   font-size: ${theme.fonts.size.h3};
 `);
 
-const SectionComponent = ({ children, title, showLoading = false, headerActions, className }: Props) => (
-  <Row className={`content ${className}`}>
-    <Col xs={12}>
-      <Header>
-        <Headline>
-          {title}
-          {showLoading && <LoadingSpinner text="" delay={0} />}
-        </Headline>
-        {headerActions}
-      </Header>
-      {children}
-    </Col>
-  </Row>
-);
+const FlexWrapper = styled.div(({ theme }) => css`
+  display: flex;
+  justify-content: flex-start;
+  gap: ${theme.spacings.sm};
+  align-items: center;
+`);
 
-SectionComponent.defaultProps = {
-  className: '',
-  showLoading: false,
-  headerActions: undefined,
+const SectionComponent = ({ children, title, showLoading = false, headerActions, className = '', collapsible = false, defaultClosed = false, disableCollapseButton = false }: Props) => {
+  const [opened, { toggle }] = useDisclosure(!defaultClosed);
+
+  return (
+    <Row className={`content ${className}`}>
+      <Col xs={12}>
+        <Header>
+          <Headline>
+            {title}
+            {showLoading && <LoadingSpinner text="" delay={0} />}
+          </Headline>
+          <FlexWrapper>
+            {headerActions}
+            {collapsible && (
+            <Button bsSize="sm"
+                    bsStyle={opened ? 'primary' : 'default'}
+                    onClick={toggle}
+                    data-testid="collapseButton"
+                    disabled={disableCollapseButton}>
+              <Icon size="xs" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+            </Button>
+            )}
+          </FlexWrapper>
+        </Header>
+        {!collapsible && children}
+        {collapsible && (
+        <Collapse in={opened}>
+          {children}
+        </Collapse>
+        )}
+      </Col>
+    </Row>
+  );
 };
 
 export default SectionComponent;

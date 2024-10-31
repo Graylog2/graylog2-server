@@ -21,7 +21,8 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashSet;
 import java.util.Set;
 

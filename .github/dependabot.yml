@@ -6,9 +6,24 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
-    open-pull-requests-limit: 10
+    ignore:
+      # The AWS SDKs receive patch updates almost every day. Reduce dependabot
+      # pull-request noise by ignoring patch updates.
+      - dependency-name: "software.amazon.awssdk:bom"
+        update-types: ["version-update:semver-patch"]
+      - dependency-name: "com.amazonaws:aws-java-sdk-bom"
+        update-types: ["version-update:semver-patch"]
+      # Lucene >=10 requires JDK 21
+      - dependency-name: "org.apache.lucene:lucene-queryparser"
+        versions:
+          - "> 9"
+      - dependency-name: "org.apache.lucene:lucene-analysis-common"
+        versions:
+          - "> 9"
+    open-pull-requests-limit: 25
     labels:
       - dependencies
+      - maven
     rebase-strategy: "disabled"
 
   - package-ecosystem: npm
@@ -42,6 +57,16 @@ updates:
           - ">= 4.a"
           - "< 5"
     rebase-strategy: "disabled"
+    groups:
+      mantine:
+        patterns:
+          - "@mantine/*"
+      openfonts:
+        patterns:
+          - "@openfonts/*"
+      tanstack:
+        patterns:
+          - "@tanstack/*"
 
   - package-ecosystem: npm
     directory: "/graylog2-web-interface/packages/babel-preset-graylog"
@@ -53,6 +78,10 @@ updates:
     labels:
       - dependencies
     rebase-strategy: "disabled"
+    groups:
+      babel:
+        patterns:
+          - "@babel/*"
 
   - package-ecosystem: npm
     directory: "/graylog2-web-interface/packages/eslint-config-graylog"
@@ -64,6 +93,10 @@ updates:
     labels:
       - dependencies
     rebase-strategy: "disabled"
+    groups:
+      typescript-eslint:
+        patterns:
+          - "@typescript-eslint/*"
 
   - package-ecosystem: npm
     directory: "/graylog2-web-interface/packages/jest-preset-graylog"
@@ -75,6 +108,13 @@ updates:
     labels:
       - dependencies
     rebase-strategy: "disabled"
+    groups:
+      jest:
+        patterns:
+          - "babel-jest"
+          - "jest"
+          - "jest-environment-*"
+          - "@jest/types"
 
   - package-ecosystem: npm
     directory: "/graylog2-web-interface/packages/stylelint-config-graylog"

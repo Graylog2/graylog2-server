@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
@@ -23,9 +22,9 @@ import PageContentLayout from 'components/layout/PageContentLayout';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
 
-const generateStyles = () => css`
+const generateStyles = () => css<{ backgroundImage: string }>`
   body {
-    background: url(${({ backgroundImage }: { backgroundImage: string }) => backgroundImage}) no-repeat center center fixed;
+    background: url(${({ backgroundImage }) => backgroundImage}) no-repeat center center fixed;
     background-size: cover;
   }
 `;
@@ -49,7 +48,7 @@ const ErrorMessage = styled.div(({ theme }) => css`
 type Props = {
   backgroundImage?: string,
   children?: React.ReactNode,
-  displayPageLayout: boolean,
+  displayPageLayout?: boolean
   description: React.ReactNode,
   title: string,
 };
@@ -58,7 +57,7 @@ const ErrorPageStyles = createGlobalStyle`
     ${generateStyles()}
 `;
 
-const ErrorPage = ({ children, title, description, backgroundImage, displayPageLayout }: Props) => {
+const ErrorPage = ({ children, title, description, backgroundImage = NotFoundBackgroundImage, displayPageLayout = true }: Props) => {
   const PageLayoutComponent = displayPageLayout ? PageContentLayout : React.Fragment;
 
   return (
@@ -76,20 +75,6 @@ const ErrorPage = ({ children, title, description, backgroundImage, displayPageL
       </PageLayoutComponent>
     </DocumentTitle>
   );
-};
-
-ErrorPage.propTypes = {
-  children: PropTypes.node,
-  description: PropTypes.node.isRequired,
-  displayPageLayout: PropTypes.bool,
-  title: PropTypes.string.isRequired,
-  backgroundImage: PropTypes.string,
-};
-
-ErrorPage.defaultProps = {
-  children: undefined,
-  displayPageLayout: true,
-  backgroundImage: NotFoundBackgroundImage,
 };
 
 export default ErrorPage;

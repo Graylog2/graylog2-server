@@ -19,10 +19,10 @@ package org.graylog2.shared.rest.exceptionmappers;
 import org.glassfish.jersey.spi.ExtendedExceptionMapper;
 import org.graylog2.plugin.rest.ApiError;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 @Provider
 public class BadRequestExceptionMapper implements ExtendedExceptionMapper<BadRequestException> {

@@ -16,13 +16,13 @@
  */
 package org.graylog2.shared.messageq.localkafka;
 
-import org.graylog2.plugin.Message;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.graylog2.shared.messageq.AbstractMessageQueueAcknowledger;
+import org.graylog2.shared.messageq.Acknowledgeable;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,11 +38,11 @@ public class LocalKafkaMessageQueueAcknowledger extends AbstractMessageQueueAckn
     }
 
     @Override
-    public void acknowledge(List<Message> messages) {
+    public void acknowledge(List<? extends Acknowledgeable> messages) {
         @SuppressWarnings("ConstantConditions")
         final Optional<Long> max =
                 messages.stream()
-                        .map(Message::getMessageQueueId)
+                        .map(Acknowledgeable::getMessageQueueId)
                         .filter(this::isValidMessageQueueId)
                         .map(Long.class::cast)
                         .max(Long::compare);

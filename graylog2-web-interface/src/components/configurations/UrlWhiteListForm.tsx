@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import map from 'lodash/map';
@@ -69,13 +68,13 @@ const validateUrlEntry = async (idx: number, entry: Url, callback?: (...any) => 
 const debouncedValidateUrlEntry = debounce(validateUrlEntry, 200);
 
 type Props = {
-  urls: Array<Url>,
-  disabled: boolean,
-  onUpdate: (config: WhiteListConfig, valid: boolean) => void,
+  urls?: Array<Url>
+  disabled?: boolean
+  onUpdate?: (config: WhiteListConfig, valid: boolean) => void
   newEntryId?: string,
 };
 
-const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
+const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId }: Props) => {
   const literal = 'literal';
   const regex = 'regex';
   const options = [{ value: literal, label: 'Exact match' }, { value: regex, label: 'Regex' }];
@@ -185,7 +184,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
       </td>
       <td>
         <Button onClick={(event) => _onRemove(event, idx)}>
-          <Icon name="trash-alt" />
+          <Icon name="delete" />
           <span className="sr-only">Delete entry</span>
         </Button>
       </td>
@@ -245,20 +244,6 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
       <Button bsSize="sm" onClick={(event) => _onAdd(event)}>Add Url</Button>
     </>
   );
-};
-
-UrlWhiteListForm.propTypes = {
-  urls: PropTypes.array,
-  disabled: PropTypes.bool,
-  onUpdate: PropTypes.func,
-  newEntryId: PropTypes.string,
-};
-
-UrlWhiteListForm.defaultProps = {
-  urls: [],
-  disabled: false,
-  onUpdate: () => {},
-  newEntryId: undefined,
 };
 
 export default UrlWhiteListForm;

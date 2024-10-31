@@ -37,7 +37,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.CoreMatchers.not;
 
-public class GraylogApis {
+public class GraylogApis implements GraylogRestApi {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogApis.class);
 
     ObjectMapperProvider OBJECT_MAPPER_PROVIDER = new ObjectMapperProvider();
@@ -50,6 +50,10 @@ public class GraylogApis {
     private final Indices indices;
     private final FieldTypes fieldTypes;
     private final Views views;
+    private final SystemApi system;
+    private final EventNotifications eventNotifications;
+    private final EventDefinitions eventDefinitions;
+    private final Dashboards dashboards;
 
     public GraylogApis(GraylogBackend backend) {
         this.backend = backend;
@@ -61,6 +65,10 @@ public class GraylogApis {
         this.indices = new Indices(this);
         this.fieldTypes = new FieldTypes(this);
         this.views = new Views(this);
+        this.system = new SystemApi(this);
+        this.eventNotifications = new EventNotifications(this);
+        this.eventDefinitions = new EventDefinitions(this);
+        this.dashboards = new Dashboards(this);
     }
 
     public RequestSpecification requestSpecification() {
@@ -114,6 +122,22 @@ public class GraylogApis {
         return views;
     }
 
+    public SystemApi system() {
+        return system;
+    }
+
+    public EventNotifications eventsNotifications() {
+        return eventNotifications;
+    }
+
+    public EventDefinitions eventDefinitions() {
+        return eventDefinitions;
+    }
+
+    public Dashboards dashboards() {
+        return dashboards;
+    }
+
     protected RequestSpecification prefix(final Users.User user) {
         return given()
                 .config(withGraylogBackendFailureConfig())
@@ -140,13 +164,13 @@ public class GraylogApis {
     }
 
     public ValidatableResponse post(final String url, final Users.User user, final String body, final int expectedResult) {
-        var response = prefix(user);
+        var request = prefix(user);
 
         if(body != null) {
-            response = response.body(body);
+            request = request.body(body);
         }
 
-        return response
+        return request
                 .post(url)
                 .then()
                 .log().ifStatusCodeMatches(not(expectedResult))
@@ -158,13 +182,13 @@ public class GraylogApis {
     }
 
     public ValidatableResponse put(final String url, final Users.User user, final String body, final int expectedResult) {
-        var response = prefix(user);
+        var request = prefix(user);
 
         if(body != null) {
-            response = response.body(body);
+            request = request.body(body);
         }
 
-        return response
+        return request
                 .put(url)
                 .then()
                 .log().ifStatusCodeMatches(not(expectedResult))

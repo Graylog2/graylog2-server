@@ -21,12 +21,14 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.util.Collection;
 import java.util.Collections;
 
@@ -103,7 +105,11 @@ public class RouteToStream extends AbstractFunction<Void> {
                         idParam,
                         messageParam,
                         removeFromDefault))
-                .description("Routes a message to a stream")
+                .description("Routes a message to a stream. If no specific message is provided, it assigns the stream to the currently processed message")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Route to stream")
+                .ruleBuilderTitle("Route message to stream<#if name??> '${name}'</#if><#if id??> '${id}'</#if>")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

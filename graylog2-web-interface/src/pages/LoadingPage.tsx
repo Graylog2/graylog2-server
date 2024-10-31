@@ -15,30 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
 import LoginChrome from 'components/login/LoginChrome';
 
 type Props = {
-  text: string,
+  text?: string
 };
 
-const LoadingPage = ({ text }: Props) => (
+const LoadingPage = ({ text = 'Loading, please wait...' }: Props) => (
   <DocumentTitle title="Loading...">
     <LoginChrome>
       <Spinner text={text} delay={0} />
     </LoginChrome>
   </DocumentTitle>
 );
-
-LoadingPage.propTypes = {
-  text: PropTypes.string,
-};
-
-LoadingPage.defaultProps = {
-  text: 'Loading, please wait...',
-};
 
 export default LoadingPage;

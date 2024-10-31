@@ -23,17 +23,18 @@ import org.graylog2.rest.models.tools.requests.ContainsStringTestRequest;
 import org.graylog2.rest.models.tools.responses.ContainsStringTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @RequiresAuthentication
 @Path("/tools/contains_string_tester")
@@ -44,7 +45,7 @@ public class ContainsStringTesterResource extends RestResource {
     @GET
     @Timed
     public ContainsStringTesterResponse containsStringTest(@QueryParam("string") @NotEmpty String string,
-                                      @QueryParam("search_string") @NotEmpty String searchString) {
+                                                           @QueryParam("search_string") @NotEmpty String searchString) {
         return doTestContainsString(string, searchString);
     }
 

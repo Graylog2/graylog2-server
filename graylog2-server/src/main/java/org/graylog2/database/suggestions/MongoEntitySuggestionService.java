@@ -16,36 +16,45 @@
  */
 package org.graylog2.database.suggestions;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Streams;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Sorts;
-import org.apache.shiro.authz.permission.AllPermission;
+import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
-import org.bson.BsonDocument;
 import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
+import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.shared.security.EntityPermissionsUtils;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-//TODO: Suggestions won't be provided to users that have permissions to just some of the entities in the collection
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+import static org.graylog2.users.UserImpl.COLLECTION_NAME;
+import static org.graylog2.users.UserImpl.LocalAdminUser.LOCAL_ADMIN_ID;
+import static org.graylog2.users.UserImpl.USERNAME;
+
 public class MongoEntitySuggestionService implements EntitySuggestionService {
 
     private final MongoConnection mongoConnection;
-    private final DbEntitiesCatalog catalog;
+    private final EntityPermissionsUtils permissionsUtils;
 
     @Inject
-    public MongoEntitySuggestionService(final MongoConnection mongoConnection, final DbEntitiesCatalog catalog) {
+    public MongoEntitySuggestionService(final MongoConnection mongoConnection,
+                                        final EntityPermissionsUtils permissionsUtils) {
         this.mongoConnection = mongoConnection;
-        this.catalog = catalog;
+        this.permissionsUtils = permissionsUtils;
+    }
+
+    private boolean addAdminToSuggestions(final String collection, final String valueColumn, final boolean filterIsEmpty, final String query) {
+        return COLLECTION_NAME.equals(collection) && USERNAME.equals(valueColumn) && (filterIsEmpty || LOCAL_ADMIN_ID.contains(query.toLowerCase(Locale.ENGLISH)));
     }
 
     @Override
@@ -55,55 +64,60 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final int page,
                                             final int perPage,
                                             final Subject subject) {
-
-        if (!hasAllPermission(subject) && !hasReadPermissionForWholeCollection(subject, collection)) {
-            return new EntitySuggestionResponse(List.of(),
-                    PaginatedList.PaginationInfo.create(0, 0, page, perPage));
-        }
-
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
+        final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
+        final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn, filterIsEmpty, query);
+        final var isFirstPageAndSpecialCollection = isSpecialCollection && page == 1;
+        final var fixNumberOfItemsToReadFromDB = isFirstPageAndSpecialCollection ? 1 : 0;
 
-        Bson bsonFilter = (query != null && !query.isEmpty()) ?
-                Filters.regex(valueColumn, query, "i") :
-                new BsonDocument();
+        final var bsonFilter = !filterIsEmpty
+                ? Filters.regex(valueColumn, query, "i")
+                : Filters.empty();
 
-        final FindIterable<Document> documents = mongoCollection
+        final var resultWithoutPagination = mongoCollection
                 .find(bsonFilter)
                 .projection(Projections.include(valueColumn))
-                .sort(Sorts.ascending(valueColumn))
-                .limit(perPage)
-                .skip((page - 1) * perPage);
+                .sort(Sorts.ascending(valueColumn));
 
-        final List<EntitySuggestion> suggestions = documents
+        final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
+        final var skip = Math.max(0, (page - 1) * perPage - fixNumberOfItemsToReadFromDB);
+        final var checkPermission = permissionsUtils.createPermissionCheck(subject, collection);
+        final var documents = userCanReadAllEntities
+                ? mongoPaginate(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip)
+                : paginateWithPermissionCheck(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip, checkPermission);
+
+        final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, "admin")) : List.of();
+
+        final Stream<EntitySuggestion> suggestionsFromDB = documents
                 .map(doc ->
                         new EntitySuggestion(
-                                doc.getObjectId("_id").toString(),
+                                doc.getObjectId(ID_FIELD).toString(),
                                 doc.getString(valueColumn)
                         )
-                )
-                .into(new ArrayList<>());
+                );
 
-        final long total = mongoCollection.countDocuments(bsonFilter);
+        final List<EntitySuggestion> suggestions = Streams.concat(staticEntry.stream(), suggestionsFromDB).toList();
+
+        final long total = userCanReadAllEntities
+                ? mongoCollection.countDocuments(bsonFilter)
+                : MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD))).filter(checkPermission).count();
 
         return new EntitySuggestionResponse(suggestions,
                 PaginatedList.PaginationInfo.create((int) total,
                         suggestions.size(),
                         page,
                         perPage));
-
     }
 
-    boolean hasAllPermission(final Subject subject) {
-        return subject.isPermitted(new AllPermission());
+    private Stream<Document> paginateWithPermissionCheck(FindIterable<Document> result, int limit, int skip, Predicate<Document> checkPermission) {
+        return MongoUtils.stream(result)
+                .filter(checkPermission)
+                .limit(limit)
+                .skip(skip);
     }
 
-    boolean hasReadPermissionForWholeCollection(final Subject subject,
-                                                final String collection) {
-        return catalog.getByCollectionName(collection)
-                .map(DbEntityCatalogEntry::readPermission)
-                .map(rp -> rp.equals(DbEntity.ALL_ALLOWED) || subject.isPermitted(rp + ":*"))
-                .orElse(false);
+    private Stream<Document> mongoPaginate(FindIterable<Document> result, int limit, int skip) {
+        return MongoUtils.stream(result.limit(limit).skip(skip));
     }
-
 
 }

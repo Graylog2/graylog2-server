@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import IconButton from 'components/common/IconButton';
 
@@ -30,10 +29,10 @@ type Props = {
 const Container = styled.span(({ theme }) => css`
   display: flex;
   padding: 10px;
-  background-color: ${theme.colors.table.background};
+  background-color: ${theme.colors.table.row.background};
 
-  :nth-of-type(even) {
-    background-color: ${theme.colors.table.backgroundAlt};
+  &:nth-of-type(even) {
+    background-color: ${theme.colors.table.row.backgroundStriped};
   }
 `);
 
@@ -52,7 +51,7 @@ const StyledDeleteButton = styled(IconButton)`
 
 const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Props) => {
   const deleteButton = typeof onDeleteItem === 'function'
-    ? <StyledDeleteButton onClick={() => onDeleteItem(item)} name="times" title={`Remove ${name}`} />
+    ? <StyledDeleteButton onClick={() => onDeleteItem(item)} name="close" title={`Remove ${name}`} />
     : null;
 
   return (
@@ -62,14 +61,6 @@ const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Prop
       {deleteButton}
     </Container>
   );
-};
-
-PaginatedItem.defaultProps = {
-  onDeleteItem: undefined,
-};
-
-PaginatedItem.propTypes = {
-  onDeleteItem: PropTypes.func,
 };
 
 export default PaginatedItem;

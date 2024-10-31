@@ -17,7 +17,7 @@
 package org.graylog2.database.dbcatalog;
 
 
-import org.graylog2.cluster.NodeImpl;
+import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
@@ -29,19 +29,14 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 class DbEntitiesScannerTest {
-
     @Test
     void testScansEntitiesWithDefaultTitleFieldProperly() {
         DbEntitiesScanner scanner = new DbEntitiesScanner(new String[]{"org.graylog2.indexer.indexset"}, new String[]{});
         final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName("index_sets").get();
-        final DbEntityCatalogEntry entryByModelClass = dbEntitiesCatalog.getByModelClass(IndexSetConfig.class).get();
-
-        assertSame(entryByCollectionName, entryByModelClass);
 
         assertEquals(new DbEntityCatalogEntry("index_sets", "title", IndexSetConfig.class, INDEXSETS_READ), entryByCollectionName);
     }
@@ -55,11 +50,8 @@ class DbEntitiesScannerTest {
         final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
 
         final Optional<DbEntityCatalogEntry> entryByCollectionName = dbEntitiesCatalog.getByCollectionName("index_sets");
-        final Optional<DbEntityCatalogEntry> entryByModelClass = dbEntitiesCatalog.getByModelClass(IndexSetConfig.class);
 
         assertFalse(entryByCollectionName.isPresent());
-        assertFalse(entryByModelClass.isPresent());
-
     }
 
     @Test
@@ -68,11 +60,8 @@ class DbEntitiesScannerTest {
         final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName("nodes").get();
-        final DbEntityCatalogEntry entryByModelClass = dbEntitiesCatalog.getByModelClass(NodeImpl.class).get();
 
-        assertSame(entryByCollectionName, entryByModelClass);
-
-        assertEquals(new DbEntityCatalogEntry("nodes", "node_id", NodeImpl.class, NOBODY_ALLOWED), entryByCollectionName);
+        assertEquals(new DbEntityCatalogEntry("nodes", "node_id", ServerNodeEntity.class, NOBODY_ALLOWED), entryByCollectionName);
     }
 
     @Test
@@ -81,12 +70,7 @@ class DbEntitiesScannerTest {
         final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName(UserImpl.COLLECTION_NAME).get();
-        final DbEntityCatalogEntry entryByModelClass = dbEntitiesCatalog.getByModelClass(UserImpl.class).get();
-
-        assertSame(entryByCollectionName, entryByModelClass);
 
         assertEquals(new DbEntityCatalogEntry(UserImpl.COLLECTION_NAME, UserImpl.USERNAME, UserImpl.class, USERS_READ), entryByCollectionName);
     }
-
-
 }

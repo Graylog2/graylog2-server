@@ -58,7 +58,11 @@ type Props = {
 }
 
 const StreamModal = ({
-  initialValues,
+  initialValues = {
+    title: '',
+    description: '',
+    remove_matches_from_default_stream: false,
+  },
   title: modalTitle,
   submitButtonText,
   submitLoadingText,
@@ -79,9 +83,7 @@ const StreamModal = ({
   return (
     <Modal title={modalTitle}
            onHide={onClose}
-           show
-           data-app-section="stream_actions"
-           data-event-element={modalTitle}>
+           show>
       <Formik<FormValues> initialValues={_initialValues}
                           onSubmit={_onSubmit}
                           validate={validate}>
@@ -103,7 +105,9 @@ const StreamModal = ({
               <IndexSetSelect indexSets={indexSets} />
 
               <FormikInput label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
-                           help={<span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>}
+                           help={
+                             <span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>
+}
                            name="remove_matches_from_default_stream"
                            id="remove_matches_from_default_stream"
                            type="checkbox" />
@@ -121,14 +125,6 @@ const StreamModal = ({
       </Formik>
     </Modal>
   );
-};
-
-StreamModal.defaultProps = {
-  initialValues: {
-    title: '',
-    description: '',
-    remove_matches_from_default_stream: false,
-  },
 };
 
 export default StreamModal;

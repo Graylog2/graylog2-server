@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
 
@@ -31,10 +30,11 @@ import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { InputDescription, ModalSubmit, IfPermitted } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const StyledDefList = styled.dl.attrs({
-  className: 'deflist',
-})(({ theme }: { theme: DefaultTheme }) => css`
+const StyledDefList = styled.dl.attrs({ className: 'deflist' })(({ theme }) => css`
   &&.deflist {
     dd {
       padding-left: ${theme.spacings.md};
@@ -43,7 +43,7 @@ const StyledDefList = styled.dl.attrs({
   }
 `);
 
-const LabelSpan = styled.span(({ theme }: { theme: DefaultTheme }) => css`
+const LabelSpan = styled.span(({ theme }) => css`
   margin-left: ${theme.spacings.sm};
   font-weight: bold;
 `);
@@ -54,6 +54,7 @@ const PermissionsConfig = () => {
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     ConfigurationsActions.listPermissionsConfig(ConfigurationType.PERMISSIONS_CONFIG).then(() => {
@@ -62,8 +63,8 @@ const PermissionsConfig = () => {
   }, [configuration]);
 
   const saveConfig = (values: PermissionsConfigType) => {
-    sendTelemetry('form_submit', {
-      app_pathname: 'configurations',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.PERMISSIONS_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'permissions',
       app_action_value: 'configuration-save',
     });
@@ -109,9 +110,7 @@ const PermissionsConfig = () => {
           <Modal show={showModal}
                  onHide={resetConfig}
                  aria-modal="true"
-                 aria-labelledby="dialog_label"
-                 data-app-section="configurations_permissions"
-                 data-event-element={modalTitle}>
+                 aria-labelledby="dialog_label">
             <Formik onSubmit={saveConfig} initialValues={config}>
 
               {({ isSubmitting }) => (
@@ -129,7 +128,7 @@ const PermissionsConfig = () => {
                                        id="shareWithEveryone"
                                        label={(
                                          <LabelSpan>Share with everyone</LabelSpan>
-                                         )} />
+                                       )} />
                           <InputDescription help="Control whether it is possible to share with everyone." />
                         </Col>
                         <Col sm={12}>
@@ -138,7 +137,7 @@ const PermissionsConfig = () => {
                                        id="shareWithUsers"
                                        label={(
                                          <LabelSpan>Share with users</LabelSpan>
-                                         )} />
+                                       )} />
                           <InputDescription help="Control whether it is possible to share with single users." />
                         </Col>
 

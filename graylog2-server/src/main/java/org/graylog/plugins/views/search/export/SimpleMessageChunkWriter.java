@@ -16,7 +16,8 @@
  */
 package org.graylog.plugins.views.search.export;
 
-import javax.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+
 import java.lang.reflect.Type;
 
 public abstract class SimpleMessageChunkWriter implements MessageBodyWriter<SimpleMessageChunk> {

@@ -23,7 +23,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class StreamGRNDescriptorProvider implements GRNDescriptorProvider {
     private final StreamService streamService;

@@ -17,34 +17,28 @@
 package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
-import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
@@ -98,21 +92,6 @@ public abstract class Pivot implements SearchType {
         return this;
     }
 
-    @Override
-    public SearchType withQuery(BackendQuery query) {
-        return toBuilder().query(query).build();
-    }
-
-    @Override
-    public SearchType withFilter(Filter filter) {
-        return toBuilder().filter(filter).build();
-    }
-
-    @Override
-    public SearchType withFilters(List<UsedSearchFilter> filters) {
-        return toBuilder().filters(filters).build();
-    }
-
     public static Builder builder() {
         return new AutoValue_Pivot.Builder()
                 .type(NAME)
@@ -120,16 +99,18 @@ public abstract class Pivot implements SearchType {
                 .columnGroups(of())
                 .sort(of())
                 .filters(of())
+                .streamCategories(Collections.emptySet())
                 .streams(Collections.emptySet());
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder implements SearchTypeBuilder {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
                     .sort(Collections.emptyList())
                     .filters(Collections.emptyList())
+                    .streamCategories(Collections.emptySet())
                     .streams(Collections.emptySet());
         }
 
@@ -182,13 +163,6 @@ public abstract class Pivot implements SearchType {
         public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
-        @JsonSubTypes({
-                @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
-                @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),
-                @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class),
-                @JsonSubTypes.Type(name = OffsetRange.OFFSET, value = OffsetRange.class)
-        })
         public Builder timerange(@Nullable TimeRange timerange) {
             return timerange(timerange == null ? null : DerivedTimeRange.of(timerange));
         }
@@ -199,6 +173,9 @@ public abstract class Pivot implements SearchType {
 
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty
+        public abstract Builder streamCategories(@Nullable Set<String> streamCategories);
 
         abstract Pivot autoBuild();
 
@@ -215,11 +192,12 @@ public abstract class Pivot implements SearchType {
         PivotEntity.Builder builder = PivotEntity.builder()
                 .sort(sort())
                 .streams(mappedStreams(entityDescriptorIds))
+                .streamCategories(streamCategories())
                 .timerange(timerange().orElse(null))
                 .columnGroups(columnGroups())
                 .rowGroups(rowGroups())
                 .filter(filter())
-                .filters(filters())
+                .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .query(query().orElse(null))
                 .id(id())
                 .name(name().orElse(null))
@@ -227,5 +205,10 @@ public abstract class Pivot implements SearchType {
                 .series(series())
                 .type(type());
         return builder.build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

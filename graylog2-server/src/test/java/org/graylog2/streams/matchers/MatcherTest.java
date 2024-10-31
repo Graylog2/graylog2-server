@@ -19,6 +19,8 @@ package org.graylog2.streams.matchers;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.InvalidStreamRuleTypeException;
@@ -30,6 +32,8 @@ import java.util.Map;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class MatcherTest {
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     protected StreamRule getSampleRule() {
         Map<String, Object> mongoRule = Maps.newHashMap();
         mongoRule.put("_id", new ObjectId());
@@ -39,7 +43,7 @@ public class MatcherTest {
     }
 
     protected Message getSampleMessage() {
-        return new Message("foo", "bar", Tools.nowUTC());
+        return messageFactory.createMessage("foo", "bar", Tools.nowUTC());
     }
 
     protected StreamRuleMatcher getMatcher(StreamRule rule) {

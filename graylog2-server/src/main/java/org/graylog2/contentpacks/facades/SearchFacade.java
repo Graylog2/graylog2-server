@@ -25,7 +25,7 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.shared.users.UserService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class SearchFacade extends ViewFacade {
     public static final ModelType TYPE_V1 = ModelTypes.SEARCH_V1;

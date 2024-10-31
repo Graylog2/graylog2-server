@@ -21,18 +21,20 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.eventbus.JobCompletedEvent;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.worker.JobWorkerPool;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.system.shutdown.GracefulShutdownHook;
+import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -40,7 +42,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
-public class JobSchedulerService extends AbstractExecutionThreadService {
+public class JobSchedulerService extends AbstractExecutionThreadService implements GracefulShutdownHook {
     private static final Logger LOG = LoggerFactory.getLogger(JobSchedulerService.class);
 
     private final JobExecutionEngine jobExecutionEngine;
@@ -49,6 +51,8 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
     private final JobSchedulerEventBus schedulerEventBus;
     private final ServerStatus serverStatus;
     private final JobWorkerPool workerPool;
+    private final GracefulShutdownService gracefulShutdownService;
+    private final java.time.Duration shutdownTimeout;
     private final Duration loopSleepDuration;
     private final InterruptibleSleeper sleeper = new InterruptibleSleeper();
     private final ScheduledExecutorService jobHeartbeatExecutor;
@@ -61,14 +65,18 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
                                JobSchedulerClock clock,
                                JobSchedulerEventBus schedulerEventBus,
                                ServerStatus serverStatus,
+                               GracefulShutdownService gracefulShutdownService,
+                               @Named("shutdown_timeout") int shutdownTimeoutMs,
                                @Named(JobSchedulerConfiguration.LOOP_SLEEP_DURATION) Duration loopSleepDuration) {
-        jobHeartbeatExecutor = createJobHeartbeatExecutor();
-        workerPool = workerPoolFactory.create("system", schedulerConfig.numberOfWorkerThreads(), this::shutdownJobHeartbeatExecutor);
+        this.jobHeartbeatExecutor = createJobHeartbeatExecutor();
+        this.workerPool = workerPoolFactory.create("system", schedulerConfig.numberOfWorkerThreads());
         this.jobExecutionEngine = engineFactory.create(workerPool);
         this.schedulerConfig = schedulerConfig;
         this.clock = clock;
         this.schedulerEventBus = schedulerEventBus;
         this.serverStatus = serverStatus;
+        this.gracefulShutdownService = gracefulShutdownService;
+        this.shutdownTimeout = java.time.Duration.ofMillis(shutdownTimeoutMs);
         this.loopSleepDuration = loopSleepDuration;
     }
 
@@ -80,15 +88,11 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
                 .build());
     }
 
-    private void shutdownJobHeartbeatExecutor() {
-        jobHeartbeatExecutor.shutdown();
-        LOG.info("Shutdown of job heartbeat executor");
-    }
-
     @Override
     protected void startUp() throws Exception {
         jobHeartbeatExecutor.scheduleAtFixedRate(this::updateLockedJobs, 0, 15, TimeUnit.SECONDS);
         schedulerEventBus.register(this);
+        gracefulShutdownService.register(this);
         this.executionThread = Thread.currentThread();
     }
 
@@ -122,7 +126,7 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
                     // we receive a job completion event via the scheduler event bus.
                     if (sleeper.sleep(loopSleepDuration.getQuantity(), loopSleepDuration.getUnit())) {
                         LOG.debug("Waited for {} {} because there are either no free worker threads or no runnable triggers",
-                                    loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
+                                loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
                     }
                 }
             } catch (InterruptedException e) {
@@ -141,10 +145,25 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
     }
 
     @Override
+    public void doGracefulShutdown() throws Exception {
+        stopAsync().awaitTerminated(shutdownTimeout);
+    }
+
+    @Override
     protected void triggerShutdown() {
         // We don't want to process events when shutting down, so do this first
         schedulerEventBus.unregister(this);
         jobExecutionEngine.shutdown();
+        try {
+            workerPool.shutdown(shutdownTimeout);
+        } catch (InterruptedException e) {
+            LOG.debug("Interrupted while waiting for worker pool shutdown");
+            Thread.currentThread().interrupt();
+        }
+        jobHeartbeatExecutor.shutdown();
+        if (gracefulShutdownService.isRunning()) {
+            gracefulShutdownService.unregister(this);
+        }
         executionThread.interrupt();
     }
 

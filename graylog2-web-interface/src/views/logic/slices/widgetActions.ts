@@ -20,7 +20,7 @@ import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { GetState, WidgetPositions } from 'views/types';
 import { selectWidgetPositions } from 'views/logic/slices/widgetSelectors';
-import { selectActiveQuery, selectActiveViewState, selectWidgets, selectWidget } from 'views/logic/slices/viewSelectors';
+import { selectActiveQuery, selectActiveViewState, selectWidget, selectWidgets } from 'views/logic/slices/viewSelectors';
 import { updateViewState } from 'views/logic/slices/viewSlice';
 import type Widget from 'views/logic/widgets/Widget';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
@@ -28,6 +28,7 @@ import generateId from 'logic/generateId';
 import { setTitle } from 'views/logic/slices/titlesActions';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
+import normalizeViewState from 'views/logic/views/normalizeViewState';
 
 export const updateWidgetPositions = (newWidgetPositions: WidgetPositions) => (dispatch: AppDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
@@ -53,7 +54,9 @@ export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: 
     .widgets(newWidgets)
     .build();
 
-  return dispatch(updateViewState(activeQuery, newViewState));
+  const newViewStateNormalized = normalizeViewState(newViewState);
+
+  return dispatch(updateViewState(activeQuery, newViewStateNormalized));
 };
 
 export const addWidget = (widget: Widget, position?: WidgetPosition) => (dispatch: AppDispatch, getState: GetState) => {

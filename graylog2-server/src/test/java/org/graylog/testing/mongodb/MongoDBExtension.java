@@ -17,6 +17,9 @@
 package org.graylog.testing.mongodb;
 
 import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -29,6 +32,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.Network;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -46,12 +50,13 @@ import static org.junit.platform.commons.support.AnnotationSupport.findAnnotatio
  * <p>When used with {@link org.junit.jupiter.api.extension.RegisterExtension RegisterExtension} on a non-static field,
  * the extension starts a MongoDB service instance for <i>each test</i>.
  *
- * Test and setup/teardown methods can inject a {@link MongoDBTestService} parameter.
+ * Test and setup/teardown methods can inject a {@link MongoDBTestService} or {@link MongoCollections} parameter.
  *
  * <p>See {@link MongoDBExtensionTest} and {@link MongoDBExtensionWithRegistrationAsStaticFieldTest} for usage examples.
  */
 public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, ParameterResolver, InvocationInterceptor {
     private final MongodbServer version;
+    private Network network;
 
     private enum Lifecycle {
         ALL_TESTS, SINGLE_TEST
@@ -89,13 +94,15 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         }
         return (MongoDBTestService) context.getStore(NAMESPACE).getOrComputeIfAbsent(MongoDBTestService.class, c -> {
             LOG.debug("Starting a new MongoDB service instance with lifecycle {}", lifecycle);
-            return MongoDBTestService.create(version);
+            this.network = Network.newNetwork();
+            return MongoDBTestService.create(version, this.network);
         });
     }
 
     private void closeInstance(ExtensionContext context) {
         context.getStore(NAMESPACE).remove(Lifecycle.class);
         getInstance(context).close();
+        this.network.close();
     }
 
     private void clearInstance(ExtensionContext context) {
@@ -138,13 +145,20 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext context) throws ParameterResolutionException {
-        return MongoDBTestService.class.equals(parameterContext.getParameter().getType());
+        return MongoDBTestService.class.equals(parameterContext.getParameter().getType()) ||
+                MongoCollections.class.equals(parameterContext.getParameter().getType());
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext context) throws ParameterResolutionException {
         if (MongoDBTestService.class.equals(parameterContext.getParameter().getType())) {
             return getInstance(context);
+        }
+        if (MongoCollections.class.equals(parameterContext.getParameter().getType())) {
+            return new MongoCollections(
+                    new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
+                    getInstance(context).mongoConnection()
+            );
         }
         throw new ParameterResolutionException("Unsupported parameter type: " + parameterContext.getParameter().getName());
     }

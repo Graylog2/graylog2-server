@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix editing of system notification event defitinions."
+
+issues = [""]
+pulls = ["17435"]

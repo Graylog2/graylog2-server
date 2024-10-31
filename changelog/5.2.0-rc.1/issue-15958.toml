@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Show errors again when loading a saved search or dashboard which exceeds the query limit."
+
+issues = ["15958"]
+pulls = ["15998", "16033"]
+

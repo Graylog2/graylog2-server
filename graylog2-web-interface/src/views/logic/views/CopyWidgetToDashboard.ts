@@ -16,11 +16,12 @@
  */
 import { List, Map } from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import * as Immutable from 'immutable';
 
 import type Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import type Query from 'views/logic/queries/Query';
-import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
+import { ConcatPositions } from 'views/logic/views/GenerateNextPosition';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TitleTypes from 'views/stores/TitleTypes';
 
@@ -29,13 +30,12 @@ import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 
 type QueryId = string;
 
-const _newPositionsMap = (oldPosition, widgetPositions, widget, widgets) => {
-  const widgetPositionsMap = oldPosition ? {
-    ...widgetPositions,
-    [widget.id]: oldPosition.toBuilder().row(0).col(0).build(),
-  } : widgetPositions;
+const _newPositionsMap = (oldPosition, widgetPositions, widget): Immutable.Map<string, WidgetPosition> => {
+  const newWidgetPositions: Immutable.Map<string, WidgetPosition> = oldPosition
+    ? ConcatPositions(Immutable.Map({ [widget.id]: oldPosition.toBuilder().row(1).col(1).build() }), Immutable.Map(widgetPositions))
+    : Immutable.Map(widgetPositions);
 
-  return GenerateNextPosition(Map(widgetPositionsMap), widgets.toArray());
+  return newWidgetPositions;
 };
 
 const _newTitlesMap = (titlesMap, widget, title) => {
@@ -55,7 +55,7 @@ const _addWidgetToDashboard = (widget: Widget, dashboard: View, oldPosition: Wid
   const widgets = viewState.widgets.push(widget);
 
   const { widgetPositions } = viewState;
-  const newWidgetPositions = _newPositionsMap(oldPosition, widgetPositions, widget, widgets);
+  const newWidgetPositions: Map<string, WidgetPosition> = _newPositionsMap(oldPosition, widgetPositions, widget);
 
   const titlesMap = viewState.titles;
   const newTitlesMap = _newTitlesMap(titlesMap, widget, title);

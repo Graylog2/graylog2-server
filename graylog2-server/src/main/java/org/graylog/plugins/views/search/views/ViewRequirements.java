@@ -22,7 +22,8 @@ import org.graylog.plugins.views.Requirements;
 import org.graylog.plugins.views.Requirement;
 import org.graylog.plugins.views.Requirements;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Set;
 
 public class ViewRequirements extends Requirements<ViewDTO> {

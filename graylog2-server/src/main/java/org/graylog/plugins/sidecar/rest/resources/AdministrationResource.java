@@ -55,17 +55,20 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -116,13 +119,13 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     @RequiresPermissions({SidecarRestPermissions.SIDECARS_READ, SidecarRestPermissions.COLLECTORS_READ, SidecarRestPermissions.CONFIGURATIONS_READ})
     @NoAuditEvent("this is not changing any data")
     public SidecarListResponse administration(@ApiParam(name = "JSON body", required = true)
-                                                @Valid @NotNull AdministrationRequest request) {
+                                              @Valid @NotNull AdministrationRequest request) {
         final String sort = Sidecar.FIELD_NODE_NAME;
         final String order = "asc";
         final String mappedQuery = sidecarStatusMapper.replaceStringStatusSearchQuery(request.query());
         SearchQuery searchQuery;
         try {
-             searchQuery = searchQueryParser.parse(mappedQuery);
+            searchQuery = searchQueryParser.parse(mappedQuery);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }

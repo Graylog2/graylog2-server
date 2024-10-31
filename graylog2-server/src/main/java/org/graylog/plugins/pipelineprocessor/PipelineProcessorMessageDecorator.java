@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
@@ -28,6 +29,7 @@ import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
@@ -35,7 +37,6 @@ import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
 
     private final PipelineInterpreter pipelineInterpreter;
     private final ConfigurationStateUpdater pipelineStateUpdater;
+    private final MessageFactory messageFactory;
     private final ImmutableSet<String> pipelines;
 
     public interface Factory extends SearchResponseDecorator.Factory {
@@ -92,10 +94,12 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
     @Inject
     public PipelineProcessorMessageDecorator(PipelineInterpreter pipelineInterpreter,
                                              ConfigurationStateUpdater pipelineStateUpdater,
+                                             MessageFactory messageFactory,
                                              @Assisted Decorator decorator) {
         this.pipelineInterpreter = pipelineInterpreter;
         this.pipelineStateUpdater = pipelineStateUpdater;
-        final String pipelineId = (String)decorator.config().get(CONFIG_FIELD_PIPELINE);
+        this.messageFactory = messageFactory;
+        final String pipelineId = (String) decorator.config().get(CONFIG_FIELD_PIPELINE);
         if (Strings.isNullOrEmpty(pipelineId)) {
             this.pipelines = ImmutableSet.of();
         } else {
@@ -111,7 +115,7 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
             return searchResponse;
         }
         searchResponse.messages().forEach((inMessage) -> {
-            final Message message = new Message(inMessage.message());
+            final Message message = messageFactory.createMessage(inMessage.message());
             final List<Message> additionalCreatedMessages = pipelineInterpreter.processForPipelines(message,
                     pipelines,
                     new NoopInterpreterListener(),

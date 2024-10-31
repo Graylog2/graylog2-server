@@ -17,14 +17,15 @@
 package org.graylog.datanode.rest;
 
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.management.OpensearchProcess;
+import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog2.plugin.Version;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -45,7 +46,9 @@ public class StatusController {
     public DataNodeStatus status() {
         return new DataNodeStatus(
                 version,
-                new StatusResponse(datanodeConfiguration.opensearchDistribution().version(), openSearch.processInfo())
+                new StatusResponse(datanodeConfiguration.opensearchDistributionProvider().get().version(),openSearch.processInfo()),
+                datanodeConfiguration.datanodeDirectories()
         );
     }
+
 }

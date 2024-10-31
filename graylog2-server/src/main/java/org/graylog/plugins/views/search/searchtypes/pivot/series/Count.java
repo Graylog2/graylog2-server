@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import javax.annotation.Nullable;
@@ -31,18 +30,29 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Count.NAME)
 @JsonDeserialize(builder = Count.Builder.class)
-public abstract class Count implements SeriesSpec {
+public abstract class Count implements SeriesSpec, HasOptionalField {
     public static final String NAME = "count";
+
     @Override
     public abstract String type();
 
     @Override
     public abstract String id();
 
-    @Override
-    @Nullable
     @JsonProperty
-    public abstract String field();
+    public abstract Optional<String> field();
+
+    @Override
+    public String literal() {
+        return type() + "(" + field().orElse("") + ")";
+    }
+
+    public abstract Builder toBuilder();
+
+    @Override
+    public Count withId(String id) {
+        return toBuilder().id(id).build();
+    }
 
     public static Builder builder() {
         return new AutoValue_Count.Builder().type(NAME);
@@ -60,18 +70,19 @@ public abstract class Count implements SeriesSpec {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @Override
         @JsonProperty
         public abstract Builder field(@Nullable String field);
 
         abstract Optional<String> id();
-        abstract String field();
+
+        abstract Optional<String> field();
+
         abstract Count autoBuild();
 
         @Override
         public Count build() {
-            if (!id().isPresent()) {
-                id(NAME + "(" + Strings.nullToEmpty(field()) + ")");
+            if (id().isEmpty()) {
+                id(NAME + "(" + field().orElse("") + ")");
             }
             return autoBuild();
         }

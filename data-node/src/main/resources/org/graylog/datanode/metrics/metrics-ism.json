@@ -1,0 +1,79 @@
+{
+  "policy": {
+    "description": "Rollover and rollup index after one day, delete after 14 days",
+    "default_state": "open",
+    "states": [
+      {
+        "name": "open",
+        "actions": [
+          {
+            "rollover": {
+              "min_index_age": "1d"
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "state_name": "rollup"
+          }
+        ]
+      },
+      {
+        "name": "rollup",
+        "actions": [
+          {
+            "rollup": {
+              "ism_rollup": {
+                "target_index": "gl-datanode-metrics-daily",
+                "description": "Rollup index",
+                "page_size": 200,
+                "dimensions": [
+                  {
+                    "date_histogram": {
+                      "source_field": "timestamp",
+                      "fixed_interval": "60m",
+                      "timezone": "America/Los_Angeles"
+                    }
+                  }
+                ],
+                "metrics": [
+                  {
+                    "source_field": "jvm_heap",
+                    "metrics": [
+                      {
+                        "avg": {}
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "state_name": "delete",
+            "conditions": {
+              "min_index_age": "13d"
+            }
+          }
+        ]
+      },
+      {
+        "name": "delete",
+        "actions": [
+          {
+            "delete": {}
+          }
+        ],
+        "transitions": []
+      }
+    ],
+    "ism_template": {
+      "index_patterns": [
+        "gl-datanode-metrics"
+      ],
+      "priority": 1
+    }
+  }
+}

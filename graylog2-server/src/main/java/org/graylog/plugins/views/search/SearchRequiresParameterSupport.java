@@ -21,7 +21,8 @@ import org.graylog.plugins.views.search.views.EnterpriseMetadataSummary;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog.plugins.views.Requirement;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.Map;
 

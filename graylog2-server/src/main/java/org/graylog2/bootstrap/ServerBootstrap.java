@@ -16,36 +16,41 @@
  */
 package org.graylog2.bootstrap;
 
-import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.util.Types;
+import org.graylog.security.certutil.CertificateAuthorityBindings;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
+import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
-import org.graylog2.cluster.preflight.PreflightConfigBindings;
+import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.cluster.preflight.GraylogServerProvisioningBindings;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
+import org.graylog2.migrations.MigrationType;
+import org.graylog2.plugin.MessageBindings;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -62,6 +67,8 @@ import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.SharedPeriodicalBindings;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.graylog2.shared.initializers.ServiceManagerListener;
+import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.graylog2.shared.security.CertificateRenewalBindings;
 import org.graylog2.shared.security.SecurityBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -156,8 +163,19 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
+        preflightCheckModules.add(new AbstractModule() {
+            @Override
+            protected void configure() {
+                // needed for the ObjectMapperModule, to avoid missing MessageInput.Factory
+                MapBinder.newMapBinder(binder(),
+                        TypeLiteral.get(String.class),
+                        new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
+                        });
+            }
+        });
+        preflightCheckModules.add(new ObjectMapperModule(chainingClassLoader));
 
-        if(featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_WEB_ENABLED)) {
+        if (featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_WEB_ENABLED)) {
             runPreflightWeb(preflightCheckModules);
         }
 
@@ -168,9 +186,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
-        modules.add(new PreflightConfigBindings());
-        modules.add(new PreflightWebModule());
-        modules.add(new ObjectMapperModule(chainingClassLoader));
+        modules.add(new GraylogServerProvisioningBindings());
+        modules.add(new PreflightWebModule(configuration));
         modules.add(new SchedulerBindings());
 
         final Injector preflightInjector = getPreflightInjector(modules);
@@ -183,6 +200,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     private void doRunWithPreflightInjector(Injector preflightInjector) {
+
+        // always run preflight migrations, even if we skip the preflight web later
+        runPreflightMigrations(preflightInjector);
+
         final PreflightBoot preflightBoot = preflightInjector.getInstance(PreflightBoot.class);
 
         if (!preflightBoot.shouldRunPreflightWeb()) {
@@ -192,7 +213,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Fresh installation detected, starting configuration webserver");
 
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
+        final LeaderElectionService leaderElectionService = preflightInjector.getInstance(LeaderElectionService.class);
+
         try {
+            leaderElectionService.startAsync().awaitRunning();
             serviceManager.startAsync().awaitHealthy();
             // wait till the marker document appears
             while (preflightBoot.shouldRunPreflightWeb()) {
@@ -203,8 +227,34 @@ public abstract class ServerBootstrap extends CmdLineTool {
                     throw new RuntimeException(e);
                 }
             }
+
         } finally {
+            // check, if this is the leader before shutting down preflight in case we want to delay startup
+            final var isLeader = leaderElectionService.isLeader();
             serviceManager.stopAsync().awaitStopped();
+            leaderElectionService.stopAsync().awaitTerminated();
+
+            try {
+                // delay startup if we're not the leader to give the leader node a headstart on resume
+                // so it can take care of mongo-collections etc.
+                // and we prevent problems that occured if all nodes started exactly at the same time
+                if (!isLeader) {
+                    Thread.sleep(5000);
+                }
+            } catch (InterruptedException e) {
+                LOG.warn("Tried to wait for a bit before resuming but got interrupted. Resuming anyway now. Error was: {}", e.getMessage());
+            }
+        }
+    }
+
+    private void runPreflightMigrations(Injector preflightInjector) {
+        try {
+            if (configuration.isLeader() && configuration.runMigrations()) {
+                runMigrations(preflightInjector, MigrationType.PREFLIGHT);
+            }
+        } catch (Exception e) {
+            LOG.error("Exception while running migrations", e);
+            System.exit(1);
         }
     }
 
@@ -228,7 +278,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getMongoPreFlightInjector() {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration)
         );
     }
@@ -236,12 +286,15 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
+                new GraylogServerProvisioningBindings(),
                 new IndexerDiscoveryModule(),
                 new ServerPreflightChecksModule(),
+                new CertificateAuthorityBindings(),
+                (binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader),
                 binder -> preflightCheckModules.forEach(binder::install));
     }
 
@@ -275,10 +328,11 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
+        LOG.info("Node ID: {}", nodeId);
 
         try {
             if (configuration.isLeader() && configuration.runMigrations()) {
-                runMigrations();
+                runMigrations(injector, MigrationType.STANDARD);
             }
         } catch (Exception e) {
             LOG.error("Exception while running migrations", e);
@@ -296,7 +350,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             activityWriter = injector.getInstance(ActivityWriter.class);
             serviceManager = injector.getInstance(ServiceManager.class);
-            leaderElectionService = injector.getInstance(Key.get(Service.class, Names.named("LeaderElectionService")));
+            leaderElectionService = injector.getInstance(LeaderElectionService.class);
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);
             annotateProvisionException(e);
@@ -345,14 +399,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
     }
 
-    public void runMigrations() {
+    public void runMigrations(Injector injector, MigrationType migrationType) {
         //noinspection unchecked
         final TypeLiteral<Set<Migration>> typeLiteral = (TypeLiteral<Set<Migration>>) TypeLiteral.get(Types.setOf(Migration.class));
         Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));
 
         LOG.info("Running {} migrations...", migrations.size());
 
-        ImmutableSortedSet.copyOf(migrations).forEach(m -> {
+        ImmutableSortedSet.copyOf(migrations).stream().filter(m -> m.migrationType() == migrationType).forEach(m -> {
             LOG.debug("Running migration <{}>", m.getClass().getCanonicalName());
             try {
                 m.upgrade();
@@ -389,6 +443,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
+        result.add(new MessageBindings());
         result.add(new SecurityBindings());
         result.add(new ServerStatusBindings(capabilities()));
         result.add(new ValidatorModule());
@@ -397,7 +452,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new GenericInitializerBindings());
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
         result.add(new IndexerDiscoveryModule());
-
+        result.add(new CertificateRenewalBindings());
+        result.add(new GraylogServerProvisioningBindings());
+        result.add(new CertificateAuthorityBindings());
         return result;
     }
 

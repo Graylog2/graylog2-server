@@ -25,9 +25,12 @@ module.exports = {
     require.resolve('./lib/setup-files/mock-FetchProvider.js'),
     require.resolve('./lib/setup-files/mock-Version.js'),
     require.resolve('./lib/setup-files/mock-IntersectionObserver.js'),
+    require.resolve('./lib/setup-files/mock-ResizeObserver.js'),
+    require.resolve('./lib/setup-files/mock-matchMedia.js'),
     require.resolve('./lib/setup-files/mock-moment-timezone.js'),
     require.resolve('./lib/setup-files/console-warnings-fail-tests.js'),
     require.resolve('./lib/setup-files/mock-crypto-getrandomvalues.js'),
+    require.resolve('./lib/setup-files/mock-styled-components.js'),
     'jest-canvas-mock',
   ],
   setupFilesAfterEnv: [
@@ -59,5 +62,5 @@ module.exports = {
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
-  transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|styled-components|p-debounce)/)'],
 };

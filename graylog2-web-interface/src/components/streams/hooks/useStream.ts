@@ -28,13 +28,14 @@ const fetchStream = (streamId: string) => {
   return fetch('GET', qualifyUrl(url));
 };
 
-const useStream = (streamId: string): {
+const useStream = (streamId: string, { enabled } = { enabled: true }): {
   data: Stream
   refetch: () => void,
   isFetching: boolean,
+  isError,
 } => {
-  const { data, refetch, isFetching } = useQuery(
-    ['streams', streamId],
+  const { data, refetch, isFetching, isError } = useQuery(
+    ['stream', streamId],
     () => fetchStream(streamId),
     {
       onError: (errorThrown) => {
@@ -42,6 +43,7 @@ const useStream = (streamId: string): {
           'Could not load Stream');
       },
       keepPreviousData: true,
+      enabled,
     },
   );
 
@@ -49,6 +51,7 @@ const useStream = (streamId: string): {
     data,
     refetch,
     isFetching,
+    isError,
   });
 };
 

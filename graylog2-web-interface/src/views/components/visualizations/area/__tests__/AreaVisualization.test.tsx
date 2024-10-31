@@ -23,9 +23,10 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import AppConfig from 'util/AppConfig';
 
 import { effectiveTimerange, simpleChartData } from './AreaVisualization.fixtures';
 
@@ -49,9 +50,11 @@ const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisual
 );
 
 describe('AreaVisualization', () => {
-  beforeAll(loadViewsPlugin);
+  useViewsPlugin();
 
-  afterAll(unloadViewsPlugin);
+  beforeEach(() => {
+    AppConfig.isFeatureEnabled = jest.fn(() => false);
+  });
 
   it('generates correct props for plot component', () => {
     const config = AggregationWidgetConfig.builder()
@@ -64,6 +67,7 @@ describe('AreaVisualization', () => {
     const wrapper = mount(<AreaVisualization config={config}
                                              data={simpleChartData}
                                              effectiveTimerange={effectiveTimerange}
+                                             setLoadingState={() => {}}
                                              fields={Immutable.List()}
                                              height={1024}
                                              onChange={() => {}}

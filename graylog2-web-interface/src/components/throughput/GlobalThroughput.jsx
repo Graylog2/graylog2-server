@@ -25,13 +25,7 @@ import { GlobalThroughputStore } from 'stores/metrics/GlobalThroughputStore';
 
 const ThroughputNavItem = styled(NavItem)`
   > a {
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
-    display: flex !important;
-    align-items: center;
-    height: 50px;
-
-    @media (max-width: 991px) {
+    @media (width <= 991px) {
       height: auto;
       display: block;
     }
@@ -42,11 +36,10 @@ const ContentWrap = styled.strong`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 1fr;
-  grid-column-gap: 0;
-  grid-row-gap: 0;
+  grid-gap: 0;
   height: 30px;
 
-  @media (max-width: 991px) {
+  @media (width <= 991px) {
     height: auto;
     display: block;
 
@@ -62,15 +55,14 @@ const ContentWrap = styled.strong`
   }
 `;
 
-const ThroughputData = styled.span(({ dataIn, theme }) => css`
+const ThroughputData = styled.span(({ $dataIn, theme }) => css`
   font-size: ${theme.fonts.size.small};
   line-height: 1;
-  grid-area: ${dataIn ? '1 / 1 / 2 / 2' : '2 / 1 / 3 / 2'};
+  grid-area: ${$dataIn ? '1 / 1 / 2 / 2' : '2 / 1 / 3 / 2'};
   display: grid;
   grid-template-columns: 1fr 1.75em;
   grid-template-rows: 1fr 1px;
-  grid-column-gap: 3px;
-  grid-row-gap: 0;
+  grid-gap: 0 3px;
   color: ${theme.colors.global.textDefault};
 
   > span {
@@ -85,13 +77,13 @@ const ThroughputData = styled.span(({ dataIn, theme }) => css`
   }
 
   &::after {
-    ${dataIn && `
+    ${$dataIn && css`
       content: ' ';
       min-height: 1px;
       background-color: ${theme.colors.variant.light.default};
       display: block;
       grid-area: 2 / 1 / 3 / 3;
-    `}
+`}
   }
 `);
 
@@ -104,8 +96,8 @@ const GlobalThroughput = (props) => {
     const outputNumeral = NumberUtils.formatNumber(throughput.output);
 
     output = (
-      <ContentWrap aria-label={`In ${inputNumeral} / Out ${outputNumeral} msg/s`}>
-        <ThroughputData dataIn>
+      <ContentWrap aria-label={`Throughput: In ${inputNumeral} / Out ${outputNumeral} msg/s`}>
+        <ThroughputData $dataIn>
           <span>{inputNumeral}</span> <i>in</i>
         </ThroughputData>
         <ThroughputData>

@@ -30,11 +30,15 @@ public interface GraylogRestApi {
         waitForObject(() -> predicate.call() ? Optional.of(true) : Optional.empty(), timeoutErrorMessage);
     }
 
-     default <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage) {
+    default void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage, Duration timeout) {
+        waitForObject(() -> predicate.call() ? Optional.of(true) : Optional.empty(), timeoutErrorMessage, timeout);
+    }
+
+    default <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage) {
         return waitForObject(predicate, timeoutErrorMessage, Duration.of(TIMEOUT_MS, ChronoUnit.MILLIS));
     }
 
-     default <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage, Duration timeout) {
+    default <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage, Duration timeout) {
         int msPassed = 0;
         while (msPassed <= timeout.toMillis()) {
             final Optional<T> result = predicate.call();

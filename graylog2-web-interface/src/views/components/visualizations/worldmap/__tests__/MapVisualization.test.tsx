@@ -15,31 +15,34 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render } from 'wrappedTestingLibrary';
 
 import * as fixtures from './MapVisualization.fixtures';
 
 import MapVisualization from '../MapVisualization';
 
 describe('MapVisualization', () => {
-  it('renders with minimal props', () => {
-    const wrapper = mount(<MapVisualization id="somemap"
-                                            onChange={() => {}}
-                                            data={[]}
-                                            height={1600}
-                                            width={900} />);
+  it('renders with minimal props', async () => {
+    const { container } = render(<MapVisualization id="somemap"
+                                                   onChange={() => {}}
+                                                   data={[]}
+                                                   height={1600}
+                                                   width={900} />);
 
-    expect(wrapper.find('div.map#visualization-somemap')).toExist();
+    // eslint-disable-next-line testing-library/no-container
+    expect(container.querySelector('div.map#visualization-somemap')).toBeInTheDocument();
   });
 
-  it('does not render circle markers for invalid data', () => {
-    const wrapper = mount(<MapVisualization id="somemap"
-                                            onChange={() => {}}
-                                            data={fixtures.invalidData}
-                                            height={1600}
-                                            width={900} />);
+  it('does not render circle markers for invalid data', async () => {
+    const { container } = render(<MapVisualization id="somemap"
+                                                   onChange={() => {}}
+                                                   data={fixtures.invalidData}
+                                                   height={1600}
+                                                   width={900} />);
 
-    expect(wrapper.find('div.map#visualization-somemap')).toExist();
-    expect(wrapper.find('CircleMarker')).not.toExist();
+    /* eslint-disable testing-library/no-container */
+    expect(container.querySelector('div.map#visualization-somemap')).toBeInTheDocument();
+    expect(container.querySelector('CircleMarker')).not.toBeInTheDocument();
+    /* eslint-enable testing-library/no-container */
   });
 });

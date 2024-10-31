@@ -19,6 +19,7 @@ import { render, screen, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
 import { HTTPHeaderAuthConfigActions } from 'stores/authentication/HTTPHeaderAuthConfigStore';
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
+import asMock from 'helpers/mocking/AsMock';
 
 import HTTPHeaderAuthConfigSection from './HTTPHeaderAuthConfigSection';
 
@@ -39,6 +40,7 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
 
   it('should display loading indicator while loading', async () => {
     jest.useFakeTimers();
+    asMock(HTTPHeaderAuthConfigActions.load).mockImplementationOnce(() => new Promise(() => {}));
 
     render(<HTTPHeaderAuthConfigSection />);
 

@@ -24,8 +24,6 @@ import com.google.common.net.HostAndPort;
 import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.handler.codec.dns.DefaultDnsPtrRecord;
 import io.netty.handler.codec.dns.DefaultDnsQuestion;
 import io.netty.handler.codec.dns.DefaultDnsRawRecord;
@@ -35,12 +33,8 @@ import io.netty.handler.codec.dns.DnsRecordType;
 import io.netty.handler.codec.dns.DnsResponse;
 import io.netty.handler.codec.dns.DnsSection;
 import io.netty.resolver.dns.DnsNameResolver;
-import io.netty.resolver.dns.DnsNameResolverBuilder;
-import io.netty.resolver.dns.DnsServerAddressStreamProvider;
-import io.netty.resolver.dns.SequentialDnsServerAddressStreamProvider;
-import io.netty.util.concurrent.Future;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog2.lookup.adapters.dnslookup.DnsResolverPool.ResolverLease;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,10 +52,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+
+import static org.graylog2.lookup.adapters.dnslookup.DnsLookupAdapterConfiguration.DEFAULT_POOL_SIZE;
+import static org.graylog2.lookup.adapters.dnslookup.DnsLookupAdapterConfiguration.DEFAULT_REFRESH_INTERVAL_SECONDS;
 
 public class DnsClient {
-
     private static final Logger LOG = LoggerFactory.getLogger(DnsClient.class);
 
     private static final int DEFAULT_DNS_PORT = 53;
@@ -80,9 +74,9 @@ public class DnsClient {
     private static final char[] HEX_CHARS_ARRAY = "0123456789ABCDEF".toCharArray();
     private final long queryTimeout;
     private final long requestTimeout;
-
-    private NioEventLoopGroup nettyEventLoop;
-    private DnsNameResolver resolver;
+    private final long resolverPoolSize;
+    private final long resolverPoolRefreshSeconds;
+    private DnsResolverPool resolverPool;
 
     /**
      * Creates a new DNS client with the given query timeout. The request timeout will be the query timeout plus
@@ -108,66 +102,33 @@ public class DnsClient {
      * @param requestTimeout the request timeout
      */
     public DnsClient(long queryTimeout, long requestTimeout) {
+        this(queryTimeout, requestTimeout, DEFAULT_POOL_SIZE, DEFAULT_REFRESH_INTERVAL_SECONDS);
+    }
+
+    public DnsClient(long queryTimeout, int resolverPoolSize, long resolverPoolRefreshSeconds) {
+        this(queryTimeout, queryTimeout + DEFAULT_REQUEST_TIMEOUT_INCREMENT, resolverPoolSize, resolverPoolRefreshSeconds);
+    }
+
+    private DnsClient(long queryTimeout, long requestTimeout, int resolverPoolSize, long resolverPoolRefreshSeconds) {
         this.queryTimeout = queryTimeout;
         this.requestTimeout = requestTimeout;
+        this.resolverPoolSize = resolverPoolSize;
+        this.resolverPoolRefreshSeconds = resolverPoolRefreshSeconds;
     }
 
     public void start(String dnsServerIps) {
-
         LOG.debug("Attempting to start DNS client");
-        final List<InetSocketAddress> iNetDnsServerIps = parseServerIpAddresses(dnsServerIps);
-
-        nettyEventLoop = new NioEventLoopGroup();
-
-        final DnsNameResolverBuilder dnsNameResolverBuilder = new DnsNameResolverBuilder(nettyEventLoop.next());
-        dnsNameResolverBuilder.channelType(NioDatagramChannel.class).queryTimeoutMillis(queryTimeout);
-
-        // Specify custom DNS servers if provided. If not, use those specified in local network adapter settings.
-        if (CollectionUtils.isNotEmpty(iNetDnsServerIps)) {
-
-            LOG.debug("Attempting to start DNS client with server IPs [{}] on port [{}] with timeout [{}]",
-                      dnsServerIps, DEFAULT_DNS_PORT, requestTimeout);
-
-            final DnsServerAddressStreamProvider dnsServer = new SequentialDnsServerAddressStreamProvider(iNetDnsServerIps);
-            dnsNameResolverBuilder.nameServerProvider(dnsServer);
-        } else {
-            LOG.debug("Attempting to start DNS client with the local network adapter DNS server address on port [{}] with timeout [{}]",
-                      DEFAULT_DNS_PORT, requestTimeout);
-        }
-
-        resolver = dnsNameResolverBuilder.build();
-
-        LOG.debug("DNS client startup successful");
-    }
-
-    private List<InetSocketAddress> parseServerIpAddresses(String dnsServerIps) {
-
-        // Parse and prepare DNS server IP addresses for Netty.
-        return StreamSupport
-                // Split comma-separated sever IP:port combos.
-                .stream(Splitter.on(",").trimResults().omitEmptyStrings().split(dnsServerIps).spliterator(), false)
-                // Parse as HostAndPort objects (allows convenient handling of port provided after colon).
-                .map(hostAndPort -> HostAndPort.fromString(hostAndPort).withDefaultPort(DnsClient.DEFAULT_DNS_PORT))
-                // Convert HostAndPort > InetSocketAddress as required by Netty.
-                .map(hostAndPort -> new InetSocketAddress(hostAndPort.getHost(), hostAndPort.getPort()))
-                .collect(Collectors.toList());
+        this.resolverPool = new DnsResolverPool(dnsServerIps, queryTimeout, resolverPoolSize, resolverPoolRefreshSeconds);
+        this.resolverPool.initialize();
     }
 
     public void stop() {
-
         LOG.debug("Attempting to stop DNS client");
-
-        if (nettyEventLoop == null) {
-            LOG.error("DNS resolution event loop not initialized");
+        if (resolverPool == null) {
+            LOG.error("DNS resolution pool is not initialized.");
             return;
         }
-
-        // Make sure to close the resolver before shutting down the event loop
-        resolver.close();
-
-        // Shutdown event loop (required by Netty).
-        final Future<?> shutdownFuture = nettyEventLoop.shutdownGracefully();
-        shutdownFuture.addListener(future -> LOG.debug("DNS client shutdown successful"));
+        resolverPool.stop();
     }
 
     public List<ADnsAnswer> resolveIPv4AddressForHostname(String hostName, boolean includeIpVersion)
@@ -187,7 +148,7 @@ public class DnsClient {
 
         LOG.debug("Attempting to resolve [{}] records for [{}]", dnsRecordType, hostName);
 
-        if (isShutdown()) {
+        if (resolverPool.isStopped()) {
             throw new DnsClientNotRunningException();
         }
 
@@ -195,15 +156,19 @@ public class DnsClient {
 
         final DefaultDnsQuestion aRecordDnsQuestion = new DefaultDnsQuestion(hostName, dnsRecordType);
 
+        final ResolverLease resolverLease = resolverPool.takeLease();
         /* The DnsNameResolver.resolveAll(DnsQuestion) method handles all redirects through CNAME records to
          * ultimately resolve a list of IP addresses with TTL values. */
         try {
-            return resolver.resolveAll(aRecordDnsQuestion).get(requestTimeout, TimeUnit.MILLISECONDS).stream()
+            return resolverLease.getResolver().resolveAll(aRecordDnsQuestion).get(requestTimeout, TimeUnit.MILLISECONDS).stream()
                            .map(dnsRecord -> decodeDnsRecord(dnsRecord, includeIpVersion))
                            .filter(Objects::nonNull) // Removes any entries which the IP address could not be extracted for.
                            .collect(Collectors.toList());
         } catch (TimeoutException e) {
             throw new ExecutionException("Resolver future didn't return a result in " + requestTimeout + " ms", e);
+        }
+        finally {
+            resolverPool.returnLease(resolverLease);
         }
     }
 
@@ -262,7 +227,7 @@ public class DnsClient {
 
         LOG.debug("Attempting to perform reverse lookup for IP address [{}]", ipAddress);
 
-        if (isShutdown()) {
+        if (resolverPool.isStopped()) {
             throw new DnsClientNotRunningException();
         }
 
@@ -271,8 +236,9 @@ public class DnsClient {
         final String inverseAddressFormat = getInverseAddressFormat(ipAddress);
 
         DnsResponse content = null;
+        final ResolverLease resolverLease = resolverPool.takeLease();
         try {
-            content = resolver.query(new DefaultDnsQuestion(inverseAddressFormat, DnsRecordType.PTR)).get(requestTimeout, TimeUnit.MILLISECONDS).content();
+            content = resolverLease.getResolver().query(new DefaultDnsQuestion(inverseAddressFormat, DnsRecordType.PTR)).get(requestTimeout, TimeUnit.MILLISECONDS).content();
             for (int i = 0; i < content.count(DnsSection.ANSWER); i++) {
 
                 // Return the first PTR record, because there should be only one as per
@@ -306,6 +272,7 @@ public class DnsClient {
                 // Must manually release references on content object since the DnsResponse class extends ReferenceCounted
                 content.release();
             }
+            resolverPool.returnLease(resolverLease);
         }
 
         return null;
@@ -348,7 +315,7 @@ public class DnsClient {
 
     public List<TxtDnsAnswer> txtLookup(String hostName) throws InterruptedException, ExecutionException {
 
-        if (isShutdown()) {
+        if (resolverPool.isStopped()) {
             throw new DnsClientNotRunningException();
         }
 
@@ -357,8 +324,9 @@ public class DnsClient {
         validateHostName(hostName);
 
         DnsResponse content = null;
+        final ResolverLease resolverLease = resolverPool.takeLease();
         try {
-            content = resolver.query(new DefaultDnsQuestion(hostName, DnsRecordType.TXT)).get(requestTimeout, TimeUnit.MILLISECONDS).content();
+            content = resolverLease.getResolver().query(new DefaultDnsQuestion(hostName, DnsRecordType.TXT)).get(requestTimeout, TimeUnit.MILLISECONDS).content();
             int count = content.count(DnsSection.ANSWER);
             final ArrayList<TxtDnsAnswer> txtRecords = new ArrayList<>(count);
             for (int i = 0; i < count; i++) {
@@ -389,11 +357,8 @@ public class DnsClient {
                 // Must manually release references on content object since the DnsResponse class extends ReferenceCounted
                 content.release();
             }
+            resolverPool.returnLease(resolverLease);
         }
-    }
-
-    private boolean isShutdown() {
-        return nettyEventLoop == null || nettyEventLoop.isShutdown();
     }
 
     private static String decodeTxtRecord(DefaultDnsRawRecord record) {

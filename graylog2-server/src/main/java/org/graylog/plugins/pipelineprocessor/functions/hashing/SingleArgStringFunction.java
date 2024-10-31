@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.Locale;
 
@@ -31,7 +32,7 @@ abstract class SingleArgStringFunction extends AbstractFunction<String> {
     private final ParameterDescriptor<String, String> valueParam;
 
     SingleArgStringFunction() {
-        valueParam = ParameterDescriptor.string("value").description("The value to hash").build();
+        valueParam = ParameterDescriptor.string("value").ruleBuilderVariable().description("The value to hash").build();
     }
 
     @Override
@@ -48,6 +49,15 @@ abstract class SingleArgStringFunction extends AbstractFunction<String> {
         return getName().toUpperCase(Locale.ENGLISH) + " hash of the string";
     }
 
+
+    protected String getRuleBuilderName() {
+        return "Generate " + getName().toUpperCase(Locale.ENGLISH) + " hash";
+    }
+
+    protected String getRuleBuilderTitle() {
+        return "Generate " + getName().toUpperCase(Locale.ENGLISH) + " hash of '${value}'";
+    }
+
     @Override
     public FunctionDescriptor<String> descriptor() {
         return FunctionDescriptor.<String>builder()
@@ -57,6 +67,10 @@ abstract class SingleArgStringFunction extends AbstractFunction<String> {
                         valueParam)
                 )
                 .description(description())
+                .ruleBuilderEnabled()
+                .ruleBuilderName(getRuleBuilderName())
+                .ruleBuilderTitle(getRuleBuilderTitle())
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.HASH)
                 .build();
     }
 }

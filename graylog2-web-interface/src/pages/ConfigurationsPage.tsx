@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
+import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
+import URI from 'urijs';
 
-import AppConfig from 'util/AppConfig';
 import { isPermitted } from 'util/PermissionsMixin';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { Col, Nav, NavItem } from 'components/bootstrap';
@@ -28,11 +29,12 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
-import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaultsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { LinkContainer } from 'components/common/router';
+import useLocation from 'routing/useLocation';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
 import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
@@ -49,22 +51,39 @@ const SubNavIconOpen = styled(Icon)`
   margin-left: 5px;
 `;
 
+type SectionLinkProps = {
+  name: string,
+  showCaret: boolean,
+}
+
+const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
+  const absolutePath = useResolvedPath(name);
+  const location = useLocation();
+
+  const isActive = URI(location.pathname).equals(absolutePath.pathname)
+    || location.pathname.startsWith(absolutePath.pathname);
+
+  return (
+    <LinkContainer key={`nav-${name}`} to={name}>
+      <NavItem title={name} active={isActive}>
+        {name}
+        {showCaret && (isActive ? <SubNavIconClosed name="arrow_right" /> : <SubNavIconOpen name="arrow_drop_down" />)}
+      </NavItem>
+    </LinkContainer>
+  );
+};
+
 const ConfigurationsPage = () => {
   const currentUser = useCurrentUser();
-  const [activeSectionKey, setActiveSectionKey] = useState(1);
-  const isCloud = AppConfig.isCloud();
-
-  const handleNavSelect = (itemKey) => {
-    setActiveSectionKey(itemKey);
-  };
 
   const configurationSections: Array<{
     name: string,
     hide?: boolean,
     SectionComponent: React.ComponentType<ConfigurationSectionProps | {}>,
-    props: ConfigurationSectionProps | {},
+    props?: ConfigurationSectionProps,
     showCaret?: boolean,
-  }> = [
+    catchAll?: boolean,
+  }> = useMemo(() => [
     {
       name: 'Search',
       SectionComponent: ConfigurationSection,
@@ -124,15 +143,6 @@ const ConfigurationsPage = () => {
       },
     },
     {
-      name: 'Index Set Defaults',
-      hide: isCloud,
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: IndexSetsDefaultsConfig,
-        title: 'Index Set Defaults',
-      },
-    },
-    {
       name: 'Users',
       SectionComponent: ConfigurationSection,
       props: {
@@ -144,13 +154,9 @@ const ConfigurationsPage = () => {
       name: 'Plugins',
       SectionComponent: PluginsConfig,
       showCaret: true,
-      props: {},
+      catchAll: true,
     },
-  ];
-
-  const isSectionActive = (configurationSection: string) : boolean => (
-    (configurationSections.findIndex((item) => item.name === configurationSection) + 1) === activeSectionKey
-  );
+  ].filter(({ hide }) => !hide), [currentUser?.permissions]);
 
   return (
     <DocumentTitle title="Configurations">
@@ -162,25 +168,21 @@ const ConfigurationsPage = () => {
 
       <ConfigletRow className="content">
         <Col md={2}>
-          <Nav bsStyle="pills" stacked activeKey={activeSectionKey} onSelect={handleNavSelect}>
-            {configurationSections.map(({ hide, name, showCaret }, index) => (
-              !hide && (
-              <NavItem key={`nav-${name}`} eventKey={index + 1} title={name}>
-                {name}
-                {showCaret && (isSectionActive(name)
-                  ? <SubNavIconClosed name="caret-right" />
-                  : <SubNavIconOpen name="caret-down" />)}
-              </NavItem>
-              )
+          <Nav bsStyle="pills" stacked>
+            {configurationSections.map(({ name, showCaret }) => (
+              <SectionLink key={`nav-${name}`} name={name} showCaret={showCaret} />
             ))}
           </Nav>
         </Col>
 
-        {configurationSections.map(({ name, hide, props, SectionComponent }) => (
-          isSectionActive(name) && !hide && (
-            <SectionComponent {...props} key={name} />
-          )
-        ))}
+        <Routes>
+          <Route path="/" element={<Navigate to={configurationSections[0].name} replace />} />
+          {configurationSections.flatMap(({ catchAll, name, props = {}, SectionComponent }) => (
+            <Route path={catchAll ? `${name}/*` : name}
+                   key={name}
+                   element={<SectionComponent {...props} key={name} />} />
+          ))}
+        </Routes>
       </ConfigletRow>
     </DocumentTitle>
   );

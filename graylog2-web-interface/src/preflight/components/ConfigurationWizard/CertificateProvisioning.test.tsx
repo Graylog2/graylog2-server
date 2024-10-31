@@ -56,8 +56,8 @@ describe('CertificateProvisioning', () => {
     });
   });
 
-  it('should provision CA', async () => {
-    renderPreflight(<CertificateProvisioning />);
+  it('should provision certificates', async () => {
+    renderPreflight(<CertificateProvisioning onSkipProvisioning={() => {}} />);
 
     userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
 
@@ -68,17 +68,17 @@ describe('CertificateProvisioning', () => {
       false,
     ));
 
-    expect(UserNotification.success).toHaveBeenCalledWith('CA provisioned successfully');
+    expect(UserNotification.success).toHaveBeenCalledWith('Started certificate provisioning successfully');
 
-    await screen.findByRole('button', { name: /provision certificate and continue/i });
+    await screen.findByRole('button', { name: /provisioning certificate.../i });
   });
 
-  it('should show error when CA provisioning failed', async () => {
+  it('should show error when certificate provisioning failed', async () => {
     asMock(fetch).mockImplementationOnce(() => Promise.reject(new Error('Error')));
 
     renderPreflight(
       <DefaultQueryClientProvider options={{ logger }}>
-        <CertificateProvisioning />
+        <CertificateProvisioning onSkipProvisioning={() => {}} />
       </DefaultQueryClientProvider>,
     );
 
@@ -91,7 +91,7 @@ describe('CertificateProvisioning', () => {
       false,
     ));
 
-    expect(UserNotification.error).toHaveBeenCalledWith('CA provisioning failed with error: Error: Error');
+    expect(UserNotification.error).toHaveBeenCalledWith('Starting certificate provisioning failed with error: Error: Error');
 
     await screen.findByRole('button', { name: /provision certificate and continue/i });
   });
@@ -104,10 +104,27 @@ describe('CertificateProvisioning', () => {
       error: undefined,
     });
 
-    renderPreflight(<CertificateProvisioning />);
+    renderPreflight(<CertificateProvisioning onSkipProvisioning={() => {}} />);
 
     await screen.findByText('At least one Graylog data node needs to run before the certificate can be provisioned.');
 
     expect(await screen.findByRole('button', { name: /provision certificate and continue/i })).toBeDisabled();
+  });
+
+  it('should skip provisioning', async () => {
+    const onSkipProvisioning = jest.fn();
+
+    asMock(useDataNodes).mockReturnValue({
+      data: [],
+      isFetching: false,
+      isInitialLoading: false,
+      error: undefined,
+    });
+
+    renderPreflight(<CertificateProvisioning onSkipProvisioning={onSkipProvisioning} />);
+
+    userEvent.click(await screen.findByRole('button', { name: /skip provisioning/i }));
+
+    expect(onSkipProvisioning).toHaveBeenCalledTimes(1);
   });
 });

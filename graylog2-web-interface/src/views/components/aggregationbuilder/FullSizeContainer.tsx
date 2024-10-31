@@ -26,8 +26,6 @@ const Wrapper = styled.div`
   overflow: hidden;
   grid-row: 2;
   grid-column: 1;
-  -ms-grid-row: 2;
-  -ms-grid-column: 1;
 `;
 
 type Dimensions = { height: number; width: number; };

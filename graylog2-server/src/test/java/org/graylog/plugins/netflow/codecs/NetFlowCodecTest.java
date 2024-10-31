@@ -19,7 +19,10 @@ package org.graylog.plugins.netflow.codecs;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.graylog.plugins.netflow.flows.FlowException;
+import org.graylog.plugins.netflow.flows.NetFlowFormatter;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.junit.Before;
@@ -45,11 +48,13 @@ public class NetFlowCodecTest {
 
     private NetFlowCodec codec;
     private NetflowV9CodecAggregator codecAggregator;
+    private final MessageFactory messageFactory = new TestMessageFactory();
+    private final NetFlowFormatter netFlowFormatter = new NetFlowFormatter(messageFactory);
 
     @Before
     public void setUp() throws Exception {
         codecAggregator = new NetflowV9CodecAggregator();
-        codec = new NetFlowCodec(Configuration.EMPTY_CONFIGURATION, codecAggregator);
+        codec = new NetFlowCodec(Configuration.EMPTY_CONFIGURATION, codecAggregator, netFlowFormatter);
     }
 
     @Test
@@ -62,7 +67,7 @@ public class NetFlowCodecTest {
         final Configuration configuration = new Configuration(configMap);
 
         assertThatExceptionOfType(FileNotFoundException.class)
-                .isThrownBy(() -> new NetFlowCodec(configuration, codecAggregator))
+                .isThrownBy(() -> new NetFlowCodec(configuration, codecAggregator, netFlowFormatter))
                 .withMessageEndingWith("(No such file or directory)");
     }
 
@@ -72,7 +77,7 @@ public class NetFlowCodecTest {
                 NetFlowCodec.CK_NETFLOW9_DEFINITION_PATH, "");
         final Configuration configuration = new Configuration(configMap);
 
-        assertThat(new NetFlowCodec(configuration, codecAggregator)).isNotNull();
+        assertThat(new NetFlowCodec(configuration, codecAggregator, netFlowFormatter)).isNotNull();
     }
 
     @Test
@@ -81,7 +86,7 @@ public class NetFlowCodecTest {
                 NetFlowCodec.CK_NETFLOW9_DEFINITION_PATH, "   ");
         final Configuration configuration = new Configuration(configMap);
 
-        assertThat(new NetFlowCodec(configuration, codecAggregator)).isNotNull();
+        assertThat(new NetFlowCodec(configuration, codecAggregator, netFlowFormatter)).isNotNull();
     }
 
     @Test
@@ -94,7 +99,7 @@ public class NetFlowCodecTest {
         final Configuration configuration = new Configuration(configMap);
 
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new NetFlowCodec(configuration, codecAggregator))
+                .isThrownBy(() -> new NetFlowCodec(configuration, codecAggregator, netFlowFormatter))
                 .withMessageMatching("Unable to parse NetFlow 9 definitions");
     }
 

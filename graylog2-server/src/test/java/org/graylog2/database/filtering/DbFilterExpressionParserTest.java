@@ -29,7 +29,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.database.filtering.DbFilterExpressionParser.FIELD_AND_VALUE_SEPARATOR;
+import static org.graylog2.database.filtering.inmemory.SingleFilterParser.FIELD_AND_VALUE_SEPARATOR;
+import static org.graylog2.database.filtering.inmemory.SingleFilterParser.RANGE_VALUES_SEPARATOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -183,6 +184,20 @@ class DbFilterExpressionParserTest {
     }
 
     @Test
+    void parsesFilterExpressionCorrectlyForDoubleType() {
+
+        assertEquals(Filters.eq("num", 22.5),
+                toTest.parseSingleExpression("num:22.5",
+                        List.of(EntityAttribute.builder()
+                                .id("num")
+                                .title("Num")
+                                .type(SearchQueryField.Type.DOUBLE)
+                                .filterable(true)
+                                .build())
+                ));
+    }
+
+    @Test
     void parsesFilterExpressionCorrectlyForIntType() {
 
         assertEquals(Filters.eq("num", 42),
@@ -216,7 +231,7 @@ class DbFilterExpressionParserTest {
                                 new DateTime(2022, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate())
                 ),
 
-                toTest.parseSingleExpression("created_at:" + fromString + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + toString,
+                toTest.parseSingleExpression("created_at:" + fromString + RANGE_VALUES_SEPARATOR + toString,
                         entityAttributes
                 ));
     }
@@ -237,7 +252,7 @@ class DbFilterExpressionParserTest {
                 Filters.and(
                         Filters.gte("created_at", dateObject.toDate())
                 ),
-                toTest.parseSingleExpression("created_at:" + dateString + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR,
+                toTest.parseSingleExpression("created_at:" + dateString + RANGE_VALUES_SEPARATOR,
                         entityAttributes
                 ));
 
@@ -245,7 +260,27 @@ class DbFilterExpressionParserTest {
                 Filters.and(
                         Filters.lte("created_at", dateObject.toDate())
                 ),
-                toTest.parseSingleExpression("created_at:" + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + dateString,
+                toTest.parseSingleExpression("created_at:" + RANGE_VALUES_SEPARATOR + dateString,
+                        entityAttributes
+                ));
+    }
+
+    @Test
+    void parsesFilterExpressionCorrectlyForDoubleRanges() {
+        final List<EntityAttribute> entityAttributes = List.of(EntityAttribute.builder()
+                .id("number")
+                .title("Number")
+                .type(SearchQueryField.Type.DOUBLE)
+                .filterable(true)
+                .build());
+
+        assertEquals(
+                Filters.and(
+                        Filters.gte("number", 22.5),
+                        Filters.lte("number", 44.5)
+                ),
+
+                toTest.parseSingleExpression("number:22.5" + RANGE_VALUES_SEPARATOR + "44.5",
                         entityAttributes
                 ));
     }
@@ -265,7 +300,7 @@ class DbFilterExpressionParserTest {
                         Filters.lte("number", 53)
                 ),
 
-                toTest.parseSingleExpression("number:42" + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + "53",
+                toTest.parseSingleExpression("number:42" + RANGE_VALUES_SEPARATOR + "53",
                         entityAttributes
                 ));
     }
@@ -280,9 +315,9 @@ class DbFilterExpressionParserTest {
                 .build());
 
         assertEquals(
-                Filters.eq("text", "42" + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + "53"),
+                Filters.eq("text", "42" + RANGE_VALUES_SEPARATOR + "53"),
 
-                toTest.parseSingleExpression("text:42" + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + "53",
+                toTest.parseSingleExpression("text:42" + RANGE_VALUES_SEPARATOR + "53",
                         entityAttributes
                 ));
     }

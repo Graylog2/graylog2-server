@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
@@ -25,7 +23,7 @@ const MessagesContainer = styled.div`
   width: 100%;
 `;
 
-const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { theme: DefaultTheme, $stickyHeader: boolean, $borderedHeader: boolean }) => css`
+const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme, $stickyHeader }) => css`
   position: relative;
   font-size: ${theme.fonts.size.small};
   margin: 0;
@@ -40,23 +38,9 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
     z-index: 2` : ''}
   }
   
-  thead > tr {
-    color: ${theme.colors.global.textAlt};
-  }
-  
   td,
   th {
     position: relative;
-  }
-
-  > thead th {
-    border: 0;
-    font-size: ${theme.fonts.size.small};
-    font-weight: normal;
-    background-color: ${theme.colors.gray[90]};
-    color: ${theme.utils.readableColor(theme.colors.gray[90])};
-    white-space: nowrap;
-    ${$borderedHeader ? `border: 1px solid ${theme.colors.table.backgroundAlt}` : ''}
   }
 
   > tbody td {
@@ -69,7 +53,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
   }
 
   &.table-striped > tbody > tr:nth-of-type(even) > td {
-    background-color: ${theme.colors.table.background};
+    background-color: ${theme.colors.table.row.background};
   }
 
   tr {
@@ -142,50 +126,25 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
   th:hover i.sort-order-item {
     color: ${theme.colors.global.textAlt};
   }
-  
-  @media print {
-    tr.fields-row > td {
-      min-width: 0;
-    }
-  }
 `);
 
 type Props = {
   children: React.ReactNode,
   striped?: boolean,
   bordered?: boolean,
-  borderedHeader?: boolean,
   stickyHeader?: boolean,
   condensed?: boolean,
 };
 
-const MessagesTable = ({ children, condensed, striped, bordered, stickyHeader, borderedHeader }: Props) => (
+const MessagesTable = ({ children, condensed = true, striped = false, bordered = false, stickyHeader = false }: Props) => (
   <MessagesContainer>
     <StyledTable condensed={condensed}
                  striped={striped}
                  bordered={bordered}
-                 $stickyHeader={stickyHeader}
-                 $borderedHeader={borderedHeader}>
+                 $stickyHeader={stickyHeader}>
       {children}
     </StyledTable>
   </MessagesContainer>
 );
-
-MessagesTable.propTypes = {
-  children: PropTypes.node.isRequired,
-  condensed: PropTypes.bool,
-  striped: PropTypes.bool,
-  bordered: PropTypes.bool,
-  stickyHeader: PropTypes.bool,
-  borderedHeader: PropTypes.bool,
-};
-
-MessagesTable.defaultProps = {
-  condensed: true,
-  striped: false,
-  bordered: false,
-  stickyHeader: false,
-  borderedHeader: false,
-};
 
 export default MessagesTable;

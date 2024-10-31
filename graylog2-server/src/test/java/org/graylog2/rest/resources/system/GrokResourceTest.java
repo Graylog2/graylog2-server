@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.system;
 
 import com.google.common.eventbus.Subscribe;
-import org.awaitility.Duration;
+import org.awaitility.Durations;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
@@ -37,7 +37,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
+
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -100,7 +101,7 @@ public class GrokResourceTest {
         assertThat(response.hasEntity()).isFalse();
 
         await()
-                .atMost(Duration.FIVE_SECONDS)
+                .atMost(Durations.FIVE_SECONDS)
                 .until(() -> !subscriber.events.isEmpty());
         assertThat(subscriber.events)
                 .containsOnly(GrokPatternsUpdatedEvent.create(Collections.singleton(expectedPattern.name())));
@@ -118,7 +119,7 @@ public class GrokResourceTest {
         assertThat(response.hasEntity()).isFalse();
 
         await()
-                .atMost(Duration.FIVE_SECONDS)
+                .atMost(Durations.FIVE_SECONDS)
                 .until(() -> !subscriber.events.isEmpty());
         assertThat(subscriber.events)
                 .containsOnly(GrokPatternsUpdatedEvent.create(Collections.singleton(expectedPattern.name())));
@@ -136,7 +137,7 @@ public class GrokResourceTest {
         assertThat(response.hasEntity()).isFalse();
 
         await()
-                .atMost(Duration.FIVE_SECONDS)
+                .atMost(Durations.FIVE_SECONDS)
                 .until(() -> !subscriber.events.isEmpty());
         assertThat(subscriber.events)
                 .containsOnly(GrokPatternsUpdatedEvent.create(Collections.singleton(expectedPattern.name())));

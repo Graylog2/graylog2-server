@@ -21,64 +21,94 @@ import type AuthenticationBackend from 'logic/authentication/AuthenticationBacke
 
 export interface SharedBackendConfig {
   type: string;
+
   clientId: string;
+
   clientSecret: string;
+
   tokenVerifierConnectTimeout: string;
+
   callbackUrl: string;
 }
 
 export interface OktaBackendConfig extends SharedBackendConfig {
   oktaBaseUrl?: string;
 }
+
 export interface OidcBackendConfig extends SharedBackendConfig {
   baseUrl?: string;
+
   claims?: { [key: string]: string },
 }
 
 export type BackendConfig = OktaBackendConfig | OidcBackendConfig;
+
 export interface SharedBackendConfigJson {
   type: string;
+
   client_id: string;
+
   client_secret: string;
+
   token_verifier_connect_timeout: string;
+
   callback_url: string;
 }
+
 export interface OktaBackendConfigJson extends SharedBackendConfigJson {
   okta_base_url: string;
 }
 
 export interface OidcBackendConfigJson extends SharedBackendConfigJson {
   base_url: string;
+
   claims: { [key: string]: string };
 }
 
 export type BackendConfigJson = OktaBackendConfigJson | OidcBackendConfigJson
-export interface OktaTeamSyncConfig {
+
+export interface TeamSyncConfig {
   teamSelectionType?: 'all' | 'include' | 'exclude',
+
   teamSelection?: Immutable.Set<string>,
+
   oktaApiToken?: { is_set: boolean };
+
   synchronizeGroups?: boolean
+
+  groupsClaim?: boolean
 }
+
 export interface OktaTeamSyncConfigJson {
   id?: string,
+
   auth_service_backend_id: string,
+
   selection_type: string,
+
   selection: Array<string>,
+
   default_roles: Array<string>,
+
   config: {
     type: string,
-    okta_api_token: (string | { keep_value: true } | { delete_value: true } | { set_value: string | undefined }) | undefined,
+    okta_api_token: (string | { keep_value: true } | { delete_value: true } | {
+      set_value: string | undefined
+    }) | undefined,
   },
 }
 
 export interface SharedBackendProps {
   id: $PropertyType<AuthenticationBackend, 'id'>;
+
   defaultRoles: $PropertyType<AuthenticationBackend, 'defaultRoles'>;
+
   title: $PropertyType<AuthenticationBackend, 'title'>;
+
   description: $PropertyType<AuthenticationBackend, 'description'>;
 }
 
-export interface OktaBackend extends SharedBackendProps{
+export interface OktaBackend extends SharedBackendProps {
   config: Omit<OktaBackendConfig, 'clientSecret'> & {
     clientSecret: { is_set: boolean };
   };

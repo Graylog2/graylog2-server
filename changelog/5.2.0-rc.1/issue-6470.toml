@@ -1,0 +1,5 @@
+type = "a"
+message = "New pipeline rule functions for map manipulation: map_set, map_remove."
+
+issues = ["6470"]
+pulls = ["16174"]

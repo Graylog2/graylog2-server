@@ -205,7 +205,7 @@ function createModel(model: RawModel): Model {
 type RawParameter = {
   name: string;
   description: string;
-  paramType: 'path' | 'query' | 'body';
+  paramType: 'path' | 'query' | 'body' | 'formdata';
   type: string | RawType;
   defaultValue?: string;
   required: boolean;

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
@@ -128,5 +129,13 @@ public abstract class SearchEntity implements NativeEntityConverter<Search> {
             searchBuilder.owner(this.owner().get());
         }
         return searchBuilder.build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        queries().forEach(query -> query.resolveForInstallation(entity, parameters, entities, graph));
     }
 }

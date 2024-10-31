@@ -34,6 +34,7 @@ import org.graylog.plugins.views.search.views.Position;
 import org.graylog.plugins.views.search.views.UnknownWidgetConfigDTO;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
+import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.WidgetDTO;
@@ -53,9 +54,10 @@ import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.NotFoundException;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -147,7 +149,7 @@ public class ViewsResourceTest {
                 mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
-                searchFilterVisibilityChecker( Collections.singletonList("<<You cannot see this filter>>")),
+                searchFilterVisibilityChecker(Collections.singletonList("<<You cannot see this filter>>")),
                 EMPTY_VIEW_RESOLVERS,
                 SEARCH
         );
@@ -422,17 +424,17 @@ public class ViewsResourceTest {
         );
 
         // Verify that view for valid id is found.
-        Assertions.assertThat(testResource.get(resolverName + ":" + VIEW_ID, SEARCH_USER).id()).isEqualTo(VIEW_ID);
+        Assertions.assertThat(testResource.get(resolverName + ViewResolverDecoder.SEPARATOR + VIEW_ID, SEARCH_USER).id()).isEqualTo(VIEW_ID);
 
 
         // Verify error paths for invalid resolver names and view ids.
-        Assertions.assertThatThrownBy(() -> testResource.get("invalid-resolver-name:" + VIEW_ID, SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> testResource.get("invalid-resolver-name" + ViewResolverDecoder.SEPARATOR + VIEW_ID, SEARCH_USER))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Failed to find view resolver: invalid-resolver-name");
 
-        Assertions.assertThatThrownBy(() -> testResource.get(resolverName + ":invalid-view-id", SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> testResource.get(resolverName + ViewResolverDecoder.SEPARATOR + "invalid-view-id", SEARCH_USER))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Failed to resolve view:test-resolver:invalid-view-id");
+                .hasMessageContaining("Failed to resolve view:test-resolver__invalid-view-id");
     }
 
     private ViewsResource createViewsResource(final ViewService viewService, final StartPageService startPageService, final RecentActivityService recentActivityService, final ClusterEventBus clusterEventBus, ReferencedSearchFiltersHelper referencedSearchFiltersHelper, SearchFilterVisibilityChecker searchFilterVisibilityChecker, final Map<String, ViewResolver> viewResolvers, Search... existingSearches) {

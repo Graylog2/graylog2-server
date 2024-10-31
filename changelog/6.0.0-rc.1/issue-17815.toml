@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Allow the index range clean up periodcal to delete index ranges that are no longer managed by an index set"
+
+issues = ["17815"]
+pulls = ["17841"]

@@ -17,17 +17,19 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AlwaysMatcherTest {
-    private static final Message message = new Message("Test", "source", new DateTime(2016, 9, 7, 0, 0, DateTimeZone.UTC));
+    private static final MessageFactory messageFactory = new TestMessageFactory();
+    private static final Message message = messageFactory.createMessage("Test", "source", new DateTime(2016, 9, 7, 0, 0, DateTimeZone.UTC));
     private static final AlwaysMatcher matcher = new AlwaysMatcher();
 
     @Test

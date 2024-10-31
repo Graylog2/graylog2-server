@@ -16,16 +16,16 @@
  */
 package org.graylog2;
 
-import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
-import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import org.graylog2.plugin.Tools;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +39,7 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog2.configuration.ConfigurationHelper.initConfig;
 
 @SuppressWarnings("deprecation")
 public class ConfigurationTest {
@@ -53,11 +54,6 @@ public class ConfigurationTest {
     @Before
     public void setUp() throws Exception {
         validProperties = new HashMap<>();
-
-        // Required properties
-        validProperties.put("password_secret", "ipNUnWxmBLCxTEzXcyamrdy0Q3G7HxdKsAvyg30R9SCof0JydiZFiA3dLSkRsbLF");
-        // SHA-256 of "admin"
-        validProperties.put("root_password_sha2", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918");
     }
 
     @Test
@@ -67,7 +63,7 @@ public class ConfigurationTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("The minimum length for \"password_secret\" is 16 characters.");
 
-        Configuration configuration = processValidProperties();
+        initConfig(new Configuration(), validProperties);
     }
 
     @Test
@@ -77,7 +73,7 @@ public class ConfigurationTest {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Parameter password_secret should not be blank");
 
-        Configuration configuration = processValidProperties();
+        initConfig(new Configuration(), validProperties);
     }
 
     @Test
@@ -87,14 +83,14 @@ public class ConfigurationTest {
         expectedException.expect(ParameterException.class);
         expectedException.expectMessage("Required parameter \"password_secret\" not found.");
 
-        Configuration configuration = processValidProperties();
+        initConfig(new Configuration(), validProperties);
     }
 
     @Test
     public void testPasswordSecretIsValid() throws ValidationException, RepositoryException {
         validProperties.put("password_secret", "abcdefghijklmnopqrstuvwxyz");
 
-        Configuration configuration = processValidProperties();
+        Configuration configuration = initConfig(new Configuration(), validProperties);
 
         assertThat(configuration.getPasswordSecret()).isEqualTo("abcdefghijklmnopqrstuvwxyz");
     }
@@ -156,9 +152,9 @@ public class ConfigurationTest {
         validProperties.put("leader_election_mode", "automatic");
         validProperties.put("lock_service_lock_ttl", "3s");
 
-        assertThatThrownBy(() -> {
-            new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
-        }).isInstanceOf(ValidationException.class).hasMessageStartingWith("The minimum valid \"lock_service_lock_ttl\" is");
+        assertThatThrownBy(() -> initConfig(new Configuration(), validProperties))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageStartingWith("The minimum valid \"lock_service_lock_ttl\" is");
     }
 
     @Test
@@ -166,9 +162,9 @@ public class ConfigurationTest {
         validProperties.put("leader_election_mode", "automatic");
         validProperties.put("leader_election_lock_polling_interval", "100ms");
 
-        assertThatThrownBy(() -> {
-            new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
-        }).isInstanceOf(ValidationException.class).hasMessageStartingWith("The minimum valid \"leader_election_lock_polling_interval\" is");
+        assertThatThrownBy(() -> initConfig(new Configuration(), validProperties))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageStartingWith("The minimum valid \"leader_election_lock_polling_interval\" is");
     }
 
     @Test
@@ -177,14 +173,14 @@ public class ConfigurationTest {
         validProperties.put("leader_election_lock_polling_interval", "2m");
         validProperties.put("lock_service_lock_ttl", "1m");
 
-        assertThatThrownBy(() -> {
-            new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
-        }).isInstanceOf(ValidationException.class).hasMessageContaining("needs to be greater than");
+        assertThatThrownBy(() -> initConfig(new Configuration(), validProperties))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("needs to be greater than");
     }
 
     @Test
     public void isLeaderByDefault() throws Exception {
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
 
         assertThat(configuration.isMaster()).isTrue();
         assertThat(configuration.isLeader()).isTrue();
@@ -194,7 +190,7 @@ public class ConfigurationTest {
     public void isMasterSetToTrue() throws Exception {
         validProperties.put("is_master", "true");
 
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.isMaster()).isTrue();
         assertThat(configuration.isLeader()).isTrue();
     }
@@ -203,7 +199,7 @@ public class ConfigurationTest {
     public void isMasterSetToFalse() throws Exception {
         validProperties.put("is_master", "false");
 
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.isMaster()).isFalse();
         assertThat(configuration.isLeader()).isFalse();
     }
@@ -212,7 +208,7 @@ public class ConfigurationTest {
     public void isLeaderSetToTrue() throws Exception {
         validProperties.put("is_leader", "true");
 
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.isMaster()).isTrue();
         assertThat(configuration.isLeader()).isTrue();
     }
@@ -221,7 +217,7 @@ public class ConfigurationTest {
     public void isLeaderSetToFalse() throws Exception {
         validProperties.put("is_leader", "false");
 
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.isMaster()).isFalse();
         assertThat(configuration.isLeader()).isFalse();
     }
@@ -231,7 +227,7 @@ public class ConfigurationTest {
         validProperties.put("is_master", "true");
         validProperties.put("is_leader", "true");
 
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.isMaster()).isTrue();
         assertThat(configuration.isLeader()).isTrue();
     }
@@ -241,7 +237,7 @@ public class ConfigurationTest {
         validProperties.put("is_master", "true");
         validProperties.put("is_leader", "false");
 
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.isMaster()).isFalse();
         assertThat(configuration.isLeader()).isFalse();
     }
@@ -251,7 +247,7 @@ public class ConfigurationTest {
         validProperties.put("is_master", "false");
         validProperties.put("is_leader", "true");
 
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.isMaster()).isTrue();
         assertThat(configuration.isLeader()).isTrue();
     }
@@ -261,14 +257,14 @@ public class ConfigurationTest {
         validProperties.put("is_master", "false");
         validProperties.put("is_leader", "false");
 
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.isMaster()).isFalse();
         assertThat(configuration.isLeader()).isFalse();
     }
 
     @Test
     public void defaultStaleLeaderTimeout() throws Exception {
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.getStaleMasterTimeout()).isEqualTo(2000);
         assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(2000);
     }
@@ -276,7 +272,7 @@ public class ConfigurationTest {
     @Test
     public void staleMasterTimeoutSet() throws Exception {
         validProperties.put("stale_master_timeout", "1000");
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.getStaleMasterTimeout()).isEqualTo(1000);
         assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(1000);
     }
@@ -284,7 +280,7 @@ public class ConfigurationTest {
     @Test
     public void staleLeaderTimeoutSet() throws Exception {
         validProperties.put("stale_leader_timeout", "1000");
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.getStaleMasterTimeout()).isEqualTo(1000);
         assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(1000);
     }
@@ -293,9 +289,44 @@ public class ConfigurationTest {
     public void staleLeaderTimeoutAndStaleMasterTimeoutSet() throws Exception {
         validProperties.put("stale_master_timeout", "1000");
         validProperties.put("stale_leader_timeout", "3000");
-        final Configuration configuration = processValidProperties();
+        final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.getStaleMasterTimeout()).isEqualTo(3000);
         assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(3000);
+    }
+
+    @Test
+    public void defaultProcessorNumbers() throws Exception {
+        // number of buffer processors:
+        // process, output
+        final int[][] baseline = {
+                {1, 1}, // 1  available processor
+                {1, 1}, // 2  available processors
+                {2, 1}, // 3  available processors
+                {2, 1}, // 4  available processors
+                {2, 1}, // 5  available processors
+                {3, 2}, // 6  available processors
+                {3, 2}, // 7  available processors
+                {4, 2}, // 8  available processors
+                {4, 2}, // 9  available processors
+                {4, 2}, // 10 available processors
+                {5, 2}, // 11 available processors
+                {5, 3}, // 12 available processors
+                {5, 3}, // 13 available processors
+                {6, 3}, // 14 available processors
+                {6, 3}, // 15 available processors
+                {6, 3}, // 16 available processors
+        };
+
+        final int[][] actual = new int[baseline.length][2];
+        for (int i = 0; i < actual.length; i++) {
+            try (final var tools = Mockito.mockStatic(Tools.class)) {
+                tools.when(Tools::availableProcessors).thenReturn(i + 1);
+                final Configuration config = initConfig(new Configuration(), validProperties);
+                actual[i][0] = config.getProcessBufferProcessors();
+                actual[i][1] = config.getOutputBufferProcessors();
+            }
+        }
+        assertThat(actual).isEqualTo(baseline);
     }
 
     /**
@@ -317,12 +348,6 @@ public class ConfigurationTest {
             return false;
         }
         return true;
-    }
-
-    private Configuration processValidProperties() throws RepositoryException, ValidationException {
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-        return configuration;
     }
 
 }

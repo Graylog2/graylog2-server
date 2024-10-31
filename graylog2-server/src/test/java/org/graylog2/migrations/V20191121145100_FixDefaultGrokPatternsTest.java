@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 
@@ -61,7 +61,7 @@ public class V20191121145100_FixDefaultGrokPatternsTest {
 
         migration.upgrade();
 
-        verifyZeroInteractions(grokPatternService);
+        verifyNoMoreInteractions(grokPatternService);
     }
 
     @Test

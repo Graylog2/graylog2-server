@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixing problem with persisting selected page size for some paginated lists."
+issues = ["17261"]
+pulls = ["17278"]

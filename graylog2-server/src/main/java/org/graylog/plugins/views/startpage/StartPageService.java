@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.startpage;
 
 import com.google.common.eventbus.EventBus;
+import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
@@ -27,63 +28,76 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
-import org.graylog.plugins.views.startpage.recentActivities.RecentActivityDTO;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 
 public class StartPageService {
-    private final Catalog catalog;
     private final GRNRegistry grnRegistry;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
+    private final StartPageItemTitleRetriever startPageItemTitleRetriever;
     private final long MAXIMUM_LAST_OPENED_PER_USER = 100;
 
     @Inject
-    public StartPageService(Catalog catalog,
-                            GRNRegistry grnRegistry,
+    public StartPageService(GRNRegistry grnRegistry,
                             LastOpenedService lastOpenedService,
                             RecentActivityService recentActivityService,
-                            EventBus eventBus) {
-        this.catalog = catalog;
+                            EventBus eventBus,
+                            StartPageItemTitleRetriever startPageItemTitleRetriever) {
         this.grnRegistry = grnRegistry;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
+        this.startPageItemTitleRetriever = startPageItemTitleRetriever;
         eventBus.register(this);
     }
 
     public PaginatedResponse<LastOpened> findLastOpenedFor(final SearchUser searchUser, final int page, final int perPage) {
+        if (perPage <= 0 || page <= 0) {
+            throw new IllegalArgumentException("invalid page size: " + perPage);
+        }
         var items = lastOpenedService
                 .findForUser(searchUser)
                 .orElse(new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream()
-                .map(i -> new LastOpened(i.grn(), catalog.getTitle(i.grn()), i.timestamp()))
+                .skip((long) (page - 1) * perPage)
+                .map(i -> startPageItemTitleRetriever
+                        .retrieveTitle(i.grn(), searchUser)
+                        .map(title -> new LastOpened(i.grn(), title, i.timestamp()))
+                )
+                .flatMap(Optional::stream)
+                .limit(perPage)
                 .toList();
 
-        return PaginatedResponse.create("lastOpened", new PaginatedList<>(PaginatedDbService.getPage(items, page, perPage), items.size(), page, perPage));
-    }
-
-    private String getTitle(RecentActivityDTO i) {
-        return i.itemTitle() == null ? catalog.getTitle(i.itemGrn()) : i.itemTitle();
+        return PaginatedResponse.create("lastOpened", new PaginatedList<>(items, items.size(), page, perPage));
     }
 
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
         final var items = recentActivityService.findRecentActivitiesFor(searchUser, page, perPage);
         final var mapped = items.stream()
-                 .map(i -> new RecentActivity(i.id(),
-                        i.activityType(),
-                        i.itemGrn(),
-                        getTitle(i),
-                        i.userName(),
-                        i.timestamp())).toList();
+                .map(i -> startPageItemTitleRetriever
+                        .retrieveTitle(i.itemGrn(), searchUser)
+                        .map(title -> new RecentActivity(i.id(),
+                                i.activityType(),
+                                i.itemGrn(),
+                                title,
+                                i.userName(),
+                                i.timestamp()))
+                        .orElse(new RecentActivity(i.id(),
+                                i.activityType(),
+                                i.itemGrn(),
+                                i.itemTitle(),
+                                i.userName(),
+                                i.timestamp()))
+                )
+                .toList();
         return PaginatedResponse.create("recentActivity", new PaginatedList<>(mapped, items.pagination().total(), page, perPage));
     }
 
@@ -98,7 +112,7 @@ public class StartPageService {
         final var type = view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
         final var lastOpenedItems = lastOpenedService.findForUser(searchUser);
         final var item = new LastOpenedDTO(grnRegistry.newGRN(type, view.id()), DateTime.now(DateTimeZone.UTC));
-        if(lastOpenedItems.isPresent()) {
+        if (lastOpenedItems.isPresent()) {
             var loi = lastOpenedItems.get();
             var items = filterForExistingIdAndCapAtMaximum(loi, item.grn(), MAXIMUM_LAST_OPENED_PER_USER);
             loi.items().clear();
@@ -107,7 +121,7 @@ public class StartPageService {
             lastOpenedService.save(loi);
         } else {
             var items = new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of(item));
-            lastOpenedService.create(items, searchUser);
+            lastOpenedService.create(items);
         }
     }
 }

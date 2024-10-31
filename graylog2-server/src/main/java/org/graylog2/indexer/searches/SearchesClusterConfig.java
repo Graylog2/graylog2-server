@@ -37,6 +37,8 @@ import java.util.Set;
 @WithBeanGetter
 public abstract class SearchesClusterConfig {
     private static final Period DEFAULT_QUERY_TIME_RANGE_LIMIT = Period.ZERO;
+
+    private static final Integer DEFAULT_QUERY_CANCEL_AFTER_SECONDS = 0;
     private static final Map<Period, String> DEFAULT_RELATIVE_TIMERANGE_OPTIONS = ImmutableMap.<Period, String>builder()
             .put(Period.minutes(5), "5 minutes")
             .put(Period.minutes(15), "15 minutes")
@@ -83,6 +85,10 @@ public abstract class SearchesClusterConfig {
 
     private static final Period DEFAULT_AUTO_REFRESH_DEFAULT_OPTION = Period.seconds(5);
 
+
+    @JsonProperty("cancel_after_seconds")
+    public abstract Integer cancelAfterSeconds();
+
     @JsonProperty("quick_access_timerange_presets")
     public abstract List<TimerangePreset> quickAccessTimerangePresets();
 
@@ -115,7 +121,8 @@ public abstract class SearchesClusterConfig {
                                                @JsonProperty("analysis_disabled_fields") @Nullable Set<String> analysisDisabledFields,
                                                @JsonProperty("auto_refresh_timerange_options") @Nullable Map<Period, String> autoRefreshTimerangeOptions,
                                                @JsonProperty("default_auto_refresh_option") Period defaultAutoRefreshOption,
-                                               @JsonProperty("quick_access_timerange_presets") @Nullable List<TimerangePreset> quickAccessTimerangePresets
+                                               @JsonProperty("quick_access_timerange_presets") @Nullable List<TimerangePreset> quickAccessTimerangePresets,
+                                               @JsonProperty("cancel_after_seconds") @Nullable Integer cancelAfterSeconds
     ) {
         return builder()
                 .quickAccessTimerangePresets(quickAccessTimerangePresets == null ? List.of() : quickAccessTimerangePresets)
@@ -126,6 +133,7 @@ public abstract class SearchesClusterConfig {
                 .analysisDisabledFields(analysisDisabledFields == null ? DEFAULT_ANALYSIS_DISABLED_FIELDS : analysisDisabledFields)
                 .autoRefreshTimerangeOptions(autoRefreshTimerangeOptions == null ? DEFAULT_AUTO_REFRESH_TIMERANGE_OPTIONS : autoRefreshTimerangeOptions)
                 .defaultAutoRefreshOption(defaultAutoRefreshOption == null ? DEFAULT_AUTO_REFRESH_DEFAULT_OPTION : defaultAutoRefreshOption)
+                .cancelAfterSeconds(cancelAfterSeconds == null ? DEFAULT_QUERY_CANCEL_AFTER_SECONDS : cancelAfterSeconds)
                 .build();
     }
 
@@ -138,6 +146,7 @@ public abstract class SearchesClusterConfig {
                 .analysisDisabledFields(DEFAULT_ANALYSIS_DISABLED_FIELDS)
                 .autoRefreshTimerangeOptions(DEFAULT_AUTO_REFRESH_TIMERANGE_OPTIONS)
                 .defaultAutoRefreshOption(DEFAULT_AUTO_REFRESH_DEFAULT_OPTION)
+                .cancelAfterSeconds(DEFAULT_QUERY_CANCEL_AFTER_SECONDS)
                 .quickAccessTimerangePresets(List.of())
                 .build();
     }
@@ -165,6 +174,8 @@ public abstract class SearchesClusterConfig {
         public abstract Builder autoRefreshTimerangeOptions(Map<Period, String> autoRefreshTimerangeOptions);
 
         public abstract Builder defaultAutoRefreshOption(Period defaultAutoRefreshOption);
+
+        public abstract Builder cancelAfterSeconds(Integer cancelAfterSeconds);
 
         public abstract SearchesClusterConfig build();
     }

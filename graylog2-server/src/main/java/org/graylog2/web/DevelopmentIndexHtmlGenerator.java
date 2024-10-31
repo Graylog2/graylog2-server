@@ -24,9 +24,11 @@ import org.graylog2.rest.RestTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import jakarta.ws.rs.core.MultivaluedMap;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;

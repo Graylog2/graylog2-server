@@ -20,7 +20,8 @@ import com.google.inject.assistedinject.Assisted;
 import org.graylog.plugins.views.Requirement;
 import org.graylog.plugins.views.Requirements;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Set;
 
 public class SearchRequirements extends Requirements<Search> {

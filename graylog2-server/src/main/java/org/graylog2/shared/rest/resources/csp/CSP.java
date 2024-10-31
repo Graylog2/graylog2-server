@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface CSP {
-    final String CSP_DEFAULT = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'strict-dynamic' 'nonce-{nonce}' 'unsafe-eval'; img-src data: *; connect-src *";
-    final String CSP_SWAGGER = "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; img-src *; connect-src *";
+    static final String DEFAULT = "default";
+    static final String SWAGGER = "swagger";
 
-    String value();
+    String group() default DEFAULT;
 }

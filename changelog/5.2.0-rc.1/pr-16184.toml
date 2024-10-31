@@ -1,0 +1,4 @@
+type = "r"
+message = "Remove ERROR level logs that happened during user/role creation."
+
+pulls = ["16184"]

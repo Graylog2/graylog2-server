@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 
 export type MaintenanceOptions = {
   strategies: Array<unknown>
@@ -50,11 +49,6 @@ export type TimeBasedRotationStrategyConfig = {
   rotation_period?: string,
   max_rotation_period?: string,
   rotate_empty_index_set?: boolean,
-}
-export type TimeBasedSizeOptimizingRotationStrategyConfig = {
-  type: string,
-  index_lifetime_max?: string,
-  index_lifetime_min?: string,
 }
 export type RotationStrategyConfig =
   SizeBasedRotationStrategyConfig
@@ -156,82 +150,10 @@ export interface RetentionStrategyResponse {
   context: RetentionStrategyContext,
 }
 
-export const RetentionStrategiesContextPropType = PropTypes.exact({
-  max_index_retention_period: PropTypes.string,
-});
-export const SizeBasedRotationStrategyConfigPropType = PropTypes.exact({
-  type: PropTypes.string,
-  max_size: PropTypes.number,
-});
-export const MessageCountRotationStrategyConfigPropType = PropTypes.exact({
-  type: PropTypes.string,
-  max_docs_per_index: PropTypes.number,
-});
-export const TimeBasedRotationStrategyConfigPropType = PropTypes.exact({
-  type: PropTypes.string,
-  rotation_period: PropTypes.string,
-  max_rotation_period: PropTypes.string,
-  rotate_empty_index_set: PropTypes.bool,
-});
+export type JsonSchema = RotationJsonSchema | RetentionJsonSchema
 
-export const TimeBasedSizePtimizingRotationStrategyConfigPropType = PropTypes.exact({
-  type: PropTypes.string,
-  index_lifetime_max: PropTypes.string,
-  index_lifetime_min: PropTypes.string,
-});
-export const RotationStrategyConfigPropType = PropTypes.oneOfType([
-  SizeBasedRotationStrategyConfigPropType,
-  MessageCountRotationStrategyConfigPropType,
-  TimeBasedRotationStrategyConfigPropType,
-  TimeBasedSizePtimizingRotationStrategyConfigPropType,
-]);
+export type Strategy = RotationStrategy | RetentionStrategy
 
-export const IndexActionPropType = PropTypes.string;
-export const RetentionStrategyConfigPropType = PropTypes.shape({
-  type: PropTypes.string.isRequired,
-  max_number_of_indices: PropTypes.number,
-  index_action: PropTypes.string,
-});
+export type Strategies = Array<Strategy>
 
-export const JsonSchemaStringPropertyTypePropType = PropTypes.exact({
-  type: PropTypes.string.isRequired,
-});
-export const JsonSchemaIndexActionPropertyTypePropType = PropTypes.exact({
-  type: PropTypes.string.isRequired,
-  enum: PropTypes.arrayOf(PropTypes.string).isRequired,
-});
-export const RotationPropertiesPropType = PropTypes.exact({
-  rotation_period: JsonSchemaStringPropertyTypePropType,
-  max_rotation_period: JsonSchemaStringPropertyTypePropType,
-  type: JsonSchemaStringPropertyTypePropType.isRequired,
-  max_size: JsonSchemaStringPropertyTypePropType,
-  max_docs_per_index: JsonSchemaStringPropertyTypePropType,
-  rotate_empty_index_set: JsonSchemaStringPropertyTypePropType,
-  index_lifetime_max: JsonSchemaStringPropertyTypePropType,
-  index_lifetime_min: JsonSchemaStringPropertyTypePropType,
-});
-export const RotationJsonSchemaPropType = PropTypes.exact({
-  type: PropTypes.string.isRequired,
-  id: PropTypes.string,
-  properties: RotationPropertiesPropType.isRequired,
-});
-export const RetentionPropertiesPropType = PropTypes.exact({
-  max_number_of_indices: JsonSchemaStringPropertyTypePropType.isRequired,
-  type: JsonSchemaStringPropertyTypePropType.isRequired,
-  index_action: JsonSchemaIndexActionPropertyTypePropType,
-});
-export const RetentionJsonSchemaPropType = PropTypes.exact({
-  type: PropTypes.string.isRequired,
-  id: PropTypes.string,
-  properties: RetentionPropertiesPropType,
-});
-export const RotationStrategyPropType = PropTypes.exact({
-  type: PropTypes.string.isRequired,
-  default_config: RotationStrategyConfigPropType.isRequired,
-  json_schema: RotationJsonSchemaPropType.isRequired,
-});
-export const RetentionStrategyPropType = PropTypes.exact({
-  type: PropTypes.string.isRequired,
-  default_config: RetentionStrategyConfigPropType.isRequired,
-  json_schema: RetentionJsonSchemaPropType.isRequired,
-});
+export type StrategyConfig = RotationStrategyConfig | RetentionStrategyConfig

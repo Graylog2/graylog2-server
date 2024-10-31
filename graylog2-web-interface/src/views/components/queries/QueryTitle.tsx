@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState, useCallback, useContext } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { MenuItem } from 'components/bootstrap';
@@ -28,21 +27,26 @@ import { duplicateQuery } from 'views/logic/slices/viewSlice';
 
 import QueryActionDropdown from './QueryActionDropdown';
 
-const TitleWrap = styled.span<{ active: boolean }>(({ active }) => css`
-  padding-right: ${active ? '6px' : '0'};
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const TitleWrap = styled.span<{ $active?: boolean }>(({ $active }) => css`
+  padding-right: ${$active ? '6px' : '0'};
 `);
 
 type Props = {
   active: boolean,
   allowsClosing?: boolean,
   id: QueryId,
-  onClose: () => Promise<void | ViewState>,
+  onRemove: () => Promise<void | ViewState>,
   openEditModal: (title: string) => void,
   openCopyToDashboardModal: (isOpen: boolean) => void,
   title: string,
 };
 
-const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCopyToDashboardModal, title }: Props) => {
+const QueryTitle = ({ active, allowsClosing = true, id, onRemove, openEditModal, openCopyToDashboardModal, title }: Props) => {
   const [titleValue, setTitleValue] = useState(title);
   const { setDashboardPage } = useContext(DashboardPageContext);
   const dispatch = useAppDispatch();
@@ -55,8 +59,8 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCop
     .then((queryId) => setDashboardPage(queryId)), [dispatch, id, setDashboardPage]);
 
   return (
-    <>
-      <TitleWrap aria-label={titleValue} active={active} data-testid="query-tab" data-active-query-tab={active}>
+    <Container>
+      <TitleWrap aria-label={titleValue} $active={active} data-testid="query-tab" data-active-query-tab={active}>
         {titleValue}
       </TitleWrap>
 
@@ -68,22 +72,11 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCop
             Copy to Dashboard
           </MenuItem>
           <MenuItem divider />
-          <MenuItem onSelect={onClose} disabled={!allowsClosing}>Delete</MenuItem>
+          <MenuItem onSelect={onRemove} disabled={!allowsClosing}>Delete</MenuItem>
         </QueryActionDropdown>
       )}
-    </>
+    </Container>
   );
-};
-
-QueryTitle.propTypes = {
-  allowsClosing: PropTypes.bool,
-  onClose: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  openEditModal: PropTypes.func.isRequired,
-};
-
-QueryTitle.defaultProps = {
-  allowsClosing: true,
 };
 
 export default QueryTitle;

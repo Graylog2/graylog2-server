@@ -21,7 +21,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
 import org.graylog2.shared.buffers.RawMessageEvent;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -32,7 +33,7 @@ public interface MessageQueueWriter {
 
     @AutoValue
     abstract class Metrics {
-        public static class Provider implements javax.inject.Provider<MessageQueueWriter.Metrics> {
+        public static class Provider implements jakarta.inject.Provider<MessageQueueWriter.Metrics> {
             private final MetricRegistry metricRegistry;
 
             @Inject

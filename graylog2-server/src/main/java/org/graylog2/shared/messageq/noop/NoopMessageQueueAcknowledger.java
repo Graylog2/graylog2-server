@@ -16,10 +16,10 @@
  */
 package org.graylog2.shared.messageq.noop;
 
-import org.graylog2.plugin.Message;
+import jakarta.inject.Singleton;
+import org.graylog2.shared.messageq.Acknowledgeable;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 
-import javax.inject.Singleton;
 import java.util.List;
 
 @Singleton
@@ -30,10 +30,10 @@ public class NoopMessageQueueAcknowledger implements MessageQueueAcknowledger {
     }
 
     @Override
-    public void acknowledge(Message message) {
+    public void acknowledge(Acknowledgeable message) {
     }
 
     @Override
-    public void acknowledge(List<Message> messages) {
+    public void acknowledge(List<? extends Acknowledgeable> messages) {
     }
 }

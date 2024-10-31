@@ -20,7 +20,7 @@ import { Formik, Form, Field } from 'formik';
 import moment from 'moment/moment';
 
 import useUserDateTime from 'hooks/useUserDateTime';
-import AbsoluteDateInput from 'views/components/searchbar/date-time-picker/AbsoluteDateInput';
+import AbsoluteDateInput from 'views/components/searchbar/time-range-filter/time-range-picker/AbsoluteDateInput';
 import { ModalSubmit } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
 import { isValidDate, toUTCFromTz, adjustFormat } from 'util/DateTime';
@@ -48,7 +48,7 @@ const Sections = styled.div`
 `;
 
 const Section = styled.div`
-  :not(:last-child) {
+  &:not(:last-child) {
     margin-bottom: 10px;
   }
 `;
@@ -103,7 +103,7 @@ const DateConfiguration = ({ name: fieldName, label, checkboxLabel }: {
             </SectionHeader>
             <AbsoluteDateInput name="from"
                                value={value}
-                               disabled={!value}
+                               disabled={value === undefined}
                                onChange={_onChange} />
             {error && <ErrorMessage>{error}</ErrorMessage>}
           </div>
@@ -152,7 +152,7 @@ const validate = (values: FormValues) => {
     errors = { ...errors, until: rangeError };
   }
 
-  if (!values.from && !values.until) {
+  if (values.from === undefined && values.until === undefined) {
     errors = { ...errors, from: 'Remove filter to search from "All time" until "Now".' };
   }
 

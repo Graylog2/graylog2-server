@@ -16,17 +16,19 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 
 import 'moment-duration-format';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
+import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
@@ -35,18 +37,14 @@ import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
-// Import built-in plugins
-import 'components/event-definitions/event-definition-types';
-import 'components/event-notifications/event-notification-types';
-
 type Props = {
   eventDefinition: Omit<EventDefinition, 'id'>,
-  notifications: Array<any>,
-  validation: {
+  notifications: Array<EventNotification>,
+  validation?: {
     errors: {
       title?: string,
     }
-  },
+  }
   currentUser: User,
 }
 
@@ -73,21 +71,29 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+        <dt style={{ margin: '16px 0 0' }}>Remediation Steps</dt>
+        <dd>
+          <MarkdownPreview show
+                           withFullView
+                           noBorder
+                           noBackground
+                           value={eventDefinition.remediation_steps || 'No remediation steps given'} />
+        </dd>
       </dl>
     </>
   );
 
-  const getPlugin = (name, type) => {
+  const getPlugin = <T extends 'eventDefinitionTypes' | 'fieldValueProviders' | 'eventNotificationTypes'>(name: T, type: string): PluginExports[T][number] => {
     if (type === undefined) {
-      return {};
+      return undefined;
     }
 
-    return PluginStore.exports(name).find((edt) => edt.type === type) || {};
+    return PluginStore.exports(name).find((edt) => edt.type === type);
   };
 
-  const renderCondition = (config) => {
+  const renderCondition = (config: EventDefinition['config']) => {
     const conditionPlugin = getPlugin('eventDefinitionTypes', config.type);
-    const component = (conditionPlugin.summaryComponent
+    const component = (conditionPlugin?.summaryComponent
       ? React.createElement(conditionPlugin.summaryComponent, {
         config,
         currentUser,
@@ -97,25 +103,25 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
 
     return (
       <>
-        <h3 className={commonStyles.title}>{conditionPlugin.displayName || config.type}</h3>
+        <h3 className={commonStyles.title}>{conditionPlugin?.displayName || config.type}</h3>
         {component}
       </>
     );
   };
 
-  const renderField = (fieldName, config, keys) => {
+  const renderField = (fieldName: string, config: EventDefinition['field_spec'][string], keys: string[]) => {
     if (!config.providers || config.providers.length === 0) {
       return <span key={fieldName}>No field value provider configured.</span>;
     }
 
-    const provider = config.providers[0] || {};
-    const fieldProviderPlugin = getPlugin('fieldValueProviders', provider.type);
+    const provider = config.providers[0];
+    const fieldProviderPlugin = getPlugin('fieldValueProviders', provider?.type);
 
-    return (fieldProviderPlugin.summaryComponent
+    return (fieldProviderPlugin?.summaryComponent
       ? React.createElement(fieldProviderPlugin.summaryComponent, {
         fieldName,
         config,
-        keys: keys,
+        keys,
         key: fieldName,
         currentUser,
       })
@@ -123,7 +129,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     );
   };
 
-  const renderFieldList = (fieldNames, fields, keys) => (
+  const renderFieldList = (fieldNames: string[], fields: EventDefinition['field_spec'], keys: EventDefinition['key_spec']) => (
     <>
       <dl>
         <dt>Keys</dt>
@@ -133,7 +139,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     </>
   );
 
-  const renderFields = (fields, keys) => {
+  const renderFields = (fields: EventDefinition['field_spec'], keys: EventDefinition['key_spec']) => {
     const fieldNames = Object.keys(fields);
 
     return (
@@ -146,7 +152,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     );
   };
 
-  const renderNotification = (definitionNotification) => {
+  const renderNotification = (definitionNotification: EventDefinition['notifications'][number]) => {
     const notification = notifications.find((n) => n.id === definitionNotification.notification_id);
 
     let content;
@@ -157,8 +163,8 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
       content = (notificationPlugin.summaryComponent
         ? React.createElement(notificationPlugin.summaryComponent, {
           type: notificationPlugin.displayName,
-          notification: notification,
-          definitionNotification: definitionNotification,
+          notification,
+          definitionNotification,
         })
         : <p>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</p>
       );
@@ -200,7 +206,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     );
   };
 
-  const renderNotifications = (definitionNotifications, notificationSettings) => {
+  const renderNotifications = (definitionNotifications: EventDefinition['notifications'], notificationSettings: EventDefinition['notification_settings']) => {
     const effectiveDefinitionNotifications = definitionNotifications
       .filter((n) => isPermitted(currentUser.permissions, `eventnotifications:read:${n.notification_id}`));
     const notificationsWithMissingPermissions = definitionNotifications
@@ -263,17 +269,6 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
       </Col>
     </Row>
   );
-};
-
-EventDefinitionSummary.propTypes = {
-  eventDefinition: PropTypes.object.isRequired,
-  notifications: PropTypes.array.isRequired,
-  validation: PropTypes.object,
-  currentUser: PropTypes.object.isRequired,
-};
-
-EventDefinitionSummary.defaultProps = {
-  validation: undefined,
 };
 
 export default EventDefinitionSummary;

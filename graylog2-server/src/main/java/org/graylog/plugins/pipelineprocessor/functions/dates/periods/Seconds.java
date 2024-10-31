@@ -41,4 +41,16 @@ public class Seconds extends AbstractPeriodComponentFunction {
     protected String getDescription() {
         return "Create a period with a specified number of seconds.";
     }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Create period (seconds)";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Create a time period of '${value}' seconds";
+    }
 }

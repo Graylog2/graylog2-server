@@ -27,6 +27,7 @@ public class VendorFields {
     public static final String VENDOR_EVENT_OUTCOME_REASON = "vendor_event_outcome_reason";
     public static final String VENDOR_EVENT_SEVERITY = "vendor_event_severity";
     public static final String VENDOR_EVENT_SEVERITY_LEVEL = "vendor_event_severity_level";
+    public static final String VENDOR_EVENT_TYPE = "vendor_event_type";
     public static final String VENDOR_PRIVATE_IP = "vendor_private_ip";
     public static final String VENDOR_PRIVATE_IPV6 = "vendor_private_ipv6";
     public static final String VENDOR_PUBLIC_IP = "vendor_public_ip";
@@ -37,4 +38,5 @@ public class VendorFields {
     public static final String VENDOR_TRANSACTION_ID = "vendor_transaction_id";
     public static final String VENDOR_TRANSACTION_TYPE = "vendor_transaction_type";
     public static final String VENDOR_USER_TYPE = "vendor_user_type";
+    public static final String VENDOR_VERSION = "vendor_version";
 }

@@ -16,6 +16,9 @@
  */
 package org.graylog.storage.opensearch2;
 
+import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
+import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -23,28 +26,34 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.utilities.AssertJsonPath.assertJsonPath;
 
 class SearchRequestFactoryTest {
+    private static final int BATCH_SIZE = 42;
+    private static final AbsoluteRange RANGE = AbsoluteRange.create(
+            DateTime.parse("2020-07-23T11:03:32.243Z"),
+            DateTime.parse("2020-07-23T11:08:32.243Z")
+    );
+    private static final String TEST_SEARCH_FILTERS_STRING = "test-filters-string";
     private SearchRequestFactory searchRequestFactory;
 
     @BeforeEach
     void setUp() {
-        this.searchRequestFactory = new SearchRequestFactory(new SortOrderMapper(), true, true);
+        this.searchRequestFactory = new SearchRequestFactory(new SortOrderMapper(), true, true,
+                new TestSearchFilterMapper());
     }
 
     @Test
     void searchIncludesTimerange() {
         final SearchSourceBuilder search = this.searchRequestFactory.create(ChunkCommand.builder()
                 .indices(Collections.singleton("graylog_0"))
-                .range(AbsoluteRange.create(
-                        DateTime.parse("2020-07-23T11:03:32.243Z"),
-                        DateTime.parse("2020-07-23T11:08:32.243Z")
-                ))
+                .range(RANGE)
                 .build());
 
         assertJsonPath(search, request -> {
@@ -56,13 +65,10 @@ class SearchRequestFactoryTest {
     }
 
     @Test
-    void scrollSearchDoesNotHighlgiht() {
+    void scrollSearchDoesNotHighlight() {
         final SearchSourceBuilder search = this.searchRequestFactory.create(ChunkCommand.builder()
                 .indices(Collections.singleton("graylog_0"))
-                .range(AbsoluteRange.create(
-                        DateTime.parse("2020-07-23T11:03:32.243Z"),
-                        DateTime.parse("2020-07-23T11:08:32.243Z")
-                ))
+                .range(RANGE)
                 .build());
 
         assertThat(search.toString()).doesNotContain("\"highlight\":");
@@ -72,10 +78,7 @@ class SearchRequestFactoryTest {
     void searchIncludesProperSourceFields() {
         final SearchSourceBuilder search = this.searchRequestFactory.create(ChunkCommand.builder()
                 .indices(Collections.singleton("graylog_0"))
-                .range(AbsoluteRange.create(
-                        DateTime.parse("2020-07-23T11:03:32.243Z"),
-                        DateTime.parse("2020-07-23T11:08:32.243Z")
-                ))
+                .range(RANGE)
                 .fields(List.of("foo", "bar"))
                 .build());
 
@@ -91,13 +94,32 @@ class SearchRequestFactoryTest {
     void searchIncludesSize() {
         final SearchSourceBuilder search = this.searchRequestFactory.create(ChunkCommand.builder()
                 .indices(Collections.singleton("graylog_0"))
-                .range(AbsoluteRange.create(
-                        DateTime.parse("2020-07-23T11:03:32.243Z"),
-                        DateTime.parse("2020-07-23T11:08:32.243Z")
-                ))
-                .batchSize(42)
+                .range(RANGE)
+                .batchSize(BATCH_SIZE)
                 .build());
 
         assertThat(search.toString()).contains("\"size\":42");
+    }
+
+    @Test
+    void searchIncludesSearchFilters() {
+        final SearchSourceBuilder search = this.searchRequestFactory.create(ChunkCommand.builder()
+                .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder()
+                        .title("filter 1")
+                        .queryString("test-filter-value")
+                        .build()))
+                .indices(Collections.singleton("graylog_0"))
+                .range(RANGE)
+                .batchSize(BATCH_SIZE)
+                .build());
+
+        assertThat(search.toString()).contains(TEST_SEARCH_FILTERS_STRING);
+    }
+
+    private static class TestSearchFilterMapper implements UsedSearchFiltersToQueryStringsMapper {
+        @Override
+        public Set<String> map(Collection<UsedSearchFilter> usedSearchFilters) {
+            return Collections.singleton(TEST_SEARCH_FILTERS_STRING);
+        }
     }
 }

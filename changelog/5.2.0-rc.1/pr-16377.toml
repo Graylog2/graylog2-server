@@ -1,0 +1,5 @@
+type = "s"
+message = "Update Jackson to 2.15.2. (CVE-2022-42003)"
+
+issues = [""]
+pulls = ["16377"]

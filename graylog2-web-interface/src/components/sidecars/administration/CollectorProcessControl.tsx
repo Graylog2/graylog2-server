@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import capitalize from 'lodash/capitalize';
 import uniq from 'lodash/uniq';
 
 import { Button, Panel, BootstrapModalConfirm } from 'components/bootstrap';
 import { Pluralize, SelectPopover } from 'components/common';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { SidecarCollectorPairType } from '../types';
 
@@ -35,6 +36,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
   const [selectedAction, setSelectedAction] = useState<string>('');
   const [isConfigurationWarningHidden, setIsConfigurationWarningHidden] = useState(false);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const sendTelemetry = useSendTelemetry();
 
   const resetSelectedAction = () => {
     setSelectedAction(undefined);
@@ -51,16 +53,16 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     setShowModal(false);
   };
 
-  const confirmProcessAction = (doneCallback?: () => void) => {
-    const callback = () => {
-      if (doneCallback && typeof doneCallback === 'function') {
-        doneCallback();
-      }
+  const confirmProcessAction = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.PROCESS_ACTION_SET, {
+      app_pathname: 'sidecars',
+      app_section: 'administration',
+      event_details: {
+        action: selectedAction,
+      },
+    });
 
-      cancelProcessAction();
-    };
-
-    onProcessAction(selectedAction, selectedSidecarCollectorPairs, callback);
+    onProcessAction(selectedAction, selectedSidecarCollectorPairs, cancelProcessAction);
   };
 
   const hideConfigurationWarning = () => {
@@ -133,11 +135,6 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
       {renderProcessActionSummary()}
     </span>
   );
-};
-
-CollectorProcessControl.propTypes = {
-  selectedSidecarCollectorPairs: PropTypes.array.isRequired,
-  onProcessAction: PropTypes.func.isRequired,
 };
 
 export default CollectorProcessControl;

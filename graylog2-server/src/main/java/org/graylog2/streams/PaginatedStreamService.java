@@ -31,7 +31,8 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.mongojack.DBQuery;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;

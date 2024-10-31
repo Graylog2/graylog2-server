@@ -25,6 +25,9 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
@@ -42,13 +45,12 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
+import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
@@ -136,6 +138,13 @@ public class MongoIndexRangeService implements IndexRangeService {
     }
 
     @Override
+    public SortedSet<IndexRange> find(Bson query) {
+        try (DBCursor<MongoIndexRange> cursor = collection.find(query)) {
+            return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) cursor);
+        }
+    }
+
+    @Override
     public IndexRange calculateRange(String index) {
         checkIfHealthy(indices.waitForRecovery(index),
                 (status) -> new RuntimeException("Unable to calculate range for index <" + index + ">, index is unhealthy: " + status));
@@ -164,6 +173,14 @@ public class MongoIndexRangeService implements IndexRangeService {
     }
 
     @Override
+    public boolean renameIndex(String from, String to) {
+        return collection.updateMulti(
+                        DBQuery.is(IndexRange.FIELD_INDEX_NAME, from),
+                        DBUpdate.set(IndexRange.FIELD_INDEX_NAME, to))
+                .getN() > 0;
+    }
+
+    @Override
     public boolean remove(String index) {
         final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
         return remove.getN() > 0;
@@ -173,11 +190,7 @@ public class MongoIndexRangeService implements IndexRangeService {
     @AllowConcurrentEvents
     public void handleIndexDeletion(IndicesDeletedEvent event) {
         for (String index : event.indices()) {
-            if (!indexSetRegistry.isManagedIndex(index)) {
-                LOG.debug("Not handling deleted index <{}> because it's not managed by any index set.", index);
-                continue;
-            }
-            LOG.debug("Index \"{}\" has been deleted. Removing index range.");
+            LOG.debug("Index \"{}\" has been deleted. Removing index range.", index);
             if (remove(index)) {
                 auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }
@@ -192,7 +205,7 @@ public class MongoIndexRangeService implements IndexRangeService {
                 LOG.debug("Not handling closed index <{}> because it's not managed by any index set.", index);
                 continue;
             }
-            LOG.debug("Index \"{}\" has been closed. Removing index range.");
+            LOG.debug("Index \"{}\" has been closed. Removing index range.", index);
             if (remove(index)) {
                 auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }

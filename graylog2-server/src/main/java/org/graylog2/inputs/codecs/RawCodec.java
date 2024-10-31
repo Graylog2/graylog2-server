@@ -18,7 +18,9 @@ package org.graylog2.inputs.codecs;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import jakarta.inject.Inject;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.annotations.Codec;
@@ -31,21 +33,22 @@ import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import java.nio.charset.StandardCharsets;
 
 @Codec(name = "raw", displayName = "Raw String")
 public class RawCodec extends AbstractCodec {
 
+    private final MessageFactory messageFactory;
+
     @AssistedInject
-    public RawCodec(@Assisted Configuration configuration) {
+    public RawCodec(@Assisted Configuration configuration, MessageFactory messageFactory) {
         super(configuration);
+        this.messageFactory = messageFactory;
     }
 
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage raw) {
-        return new Message(new String(raw.getPayload(), charset), null, raw.getTimestamp());
+        return messageFactory.createMessage(new String(raw.getPayload(), charset), null, raw.getTimestamp());
     }
 
     @Nullable

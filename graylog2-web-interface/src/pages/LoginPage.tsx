@@ -141,8 +141,8 @@ const LoginPage = () => {
     if (lastError) {
       return (
         <div className="form-group">
-          <Alert bsStyle="danger">
-            <button type="button" className="close" onClick={resetLastError}>&times;</button>{lastError}
+          <Alert bsStyle="danger" onDismiss={resetLastError}>
+            {lastError}
           </Alert>
         </div>
       );

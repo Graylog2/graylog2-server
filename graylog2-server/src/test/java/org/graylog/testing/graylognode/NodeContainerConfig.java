@@ -25,6 +25,7 @@ import org.testcontainers.containers.Network;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class NodeContainerConfig {
@@ -35,38 +36,44 @@ public class NodeContainerConfig {
 
     public final Network network;
     public final String mongoDbUri;
+    public final String passwordSecret;
+    public final String rootPasswordSha2;
     public final SearchVersion elasticsearchVersion;
     public final String elasticsearchUri;
-    public final int[] extraPorts;
     public final boolean enableDebugging;
     public final boolean skipPackaging;
     public final PluginJarsProvider pluginJarsProvider;
     public final MavenProjectDirProvider mavenProjectDirProvider;
     private final List<String> enabledFeatureFlags;
     public final Optional<String> proxiedRequestsTimeout;
+    public final Map<String, String> configParams;
 
     public NodeContainerConfig(Network network,
                                String mongoDbUri,
+                               final String passwordSecret,
+                               final String rootPasswordSha2,
                                String elasticsearchUri,
                                SearchVersion elasticsearchVersion,
-                               int[] extraPorts,
                                PluginJarsProvider pluginJarsProvider,
                                MavenProjectDirProvider mavenProjectDirProvider,
-                               List<String> enabledFeatureFlags) {
+                               List<String> enabledFeatureFlags,
+                               Map<String, String> configParams) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
+        this.passwordSecret = passwordSecret;
+        this.rootPasswordSha2 = rootPasswordSha2;
         this.elasticsearchUri = elasticsearchUri;
         this.elasticsearchVersion = elasticsearchVersion;
-        this.extraPorts = extraPorts == null ? new int[0] : extraPorts;
         this.enableDebugging = flagFromEnvVar("GRAYLOG_IT_DEBUG_SERVER");
         this.skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
         this.pluginJarsProvider = pluginJarsProvider;
         this.mavenProjectDirProvider = mavenProjectDirProvider;
         this.enabledFeatureFlags = enabledFeatureFlags == null ? Collections.emptyList() : enabledFeatureFlags;
         this.proxiedRequestsTimeout = stringFromEnvVar("GRAYLOG_IT_PROXIED_REQUESTS_TIMEOUT");
+        this.configParams = configParams;
     }
 
-    private static boolean flagFromEnvVar(String flagName) {
+    public static boolean flagFromEnvVar(String flagName) {
         String flag = System.getenv(flagName);
         return flag != null && flag.equalsIgnoreCase("true");
     }
@@ -76,7 +83,7 @@ public class NodeContainerConfig {
     }
 
     public Integer[] portsToExpose() {
-        int[] allPorts = ArrayUtils.add(extraPorts, 0, GELF_HTTP_PORT);
+        int[] allPorts = new int[] {GELF_HTTP_PORT};
         allPorts = ArrayUtils.add(allPorts, 0, API_PORT);
 
         if (enableDebugging) {

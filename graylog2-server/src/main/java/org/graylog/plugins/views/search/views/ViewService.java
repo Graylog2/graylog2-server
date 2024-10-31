@@ -19,25 +19,25 @@ package org.graylog.plugins.views.search.views;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
+import jakarta.inject.Inject;
+import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.indices.MongoDbIndexTools;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-import org.mongojack.WriteResult;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +50,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtils<ViewDTO> {
+public class ViewService implements ViewUtils<ViewDTO> {
     private static final String COLLECTION_NAME = "views";
 
     private final ClusterConfigService clusterConfigService;
@@ -58,56 +58,55 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
     private final EntityOwnershipService entityOwnerShipService;
     private final ViewSummaryService viewSummaryService;
     private final MongoCollection<ViewDTO> collection;
+    private final MongoPaginationHelper<ViewDTO> pagination;
+    private final MongoUtils<ViewDTO> mongoUtils;
 
     @Inject
-    protected ViewService(MongoConnection mongoConnection,
-                          MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                          ClusterConfigService clusterConfigService,
+    protected ViewService(ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
                           EntityOwnershipService entityOwnerShipService,
                           ViewSummaryService viewSummaryService,
                           MongoCollections mongoCollections) {
-        super(mongoConnection, mongoJackObjectMapperProvider, ViewDTO.class, COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityOwnerShipService = entityOwnerShipService;
         this.viewSummaryService = viewSummaryService;
-        this.collection = mongoCollections.get(COLLECTION_NAME, ViewDTO.class);
+        this.collection = mongoCollections.collection(COLLECTION_NAME, ViewDTO.class);
+        this.pagination = mongoCollections.paginationHelper(this.collection);
+        this.mongoUtils = mongoCollections.utils(collection);
 
-        new MongoDbIndexTools(db).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
+        new MongoDbIndexTools<>(collection).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
     }
 
     private PaginatedList<ViewDTO> searchPaginated(SearchUser searchUser,
                                                    SearchQuery query,
                                                    Predicate<ViewDTO> filter,
-                                                   String order,
+                                                   SortOrder order,
                                                    String sortField,
-                                                   DBQuery.Query grandTotalQuery,
+                                                   Bson grandTotalQuery,
                                                    int page,
                                                    int perPage) {
         final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSortWithGrandTotal(searchUser, query, filter,
-                getMultiFieldSortBuilder(order, List.of(sortField, ViewDTO.SECONDARY_SORT)),
+                Sorts.orderBy(order.toBsonSort(sortField), order.toBsonSort(ViewDTO.SECONDARY_SORT)),
                 grandTotalQuery, page, perPage);
-        return viewsList.stream()
+        return viewsList.withList(viewsList.delegate().stream()
                 .map(this::requirementsForView)
-                .collect(Collectors.toCollection(() -> viewsList.grandTotal()
-                        .map(grandTotal -> new PaginatedList<ViewDTO>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage, grandTotal))
-                        .orElseGet(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage))));
+                .toList());
     }
 
     public Optional<ViewDTO> get(final SearchUser searchUser, final String id) {
-        return findViews(searchUser, Filters.eq("_id", new ObjectId(id)), getSortBuilder("asc", "_id"))
+        return findViews(searchUser, Filters.eq("_id", new ObjectId(id)), Sorts.ascending("_id"))
                 .findFirst();
     }
 
     protected PaginatedList<ViewDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
                                                                                        SearchQuery dbQuery,
                                                                                        Predicate<ViewDTO> filter,
-                                                                                       DBSort.SortBuilder sort,
-                                                                                       DBQuery.Query grandTotalQuery,
+                                                                                       Bson sort,
+                                                                                       Bson grandTotalQuery,
                                                                                        int page,
                                                                                        int perPage) {
-        var grandTotal = db.getCount(grandTotalQuery);
+        var grandTotal = collection.countDocuments(grandTotalQuery);
 
         var views = findViews(searchUser, dbQuery.toBson(), sort)
                 .filter(filter)
@@ -126,40 +125,45 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
     public PaginatedList<ViewDTO> searchPaginated(SearchUser searchUser,
                                                   SearchQuery query,
                                                   Predicate<ViewDTO> filter,
-                                                  String order,
+                                                  SortOrder order,
                                                   String sortField,
                                                   int page,
                                                   int perPage) {
-        return searchPaginated(searchUser, query, filter, order, sortField, DBQuery.empty(), page, perPage);
+        return searchPaginated(searchUser, query, filter, order, sortField, new BsonDocument(), page, perPage);
     }
 
-    private PaginatedList<ViewDTO> searchPaginatedWithGrandTotal(DBQuery.Query query,
+    private PaginatedList<ViewDTO> searchPaginatedWithGrandTotal(Bson query,
                                                                  Predicate<ViewDTO> filter,
-                                                                 String order,
+                                                                 SortOrder order,
                                                                  String sortField,
-                                                                 DBQuery.Query grandTotalQuery,
+                                                                 Bson grandTotalQuery,
                                                                  int page,
                                                                  int perPage) {
-        return findPaginatedWithQueryFilterAndSortWithGrandTotal(query, filter, getMultiFieldSortBuilder(order, List.of(sortField, ViewDTO.SECONDARY_SORT)), grandTotalQuery, page, perPage);
+        return pagination.perPage(perPage)
+                .sort(order.toBsonSort(sortField))
+                .filter(query)
+                .includeGrandTotal(true)
+                .grandTotalFilter(grandTotalQuery)
+                .page(page, filter);
     }
 
     public PaginatedList<ViewDTO> searchPaginatedByType(ViewDTO.Type type,
                                                         SearchQuery query,
                                                         Predicate<ViewDTO> filter,
-                                                        String order,
+                                                        SortOrder order,
                                                         String sortField,
                                                         int page,
                                                         int perPage) {
         checkNotNull(sortField);
         return searchPaginatedWithGrandTotal(
-                DBQuery.and(
-                        DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
-                        query.toDBQuery()
+                Filters.and(
+                        Filters.or(Filters.eq(ViewDTO.FIELD_TYPE, type), Filters.not(Filters.exists(ViewDTO.FIELD_TYPE))),
+                        query.toBson()
                 ),
                 filter,
                 order,
                 sortField,
-                DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
+                Filters.or(Filters.eq(ViewDTO.FIELD_TYPE, type), Filters.not(Filters.exists(ViewDTO.FIELD_TYPE))),
                 page,
                 perPage
         );
@@ -169,7 +173,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
                                                                         final ViewDTO.Type type,
                                                                         final Bson dbQuery, //query executed on DB level
                                                                         final Predicate<ViewSummaryDTO> predicate, //predicate executed on code level, AFTER data is fetched
-                                                                        final String order,
+                                                                        final SortOrder order,
                                                                         final String sortField,
                                                                         final int page,
                                                                         final int perPage) {
@@ -191,25 +195,21 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
     }
 
     public Collection<ViewDTO> forSearch(String searchId) {
-        return this.db.find(DBQuery.is(ViewDTO.FIELD_SEARCH_ID, searchId)).toArray()
-                .stream()
+        return MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))
                 .map(this::requirementsForView)
                 .collect(Collectors.toSet());
     }
 
-    @Override
     public Optional<ViewDTO> get(String id) {
-        return super.get(id).map(this::requirementsForView);
+        return mongoUtils.getById(id).map(this::requirementsForView);
     }
 
-    @Override
     public Stream<ViewDTO> streamAll() {
-        return super.streamAll().map(this::requirementsForView);
+        return MongoUtils.stream(collection.find()).map(this::requirementsForView);
     }
 
-    @Override
     public Stream<ViewDTO> streamByIds(Set<String> idSet) {
-        return super.streamByIds(idSet).map(this::requirementsForView);
+        return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(idSet))).map(this::requirementsForView);
     }
 
     public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {
@@ -222,18 +222,16 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
         return savedObject;
     }
 
-    @Override
     public ViewDTO save(ViewDTO viewDTO) {
         try {
-            final WriteResult<ViewDTO, ObjectId> save = db.insert(requirementsForView(viewDTO));
-            return save.getSavedObject();
+            final var save = collection.insertOne(requirementsForView(viewDTO));
+            return mongoUtils.getById(MongoUtils.insertedId(save)).orElseThrow(() -> new IllegalStateException("Unable to retrieve saved View!"));
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to save view, it already exists.");
         }
     }
 
-    @Override
-    public int delete(String id) {
+    public void delete(String id) {
         get(id).ifPresent(view -> {
             if (view.type().equals(ViewDTO.Type.DASHBOARD)) {
                 entityOwnerShipService.unregisterDashboard(id);
@@ -241,13 +239,13 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
                 entityOwnerShipService.unregisterSearch(id);
             }
         });
-        return super.delete(id);
+        mongoUtils.deleteById(id);
     }
 
     public ViewDTO update(ViewDTO viewDTO) {
         checkArgument(viewDTO.id() != null, "Id of view must not be null.");
-        final ViewDTO viewWithRequirements = requirementsForView(viewDTO);
-        db.updateById(new ObjectId(viewWithRequirements.id()), viewWithRequirements);
+        final ViewDTO viewWithRequirements = requirementsForView(viewDTO).toBuilder().lastUpdatedAt(DateTime.now(DateTimeZone.UTC)).build();
+        collection.replaceOne(MongoUtils.idEq(viewWithRequirements.id()), viewWithRequirements);
         return viewWithRequirements;
     }
 

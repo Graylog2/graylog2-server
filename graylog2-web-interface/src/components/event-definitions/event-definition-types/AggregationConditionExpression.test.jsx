@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import { act } from 'react-dom/test-utils';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import selectEvent from 'react-select-event';
 
 import AggregationConditionExpression from './AggregationConditionExpression';
 
@@ -58,14 +58,14 @@ describe('AggregationConditionExpression', () => {
   };
 
   describe('rendering conditions', () => {
-    it('should render empty comparison expression', () => {
+    it('should render empty comparison expression', async () => {
       const eventDefinition = {
         config: {
           series: [],
         },
       };
 
-      const wrapper = mount(
+      render(
         <AggregationConditionExpression eventDefinition={eventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -74,11 +74,11 @@ describe('AggregationConditionExpression', () => {
                                         expression={getComparisonExpression()} />,
       );
 
-      expect(wrapper.find('BooleanOperatorSelector').length).toBe(1);
+      await screen.findByText(/Messages must meet/);
     });
 
-    it('should render simple comparison expression', () => {
-      const wrapper = mount(
+    it('should render simple comparison expression', async () => {
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -87,12 +87,13 @@ describe('AggregationConditionExpression', () => {
                                         expression={getComparisonExpression('<', 12)} />,
       );
 
-      expect(wrapper.find('BooleanOperatorSelector').length).toBe(1);
+      await screen.findByText(/Messages must meet/);
     });
 
-    it('should render a boolean expression', () => {
+    it('should render a boolean expression', async () => {
       const expression = getBooleanExpression('&&');
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -101,12 +102,13 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      expect(wrapper.find('BooleanOperatorSelector').length).toBe(1);
+      await screen.findByText(/Messages must meet/);
     });
 
-    it('should render a group expression with a comparison expression', () => {
+    it('should render a group expression with a comparison expression', async () => {
       const expression = getGroupExpression('&&');
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -115,12 +117,13 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      expect(wrapper.find('BooleanOperatorSelector').length).toBe(1);
+      await screen.findByText(/all/);
     });
 
-    it('should render a group expression with a boolean expression', () => {
+    it('should render a group expression with a boolean expression', async () => {
       const expression = getBooleanExpression('&&', getComparisonExpression(), getGroupExpression('&&'));
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -129,43 +132,20 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      expect(wrapper.find('BooleanOperatorSelector').length).toBe(2);
+      expect(await screen.findAllByText(/all/)).toHaveLength(2);
     });
   });
 
   describe('managing conditions', () => {
-    it('should generate right expression when adding conditions', () => {
+    it('should generate right expression when adding conditions', async () => {
       const expression = getComparisonExpression('<', 12);
       const onChange = jest.fn(({ conditions }) => {
         expect(conditions).toBeDefined();
         expect(conditions.expr).toBe('&&');
         expect(conditions.left).toBe(expression);
       });
-      const wrapper = mount(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={onChange}
-                                        expression={expression} />,
-      );
-      const addConditionButton = wrapper.find('button > [name="plus"]');
 
-      expect(addConditionButton).toHaveLength(1);
-
-      addConditionButton.simulate('click');
-
-      expect(onChange.mock.calls.length).toBe(1);
-    });
-
-    it('should generate right expression when adding conditions with different operator', () => {
-      const expression = getComparisonExpression('<', 12);
-      const onChange = jest.fn(({ conditions }) => {
-        expect(conditions).toBeDefined();
-        expect(conditions.expr).toBe('||');
-        expect(conditions.left).toBe(expression);
-      });
-      const wrapper = mount(
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -174,25 +154,24 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      wrapper.setState({ globalGroupOperator: '||' }, () => {
-        const addConditionButton = wrapper.find('button > [name="plus"]');
+      const addConditionButton = await screen.findByTitle('Add Expression');
 
-        expect(addConditionButton).toHaveLength(1);
+      addConditionButton.click();
 
-        addConditionButton.simulate('click');
-
-        expect(onChange.mock.calls.length).toBe(1);
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled();
       });
     });
 
-    it('should generate right expression when deleting conditions', () => {
+    it('should generate right expression when deleting conditions', async () => {
       const remainingExpression = getComparisonExpression('>', 42);
       const expression = getBooleanExpression('&&', getComparisonExpression('<', 12), remainingExpression);
       const onChange = jest.fn(({ conditions }) => {
         expect(conditions).toBeDefined();
         expect(conditions).toBe(remainingExpression);
       });
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -200,22 +179,26 @@ describe('AggregationConditionExpression', () => {
                                         onChange={onChange}
                                         expression={expression} />,
       );
-      const removeConditionButton = wrapper.find('button > [name="minus"]');
+
+      const removeConditionButton = await screen.findAllByTitle('Delete Expression');
 
       expect(removeConditionButton).toHaveLength(2);
 
-      removeConditionButton.at(0).simulate('click');
+      removeConditionButton[0].click();
 
-      expect(onChange.mock.calls.length).toBe(1);
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled();
+      });
     });
 
-    it('should propagate null update when deleting last condition', () => {
+    it('should propagate null update when deleting last condition', async () => {
       const expression = getComparisonExpression('<', 12);
       const onChange = jest.fn(({ conditions }) => {
         expect(conditions).toBeDefined();
         expect(conditions).toBe(null);
       });
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -223,18 +206,19 @@ describe('AggregationConditionExpression', () => {
                                         onChange={onChange}
                                         expression={expression} />,
       );
-      const removeConditionButton = wrapper.find('button > [name="minus"]');
 
-      expect(removeConditionButton).toHaveLength(1);
+      const removeConditionButton = await screen.findByTitle('Delete Expression');
 
-      removeConditionButton.simulate('click');
+      removeConditionButton.click();
 
-      expect(onChange.mock.calls.length).toBe(1);
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled();
+      });
     });
   });
 
   describe('managing groups', () => {
-    it('should generate right expression when adding groups', () => {
+    it('should generate right expression when adding groups', async () => {
       const expression = getComparisonExpression('<', 12);
       const onChange = jest.fn(({ conditions }) => {
         expect(conditions).toBeDefined();
@@ -243,7 +227,8 @@ describe('AggregationConditionExpression', () => {
         expect(conditions.right.expr).toBe('group');
         expect(conditions.right.operator).toBe('||');
       });
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -252,23 +237,24 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      const addGroupButton = wrapper.find('button[children="Add Group"]');
+      const addGroupButton = await screen.findByRole('button', { name: 'Add Group' });
 
-      expect(addGroupButton).toHaveLength(1);
+      addGroupButton.click();
 
-      addGroupButton.simulate('click');
-
-      expect(onChange.mock.calls.length).toBe(1);
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled();
+      });
     });
 
-    it('should generate right expression when deleting groups', () => {
+    it('should generate right expression when deleting groups', async () => {
       const leftExpression = getComparisonExpression();
       const expression = getBooleanExpression('&&', leftExpression, getGroupExpression('&&'));
       const onChange = jest.fn(({ conditions }) => {
         expect(conditions).toBeDefined();
         expect(conditions).toBe(leftExpression);
       });
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -277,16 +263,18 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      const deleteConditionButton = wrapper.find('button > [name="minus"]');
+      const deleteConditionButton = await screen.findAllByTitle('Delete Expression');
 
       expect(deleteConditionButton).toHaveLength(2);
 
-      deleteConditionButton.last().simulate('click');
+      deleteConditionButton[1].click();
 
-      expect(onChange.mock.calls.length).toBe(1);
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled();
+      });
     });
 
-    it('should generate right expression when adding conditions inside group', () => {
+    it('should generate right expression when adding conditions inside group', async () => {
       const leftExpression = getComparisonExpression();
       const booleanExpression = getBooleanExpression('||');
       const groupExpression = getGroupExpression('||', booleanExpression);
@@ -306,7 +294,8 @@ describe('AggregationConditionExpression', () => {
         expect(nextBooleanExpression.right.left).toStrictEqual(booleanExpression.right);
         expect(nextBooleanExpression.right.right.expr).toBe(undefined); // This is the added condition
       });
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -315,16 +304,18 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      const addConditionButton = wrapper.find('button > [name="plus"]');
+      const addConditionButton = await screen.findAllByTitle('Add Expression');
 
       expect(addConditionButton).toHaveLength(3);
 
-      addConditionButton.last().simulate('click');
+      addConditionButton[2].click();
 
-      expect(onChange.mock.calls.length).toBe(1);
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled();
+      });
     });
 
-    it('should generate right expression when deleting conditions inside group', () => {
+    it('should generate right expression when deleting conditions inside group', async () => {
       const leftExpression = getComparisonExpression('<', 12);
       const booleanExpression = getBooleanExpression('&&', leftExpression);
       const expression = getGroupExpression('&&', booleanExpression);
@@ -333,7 +324,8 @@ describe('AggregationConditionExpression', () => {
         expect(conditions.expr).toBe('group');
         expect(conditions.child).toBe(leftExpression);
       });
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -342,16 +334,18 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      const deleteConditionButton = wrapper.find('button > [name="minus"]');
+      const deleteConditionButton = await screen.findAllByTitle('Delete Expression');
 
       expect(deleteConditionButton).toHaveLength(2);
 
-      deleteConditionButton.last().simulate('click');
+      deleteConditionButton[1].click();
 
-      expect(onChange.mock.calls.length).toBe(1);
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled();
+      });
     });
 
-    it('should update boolean expressions when group operator changes', () => {
+    it('should update boolean expressions when group operator changes', async () => {
       const comparisonExpression = getComparisonExpression('<', 12);
       const secondBooleanExpression = getBooleanExpression('||', comparisonExpression, comparisonExpression);
       const firstBooleanExpression = getBooleanExpression('||', comparisonExpression, secondBooleanExpression);
@@ -372,7 +366,8 @@ describe('AggregationConditionExpression', () => {
         expect(nextBoolean.expr).toBe('&&');
         expect(nextBoolean.right.expr).toBe('&&');
       });
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -381,16 +376,17 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      const select = wrapper.find('Select Select.boolean-operator').at(1);
+      const select = (await screen.findAllByLabelText('Boolean Operator'))[1];
 
-      act(() => {
-        select.prop('onChange')({ value: '&&' });
+      await selectEvent.openMenu(select);
+      await selectEvent.select(select, 'all');
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled();
       });
-
-      expect(onChange.mock.calls.length).toBe(1);
     });
 
-    it('should update boolean expressions when global group operator changes', () => {
+    it('should update boolean expressions when global group operator changes', async () => {
       const comparisonExpression = getComparisonExpression('<', 12);
       const groupBooleanExpression = getBooleanExpression('||', comparisonExpression, comparisonExpression);
       const groupExpression = getGroupExpression('||', groupBooleanExpression);
@@ -413,7 +409,8 @@ describe('AggregationConditionExpression', () => {
 
         expect(nextGroupBoolean.expr).toBe('||');
       });
-      const wrapper = mount(
+
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -422,19 +419,20 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      const select = wrapper.find('Select Select.boolean-operator').at(0);
+      const select = (await screen.findAllByLabelText('Boolean Operator'))[0];
 
-      act(() => {
-        select.prop('onChange')({ value: '||' });
+      await selectEvent.openMenu(select);
+      await selectEvent.select(select, 'any');
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled();
       });
-
-      expect(onChange.mock.calls.length).toBe(1);
     });
 
-    it('should display the right default initial global group operator', () => {
-      const expression = getComparisonExpression('<', 12);
+    it('should display the right default initial global group operator from props', async () => {
+      const expression = getBooleanExpression('||');
 
-      const wrapper = mount(
+      render(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
                                         validation={{ errors: {} }}
                                         formattedFields={[]}
@@ -443,32 +441,14 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      expect(wrapper.find('BooleanOperatorSelector').at(0).prop('operator')).toBe('&&');
+      const select = (await screen.findAllByLabelText('Boolean Operator'))[0];
 
-      wrapper.setState({ globalGroupOperator: '||' });
-      wrapper.update();
+      expect(screen.queryByText('all')).not.toBeInTheDocument();
 
-      expect(wrapper.find('BooleanOperatorSelector').at(0).prop('operator')).toBe('||');
-    });
+      await selectEvent.openMenu(select);
+      await selectEvent.select(select, 'all');
 
-    it('should display the right default initial global group operator from props', () => {
-      const expression = getBooleanExpression('||');
-
-      const wrapper = mount(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={() => { }}
-                                        expression={expression} />,
-      );
-
-      expect(wrapper.find('BooleanOperatorSelector').at(0).prop('operator')).toBe('||');
-
-      wrapper.setState({ globalGroupOperator: '&&' });
-      wrapper.update();
-
-      expect(wrapper.find('BooleanOperatorSelector').at(0).prop('operator')).toBe('&&');
+      await screen.findByText('all');
     });
   });
 });

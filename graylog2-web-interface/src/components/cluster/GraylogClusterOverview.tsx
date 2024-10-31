@@ -16,59 +16,22 @@
  */
 
 import * as React from 'react';
-import { useState, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import EventHandlersThrottler from 'util/EventHandlersThrottler';
-import NumberUtils from 'util/NumberUtils';
 import { useStore } from 'stores/connect';
-import { Col, Row, Input } from 'components/bootstrap';
-import { Spinner } from 'components/common';
-import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
-import { NodesStore } from 'stores/nodes/NodesStore';
-import { formatTrafficData } from 'util/TrafficUtils';
-import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-
-import TrafficGraph from './TrafficGraph';
-
-const DAYS = [
-  30,
-  90,
-  180,
-  365,
-];
-
-const Wrapper = styled.div`
-  margin-bottom: 5px;
-
-  .control-label {
-    padding-top: 0;
-  }
-
-  .graph-days-select {
-    display: flex;
-    align-items: baseline;
-
-    select {
-      padding-top: 3px;
-      height: 28px;
-    }
-  }
-`;
+import { isPermitted } from 'util/PermissionsMixin';
+import { Col, Row } from 'components/bootstrap';
+import { Spinner } from 'components/common';
+import { NodesStore } from 'stores/nodes/NodesStore';
+import ClusterTrafficGraph from 'components/cluster/ClusterTrafficGraph';
+import GraphDaysContextProvider from 'components/common/Graph/contexts/GraphDaysContextProvider';
 
 const StyledDl = styled.dl`
   margin-bottom: 0;
 `;
-const StyledH2 = styled.h2(({ theme }: { theme: DefaultTheme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
-const StyledH3 = styled.h3(({ theme }: { theme: DefaultTheme }) => css`
+const StyledH2 = styled.h2(({ theme }) => css`
   margin-bottom: ${theme.spacings.sm};
 `);
 
@@ -93,144 +56,60 @@ const ClusterInfo = () => {
   );
 };
 
-const GraylogClusterTrafficGraph = () => {
-  const { traffic } = useStore(ClusterTrafficStore);
-  const [graphDays, setGraphDays] = useState(DAYS[0]);
-  const [graphWidth, setGraphWidth] = useState(600);
-  const eventThrottler = useRef(new EventHandlersThrottler());
-  const containerRef = useRef(null);
+type Props = {
+  layout?: 'default' | 'compact',
+  children?: React.ReactNode
+  showLicenseGraph?: boolean,
+}
+
+const GraylogClusterOverview = ({ layout = 'default', children = null, showLicenseGraph = false }: Props) => {
   const licensePlugin = PluginStore.exports('license');
   const currentUser = useCurrentUser();
-  const sendTelemetry = useSendTelemetry();
 
-  const onGraphDaysChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
-    event.preventDefault();
-    const newDays = Number(event.target.value);
+  const LicenseGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.LicenseGraphWithMetrics) || ClusterTrafficGraph;
+  const EnterpriseGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) || ClusterTrafficGraph;
 
-    setGraphDays(newDays);
-
-    sendTelemetry('input_value_change', {
-      app_pathname: 'system-overview',
-      app_section: 'outgoing-traffic',
-      app_action_value: 'trafficgraph-days-button',
-      event_details: { value: newDays },
-    });
-  };
-
-  useEffect(() => {
-    ClusterTrafficActions.getTraffic(graphDays);
-  }, [graphDays]);
-
-  useEffect(() => {
-    const _resizeGraphs = () => {
-      const { clientWidth } = containerRef.current;
-
-      setGraphWidth(clientWidth);
-    };
-
-    const _onResize = () => {
-      eventThrottler.current.throttle(() => _resizeGraphs());
-    };
-
-    window.addEventListener('resize', _onResize);
-
-    if (containerRef.current) {
-      _resizeGraphs();
-    }
-
-    return () => {
-      window.removeEventListener('resize', _onResize);
-    };
-  }, []);
-
-  const TrafficGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) || TrafficGraph;
-  let sumOutput = null;
-  let trafficGraph = <Spinner />;
-
-  if (traffic) {
-    const bytesOut = reduce(traffic.output, (result, value) => result + value);
-
-    sumOutput = <small>Last {graphDays} days: {NumberUtils.formatBytes(bytesOut)}</small>;
-
-    const unixTraffic = formatTrafficData(traffic.output);
-
-    trafficGraph = (
-      <TrafficGraphComponent traffic={unixTraffic}
-                             width={graphWidth} />
+  if (layout === 'compact') {
+    return (
+      <GraphDaysContextProvider>
+        <Row className="content">
+          <Col md={12}>
+            <Header />
+            <Row>
+              <Col md={6}>
+                <ClusterInfo />
+                <hr />
+                {children}
+              </Col>
+              <Col md={6}>
+                {showLicenseGraph ? (<LicenseGraphComponent />
+                ) : (<EnterpriseGraphComponent />)}
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </GraphDaysContextProvider>
     );
   }
 
   return (
-    <>
-      <Wrapper className="form-inline graph-days pull-right">
-        <Input id="graph-days"
-               type="select"
-               bsSize="small"
-               label="Days"
-               value={graphDays}
-               onChange={onGraphDaysChange}
-               formGroupClassName="graph-days-select">
-          {DAYS.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
-        </Input>
-      </Wrapper>
-
-      <StyledH3 ref={containerRef}>Outgoing traffic {sumOutput}</StyledH3>
-      {trafficGraph}
-    </>
-  );
-};
-
-type Props = {
-  layout?: 'default' | 'compact',
-  children: React.ReactNode
-}
-
-const GraylogClusterOverview = ({ layout, children }: Props) => {
-  if (layout === 'compact') {
-    return (
+    <GraphDaysContextProvider>
       <Row className="content">
         <Col md={12}>
           <Header />
+          <ClusterInfo />
+          <hr />
+          {children}
           <Row>
-            <Col md={6}>
-              <ClusterInfo />
-              <hr />
-              {children}
-            </Col>
-            <Col md={6}>
-              <GraylogClusterTrafficGraph />
+            <Col md={12}>
+              {showLicenseGraph ? (<LicenseGraphComponent />
+              ) : (<EnterpriseGraphComponent />)}
             </Col>
           </Row>
         </Col>
       </Row>
-    );
-  }
-
-  return (
-    <Row className="content">
-      <Col md={12}>
-        <Header />
-        <ClusterInfo />
-        <hr />
-        {children}
-        <Row>
-          <Col md={12}>
-            <GraylogClusterTrafficGraph />
-          </Col>
-        </Row>
-      </Col>
-    </Row>
+    </GraphDaysContextProvider>
   );
-};
-
-GraylogClusterOverview.propTypes = {
-  layout: PropTypes.oneOf(['default', 'compact']),
-  children: PropTypes.node,
-};
-
-GraylogClusterOverview.defaultProps = {
-  layout: 'default',
-  children: null,
 };
 
 export default GraylogClusterOverview;

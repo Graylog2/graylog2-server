@@ -1,0 +1,5 @@
+type = "f" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fixing problem with focus loss in query input autocompletion."
+
+issues = ["15718"]
+pulls = ["15933"]

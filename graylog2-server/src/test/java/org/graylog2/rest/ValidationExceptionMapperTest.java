@@ -25,9 +25,10 @@ import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,10 +46,10 @@ public class ValidationExceptionMapperTest {
         final ExceptionMapper<ValidationException> mapper = new ValidationExceptionMapper();
 
         final Map<String, List<ValidationResult>> validationErrors = ImmutableMap.of(
-            "foo", ImmutableList.of(new ValidationResult.ValidationFailed("foo failed")),
-            "bar", ImmutableList.of(
-                new ValidationResult.ValidationFailed("bar failed"),
-                new ValidationResult.ValidationFailed("baz failed"))
+                "foo", ImmutableList.of(new ValidationResult.ValidationFailed("foo failed")),
+                "bar", ImmutableList.of(
+                        new ValidationResult.ValidationFailed("bar failed"),
+                        new ValidationResult.ValidationFailed("baz failed"))
         );
 
         @SuppressWarnings("ThrowableInstanceNeverThrown")

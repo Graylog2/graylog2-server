@@ -37,6 +37,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.adapters.dnslookup.ADnsAnswer;
 import org.graylog2.lookup.adapters.dnslookup.DnsAnswer;
 import org.graylog2.lookup.adapters.dnslookup.DnsClient;
+import org.graylog2.lookup.adapters.dnslookup.DnsLookupAdapterConfiguration;
 import org.graylog2.lookup.adapters.dnslookup.DnsLookupType;
 import org.graylog2.lookup.adapters.dnslookup.PtrDnsAnswer;
 import org.graylog2.lookup.adapters.dnslookup.TxtDnsAnswer;
@@ -51,7 +52,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,6 +83,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
     private static final String TIMER_TEXT_LOOKUP = "textLookupTime";
     private DnsClient dnsClient;
     private final Config config;
+    private final DnsLookupAdapterConfiguration adapterConfiguration;
 
     private final Counter errorCounter;
 
@@ -90,9 +94,11 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
     @Inject
     public DnsLookupDataAdapter(@Assisted("dto") DataAdapterDto dto,
-                                MetricRegistry metricRegistry) {
+                                MetricRegistry metricRegistry,
+                                DnsLookupAdapterConfiguration adapterConfiguration) {
         super(dto, metricRegistry);
         this.config = (Config) dto.config();
+        this.adapterConfiguration = adapterConfiguration;
         this.errorCounter = metricRegistry.counter(MetricRegistry.name(getClass(), dto.id(), ERROR_COUNTER));
         this.resolveDomainNameTimer = metricRegistry.timer(MetricRegistry.name(getClass(), dto.id(), TIMER_RESOLVE_DOMAIN_NAME));
         this.reverseLookupTimer = metricRegistry.timer(MetricRegistry.name(getClass(), dto.id(), TIMER_REVERSE_LOOKUP));
@@ -101,8 +107,8 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
     @Override
     protected void doStart() {
-
-        dnsClient = new DnsClient(config.requestTimeout());
+        dnsClient = new DnsClient(config.requestTimeout(), adapterConfiguration.getPoolSize(),
+                adapterConfiguration.getPoolRefreshInterval().toSeconds());
         dnsClient.start(config.serverIps());
     }
 
@@ -237,9 +243,9 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
          * Always read the first entry and place in singleValue */
         final String singleValue = aDnsAnswers.get(0).ipAddress();
         LookupResult.Builder builder = LookupResult.builder()
-                                                   .single(singleValue)
-                                                   .multiValue(Collections.singletonMap(RESULTS_FIELD, aDnsAnswers))
-                                                   .stringListValue(ADnsAnswer.convertToStringListValue(aDnsAnswers));
+                .single(singleValue)
+                .multiValue(Collections.singletonMap(RESULTS_FIELD, aDnsAnswers))
+                .stringListValue(ADnsAnswer.convertToStringListValue(aDnsAnswers));
 
         assignMinimumTTL(aDnsAnswers, builder);
 
@@ -380,8 +386,8 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } else {
             // Deduce minimum TTL on all TXT records. A TTL will always be returned by DNS server.
             builder.cacheTTL(dnsAnswers.stream()
-                                       .map(DnsAnswer::dnsTTL)
-                                       .min(Comparator.comparing(Long::valueOf)).get() * 1000);
+                    .map(DnsAnswer::dnsTTL)
+                    .min(Comparator.comparing(Long::valueOf)).get() * 1000);
         }
     }
 
@@ -406,12 +412,12 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         @Override
         public DnsLookupDataAdapter.Config defaultConfiguration() {
             return DnsLookupDataAdapter.Config.builder()
-                                              .type(NAME)
-                                              .lookupType(Config.DEFAULT_LOOKUP_TYPE)
-                                              .serverIps(Config.DEFAULT_SERVER_IP)
-                                              .cacheTTLOverrideEnabled(Config.DEFAULT_CACHE_TTL_OVERRIDE)
-                                              .requestTimeout(Config.DEFAULT_TIMEOUT_MILLIS)
-                                              .build();
+                    .type(NAME)
+                    .lookupType(Config.DEFAULT_LOOKUP_TYPE)
+                    .serverIps(Config.DEFAULT_SERVER_IP)
+                    .cacheTTLOverrideEnabled(Config.DEFAULT_CACHE_TTL_OVERRIDE)
+                    .requestTimeout(Config.DEFAULT_TIMEOUT_MILLIS)
+                    .build();
         }
     }
 
@@ -470,7 +476,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
             final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
             if (StringUtils.isNotBlank(serverIps()) && !DnsClient.allIpAddressesValid(serverIps())) {
                 errors.put(FIELD_SERVER_IPS, "Invalid server IP address and/or port. " +
-                                             "Please enter one or more comma-separated IPv4 addresses with optional ports (eg. 192.168.1.1:5353, 192.168.1.244).");
+                        "Please enter one or more comma-separated IPv4 addresses with optional ports (eg. 192.168.1.1:5353, 192.168.1.244).");
             }
 
             if (requestTimeout() < 1) {
@@ -501,10 +507,10 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
             @JsonCreator
             public static Builder create() {
                 return Config.builder()
-                             .serverIps(DEFAULT_SERVER_IP)
-                             .lookupType(DnsLookupType.A)
-                             .cacheTTLOverrideEnabled(DEFAULT_CACHE_TTL_OVERRIDE)
-                             .requestTimeout(DEFAULT_TIMEOUT_MILLIS);
+                        .serverIps(DEFAULT_SERVER_IP)
+                        .lookupType(DnsLookupType.A)
+                        .cacheTTLOverrideEnabled(DEFAULT_CACHE_TTL_OVERRIDE)
+                        .requestTimeout(DEFAULT_TIMEOUT_MILLIS);
             }
 
             @JsonProperty(TYPE_FIELD)

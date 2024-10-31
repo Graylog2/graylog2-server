@@ -19,9 +19,9 @@ import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 const indicatorClassName = 'nav-item-state-indicator';
-const indicatorPseudoElement = ':before';
+const indicatorPseudoElement = '::before';
 
-const itemStateIndicatorSelector = `.${indicatorClassName}${indicatorPseudoElement}`;
+export const itemStateIndicatorSelector = `.${indicatorClassName}${indicatorPseudoElement}`;
 
 export const hoverIndicatorStyles = (theme: DefaultTheme) => css`
   ${itemStateIndicatorSelector} {
@@ -39,7 +39,7 @@ const Container = styled.div`
   display: inline;
   position: relative;
   
-  ${indicatorPseudoElement} {
+  &${indicatorPseudoElement} {
     content: ' ';
     position: absolute;
     border-bottom: 1px solid transparent;

@@ -1,0 +1,2525 @@
+{
+  "execution": {
+    "done": true,
+    "cancelled": false,
+    "completed_exceptionally": false
+  },
+  "results": {
+    "5ebe4f70-3dd7-436d-8242-3164bbbaea5c": {
+      "query": {
+        "id": "5ebe4f70-3dd7-436d-8242-3164bbbaea5c",
+        "timerange": {
+          "from": 300,
+          "type": "relative"
+        },
+        "filter": {
+          "type": "or",
+          "filters": [
+            {
+              "type": "stream",
+              "id": "653972ed4062770d2af9d2c9"
+            },
+            {
+              "type": "stream",
+              "id": "000000000000000000000001"
+            },
+            {
+              "type": "stream",
+              "id": "653972eb4062770d2af9d298"
+            },
+            {
+              "type": "stream",
+              "id": "653972ec4062770d2af9d2b7"
+            },
+            {
+              "type": "stream",
+              "id": "653972fe4062770d2af9d36f"
+            },
+            {
+              "type": "stream",
+              "id": "653972ec4062770d2af9d2ae"
+            },
+            {
+              "type": "stream",
+              "id": "653980454062770d2af9fd86"
+            },
+            {
+              "type": "stream",
+              "id": "655634e28cca23167c7dfdce"
+            },
+            {
+              "type": "stream",
+              "id": "653972ec4062770d2af9d2a5"
+            },
+            {
+              "type": "stream",
+              "id": "653972ed4062770d2af9d2c0"
+            }
+          ]
+        },
+        "filters": [],
+        "query": {
+          "type": "elasticsearch",
+          "query_string": ""
+        },
+        "search_types": [
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(network_bytes AND associated_ip)"
+            },
+            "streams": [],
+            "id": "53fc12e9-990c-4463-afb0-5e9f39892a60",
+            "name": "chart",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(network_bytes)",
+                "field": "network_bytes"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "sum(network_bytes)",
+                "direction": "Descending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "associated_ip"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND event_source) AND gim_event_category:(network)"
+            },
+            "streams": [],
+            "id": "bd49d534-92cc-4b70-be56-1c8e2ffeb79f",
+            "name": "chart",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(network_bytes)",
+                "field": "network_bytes"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "sum(network_bytes)",
+                "direction": "Descending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "event_source"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_source AND gim_event_category) AND gim_event_category:(\"name resolution\")"
+            },
+            "streams": [],
+            "id": "bc72e61e-9f67-4606-ac9b-bc9bf05643a2",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "event_source"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND event_source_product) AND gim_event_category:(\"name resolution\")"
+            },
+            "streams": [],
+            "id": "2416aa11-d8c1-4d77-862e-7000e060a996",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "event_source_product"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND network_bytes AND source_ip) AND gim_event_category:(network)"
+            },
+            "streams": [],
+            "id": "d4b777c8-a08f-43b2-9ce6-769ca8ff5b37",
+            "name": "chart",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(network_bytes)",
+                "field": "network_bytes"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "sum(network_bytes)",
+                "direction": "Descending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "source_ip"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND timestamp AND network_bytes) AND gim_event_category:(network)"
+            },
+            "streams": [],
+            "id": "ed157f68-1bd1-4a06-91f6-37b37a377d62",
+            "name": "chart",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(network_bytes)",
+                "field": "network_bytes"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "fields": [
+                  "timestamp"
+                ],
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND network_bytes AND destination_ip) AND gim_event_category:(network)"
+            },
+            "streams": [],
+            "id": "7ff77c06-4f85-4586-b4e2-16dcff9a860f",
+            "name": "chart",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(network_bytes)",
+                "field": "network_bytes"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "sum(network_bytes)",
+                "direction": "Descending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "destination_ip"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_category) AND _exists_:(associated_user_name AND network_bytes) AND gim_event_category:(network)"
+            },
+            "streams": [],
+            "id": "273e4a5c-2e84-47ca-8c8e-6aa56c2aa67a",
+            "name": "chart",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(network_bytes)",
+                "field": "network_bytes"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "sum(network_bytes)",
+                "direction": "Descending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "associated_user_name"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND query_result) AND gim_event_category:(\"name resolution\")"
+            },
+            "streams": [],
+            "id": "00d9b465-3654-4cfc-bfc4-8c9d4b2b9638",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "query_result"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          }
+        ]
+      },
+      "execution_stats": {
+        "duration": 1382,
+        "timestamp": "2023-11-30T10:38:19.954Z",
+        "effective_timerange": {
+          "from": "2023-11-30T10:33:21.336Z",
+          "to": "2023-11-30T10:38:21.336Z",
+          "type": "absolute"
+        }
+      },
+      "search_types": {
+        "d4b777c8-a08f-43b2-9ce6-769ca8ff5b37": {
+          "name": "chart",
+          "id": "d4b777c8-a08f-43b2-9ce6-769ca8ff5b37",
+          "rows": [
+            {
+              "key": [
+                "192.168.92.14"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 18717248,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.53"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 18373525,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.34"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17793619,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.38"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17753320,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.1"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17593899,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.29"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17550107,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.13"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17445019,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.15"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17418120,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.31"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17321719,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.59"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17317532,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.3"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17269970,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.52"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17256420,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.16"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17197356,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.22"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17184039,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.57"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17171413,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 1094135122,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 341478,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T10:38:21.320Z",
+            "to": "2023-11-30T10:38:21.320Z",
+            "type": "absolute"
+          }
+        },
+        "bc72e61e-9f67-4606-ac9b-bc9bf05643a2": {
+          "name": "chart",
+          "id": "bc72e61e-9f67-4606-ac9b-bc9bf05643a2",
+          "rows": [
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 0,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 0,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T10:38:21.320Z",
+            "to": "2023-11-30T10:38:21.320Z",
+            "type": "absolute"
+          }
+        },
+        "273e4a5c-2e84-47ca-8c8e-6aa56c2aa67a": {
+          "name": "chart",
+          "id": "273e4a5c-2e84-47ca-8c8e-6aa56c2aa67a",
+          "rows": [
+            {
+              "key": [
+                "ppadilla"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 31757736,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "hkline"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 31481804,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "ewilkes"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 31350170,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cmustafa"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 31304436,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jgross"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 31298524,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "mgray"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 31091733,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "asheppard"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 31050999,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "lbusby"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 30945125,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "zsims"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 30926354,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "rferry"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 30908423,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "kpearson"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 30852627,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "dbenitez"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 30823919,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jford"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 30754712,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jduffield"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 30666588,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "erhodes"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 30552705,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 1058198015,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 96516,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T10:38:21.336Z",
+            "to": "2023-11-30T10:38:21.336Z",
+            "type": "absolute"
+          }
+        },
+        "7ff77c06-4f85-4586-b4e2-16dcff9a860f": {
+          "name": "chart",
+          "id": "7ff77c06-4f85-4586-b4e2-16dcff9a860f",
+          "rows": [
+            {
+              "key": [
+                "8.8.8.8"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 214054480,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "77.70.128.4"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 213418502,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "80.247.136.3"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 211355738,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.118.71.2"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 211037937,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "213.154.64.1"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 210370252,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "13.107.64.1"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 2124023,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "13.107.6.153"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 2094113,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "13.107.6.171"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 2075489,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "13.107.136.1"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 2068990,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.52"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 364176,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.12"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 355386,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.61"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 354868,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.37"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 352835,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.30"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 351334,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.45"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 349931,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 1094189047,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 341487,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T10:38:21.336Z",
+            "to": "2023-11-30T10:38:21.336Z",
+            "type": "absolute"
+          }
+        },
+        "53fc12e9-990c-4463-afb0-5e9f39892a60": {
+          "name": "chart",
+          "id": "53fc12e9-990c-4463-afb0-5e9f39892a60",
+          "rows": [
+            {
+              "key": [
+                "8.8.8.8"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 214054598,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "77.70.128.4"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 213418502,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "80.247.136.3"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 211355738,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.118.71.2"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 211038158,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "213.154.64.1"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 210370252,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.14"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 18717248,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.53"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 18373525,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.34"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17793619,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.38"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17458004,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.15"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17418120,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.1"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17376508,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.13"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17279564,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.3"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17137366,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.22"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17053883,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "192.168.92.16"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 17001490,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 1094189386,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 403926,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T10:38:21.320Z",
+            "to": "2023-11-30T10:38:21.320Z",
+            "type": "absolute"
+          }
+        },
+        "2416aa11-d8c1-4d77-862e-7000e060a996": {
+          "name": "chart",
+          "id": "2416aa11-d8c1-4d77-862e-7000e060a996",
+          "rows": [
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 0,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 0,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T10:38:21.320Z",
+            "to": "2023-11-30T10:38:21.320Z",
+            "type": "absolute"
+          }
+        },
+        "ed157f68-1bd1-4a06-91f6-37b37a377d62": {
+          "name": "chart",
+          "id": "ed157f68-1bd1-4a06-91f6-37b37a377d62",
+          "rows": [
+            {
+              "key": [
+                "2023-11-29T10:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 19957673,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T11:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 24736991,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T11:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 24653198,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T12:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 16818079,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T12:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 15405490,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T13:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 20791673,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T13:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 19311835,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T14:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 27031450,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T14:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 27914732,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T15:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 21654820,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T15:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22598573,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T16:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 15551798,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T16:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 16199598,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T17:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 26575522,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T17:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 26633870,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T18:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 21389396,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T18:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22408274,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T19:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 23459001,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T19:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22016377,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T20:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22046143,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T20:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 21115855,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T21:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 21714786,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T21:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22703365,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T22:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22771726,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T22:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 23035116,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T23:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22777791,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-29T23:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22043934,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T00:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22500986,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T00:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22356281,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T01:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 20940618,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T01:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22164527,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T02:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22586562,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T02:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22192828,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T03:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22775374,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T03:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 21692883,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T04:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22627755,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T04:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 21583015,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T05:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 23802530,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T05:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22296254,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T06:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22919600,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T06:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22501039,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T07:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22624916,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T07:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 22162631,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T08:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 25249725,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T08:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 25095442,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T09:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 26703874,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T09:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 29051719,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T10:00:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 29699771,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "2023-11-30T10:30:00.000Z"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 7343990,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 1094189386,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 341492,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T10:38:21.336Z",
+            "to": "2023-11-30T10:38:21.336Z",
+            "type": "absolute"
+          }
+        },
+        "bd49d534-92cc-4b70-be56-1c8e2ffeb79f": {
+          "name": "chart",
+          "id": "bd49d534-92cc-4b70-be56-1c8e2ffeb79f",
+          "rows": [
+            {
+              "key": [
+                "DEV01"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 1049835400,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "acme-dmzouter-fw2"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 2111632,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "acme-dmzinner-fw1"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 2088468,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "acme-dmzinner-fw2"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 2083420,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "acme-vpn-fw1"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 2071954,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "acme-dmzouter-fw1"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 2046374,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "sum(network_bytes)"
+                  ],
+                  "value": 1060237248,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 171740,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T10:38:21.320Z",
+            "to": "2023-11-30T10:38:21.320Z",
+            "type": "absolute"
+          }
+        },
+        "00d9b465-3654-4cfc-bfc4-8c9d4b2b9638": {
+          "name": "chart",
+          "id": "00d9b465-3654-4cfc-bfc4-8c9d4b2b9638",
+          "rows": [
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 0,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 0,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T10:38:21.336Z",
+            "to": "2023-11-30T10:38:21.336Z",
+            "type": "absolute"
+          }
+        }
+      },
+      "errors": [],
+      "state": "COMPLETED"
+    }
+  },
+  "id": "6568661b0548c879277bceeb",
+  "owner": "admin",
+  "search_id": "656510c70548c8792779eea5"
+}

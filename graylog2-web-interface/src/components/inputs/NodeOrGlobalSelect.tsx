@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useCallback, useState, useEffect } from 'react';
 
 import { useStore } from 'stores/connect';
@@ -23,8 +22,8 @@ import { Spinner } from 'components/common';
 import { NodesStore } from 'stores/nodes/NodesStore';
 
 type Props = {
-  global: boolean,
-  node: string,
+  global?: boolean
+  node?: string
   onChange: (type: 'node' | 'global', value: boolean | string | undefined | null) => void,
 };
 
@@ -96,17 +95,6 @@ const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
       {nodeSelect}
     </span>
   );
-};
-
-NodeOrGlobalSelect.propTypes = {
-  global: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  node: PropTypes.string,
-};
-
-NodeOrGlobalSelect.defaultProps = {
-  global: false,
-  node: undefined,
 };
 
 export default NodeOrGlobalSelect;

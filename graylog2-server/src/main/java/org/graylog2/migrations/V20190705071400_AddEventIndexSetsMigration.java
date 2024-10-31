@@ -19,6 +19,7 @@ package org.graylog2.migrations;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.DuplicateKeyException;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
@@ -44,7 +45,6 @@ import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -53,6 +53,8 @@ import java.util.Optional;
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_PREFIX;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE;
 
 public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190705071400_AddEventIndexSetsMigration.class);
@@ -129,8 +131,8 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
 
     private void checkIndexPrefixConflicts(String indexPrefix, String configKey) {
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.notEquals(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
-                DBQuery.is(IndexSetConfig.FIELD_INDEX_PREFIX, indexPrefix)
+                DBQuery.notEquals(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
+                DBQuery.is(FIELD_INDEX_PREFIX, indexPrefix)
         );
 
         if (indexSetService.findOne(query).isPresent()) {
@@ -142,8 +144,8 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
 
     private Optional<IndexSetConfig> getEventsIndexSetConfig(String indexPrefix) {
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.is(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
-                DBQuery.is(IndexSetConfig.FIELD_INDEX_PREFIX, indexPrefix)
+                DBQuery.is(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
+                DBQuery.is(FIELD_INDEX_PREFIX, indexPrefix)
         );
         return indexSetService.findOne(query);
     }

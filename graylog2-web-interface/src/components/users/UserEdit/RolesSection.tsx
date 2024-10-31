@@ -30,8 +30,7 @@ import PaginatedItemOverview, {
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import RolesSelector from 'components/permissions/RolesSelector';
-
-import RolesQueryHelp from '../RolesQueryHelp';
+import RolesQueryHelper from 'components/roles/RolesQueryHelper';
 
 type Props = {
   user: User,
@@ -104,7 +103,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
                                onLoad={_onLoad}
                                overrideList={paginatedRoles}
                                onDeleteItem={onDeleteRole}
-                               queryHelper={<RolesQueryHelp />} />
+                               queryHelper={<RolesQueryHelper />} />
       </Container>
     </SectionComponent>
   );

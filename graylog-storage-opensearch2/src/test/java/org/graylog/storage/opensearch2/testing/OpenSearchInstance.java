@@ -16,104 +16,190 @@
  */
 package org.graylog.storage.opensearch2.testing;
 
-import com.github.joschi.jadconfig.util.Duration;
-import com.github.zafarkhaja.semver.Version;
+import com.github.joschi.jadconfig.JadConfig;
+import com.github.joschi.jadconfig.RepositoryException;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.ImmutableList;
 import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template;
+import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
+import org.graylog.storage.opensearch2.RestClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
+import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.opensearch.testcontainers.OpensearchContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.isNull;
 
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
 
-    public static final String DEFAULT_HEAP_SIZE = "2g";
     public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
-    private final OpenSearchClient openSearchClient;
-    private final Client client;
-    private final FixtureImporter fixtureImporter;
-    private final Adapters adapters;
+    private OpenSearchClient openSearchClient;
+    private Client client;
+    private FixtureImporter fixtureImporter;
+    private Adapters adapters;
+    private List<String> featureFlags;
 
-    protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize) {
-        super(image, version, network, heapSize);
-        RestHighLevelClient restHighLevelClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientOS2(this.openSearchClient);
-        this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
-        adapters = new AdaptersOS2(openSearchClient);
+    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
+        this(version, hostname, network, heapSize, featureFlags, Map.of());
     }
-    protected OpenSearchInstance(String image, SearchVersion version, Network network) {
-        this(image, version, network, DEFAULT_HEAP_SIZE);
+
+    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
+        super(version, hostname, network, heapSize, env);
+        this.featureFlags = featureFlags;
+    }
+
+    @Override
+    public OpenSearchInstance init() {
+        super.init();
+        RestHighLevelClient restHighLevelClient = buildRestClient();
+        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
+        this.client = new ClientOS2(this.openSearchClient, featureFlags);
+        this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
+        adapters = new AdaptersOS2(openSearchClient, featureFlags);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        if (isFirstContainerStart) {
+            afterContainerCreated();
+        }
+        return this;
+    }
+
+    private RestHighLevelClient buildRestClient() {
+
+        final ElasticsearchClientConfiguration config = buildconfig(Map.of(
+                "elasticsearch_connect_timeout", "60s",
+                "elasticsearch_socket_timeout", "60s",
+                "elasticsearch_idle_timeout", "60s",
+                "elasticsearch_max_total_connections", "1",
+                "elasticsearch_max_total_connections_per_route", "1",
+                "elasticsearch_max_retries", "1",
+                "elasticsearch_use_expect_continue", "false"
+        ));
+
+        return new RestClientProvider(
+                new GracefulShutdownService(),
+                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
+                config,
+                new BasicCredentialsProvider(),
+                null,
+                false,
+                null)
+                .get();
+    }
+
+    private ElasticsearchClientConfiguration buildconfig(Map<String, String> properties) {
+        final ElasticsearchClientConfiguration opensearchConfig = new ElasticsearchClientConfiguration();
+        final JadConfig config = new JadConfig(new InMemoryRepository(properties), opensearchConfig);
+        try {
+            config.process();
+            return opensearchConfig;
+        } catch (RepositoryException | ValidationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static OpenSearchInstance create() {
+        return OpenSearchInstanceBuilder.builder().instantiate();
+    }
+
+    protected void afterContainerCreated() {
+        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "2.9.0")) {
+            fixNumberOfReplicaForMlPlugin();
+        }
+        if (version().isOpenSearch()) {
+            fixDefaultNumberOfReplicasForIsmConfigs();
+        }
+    }
+
+    private void fixDefaultNumberOfReplicasForIsmConfigs() {
+        PutComposableIndexTemplateRequest request = new PutComposableIndexTemplateRequest();
+        request.name("ism-zero-replica-template");
+        request.indexTemplate(new ComposableIndexTemplate(List.of(".opendistro-ism-config"),
+                new Template(Settings.builder().put("number_of_replicas", 0).build(), null, null),
+                null, Long.MAX_VALUE, null, null));
+        openSearchClient().execute((client, requestOptions) -> client.indices().putIndexTemplate(request, requestOptions));
+    }
+
+    /**
+     * TODO: this is a workaround and should be removed once we can configure the default number of replicas for ML and SAP plugins or
+     * opensearch fixes their code so it sets number_of_replicas to 0 when the cluster is running in the single-node mode.
+     *
+     * @see <a href="https://github.com/opensearch-project/security/issues/3130">https://github.com/opensearch-project/security/issues/3130</a>
+     * When opensearch starts in a single-node mode, the ML and security analysis plugins still configure its
+     * indices to require replicas. We can't change this behaviour currently, so we have to adapt the setting
+     * after the indices are created and before the tests can start.
+     */
+    private void fixNumberOfReplicaForMlPlugin() {
+        openSearchClient().execute((client, requestOptions) -> {
+            try {
+                waitForIndices(client, requestOptions, ".plugins-ml-config");
+            } catch (ExecutionException | RetryException e) {
+                throw new RuntimeException("Failed to wait for indices", e);
+            }
+
+            final UpdateSettingsRequest req = new UpdateSettingsRequest().indices(".plugins-ml-config", ".opensearch-sap-pre-packaged-rules-config", ".opensearch-sap-log-types-config");
+            req.settings(Map.of("number_of_replicas", "0"));
+            return client.indices().putSettings(req, requestOptions);
+        });
+    }
+
+    private GetIndexResponse waitForIndices(RestHighLevelClient client, RequestOptions requestOptions, String... indices) throws ExecutionException, RetryException {
+        return RetryerBuilder.<GetIndexResponse>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(30))
+                .retryIfResult(input -> !new HashSet<>(Arrays.asList(input.getIndices())).containsAll(Arrays.asList(indices)))
+                .build()
+                .call(() -> {
+                    final GetIndexRequest request = new GetIndexRequest("*");
+                    request.indicesOptions(IndicesOptions.lenientExpandOpen());
+                    return client.indices().get(request, requestOptions);
+                });
+    }
+
+    @Override
+    protected String imageName() {
+        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version().version());
     }
 
     @Override
     public SearchServer searchServer() {
         return OPENSEARCH_VERSION;
-    }
-
-    private RestHighLevelClient buildRestClient() {
-        return new RestHighLevelClientProvider(
-                new GracefulShutdownService(),
-                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
-                Duration.seconds(60),
-                Duration.seconds(60),
-                Duration.seconds(60),
-                1,
-                1,
-                1,
-                false,
-                null,
-                Duration.seconds(60),
-                "http",
-                false,
-                false,
-                new BasicCredentialsProvider())
-                .get();
-    }
-
-    public static OpenSearchInstance create() {
-        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE);
-    }
-
-    public static OpenSearchInstance create(String heapSize) {
-        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), heapSize);
-    }
-
-    // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
-    public static OpenSearchInstance create(SearchVersion searchVersion, Network network) {
-        return create(searchVersion, network, DEFAULT_HEAP_SIZE);
-    }
-
-    private static OpenSearchInstance create(SearchVersion searchVersion, Network network, String heapSize) {
-        final String image = imageNameFrom(searchVersion.version());
-
-        LOG.debug("Creating instance {}", image);
-
-        return new OpenSearchInstance(image, searchVersion, network, heapSize);
-    }
-
-    protected static String imageNameFrom(Version version) {
-        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.toString());
     }
 
     @Override
@@ -132,19 +218,27 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        return new OpenSearchContainer(DockerImageName.parse(image))
+        var container = new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
-                .withEnv("discovery.type", "single-node")
-                .withEnv("action.auto_create_index", "false")
-                .withEnv("plugins.security.ssl.http.enabled", "false")
-                .withEnv("plugins.security.disabled", "true")
-                .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
+                .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")
+                .withEnv("action.auto_create_index", "false")
+                .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
+                .withEnv("START_PERF_ANALYZER", "false")
                 .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
+                .withNetworkAliases(hostname);
+
+        getContainerEnv().forEach(container::withEnv);
+
+        // disabling the performance plugin in 2.0.1 consistently created errors during CI runs, but keeping it running
+        // in later versions sometimes created errors on CI, too.
+        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "^2.7.0")) {
+            return container.withCommand("sh", "-c", "opensearch-plugin remove opensearch-performance-analyzer && ./opensearch-docker-entrypoint.sh");
+        } else {
+            return container;
+        }
     }
 
     @Override

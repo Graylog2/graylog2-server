@@ -17,6 +17,7 @@
 import Reflux from 'reflux';
 
 import type { Store } from 'stores/StoreTypes';
+import type { Stream as CompleteStream } from 'logic/streams/types';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import OriginalStreamsStore from 'stores/streams/StreamsStore';
 import { SessionActions } from 'stores/sessions/SessionStore';
@@ -30,10 +31,7 @@ export const StreamsActions = singletonActions(
    streams list for every component using it over and over again. This simple Reflux store is supposed to query the
    `StreamsStore` once and hold the result for future subscribers.
    */
-export type Stream = {
-  id: string;
-  title: string;
-};
+export type Stream = CompleteStream;
 export type StreamsStoreState = {
   streams: Array<Stream>;
 };

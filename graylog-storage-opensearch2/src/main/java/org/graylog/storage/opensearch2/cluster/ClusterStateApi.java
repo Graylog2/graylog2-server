@@ -23,7 +23,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Map;

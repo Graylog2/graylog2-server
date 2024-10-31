@@ -32,7 +32,7 @@ public class ExposedConfigurationTest {
 
     @Test
     public void testCreateWithConfiguration() throws Exception {
-        final Configuration configuration = new Configuration();
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration());
         final ExposedConfiguration c = ExposedConfiguration.create(configuration);
 
         assertThat(c.inputBufferProcessors()).isEqualTo(configuration.getInputbufferProcessors());
@@ -54,11 +54,13 @@ public class ExposedConfigurationTest {
         assertThat(c.staleLeaderTimeout()).isEqualTo(configuration.getStaleLeaderTimeout());
         //noinspection deprecation
         assertThat(c.staleMasterTimeout()).isEqualTo(configuration.getStaleLeaderTimeout());
+        assertThat(c.minimumAutoRefreshInterval()).isEqualTo(configuration.getMinimumAutoRefreshInterval());
+
     }
 
     @Test
     public void testSerialization() throws Exception {
-        final Configuration configuration = new Configuration();
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration());
         final ExposedConfiguration c = ExposedConfiguration.create(configuration);
 
         final String json = objectMapper.writeValueAsString(c);
@@ -80,6 +82,7 @@ public class ExposedConfigurationTest {
         assertThat((int) JsonPath.read(json, "$.output_module_timeout")).isEqualTo((int) c.outputModuleTimeout());
         assertThat((int) JsonPath.read(json, "$.stale_leader_timeout")).isEqualTo(c.staleLeaderTimeout());
         assertThat((int) JsonPath.read(json, "$.stale_master_timeout")).isEqualTo(c.staleLeaderTimeout());
+        assertThat((String) JsonPath.read(json, "$.minimum_auto_refresh_interval")).isEqualTo(c.minimumAutoRefreshInterval().toString());
     }
 
     @Test
@@ -88,6 +91,7 @@ public class ExposedConfigurationTest {
                 "  \"inputbuffer_processors\": 2," +
                 "  \"processbuffer_processors\": 5," +
                 "  \"outputbuffer_processors\": 3," +
+                "  \"output_batch_size\": 500," +
                 "  \"processor_wait_strategy\": \"com.lmax.disruptor.BlockingWaitStrategy\"," +
                 "  \"inputbuffer_wait_strategy\": \"com.lmax.disruptor.BlockingWaitStrategy\"," +
                 "  \"inputbuffer_ring_size\": 65536," +
@@ -102,7 +106,8 @@ public class ExposedConfigurationTest {
                 "  \"stream_processing_max_faults\": 3," +
                 "  \"output_module_timeout\": 10000," +
                 "  \"stale_leader_timeout\": 2000," +
-                "  \"stale_master_timeout\": 3000" +
+                "  \"stale_master_timeout\": 3000," +
+                "  \"minimum_auto_refresh_interval\": \"PT13S\"" +
                 "}";
 
         final ExposedConfiguration c = objectMapper.readValue(json, ExposedConfiguration.class);
@@ -110,6 +115,7 @@ public class ExposedConfigurationTest {
         assertThat(c.inputBufferProcessors()).isEqualTo(JsonPath.read(json, "$.inputbuffer_processors"));
         assertThat(c.processBufferProcessors()).isEqualTo(JsonPath.read(json, "$.processbuffer_processors"));
         assertThat(c.outputBufferProcessors()).isEqualTo(JsonPath.read(json, "$.outputbuffer_processors"));
+        assertThat(c.outputBatchSize().getAsCount().orElseThrow()).isEqualTo(JsonPath.read(json, "$.output_batch_size"));
         assertThat(c.processorWaitStrategy()).isEqualTo(JsonPath.read(json, "$.processor_wait_strategy"));
         assertThat(c.inputBufferWaitStrategy()).isEqualTo(JsonPath.read(json, "$.inputbuffer_wait_strategy"));
         assertThat(c.inputBufferRingSize()).isEqualTo(JsonPath.read(json, "$.inputbuffer_ring_size"));
@@ -126,5 +132,6 @@ public class ExposedConfigurationTest {
         //noinspection deprecation
         assertThat(c.staleLeaderTimeout()).isEqualTo(JsonPath.read(json, "$.stale_leader_timeout"))
                 .isEqualTo(c.staleMasterTimeout());
+        assertThat(c.minimumAutoRefreshInterval().toString()).isEqualTo(JsonPath.read(json, "$.minimum_auto_refresh_interval"));
     }
 }

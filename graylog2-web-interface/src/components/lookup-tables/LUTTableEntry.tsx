@@ -26,6 +26,8 @@ import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
   table: LookupTable,
@@ -45,20 +47,35 @@ const Actions = styled(ButtonToolbar)`
   justify-content: flex-start;
 `;
 
-const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
+const LUTTableEntry = ({
+  table, cache, dataAdapter, errors = {
+    table: null,
+    cache: null,
+    dataAdapter: null,
+  },
+}: Props) => {
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
+
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
   const handleDelete = React.useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {
+      app_pathname: 'lut',
+      app_section: 'lut',
+    });
+
     // eslint-disable-next-line no-alert
     const shouldDelete = window.confirm(
       `Are you sure you want to delete lookup table "${table.title}"?`,
     );
 
     if (shouldDelete) {
-      LookupTablesActions.delete(table.id).then(() => LookupTablesActions.reloadPage());
+      LookupTablesActions.delete(table.id).then(() => {
+        LookupTablesActions.reloadPage();
+      });
     }
-  }, [table.id, table.title]);
+  }, [table.id, table.title, sendTelemetry]);
 
   const handleEdit = React.useCallback(() => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));
@@ -93,7 +110,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
               <Button bsSize="xsmall"
                       onClick={handleEdit}
                       role="button"
-                      name="edit">
+                      name="edit_square">
                 Edit
               </Button>
               <Button bsSize="xsmall"
@@ -109,14 +126,6 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
       </tr>
     </tbody>
   );
-};
-
-LUTTableEntry.defaultProps = {
-  errors: {
-    table: null,
-    cache: null,
-    dataAdapter: null,
-  },
 };
 
 export default LUTTableEntry;

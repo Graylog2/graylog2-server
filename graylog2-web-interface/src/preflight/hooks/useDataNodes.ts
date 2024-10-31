@@ -16,6 +16,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -34,20 +35,43 @@ const useDataNodes = (): {
   isInitialLoading: boolean,
   error: FetchError
 } => {
+  const [metaData, setMetaData] = useState<{
+    error: FetchError | null,
+    isInitialLoading: boolean,
+  }>({
+    error: null,
+    isInitialLoading: false,
+  });
   const {
     data,
     isFetching,
-    error,
-    isInitialLoading,
   } = useQuery<DataNodes, FetchError>(
-    DATA_NODES_OVERVIEW_QUERY_KEY,
-    fetchDataNodes,
     {
+      queryKey: DATA_NODES_OVERVIEW_QUERY_KEY,
+      queryFn: fetchDataNodes,
       refetchInterval: 3000,
       keepPreviousData: true,
+      onError: (newError) => {
+        setMetaData({
+          error: newError,
+          isInitialLoading: false,
+        });
+      },
+      onSuccess: () => {
+        setMetaData({
+          error: null,
+          isInitialLoading: false,
+        });
+      },
+      retry: false,
     });
 
-  return { data: data ?? DEFAULT_DATA, isFetching, isInitialLoading, error };
+  return {
+    data: data ?? DEFAULT_DATA,
+    isFetching,
+    isInitialLoading: metaData.isInitialLoading,
+    error: metaData.error,
+  };
 };
 
 export default useDataNodes;

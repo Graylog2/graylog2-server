@@ -1,0 +1,5 @@
+type = "f"
+message = "By default, 'none' retention strategy is now disabled for new installations."
+
+issues = ["graylog-plugin-enterprise#5894"]
+pulls = ["16927"]

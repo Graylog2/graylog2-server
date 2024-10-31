@@ -26,17 +26,19 @@ import java.io.IOException;
 
 abstract class IpInfoIpResolver<T> extends GeoIpResolver<T> {
     protected static final Logger LOG = LoggerFactory.getLogger(IpInfoIpResolver.class);
+    private final boolean disableIpInfoDbTypeCheck;
     protected IPinfoIPLocationDatabaseAdapter adapter;
 
-    IpInfoIpResolver(Timer resolveTime, String configPath, boolean enabled) {
+    IpInfoIpResolver(Timer resolveTime, String configPath, boolean enabled, boolean disableIpInfoDbTypeCheck) {
         super(resolveTime, configPath, enabled);
+        this.disableIpInfoDbTypeCheck = disableIpInfoDbTypeCheck;
     }
 
     @Override
     boolean createDataProvider(File configFile) {
 
         try {
-            adapter = new IPinfoIPLocationDatabaseAdapter(configFile);
+            adapter = new IPinfoIPLocationDatabaseAdapter(configFile, disableIpInfoDbTypeCheck);
         } catch (IOException e) {
             LOG.warn("Error creating IPinfoIPLocationDatabaseAdapter for '{}' from file '{}'", getClass().getSimpleName(), configFile);
             adapter = null;

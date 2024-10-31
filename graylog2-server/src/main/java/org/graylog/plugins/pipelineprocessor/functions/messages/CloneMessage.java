@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions.messages;
 
 import com.google.common.collect.ImmutableList;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.ObjectUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -25,7 +26,9 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.shared.utilities.StringUtils;
 
 import java.util.Objects;
@@ -45,8 +48,11 @@ public class CloneMessage extends AbstractFunction<Message> {
 
     private final ParameterDescriptor<Message, Message> messageParam;
     private final ParameterDescriptor<Boolean, Boolean> loopDetectionParam;
+    private final MessageFactory messageFactory;
 
-    public CloneMessage() {
+    @Inject
+    public CloneMessage(MessageFactory messageFactory) {
+        this.messageFactory = messageFactory;
         loopDetectionParam = ParameterDescriptor.bool("preventLoops").optional().description("Detects if a cloned message is processed by the same rule again, in order to prevent loops. Defaults to 'false', but will not allow more than " + MAX_CLONES + " clones if not explicitly set.").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
     }
@@ -67,7 +73,7 @@ public class CloneMessage extends AbstractFunction<Message> {
             }
 
             if (preventLoops.isEmpty() && cloneNumber >= MAX_CLONES) {
-               throw new IllegalStateException(
+                throw new IllegalStateException(
                         StringUtils.f("Message was cloned more than %d times by rule '%s'. Not allowing any more " +
                                         "clones to prevent a potential endless loop. If this was intentional, please " +
                                         "explicitly set the 'preventLoops' parameter to 'false'.",
@@ -76,7 +82,7 @@ public class CloneMessage extends AbstractFunction<Message> {
 
         }
 
-        final Message clonedMessage = new Message(currentMessage.getMessage(), currentMessage.getSource(), currentMessage.getTimestamp());
+        final Message clonedMessage = messageFactory.createMessage(currentMessage.getMessage(), currentMessage.getSource(), currentMessage.getTimestamp());
         clonedMessage.addFields(currentMessage.getFields());
         clonedMessage.addStreams(currentMessage.getStreams());
         if (rule != null) {
@@ -95,7 +101,11 @@ public class CloneMessage extends AbstractFunction<Message> {
                 .name(NAME)
                 .params(ImmutableList.of(messageParam, loopDetectionParam))
                 .returnType(Message.class)
-                .description("Clones a message")
+                .description("Clones a message. If no specific message is provided, it clones the currently processed message")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Clone message")
+                .ruleBuilderTitle("Clone message")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

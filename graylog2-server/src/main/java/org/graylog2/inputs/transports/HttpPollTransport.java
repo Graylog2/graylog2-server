@@ -24,8 +24,10 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import okhttp3.Headers;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.ServerStatus;
@@ -50,7 +52,8 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
@@ -65,15 +68,25 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 
 public class HttpPollTransport extends ThrottleableTransport2 {
     private static final Logger LOG = LoggerFactory.getLogger(HttpPollTransport.class);
 
     private static final String CK_URL = "target_url";
+    public static final String CK_HTTP_METHOD = "http_method";
+    public static final String CK_HTTP_BODY = "http_body";
+    public static final String CK_CONTENT_TYPE = "content_type";
     private static final String CK_HEADERS = "headers";
     private static final String CK_ENCRYPTED_HEADERS = "encrypted_headers";
     private static final String CK_TIMEUNIT = "timeunit";
     private static final String CK_INTERVAL = "interval";
+
+    public static final String GET = "GET";
+    public static final String PUT = "PUT";
+    public static final String POST = "POST";
 
     private final Configuration configuration;
     private final EventBus serverEventBus;
@@ -167,7 +180,7 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                 return;
             }
 
-            final Request.Builder requestBuilder = new Request.Builder().get()
+            final Request.Builder requestBuilder = getRequestBuilder()
                     .url(url)
                     .headers(Headers.of(headers));
 
@@ -199,6 +212,26 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                 .map(String::strip)
                 .filter(s -> !s.isBlank())
                 .collect(Collectors.joining(","));
+    }
+
+    @VisibleForTesting
+    Request.Builder getRequestBuilder() {
+        final Request.Builder requestBuilder = new Request.Builder();
+
+        final String httpMethod = configuration.getString(CK_HTTP_METHOD);
+        if (httpMethod == null || httpMethod.equals(GET)) {
+            return requestBuilder.get();
+        }
+
+        final String body = configuration.getString(CK_HTTP_BODY);
+        final MediaType contentType = MediaType.parse(configuration.getString(CK_CONTENT_TYPE));
+
+        switch (httpMethod) {
+            case PUT -> requestBuilder.put(RequestBody.create(body, contentType));
+            case POST -> requestBuilder.post(RequestBody.create(body, contentType));
+        }
+
+        return requestBuilder;
     }
 
     @Override
@@ -234,8 +267,38 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                     CK_URL,
                     "URI of JSON resource",
                     "http://example.org/api",
-                    "HTTP resource returning JSON on GET",
+                    "HTTP resource returning JSON on HTTP request",
                     ConfigurationField.Optional.NOT_OPTIONAL
+            ));
+
+            r.addField(new DropdownField(
+                    CK_HTTP_METHOD,
+                    "HTTP method",
+                    GET,
+                    Map.of(GET, GET,
+                            PUT, PUT,
+                            POST, POST),
+                    "HTTP method to use for the requests.",
+                    ConfigurationField.Optional.OPTIONAL
+            ));
+
+            r.addField(new TextField(
+                    CK_HTTP_BODY,
+                    "HTTP body",
+                    "",
+                    "HTTP body for POST/PUT requests. Required for POST/PUT.",
+                    ConfigurationField.Optional.OPTIONAL
+            ));
+
+            r.addField(new DropdownField(
+                    CK_CONTENT_TYPE,
+                    "HTTP content type",
+                    "",
+                    Map.of(APPLICATION_JSON, APPLICATION_JSON,
+                            APPLICATION_FORM_URLENCODED, APPLICATION_FORM_URLENCODED,
+                            TEXT_PLAIN, TEXT_PLAIN),
+                    "HTTP content type for POST/PUT requests. Required for POST/PUT.",
+                    ConfigurationField.Optional.OPTIONAL
             ));
 
             r.addField(new TextField(

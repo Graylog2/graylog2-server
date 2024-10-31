@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -30,7 +31,7 @@ public class IsNotNull extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsNotNull() {
-        valueParam = ParameterDescriptor.type("value", Object.class).description("The value to check").build();
+        valueParam = ParameterDescriptor.type("value", Object.class).ruleBuilderVariable().description("The value to check").build();
     }
 
     @Override
@@ -50,6 +51,10 @@ public class IsNotNull extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(of(valueParam))
                 .description("Checks whether a value is not 'null'")
+                .ruleBuilderEnabled(false)
+                .ruleBuilderName("Check if not null")
+                .ruleBuilderTitle("Check if value is not null")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }
 }

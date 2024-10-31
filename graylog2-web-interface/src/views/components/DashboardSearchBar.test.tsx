@@ -20,23 +20,28 @@ import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
-import MockStore from 'helpers/mocking/StoreMock';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { execute, setGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
-jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+jest.mock('hooks/useHotkey', () => jest.fn());
+jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
+jest.mock('views/logic/fieldtypes/useFieldTypes');
+jest.mock('views/hooks/useAutoRefresh');
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('views/hooks/useMinimumRefreshInterval', () => () => ({
+  data: 'PT1S',
+  isInitialLoading: false,
+}));
+
+jest.mock('hooks/useSearchConfiguration', () => () => ({
+  config: mockSearchesClusterConfig,
+  refresh: () => {},
 }));
 
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({
@@ -61,9 +66,7 @@ describe('DashboardSearchBar', () => {
     jest.clearAllMocks();
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('should render the DashboardSearchBar', async () => {
     render(<DashboardSearchBar />);
@@ -92,14 +95,16 @@ describe('DashboardSearchBar', () => {
     await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
   });
 
-  it('should call trigger search execution and set global override on submit when there are changes', async () => {
+  it('should trigger search execution and set global override on submit when there are changes', async () => {
     render(<DashboardSearchBar />);
 
-    const timeRangeInput = await screen.findByText(/no override/i);
+    const timeRangeFilter = await screen.findByText(/no override/i);
 
-    userEvent.click(timeRangeInput);
+    userEvent.click(timeRangeFilter);
     userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
-    userEvent.click(await screen.findByRole('button', { name: 'Update time range' }));
+    const timeRangePickerSubmitButton = await screen.findByRole('button', { name: 'Update time range' });
+    await waitFor(() => expect(timeRangePickerSubmitButton).toBeEnabled());
+    userEvent.click(timeRangePickerSubmitButton);
 
     const searchButton = await screen.findByRole('button', {
       name: /perform search \(changes were made after last search execution\)/i,

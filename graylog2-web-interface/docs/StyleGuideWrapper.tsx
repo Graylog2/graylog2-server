@@ -23,7 +23,12 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import GraylogThemeProvider from '../src/theme/GraylogThemeProvider';
 import CurrentUserContext from '../src/contexts/CurrentUserContext';
 import User from '../src/logic/users/User';
+import UserDateTimeProvider from '../src/contexts/UserDateTimeProvider';
 /* eslint-enable import/no-relative-packages */
+
+import '@graylog/sawmill/fonts';
+import '@mantine/core/styles.css';
+import '@mantine/dropzone/styles.css';
 
 export const adminUser = User.builder()
   .id('admin-id')
@@ -50,18 +55,20 @@ const StyleGuideStyles = createGlobalStyle(({ theme }) => css`
 `);
 
 type Props = {
-  children: React.Component,
+  children: React.ReactNode,
 }
 
 const StyleGuideWrapper = ({ children }: Props) => {
   const router = createBrowserRouter([{
-    path: '/',
+    path: '/:url?',
     element: (
       <CurrentUserContext.Provider value={adminUser}>
-        <GraylogThemeProvider initialThemeModeOverride="teint">
-          <StyleGuideStyles />
-          {children}
-        </GraylogThemeProvider>
+        <UserDateTimeProvider>
+          <GraylogThemeProvider initialThemeModeOverride="light" userIsLoggedIn={false}>
+            <StyleGuideStyles />
+            {children}
+          </GraylogThemeProvider>
+        </UserDateTimeProvider>
       </CurrentUserContext.Provider>
     ),
   }]);

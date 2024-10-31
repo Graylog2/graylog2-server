@@ -20,7 +20,8 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.users.Role;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -45,6 +46,7 @@ public interface RoleService {
 
     /**
      * Deletes the (case insensitively) named role, unless it is read only.
+     *
      * @param roleName role name to delete, case insensitive
      * @return the number of deleted roles
      */

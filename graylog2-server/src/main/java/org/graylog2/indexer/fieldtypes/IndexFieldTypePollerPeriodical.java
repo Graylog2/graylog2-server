@@ -20,7 +20,8 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.mina.util.ConcurrentHashSet;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
@@ -38,8 +39,6 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -69,7 +68,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     private volatile Set<IndexSetConfig> allIndexSetConfigs;
     private volatile Instant lastFullRefresh = Instant.MIN;
     private final ConcurrentHashMap<String, Instant> lastPoll = new ConcurrentHashMap<>();
-    private final ConcurrentHashSet<String> pollInProgress = new ConcurrentHashSet<>();
+    private final ConcurrentHashMap<String, Boolean> pollInProgress = new ConcurrentHashMap<>();
 
     @Inject
     public IndexFieldTypePollerPeriodical(final IndexFieldTypePoller poller,
@@ -100,6 +99,10 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
     @Override
     public void doRun() {
+        doRun(false);
+    }
+
+    private void doRun(boolean forceFullRefresh) {
         if (serverIsNotRunning()) {
             return;
         }
@@ -126,7 +129,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
             lastPoll.keySet().retainAll(allConfigs.stream().map(IndexSetConfig::id).collect(Collectors.toSet()));
         }
 
-        if (needsFullRefresh()) {
+        if (forceFullRefresh || needsFullRefresh()) {
             try {
                 refreshFieldTypes(allConfigs);
             } finally {
@@ -184,15 +187,15 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         final String indexSetId = indexSetConfig.id();
 
         scheduler.submit(() -> {
-            if (this.pollInProgress.contains(indexSetId)) {
+            if (this.pollInProgress.containsKey(indexSetId)) {
                 LOG.debug("Poll for index set <{}> is already in progress", indexSetTitle);
                 return;
             }
-            LOG.debug("Starting poll for index set <{}>, current polls in progress {}", indexSetTitle, this.pollInProgress);
+            LOG.debug("Starting poll for index set <{}>, current polls in progress {}", indexSetTitle, this.pollInProgress.keySet());
 
             final Stopwatch stopwatch = Stopwatch.createStarted();
             try {
-                this.pollInProgress.add(indexSetId);
+                this.pollInProgress.put(indexSetId, Boolean.TRUE);
                 final MongoIndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
                 // Only check the active write index on a regular basis, the others don't change anymore
                 final String activeWriteIndex = indexSet.getActiveWriteIndex();
@@ -225,6 +228,10 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         return !Instant.now().isBefore(nextFullRefresh);
     }
 
+    public void triggerFullRefresh() {
+        doRun(true);
+    }
+
     private boolean serverIsNotRunning() {
         final Lifecycle currentLifecycle = serverStatus.getLifecycle();
         return skippedLifecycles.contains(currentLifecycle);
@@ -246,6 +253,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
     /**
      * Removes the field type polling job for the now deleted index set.
+     *
      * @param event index set deletion event
      */
     @SuppressWarnings("unused")
@@ -259,6 +267,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
     /**
      * Removes the index field type data for the deleted index.
+     *
      * @param event index deletion event
      */
     @SuppressWarnings("unused")

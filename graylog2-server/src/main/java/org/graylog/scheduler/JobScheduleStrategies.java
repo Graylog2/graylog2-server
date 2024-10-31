@@ -16,12 +16,12 @@
  */
 package org.graylog.scheduler;
 
+import jakarta.inject.Inject;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.Optional;
 
 /**
@@ -47,10 +47,20 @@ public class JobScheduleStrategies {
      * @return the next time this trigger should fire, empty optional if the trigger should not fire anymore
      */
     public Optional<DateTime> nextTime(JobTriggerDto trigger) {
-        final DateTime lastNextTime = trigger.nextTime();
-        final DateTime lastExecutionTime = trigger.lock().lastLockTime();
+        return nextTime(trigger, trigger.nextTime());
+    }
 
-        return trigger.schedule().calculateNextTime(lastExecutionTime, lastNextTime, clock);
+    /**
+     * Calculates the next execution time for a trigger after a given date.
+     * <p>
+     * If this returns an empty {@link Optional}, the trigger should not be executed anymore.
+     *
+     * @param trigger the trigger to use for the calculation
+     * @param date    the date to use when calculating the next time the trigger should fire
+     * @return the next time this trigger should fire, empty optional if the trigger should not fire anymore
+     */
+    public Optional<DateTime> nextTime(JobTriggerDto trigger, DateTime date) {
+        return trigger.schedule().calculateNextTime(trigger.lock().lastLockTime(), date, clock);
     }
 
     /**

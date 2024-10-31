@@ -19,7 +19,6 @@ import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import selectEvent from 'react-select-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
 import type { TitleType } from 'views/stores/TitleTypes';
@@ -41,10 +40,11 @@ import {
 import { createWidget } from 'views/logic/WidgetTestHelpers';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useViewType from 'views/hooks/useViewType';
-import { viewSliceReducer } from 'views/logic/slices/viewSlice';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
-import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
+import useViewsPlugin from 'views/test/testViewsPlugin';
+import { usePlugin } from 'views/test/testPlugins';
+import startDownload from 'views/components/export/startDownload';
 
 import type { Props as ExportModalProps } from './ExportModal';
 import ExportModal from './ExportModal';
@@ -63,15 +63,13 @@ const pluginExports: PluginRegistration = {
       mimeType: 'text/csv',
       fileExtension: 'csv',
     }],
-    'views.reducers': [
-      { key: 'view', reducer: viewSliceReducer },
-      { key: 'searchExecution', reducer: searchExecutionSliceReducer },
-    ],
   },
 };
 
 jest.mock('views/hooks/useSearchExecutionState');
 jest.mock('views/hooks/useViewType');
+
+jest.mock('./startDownload');
 
 describe('ExportModal', () => {
   // Prepare expected payload
@@ -91,15 +89,11 @@ describe('ExportModal', () => {
     execution_state: new SearchExecutionState(),
   };
 
-  beforeAll(() => {
-    PluginStore.register(pluginExports);
-  });
-
-  afterAll(() => {
-    PluginStore.unregister(pluginExports);
-  });
+  useViewsPlugin();
+  usePlugin(pluginExports);
 
   beforeEach(() => {
+    asMock(startDownload).mockImplementation(jest.requireActual('./startDownload').default);
     jest.clearAllMocks();
     asMock(useViewType).mockReturnValue(View.Type.Search);
     asMock(useSearchExecutionState).mockReturnValue(new SearchExecutionState());
@@ -109,21 +103,13 @@ describe('ExportModal', () => {
     viewType?: ViewType,
   } & Partial<ExportModalProps>;
 
-  const SimpleExportModal = ({ viewType = View.Type.Search, ...props }: SimpleExportModalProps) => (
+  const SimpleExportModal = ({ viewType = View.Type.Search, closeModal = () => {}, view = viewWithoutWidget(View.Type.Search), ...props }: SimpleExportModalProps) => (
     <TestStoreProvider>
       <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
-        <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
+        <ExportModal view={view ?? viewWithoutWidget(viewType)} closeModal={closeModal} {...props as ExportModalProps} />
       </FieldTypesContext.Provider>
     </TestStoreProvider>
   );
-
-  SimpleExportModal.defaultProps = {
-    viewType: View.Type.Search,
-    closeModal: () => {},
-    directExportWidgetId: undefined,
-    fields: Immutable.List(),
-    view: viewWithoutWidget(View.Type.Search),
-  };
 
   it('should provide current execution state on export', async () => {
     const parameterBindings = Immutable.Map({ mainSource: new ParameterBinding('value', 'example.org') });
@@ -155,6 +141,7 @@ describe('ExportModal', () => {
   });
 
   it('should show loading indicator after starting download', async () => {
+    asMock(startDownload).mockImplementation(() => new Promise(() => {}));
     const { findByText, getAllByText } = render(<SimpleExportModal />);
 
     expect(getAllByText('Start Download')).toHaveLength(2);
@@ -162,8 +149,6 @@ describe('ExportModal', () => {
     triggerFormSubmit();
 
     await findByText('Downloading...');
-
-    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledTimes(1));
   });
 
   it('should be closed after finishing download', async () => {

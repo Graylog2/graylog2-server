@@ -237,23 +237,13 @@ export const EventDefinitionsStore = singletonStore(
       EventDefinitionsActions.create.promise(promise);
     },
 
-    copy(eventDefinitionToCopy) {
-      const { eventDefinition } = this.extractSchedulerInfo(eventDefinitionToCopy);
-      // Remove the id from the event definition to create a new copy
-      delete eventDefinition.id;
-      // Remove the scheduler from the event definition to create a new copy
-      delete eventDefinition.scheduler;
-      // Modify the title to indicate a copy
-      eventDefinition.title = `COPY-${eventDefinition.title}`;
-      // Set the scope to DEFAULT
-      eventDefinition._scope = 'DEFAULT';
-
-      const promise = fetch('POST', this.eventDefinitionsUrl({ query: { schedule: false } }), this.setAlertFlag(eventDefinition));
+    copy(eventDefinition) {
+      const promise = fetch('POST', this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'duplicate'] }));
 
       promise.then(
         (response) => {
-          UserNotification.success('Event Definition copied successfully',
-            `Event Definition "${eventDefinition.title}" was created successfully.`);
+          UserNotification.success('Event Definition duplicated successfully',
+            `Event Definition "${response.title}" was created successfully.`);
 
           this.refresh();
 
@@ -261,8 +251,8 @@ export const EventDefinitionsStore = singletonStore(
         },
         (error) => {
           if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
-            UserNotification.error(`Creating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-              'Could not save Event Definition');
+            UserNotification.error(`Duplicating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+              'Could not duplicate Event Definition');
           }
         },
       );

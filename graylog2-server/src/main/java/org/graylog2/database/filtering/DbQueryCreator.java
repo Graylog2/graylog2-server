@@ -17,13 +17,13 @@
 package org.graylog2.database.filtering;
 
 import com.mongodb.client.model.Filters;
+import jakarta.ws.rs.BadRequestException;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryParser;
 
-import javax.ws.rs.BadRequestException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -51,21 +51,14 @@ public class DbQueryCreator {
         this.attributes = attributes;
     }
 
-    public Bson createDbQuery(final List<String> filters,
-                              final String query) {
-        SearchQuery searchQuery;
+    public Bson createDbQuery(final List<String> filters, final String query) {
         try {
-            searchQuery = searchQueryParser.parse(query);
+            final var searchQuery = searchQueryParser.parse(query);
+            final var filterExpressionFilters = dbFilterParser.parse(filters, attributes);
+            return buildDbQuery(searchQuery, filterExpressionFilters);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        List<Bson> filterExpressionFilters;
-        try {
-            filterExpressionFilters = dbFilterParser.parse(filters, attributes);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
-        return buildDbQuery(searchQuery, filterExpressionFilters);
     }
 
     private Bson buildDbQuery(final SearchQuery searchQuery,

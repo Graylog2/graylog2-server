@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import com.google.common.graph.MutableGraph;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -48,7 +49,6 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSort
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
@@ -64,6 +64,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
+
 @AutoValue
 @JsonDeserialize(builder = WidgetEntity.Builder.class)
 @WithBeanGetter
@@ -76,6 +78,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     public static final String FIELD_TIMERANGE = "timerange";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -98,6 +101,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
 
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
+
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    public abstract Set<String> streamCategories();
 
     @JsonProperty(FIELD_CONFIG)
     public abstract WidgetConfigDTO config();
@@ -129,6 +135,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
 
+        @JsonProperty(FIELD_STREAM_CATEGORIES)
+        public abstract Builder streamCategories(Set<String> streamCategories);
+
         @JsonProperty(FIELD_CONFIG)
         @JsonTypeInfo(
                 use = JsonTypeInfo.Id.NAME,
@@ -143,6 +152,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         static Builder builder() {
             return new AutoValue_WidgetEntity.Builder()
                     .streams(Collections.emptySet())
+                    .streamCategories(Collections.emptySet())
                     .filters(Collections.emptyList());
         }
     }
@@ -152,11 +162,10 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         final WidgetDTO.Builder widgetBuilder = WidgetDTO.builder()
                 .config(this.config())
                 .filter(this.filter())
-                .filters(this.filters())
+                .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .id(this.id())
                 .streams(this.streams().stream()
-                        .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
-                        .map(nativeEntities::get)
+                        .map(id -> resolveStreamEntityObject(id, nativeEntities))
                         .map(object -> {
                             if (object == null) {
                                 throw new ContentPackException("Missing Stream for widget entity");
@@ -167,6 +176,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                                         "Invalid type for stream Stream for event definition: " + object.getClass());
                             }
                         }).collect(Collectors.toSet()))
+                .streamCategories(this.streamCategories())
                 .type(this.type());
         if (this.query().isPresent()) {
             widgetBuilder.query(this.query().get());
@@ -177,6 +187,14 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         return widgetBuilder.build();
     }
 
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        filters().forEach(filter -> filter.resolveForInstallation(entity, parameters, entities, graph));
+    }
+
     public List<SearchTypeEntity> createSearchTypeEntity() {
         if (!type().matches(AggregationConfigDTO.NAME)) {
             return ImmutableList.of();
@@ -185,6 +203,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         final PivotEntity.Builder pivotBuilder = PivotEntity.builder()
                 .name("chart")
                 .streams(streams())
+                .streamCategories(streamCategories())
                 .rollup(true)
                 .sort(toSortSpec(config))
                 .rowGroups(toRowGroups(config))

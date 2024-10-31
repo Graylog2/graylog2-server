@@ -16,7 +16,6 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import type { Subtract } from 'utility-types';
 
@@ -31,8 +30,10 @@ import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMe
 import AppConfig from 'util/AppConfig';
 import { CodecTypesStore, CodecTypesActions } from 'stores/codecs/CodecTypesStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-import { MessagesActions } from 'stores/messages/MessagesStore';
 import useHistory from 'routing/useHistory';
+import { Messages } from '@graylog/server-api';
+import MessageFormatter from 'logic/message/MessageFormatter';
+import UserNotification from 'util/UserNotification';
 
 import type { Input as InputType, CodecTypes } from './Types';
 
@@ -118,7 +119,7 @@ const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSele
              label="Select an Input type (optional)"
              help="Select the Input type you want to load the message from."
              value={selectedInputType ?? 'placeholder'}
-             onChange={(e) => setSelectedInputType(e.target.value)}>
+             onChange={(e) => setSelectedInputType(e.target.value as 'server' | 'forwarder')}>
         <option value="placeholder" disabled>Select an Input type</option>
         <option value="server">Server Input</option>
         <option value="forwarder">Forwarder Input</option>
@@ -148,12 +149,37 @@ type OptionsType = {
 
 type Props = {
   inputs?: Immutable.Map<string, InputType>,
-  codecTypes: CodecTypes,
+  codecTypes?: CodecTypes
   onMessageLoaded: (message: Message | undefined, option: OptionsType) => void,
   inputIdSelector?: boolean,
 };
 
-const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs }: Props) => {
+const parseRawMessage = (message: string, remoteAddress: string, codec: string, codecConfiguration: { [key: string]: {} }) => {
+  const payload = {
+    message,
+    remote_address: remoteAddress,
+    codec,
+    configuration: codecConfiguration,
+  };
+
+  return Messages.parse(payload)
+    .then(
+      (response) => MessageFormatter.formatResultMessage(response),
+      (error) => {
+        if (error.additional && error.additional.status === 400) {
+          UserNotification.error('Please ensure the selected codec and its configuration are right. '
+            + 'Check your server logs for more information.', 'Could not load raw message');
+
+          return;
+        }
+
+        UserNotification.error(`Loading raw message failed with status: ${error}`,
+          'Could not load raw message');
+      },
+    );
+};
+
+const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, codecTypes, inputs }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [remoteAddress, setRemoteAddress] = useState<string>(DEFAULT_REMOTE_ADDRESS);
@@ -176,22 +202,21 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     event.preventDefault();
 
     setLoading(true);
-    const promise = MessagesActions.loadRawMessage(message, remoteAddress, codec, codecConfiguration);
 
-    promise.then((loadedMessage) => {
-      onMessageLoaded(
-        loadedMessage,
-        {
-          message: message,
-          remoteAddress: remoteAddress,
-          codec: codec,
-          codecConfiguration: codecConfiguration,
-          inputId: inputId,
-        },
-      );
-    });
-
-    promise.finally(() => setLoading(false));
+    parseRawMessage(message, remoteAddress, codec, codecConfiguration)
+      .then((loadedMessage) => {
+        onMessageLoaded(
+          loadedMessage,
+          {
+            message: message,
+            remoteAddress: remoteAddress,
+            codec: codec,
+            codecConfiguration: codecConfiguration,
+            inputId: inputId,
+          },
+        );
+      })
+      .finally(() => setLoading(false));
   };
 
   const _formatSelectOptions = () => {
@@ -225,11 +250,11 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     setInputId(selectedInput);
   };
 
-  const _onMessageChange = (event: React.SyntheticEvent<HTMLTextAreaElement>) => {
+  const _onMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(getValueFromInput(event.target));
   };
 
-  const _onRemoteAddressChange = (event: React.SyntheticEvent<HTMLSelectElement>) => {
+  const _onRemoteAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRemoteAddress(getValueFromInput(event.target));
   };
 
@@ -349,19 +374,6 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
       </Col>
     </Row>
   );
-};
-
-RawMessageLoader.propTypes = {
-  onMessageLoaded: PropTypes.func.isRequired,
-  inputIdSelector: PropTypes.bool,
-  codecTypes: PropTypes.object,
-  inputs: PropTypes.object,
-};
-
-RawMessageLoader.defaultProps = {
-  inputIdSelector: false,
-  codecTypes: undefined,
-  inputs: undefined,
 };
 
 export default connect(

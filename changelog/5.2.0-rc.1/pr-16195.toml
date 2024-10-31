@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Added a new Event Definition column: Last Matched."
+
+issues = ["15751"]
+pulls = ["16195"]

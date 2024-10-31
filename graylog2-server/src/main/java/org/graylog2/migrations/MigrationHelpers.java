@@ -17,6 +17,7 @@
 package org.graylog2.migrations;
 
 import com.mongodb.DuplicateKeyException;
+import jakarta.inject.Inject;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -30,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -42,10 +42,19 @@ public class MigrationHelpers {
     private final RoleService roleService;
     private final UserService userService;
 
+    private final RoleRemover roleRemover;
+
     @Inject
-    public MigrationHelpers(RoleService roleService, UserService userService) {
+    public MigrationHelpers(final RoleService roleService,
+                            final UserService userService,
+                            final RoleRemover roleRemover) {
         this.roleService = roleService;
         this.userService = userService;
+        this.roleRemover = roleRemover;
+    }
+
+    public void removeBuiltinRole(final String roleName) {
+        this.roleRemover.removeBuiltinRole(roleName);
     }
 
     @Nullable
@@ -55,7 +64,7 @@ public class MigrationHelpers {
             previousRole = roleService.load(roleName);
             if (!previousRole.isReadOnly() || !expectedPermissions.equals(previousRole.getPermissions())) {
                 final String msg = "Invalid role '" + roleName + "', fixing it.";
-                LOG.error(msg);
+                LOG.debug(msg);
                 throw new IllegalArgumentException(msg); // jump to fix code
             }
         } catch (NotFoundException | IllegalArgumentException | NoSuchElementException ignored) {
@@ -122,7 +131,7 @@ public class MigrationHelpers {
 
     @Nullable
     public String ensureUserHelper(String userName, String password, String firstName, String lastName, String email,
-                             Set<String> expectedRoles, boolean isServiceAccount) {
+                                   Set<String> expectedRoles, boolean isServiceAccount) {
         User previousUser = null;
         try {
             previousUser = userService.load(userName);
@@ -130,7 +139,7 @@ public class MigrationHelpers {
                     || !previousUser.getRoleIds().containsAll(expectedRoles)
                     || !Objects.equals(isServiceAccount, previousUser.isServiceAccount())) {
                 final String msg = "Invalid user '" + userName + "', fixing it.";
-                LOG.error(msg);
+                LOG.debug(msg);
                 throw new IllegalArgumentException(msg);
             }
         } catch (IllegalArgumentException ignored) {

@@ -52,7 +52,7 @@ const OrderedList = styled.ol`
 const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetComponentProps> = ({ config, type }: WidgetComponentProps & EditWidgetComponentProps) => (
   <Container>
     <IconContainer>
-      <Icon name="question" size="3x" />
+      <Icon name="help" size="3x" />
     </IconContainer>
     <Description>
       <Row>
@@ -76,7 +76,7 @@ const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetCompon
       </Row>
       <Row>
         Either way, you can copy the widget&rsquo;s config to the
-        clipboard: <ClipboardButton title={<Icon name="copy" size="sm" />} text={JSON.stringify(config, null, 2)} bsSize="xsmall" />
+        clipboard: <ClipboardButton title={<Icon name="content_copy" size="sm" />} text={JSON.stringify(config, null, 2)} bsSize="xsmall" />
       </Row>
     </Description>
   </Container>

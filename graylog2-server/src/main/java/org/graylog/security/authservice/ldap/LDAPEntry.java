@@ -44,11 +44,11 @@ public abstract class LDAPEntry {
     }
 
     public Optional<ImmutableList<String>> allAttributeValues(String key) {
-        return Optional.ofNullable(attributes().get(toKey(key)));
+        return Optional.of(attributes().get(toKey(key)));
     }
 
     public Optional<String> firstAttributeValue(String key) {
-        return Optional.ofNullable(attributes().get(toKey(key)))
+        return Optional.of(attributes().get(toKey(key)))
                 .filter(values -> !values.isEmpty())
                 .map(values -> values.get(0));
     }

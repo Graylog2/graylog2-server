@@ -1,0 +1,13 @@
+type = "fixed"
+message = "Fix internal server error for cluster logger level API requests."
+
+issues = ["11408", "14256"]
+pulls = ["16092"]
+
+details.user = """
+Requests to the cluster logger-level endpoint `/cluster/system/loggers/{loggerName}/level/{level}` previously responded
+with a `500` error status (but still executed successfully) unless the request included the `Accept: application/json`
+header.
+
+This API endpoint has been fixed to respond with a `200` success code even when the `Accept` header is not supplied.
+"""

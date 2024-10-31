@@ -20,12 +20,12 @@ import useResizeObserver from '@react-hook/resize-observer';
 import debounce from 'lodash/debounce';
 
 // Simple hook which provides the width and height of an element by using a ResizeObserver.
-const useElementDimensions = (target: React.RefObject<HTMLElement>, debounceDelay = 200) => {
+const useElementDimensions = (target: React.RefObject<HTMLElement> | HTMLElement, debounceDelay = 200) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const debouncedUpdate = debounce((newDimensions) => setDimensions(newDimensions), debounceDelay);
 
   useLayoutEffect(() => {
-    if (target?.current) {
+    if (target && 'current' in target && target.current) {
       const { width, height } = target.current.getBoundingClientRect();
       setDimensions({ width, height });
     }

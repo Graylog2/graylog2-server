@@ -1,0 +1,8 @@
+rule "mapSet"
+when
+  true
+then
+  let map = {k1: "v1", k2: 2};
+  set_field("k1", map_get(map, "k1"));
+  set_field("k2", map_get(map, "k2"));
+end

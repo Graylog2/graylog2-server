@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.regex.Pattern;
 
@@ -37,7 +38,7 @@ public class RegexReplace extends AbstractFunction<String> {
 
     public RegexReplace() {
         patternParam = ParameterDescriptor.string("pattern", Pattern.class).transform(Pattern::compile).description("The regular expression to which the \"value\" string is to be matched; uses Java regex syntax").build();
-        valueParam = ParameterDescriptor.string("value").description("The string to match the pattern against").build();
+        valueParam = ParameterDescriptor.string("value").ruleBuilderVariable().description("The string to match the pattern against").build();
         replacementParam = ParameterDescriptor.string("replacement").description("The string to be substituted for the first or all matches").build();
         replaceAllParam = ParameterDescriptor.bool("replace_all").optional().description("Replace all matches if \"true\", otherwise only replace the first match. Default: true").build();
     }
@@ -67,7 +68,11 @@ public class RegexReplace extends AbstractFunction<String> {
                 .pure(true)
                 .returnType(String.class)
                 .params(of(patternParam, valueParam, replacementParam, replaceAllParam))
-                .description("Match a string with a regular expression (Java syntax)")
+                .description("Match a string with a regular expression (Java syntax) and replace all matches with string")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Regex replace")
+                .ruleBuilderTitle("Match the regular expression '${pattern}' against '${value}' and replace it with '${replacement}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }

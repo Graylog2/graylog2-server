@@ -21,6 +21,7 @@ import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -31,9 +32,10 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -65,18 +67,21 @@ public class InputBufferImpl implements InputBuffer {
         if (configuration.isMessageJournalEnabled()) {
             LOG.info("Message journal is enabled.");
 
-            final RawMessageEncoderHandler[] handlers = new RawMessageEncoderHandler[numberOfHandlers];
+            @SuppressWarnings("unchecked")
+            final EventHandler<RawMessageEvent>[] handlers = new PartitioningWorkHandler[numberOfHandlers];
             for (int i = 0; i < numberOfHandlers; i++) {
-                handlers[i] = rawMessageEncoderHandlerProvider.get();
+                handlers[i] = new PartitioningWorkHandler<>(rawMessageEncoderHandlerProvider.get(), i, numberOfHandlers);
             }
-            disruptor.handleEventsWithWorkerPool(handlers).then(spoolingMessageHandlerProvider.get());
+            disruptor.handleEventsWith(handlers).then(spoolingMessageHandlerProvider.get());
         } else {
             LOG.info("Message journal is disabled.");
-            final DirectMessageHandler[] handlers = new DirectMessageHandler[numberOfHandlers];
+
+            @SuppressWarnings("unchecked")
+            final EventHandler<RawMessageEvent>[] handlers = new PartitioningWorkHandler[numberOfHandlers];
             for (int i = 0; i < numberOfHandlers; i++) {
-                handlers[i] = directMessageHandlerProvider.get();
+                handlers[i] = new PartitioningWorkHandler<>(directMessageHandlerProvider.get(), i, numberOfHandlers);
             }
-            disruptor.handleEventsWithWorkerPool(handlers);
+            disruptor.handleEventsWith(handlers);
         }
 
         ringBuffer = disruptor.start();

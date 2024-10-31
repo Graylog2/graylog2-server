@@ -30,8 +30,9 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_COMPLETE;

@@ -18,7 +18,7 @@ package org.graylog2.cluster.leader;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 /**
  * Leader election when we don't care (i.e. Forwarder) - always claim leader

@@ -24,7 +24,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,13 +60,13 @@ public class V20230220095500_MigrateStartPageObjectReferencesToGRNbyRemoval exte
         final Set<String> names = new HashSet();
         mongoConnection.getMongoDatabase().listCollectionNames().forEach(names::add);
 
-        if(names.contains(FavoritesService.COLLECTION_NAME)) {
+        if (names.contains(FavoritesService.COLLECTION_NAME)) {
             mongoConnection.getMongoDatabase().getCollection(FavoritesService.COLLECTION_NAME).drop();
         }
-        if(names.contains(LastOpenedService.COLLECTION_NAME)) {
+        if (names.contains(LastOpenedService.COLLECTION_NAME)) {
             mongoConnection.getMongoDatabase().getCollection(LastOpenedService.COLLECTION_NAME).drop();
         }
-        if(names.contains(RecentActivityService.COLLECTION_NAME)) {
+        if (names.contains(RecentActivityService.COLLECTION_NAME)) {
             mongoConnection.getMongoDatabase().getCollection(RecentActivityService.COLLECTION_NAME).drop();
         }
 

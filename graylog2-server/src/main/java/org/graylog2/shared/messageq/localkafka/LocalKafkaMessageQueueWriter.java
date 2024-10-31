@@ -18,10 +18,10 @@ package org.graylog2.shared.messageq.localkafka;
 
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 import com.google.common.util.concurrent.AbstractIdleService;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.LocalKafkaJournal;
@@ -30,15 +30,12 @@ import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -57,16 +54,7 @@ public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements
         this.kafkaJournal = kafkaJournal;
         this.journalFilled = journalFilled;
         this.metrics = metrics;
-
-        writeRetryer = RetryerBuilder.<Void>newBuilder()
-                .retryIfException(input -> {
-                    LOG.error("Unable to write to journal - retrying with exponential back-off", input);
-                    metrics.failedWriteAttempts().mark();
-                    return true;
-                })
-                .withWaitStrategy(WaitStrategies.exponentialWait(250, 1, TimeUnit.MINUTES))
-                .withStopStrategy(StopStrategies.neverStop())
-                .build();
+        this.writeRetryer = JournalRetryerFactory.create(retryerExceptionPredicate());
     }
 
     @Override
@@ -106,6 +94,14 @@ public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements
         LOG.debug("Processed batch, last journal offset: {}, signalling reader.",
                 lastOffset);
         journalFilled.release();
+    }
+
+    private Predicate<Throwable> retryerExceptionPredicate() {
+        return exception -> {
+            LOG.error("Unable to write to journal - retrying with exponential back-off", exception);
+            metrics.failedWriteAttempts().mark();
+            return true;
+        };
     }
 
     @Override

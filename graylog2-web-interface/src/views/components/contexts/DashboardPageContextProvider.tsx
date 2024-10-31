@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import URI from 'urijs';
 
+import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import useAppSelector from 'stores/useAppSelector';

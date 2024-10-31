@@ -21,9 +21,10 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.lookup.LookupTableService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -38,7 +39,7 @@ public class LookupAssignTtl extends AbstractFunction<Object> {
 
     @Inject
     public LookupAssignTtl(LookupTableService lookupTableService) {
-        lookupTableParam = string("lookup_table", LookupTableService.Function.class)
+        lookupTableParam = string("lookup_table", LookupTableService.Function.class).ruleBuilderVariable()
                 .description("The existing lookup table to use to add/update a ttl to the given key")
                 .transform(tableName -> lookupTableService.newBuilder().lookupTable(tableName).build())
                 .build();
@@ -75,6 +76,10 @@ public class LookupAssignTtl extends AbstractFunction<Object> {
                 .description("Add a time to live to the key in the named lookup table. Returns the updated entry on success, null on failure.")
                 .params(lookupTableParam, keyParam, ttlSecondsParam)
                 .returnType(Object.class)
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Add ttl to key in lookup table")
+                .ruleBuilderTitle("Add ${ttl} seconds ttl to key '${key}' in '${lookup_table}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }
 }

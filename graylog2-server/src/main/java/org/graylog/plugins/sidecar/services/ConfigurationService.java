@@ -17,7 +17,6 @@
 package org.graylog.plugins.sidecar.services;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Template;
@@ -39,9 +38,10 @@ import org.mongojack.DBSort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -75,11 +75,9 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         this.templateConfiguration = createTemplateConfiguration(new MongoDbTemplateLoader(db));
         this.configurationVariableService = configurationVariableService;
 
-        DBCollection collection = db.getDB().getCollection(COLLECTION_NAME);
-
-        collection.createIndex(new BasicDBObject(Configuration.FIELD_ID, 1));
-        collection.createIndex(new BasicDBObject(Configuration.FIELD_COLLECTOR_ID, 1));
-        collection.createIndex(new BasicDBObject(Configuration.FIELD_TAGS, 1));
+        db.createIndex(new BasicDBObject(Configuration.FIELD_ID, 1));
+        db.createIndex(new BasicDBObject(Configuration.FIELD_COLLECTOR_ID, 1));
+        db.createIndex(new BasicDBObject(Configuration.FIELD_TAGS, 1));
     }
 
     private freemarker.template.Configuration createTemplateConfiguration(TemplateLoader templateLoader) {

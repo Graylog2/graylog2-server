@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import uniq from 'lodash/uniq';
 import styled from 'styled-components';
 
@@ -50,16 +49,28 @@ const CollectorsAdministrationActions = ({
   const onCancelConfigurationModal = useCallback(() => setShowConfigurationModal(false), []);
 
   const selectedLogCollectorsNames = uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector.name));
-  const configButtonTooltip = `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously`;
+  const disableConfigButton = !selectedSidecarCollectorPairs.length || selectedLogCollectorsNames.length !== 1;
+
+  const getConfigButtonTooltip = () => {
+    if (!selectedSidecarCollectorPairs.length) {
+      return 'Incompatible collectors, please check your sidecar configuration.';
+    }
+
+    if (selectedLogCollectorsNames.length !== 1) {
+      return `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously.`;
+    }
+
+    return 'Assign Configurations';
+  };
 
   return (
     <ButtonToolbar>
-      <ConfigurationButton title={(selectedLogCollectorsNames.length > 1) ? configButtonTooltip : undefined}
+      <ConfigurationButton title={getConfigButtonTooltip()}
                            bsStyle="primary"
                            bsSize="small"
-                           disabled={selectedLogCollectorsNames.length !== 1}
+                           disabled={disableConfigButton}
                            onClick={() => setShowConfigurationModal(true)}>
-        <Icon name="edit" /> Assign Configurations
+        <Icon name="edit_square" /> Assign Configurations
       </ConfigurationButton>
       <CollectorConfigurationModalContainer collectors={collectors}
                                             configurations={configurations}
@@ -70,14 +81,6 @@ const CollectorsAdministrationActions = ({
       <CollectorProcessControl selectedSidecarCollectorPairs={selectedSidecarCollectorPairs} onProcessAction={onProcessAction} />
     </ButtonToolbar>
   );
-};
-
-CollectorsAdministrationActions.propTypes = {
-  collectors: PropTypes.array.isRequired,
-  configurations: PropTypes.array.isRequired,
-  selectedSidecarCollectorPairs: PropTypes.array.isRequired,
-  onConfigurationSelectionChange: PropTypes.func.isRequired,
-  onProcessAction: PropTypes.func.isRequired,
 };
 
 export default CollectorsAdministrationActions;

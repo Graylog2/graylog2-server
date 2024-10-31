@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { flushSync } from 'react-dom';
+
 import UserNotification from 'util/UserNotification';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { loadDashboard } from 'views/logic/views/Actions';
@@ -26,8 +28,12 @@ import type View from './View';
 export default (view: View, history: HistoryFunction) => async (dispatch: AppDispatch) => {
   try {
     const savedView = await ViewManagementActions.create(view);
-    dispatch(setIsDirty(false));
-    dispatch(setIsNew(false));
+
+    flushSync(() => {
+      dispatch(setIsDirty(false));
+      dispatch(setIsNew(false));
+    });
+
     loadDashboard(history, savedView.id);
     UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
   } catch (error) {

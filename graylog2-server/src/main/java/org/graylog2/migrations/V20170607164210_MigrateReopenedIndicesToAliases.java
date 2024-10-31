@@ -29,7 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,7 +39,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.storage.SearchVersion.Distribution.*;
+import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
+import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
 public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {

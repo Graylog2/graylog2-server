@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 public class ViewResolverDecoderTest {
     @Test
     public void testValidResolver() {
-        final ViewResolverDecoder decoder = new ViewResolverDecoder("resolver:id");
+        final ViewResolverDecoder decoder = new ViewResolverDecoder("resolver" + ViewResolverDecoder.SEPARATOR + "id");
         assertTrue(decoder.isResolverViewId());
         assertEquals("resolver", decoder.getResolverName());
         assertEquals("id", decoder.getViewId());

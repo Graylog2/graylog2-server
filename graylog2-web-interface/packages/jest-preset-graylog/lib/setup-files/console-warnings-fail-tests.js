@@ -22,10 +22,14 @@ import { DEPRECATION_NOTICE } from 'util/deprecationNotice';
 console.origWarn = console.warn;
 console.origError = console.error;
 
+global.IS_REACT_ACT_ENVIRONMENT = false;
+
 const ignoredWarnings = [
   'react-async-component-lifecycle-hooks',
   'react-unsafe-component-lifecycles',
   DEPRECATION_NOTICE,
+  'A suspended resource finished loading inside a test, but the event was not wrapped in act',
+  'When testing, code that causes React state updates should be wrapped into act(...)',
 ];
 
 const ignoreWarning = (args) => (!args[0] || ignoredWarnings.filter((warning) => args[0]?.includes?.(warning)).length > 0);

@@ -21,7 +21,10 @@ import org.graylog2.plugin.database.ValidationException;
 import java.util.Optional;
 
 public interface PreflightConfigService {
-    Optional<PreflightConfig> getPersistedConfig();
+    PreflightConfig setConfigResult(PreflightConfigResult result);
 
-    PreflightConfig saveConfiguration() throws ValidationException;
+    PreflightConfigResult getPreflightConfigResult();
+
+    String getPreflightPassword();
+
 }

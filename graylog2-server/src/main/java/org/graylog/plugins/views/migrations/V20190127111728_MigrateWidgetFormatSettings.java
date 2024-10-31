@@ -31,7 +31,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -70,10 +71,11 @@ public class V20190127111728_MigrateWidgetFormatSettings extends Migration {
         for (final Document view : documents) {
             viewMigrated = false;
             final Document states = view.get("state", Document.class);
-            for(Map.Entry<String, Object> obj : states.entrySet()) {
+            for (Map.Entry<String, Object> obj : states.entrySet()) {
                 final Document state = (Document) obj.getValue();
                 if (state.get("widgets") instanceof List) {
-                    @SuppressWarnings("unchecked") final List<Document> widgets = (List) state.get("widgets");
+                    @SuppressWarnings("unchecked")
+                    final List<Document> widgets = (List) state.get("widgets");
                     for (final Document widget : widgets) {
                         final String type = widget.getString("type");
                         if (type.equals("aggregation")) {
@@ -87,7 +89,8 @@ public class V20190127111728_MigrateWidgetFormatSettings extends Migration {
                                 continue;
                             }
                             viewMigrated = true;
-                            @SuppressWarnings({"unchecked", "rawtypes"}) final Map<String, String> chartColors =
+                            @SuppressWarnings({"unchecked", "rawtypes"})
+                            final Map<String, String> chartColors =
                                     (Map) charColorsObj;
                             List<Document> chartColorSettings = chartColors.entrySet().stream().map(entry -> {
                                 final Document chartColorFieldSetting = new Document();

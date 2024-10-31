@@ -121,4 +121,38 @@ class EntityDependencyResolverTest {
             assertThat(descriptor.title()).isEqualTo("unknown dependency: <grn::::stream:54e3deadbeefdeadbeefaffe>");
         });
     }
+
+    @Test
+    @DisplayName("Try a stream reference dependency resolve")
+    void resolveStreamReference() {
+        final String TEST_TITLE = "Test Stream Title";
+        final EntityExcerpt streamExcerpt = EntityExcerpt.builder()
+                .type(ModelTypes.STREAM_V1)
+                .id(ModelId.of("54e3deadbeefdeadbeefaffe"))
+                .title(TEST_TITLE).build();
+        final EntityExcerpt streamRefExcerpt = EntityExcerpt.builder()
+                .type(ModelTypes.STREAM_REF_V1)
+                .id(ModelId.of("54e3deadbeefdeadbeefaffe"))
+                .title(TEST_TITLE).build();
+        when(contentPackService.listAllEntityExcerpts()).thenReturn(ImmutableSet.of(streamExcerpt, streamRefExcerpt));
+
+        final EntityDescriptor streamDescriptor = EntityDescriptor.builder().type(ModelTypes.STREAM_REF_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
+        when(contentPackService.resolveEntities(any())).thenReturn(ImmutableSet.of(streamDescriptor));
+
+        when(grnDescriptorService.getDescriptor(any(GRN.class))).thenAnswer(a -> {
+            GRN grnArg = a.getArgument(0);
+            return GRNDescriptor.builder().grn(grnArg).title("dummy").build();
+        });
+        final GRN dashboard = grnRegistry.newGRN("dashboard", "33e3deadbeefdeadbeefaffe");
+
+        final ImmutableSet<org.graylog.security.entities.EntityDescriptor> missingDependencies = entityDependencyResolver.resolve(dashboard);
+        assertThat(missingDependencies).hasSize(1);
+        assertThat(missingDependencies.asList().get(0)).satisfies(descriptor -> {
+            assertThat(descriptor.id().toString()).isEqualTo("grn::::stream:54e3deadbeefdeadbeefaffe");
+            assertThat(descriptor.title()).isEqualTo(TEST_TITLE);
+
+            assertThat(descriptor.owners()).hasSize(1);
+            assertThat(descriptor.owners().asList().get(0).grn().toString()).isEqualTo("grn::::user:jane");
+        });
+    }
 }

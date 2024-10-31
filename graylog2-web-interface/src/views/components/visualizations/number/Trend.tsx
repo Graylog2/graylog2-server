@@ -45,7 +45,7 @@ const Background = styled.div<{ trend: TrendDirection | undefined }>(({ theme, t
       background-color: ${bgColor} !important; /* Needed for report generation */
       color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
       color-adjust: exact !important; /* Needed for report generation */
-    `}
+`}
 `;
 });
 
@@ -82,10 +82,10 @@ const _trendDirection = (delta: number, trendPreference: TrendPreference): Trend
 
 // eslint-disable-next-line no-nested-ternary
 const _trendIcon = (delta: number) => (delta === 0
-  ? 'arrow-circle-right'
+  ? 'arrow_circle_right'
   : delta > 0
-    ? 'arrow-circle-up'
-    : 'arrow-circle-down');
+    ? 'arrow_circle_up'
+    : 'arrow_circle_down');
 
 const diff = (current: number | undefined, previous: number | undefined): [number, number] => {
   if (typeof current === 'number' && typeof previous === 'number') {

@@ -20,8 +20,9 @@ import merge from 'lodash/merge';
 import fill from 'lodash/fill';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
+import type { DefaultTheme } from 'styled-components';
+import styled, { useTheme, css } from 'styled-components';
 
-import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
@@ -31,6 +32,11 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
 import GenericPlot from '../GenericPlot';
+
+const Container = styled.div<{ $height: number, $width: number }>(({ $height, $width }) => css`
+  height: ${$height ? `${$height}px` : '100%'};
+  width: ${$width ? `${$width}px` : '100%'};
+`);
 
 const _generateSeriesTitles = (config, x, y) => {
   const seriesTitles = config.series.map((s) => s.function);
@@ -45,7 +51,7 @@ const _generateSeriesTitles = (config, x, y) => {
   return y.map(() => columnSeriesTitles);
 };
 
-const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig, mapKeys: KeyMapper): Generator => ({
+const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig, mapKeys: KeyMapper, theme: DefaultTheme): Generator => ({
   type,
   name,
   labels,
@@ -77,6 +83,9 @@ const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig, mapKey
     zmin: zMin,
     zmax: zMax,
     originalName: name,
+    colorbar: {
+      tickfont: { color: theme.colors.global.textDefault },
+    },
   };
 };
 
@@ -147,27 +156,25 @@ const _chartLayout = (heatmapData: ChartDefinition[]) => {
 
 const _leafSourceMatcher = ({ source }: { source: string }) => source.endsWith('leaf') && source !== 'row-leaf';
 
-const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+const HeatmapVisualization = makeVisualization(({ config, data, height, width }: VisualizationComponentProps) => {
+  const theme = useTheme();
   const visualizationConfig = (config.visualizationConfig ?? HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
   const heatmapData = useChartData(rows, {
     widgetConfig: config,
     chartType: 'heatmap',
-    generator: _generateSeries(visualizationConfig, mapKeys),
+    generator: _generateSeries(visualizationConfig, mapKeys, theme),
     seriesFormatter: _formatSeries(visualizationConfig),
     leafValueMatcher: _leafSourceMatcher,
   });
   const layout = _chartLayout(heatmapData);
 
   return (
-    <GenericPlot chartData={heatmapData} layout={layout} />
+    <Container $height={height} $width={width}>
+      <GenericPlot chartData={heatmapData} layout={layout} />
+    </Container>
   );
 }, 'heatmap');
-
-HeatmapVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-};
 
 export default HeatmapVisualization;

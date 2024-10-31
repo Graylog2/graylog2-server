@@ -1,0 +1,6 @@
+type = "c"
+message = "Report partial shard failures and fix sort order for search export."
+
+issues = [""]
+pulls = ["18787"]
+

@@ -43,7 +43,7 @@ import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import FieldStatisticsHandler from 'views/logic/fieldactions/FieldStatisticsHandler';
 import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
@@ -98,6 +98,18 @@ import ScatterVisualization from 'views/components/visualizations/scatter/Scatte
 import Icon from 'components/common/Icon';
 import viewsReducers from 'views/viewsReducers';
 import CreateEventDefinition from 'views/logic/valueactions/createEventDefinition/CreateEventDefinition';
+import ChangeFieldType, {
+  ChangeFieldTypeHelp,
+  isChangeFieldTypeEnabled,
+} from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
+import AddEventsWidgetActionHandler, { CreateEventsWidget } from 'views/logic/widgets/events/AddEventsWidgetActionHandler';
+import EventsListConfigGenerator from 'views/logic/searchtypes/events/EventsListConfigGenerator';
+import EventsWidgetEdit from 'views/components/widgets/events/EventsWidgetEdit';
+import EventsWidget from 'views/logic/widgets/events/EventsWidget';
+import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
+import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
+import ExportMessageWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportMessageWidgetAction';
+import ExportWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetAction';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -109,9 +121,12 @@ import ValueParameter from './logic/parameters/ValueParameter';
 import MessageConfigGenerator from './logic/searchtypes/messages/MessageConfigGenerator';
 import UnknownWidget from './components/widgets/UnknownWidget';
 import NewSearchRedirectPage from './pages/NewSearchRedirectPage';
+import EventsVisualization from './components/widgets/events/EventsVisualization';
+import eventsFilterComponents from './components/widgets/events/filters/filterComponents';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
+Widget.registerSubtype(EventsWidget.type, EventsWidget);
 VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
 VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfig);
 VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
@@ -154,7 +169,6 @@ const exports: PluginExports = {
       type: 'MESSAGES',
       displayName: 'Message List',
       defaultHeight: 5,
-      reportStyle: () => ({ width: 800 }),
       defaultWidth: 6,
       // TODO: Subtyping needs to be taken into account
       visualizationComponent: MessageList as unknown as React.ComponentType<WidgetComponentProps>,
@@ -170,7 +184,6 @@ const exports: PluginExports = {
       displayName: 'Results',
       defaultHeight: 4,
       defaultWidth: 4,
-      reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
       editComponent: AggregationWizard,
       hasEditSubmitButton: true,
@@ -195,6 +208,19 @@ const exports: PluginExports = {
 
         return AggregationWidget.defaultTitle;
       },
+    },
+    {
+      type: 'EVENTS',
+      displayName: 'Events',
+      defaultHeight: 4,
+      defaultWidth: 6,
+      hasEditSubmitButton: true,
+      visualizationComponent: EventsVisualization,
+      editComponent: EventsWidgetEdit,
+      searchTypes: EventsListConfigGenerator,
+      titleGenerator: () => EventsWidget.defaultTitle,
+      needsControlledHeight: () => false,
+      searchResultTransformer: (data: Array<unknown>) => data?.[0],
     },
     {
       type: 'default',
@@ -291,6 +317,14 @@ const exports: PluginExports = {
       isEnabled: () => true,
       resetFocus: false,
     },
+    {
+      type: 'change-field-type',
+      title: 'Change field type',
+      isEnabled: isChangeFieldTypeEnabled,
+      resetFocus: false,
+      component: ChangeFieldType,
+      help: ChangeFieldTypeHelp,
+    },
   ],
   valueActions: filterCloudValueActions([
     {
@@ -347,7 +381,7 @@ const exports: PluginExports = {
   widgetCreators: [{
     title: 'Message Count',
     func: CreateMessageCount,
-    icon: () => <Icon name="hashtag" />,
+    icon: () => <Icon name="tag" />,
   }, {
     title: 'Message Table',
     func: CreateMessagesWidget,
@@ -355,7 +389,11 @@ const exports: PluginExports = {
   }, {
     title: 'Custom Aggregation',
     func: CreateCustomAggregation,
-    icon: () => <Icon name="chart-column" />,
+    icon: () => <Icon name="monitoring" />,
+  }, {
+    title: 'Events Overview',
+    func: CreateEventsWidget,
+    icon: () => <Icon name="report" type="regular" />,
   }],
   creators: [
     {
@@ -372,6 +410,11 @@ const exports: PluginExports = {
       type: 'generic',
       title: 'Aggregation',
       func: AddCustomAggregation,
+    },
+    {
+      type: 'events' as const,
+      title: 'Events Overview',
+      func: AddEventsWidgetActionHandler,
     },
   ],
   'views.completers': [
@@ -410,7 +453,11 @@ const exports: PluginExports = {
       sort: 1,
     },
   ],
+  'views.components.widgets.events.filterComponents': eventsFilterComponents,
+  'views.components.widgets.events.attributes': eventsAttributes,
   'views.reducers': viewsReducers,
+  'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
+  'views.widgets.actions': [ExportMessageWidgetAction, ExportWidgetAction],
 };
 
 export default exports;

@@ -26,7 +26,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.grok.GrokPatternRegistry;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -62,7 +63,7 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
 
         final Grok grok = grokPatternRegistry.cachedGrokForPattern(pattern, onlyNamedCaptures);
 
-        final Match match = grok.match(value);;
+        final Match match = grok.match(value);
         return new GrokResult(match.captureFlattened());
     }
 

@@ -27,6 +27,7 @@ import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
 import java.util.OptionalInt;
 
 @AutoValue
@@ -39,7 +40,7 @@ public abstract class RelativeRange extends TimeRange {
 
     @JsonProperty
     @Override
-    public  String type() {
+    public String type() {
         return RELATIVE;
     }
 
@@ -52,6 +53,10 @@ public abstract class RelativeRange extends TimeRange {
     @JsonProperty
     public abstract OptionalInt to();
 
+    @JsonIgnore
+    @Nullable
+    public abstract DateTime nowUTC();
+
     public int getRange() {
         return range().orElse(0);
     }
@@ -63,11 +68,11 @@ public abstract class RelativeRange extends TimeRange {
         if (range().isPresent()) {
             final int range = range().getAsInt();
             return range > 0
-                ? Tools.nowUTC().minusSeconds(range().getAsInt())
+                    ? pickNowUTC().minusSeconds(range().getAsInt())
                 : new DateTime(0, DateTimeZone.UTC);
         }
 
-        return Tools.nowUTC().minusSeconds(from().orElseThrow(() -> new IllegalStateException("Neither `range` nor `from` specified!")));
+        return pickNowUTC().minusSeconds(from().orElseThrow(() -> new IllegalStateException("Neither `range` nor `from` specified!")));
     }
 
     @Override
@@ -75,10 +80,19 @@ public abstract class RelativeRange extends TimeRange {
     public DateTime getTo() {
         // TODO this should be fixed
         if (range().isPresent()) {
-            return Tools.nowUTC();
+            return pickNowUTC();
         }
 
-        return Tools.nowUTC().minusSeconds(to().orElse(0));
+        return pickNowUTC().minusSeconds(to().orElse(0));
+    }
+
+    @JsonIgnore
+    private DateTime pickNowUTC() {
+        if (nowUTC() != null) {
+            return nowUTC();
+        } else {
+            return Tools.nowUTC();
+        }
     }
 
     @JsonIgnore
@@ -100,9 +114,17 @@ public abstract class RelativeRange extends TimeRange {
         }
     }
 
+    @Override
+    public TimeRange withReferenceDate(DateTime now) {
+        return this.toBuilder().nowUTC(now).build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         abstract RelativeRange autoBuild();
+
+        @JsonIgnore
+        public abstract Builder nowUTC(DateTime nowUTC);
 
         @JsonProperty("range")
         public abstract Builder range(int range);
@@ -127,7 +149,7 @@ public abstract class RelativeRange extends TimeRange {
                 }
             }
 
-            if (to().isPresent() && !from().isPresent()) {
+            if (to().isPresent() && from().isEmpty()) {
                 throw new InvalidRangeParametersException("If `to` is specified, `from` must be specified to!");
             }
 
@@ -142,5 +164,7 @@ public abstract class RelativeRange extends TimeRange {
             return new AutoValue_RelativeRange.Builder();
         }
     }
+
+    public abstract Builder toBuilder();
 
 }

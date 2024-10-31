@@ -17,7 +17,6 @@
 package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
@@ -48,7 +47,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5)
+@ContainerMatrixTestsConfiguration
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
     private static final String INDEX_NAME_1 = "index_set_1_counts_test_0";
@@ -90,9 +89,9 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
                 .shards(1)
                 .replicas(0)
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.createDefault())
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .retentionStrategyConfig(DeletionRetentionStrategyConfig.createDefault())
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
                 .indexAnalyzer("standard")
                 .indexTemplateName("template-1")
@@ -107,9 +106,9 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
                 .shards(1)
                 .replicas(0)
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.createDefault())
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .retentionStrategyConfig(DeletionRetentionStrategyConfig.createDefault())
                 .creationDate(ZonedDateTime.of(2016, 10, 13, 0, 0, 0, 0, ZoneOffset.UTC))
                 .indexAnalyzer("standard")
                 .indexTemplateName("template-2")
@@ -124,9 +123,9 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
                 .shards(1)
                 .replicas(0)
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.createDefault())
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .retentionStrategyConfig(DeletionRetentionStrategyConfig.createDefault())
                 .creationDate(ZonedDateTime.of(2016, 10, 13, 0, 0, 0, 0, ZoneOffset.UTC))
                 .indexAnalyzer("standard")
                 .indexTemplateName("template-3")

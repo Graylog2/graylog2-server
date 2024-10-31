@@ -18,19 +18,18 @@ import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import mockComponent from 'helpers/mocking/MockComponent';
 import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import useWidgetResults from 'views/components/useWidgetResults';
-import type SearchError from 'views/logic/SearchError';
-import { viewSliceReducer } from 'views/logic/slices/viewSlice';
+import SearchError from 'views/logic/SearchError';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 import { duplicateWidget, updateWidgetConfig, updateWidget } from 'views/logic/slices/widgetActions';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import useViewsPlugin from 'views/test/testViewsPlugin';
+import { usePlugin } from 'views/test/testPlugins';
+import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -40,10 +39,38 @@ import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import FieldTypesContext from '../contexts/FieldTypesContext';
 
-jest.mock('../searchbar/queryinput/QueryInput', () => mockComponent('QueryInput'));
+jest.mock('../searchbar/queryinput/QueryInput');
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock('views/logic/fieldtypes/useFieldTypes');
+
+const searchExplainContext = (searchedIndexRanges = [
+  {
+    index_name: 'aloho_1017',
+    begin: 1709716042283,
+    end: 1709716342274,
+    is_warm_tiered: false,
+    stream_names: ['foo', 'bar'],
+  },
+  {
+    index_name: 'aloho_1018',
+    begin: 0,
+    end: 0,
+    is_warm_tiered: false,
+    stream_names: ['bar'],
+  },
+],
+) => ({
+  explainedSearch: undefined,
+  getExplainForWidget: () => ({
+    query_string: 'foo',
+    searched_index_ranges: searchedIndexRanges,
+  }),
+});
+
 jest.mock('views/components/useWidgetResults');
+
+jest.mock('views/hooks/useAutoRefresh');
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
@@ -54,10 +81,6 @@ jest.mock('views/logic/slices/widgetActions', () => ({
 
 const pluginManifest: PluginRegistration = {
   exports: {
-    'views.reducers': [
-      { key: 'view', reducer: viewSliceReducer },
-      { key: 'searchExecution', reducer: searchExecutionSliceReducer },
-    ],
     enterpriseWidgets: [
       {
         type: 'dummy',
@@ -80,9 +103,8 @@ const pluginManifest: PluginRegistration = {
 };
 
 describe('<Widget />', () => {
-  beforeAll(() => PluginStore.register(pluginManifest));
-
-  afterAll(() => PluginStore.unregister(pluginManifest));
+  usePlugin(pluginManifest);
+  useViewsPlugin();
 
   const widget = WidgetModel.builder().newId()
     .type('dummy')
@@ -100,11 +122,19 @@ describe('<Widget />', () => {
     setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
     unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'],
     unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'],
+    searchedIndices?: Array<{
+      index_name: string,
+      begin: number,
+      end: number,
+      is_warm_tiered: boolean,
+      stream_names: Array<string>
+    }>,
   }
 
   const DummyWidget = ({
     widget: propsWidget = widget,
     focusedWidget = undefined,
+    searchedIndices = undefined,
     setWidgetFocusing = () => {},
     setWidgetEditing = () => {},
     unsetWidgetFocusing = () => {},
@@ -112,23 +142,28 @@ describe('<Widget />', () => {
     ...props
   }: DummyWidgetProps) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={fieldTypes}>
-        {}
-        <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
-          <WidgetContext.Provider value={propsWidget}>
-            <Widget widget={propsWidget}
-                    id="widgetId"
-                    onPositionsChange={() => {}}
-                    title="Widget Title"
-                    position={new WidgetPosition(1, 1, 1, 1)}
-                    {...props} />
-          </WidgetContext.Provider>
-        </WidgetFocusContext.Provider>
-      </FieldTypesContext.Provider>
+      <SearchExplainContext.Provider value={searchExplainContext(searchedIndices)}>
+        <FieldTypesContext.Provider value={fieldTypes}>
+          <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
+            <WidgetContext.Provider value={propsWidget}>
+              <Widget widget={propsWidget}
+                      id="widgetId"
+                      onPositionsChange={() => {}}
+                      title="Widget Title"
+                      position={new WidgetPosition(1, 1, 1, 1)}
+                      {...props} />
+            </WidgetContext.Provider>
+          </WidgetFocusContext.Provider>
+        </FieldTypesContext.Provider>
+      </SearchExplainContext.Provider>
     </TestStoreProvider>
   );
 
   const getWidgetUpdateButton = () => screen.getByRole('button', { name: /update widget/i });
+
+  beforeEach(() => {
+    asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
+  });
 
   it('should render with empty props', async () => {
     asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
@@ -145,7 +180,18 @@ describe('<Widget />', () => {
   });
 
   it('should render error widget for widget with one error', async () => {
-    asMock(useWidgetResults).mockReturnValue({ error: [{ description: 'The widget has failed: the dungeon collapsed, you die!' } as SearchError], widgetData: undefined });
+    asMock(useWidgetResults).mockReturnValue({
+      error: [
+        new SearchError({
+          description: 'The widget has failed: the dungeon collapsed, you die!',
+          query_id: 'query-id-2',
+          search_type_id: 'search_type_id-2',
+          type: 'query',
+          backtrace: '',
+        })],
+      widgetData: undefined,
+    });
+
     render(<DummyWidget />);
 
     await screen.findByText('The widget has failed: the dungeon collapsed, you die!');
@@ -154,8 +200,20 @@ describe('<Widget />', () => {
   it('should render error widget including all error messages for widget with multiple errors', async () => {
     asMock(useWidgetResults).mockReturnValue({
       error: [
-        { description: 'Something is wrong' } as SearchError,
-        { description: 'Very wrong' } as SearchError,
+        new SearchError({
+          description: 'Something is wrong',
+          query_id: 'query-id-1',
+          search_type_id: 'search_type_id-1',
+          type: 'query',
+          backtrace: '',
+        }),
+        new SearchError({
+          description: 'Very wrong',
+          query_id: 'query-id-2',
+          search_type_id: 'search_type_id-2',
+          type: 'query',
+          backtrace: '',
+        }),
       ],
       widgetData: undefined,
     });
@@ -207,8 +265,8 @@ describe('<Widget />', () => {
       .config({})
       .build();
     const UnknownWidget = (props: Partial<React.ComponentProps<typeof Widget>>) => (
-      <FieldTypesContext.Provider value={fieldTypes}>
-        <TestStoreProvider>
+      <TestStoreProvider>
+        <FieldTypesContext.Provider value={fieldTypes}>
           <WidgetContext.Provider value={unknownWidget}>
             <Widget widget={unknownWidget}
                     editing
@@ -218,8 +276,8 @@ describe('<Widget />', () => {
                     position={new WidgetPosition(1, 1, 1, 1)}
                     {...props} />
           </WidgetContext.Provider>
-        </TestStoreProvider>
-      </FieldTypesContext.Provider>
+        </FieldTypesContext.Provider>
+      </TestStoreProvider>
     );
 
     render(
@@ -232,10 +290,10 @@ describe('<Widget />', () => {
   it('copies title when duplicating widget', async () => {
     render(<DummyWidget title="Dummy Widget" />);
 
-    const actionToggle = screen.getByTestId('widgetActionDropDown');
+    const actionToggle = await screen.findByRole('button', { name: /open actions dropdown/i });
 
     fireEvent.click(actionToggle);
-    const duplicateBtn = screen.getByText('Duplicate');
+    const duplicateBtn = await screen.findByRole('menuitem', { name: /duplicate/i });
 
     fireEvent.click(duplicateBtn);
 
@@ -318,5 +376,34 @@ describe('<Widget />', () => {
     await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 
     expect(updateWidget).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
+  });
+
+  it('shows an info when the widget accesses the Warm Tier', async () => {
+    render(<DummyWidget searchedIndices={
+[
+  {
+    index_name: 'aloho_warm_1016',
+    begin: 1709715731270,
+    end: 1709716042255,
+    is_warm_tiered: true,
+    stream_names: ['aloho', 'mora'],
+  },
+  {
+    index_name: 'aloho_1017',
+    begin: 1709716042283,
+    end: 1709716342274,
+    is_warm_tiered: false,
+    stream_names: ['lumos'],
+  },
+  {
+    index_name: 'aloho_1018',
+    begin: 0,
+    end: 0,
+    is_warm_tiered: false,
+    stream_names: [],
+  }]
+    } />);
+
+    await screen.findByText('This widget is retrieving data from the Warm Tier and may take longer to load.');
   });
 });

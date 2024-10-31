@@ -16,22 +16,20 @@
  */
 
 import React, { useCallback } from 'react';
-import PropTypes from 'prop-types';
+import merge from 'lodash/merge';
 
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
 import useAppDispatch from 'stores/useAppDispatch';
 
 import GenericPlot from './GenericPlot';
-import type { ChartColor, ChartConfig } from './GenericPlot';
+import type { ChartColor, ChartConfig, PlotLayout } from './GenericPlot';
 import OnZoom from './OnZoom';
-
-import CustomPropTypes from '../CustomPropTypes';
 
 export type Props = {
   axisType?: AxisType,
@@ -41,10 +39,10 @@ export type Props = {
     from: string,
     to: string,
   },
-  getChartColor?: (data: Array<ChartConfig>, name: string) => (string | undefined | null),
-  height?: number;
+  height: number;
+  width: number;
   setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor,
-  plotLayout?: any,
+  plotLayout?: Partial<PlotLayout>,
   onZoom?: (from: string, to: string, userTimezone: string) => boolean,
 };
 
@@ -60,13 +58,6 @@ const yLegendPosition = (containerHeight: number) => {
   return -0.14;
 };
 
-type Layout = {
-  yaxis: { fixedrange?: boolean },
-  legend?: { y?: number },
-  showlegend: boolean,
-  hovermode: 'x',
-};
-
 const mapAxisType = (axisType: AxisType): 'linear' | 'log' => {
   switch (axisType) {
     case 'linear': return 'linear';
@@ -78,21 +69,20 @@ const mapAxisType = (axisType: AxisType): 'linear' | 'log' => {
 const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({ line: { color: colors.get(chart.originalName ?? chart.name) } });
 
 const XYPlot = ({
-  axisType,
+  axisType = DEFAULT_AXIS_TYPE,
   config,
   chartData,
   effectiveTimerange,
-  getChartColor,
-  setChartColor,
+  setChartColor = defaultSetColor,
   height,
+  width,
   plotLayout = {},
   onZoom,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
-  const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) };
-  const defaultLayout: Layout = {
+  const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) } as const;
+  const defaultLayout: Partial<PlotLayout> = {
     yaxis,
-    showlegend: false,
     hovermode: 'x',
   };
 
@@ -100,7 +90,7 @@ const XYPlot = ({
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
 
-  const layout = { ...defaultLayout, ...plotLayout };
+  const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
   const dispatch = useAppDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
@@ -111,53 +101,26 @@ const XYPlot = ({
     const normalizedFrom = formatTime(effectiveTimerange.from, 'internal');
     const normalizedTo = formatTime(effectiveTimerange.to, 'internal');
 
-    layout.xaxis = {
+    layout.xaxis = merge(layout.xaxis, {
       range: [normalizedFrom, normalizedTo],
       type: 'date',
-    };
+    });
   } else {
-    layout.xaxis = {
+    layout.xaxis = merge(layout.xaxis, {
       fixedrange: true,
       /* disable plotly sorting by setting the type of the xaxis to category */
       type: config.sort.length > 0 ? 'category' : undefined,
-    };
+    });
   }
 
   return (
-    <PlotLegend config={config} chartData={chartData}>
+    <PlotLegend config={config} chartData={chartData} height={height} width={width}>
       <GenericPlot chartData={chartData}
                    layout={layout}
                    onZoom={_onZoom}
-                   getChartColor={getChartColor}
                    setChartColor={setChartColor} />
     </PlotLegend>
   );
-};
-
-XYPlot.propTypes = {
-  axisType: PropTypes.oneOf(axisTypes),
-  chartData: PropTypes.array.isRequired,
-  config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
-  effectiveTimerange: PropTypes.exact({
-
-    type: PropTypes.string.isRequired,
-    from: PropTypes.string.isRequired,
-    to: PropTypes.string.isRequired,
-  }),
-  plotLayout: PropTypes.object,
-  getChartColor: PropTypes.func,
-  setChartColor: PropTypes.func,
-  onZoom: PropTypes.func,
-};
-
-XYPlot.defaultProps = {
-  axisType: DEFAULT_AXIS_TYPE,
-  plotLayout: {},
-  getChartColor: undefined,
-  setChartColor: defaultSetColor,
-  effectiveTimerange: undefined,
-  onZoom: undefined,
-  height: undefined,
 };
 
 export default XYPlot;

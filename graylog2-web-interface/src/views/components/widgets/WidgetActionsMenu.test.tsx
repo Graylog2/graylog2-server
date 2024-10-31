@@ -35,11 +35,12 @@ import { loadDashboard } from 'views/logic/views/Actions';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import createSearch from 'views/logic/slices/createSearch';
 import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
 import useViewType from 'views/hooks/useViewType';
 import fetchSearch from 'views/logic/views/fetchSearch';
+import useWidgetResults from 'views/components/useWidgetResults';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -48,6 +49,7 @@ import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
 jest.mock('views/components/dashboard/hooks/useDashboards');
+jest.mock('views/components/useWidgetResults');
 jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/slices/createSearch');
@@ -61,11 +63,15 @@ jest.mock('views/logic/slices/widgetActions', () => ({
 }));
 
 const openActionDropdown = async () => {
-  const actionToggle = await screen.findByTestId('widgetActionDropDown');
+  const actionToggle = await screen.findByRole('button', { name: /open actions dropdown/i });
 
   fireEvent.click(actionToggle);
   await screen.findByRole('heading', { name: 'Actions' });
 };
+
+const waitForDropdownToClose = () => waitFor(() => {
+  expect(screen.queryByRole('heading', { name: 'Actions' })).not.toBeInTheDocument();
+});
 
 describe('<WidgetActionsMenu />', () => {
   const widget = WidgetModel.builder().newId()
@@ -140,20 +146,19 @@ describe('<WidgetActionsMenu />', () => {
     </TestStoreProvider>
   );
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(createSearch).mockImplementation(async (s) => s);
+    asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
   });
 
-  it('is updating widget focus context on focus', () => {
+  it('is updating widget focus context on focus', async () => {
     const mockSetWidgetFocusing = jest.fn();
     render(<DummyWidget title="Dummy Widget" setWidgetFocusing={mockSetWidgetFocusing} />);
 
-    const focusButton = screen.getByTitle('Focus this widget');
+    const focusButton = await screen.findByTitle('Focus this widget');
 
     fireEvent.click(focusButton);
 
@@ -189,11 +194,13 @@ describe('<WidgetActionsMenu />', () => {
       .type('dummy')
       .config({})
       .build();
-    const { queryByText } = render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
+    render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
 
     await openActionDropdown();
 
-    expect(queryByText('Export')).toBeNull();
+    const exportButton = screen.queryByRole('button', { name: /Export all search results/i });
+
+    expect(exportButton).toBeNull();
   });
 
   it('allows export for message tables', async () => {
@@ -204,13 +211,13 @@ describe('<WidgetActionsMenu />', () => {
 
     render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
 
-    await openActionDropdown();
-
-    const exportButton = screen.getByText('Export');
+    const exportButton = screen.queryByRole('button', { name: /Export all search results/i });
 
     fireEvent.click(exportButton);
 
     expect(screen.getByText('Export message table search results')).not.toBeNull();
+
+    await waitForDropdownToClose();
   });
 
   describe('copy widget to dashboard', () => {
@@ -391,6 +398,8 @@ describe('<WidgetActionsMenu />', () => {
         expect(removeWidget).not.toHaveBeenCalledWith('widget-id');
 
         expect(deletingWidgetHook).toHaveBeenCalled();
+
+        await waitForDropdownToClose();
       });
 
       it('should skip custom deletion hook if it throws exception', async () => {

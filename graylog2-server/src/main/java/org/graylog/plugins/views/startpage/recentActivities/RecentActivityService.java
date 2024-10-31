@@ -18,58 +18,62 @@ package org.graylog.plugins.views.startpage.recentActivities;
 
 import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.CreateCollectionOptions;
+import com.mongodb.client.model.Filters;
+import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.PermissionAndRoleResolver;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.plugin.database.users.User;
-import org.mongojack.DBQuery;
+import org.graylog2.rest.models.SortOrder;
 
-import javax.inject.Inject;
+import java.util.HashSet;
 
-public class RecentActivityService extends PaginatedDbService<RecentActivityDTO> {
+public class RecentActivityService {
     public static final String COLLECTION_NAME = "recent_activity";
     private final EventBus eventBus;
     private final GRNRegistry grnRegistry;
     private final PermissionAndRoleResolver permissionAndRoleResolver;
 
     private static final long MAXIMUM_RECENT_ACTIVITIES = 10000;
+    private final MongoCollection<RecentActivityDTO> db;
+    private final MongoPaginationHelper<RecentActivityDTO> pagination;
 
     @Inject
-    public RecentActivityService(final MongoConnection mongoConnection,
-                                 final MongoJackObjectMapperProvider mapper,
+    public RecentActivityService(final MongoCollections mongoCollections,
+                                 final MongoConnection mongoConnection,
                                  final EventBus eventBus,
                                  final GRNRegistry grnRegistry,
                                  final PermissionAndRoleResolver permissionAndRoleResolver) {
-        this(mongoConnection, mapper, eventBus, grnRegistry, permissionAndRoleResolver, MAXIMUM_RECENT_ACTIVITIES);
+        this(mongoCollections, mongoConnection, eventBus, grnRegistry, permissionAndRoleResolver, MAXIMUM_RECENT_ACTIVITIES);
     }
 
     /*
      * Constructor to set a low maximum in tests to check the capped collection.
      */
-    protected RecentActivityService(final MongoConnection mongoConnection,
-                                    final MongoJackObjectMapperProvider mapper,
+    protected RecentActivityService(final MongoCollections mongoCollections,
+                                    final MongoConnection mongoConnection,
                                     final EventBus eventBus,
                                     final GRNRegistry grnRegistry,
                                     final PermissionAndRoleResolver permissionAndRoleResolver,
                                     final long maximum) {
-        super(mongoConnection, mapper, RecentActivityDTO.class, COLLECTION_NAME,
-                BasicDBObjectBuilder.start()
-                        .add("capped", true)
-                        .add("size", maximum * 1024)
-                        .add("max", maximum)
-                        .get(),
-                null );
+        final var mongodb = mongoConnection.getMongoDatabase();
+        if (!mongodb.listCollectionNames().into(new HashSet<>()).contains(COLLECTION_NAME)) {
+            mongodb.createCollection(COLLECTION_NAME, new CreateCollectionOptions().capped(true).sizeInBytes(maximum * 1024).maxDocuments(maximum));
+        }
+        this.db = mongoCollections.collection(COLLECTION_NAME, RecentActivityDTO.class);
         this.grnRegistry = grnRegistry;
         this.permissionAndRoleResolver = permissionAndRoleResolver;
         this.eventBus = eventBus;
+        this.pagination = mongoCollections.paginationHelper(this.db);
 
         db.createIndex(new BasicDBObject(RecentActivityDTO.FIELD_ITEM_GRN, 1));
     }
@@ -104,20 +108,34 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
 
     public PaginatedList<RecentActivityDTO> findRecentActivitiesFor(SearchUser user, int page, int perPage) {
         // show the most recent activities first
-        var sort = getSortBuilder("desc", RecentActivityDTO.FIELD_TIMESTAMP);
+        var sort = SortOrder.DESCENDING.toBsonSort(RecentActivityDTO.FIELD_TIMESTAMP);
         // no permission check for local admin
-        if(user.getUser().isLocalAdmin()) {
-            return findPaginatedWithQueryAndSort(DBQuery.empty(), sort, page, perPage);
+        if (user.getUser().isLocalAdmin()) {
+            return pagination
+                    .perPage(perPage)
+                    .sort(sort)
+                    .includeGrandTotal(true)
+                    .page(page);
         }
 
         // filter relevant activities by permissions
         final var principal = grnRegistry.newGRN(GRNTypes.USER, user.getUser().getId());
         final var grns = permissionAndRoleResolver.resolveGrantees(principal).stream().map(GRN::toString).toList();
-        var query = DBQuery.in(RecentActivityDTO.FIELD_GRANTEE, grns);
-        return findPaginatedWithQueryAndSort(query, sort, page, perPage);
+        var query = Filters.in(RecentActivityDTO.FIELD_GRANTEE, grns);
+        return pagination
+                .perPage(perPage)
+                .sort(sort)
+                .filter(query)
+                .includeGrandTotal(true)
+                .grandTotalFilter(query)
+                .page(page);
     }
 
     public void deleteAllEntriesForEntity(GRN grn) {
-        db.remove(DBQuery.is(RecentActivityDTO.FIELD_ITEM_GRN, grn.toString()));
+        db.deleteMany(Filters.eq(RecentActivityDTO.FIELD_ITEM_GRN, grn.toString()));
+    }
+
+    public void save(RecentActivityDTO activity) {
+        db.insertOne(activity);
     }
 }

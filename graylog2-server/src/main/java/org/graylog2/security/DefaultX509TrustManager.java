@@ -36,6 +36,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class DefaultX509TrustManager extends X509ExtendedTrustManager {
     private final List<String> hosts;
@@ -52,8 +53,9 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
      * one of the given hosts in the list.
      * <p>
      * <b>Note: ANY matching host from the list is accepted. </b> <br>
-     *    E.g.: Given a host list [A,B], the server B is allowed to offer a certificate issued to A
-     * @param hosts     The hosts to check the certificate subject against
+     * E.g.: Given a host list [A,B], the server B is allowed to offer a certificate issued to A
+     *
+     * @param hosts The hosts to check the certificate subject against
      * @throws NoSuchAlgorithmException
      * @throws KeyStoreException
      */
@@ -72,9 +74,10 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
      * one of the given hosts in the list.
      * <p>
      * <b>Note: ANY matching host from the list is accepted. </b> <br>
-     *    E.g.: Given a host list [A,B], the server B is allowed to offer a certificate issued to A
-     * @param hosts     The hosts to check the certificate subject against
-     * @param keyStore  The trusted KeyStore
+     * E.g.: Given a host list [A,B], the server B is allowed to offer a certificate issued to A
+     *
+     * @param hosts    The hosts to check the certificate subject against
+     * @param keyStore The trusted KeyStore
      * @throws NoSuchAlgorithmException
      * @throws KeyStoreException
      */
@@ -88,7 +91,7 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
 
         this.defaultTrustManager = Arrays.stream(tmf.getTrustManagers())
                 .filter(trustManager -> trustManager instanceof X509TrustManager)
-                .map(trustManager -> (X509TrustManager)trustManager)
+                .map(trustManager -> (X509TrustManager) trustManager)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Unable to initialize default X509 trust manager."));
 
@@ -133,10 +136,12 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
     }
 
     private void validateHostnames(X509Certificate[] x509Certificates, String s) throws CertificateException {
-        Arrays.stream(x509Certificates)
+        final Optional<X509Certificate> matchedCert = Arrays.stream(x509Certificates)
                 .filter(this::certificateMatchesHostname)
-                .findFirst()
-                .orElseThrow(() -> new CertificateException("Presented certificate does not match configured hostname!"));
+                .findFirst();
+        if (matchedCert.isEmpty()) {
+            throw new CertificateException("Presented certificate does not match configured hostname!");
+        }
     }
 
     private boolean certificateMatchesHostname(X509Certificate x509Certificate) {

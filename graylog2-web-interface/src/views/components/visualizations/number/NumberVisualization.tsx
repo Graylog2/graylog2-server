@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
@@ -31,24 +31,23 @@ import ElementDimensions from 'components/common/ElementDimensions';
 import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
 
-const GridContainer = styled.div`
+const Container = styled.div<{ $height: number }>(({ $height }) => css`
+  height: ${$height}px;
+  width: 100%;
+`);
+
+const GridContainer = styled(Container)`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr auto;
-  grid-column-gap: 0;
-  grid-row-gap: 0;
-  height: 100%;
-  width: 100%;
+  grid-gap: 0;
 `;
 
-const SingleItemGrid = styled.div`
+const SingleItemGrid = styled(Container)`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
-  grid-column-gap: 0;
-  grid-row-gap: 0;
-  height: 100%;
-  width: 100%;
+  grid-gap: 0;
 `;
 
 const NumberBox = styled(ElementDimensions)`
@@ -88,7 +87,7 @@ const _extractFirstSeriesName = (config) => {
     : series[0].function;
 };
 
-const NumberVisualization = ({ config, fields, data }: VisualizationComponentProps) => {
+const NumberVisualization = ({ config, fields, data, height: heightProp }: VisualizationComponentProps) => {
   const targetRef = useRef();
   const onRenderComplete = useContext(RenderCompletionCallback);
   const visualizationConfig = (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
@@ -105,10 +104,10 @@ const NumberVisualization = ({ config, fields, data }: VisualizationComponentPro
     return <>N/A</>;
   }
 
-  const Container = visualizationConfig.trend ? GridContainer : SingleItemGrid;
+  const ContainerComponent = visualizationConfig.trend ? GridContainer : SingleItemGrid;
 
   return (
-    <Container>
+    <ContainerComponent $height={heightProp}>
       <NumberBox resizeDelay={20}>
         {({ height, width }) => (
           <AutoFontSizer height={height} width={width} center>
@@ -133,7 +132,7 @@ const NumberVisualization = ({ config, fields, data }: VisualizationComponentPro
           )}
         </TrendBox>
       )}
-    </Container>
+    </ContainerComponent>
   );
 };
 

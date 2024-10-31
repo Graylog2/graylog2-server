@@ -19,12 +19,15 @@ package org.graylog.plugins.views.search.export;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog2.database.filtering.AttributeFilter;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTimeZone;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,6 +41,8 @@ public abstract class ExportMessagesCommand {
     public static final ElasticsearchQueryString DEFAULT_QUERY = ElasticsearchQueryString.empty();
     public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of();
     public static final LinkedHashSet<String> DEFAULT_FIELDS = linkedHashSetOf("timestamp", "source", "message");
+
+    public static final LinkedHashSet<String> ALL_FIELDS = new LinkedHashSet<>();
     public static final int DEFAULT_CHUNK_SIZE = 1000;
     public static final DateTimeZone DEFAULT_TIME_ZONE = DateTimeZone.UTC;
 
@@ -50,11 +55,19 @@ public abstract class ExportMessagesCommand {
         }
     }
 
+    public boolean exportAllFields() {
+        return fieldsInOrder().isEmpty();
+    }
+
     public abstract AbsoluteRange timeRange();
 
     public abstract ElasticsearchQueryString queryString();
 
     public abstract Set<String> streams();
+
+    public abstract Collection<UsedSearchFilter> usedSearchFilters();
+
+    public abstract List<AttributeFilter> attributeFilters();
 
     public abstract LinkedHashSet<String> fieldsInOrder();
 
@@ -81,6 +94,10 @@ public abstract class ExportMessagesCommand {
         public abstract Builder timeRange(AbsoluteRange timeRange);
 
         public abstract Builder streams(Set<String> streams);
+
+        public abstract Builder usedSearchFilters(final Collection<UsedSearchFilter> usedSearchFilters);
+
+        public abstract Builder attributeFilters(final List<AttributeFilter> attributeFilters);
 
         public Builder streams(String... streams) {
             return streams(ImmutableSet.copyOf(streams));
@@ -113,6 +130,8 @@ public abstract class ExportMessagesCommand {
                     .timeRange(defaultTimeRange())
                     .streams(DEFAULT_STREAMS)
                     .queryString(DEFAULT_QUERY)
+                    .usedSearchFilters(List.of())
+                    .attributeFilters(List.of())
                     .fieldsInOrder(DEFAULT_FIELDS)
                     .decorators(Collections.emptyList())
                     .chunkSize(DEFAULT_CHUNK_SIZE)

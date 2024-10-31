@@ -16,55 +16,75 @@
  */
 package org.graylog2.lookup.db;
 
-import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
-import org.graylog2.database.entities.ScopedDbService;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.events.CachesDeleted;
 import org.graylog2.lookup.events.CachesUpdated;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public class DBCacheService extends ScopedDbService<CacheDto> {
+import static com.mongodb.client.model.Filters.eq;
+import static org.graylog2.database.utils.MongoUtils.stream;
+import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
+
+
+public class DBCacheService {
     public static final String COLLECTION_NAME = "lut_caches";
 
     private final ClusterEventBus clusterEventBus;
+    private final MongoCollection<CacheDto> collection;
+    private final MongoUtils<CacheDto> mongoUtils;
+    private final ScopedEntityMongoUtils<CacheDto> scopedEntityMongoUtils;
+    private final MongoPaginationHelper<CacheDto> paginationHelper;
 
     @Inject
-    public DBCacheService(MongoConnection mongoConnection,
-                          MongoJackObjectMapperProvider mapper,
+    public DBCacheService(MongoCollections mongoCollections,
                           EntityScopeService entityScopeService,
                           ClusterEventBus clusterEventBus) {
-        super(mongoConnection, mapper, CacheDto.class, COLLECTION_NAME, entityScopeService);
         this.clusterEventBus = clusterEventBus;
-
-        db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
+        this.collection = mongoCollections.collection(COLLECTION_NAME, CacheDto.class);
+        this.mongoUtils = mongoCollections.utils(collection);
+        this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
+        this.paginationHelper = mongoCollections.paginationHelper(collection);
+        collection.createIndex(Indexes.ascending("name"), new IndexOptions().unique(true));
     }
 
-    @Override
     public Optional<CacheDto> get(String idOrName) {
         if (ObjectId.isValid(idOrName)) {
-            return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
+            return mongoUtils.getById(idOrName);
         } else {
             // not an ObjectId, try with name
-            return Optional.ofNullable(db.findOne(DBQuery.is("name", idOrName)));
+            return Optional.ofNullable(collection.find(eq("name", idOrName)).first());
         }
     }
 
-    public CacheDto saveAndPostEvent(CacheDto table) {
-        final CacheDto savedCache = save(table);
+    public CacheDto save(CacheDto cache) {
+        final CacheDto savedCache;
+        if (cache.id() == null) {
+            final String id = scopedEntityMongoUtils.create(cache);
+            savedCache = cache.toBuilder().id(id).build();
+        } else {
+            savedCache = scopedEntityMongoUtils.update(cache);
+        }
+        return savedCache;
+    }
+
+    public CacheDto saveAndPostEvent(CacheDto cache) {
+        final CacheDto savedCache = save(cache);
         clusterEventBus.post(CachesUpdated.create(savedCache.id()));
 
         return savedCache;
@@ -74,38 +94,32 @@ public class DBCacheService extends ScopedDbService<CacheDto> {
         clusterEventBus.post(CachesUpdated.create(updatedCacheIds));
     }
 
-    public PaginatedList<CacheDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
-        try (DBCursor<CacheDto> cursor = db.find(query)
-                .sort(sort)
-                .limit(perPage)
-                .skip(perPage * Math.max(0, page - 1))) {
-
-            return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
-        }
+    public PaginatedList<CacheDto> findPaginated(Bson query, Bson sort, int page, int perPage) {
+        return paginationHelper.filter(query).sort(sort).perPage(perPage).page(page);
     }
 
     public void deleteAndPostEvent(String idOrName) {
         final Optional<CacheDto> cacheDto = get(idOrName);
-        delete(idOrName);
-        cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
+
+        cacheDto.ifPresent(cache -> {
+            scopedEntityMongoUtils.deleteById(cache.id());
+            clusterEventBus.post(CachesDeleted.create(cache.id()));
+        });
     }
 
     public void deleteAndPostEventImmutable(String idOrName) {
         final Optional<CacheDto> cacheDto = get(idOrName);
-        super.forceDelete(idOrName);
-        cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
+        cacheDto.ifPresent(cache -> {
+            scopedEntityMongoUtils.forceDelete(cache.id());
+            clusterEventBus.post(CachesDeleted.create(cache.id()));
+        });
     }
 
     public Collection<CacheDto> findByIds(Set<String> idSet) {
-        final DBQuery.Query query = DBQuery.in("_id", idSet.stream().map(ObjectId::new).collect(Collectors.toList()));
-        try (DBCursor<CacheDto> cursor = db.find(query)) {
-            return asImmutableList(cursor);
-        }
+        return stream(collection.find(stringIdsIn(idSet))).toList();
     }
 
     public Collection<CacheDto> findAll() {
-        try (DBCursor<CacheDto> cursor = db.find()) {
-            return asImmutableList(cursor);
-        }
+        return stream(collection.find()).toList();
     }
 }

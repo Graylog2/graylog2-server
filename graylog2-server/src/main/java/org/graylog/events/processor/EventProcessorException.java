@@ -62,6 +62,13 @@ public class EventProcessorException extends Exception {
         this.eventDefinitionId = requireNonNull(eventDefinition.id(), "eventDefinitionId cannot be null");
     }
 
+    public EventProcessorException(String message, EventProcessorException e) {
+        super(message, e);
+        this.permanent = e.isPermanent();
+        this.eventDefinition = e.getEventDefinition().orElse(null);
+        this.eventDefinitionId = e.getEventDefinitionId();
+    }
+
     /**
      * Indicates if an error is permanent or temporary. Temporary errors could be candidates for retries.
      *

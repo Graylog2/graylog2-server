@@ -106,7 +106,7 @@ public class MongoDBFixtureImporter {
     }
 
     private static URL toResource(final String resourceName, final Class<?> contextClass) {
-        if (! Paths.get(resourceName).isAbsolute()) {
+        if (!Paths.get(resourceName).isAbsolute()) {
             try {
                 return Resources.getResource(contextClass, resourceName);
             } catch (IllegalArgumentException ignored) {
@@ -230,10 +230,6 @@ public class MongoDBFixtureImporter {
 
         if (indexOptionsDoc.containsKey("max")) {
             indexOptions.max(indexOptionsDoc.getDouble("max"));
-        }
-
-        if (indexOptionsDoc.containsKey("bucketSize")) {
-            indexOptions.bucketSize(indexOptionsDoc.getDouble("bucketSize"));
         }
 
         if (indexOptionsDoc.containsKey("storageEngine")) {

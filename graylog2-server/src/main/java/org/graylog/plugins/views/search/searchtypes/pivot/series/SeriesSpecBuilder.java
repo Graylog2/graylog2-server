@@ -23,7 +23,4 @@ public abstract class SeriesSpecBuilder<V, B> extends TypedBuilder<V, B> {
 
     @JsonProperty
     public abstract B id(String id);
-
-    @JsonProperty
-    public abstract B field(String field);
 }

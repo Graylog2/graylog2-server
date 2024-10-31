@@ -38,23 +38,19 @@ import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.elasticsearch7.views.ViewsUtils.indicesOf;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBackendGeneratedRequestTestBase {
@@ -66,25 +62,21 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
 
     @Before
     public void setUpFixtures() throws InvalidRangeParametersException {
-        final Set<SearchType> searchTypes = new HashSet<>() {{
-            add(
-                    Pivot.builder()
-                            .id("pivot1")
-                            .series(Collections.singletonList(Average.builder().field("field1").build()))
-                            .rollup(true)
-                            .timerange(DerivedTimeRange.of(AbsoluteRange.create("2019-09-11T10:31:52.819Z", "2019-09-11T10:36:52.823Z")))
-                            .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder().title("Pivot1 local filter").description("Pivot1 local filter").queryString("local:filter").build()))
-                            .build()
-            );
-            add(
-                    Pivot.builder()
-                            .id("pivot2")
-                            .series(Collections.singletonList(Max.builder().field("field2").build()))
-                            .rollup(true)
-                            .query(ElasticsearchQueryString.of("source:babbage"))
-                            .build()
-            );
-        }};
+        final Set<SearchType> searchTypes = Set.of(
+                Pivot.builder()
+                        .id("pivot1")
+                        .series(Collections.singletonList(Average.builder().field("field1").build()))
+                        .rollup(true)
+                        .timerange(DerivedTimeRange.of(AbsoluteRange.create("2019-09-11T10:31:52.819Z", "2019-09-11T10:36:52.823Z")))
+                        .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder().title("Pivot1 local filter").description("Pivot1 local filter").queryString("local:filter").build()))
+                        .build(),
+                Pivot.builder()
+                        .id("pivot2")
+                        .series(Collections.singletonList(Max.builder().field("field2").build()))
+                        .rollup(true)
+                        .query(ElasticsearchQueryString.of("source:babbage"))
+                        .build()
+        );
         this.query = Query.builder()
                 .id("query1")
                 .searchTypes(searchTypes)
@@ -98,14 +90,12 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
     }
 
     @Test
-    public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws IOException {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(query, Collections.emptySet());
+    public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws Exception {
+        final ESGeneratedQueryContext queryContext = createContext(query);
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
 
-        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
+        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext);
 
         final DocumentContext pivot1 = parse(generatedRequest.get(0).source().toString());
         final DocumentContext pivot2 = parse(generatedRequest.get(1).source().toString());
@@ -146,7 +136,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
     }
 
     @Test
-    public void timerangeOverridesAffectIndicesSelection() throws IOException, InvalidRangeParametersException {
+    public void timerangeOverridesAffectIndicesSelection() throws Exception {
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), timeRangeForTest()))
                 .thenReturn(ImmutableSet.of("queryIndex"));
 
@@ -154,13 +144,11 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), tr))
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = createContext(query);
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
 
-        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
+        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext);
 
         assertThat(indicesOf(generatedRequest))
                 .hasSize(2)
@@ -168,5 +156,9 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                         "searchTypeIndex",
                         "queryIndex"
                 );
+    }
+
+    private ESGeneratedQueryContext createContext(Query query) {
+        return this.elasticsearchBackend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
     }
 }

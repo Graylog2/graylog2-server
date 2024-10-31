@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Pipeline rule editor: Prevent Abandon Page Confirmation."
+
+issues = ["18718"]
+pulls = ["18845"]

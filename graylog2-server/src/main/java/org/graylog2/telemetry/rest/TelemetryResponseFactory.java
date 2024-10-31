@@ -16,7 +16,11 @@
  */
 package org.graylog2.telemetry.rest;
 
+import com.google.common.base.Strings;
+import jakarta.annotation.Nullable;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
+import org.graylog2.system.traffic.TrafficCounterService.TrafficHistogram;
+import org.graylog2.system.traffic.TrafficCounterService.TrafficHistograms;
 import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.joda.time.DateTime;
 
@@ -39,6 +43,7 @@ class TelemetryResponseFactory {
     private static final String LICENSE = "license";
     private static final String PLUGIN = "plugin";
     private static final String SEARCH_CLUSTER = "search_cluster";
+    private static final String DATA_NODES = "data_nodes";
 
     private static boolean isLeader(Map<String, Object> n) {
         if (n.get(FIELD_IS_LEADER) instanceof Boolean isLeader) {
@@ -52,7 +57,8 @@ class TelemetryResponseFactory {
                                                 Map<String, Object> pluginInfo,
                                                 Map<String, Object> searchClusterInfo,
                                                 List<TelemetryLicenseStatus> licenseStatuses,
-                                                TelemetryUserSettings telemetryUserSettings) {
+                                                TelemetryUserSettings telemetryUserSettings,
+                                                Map<String, Object> dataNodeInfo) {
         Map<String, Object> telemetryResponse = new LinkedHashMap<>();
         telemetryResponse.put(CURRENT_USER, userInfo);
         telemetryResponse.put(USER_TELEMETRY_SETTINGS, telemetryUserSettings);
@@ -60,6 +66,7 @@ class TelemetryResponseFactory {
         telemetryResponse.put(LICENSE, createLicenseInfo(licenseStatuses));
         telemetryResponse.put(PLUGIN, pluginInfo);
         telemetryResponse.put(SEARCH_CLUSTER, searchClusterInfo);
+        telemetryResponse.put(DATA_NODES, dataNodeInfo);
         return telemetryResponse;
     }
 
@@ -82,20 +89,32 @@ class TelemetryResponseFactory {
     Map<String, Object> createClusterInfo(String clusterId,
                                           DateTime clusterCreationDate,
                                           Map<String, Map<String, Object>> nodes,
-                                          long averageLastMonthTraffic,
+                                          TrafficHistogram trafficLastMonth,
                                           long usersCount,
-                                          int licenseCount) {
+                                          int licenseCount,
+                                          String installationSource,
+                                          @Nullable TrafficHistograms enterpriseTraffic) {
         Map<String, Object> clusterInfo = new LinkedHashMap<>();
         clusterInfo.put("cluster_id", clusterId);
         clusterInfo.put("cluster_creation_date", clusterCreationDate);
         clusterInfo.put("nodes_count", nodes.size());
-        clusterInfo.put("traffic_last_month", averageLastMonthTraffic);
+        clusterInfo.put("traffic_last_month", sumTraffic(trafficLastMonth.output()));
+        clusterInfo.put("data_warehouse_output_traffic_last_month", 0);
+        clusterInfo.put("input_traffic_last_month", sumTraffic(trafficLastMonth.input()));
         clusterInfo.put("users_count", usersCount);
         clusterInfo.put("license_count", licenseCount);
         clusterInfo.put("node_leader_app_version", leaderNodeVersion(nodes));
+        clusterInfo.put("installation_source", installationSource);
         clusterInfo.put("nodes", nodes);
+        if (enterpriseTraffic != null) {
+            clusterInfo.put("data_warehouse_accounted_output_traffic_last_month", enterpriseTraffic.sumTraffic("data_warehouse_indexed_output"));
+            clusterInfo.put("data_warehouse_not_accounted_output_traffic_last_month", enterpriseTraffic.sumTraffic("data_warehouse_not_indexed_output"));
+        }
         return clusterInfo;
+    }
 
+    private static long sumTraffic(Map<DateTime, Long> traffic) {
+        return traffic.values().stream().mapToLong(Long::longValue).sum();
     }
 
     private Object leaderNodeVersion(Map<String, Map<String, Object>> nodes) {
@@ -154,6 +173,9 @@ class TelemetryResponseFactory {
     }
 
     private String formatLicenseString(TelemetryLicenseStatus telemetryLicenseStatus) {
-        return telemetryLicenseStatus.subject().replace("/", "_").substring(1);
+        if (!Strings.isNullOrEmpty(telemetryLicenseStatus.subject())) {
+            return telemetryLicenseStatus.subject().replace("/", "_").substring(1);
+        }
+        return "";
     }
 }

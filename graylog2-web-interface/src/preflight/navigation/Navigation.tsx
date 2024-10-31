@@ -16,40 +16,38 @@
  */
 import React from 'react';
 import type { TextProps } from '@mantine/core';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import HelpMenu from 'preflight/navigation/HelpMenu';
-import { Group, Header, Text } from 'preflight/components/common';
+import { Group, AppShell, Text } from 'preflight/components/common';
+import NavigationBrand from 'components/perspectives/DefaultBrand';
 
-import NavigationBrand from './NavigationBrand';
 import ThemeModeToggle from './ThemeModeToggle';
 
 type StyledMantineTextProps = TextProps & {
-  theme: DefaultTheme,
   children: React.ReactNode,
 };
-const GraylogHeader = styled(Header)(({ theme }) => css`
+const GraylogHeader = styled(AppShell.Header)(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
   border: 1px solid ${theme.colors.variant.lighter.default};
   padding: ${theme.spacings.md};
 `);
 const NavigationContainer = styled.div`
   display: flex;
-  justify-content : space-between;
+  justify-content: space-between;
   align-items: center;
 `;
-const StyledText = styled(Text)<React.PropsWithChildren<StyledMantineTextProps>>(({ theme }: StyledMantineTextProps) => css`
-  color: ${theme.mode === 'teint' ? theme.colors.brand.concrete : 'white'};
+const StyledText = styled(Text)<StyledMantineTextProps>(({ theme }) => css`
+  color: ${theme.mode === 'light' ? theme.colors.brand.concrete : 'white'};
 `);
 const Navigation = () => (
-  <GraylogHeader height={80}>
+  <GraylogHeader>
     <NavigationContainer>
-      <Group position="left" spacing="xs">
+      <Group gap="xs">
         <NavigationBrand />
-        <StyledText weight={700} size="lg" mr={1}>Graylog Initial Setup</StyledText>
+        <StyledText fw={500} size="xs" mr={1}>Graylog Initial Setup</StyledText>
       </Group>
-      <Group position="right">
+      <Group justify="flex-end">
         <HelpMenu />
         <ThemeModeToggle />
       </Group>

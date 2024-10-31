@@ -19,10 +19,13 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivots.buckets;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.AutoDateHistogramAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.AggTypes;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler;
@@ -39,8 +42,12 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler.DATE_TIME_FORMAT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -92,9 +99,25 @@ class ESTimeHandlerTest {
         assertThat(argumentTimeRange).isEqualTo(RelativeRange.create(2323));
     }
 
+    @Test
+    public void autoDateHistogramAggregationBuilderUsedForAutoIntervalAndAllMessages() {
+        final AutoInterval interval = mock(AutoInterval.class);
+        final RelativeRange allMessagesRange = RelativeRange.allTime();
+        doReturn(allMessagesRange).when(query).timerange();
+        when(time.interval()).thenReturn(interval);
+
+        final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdAggregations = this.esTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, time, queryContext, query);
+        assertEquals(createdAggregations.root(), createdAggregations.leaf());
+        assertTrue(createdAggregations.root() instanceof AutoDateHistogramAggregationBuilder);
+        assertEquals("foobar", createdAggregations.root().getName());
+        assertEquals("foobar", ((AutoDateHistogramAggregationBuilder) createdAggregations.root()).field());
+        assertEquals(DATE_TIME_FORMAT, ((AutoDateHistogramAggregationBuilder) createdAggregations.root()).format());
+
+    }
+
 
     @ParameterizedTest
-    @ValueSource(strings = { "1s", "1M", "4s", "14d" })
+    @ValueSource(strings = {"1s", "1M", "4s", "14d"})
     public void correctIntervalTypeIsUsedForAggregation(String intervalString) throws InvalidRangeParametersException {
         when(pivot.timerange()).thenReturn(Optional.empty());
         when(query.timerange()).thenReturn(RelativeRange.create(2323));

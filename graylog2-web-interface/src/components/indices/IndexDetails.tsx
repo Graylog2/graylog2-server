@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -45,6 +44,7 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
   }, [indexName]);
 
   const _onRecalculateIndex = useCallback(() => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Really recalculate the index ranges for index ${indexName}?`)) {
       IndexRangesActions.recalculateIndex(indexName).then(() => {
         IndicesActions.list(indexSetId);
@@ -52,15 +52,8 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
     }
   }, [indexName, indexSetId]);
 
-  const _onCloseIndex = useCallback(() => {
-    if (window.confirm(`Really close index ${indexName}?`)) {
-      IndicesActions.close(indexName).then(() => {
-        IndicesActions.list(indexSetId);
-      });
-    }
-  }, [indexName, indexSetId]);
-
   const _onDeleteIndex = useCallback(() => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Really delete index ${indexName}?`)) {
       IndicesActions.delete(indexName).then(() => {
         IndicesActions.list(indexSetId);
@@ -72,7 +65,6 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
     if (isDeflector) {
       return (
         <span>
-          <Button bsStyle="warning" bsSize="xs" disabled>Active write index cannot be closed</Button>{' '}
           <Button bsStyle="danger" bsSize="xs" disabled>Active write index cannot be deleted</Button>
         </span>
       );
@@ -81,11 +73,10 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
     return (
       <span>
         <Button bsStyle="warning" bsSize="xs" onClick={_onRecalculateIndex}>Recalculate index ranges</Button>{' '}
-        <Button bsStyle="warning" bsSize="xs" onClick={_onCloseIndex}>Close index</Button>{' '}
         <Button bsStyle="danger" bsSize="xs" onClick={_onDeleteIndex}>Delete index</Button>
       </span>
     );
-  }, [isDeflector, _onCloseIndex, _onDeleteIndex, _onRecalculateIndex]);
+  }, [isDeflector, _onDeleteIndex, _onRecalculateIndex]);
 
   if (!index || !index.all_shards) {
     return <Spinner />;
@@ -114,14 +105,6 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
       {actionButtons}
     </div>
   );
-};
-
-IndexDetails.propTypes = {
-  index: PropTypes.object.isRequired,
-  indexName: PropTypes.string.isRequired,
-  indexRange: PropTypes.object.isRequired,
-  indexSetId: PropTypes.string.isRequired,
-  isDeflector: PropTypes.bool.isRequired,
 };
 
 export default IndexDetails;

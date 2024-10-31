@@ -18,7 +18,8 @@ package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearche
 
 import com.eaio.uuid.UUIDGen;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;

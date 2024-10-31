@@ -19,14 +19,15 @@
 import moment from 'moment-timezone';
 
 import {
-  relativeDifference,
-  formatAsBrowserTime,
-  adjustFormat,
-  toUTCFromTz,
   DATE_TIME_FORMATS,
+  adjustFormat,
+  formatAsBrowserTime,
   getBrowserTimezone,
   parseFromIsoString,
+  relativeDifference,
+  relativeDifferenceDays,
   toDateObject,
+  toUTCFromTz,
 } from 'util/DateTime';
 
 const mockRootTimeZone = 'America/Chicago';
@@ -42,7 +43,6 @@ jest.mock('moment-timezone', () => {
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.useFakeTimers()
-  // @ts-expect-error
   .setSystemTime(mockedUnixTime);
 
 describe('DateTime utils', () => {
@@ -171,13 +171,19 @@ describe('DateTime utils', () => {
     });
   });
 
+  describe('relativeDifferenceDays', () => {
+    it('should return relative difference for time in days', () => {
+      expect(relativeDifferenceDays('2019-01-01T10:00:00.000Z')).toBe(364);
+    });
+  });
+
   describe('toUTCFromTz', () => {
     it('should transform time to UTC based on defined tz', () => {
-      expect(adjustFormat(toUTCFromTz('2020-01-01T10:00:00.000', moscowTZ), 'internal')).toBe('2020-01-01T07:00:00.000+00:00');
+      expect(toUTCFromTz('2020-01-01T10:00:00.000', moscowTZ).toISOString()).toEqual('2020-01-01T07:00:00.000Z');
     });
 
     it('should prioritize time zone of date time over provided time zone when calculating UTC time', () => {
-      expect(adjustFormat(toUTCFromTz('2020-01-01T12:00:00.000+02:00', 'Europe/Berlin'), 'internal')).toBe('2020-01-01T10:00:00.000+00:00');
+      expect(toUTCFromTz('2020-01-01T12:00:00.000+05:00', 'Europe/Berlin').toISOString()).toBe('2020-01-01T07:00:00.000Z');
     });
   });
 });

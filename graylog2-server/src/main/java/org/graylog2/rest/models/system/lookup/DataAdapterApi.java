@@ -26,8 +26,10 @@ import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.lookup.dto.DataAdapterDto.FIELD_CUSTOM_ERROR_TTL;

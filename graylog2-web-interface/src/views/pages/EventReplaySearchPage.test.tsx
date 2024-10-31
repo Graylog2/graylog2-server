@@ -24,7 +24,7 @@ import StreamsContext from 'contexts/StreamsContext';
 import UseCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import EventReplaySearchPage, { onErrorHandler } from 'views/pages/EventReplaySearchPage';
 import useEventById from 'hooks/useEventById';
@@ -36,6 +36,7 @@ import {
   mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
+import type { Stream } from 'logic/streams/types';
 
 const mockView = createSearch();
 
@@ -69,14 +70,12 @@ jest.mock('views/logic/Widgets', () => ({
 
 describe('EventReplaySearchPage', () => {
   const SimpleReplaySearchPage = () => (
-    <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' }]}>
+    <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' } as Stream]}>
       <EventReplaySearchPage />
     </StreamsContext.Provider>
   );
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useParams).mockReturnValue({ alertId: mockEventData.event.id });

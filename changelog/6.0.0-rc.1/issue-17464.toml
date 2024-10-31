@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Pipeline rule simulator - JSON inside message"
+
+issues = ["17464"]
+pulls = ["17817"]

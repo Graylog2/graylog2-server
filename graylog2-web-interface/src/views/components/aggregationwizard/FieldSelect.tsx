@@ -15,21 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useMemo } from 'react';
+import type { SyntheticEvent } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
-import type { SelectInstance, GroupBase } from 'react-select';
 
-import type { FieldTypeCategory } from 'views/logic/aggregationbuilder/Pivot';
-import { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 import { defaultCompare } from 'logic/DefaultCompare';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Select from 'components/common/Select';
-import type { Property } from 'views/logic/fieldtypes/FieldType';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypeIcon from 'views/components/sidebar/fields/FieldTypeIcon';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type { SelectRef } from 'components/common/Select/Select';
+import { Button } from 'components/bootstrap';
 
 const FieldName = styled.span`
   display: inline-flex;
@@ -37,13 +36,22 @@ const FieldName = styled.span`
   align-items: center;
 `;
 
+const ButtonRow = styled.div`
+  margin-top: 5px;
+  display: inline-flex;
+  gap: 5px;
+  margin-bottom: 10px;  
+`;
+
 type Props = {
   ariaLabel?: string,
   autoFocus?: boolean,
+  allowCreate?: boolean,
   className?: string,
   clearable?: boolean,
   excludedFields?: Array<string>,
   id: string,
+  isFieldQualified?: (field: FieldTypeMapping) => boolean,
   menuPortalTarget?: HTMLElement,
   name: string,
   onChange: (fieldName: string) => void,
@@ -51,49 +59,33 @@ type Props = {
   openMenuOnFocus?: boolean,
   persistSelection?: boolean,
   placeholder?: string,
-  properties?: Array<Property>,
-  qualifiedTypeCategory?: FieldTypeCategory,
-  selectRef?: React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>,
+  selectRef?: SelectRef,
   size?: 'normal' | 'small',
   value: string | undefined,
+  onSelectAllRest?: (fieldNames: Array<string>) => void,
+  showSelectAllRest?: boolean,
+  onDeSelectAll?: (e: SyntheticEvent) => void,
+  showDeSelectAll?: boolean,
 }
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
-const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) => {
-  const fieldProperties = fieldType?.type?.properties ?? Immutable.Set();
-
-  return properties
-    .map((property) => fieldProperties.contains(property))
-    .find((result) => result === false) === undefined;
-};
-
-const isFieldQualified = (field: FieldTypeMapping, properties: Array<Property>, qualifiedTypeCategory: FieldTypeCategory | undefined) => {
-  if (properties) {
-    return hasProperty(field, properties);
-  }
-
-  if (qualifiedTypeCategory) {
-    const fieldTypeCategory = field.type.type === 'date' ? DateType : ValuesType;
-
-    return qualifiedTypeCategory === fieldTypeCategory;
-  }
-
-  return true;
-};
-
 const UnqualifiedOption = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.light.default};
+  color: ${theme.colors.gray[70]};
 `);
 
 type OptionRendererProps = {
   label: string,
   qualified: boolean,
-  type: FieldType,
+  type?: FieldType,
 };
 
 const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
-  const children = <FieldName><FieldTypeIcon type={type} /> {label}</FieldName>;
+  const children = (
+    <FieldName>
+      {type && <><FieldTypeIcon type={type} /> </>}{label}
+    </FieldName>
+  );
 
   return qualified ? <span>{children}</span> : <UnqualifiedOption>{children}</UnqualifiedOption>;
 };
@@ -101,10 +93,12 @@ const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
 const FieldSelect = ({
   ariaLabel,
   autoFocus,
+  allowCreate = false,
   className,
-  clearable,
-  excludedFields,
+  clearable = false,
+  excludedFields = [],
   id,
+  isFieldQualified = () => true,
   menuPortalTarget,
   name,
   onChange,
@@ -112,11 +106,13 @@ const FieldSelect = ({
   openMenuOnFocus,
   persistSelection,
   placeholder,
-  properties,
-  qualifiedTypeCategory,
   selectRef,
-  size,
+  size = 'small',
   value,
+  onSelectAllRest,
+  showSelectAllRest = false,
+  onDeSelectAll,
+  showDeSelectAll = false,
 }: Props) => {
   const activeQuery = useActiveQueryId();
   const fieldTypes = useContext(FieldTypesContext);
@@ -127,48 +123,46 @@ const FieldSelect = ({
       label: field.name,
       value: field.name,
       type: field.type,
-      qualified: isFieldQualified(field, properties, qualifiedTypeCategory),
+      qualified: isFieldQualified(field),
     }))
     .toArray()
-    .sort(sortByLabel), [activeQuery, excludedFields, fieldTypes.queryFields, properties, qualifiedTypeCategory]);
+    .sort(sortByLabel), [activeQuery, excludedFields, fieldTypes.queryFields, isFieldQualified]);
+
+  const _onSelectAllRest = useCallback(() => onSelectAllRest(fieldOptions.map(({ value: fieldValue }) => fieldValue)), [fieldOptions, onSelectAllRest]);
+
+  const _showSelectAllRest = !!fieldOptions?.length && showSelectAllRest && typeof _onSelectAllRest === 'function';
+
+  const _showDeSelectAll = showDeSelectAll && typeof onDeSelectAll === 'function';
 
   return (
-    <Select options={fieldOptions}
-            inputId={`select-${id}`}
-            forwardedRef={selectRef}
-            className={className}
-            onMenuClose={onMenuClose}
-            openMenuOnFocus={openMenuOnFocus}
-            persistSelection={persistSelection}
-            clearable={clearable}
-            placeholder={placeholder}
-            name={name}
-            value={value}
-            aria-label={ariaLabel}
-            optionRenderer={OptionRenderer}
-            size={size}
-            autoFocus={autoFocus}
-            menuPortalTarget={menuPortalTarget}
-            onChange={onChange} />
+    <>
+      <Select options={fieldOptions}
+              inputId={`select-${id}`}
+              forwardedRef={selectRef}
+              allowCreate={allowCreate}
+              className={className}
+              onMenuClose={onMenuClose}
+              openMenuOnFocus={openMenuOnFocus}
+              persistSelection={persistSelection}
+              clearable={clearable}
+              placeholder={placeholder}
+              name={name}
+              value={value}
+              aria-label={ariaLabel}
+              optionRenderer={OptionRenderer}
+              size={size}
+              autoFocus={autoFocus}
+              menuPortalTarget={menuPortalTarget}
+              onChange={onChange} />
+      {(_showSelectAllRest || _showDeSelectAll) && (
+      <ButtonRow>
+        {_showSelectAllRest && <Button bsSize="xs" onClick={_onSelectAllRest}>Select all fields</Button>}
+        {_showDeSelectAll && <Button bsSize="xs" onClick={onDeSelectAll}>Deselect all fields</Button>}
+      </ButtonRow>
+      )}
+    </>
 
   );
-};
-
-FieldSelect.defaultProps = {
-  ariaLabel: undefined,
-  autoFocus: undefined,
-  className: undefined,
-  clearable: false,
-  qualifiedTypeCategory: undefined,
-  excludedFields: [],
-  onMenuClose: undefined,
-  openMenuOnFocus: undefined,
-  persistSelection: undefined,
-  placeholder: undefined,
-  properties: undefined,
-  selectRef: undefined,
-  size: 'small',
-  menuPortalTarget: undefined,
 };
 
 export default FieldSelect;

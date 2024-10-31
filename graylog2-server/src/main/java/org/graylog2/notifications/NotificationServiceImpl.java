@@ -20,12 +20,6 @@ import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.graylog.events.processor.DBEventDefinitionService;
-import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog.events.processor.EventProcessorEngine;
-import org.graylog.events.processor.EventProcessorException;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorParameters;
-import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.Node;
@@ -38,8 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -56,21 +52,16 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
-    private final EventProcessorEngine eventProcessorEngine;
-    private final DBEventDefinitionService dbEventDefinitionService;
-    private final SystemNotificationRenderService systemNotificationRenderService;
+    private final NotificationSystemEventPublisher eventPublisher;
 
     @Inject
     public NotificationServiceImpl(
             NodeId nodeId, MongoConnection mongoConnection, AuditEventSender auditEventSender,
-            EventProcessorEngine eventProcessorEngine, DBEventDefinitionService dbEventDefinitionService,
-            SystemNotificationRenderService systemNotificationRenderService) {
+            NotificationSystemEventPublisher eventPublisher) {
         super(mongoConnection);
         this.nodeId = checkNotNull(nodeId);
         this.auditEventSender = auditEventSender;
-        this.eventProcessorEngine = eventProcessorEngine;
-        this.dbEventDefinitionService = dbEventDefinitionService;
-        this.systemNotificationRenderService = systemNotificationRenderService;
+        this.eventPublisher = eventPublisher;
         collection(NotificationImpl.class).createIndex(NotificationImpl.FIELD_TYPE);
     }
 
@@ -177,39 +168,14 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         try {
             save(notification);
             auditEventSender.success(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_CREATE, notification.asMap());
-            createSystemEvent(notification);
         } catch (ValidationException e) {
             // We have no validations, but just in case somebody adds some...
             LOG.error("Validating user warning failed.", e);
             auditEventSender.failure(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_CREATE, notification.asMap());
             return false;
-        } catch (EventProcessorException processorException) {
-            LOG.error("Failed to create event for system notification {}", notification.getType().toString(), processorException);
-            return false;
         }
 
-        return true;
-    }
-
-    private void createSystemEvent(Notification notification) throws EventProcessorException {
-        final EventDefinitionDto systemEventDefinition =
-                dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
-                        .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
-
-        try {
-            SystemNotificationRenderService.RenderResponse renderResponse = systemNotificationRenderService.render(notification);
-            notification.addDetail("message_details", renderResponse.description);
-            SystemNotificationEventProcessorParameters parameters =
-                    SystemNotificationEventProcessorParameters.builder()
-                            .notificationType(notification.getType())
-                            .notificationMessage(renderResponse.title)
-                            .notificationDetails(notification.getDetails())
-                            .timestamp(notification.getTimestamp())
-                            .build();
-            eventProcessorEngine.execute(systemEventDefinition.id(), parameters);
-        } catch (Exception e) {
-            LOG.warn("Cannot render system event", e);
-        }
+        return eventPublisher.submit(notification);
     }
 
     @Override

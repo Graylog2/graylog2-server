@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
@@ -39,11 +39,11 @@ const Header = styled.div`
 
 const List = styled.div(({ theme }) => `
   >:nth-child(even) {
-    background: ${theme.colors.table.backgroundAlt};
+    background: ${theme.colors.table.row.backgroundStriped};
   };
 
   >:nth-child(odd) {
-    background: ${theme.colors.table.background};
+    background: ${theme.colors.table.row.background};
   };
 `);
 
@@ -61,10 +61,10 @@ const StyledPagination = styled(Pagination)`
   margin-bottom: 0;
 `;
 
-const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => `
+const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => css`
   label {
     font-weight: normal;
-    font-size: ${theme.fonts.size.body}
+    font-size: ${theme.fonts.size.body};
   }
 `);
 
@@ -132,11 +132,6 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
       </PaginationWrapper>
     </div>
   );
-};
-
-GranteesList.defaultProps = {
-  className: undefined,
-  entityTypeTitle: undefined,
 };
 
 export default GranteesList;

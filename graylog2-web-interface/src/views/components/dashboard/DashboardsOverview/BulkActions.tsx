@@ -24,18 +24,14 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import MenuItem from 'components/bootstrap/MenuItem';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 const VIEWS_BULK_DELETE_API_ROUTE = '/views/bulk_delete';
 
-type Props = {
-  selectedDashboardIds: Array<string>,
-  setSelectedDashboardIds: (dashboardIds: Array<string>) => void,
-}
-
-const BulkActions = ({ selectedDashboardIds, setSelectedDashboardIds }: Props) => {
+const BulkActions = () => {
   const queryClient = useQueryClient();
-
-  const selectedItemsAmount = selectedDashboardIds?.length;
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+  const selectedItemsAmount = selectedEntities?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'dashboard', 'dashboards');
 
   const onDelete = useCallback(() => {
@@ -44,14 +40,14 @@ const BulkActions = ({ selectedDashboardIds, setSelectedDashboardIds }: Props) =
       fetch(
         'POST',
         qualifyUrl(VIEWS_BULK_DELETE_API_ROUTE),
-        { entity_ids: selectedDashboardIds },
+        { entity_ids: selectedEntities },
       ).then(({ failures }) => {
         if (failures?.length) {
           const notDeletedDashboardIds = failures.map(({ entity_id }) => entity_id);
-          setSelectedDashboardIds(notDeletedDashboardIds);
+          setSelectedEntities(notDeletedDashboardIds);
           UserNotification.error(`${notDeletedDashboardIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted.`);
         } else {
-          setSelectedDashboardIds([]);
+          setSelectedEntities([]);
           UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
         }
       }).catch((error) => {
@@ -60,10 +56,10 @@ const BulkActions = ({ selectedDashboardIds, setSelectedDashboardIds }: Props) =
         queryClient.invalidateQueries(['dashboards', 'overview']);
       });
     }
-  }, [descriptor, queryClient, selectedItemsAmount, selectedDashboardIds, setSelectedDashboardIds]);
+  }, [descriptor, queryClient, selectedItemsAmount, selectedEntities, setSelectedEntities]);
 
   return (
-    <BulkActionsDropdown selectedEntities={selectedDashboardIds} setSelectedEntities={setSelectedDashboardIds}>
+    <BulkActionsDropdown>
       <MenuItem onSelect={onDelete}>Delete</MenuItem>
     </BulkActionsDropdown>
   );

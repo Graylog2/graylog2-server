@@ -110,8 +110,15 @@ const URLUtils = {
 
     return acceptedProtocols.includes(url.protocol);
   },
-  getBasePathname(pathname: string) {
-    return pathname.split('/')[1];
+  getPathnameWithoutId(pathname: string) {
+    return pathname.replace(/\/[0-9a-fA-F]{24}/, '').slice(1);
+  },
+  currentPathnameWithoutPrefix() {
+    const pathPrefix = AppConfig.gl2AppPathPrefix();
+
+    const pathPrefixLength = (!pathPrefix || pathPrefix === '' || pathPrefix === '/') ? 0 : pathPrefix.length;
+
+    return window.location.pathname.slice(pathPrefixLength);
   },
 };
 
@@ -121,10 +128,11 @@ export const {
   appPrefixed,
   getParsedHash,
   getParsedSearch,
-  getBasePathname,
+  getPathnameWithoutId,
   qualifyUrl,
   replaceHashParam,
   concatURLPath,
   isValidURL,
   hasAcceptedProtocol,
+  currentPathnameWithoutPrefix,
 } = URLUtils;

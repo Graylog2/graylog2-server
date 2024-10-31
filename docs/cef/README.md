@@ -1,7 +1,5 @@
 # Graylog CEF message input
 
-[![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-cef.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-cef)
-
 Graylog input plugin to receive CEF logs via UDP or TCP. Install the plugin and launch a new CEF input from `System -> Inputs` in your Graylog Web Interface.
 
 This plugin is strictly following the CEF standard and will probably not work with non-compliant messages. Please open an issue in this repository in case of any problems.
@@ -53,4 +51,4 @@ $ mvn release:prepare
 $ mvn release:perform
 ```
 
-This sets the version numbers, creates a tag and pushes to GitHub. Travis CI will build the release artifacts and upload to GitHub automatically.
+This sets the version numbers, creates a tag and pushes to GitHub.

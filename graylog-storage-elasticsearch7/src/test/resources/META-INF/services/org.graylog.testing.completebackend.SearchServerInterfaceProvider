@@ -1,0 +1,2 @@
+org.graylog.storage.elasticsearch7.testing.Elasticsearch7InstanceProvider
+org.graylog.storage.elasticsearch7.testing.OpenSearch13InstanceProvider

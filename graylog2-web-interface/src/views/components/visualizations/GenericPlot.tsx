@@ -15,31 +15,60 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
-import { withTheme } from 'styled-components';
+import { useContext, useMemo, useCallback } from 'react';
+import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
-import { Overlay, RootCloseWrapper } from 'react-overlays';
+import type { Layout } from 'plotly.js';
 
-import { Popover } from 'components/bootstrap';
-import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
-import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import { ROOT_FONT_SIZE } from 'theme/constants';
+import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
 
 import ChartColorContext from './ChartColorContext';
-import styles from './GenericPlot.lazy.css';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
-type LegendConfig = {
-  name: string,
-  target: HTMLElement,
-  color?: string,
-};
+export type PlotLayout = Layout
+
+const StyledPlot = styled(Plot)(({ theme }) => css`
+  div.plotly-notifier {
+    visibility: hidden;
+  }
+
+  .customPopover .popover-content {
+    padding: 0;
+  }
+  
+  .hoverlayer .hovertext {
+    rect {
+      fill: ${theme.colors.global.contentBackground} !important;
+      opacity: 0.9 !important;
+    }
+
+    .name {
+      fill: ${theme.colors.global.textDefault} !important;
+    }
+
+    path {
+      stroke: ${theme.colors.global.contentBackground} !important;
+    }
+  }
+`);
+
+export type OnClickMarkerEvent = {
+  x: string,
+  y: string,
+}
+
+export type OnHoverMarkerEvent = {
+  positionX: number,
+  positionY: number,
+  x: string,
+  y: string,
+}
 
 type ChartMarker = {
   colors?: Array<string>,
@@ -56,10 +85,6 @@ export type ChartConfig = {
   originalName?: string,
 };
 
-export type ColorMap = {
-  [key: string]: string,
-};
-
 export type ChartColor = {
   line?: ChartMarker,
   marker?: ChartMarker,
@@ -70,16 +95,13 @@ export type ChartColor = {
 
 type Props = {
   chartData: Array<any>,
-  getChartColor?: (data: Array<ChartConfig>, name: string) => string | undefined | null,
-  layout: {},
-  onZoom: (from: string, to: string) => boolean,
+  layout?: Partial<PlotLayout>,
+  onZoom?: (from: string, to: string) => void,
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor,
-};
-
-type GenericPlotProps = Props & { theme: DefaultTheme };
-
-type State = {
-  legendConfig?: LegendConfig,
+  onClickMarker?: (event: OnClickMarkerEvent) => void
+  onHoverMarker?: (event: OnHoverMarkerEvent) => void,
+  onUnhoverMarker?: () => void,
+  onAfterPlot?: () => void,
 };
 
 type Axis = {
@@ -96,77 +118,22 @@ const style = { height: '100%', width: '100%' };
 
 const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
 
-class GenericPlot extends React.Component<GenericPlotProps, State> {
-  static propTypes = {
-    chartData: PropTypes.array.isRequired,
-    layout: PropTypes.object,
-    onZoom: PropTypes.func,
-    getChartColor: PropTypes.func,
-    setChartColor: PropTypes.func,
-  };
+const usePlotLayout = (layout: Partial<Layout>) => {
+  const theme = useTheme();
+  const interactive = useContext(InteractiveContext);
+  const { colors } = useContext(ChartColorContext);
 
-  static defaultProps = {
-    layout: {},
-    onZoom: () => true,
-    getChartColor: undefined,
-    setChartColor: undefined,
-  };
-
-  constructor(props: GenericPlotProps) {
-    super(props);
-    this.state = {};
-  }
-
-  componentDidMount() {
-    styles.use();
-  }
-
-  componentWillUnmount() {
-    styles.unuse();
-  }
-
-  _onRelayout = (axis: Axis) => {
-    if (!axis.autosize && axis['xaxis.range[0]'] && axis['xaxis.range[1]']) {
-      const { onZoom } = this.props;
-      const from = axis['xaxis.range[0]'];
-      const to = axis['xaxis.range[1]'];
-
-      return onZoom(from, to);
-    }
-
-    return true;
-  };
-
-  _onLegendClick = (e: any) => {
-    const name = e.node.textContent;
-    const target = e.node.querySelector('g.layers');
-    const { getChartColor } = this.props;
-
-    if (getChartColor) {
-      const color = getChartColor(e.fullData, name);
-
-      this.setState({ legendConfig: { name, target, color } });
-    }
-
-    return false;
-  };
-
-  _onColorSelect = (setColor: (name: string, color: string) => Promise<unknown>, name: string, newColor: string) => setColor(name, newColor)
-    .then(this._onCloseColorPopup);
-
-  _onCloseColorPopup = () => this.setState({ legendConfig: undefined });
-
-  render() {
-    const { chartData, layout, setChartColor, theme } = this.props;
+  return useMemo(() => {
     const fontSettings = {
       color: theme.colors.global.textDefault,
-      size: ROOT_FONT_SIZE * theme.fonts.size.small.replace(/rem|em/i, ''),
+      size: ROOT_FONT_SIZE * Number(theme.fonts.size.small.replace(/rem|em/i, '')),
       family: theme.fonts.family.body,
     };
+
     const defaultLayout = {
       shapes: [],
       autosize: true,
-      showlegend: true,
+      showlegend: false,
       margin: {
         t: 10,
         l: 40,
@@ -186,14 +153,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
       title: {
         font: fontSettings,
       },
-      yaxis: {
-        automargin: true,
-        gridcolor: theme.colors.variant.lightest.default,
-        tickfont: fontSettings,
-        title: {
-          font: fontSettings,
-        },
-      },
+      yaxis: getDefaultPlotYLayoutSettings(theme),
       xaxis: {
         automargin: true,
         tickfont: fontSettings,
@@ -202,84 +162,97 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
         },
       },
     };
+
     const plotLayout = merge({}, defaultLayout, layout);
 
-    const { legendConfig } = this.state;
+    plotLayout.shapes = plotLayout.shapes.map((shape) => ({
+      ...shape,
+      line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
+    }));
 
-    return (
-      <ChartColorContext.Consumer>
-        {({ colors, setColor }) => {
-          plotLayout.shapes = plotLayout.shapes.map((shape) => ({
-            ...shape,
-            line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
-          }));
+    return interactive ? plotLayout : merge({}, plotLayout, nonInteractiveLayout);
+  }, [colors, interactive, layout, theme]);
+};
 
-          const newChartData = chartData.map((chart) => {
-            if (setChartColor && colors) {
-              const conf = setChartColor(chart, colors);
+const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfig, color: ColorMapper) => ChartColor) => {
+  const theme = useTheme();
+  const { colors } = useContext(ChartColorContext);
 
-              if (chart.type === 'pie') {
-                conf.outsidetextfont = { color: theme.colors.global.textDefault };
-              }
+  return useMemo(() => chartData.map((chart) => {
+    if (setChartColor && colors) {
+      const conf = setChartColor(chart, colors);
 
-              if (chart?.name === eventsDisplayName) {
-                const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
+      if (chart.type === 'pie') {
+        conf.outsidetextfont = { color: theme.colors.global.textDefault };
+      }
 
-                conf.marker = { color: eventColor, size: 5 };
-              }
+      if (chart?.name === eventsDisplayName) {
+        const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
 
-              if (conf.line || conf.marker) {
-                return merge(chart, conf);
-              }
+        conf.marker = { color: eventColor, size: 5 };
+      }
 
-              return chart;
-            }
+      if (conf.line || conf.marker) {
+        return merge(chart, conf);
+      }
 
-            return chart;
-          });
+      return chart;
+    }
 
-          return (
-            <InteractiveContext.Consumer>
-              {(interactive) => (
-                <RenderCompletionCallback.Consumer>
-                  {(onRenderComplete) => (
-                    <>
-                      <Plot data={newChartData}
-                            useResizeHandler
-                            layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
-                            style={style}
-                            onAfterPlot={onRenderComplete}
-                            onClick={interactive ? null : () => false}
-                            onLegendClick={interactive ? this._onLegendClick : () => false}
-                            onRelayout={interactive ? this._onRelayout : () => false}
-                            config={config} />
-                      {legendConfig && (
-                        <RootCloseWrapper event="mousedown"
-                                          onRootClose={this._onCloseColorPopup}>
-                          <Overlay show
-                                   placement="top"
-                                   target={legendConfig.target}>
-                            <Popover id="legend-config"
-                                     title={`Configuration for ${legendConfig.name}`}
-                                     className={styles.locals.customPopover}
-                                     data-event-element="Generic Plot">
-                              <ColorPicker color={legendConfig.color}
-                                           colors={defaultColors}
-                                           onChange={(newColor) => this._onColorSelect(setColor, legendConfig.name, newColor)} />
-                            </Popover>
-                          </Overlay>
-                        </RootCloseWrapper>
-                      )}
-                    </>
-                  )}
-                </RenderCompletionCallback.Consumer>
-              )}
-            </InteractiveContext.Consumer>
-          );
-        }}
-      </ChartColorContext.Consumer>
-    );
-  }
-}
+    return chart;
+  }), [chartData, colors, setChartColor, theme.colors.global.textDefault]);
+};
 
-export default withTheme(GenericPlot);
+const GenericPlot = ({ chartData, layout = {}, setChartColor, onClickMarker = () => {}, onHoverMarker = () => {}, onUnhoverMarker = () => {}, onZoom = () => {}, onAfterPlot = () => {} }: Props) => {
+  const interactive = useContext(InteractiveContext);
+  const plotLayout = usePlotLayout(layout);
+  const plotChartData = usePlotChatData(chartData, setChartColor);
+  const onRenderComplete = useContext(RenderCompletionCallback);
+
+  const _onRelayout = useCallback((axis: Axis) => {
+    if (!axis.autosize && axis['xaxis.range[0]'] && axis['xaxis.range[1]']) {
+      const from = axis['xaxis.range[0]'];
+      const to = axis['xaxis.range[1]'];
+
+      onZoom(from, to);
+    }
+  }, [onZoom]);
+
+  const _onHoverMarker = useCallback((event: unknown) => {
+    const { points } = event as { points: Array<{ bbox: { x0: number, y0: number }, y: string, x: string }> };
+
+    onHoverMarker?.({
+      positionX: points[0].bbox.x0,
+      positionY: points[0].bbox.y0,
+      x: points[0].x,
+      y: points[0].y,
+    });
+  }, [onHoverMarker]);
+
+  const _onMarkerClick = useCallback(({ points }: Readonly<Plotly.PlotMouseEvent>) => {
+    onClickMarker?.({
+      x: points[0].x as string,
+      y: points[0].y as string,
+    });
+  }, [onClickMarker]);
+
+  const _onAfterPlot = useCallback(() => {
+    onRenderComplete();
+    onAfterPlot();
+  }, [onRenderComplete, onAfterPlot]);
+
+  return (
+    <StyledPlot data={plotChartData}
+                useResizeHandler
+                layout={plotLayout}
+                style={style}
+                onAfterPlot={_onAfterPlot}
+                onClick={interactive ? _onMarkerClick : () => false}
+                onHover={_onHoverMarker}
+                onUnhover={onUnhoverMarker}
+                onRelayout={interactive ? _onRelayout : () => {}}
+                config={config} />
+  );
+};
+
+export default GenericPlot;

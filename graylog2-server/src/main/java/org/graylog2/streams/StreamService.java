@@ -26,6 +26,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,15 +43,26 @@ public interface StreamService extends PersistedService {
 
     Stream load(String id) throws NotFoundException;
 
-    void destroy(Stream stream) throws NotFoundException;
+    void destroy(Stream stream) throws NotFoundException, StreamGuardException;
 
     List<Stream> loadAll();
 
     Set<Stream> loadByIds(Collection<String> streamIds);
 
+    Set<String> mapCategoriesToIds(Collection<String> streamCategories);
+
     Set<String> indexSetIdsByIds(Collection<String> streamIds);
 
     List<Stream> loadAllEnabled();
+
+    default List<Stream> loadAllByTitle(String title) {
+        return loadAll().stream().filter(s -> title.equals(s.getTitle())).toList();
+    }
+
+    Map<String, String> loadStreamTitles(Collection<String> streamIds);
+
+    @Nullable
+    public String streamTitleFromCache(String streamId);
 
     /**
      * @return the total number of streams
@@ -70,6 +82,8 @@ public interface StreamService extends PersistedService {
     void removeOutputFromAllStreams(Output output);
 
     List<Stream> loadAllWithIndexSet(String indexSetId);
+
+    List<String> streamTitlesForIndexSet(String indexSetId);
 
     void addToIndexSet(String indexSetId, Collection<String> streamIds);
 }

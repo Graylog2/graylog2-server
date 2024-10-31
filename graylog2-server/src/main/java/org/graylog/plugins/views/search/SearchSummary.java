@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -38,7 +39,7 @@ import static org.graylog.plugins.views.search.Search.FIELD_OWNER;
 @JsonAutoDetect
 @JsonDeserialize(builder = SearchSummary.Builder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class SearchSummary {
+public abstract class SearchSummary implements MongoEntity {
     @Id
     @ObjectId
     @Nullable

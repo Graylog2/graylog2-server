@@ -20,7 +20,8 @@ import com.google.inject.assistedinject.Assisted;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 
 public class ConfigurationAdministrationFilter implements AdministrationFilter {

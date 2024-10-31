@@ -17,6 +17,9 @@
 package org.graylog2.streams;
 
 import com.google.common.base.Strings;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -26,6 +29,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.WriteResult;
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.database.MongoConnection;
@@ -36,8 +41,6 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -52,21 +55,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Projections.excludeId;
+import static com.mongodb.client.model.Projections.fields;
+import static com.mongodb.client.model.Projections.include;
+import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.graylog2.streams.StreamImpl.FIELD_ID;
+import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
+import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 
 public class StreamServiceImpl extends PersistedServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
@@ -74,9 +86,11 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final OutputService outputService;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
-    private final NotificationService notificationService;
     private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
+    private final Set<StreamDeletionGuard> streamDeletionGuards;
+    private final CacheLoader<String, String> streamTitleLoader;
+    private final LoadingCache<String, String> streamTitleCache;
 
     @Inject
     public StreamServiceImpl(MongoConnection mongoConnection,
@@ -84,22 +98,40 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              OutputService outputService,
                              IndexSetService indexSetService,
                              MongoIndexSet.Factory indexSetFactory,
-                             NotificationService notificationService,
                              EntityOwnershipService entityOwnershipService,
-                             ClusterEventBus clusterEventBus) {
+                             ClusterEventBus clusterEventBus,
+                             Set<StreamDeletionGuard> streamDeletionGuards) {
         super(mongoConnection);
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
-        this.notificationService = notificationService;
         this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
+        this.streamDeletionGuards = streamDeletionGuards;
+
+        this.streamTitleLoader = new CacheLoader<String, String>() {
+            @Nonnull
+            @Override
+            public String load(@Nonnull String streamId) throws NotFoundException {
+                String title = loadStreamTitles(List.of(streamId)).get(streamId);
+                if (title != null) {
+                    return title;
+                } else {
+                    throw new NotFoundException(f("Couldn't find stream %s", streamId));
+                }
+            }
+        };
+
+        this.streamTitleCache = CacheBuilder.newBuilder()
+                .expireAfterAccess(10, TimeUnit.SECONDS)
+                .build(streamTitleLoader);
+
     }
 
     @Nullable
     private IndexSet getIndexSet(DBObject dbObject) {
-        return getIndexSet((String) dbObject.get(StreamImpl.FIELD_INDEX_SET_ID));
+        return getIndexSet((String) dbObject.get(FIELD_INDEX_SET_ID));
     }
 
     @Nullable
@@ -129,13 +161,13 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Override
     public Stream create(Map<String, Object> fields) {
-        return new StreamImpl(fields, getIndexSet((String) fields.get(StreamImpl.FIELD_INDEX_SET_ID)));
+        return new StreamImpl(fields, getIndexSet((String) fields.get(FIELD_INDEX_SET_ID)));
     }
 
     @Override
     public Stream create(CreateStreamRequest cr, String userId) {
         Map<String, Object> streamData = Maps.newHashMap();
-        streamData.put(StreamImpl.FIELD_TITLE, cr.title().strip());
+        streamData.put(FIELD_TITLE, cr.title().strip());
         streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description());
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userId);
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
@@ -143,7 +175,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         streamData.put(StreamImpl.FIELD_MATCHING_TYPE, cr.matchingType().toString());
         streamData.put(StreamImpl.FIELD_DISABLED, false);
         streamData.put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream());
-        streamData.put(StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId());
+        streamData.put(FIELD_INDEX_SET_ID, cr.indexSetId());
 
         return create(streamData);
     }
@@ -166,6 +198,38 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         additionalQueryOpts.put(StreamImpl.FIELD_DISABLED, false);
 
         return loadAll(additionalQueryOpts);
+    }
+
+    @Override
+    public List<Stream> loadAllByTitle(String title) {
+        return loadAll(QueryBuilder.start(StreamImpl.FIELD_TITLE).is(title).get());
+    }
+
+    @Override
+    public Map<String, String> loadStreamTitles(Collection<String> streamIds) {
+        if (streamIds.isEmpty()) {
+            return Map.of();
+        }
+
+        final var streamObjectIds = streamIds.stream().map(ObjectId::new).toList();
+        final var cursor = collection(StreamImpl.class).find(
+                new BasicDBObject("_id", new BasicDBObject("$in", streamObjectIds)),
+                new BasicDBObject("_id", 1).append("title", 1)
+        );
+        try (cursor) {
+            return cursorToList(cursor).stream()
+                    .collect(Collectors.toMap(i -> i.get("_id").toString(), i -> i.get("title").toString()));
+        }
+    }
+
+    @Override
+    @Nullable
+    public String streamTitleFromCache(String streamId) {
+        try {
+            return streamTitleCache.get(streamId);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
@@ -211,7 +275,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                     .map(outputId -> {
                         final Output output = outputsById.get(outputId);
                         if (output == null) {
-                            final String streamTitle = Strings.nullToEmpty((String) o.get(StreamImpl.FIELD_TITLE));
+                            final String streamTitle = Strings.nullToEmpty((String) o.get(FIELD_TITLE));
                             LOG.warn("Stream \"" + streamTitle + "\" <" + id + "> references missing output <" + outputId + "> - ignoring output.");
                         }
                         return output;
@@ -222,7 +286,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
             @SuppressWarnings("unchecked")
             final Map<String, Object> fields = o.toMap();
 
-            final String indexSetId = (String) fields.get(StreamImpl.FIELD_INDEX_SET_ID);
+            final String indexSetId = (String) fields.get(FIELD_INDEX_SET_ID);
 
             streams.add(new StreamImpl(objectId, fields, streamRules, outputs, indexSets.get(indexSetId)));
         }
@@ -237,7 +301,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     private Map<String, IndexSet> indexSetsForStreams(List<DBObject> streams) {
         final Set<String> indexSetIds = streams.stream()
-                .map(stream -> (String) stream.get(StreamImpl.FIELD_INDEX_SET_ID))
+                .map(stream -> (String) stream.get(FIELD_INDEX_SET_ID))
                 .filter(s -> !isNullOrEmpty(s))
                 .collect(Collectors.toSet());
         return indexSetService.findByIds(indexSetIds)
@@ -256,15 +320,32 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
+    public Set<String> mapCategoriesToIds(Collection<String> categories) {
+        final DBObject query = QueryBuilder.start(StreamImpl.FIELD_CATEGORIES).in(categories).get();
+        final DBObject onlyIdField = DBProjection.include(FIELD_ID);
+        try (var cursor = collection(StreamImpl.class).find(query, onlyIdField);
+             var stream = StreamSupport.stream(cursor.spliterator(), false)) {
+            return stream.map(s -> s.get(FIELD_ID).toString()).collect(Collectors.toSet());
+        }
+    }
+
+    @Override
     public Set<String> indexSetIdsByIds(Collection<String> streamIds) {
+        Set<String> dataStreamIds = streamIds.stream()
+                .filter(s -> s.startsWith(Stream.DATASTREAM_PREFIX))
+                .collect(Collectors.toSet());
+
         final Set<ObjectId> objectIds = streamIds.stream()
+                .filter(s -> !s.startsWith(Stream.DATASTREAM_PREFIX))
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         final DBObject query = QueryBuilder.start(StreamImpl.FIELD_ID).in(objectIds).get();
-        final DBObject onlyIndexSetIdField = DBProjection.include(StreamImpl.FIELD_INDEX_SET_ID);
-        return StreamSupport.stream(collection(StreamImpl.class).find(query, onlyIndexSetIdField).spliterator(), false)
-                .map(s -> s.get(StreamImpl.FIELD_INDEX_SET_ID).toString())
+        final DBObject onlyIndexSetIdField = DBProjection.include(FIELD_INDEX_SET_ID);
+        Set<String> indexSets = StreamSupport.stream(collection(StreamImpl.class).find(query, onlyIndexSetIdField).spliterator(), false)
+                .map(s -> s.get(FIELD_INDEX_SET_ID).toString())
                 .collect(Collectors.toSet());
+        indexSets.addAll(dataStreamIds);
+        return indexSets;
     }
 
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
@@ -290,19 +371,16 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public void destroy(Stream stream) throws NotFoundException {
+    public void destroy(Stream stream) throws NotFoundException, StreamGuardException {
+        checkDeletionguards(stream.getId());
+
         for (StreamRule streamRule : streamRuleService.loadForStream(stream)) {
             super.destroy(streamRule);
         }
 
         final String streamId = stream.getId();
-        for (Notification notification : notificationService.all()) {
-            Object rawValue = notification.getDetail("stream_id");
-            if (rawValue != null && rawValue.toString().equals(streamId)) {
-                LOG.debug("Removing notification that references stream: {}", notification);
-                notificationService.destroy(notification);
-            }
-        }
+        // we need to remove notifications referencing this stream. This happens in the DeletedStreamNotificationListener
+        // triggered by the StreamDeletedEvent below.
         super.destroy(stream);
 
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
@@ -310,9 +388,15 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         entityOwnershipService.unregisterStream(streamId);
     }
 
+    private void checkDeletionguards(String streamId) throws StreamGuardException {
+        for (StreamDeletionGuard guard : streamDeletionGuards) {
+            guard.checkGuard(streamId);
+        }
+    }
+
     public void update(Stream stream, @Nullable String title, @Nullable String description) throws ValidationException {
         if (title != null) {
-            stream.getFields().put(StreamImpl.FIELD_TITLE, title);
+            stream.getFields().put(FIELD_TITLE, title);
         }
 
         if (description != null) {
@@ -393,7 +477,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Override
     public List<Stream> loadAllWithIndexSet(String indexSetId) {
-        final Map<String, Object> query = db(StreamImpl.FIELD_INDEX_SET_ID, indexSetId);
+        final Map<String, Object> query = db(FIELD_INDEX_SET_ID, indexSetId);
         return loadAll(query);
     }
 
@@ -403,7 +487,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         final var matchStreamIds = QueryBuilder.start(StreamImpl.FIELD_ID).in(objectIds).get();
-        var updateIndexSets = db("$set", db(StreamImpl.FIELD_INDEX_SET_ID, indexSetId));
+        var updateIndexSets = db("$set", db(FIELD_INDEX_SET_ID, indexSetId));
         final WriteResult update = collection(StreamImpl.class).update(matchStreamIds, updateIndexSets, false, true);
 
         if (update.getN() < streamIds.stream().distinct().count()) {
@@ -431,6 +515,20 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         clusterEventBus.post(StreamsChangedEvent.create(savedStreamId));
 
         return savedStreamId;
+    }
+
+    @Override
+    public List<String> streamTitlesForIndexSet(final String indexSetId) {
+        List<String> result = new LinkedList<>();
+        mongoCollection(StreamImpl.class)
+                .find(eq(FIELD_INDEX_SET_ID, indexSetId))
+                .projection(fields(
+                        include(FIELD_TITLE),
+                        excludeId()
+                ))
+                .map(doc -> doc.getString(FIELD_TITLE))
+                .forEach(result::add);
+        return result;
     }
 
     private BasicDBObject db(String key, Object value) {

@@ -25,7 +25,6 @@ import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
@@ -36,7 +35,8 @@ import SearchResult from 'views/logic/SearchResult';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
 import type { SearchErrorResponse } from 'views/logic/SearchError';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
 import type { MessageListResult } from './MessageList';
 import MessageList from './MessageList';
@@ -54,9 +54,7 @@ jest.mock('stores/inputs/InputsStore', () => ({
   InputsActions: { list: jest.fn(() => Promise.resolve()) },
 }));
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations'),
-}));
+jest.mock('views/hooks/useAutoRefresh');
 
 const searchTypeResults = {
   'search-type-id': {
@@ -74,13 +72,6 @@ const dummySearchJobResults = {
   search_id: 'bar',
   results: {},
 };
-
-jest.mock('views/stores/RefreshStore', () => ({
-  RefreshActions: {
-    disable: jest.fn(),
-  },
-}));
-
 jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/components/widgets/useCurrentSearchTypesResults');
 jest.mock('views/components/widgets/reexecuteSearchTypes');
@@ -106,9 +97,17 @@ describe('MessageList', () => {
     total: 1,
   };
 
-  beforeAll(loadViewsPlugin);
+  useViewsPlugin();
 
-  afterAll(unloadViewsPlugin);
+  beforeAll(() => {
+    asMock(useAutoRefresh).mockReturnValue({
+      refreshConfig: null,
+      startAutoRefresh: () => {},
+      stopAutoRefresh: () => {},
+      restartAutoRefresh: () => {},
+      animationId: 'animation-id',
+    });
+  });
 
   beforeEach(() => {
     asMock(useActiveQueryId).mockReturnValue('somequery');
@@ -130,7 +129,7 @@ describe('MessageList', () => {
     userEvent.click(nextPageButton);
   };
 
-  const SimpleMessageList = (props: Partial<React.ComponentProps<typeof MessageList>>) => (
+  const SimpleMessageList = ({ data: _data = data, config: _config = config, fields = Immutable.List([]), ...props }: Partial<React.ComponentProps<typeof MessageList>>) => (
     <TestStoreProvider>
       <MessageList title="Message List"
                    editing={false}
@@ -140,18 +139,14 @@ describe('MessageList', () => {
                    queryId="deadbeef"
                    toggleEdit={() => {}}
                    setLoadingState={() => {}}
-                   data={props.data}
-                   config={props.config}
-                   fields={props.fields}
+                   data={_data}
+                   config={_config}
+                   fields={fields}
+                   height={480}
+                   width={640}
                    {...props} />
     </TestStoreProvider>
   );
-
-  SimpleMessageList.defaultProps = {
-    config: config,
-    data: data,
-    fields: Immutable.List([]),
-  };
 
   it('should render width widget fields', async () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
@@ -213,6 +208,16 @@ describe('MessageList', () => {
   });
 
   it('disables refresh actions, when using pagination', async () => {
+    const stopAutoRefresh = jest.fn();
+
+    asMock(useAutoRefresh).mockReturnValue({
+      refreshConfig: null,
+      startAutoRefresh: () => {},
+      stopAutoRefresh,
+      restartAutoRefresh: () => {},
+      animationId: 'animation-id',
+    });
+
     const dispatch = jest.fn().mockResolvedValue(finishedLoading({
       result: new SearchResult(dummySearchJobResults),
       widgetMapping: Immutable.Map(),
@@ -224,7 +229,7 @@ describe('MessageList', () => {
 
     clickNextPageButton();
 
-    await waitFor(() => expect(RefreshActions.disable).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(stopAutoRefresh).toHaveBeenCalledTimes(1));
   });
 
   it('displays error description, when using pagination throws an error', async () => {

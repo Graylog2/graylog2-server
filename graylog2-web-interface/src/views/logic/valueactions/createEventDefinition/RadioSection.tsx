@@ -29,7 +29,7 @@ const Container = styled.div`
 
 type Props = {
   strategy: StrategyId,
-  onChange: (e: React.SyntheticEvent) => void,
+  onChange: (e: React.FormEvent<Radio>) => void,
   strategyAvailabilities: {[name in StrategyId]: boolean}
 }
 

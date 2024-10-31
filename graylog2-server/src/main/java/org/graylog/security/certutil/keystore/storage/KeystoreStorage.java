@@ -17,12 +17,11 @@
 package org.graylog.security.certutil.keystore.storage;
 
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreLocation;
 
 import java.security.KeyStore;
 import java.util.Optional;
 
-public sealed interface KeystoreStorage<T extends KeystoreLocation> permits KeystoreFileStorage, KeystoreMongoStorage, SmartKeystoreStorage {
+public interface KeystoreStorage<T> {
 
     void writeKeyStore(final T location,
                        final KeyStore keyStore,
@@ -31,5 +30,4 @@ public sealed interface KeystoreStorage<T extends KeystoreLocation> permits Keys
     ) throws KeyStoreStorageException;
 
     Optional<KeyStore> readKeyStore(final T location, char[] password) throws KeyStoreStorageException;
-
 }

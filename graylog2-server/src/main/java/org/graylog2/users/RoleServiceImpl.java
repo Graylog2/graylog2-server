@@ -22,10 +22,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DuplicateKeyException;
+import jakarta.inject.Inject;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoDBUpsertRetryer;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.security.Permissions;
@@ -38,9 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -53,8 +52,8 @@ import static org.mongojack.DBQuery.is;
 public class RoleServiceImpl implements RoleService {
     private static final Logger log = LoggerFactory.getLogger(RoleServiceImpl.class);
 
-    private static final String ROLES = "roles";
-    private static final String NAME_LOWER = "name_lower";
+    public static final String ROLES_COLLECTION_NAME = "roles";
+    public static final String NAME_LOWER = "name_lower";
     private static final String READ_ONLY = "read_only";
     private static final String ID = "_id";
 
@@ -68,13 +67,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Inject
     public RoleServiceImpl(MongoConnection mongoConnection,
-                              MongoJackObjectMapperProvider mapper,
-                              Permissions permissions,
-                              Validator validator) {
+                           MongoJackObjectMapperProvider mapper,
+                           Permissions permissions,
+                           Validator validator) {
         this.validator = validator;
 
         dbCollection = JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(ROLES),
+                mongoConnection.getDatabase().getCollection(ROLES_COLLECTION_NAME),
                 RoleImpl.class,
                 ObjectId.class,
                 mapper.get());
@@ -83,9 +82,9 @@ public class RoleServiceImpl implements RoleService {
 
         // make sure the two built-in roles actually exist
         adminRoleObjectId = checkNotNull(ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
-                                                           "Grants all permissions for Graylog administrators (built-in)"));
+                "Grants all permissions for Graylog administrators (built-in)"));
         readerRoleObjectId = checkNotNull(ensureBuiltinRole(READER_ROLENAME, permissions.readerBasePermissions(), "Reader",
-                          "Grants basic permissions for every Graylog user (built-in)"));
+                "Grants basic permissions for every Graylog user (built-in)"));
 
     }
 
@@ -96,7 +95,7 @@ public class RoleServiceImpl implements RoleService {
         RoleImpl previousRole = null;
         try {
             previousRole = load(roleName);
-            if (!previousRole.isReadOnly() || !expectedPermissions.equals(previousRole.getPermissions()))  {
+            if (!previousRole.isReadOnly() || !expectedPermissions.equals(previousRole.getPermissions())) {
                 final String msg = "Invalid role '" + roleName + "', fixing it.";
                 log.error(msg);
                 throw new IllegalArgumentException(msg); // jump to fix code
@@ -204,8 +203,7 @@ public class RoleServiceImpl implements RoleService {
         if (!violations.isEmpty()) {
             throw new ValidationException("Validation failed.", violations.toString());
         }
-        return MongoDBUpsertRetryer.run(() ->
-                dbCollection.findAndModify(is(NAME_LOWER, role.nameLower()), null, null, false, role, true, true));
+        return dbCollection.findAndModify(is(NAME_LOWER, role.nameLower()), null, null, false, role, true, true);
     }
 
     @Override

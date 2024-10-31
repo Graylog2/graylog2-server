@@ -20,8 +20,8 @@ import com.codahale.metrics.MetricRegistry;
 import io.netty.channel.EventLoopGroup;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 public class EventLoopGroupProvider implements Provider<EventLoopGroup> {
     private final EventLoopGroupFactory eventLoopGroupFactory;

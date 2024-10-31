@@ -19,12 +19,12 @@ package org.graylog2.shared.metrics.jersey2;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.Timed;
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.ext.Provider;
 
-import javax.annotation.Priority;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 

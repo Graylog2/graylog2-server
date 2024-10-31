@@ -903,7 +903,7 @@ public final class NetFlowV9Journal {
       }
       private com.google.protobuf.MapField<java.lang.Integer, com.google.protobuf.ByteString>
       internalGetMutableTemplates() {
-        onChanged();;
+        onChanged();
         if (templates_ == null) {
           templates_ = com.google.protobuf.MapField.newMapField(
               TemplatesDefaultEntryHolder.defaultEntry);

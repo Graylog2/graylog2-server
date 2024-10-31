@@ -43,9 +43,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -364,7 +366,7 @@ public class LookupTableService extends AbstractIdleService {
     public void handleLookupTableUpdate(LookupTablesUpdated updated) {
         scheduler.schedule(() -> {
             // load the DTO, and recreate the table
-            updated.lookupTableIds().forEach(id -> configService.getTable(id).map(this::createLookupTable));
+            updated.lookupTableIds().forEach(id -> configService.getTable(id).ifPresent(this::createLookupTable));
         }, 0, TimeUnit.SECONDS);
     }
 

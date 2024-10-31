@@ -17,7 +17,6 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import suppressConsole from 'helpers/suppressConsole';
 import mockComponent from 'helpers/mocking/MockComponent';
 import FetchError from 'logic/errors/FetchError';
 
@@ -29,11 +28,9 @@ describe('UnauthorizedErrorPage', () => {
   it('displays fetch error', async () => {
     const response = { status: 403, body: { message: 'The request error message' } };
 
-    await suppressConsole(() => {
-      render(<UnauthorizedErrorPage error={new FetchError('The request error message', response.status, response)} />);
-    });
+    render(<UnauthorizedErrorPage error={new FetchError('The request error message', response.status, response)} />);
 
-    expect(screen.getByText('Missing Permissions')).not.toBeNull();
-    expect(screen.getByText(/The request error message/)).not.toBeNull();
+    await screen.findByText('Missing Permissions');
+    await screen.findByText(/The request error message/);
   });
 });

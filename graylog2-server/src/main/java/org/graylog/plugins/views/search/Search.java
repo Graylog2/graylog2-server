@@ -27,11 +27,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.graph.MutableGraph;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -40,24 +44,27 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableSet.of;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.Collectors.toSet;
 
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = Search.Builder.class)
-public abstract class Search implements ContentPackable<SearchEntity>, ParameterProvider {
+public abstract class Search implements ContentPackable<SearchEntity>, ParameterProvider, MongoEntity {
     public static final String FIELD_REQUIRES = "requires";
-    static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
 
     // generated during build to help quickly find a parameter by name.
@@ -144,14 +151,78 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         return toBuilder().queries(newQueries).build();
     }
 
+    public Search addStreamsToQueriesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                                    StreamPermissions streamPermissions) {
+        if (!hasQueriesWithStreamCategories()) {
+            return this;
+        }
+        final Set<Query> withStreamCategories = queries().stream().filter(q -> !q.usedStreamCategories().isEmpty()).collect(toSet());
+        final Set<Query> withoutStreamCategories = Sets.difference(queries(), withStreamCategories);
+        final Set<Query> withMappedStreamCategories = new HashSet<>();
+
+        for (Query query : withStreamCategories) {
+            final Set<String> mappedStreamIds = categoryMappingFunction.apply(query.usedStreamCategories())
+                    .filter(streamPermissions::canReadStream)
+                    .collect(toSet());
+            withMappedStreamCategories.add(query.addStreamsToFilter(mappedStreamIds));
+        }
+
+        final ImmutableSet<Query> newQueries = Sets.union(withMappedStreamCategories, withoutStreamCategories).immutableCopy();
+
+        return toBuilder().queries(newQueries).build();
+    }
+
+    public Search addStreamsToSearchTypesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                                        StreamPermissions streamPermissions) {
+        if (!hasQuerySearchTypesWithStreamCategories()) {
+            return this;
+        }
+        final Set<Query> withStreamCategories = queries().stream()
+                .filter(q -> q.searchTypes().stream()
+                        .anyMatch(SearchType::hasStreamCategories))
+                .collect(toSet());
+        final Set<Query> withoutStreamCategories = Sets.difference(queries(), withStreamCategories);
+        final Set<Query> withMappedStreamCategories = new HashSet<>();
+
+        for (Query query : withStreamCategories) {
+            final Set<SearchType> mappedSearchTypes = new HashSet<>();
+            for (SearchType st : query.searchTypes()) {
+                if (!st.hasStreamCategories()) {
+                    mappedSearchTypes.add(st);
+                } else {
+                    final Set<String> mappedStreamIds = categoryMappingFunction.apply(st.streamCategories())
+                            .filter(streamPermissions::canReadStream)
+                            .collect(toSet());
+                    mappedStreamIds.addAll(st.streams());
+                    mappedSearchTypes.add(st.toBuilder().streams(mappedStreamIds).build());
+                }
+            }
+            withMappedStreamCategories.add(query.toBuilder().searchTypes(mappedSearchTypes).build());
+        }
+
+        final ImmutableSet<Query> newQueries = Sets.union(withMappedStreamCategories, withoutStreamCategories).immutableCopy();
+
+        return toBuilder().queries(newQueries).build();
+    }
+
     private boolean hasQueriesWithoutStreams() {
         return !queries().stream().allMatch(Query::hasStreams);
+    }
+
+    private boolean hasQueriesWithStreamCategories() {
+        return queries().stream().anyMatch(q -> !q.usedStreamCategories().isEmpty());
+    }
+
+    private boolean hasQuerySearchTypesWithStreamCategories() {
+        return queries().stream()
+                .flatMap(q -> q.searchTypes().stream())
+                .anyMatch(SearchType::hasStreamCategories);
     }
 
     public abstract Builder toBuilder();
 
     public static Builder builder() {
-        return Builder.create().parameters(of()).queries(ImmutableSet.<Query>builder().build());
+        return Builder.create().parameters(ImmutableSet.of()).queries(ImmutableSet.<Query>builder().build());
     }
 
     public Set<String> usedStreamIds() {
@@ -177,6 +248,14 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
                 .filter(q -> q.hasSearchType(searchTypeId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Search " + id() + " doesn't have a query for search type " + searchTypeId));
+    }
+
+    public Search withReferenceDate(DateTime now) {
+        return toBuilder()
+                .queries(queries().stream()
+                        .map(q -> q.withReferenceDate(now))
+                        .collect(ImmutableSet.toImmutableSet()))
+                .build();
     }
 
 
@@ -211,7 +290,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
             return new AutoValue_Search.Builder()
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC))
-                    .parameters(of());
+                    .parameters(ImmutableSet.of());
         }
 
         public Search build() {
@@ -239,5 +318,10 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
             searchEntityBuilder.owner(this.owner().get());
         }
         return searchEntityBuilder.build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        queries().forEach(query -> query.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

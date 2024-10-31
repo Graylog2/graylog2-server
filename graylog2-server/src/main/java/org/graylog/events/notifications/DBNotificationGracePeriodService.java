@@ -27,7 +27,8 @@ import org.joda.time.DateTime;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

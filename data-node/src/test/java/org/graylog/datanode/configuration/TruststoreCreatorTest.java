@@ -17,6 +17,9 @@
 package org.graylog.datanode.configuration;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -24,24 +27,27 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
+import org.graylog.security.certutil.CertConstants;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,35 +55,25 @@ import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORIT
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-
 
 public class TruststoreCreatorTest {
 
-    private TruststoreCreator toTest;
-
-    @BeforeEach
-    void setUp() {
-        toTest = new TruststoreCreator();
-    }
-
     @Test
     void testTrustStoreCreation(@TempDir Path tempDir) throws Exception {
-        final Path trustStoreFile = tempDir.resolve("truststore.sec");
-        final char[] truststorePassword = "caramba! caramba!".toCharArray();
 
-        toTest.createTruststore(
-                Map.of(
-                        "root", prepareSimpleCert("CN=ROOT", BigInteger.ONE),
-                        "boot", prepareSimpleCert("CN=BOOT", BigInteger.TWO)
-                ),
-                truststorePassword,
-                trustStoreFile);
+        final FilesystemKeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "root", "CN=ROOT", BigInteger.ONE);
+        final FilesystemKeystoreInformation boot = createKeystore(tempDir.resolve("boot.p12"), "boot", "CN=BOOT", BigInteger.TWO);
 
-        assertTrue(trustStoreFile.toFile().exists());
+        final FilesystemKeystoreInformation truststore = TruststoreCreator.newEmpty()
+                .addRootCert("root", root, "root")
+                .addRootCert("boot", boot, "boot")
 
-        KeystoreFileStorage keystoreFileStorage = new KeystoreFileStorage(mock(KeystoreContentMover.class));
-        final Optional<KeyStore> keyStoreOptional = keystoreFileStorage.readKeyStore(new KeystoreFileLocation(trustStoreFile), truststorePassword);
+                .persist(tempDir.resolve("truststore.sec"), "caramba! caramba!".toCharArray());
+
+        assertTrue(truststore.location().toFile().exists());
+
+        KeystoreFileStorage keystoreFileStorage = new KeystoreFileStorage();
+        final Optional<KeyStore> keyStoreOptional = keystoreFileStorage.readKeyStore(truststore.location(), truststore.password());
 
         assertTrue(keyStoreOptional.isPresent());
 
@@ -89,6 +85,32 @@ public class TruststoreCreatorTest {
         verifyCertificate(rootCert, "CN=ROOT", BigInteger.ONE);
         final Certificate bootCert = keyStore.getCertificate("boot");
         verifyCertificate(bootCert, "CN=BOOT", BigInteger.TWO);
+    }
+
+    @Test
+    void testDefaultJvm() throws KeyStoreException {
+        final TruststoreCreator truststoreCreator = TruststoreCreator.newDefaultJvm();
+        final KeyStore truststore = truststoreCreator.getTruststore();
+        final ArrayList<String> aliases = Lists.newArrayList(truststore.aliases().asIterator());
+        Assertions.assertThat(aliases)
+                .hasSizeGreaterThan(10); // reasonable assumption that there are more than 10 trusted CAs in JVM truststore?
+    }
+
+    @Test
+    void testAdditionalCertificates(@TempDir Path tempDir) throws GeneralSecurityException, IOException, OperatorCreationException {
+        final FilesystemKeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "something-unknown", "CN=ROOT", BigInteger.ONE);
+        final X509Certificate cert = (X509Certificate) root.loadKeystore().getCertificate("something-unknown");
+
+        final FilesystemKeystoreInformation truststore = TruststoreCreator.newEmpty()
+                .addCertificates(List.of(cert))
+                .persist(tempDir.resolve("truststore.sec"), "caramba! caramba!".toCharArray());
+
+        final KeyStore keystore = truststore.loadKeystore();
+
+        final String alias = keystore.getCertificateAlias(cert);
+        Assertions.assertThat(alias)
+                .isNotNull()
+                .isEqualTo("cn=root");
 
     }
 
@@ -102,7 +124,7 @@ public class TruststoreCreatorTest {
         assertEquals(cnName, x509Certificate.getIssuerX500Principal().getName());
     }
 
-    private X509Certificate prepareSimpleCert(final String cnName, final BigInteger serialNumber) throws GeneralSecurityException, OperatorCreationException {
+    private FilesystemKeystoreInformation createKeystore(Path path, String alias, final String cnName, final BigInteger serialNumber) throws GeneralSecurityException, OperatorCreationException, IOException {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
         X500Name name = new X500Name(cnName);
@@ -117,8 +139,20 @@ public class TruststoreCreatorTest {
 
         ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(certKeyPair.getPrivate());
         X509CertificateHolder certHolder = builder.build(signer);
-        return new JcaX509CertificateConverter().getCertificate(certHolder);
 
+        final X509Certificate signedCert = new JcaX509CertificateConverter().getCertificate(certHolder);
+
+        KeyStore trustStore = KeyStore.getInstance(CertConstants.PKCS12);
+        trustStore.load(null, null);
+
+        final char[] password = RandomStringUtils.randomAlphabetic(256).toCharArray();
+
+        trustStore.setKeyEntry(alias, certKeyPair.getPrivate(), password, new Certificate[]{signedCert});
+
+
+        try (final FileOutputStream fileOutputStream = new FileOutputStream(path.toFile())) {
+            trustStore.store(fileOutputStream, password);
+        }
+        return new FilesystemKeystoreInformation(path, password);
     }
-
 }

@@ -23,7 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 /**
  * This class is a convenience listener for {@link Service} instances so that service lifecycle changes can easily
@@ -44,8 +45,9 @@ public class LoggingServiceListener extends Service.Listener {
 
     /**
      * Creates a new logging listener for the service name and an id.
+     *
      * @param serviceName the concise name describing the service being listened to (e.g. "Input" or "Cache")
-     * @param id the unique id of the service instance, useful if there are more than one running.
+     * @param id          the unique id of the service instance, useful if there are more than one running.
      */
     public LoggingServiceListener(String serviceName, String id) {
         this(serviceName, id, null, LOG);

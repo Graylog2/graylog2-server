@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views;
 
-import io.restassured.path.json.JsonPath;
+import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -27,10 +27,13 @@ import java.util.Collections;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration
 public class FavoritesIT {
+    private static final String USERNAME = "john.doe1";
+    private static final String PASSWORD = "asdfgh";
     private final GraylogApis api;
 
     public FavoritesIT(GraylogApis apis) {
@@ -39,9 +42,9 @@ public class FavoritesIT {
 
     @BeforeAll
     public void init() {
-        final JsonPath user = api.users().createUser(new Users.User(
-                "john.doe1",
-                "asdfgh",
+        api.users().createUser(new Users.User(
+                USERNAME,
+                PASSWORD,
                 "John",
                 "Doe",
                 "john.doe1@example.com",
@@ -55,36 +58,44 @@ public class FavoritesIT {
 
     @ContainerMatrixTest
     void testCreateDeleteFavorite() {
-        var grn = "grn::::search_filter:63d39fa82ba2606a6710a545";
+        final String defaultIndexSetId = api.indices().defaultIndexSetId();
+        final String temporaryStream = api.streams().createStream("Temporary", defaultIndexSetId);
+        var grn = "grn::::stream:" + temporaryStream;
 
         given()
                 .spec(api.requestSpecification())
-                .auth().basic("john.doe1", "asdfgh")
+                .auth().basic(USERNAME, PASSWORD)
                 .when()
                 .put("/favorites/" + grn)
                 .then()
                 .log().ifStatusCodeMatches(not(204))
                 .statusCode(204);
 
-        var validatableResponse = given()
-                .spec(api.requestSpecification())
-                .auth().basic("john.doe1", "asdfgh")
-                .when()
-                .get("/favorites")
-                .then()
-                .log().ifStatusCodeMatches(not(200))
-                .statusCode(200);
-
+        var validatableResponse = getFavourites();
         validatableResponse.assertThat().body("favorites[0].grn", equalTo(grn));
 
         given()
                 .spec(api.requestSpecification())
-                .auth().basic("john.doe1", "asdfgh")
+                .auth().basic(USERNAME, PASSWORD)
                 .when()
                 .delete("/favorites/" + grn)
                 .then()
                 .log().ifStatusCodeMatches(not(204))
                 .statusCode(204);
+
+        validatableResponse = getFavourites();
+        validatableResponse.assertThat().body("favorites", empty());
+    }
+
+    private ValidatableResponse getFavourites() {
+        return given()
+                .spec(api.requestSpecification())
+                .auth().basic(USERNAME, PASSWORD)
+                .when()
+                .get("/favorites")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
     }
 
 

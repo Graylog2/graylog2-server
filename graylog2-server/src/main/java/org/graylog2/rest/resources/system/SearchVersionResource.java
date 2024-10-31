@@ -25,6 +25,14 @@ import com.google.auto.value.AutoValue;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.configuration.validators.SearchVersionRange;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -35,15 +43,9 @@ import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Api(value = "System/SearchVersion", description = "Checks system search version requirements")
 @Path("/system/searchVersion")
@@ -52,6 +54,11 @@ import java.util.Locale;
 public class SearchVersionResource extends RestResource implements PluginRestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchVersionResource.class);
+    private static final String SUPPORTED_SEARCH_VERSIONS =
+            Arrays.stream(SearchVersion.Distribution.values())
+                    .map(Enum::toString)
+                    .map(s -> s.toLowerCase(Locale.ENGLISH))
+                    .collect(Collectors.joining(", "));
     final private ElasticsearchVersionProvider versionProvider;
 
     @Inject
@@ -74,9 +81,9 @@ public class SearchVersionResource extends RestResource implements PluginRestRes
         try {
             requiredDistribution = SearchVersion.Distribution.valueOf(distribution.toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException e) {
-            LOG.error("Unsupported distribution {}. Valid values are [opensearch, elasticsearch].", distribution);
+            LOG.error("Unsupported distribution {}. Valid values are [" + SUPPORTED_SEARCH_VERSIONS + "].", distribution);
             throw new InternalServerErrorException(StringUtils.f(
-                    "Unsupported distribution %s. Valid values are [opensearch, elasticsearch].", distribution));
+                    "Unsupported distribution %s. Valid values are [" + SUPPORTED_SEARCH_VERSIONS + "].", distribution));
         }
 
         final SearchVersion currentVersion = versionProvider.get();

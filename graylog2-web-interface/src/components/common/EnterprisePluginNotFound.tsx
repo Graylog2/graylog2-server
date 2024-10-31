@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
@@ -36,14 +35,14 @@ const HeaderIcon = styled(Icon)`
 
 type Props = {
   featureName: string,
-  wrapperClassName: string | null | undefined,
+  wrapperClassName?: string | null | undefined
 };
 
-const EnterprisePluginNotFound = ({ featureName, wrapperClassName }: Props) => (
+const EnterprisePluginNotFound = ({ featureName, wrapperClassName = 'no-bm' }: Props) => (
   <Panel bsStyle="info" className={wrapperClassName}>
     <Panel.Heading>
       <Header>
-        <HeaderIcon name="crown" />Enterprise Feature
+        <HeaderIcon name="enterprise" />Enterprise Feature
       </Header>
     </Panel.Heading>
     <Panel.Body>
@@ -51,14 +50,5 @@ const EnterprisePluginNotFound = ({ featureName, wrapperClassName }: Props) => (
     </Panel.Body>
   </Panel>
 );
-
-EnterprisePluginNotFound.propTypes = {
-  featureName: PropTypes.string.isRequired,
-  wrapperClassName: PropTypes.string,
-};
-
-EnterprisePluginNotFound.defaultProps = {
-  wrapperClassName: 'no-bm',
-};
 
 export default EnterprisePluginNotFound;

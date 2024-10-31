@@ -21,10 +21,11 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.lookup.LookupResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -80,6 +81,10 @@ public class LookupStringListContains extends AbstractFunction<Boolean> {
                 .description("Looks up a value in the string list referenced by the key in the named lookup table.")
                 .params(lookupTableParam, keyParam, valueParam)
                 .returnType(Boolean.class)
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Lookup table string list contains")
+                .ruleBuilderTitle("Check if string list in '${lookup_table}' using key '${key}' contains '${value}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }
 }

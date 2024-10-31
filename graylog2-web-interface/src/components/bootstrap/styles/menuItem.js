@@ -30,8 +30,8 @@ const menuItemStyles = css(({ theme }) => css`
       display: flex;
       color: ${theme.colors.global.textDefault};
 
-      :hover,
-      :focus {
+      &:hover,
+      &:focus {
         color: ${theme.colors.variant.darker.default};
         background-color: ${theme.colors.variant.lightest.default};
       }
@@ -41,8 +41,8 @@ const menuItemStyles = css(({ theme }) => css`
       color: ${theme.colors.variant.darker.default};
       background-color: ${theme.colors.variant.lightest.default};
 
-      :hover,
-      :focus {
+      &:hover,
+      &:focus {
         color: ${theme.colors.variant.darkest.default};
         background-color: ${theme.colors.variant.lighter.default};
       }
@@ -52,8 +52,8 @@ const menuItemStyles = css(({ theme }) => css`
       color: ${theme.colors.variant.dark.default};
       background-color: ${theme.colors.variant.lightest.default};
 
-      :hover,
-      :focus {
+      &:hover,
+      &:focus {
         color: ${theme.colors.variant.dark.default};
         background-color: ${theme.colors.variant.lightest.default};
       }

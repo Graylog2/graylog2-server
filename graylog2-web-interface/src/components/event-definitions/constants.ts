@@ -18,14 +18,15 @@ import type { Sort } from 'stores/PaginationTypes';
 
 export const SYSTEM_EVENT_DEFINITION_TYPE = 'system-notifications-v1';
 
-export const ENTITY_TABLE_ID = 'event_definitions';
 export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'priority', 'scheduling', 'status'],
-  columnsOrder: ['title', 'description', 'priority', 'status', 'scheduling'],
+  entityTableId: 'event_definitions',
+  defaultPageSize: 20,
+  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
+  defaultDisplayedAttributes: ['title', 'description', 'priority', 'scheduling', 'status', 'matched_at'],
 };
+export const COLUMNS_ORDER = ['title', 'description', 'priority', 'matched_at', 'status', 'scheduling'];
 
 export const ADDITIONAL_ATTRIBUTES = [
   { id: 'scheduling', title: 'Scheduling', sortable: false },
+  { id: 'matched_at', title: 'Last Matched', sortable: true },
 ];

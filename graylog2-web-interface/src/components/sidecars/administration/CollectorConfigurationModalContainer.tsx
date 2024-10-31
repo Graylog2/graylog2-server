@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import countBy from 'lodash/countBy';
 import intersection from 'lodash/intersection';
 import uniq from 'lodash/uniq';
@@ -23,6 +22,8 @@ import styled from 'styled-components';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { BootstrapModalConfirm } from 'components/bootstrap';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import CollectorConfigurationModal from './CollectorConfigurationModal';
 
@@ -52,6 +53,7 @@ const CollectorConfigurationModalContainer = ({
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState<string[]>([]);
   const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState<string[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+  const sendTelemetry = useSendTelemetry();
 
   const getSelectedLogCollector = () => (uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
 
@@ -94,7 +96,7 @@ const CollectorConfigurationModalContainer = ({
     setShowConfirmModal(false);
   };
 
-  const confirmConfigurationChange = (doneCallback: () => void) => {
+  const confirmConfigurationChange = () => {
     const assignedConfigurationsToSave = configurations.filter((config) => nextAssignedConfigurations.includes(config.name));
 
     selectedSidecarCollectorPairs.forEach((sidecarCollectorPair) => {
@@ -108,7 +110,12 @@ const CollectorConfigurationModalContainer = ({
         configs = [...assignedConfigurationsToSave, ...assignedConfigurationsToKeep];
       }
 
-      onConfigurationSelectionChange([sidecarCollectorPair], configs, doneCallback);
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_ASSIGNED, {
+        app_pathname: 'sidecars',
+        app_section: 'administration',
+      });
+
+      onConfigurationSelectionChange([sidecarCollectorPair], configs, () => {});
     });
 
     cancelConfigurationChange();
@@ -193,15 +200,6 @@ const CollectorConfigurationModalContainer = ({
       {renderConfigurationSummary()}
     </>
   );
-};
-
-CollectorConfigurationModalContainer.propTypes = {
-  collectors: PropTypes.array.isRequired,
-  configurations: PropTypes.array.isRequired,
-  selectedSidecarCollectorPairs: PropTypes.array.isRequired,
-  onConfigurationSelectionChange: PropTypes.func.isRequired,
-  show: PropTypes.bool.isRequired,
-  onCancel: PropTypes.func.isRequired,
 };
 
 export default CollectorConfigurationModalContainer;

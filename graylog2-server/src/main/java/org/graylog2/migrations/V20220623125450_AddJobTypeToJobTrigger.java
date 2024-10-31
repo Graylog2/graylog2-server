@@ -36,7 +36,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -81,8 +82,8 @@ public class V20220623125450_AddJobTypeToJobTrigger extends Migration {
         final FindIterable<Document> query = jobTriggers.find(Filters.exists(JobTriggerDto.FIELD_JOB_DEFINITION_TYPE, false));
 
         List<UpdateOneModel<Document>> typeUpdate = Streams.stream(query).map(d -> new UpdateOneModel<Document>(
-                Filters.eq("_id", d.getObjectId("_id")),
-                Updates.set(JobTriggerDto.FIELD_JOB_DEFINITION_TYPE, typeMap.get(d.getString(JobTriggerDto.FIELD_JOB_DEFINITION_ID)))))
+                        Filters.eq("_id", d.getObjectId("_id")),
+                        Updates.set(JobTriggerDto.FIELD_JOB_DEFINITION_TYPE, typeMap.get(d.getString(JobTriggerDto.FIELD_JOB_DEFINITION_ID)))))
                 .collect(Collectors.toList());
 
         long modifiedCount = 0;

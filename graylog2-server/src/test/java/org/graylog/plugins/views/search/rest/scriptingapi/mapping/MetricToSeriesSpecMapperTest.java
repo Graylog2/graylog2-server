@@ -23,7 +23,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,7 +56,7 @@ class MetricToSeriesSpecMapperTest {
         assertThat(result)
                 .isNotNull()
                 .isInstanceOf(Average.class)
-                .satisfies(a -> assertEquals("took_ms", a.field()))
+                .satisfies(a -> assertEquals("took_ms", ((Average) a).field()))
                 .satisfies(a -> assertEquals(Average.NAME, a.type()));
     }
 

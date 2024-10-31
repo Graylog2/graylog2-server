@@ -21,8 +21,8 @@ import freemarker.template.Configuration;
 import freemarker.template.SimpleObjectWrapper;
 import freemarker.template.Version;
 
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 /**
  * Provide a freemarker configuration with sane security defaults.

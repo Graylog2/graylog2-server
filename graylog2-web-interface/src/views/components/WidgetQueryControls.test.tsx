@@ -17,11 +17,10 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 
-import MockStore from 'helpers/mocking/StoreMock';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { asMock } from 'helpers/mocking';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
@@ -31,30 +30,11 @@ import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
 
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
-jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
-
-jest.mock('moment', () => {
-  const mockMoment = jest.requireActual('moment');
-
-  return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
-});
-
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
-jest.mock('views/components/searchbar/queryinput/BasicQueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
-jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-  SearchConfigStore: MockStore(['getInitialState', () => ({
-    searchesClusterConfig: {
-      relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
-      query_time_range_limit: 'PT0S',
-    },
-  })]),
-}));
-
+jest.mock('views/components/searchbar/queryinput/QueryInput');
+jest.mock('views/components/searchbar/queryinput/BasicQueryInput');
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/hooks/useGlobalOverride');
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
@@ -70,9 +50,7 @@ describe('WidgetQueryControls', () => {
     asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   const config = {
     relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
@@ -112,16 +90,10 @@ describe('WidgetQueryControls', () => {
     </Wrapper>,
   );
 
-  it('should do something', () => {
-    const { container } = renderSUT();
-
-    expect(container).not.toBeNull();
-  });
-
   describe('displays if global override is set', () => {
     const resetTimeRangeButtonTitle = /reset global override/i;
     const resetQueryButtonTitle = /reset global filter/i;
-    const timeRangeOverrideInfo = '2019-10-10 14:26:31.146 - 2019-10-10 14:26:31.146';
+    const timeRangeOverrideInfo = '2020-01-01 11:00:00.850 - 2020-01-02 11:00:00.000';
     const queryOverrideInfo = globalOverrideWithQuery.query.query_string;
 
     it('shows preview of global override time range', async () => {
@@ -146,7 +118,14 @@ describe('WidgetQueryControls', () => {
       renderSUT();
 
       expect(screen.queryByRole('button', { name: resetTimeRangeButtonTitle })).toBeNull();
-      expect(screen.queryByRole('button', { name: resetTimeRangeButtonTitle })).toBeNull();
+      expect(screen.queryByRole('button', { name: resetQueryButtonTitle })).toBeNull();
+    });
+
+    it('does not show global override query indicator if global override query is an object with an empty query string', async () => {
+      asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: '' }));
+      renderSUT();
+
+      expect(screen.queryByRole('button', { name: resetQueryButtonTitle })).toBeNull();
     });
 
     it('triggers resetting global override when reset time range override button is clicked', async () => {

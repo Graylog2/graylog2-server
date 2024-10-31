@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
-import { Icon, SortableList } from 'components/common';
+import { SortableList } from 'components/common';
 
 import DecoratorStyles from './decoratorStyles.css';
 
@@ -40,12 +39,6 @@ type Props = {
 };
 
 class DecoratorList extends React.Component<Props> {
-  static propTypes = {
-    decorators: PropTypes.arrayOf(PropTypes.object).isRequired,
-    disableDragging: PropTypes.bool,
-    onReorder: PropTypes.func,
-  };
-
   static defaultProps = {
     disableDragging: false,
     onReorder: () => {
@@ -65,7 +58,7 @@ class DecoratorList extends React.Component<Props> {
       return (
         <AlertContainer>
           <Alert bsStyle="info" className={DecoratorStyles.noDecoratorsAlert}>
-            <Icon name="info-circle" />&nbsp;No decorators configured.
+            No decorators configured.
           </Alert>
         </AlertContainer>
       );

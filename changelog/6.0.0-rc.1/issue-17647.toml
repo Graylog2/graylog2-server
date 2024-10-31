@@ -1,0 +1,5 @@
+type = "c"
+message = "Updated the select_jsonpath pipeline function to accept JSON strings as the `json` parameter in addition to parsed JsonNode objects."
+
+issues = ["17647"]
+pulls = ["17683"]

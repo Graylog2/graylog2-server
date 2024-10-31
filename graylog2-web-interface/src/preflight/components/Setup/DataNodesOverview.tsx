@@ -19,22 +19,24 @@ import { Space } from '@mantine/core';
 import styled from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
+import Alert from 'components/bootstrap/Alert';
 import useDataNodes from 'preflight/hooks/useDataNodes';
-import { Alert, Badge, List } from 'preflight/components/common';
+import { Badge, List } from 'preflight/components/common';
+import DataNodeBadge from 'components/datanode/DataNodeList/DataNodeBadge';
 
 const P = styled.p`
   max-width: 700px;
 `;
 
-const NodeId = styled(Badge)`
-  margin-right: 3px;
+const ErrorBadge = styled(Badge)`
+  margin-left: 5px;
 `;
+const Error = ({ message }: { message: string }) => <ErrorBadge title={message} color="red">{message}</ErrorBadge>;
 
 const DataNodesOverview = () => {
   const {
     data: dataNodes,
     isFetching: isFetchingDataNodes,
-    error: dataNodesFetchError,
     isInitialLoading: isInitialLoadingDataNodes,
   } = useDataNodes();
 
@@ -57,24 +59,23 @@ const DataNodesOverview = () => {
               hostname,
               transport_address,
               short_node_id,
+              status,
+              error_msg,
+
             }) => (
               <List.Item key={short_node_id}>
-                <NodeId title="Short node id">{short_node_id}</NodeId>
+                <DataNodeBadge status={status} nodeId={short_node_id} transportAddress={transport_address} />
                 <span title="Transport address">{transport_address}</span>{' – '}
                 <span title="Hostname">{hostname}</span>
+                {error_msg && <Error message={error_msg} />}
               </List.Item>
             ))}
           </List>
         </>
       )}
       {(!dataNodes.length && !isInitialLoadingDataNodes) && (
-        <Alert type="info">
+        <Alert bsStyle="info">
           No data nodes have been found.
-        </Alert>
-      )}
-      {dataNodesFetchError && (
-        <Alert type="danger">
-          There was an error fetching the data nodes: {dataNodesFetchError.message}
         </Alert>
       )}
       <Space h="md" />

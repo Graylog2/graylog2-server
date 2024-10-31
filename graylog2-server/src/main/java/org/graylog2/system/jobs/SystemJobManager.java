@@ -29,7 +29,8 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -93,7 +94,7 @@ public class SystemJobManager {
                     x.stop();
 
                     final String msg = "SystemJob <" + job.getId() + "> [" + jobClass + "] finished in " + x.elapsed(
-                        TimeUnit.MILLISECONDS) + "ms.";
+                            TimeUnit.MILLISECONDS) + "ms.";
                     LOG.info(msg);
                     activityWriter.write(new Activity(msg, SystemJobManager.class));
                 } catch (SystemJobConcurrencyException ignored) {

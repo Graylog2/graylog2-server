@@ -21,11 +21,12 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -84,6 +85,10 @@ public class FromInput extends AbstractFunction<Boolean> {
                         idParam,
                         nameParam))
                 .description("Checks if a message arrived on a given input")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Check source input")
+                .ruleBuilderTitle("Check if message arrived on input<#if name??> '${name}'</#if><#if id??> '${id}'</#if>")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }
 }

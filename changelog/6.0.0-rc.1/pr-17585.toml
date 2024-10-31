@@ -1,0 +1,5 @@
+type = "r"
+message = "Removed deprecated methods in org.graylog2.plugin.Message class : addStringFields, addLongFields, addDoubleFields, getValidationErrors"
+
+issues = [""]
+pulls = ["17585"]

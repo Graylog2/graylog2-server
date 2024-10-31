@@ -22,10 +22,12 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.lookup.LookupResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -47,7 +49,7 @@ public class Lookup extends AbstractFunction<Map<Object, Object>> {
                 .description("The existing lookup table to use to lookup the given key")
                 .transform(tableName -> lookupTableService.newBuilder().lookupTable(tableName).build())
                 .build();
-        keyParam = object("key")
+        keyParam = object("key").ruleBuilderVariable()
                 .description("The key to lookup in the table")
                 .build();
         defaultParam = object("default")
@@ -81,6 +83,10 @@ public class Lookup extends AbstractFunction<Map<Object, Object>> {
                 .description("Looks up a multi value in the named lookup table.")
                 .params(lookupTableParam, keyParam, defaultParam)
                 .returnType((Class<? extends Map<Object, Object>>) new TypeLiteral<Map<Object, Object>>() {}.getRawType())
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Lookup multi value")
+                .ruleBuilderTitle("Lookup multi value in '${lookup_table}' using '${key}'<#if $default??> (default: '${default}')</#if>")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }
 }

@@ -15,10 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
 
-import { Popover } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import { relativeDifference } from 'util/DateTime';
@@ -27,13 +25,13 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import style from './StatusIndicator.css';
 
 type Props = {
-  message: string,
-  status: number,
-  lastSeen: string,
-  id: string,
+  message?: string
+  status?: number
+  lastSeen?: string
+  id?: string
 }
 
-const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) => {
+const StatusIndicator = ({ message: messageProp = '', status = -1, lastSeen, id = '' }: Props) => {
   const { toUserTimezone } = useUserDateTime();
   let message = messageProp;
   const text = upperFirst(SidecarStatusEnum.toString(status));
@@ -45,35 +43,27 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
   switch (status) {
     case SidecarStatusEnum.RUNNING:
       className = 'text-success';
-      icon = 'play';
+      icon = 'play_arrow';
       break;
     case SidecarStatusEnum.FAILING:
       className = 'text-danger';
-      icon = 'exclamation-triangle';
+      icon = 'warning';
       break;
     case SidecarStatusEnum.STOPPED:
       className = 'text-danger';
-      icon = 'stop';
+      icon = 'error';
       break;
     default:
       className = 'text-info';
-      icon = 'question-circle';
+      icon = 'help';
       message += ` (${relativeDifference(lastSeenDateTime)})`;
   }
 
   if (message && id) {
-    const popover = (
-      <Popover id={`${id}-status-tooltip`}
-               data-app-section="sidecars"
-               data-event-element="Status Indicator">
-        {message}
-      </Popover>
-    );
-
     return (
-      <OverlayTrigger placement="top" overlay={popover} rootClose trigger="hover">
+      <OverlayTrigger placement="top" overlay={message} rootClose trigger="hover">
         <span className={`${className} ${style.indicator}`}>
-          <Icon name={icon} fixedWidth /> {text}
+          <Icon name={icon} /> {text}
         </span>
       </OverlayTrigger>
     );
@@ -81,23 +71,9 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
 
   return (
     <span className={`${className} ${style.indicator}`}>
-      <Icon name={icon} fixedWidth /> {text}
+      <Icon name={icon} /> {text}
     </span>
   );
-};
-
-StatusIndicator.propTypes = {
-  id: PropTypes.string,
-  lastSeen: PropTypes.string,
-  message: PropTypes.string,
-  status: PropTypes.number,
-};
-
-StatusIndicator.defaultProps = {
-  id: '',
-  lastSeen: undefined,
-  message: '',
-  status: -1,
 };
 
 export default StatusIndicator;

@@ -16,17 +16,12 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.core.CountRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.core.CountResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.rest.RestStatus;
+import org.graylog.shaded.opensearch2.org.opensearch.core.rest.RestStatus;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.MessagesIT;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 
 import java.util.Map;

@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
@@ -34,7 +35,6 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
@@ -53,6 +53,7 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSortedSet.of;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
 
 @AutoValue
 @JsonAutoDetect
@@ -149,8 +150,7 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                           .map(filter -> {
                               if (filter.type().matches(StreamFilter.NAME)) {
                                   final StreamFilter streamFilter = (StreamFilter) filter;
-                                  final Stream stream = (Stream) nativeEntities.get(
-                                          EntityDescriptor.create(streamFilter.streamId(), ModelTypes.STREAM_V1));
+                                  final Stream stream = (Stream) resolveStreamEntityObject(streamFilter.streamId(), nativeEntities);
                                   if (Objects.isNull(stream)) {
                                       throw new ContentPackException("Could not find matching stream id: " +
                                               streamFilter.streamId());
@@ -172,9 +172,17 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                         .collect(Collectors.toSet()))
                 .query(query())
                 .filter(shallowMappedFilter(nativeEntities))
-                .filters(filters())
+                .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .timerange(timerange())
                 .globalOverride(globalOverride().orElse(null))
                 .build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        filters().forEach(filter -> filter.resolveForInstallation(entity, parameters, entities, graph));
     }
 }

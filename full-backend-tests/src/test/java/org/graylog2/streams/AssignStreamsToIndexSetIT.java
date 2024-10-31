@@ -31,7 +31,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5)
+@ContainerMatrixTestsConfiguration
 public class AssignStreamsToIndexSetIT {
     private static final String STREAMS_RESOURCE = "/streams";
 

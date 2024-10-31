@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix test lookup not accepting uppercase characters"
+
+issues = ["14373"]
+pulls = ["16909"]

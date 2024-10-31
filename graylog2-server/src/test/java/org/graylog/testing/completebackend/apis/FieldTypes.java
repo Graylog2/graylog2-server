@@ -16,8 +16,9 @@
  */
 package org.graylog.testing.completebackend.apis;
 
-import io.restassured.specification.RequestSpecification;
+import org.graylog.plugins.views.search.rest.FieldTypesForStreamsRequest;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +40,15 @@ public class FieldTypes implements GraylogRestApi {
         final MappedFieldTypeDTO[] as = given()
                 .spec(api.requestSpecification())
                 .get("/views/fields")
+                .as(MappedFieldTypeDTO[].class);
+        return Arrays.asList(as);
+    }
+
+    public List<MappedFieldTypeDTO> getFieldTypes(TimeRange timeRange, Set<String> streams) {
+        final MappedFieldTypeDTO[] as = given()
+                .spec(api.requestSpecification())
+                .body(FieldTypesForStreamsRequest.Builder.builder().streams(streams).timerange(timeRange).build())
+                .post("/views/fields")
                 .as(MappedFieldTypeDTO[].class);
         return Arrays.asList(as);
     }

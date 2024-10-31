@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
@@ -23,41 +22,52 @@ import { Icon } from 'components/common';
 import { useStore } from 'stores/connect';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { Link } from 'components/common/router';
+import AppConfig from 'util/AppConfig';
 
 type NodeId = string;
+
+const BreakWord = styled.span`
+  word-break: break-word;
+`;
+
+type NodeTitleProps = {
+  shortNodeId: string,
+  hostname: string
+}
+
+const NodeTitle = ({ shortNodeId, hostname }: NodeTitleProps) => (
+  <>
+    <Icon name="lan" />
+    &nbsp;
+    <BreakWord>
+      {shortNodeId}
+    </BreakWord>&nbsp;/&nbsp;
+    <BreakWord>
+      {hostname}
+    </BreakWord>
+  </>
+);
+
 type Props = {
   nodeId: NodeId,
 };
 
-const BreakWord = styled.span`
-  word-break: 'break-word';
-`;
-
 const NodeName = ({ nodeId }: Props) => {
   const node = useStore(NodesStore, (state) => state?.nodes?.[nodeId]);
 
-  if (node) {
-    const nodeURL = Routes.node(nodeId);
-
-    return (
-      <Link to={nodeURL}>
-        <Icon name="circle-nodes" />
-        &nbsp;
-        <BreakWord>
-          {node.short_node_id}
-        </BreakWord>&nbsp;/&nbsp;
-        <BreakWord>
-          {node.hostname}
-        </BreakWord>
-      </Link>
-    );
+  if (!node) {
+    return <BreakWord>stopped node</BreakWord>;
   }
 
-  return <BreakWord>stopped node</BreakWord>;
-};
+  if (AppConfig.isCloud()) {
+    return <NodeTitle shortNodeId={node.short_node_id} hostname={node.hostname} />;
+  }
 
-NodeName.propTypes = {
-  nodeId: PropTypes.string.isRequired,
+  return (
+    <Link to={Routes.node(nodeId)}>
+      <NodeTitle shortNodeId={node.short_node_id} hostname={node.hostname} />
+    </Link>
+  );
 };
 
 export default NodeName;

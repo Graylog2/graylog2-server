@@ -26,8 +26,9 @@ import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
@@ -72,14 +73,14 @@ public class EventIndexer {
 
     private Map<String, IndexSet> indexSetsForStreams(Set<String> streamIds) {
         return streamService.loadByIds(streamIds).stream()
-            .collect(Collectors.toMap(Persisted::getId, org.graylog2.plugin.streams.Stream::getIndexSet));
+                .collect(Collectors.toMap(Persisted::getId, org.graylog2.plugin.streams.Stream::getIndexSet));
     }
 
     private Set<String> streamIdsForEvents(List<EventWithContext> eventsWithContext) {
         return eventsWithContext.stream()
-            .map(EventWithContext::event)
-            .flatMap(event -> event.getStreams().stream())
-            .collect(Collectors.toSet());
+                .map(EventWithContext::event)
+                .flatMap(event -> event.getStreams().stream())
+                .collect(Collectors.toSet());
     }
 
     private Stream<AbstractMap.SimpleEntry<IndexSet, Event>> assignEventsToTargetIndices(Event event, Map<String, IndexSet> streamIndices) {

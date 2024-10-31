@@ -32,8 +32,7 @@ const DSVHTTPAdapterDocumentation = () => {
       <p>The DSV data adapter can read key value pairs (or check for the presence of a key) from a DSV file.</p>
       <p>Please make sure your DSV file is formatted according to your configuration settings.</p>
 
-      <Alert style={{ marginBottom: 10 }} bsStyle="info">
-        <h4 style={{ marginBottom: 10 }}>CSV file requirements:</h4>
+      <Alert style={{ marginBottom: 10 }} bsStyle="info" title="CSV file requirements">
         <ul className="no-padding">
           <li>The file uses <strong>utf-8</strong> encoding</li>
           <li>The file is accessible using the same URL by <strong>every</strong> Graylog server node</li>

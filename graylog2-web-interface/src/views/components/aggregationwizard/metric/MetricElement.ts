@@ -28,6 +28,7 @@ type MetricError = {
   function?: string,
   field?: string,
   percentile?: string,
+  name?: string,
 };
 
 const hasErrors = <T extends {}> (errors: Array<T>): boolean => errors.filter((error) => Object.keys(error).length > 0).length > 0;
@@ -46,7 +47,7 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
       metricError.function = 'Function is required.';
     }
 
-    const isFieldRequired = metric.function && metric.function !== 'count';
+    const isFieldRequired = metric.function !== 'count' && (metric.function !== 'percentage' || metric.strategy === 'SUM');
 
     if (isFieldRequired && !metric.field) {
       metricError.field = `Field is required for function ${metric.function}.`;
@@ -56,20 +57,34 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
       metricError.percentile = 'Percentile is required.';
     }
 
+    if (metric.name && values.metrics.filter(({ name }) => name === metric.name).length > 1) {
+      metricError.name = 'Name must be unique.';
+    }
+
     return metricError;
   });
 
   return hasErrors(metricsErrors) ? { metrics: metricsErrors } : {};
 };
 
+const parameterForMetric = (metric: MetricFormValues) => {
+  switch (metric.function) {
+    case 'percentage': return metric.strategy;
+    case 'percentile': return metric.percentile;
+    default: return undefined;
+  }
+};
+
+const emptyToUndefined = (s: string) => (s?.trim() === '' ? undefined : s);
+
 const metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
-  .map((metric) => Series.create(metric.function, metric.field, metric.percentile)
+  .map((metric) => Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
     .toBuilder()
     .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
     .build());
 
 export const seriesToMetrics = (series: Array<Series>) => series.map((s: Series) => {
-  const { type: func, field, percentile } = parseSeries(s.function) ?? {};
+  const { type: func, field, percentile, strategy } = parseSeries(s.function) ?? {};
 
   const metric = {
     function: func,
@@ -83,6 +98,13 @@ export const seriesToMetrics = (series: Array<Series>) => series.map((s: Series)
     return {
       ...metric,
       percentile: parsedPercentile,
+    };
+  }
+
+  if (strategy) {
+    return {
+      ...metric,
+      strategy,
     };
   }
 

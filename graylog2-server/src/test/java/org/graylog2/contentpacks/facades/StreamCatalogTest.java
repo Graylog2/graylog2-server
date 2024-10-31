@@ -87,8 +87,6 @@ public class StreamCatalogTest {
     @Mock
     private MongoIndexSet.Factory mongoIndexSetFactory;
     @Mock
-    private NotificationService notificationService;
-    @Mock
     private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
     @Mock
     private EntityOwnershipService entityOwnershipService;
@@ -108,9 +106,8 @@ public class StreamCatalogTest {
                 outputService,
                 indexSetService,
                 mongoIndexSetFactory,
-                notificationService,
                 entityOwnershipService,
-                clusterEventBus);
+                clusterEventBus, Set.of());
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );

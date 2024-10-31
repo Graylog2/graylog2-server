@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.MutableGraph;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -30,7 +31,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
+
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -91,8 +94,10 @@ public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builde
 
     public ViewDTO.Type dtoType() {
         switch (type()) {
-            case SEARCH: return ViewDTO.Type.SEARCH;
-            case DASHBOARD: return ViewDTO.Type.DASHBOARD;
+            case SEARCH:
+                return ViewDTO.Type.SEARCH;
+            case DASHBOARD:
+                return ViewDTO.Type.DASHBOARD;
             default:
                 throw new IllegalArgumentException("Unsupported view type:" + type());
         }
@@ -180,5 +185,14 @@ public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builde
                 .requires(this.requires());
         this.owner().ifPresent(viewBuilder::owner);
         return viewBuilder;
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        state().entrySet().forEach(state -> state.getValue().resolveForInstallation(entity, parameters, entities, graph));
+        search().resolveForInstallation(entity, parameters, entities, graph);
     }
 }

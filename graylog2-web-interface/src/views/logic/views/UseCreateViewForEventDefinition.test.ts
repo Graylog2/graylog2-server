@@ -26,6 +26,7 @@ import UseCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForE
 import generateId from 'logic/generateId';
 import asMock from 'helpers/mocking/AsMock';
 import type View from 'views/logic/views/View';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 const counter = () => {
   let index = 0;
@@ -78,6 +79,13 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 jest.mock('logic/generateId', () => jest.fn());
 
 jest.mock('bson-objectid', () => jest.fn());
+const mock_color = StaticColor.create('#ffffff');
+
+jest.mock('views/logic/views/formatting/highlighting/HighlightingRule', () => ({
+  ...jest.requireActual('views/logic/views/formatting/highlighting/HighlightingRule'),
+  randomColor: jest.fn(() => mock_color),
+  __esModule: true,
+}));
 
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
@@ -100,9 +108,9 @@ describe('UseCreateViewForEventDefinition', () => {
   it('should create view with 2 aggregation widgets and one summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdTwoAggregations);
 
-    asMock(ObjectID).mockImplementation(() => ({
+    asMock(ObjectID).mockImplementation(() => (({
       toString: () => mockedObjectIdTwoAggregations(),
-    }) as ObjectID);
+    }) as ObjectID));
 
     const { result } = renderHook(() => UseCreateViewForEventDefinition({ eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation }));
     const view = await result.current.then((r) => r);
@@ -113,9 +121,9 @@ describe('UseCreateViewForEventDefinition', () => {
   it('should create view with 1 aggregation widgets and without summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregation);
 
-    asMock(ObjectID).mockImplementation(() => ({
+    asMock(ObjectID).mockImplementation(() => (({
       toString: () => mockedObjectIdOneAggregation(),
-    }) as ObjectID);
+    }) as ObjectID));
 
     const { result } = renderHook(() => UseCreateViewForEventDefinition({ eventDefinition: mockEventDefinitionOneAggregation, aggregations: [mockedMappedAggregation[0]] }));
     const view = await result.current.then((r) => r);

@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
+import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type IndexerOverviewActionsType = {
@@ -32,6 +32,7 @@ export const IndexerOverviewActions = singletonActions(
 );
 
 export type IndexSummary = {
+  index_name: string,
   size: {
     events: number,
     deleted: number,
@@ -43,10 +44,12 @@ export type IndexSummary = {
     end: string,
     calculated_at: string,
     took_ms: number,
-  },
+  } | null,
   is_deflector: boolean,
   is_closed: boolean,
   is_reopened: boolean,
+  shard_count: number,
+  tier: 'WARM' | 'HOT'
 };
 
 export type IndexerOverview = {
@@ -88,7 +91,7 @@ export const IndexerOverviewStore = singletonStore(
 
     list(indexSetId: string) {
       const url = qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url);
-      const promise = fetch('GET', url);
+      const promise = fetchPeriodically('GET', url);
 
       promise.then(
         (response: IndexerOverview) => {

@@ -21,9 +21,12 @@ import org.graylog2.storage.SearchVersion;
 
 import javax.annotation.Nonnull;
 
-public interface IndexTemplateProvider {
+public interface IndexTemplateProvider<T extends IndexMappingTemplate> {
+
+    String FAILURE_TEMPLATE_TYPE = "failures";
+    String ILLUMINATE_INDEX_TEMPLATE_TYPE = "illuminate_content";
 
     @Nonnull
-    IndexMappingTemplate create(@Nonnull SearchVersion elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig)
+    T create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig)
             throws IgnoreIndexTemplate;
 }

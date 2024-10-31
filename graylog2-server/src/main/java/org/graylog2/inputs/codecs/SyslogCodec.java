@@ -22,8 +22,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
@@ -50,7 +52,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -78,12 +79,14 @@ public class SyslogCodec extends AbstractCodec {
 
     private final Timer resolveTime;
     private final Timer decodeTime;
+    private final MessageFactory messageFactory;
 
     @AssistedInject
-    public SyslogCodec(@Assisted Configuration configuration, MetricRegistry metricRegistry) {
+    public SyslogCodec(@Assisted Configuration configuration, MetricRegistry metricRegistry, MessageFactory messageFactory) {
         super(configuration);
         this.resolveTime = metricRegistry.timer(name(SyslogCodec.class, "resolveTime"));
         this.decodeTime = metricRegistry.timer(name(SyslogCodec.class, "decodeTime"));
+        this.messageFactory = messageFactory;
     }
 
     @Nullable
@@ -134,7 +137,7 @@ public class SyslogCodec extends AbstractCodec {
         } else if (CISCO_WITH_SEQUENCE_NUMBERS_PATTERN.matcher(msg).matches()) {
             e = new CiscoSyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         } else if (FORTIGATE_PATTERN.matcher(msg).matches()) {
-            e = new FortiGateSyslogEvent(msg, defaultTimeZone);
+            e = new FortiGateSyslogEvent(msg.trim(), defaultTimeZone);
         } else {
             e = new SyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         }
@@ -149,7 +152,7 @@ public class SyslogCodec extends AbstractCodec {
             syslogMessage = e.getMessage();
         }
 
-        final Message m = new Message(syslogMessage, parseHost(e, remoteAddress), parseDate(e, receivedTimestamp));
+        final Message m = messageFactory.createMessage(syslogMessage, parseHost(e, remoteAddress), parseDate(e, receivedTimestamp));
         m.addField("facility", Tools.syslogFacilityToReadable(e.getFacility()));
         m.addField("level", e.getLevel());
         m.addField("facility_num", e.getFacility());

@@ -1,0 +1,5 @@
+type = "a"
+message = "Add CA configuration to load a given CA during startup for datanode certificate provisioning."
+
+pulls = ["15546"]
+

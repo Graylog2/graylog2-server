@@ -19,17 +19,21 @@ import styled, { css } from 'styled-components';
 
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 import DocsHelper from 'util/DocsHelper';
-import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner, QueryHelper } from 'components/common';
 import RuleList from 'components/rules/RuleList';
 import RuleMetricsConfigContainer from 'components/rules/RuleMetricsConfigContainer';
-import Routes from 'routing/Routes';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import type { Pagination } from 'stores/PaginationTypes';
 import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import useHistory from 'routing/useHistory';
+import Routes from 'routing/Routes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const Flex = styled.div`
   display: flex;
@@ -57,12 +61,15 @@ const _loadRuleMetricData = (setMetricsConfig) => {
 
 const RulesPage = () => {
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
+  const { pathname } = useLocation();
+  const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
   const [query, setQuery] = useState('');
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
   const [metricsConfig, setMetricsConfig] = useState<MetricsConfigType>();
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
-  const { list: rules, pagination: { total = 0, count = 0 } = {}, context: rulesContext } = paginatedRules ?? {};
+  const { list: rules, pagination: { total = 0 } = {}, context: rulesContext } = paginatedRules ?? {};
 
   useEffect(() => {
     _loadData({ query, page, perPage }, setIsDataLoading, setPaginatedRules);
@@ -82,12 +89,7 @@ const RulesPage = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
       RulesActions.delete(rule).then(() => {
-        if (count > 1) {
-          _loadData({ query, page, perPage }, setIsDataLoading, setPaginatedRules);
-
-          return;
-        }
-
+        _loadData({ query, page, perPage }, setIsDataLoading, setPaginatedRules);
         setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
       });
     }
@@ -109,9 +111,18 @@ const RulesPage = () => {
   // eslint-disable-next-line react/no-unstable-nested-components
   const RulesButtonToolbar = () => (
     <ButtonToolbar className="pull-right">
-      <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
-        <Button bsStyle="success">Create Rule</Button>
-      </LinkContainer>
+      <Button bsStyle="success"
+              onClick={() => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_RULE_CLICKED, {
+                  app_pathname: getPathnameWithoutId(pathname),
+                  app_section: 'pipeline-rules',
+                  app_action_value: 'create-rule-button',
+                });
+
+                history.push(`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`);
+              }}>
+        Create Rule
+      </Button>
       {renderDebugMetricsButton()}
     </ButtonToolbar>
   );
@@ -153,7 +164,10 @@ const RulesPage = () => {
             <Row>
               <Col md={12}>
                 <PaginatedList totalItems={total}>
-                  <RuleList rules={rules} rulesContext={rulesContext} onDelete={handleDelete} searchFilter={searchFilter} />
+                  <RuleList rules={rules}
+                            rulesContext={rulesContext}
+                            onDelete={handleDelete}
+                            searchFilter={searchFilter} />
                   {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
                 </PaginatedList>
               </Col>

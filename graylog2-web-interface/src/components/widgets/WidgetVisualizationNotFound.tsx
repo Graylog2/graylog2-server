@@ -15,10 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 import { Alert } from 'components/bootstrap';
-import { Icon } from 'components/common';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 type Props = {
@@ -32,14 +30,10 @@ const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
 
   return (
     <Alert bsStyle="danger">
-      <Icon name="exclamation-circle" /> Widget Visualization (<i>{widgetClassName}</i>) not found.
+      Widget Visualization (<i>{widgetClassName}</i>) not found.
       It looks like the plugin supplying this widget is not loaded.
     </Alert>
   );
-};
-
-WidgetVisualizationNotFound.propTypes = {
-  widgetClassName: PropTypes.string.isRequired,
 };
 
 export default WidgetVisualizationNotFound;

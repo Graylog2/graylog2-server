@@ -26,6 +26,8 @@ import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.inputs.converters.DateConverter;
 import org.graylog2.inputs.extractors.ExtractorException;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.inputs.Extractor.Result;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -50,6 +52,7 @@ import static org.joda.time.DateTimeZone.UTC;
 
 public class ExtractorTest {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorTest.class);
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Test
     public void testInitializationWithReservedFields() throws Exception {
@@ -982,7 +985,7 @@ public class ExtractorTest {
     }
 
     private Message createMessage(String message) {
-        return new Message(message, "localhost", DateTime.now(UTC));
+        return messageFactory.createMessage(message, "localhost", DateTime.now(UTC));
     }
 
     private static class TestExtractor extends Extractor {

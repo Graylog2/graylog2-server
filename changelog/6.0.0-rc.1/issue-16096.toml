@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix timezone issue with date picker, which resulted in highlighting the wrong selected day."
+
+issues = ["16096"]
+pulls = ["16973"]

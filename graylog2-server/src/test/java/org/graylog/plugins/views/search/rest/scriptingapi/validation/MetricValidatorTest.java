@@ -23,7 +23,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
+
 import java.util.Map;
 
 import static org.junit.Assert.assertThrows;

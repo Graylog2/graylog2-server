@@ -28,13 +28,15 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
+import jakarta.validation.constraints.NotEmpty;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+
 import java.util.Map;
 
 @RequiresAuthentication
@@ -46,8 +48,10 @@ public class NaturalDateTesterResource extends RestResource {
     public abstract static class NaturalDateResponse {
         @JsonProperty
         public abstract DateTime from();
+
         @JsonProperty
         public abstract DateTime to();
+
         @JsonProperty
         public abstract String timezone();
 

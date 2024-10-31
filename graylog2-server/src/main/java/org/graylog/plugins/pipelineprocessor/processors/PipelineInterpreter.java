@@ -48,6 +48,7 @@ import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.metrics.MetricUtils;
@@ -57,8 +58,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Named;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -285,11 +288,11 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     public void evaluateStage(Stage stage,
-                               Message message,
-                               String msgId,
-                               List<Message> result,
-                               Set<Pipeline> pipelinesToSkip,
-                               InterpreterListener interpreterListener) {
+                              Message message,
+                              String msgId,
+                              List<Message> result,
+                              Set<Pipeline> pipelinesToSkip,
+                              InterpreterListener interpreterListener) {
         final Pipeline pipeline = stage.getPipeline();
         if (pipelinesToSkip.contains(pipeline)) {
             log.debug("[{}] previous stage result prevents further processing of pipeline `{}`",
@@ -319,22 +322,22 @@ public class PipelineInterpreter implements MessageProcessor {
                 allRulesMatched &= ruleCondition;
 
                 if (context.hasEvaluationErrors()) {
-                    log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
-                            rule.name(), rule.id(), message, context.lastEvaluationError());
+                    log.warn("Error evaluating condition for rule <{}/{}> in pipeline <{}/stage {}> with message: {} (Error: {})",
+                            rule.name(), rule.id(), pipeline.name(), stage.stage(), message, context.lastEvaluationError());
                     break;
                 }
 
             } catch (Exception e) {
-                log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
-                        rule.name(), rule.id(), message, e.getMessage());
+                log.warn("Error evaluating condition for rule <{}/{}> in pipeline <{}/stage {}> with message: {} (Error: {})",
+                        rule.name(), rule.id(), pipeline.name(), stage.stage(), message, e.getMessage());
                 throw e;
             }
         }
 
         for (Rule rule : rulesToRun) {
             if (!executeRuleActions(rule, message, msgId, pipeline, context, interpreterListener)) {
-                log.warn("Error evaluating action for rule <{}/{}> with message: {} (Error: {})",
-                        rule.name(), rule.id(), message, context.lastEvaluationError());
+                log.warn("Error evaluating action for rule <{}/{}> in pipeline <{}/stage {}> with message: {} (Error: {})",
+                        rule.name(), rule.id(), pipeline.name(), stage.stage(), message, context.lastEvaluationError());
                 // if any of the rules raise an error, skip the rest of the rules
                 break;
             }
@@ -470,12 +473,8 @@ public class PipelineInterpreter implements MessageProcessor {
         }
     }
 
-    public static RateLimitedLog getRateLimitedLog(Class clazz) {
-        final Logger baseLog = LoggerFactory.getLogger(clazz);
-        return RateLimitedLog
-                .withRateLimit(baseLog)
-                .maxRate(5).every(Duration.ofSeconds(10))
-                .build();
+    public static RateLimitedLog getRateLimitedLog(final Class<?> clazz) {
+        return RateLimitedLogFactory.createRateLimitedLog(clazz, 5, Duration.ofSeconds(10));
     }
 
     public static class State {

@@ -20,8 +20,3 @@
 
 import 'core-js';
 import 'regenerator-runtime/runtime';
-
-// To support IE11 (remove if support is dropped)
-import 'promise-polyfill/src/polyfill';
-import 'whatwg-fetch';
-import 'intersection-observer';

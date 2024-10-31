@@ -16,12 +16,14 @@
  */
 package org.graylog.events;
 
+import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
 import org.graylog.events.contentpack.entities.HttpEventNotificationConfigEntity;
+import org.graylog.events.contentpack.entities.HttpEventNotificationConfigV2Entity;
 import org.graylog.events.contentpack.entities.LegacyAlarmCallbackEventNotificationConfigEntity;
 import org.graylog.events.contentpack.facade.EventDefinitionFacade;
 import org.graylog.events.contentpack.facade.NotificationFacade;
@@ -32,6 +34,7 @@ import org.graylog.events.indices.EventIndexer;
 import org.graylog.events.legacy.LegacyAlarmCallbackEventNotification;
 import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
+import org.graylog.events.migrations.V20230629140000_RenameFieldTypeOfEventDefinitionSeries;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.notifications.EventNotificationExecutionMetrics;
 import org.graylog.events.notifications.NotificationGracePeriodService;
@@ -39,6 +42,8 @@ import org.graylog.events.notifications.types.EmailEventNotification;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotification;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
+import org.graylog.events.notifications.types.HTTPEventNotificationConfigV2;
+import org.graylog.events.notifications.types.HTTPEventNotificationV2;
 import org.graylog.events.periodicals.EventNotificationStatusCleanUp;
 import org.graylog.events.processor.DefaultEventResolver;
 import org.graylog.events.processor.EventProcessorEngine;
@@ -65,6 +70,7 @@ import org.graylog.events.rest.EventsResource;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.notifications.NotificationSystemEventPublisher;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 
@@ -158,6 +164,12 @@ public class EventsModule extends PluginModule {
                 HTTPEventNotification.Factory.class,
                 HttpEventNotificationConfigEntity.TYPE_NAME,
                 HttpEventNotificationConfigEntity.class);
+        addNotificationType(HTTPEventNotificationConfigV2.TYPE_NAME,
+                HTTPEventNotificationConfigV2.class,
+                HTTPEventNotificationV2.class,
+                HTTPEventNotificationV2.Factory.class,
+                HttpEventNotificationConfigV2Entity.TYPE_NAME,
+                HttpEventNotificationConfigV2Entity.class);
         addNotificationType(LegacyAlarmCallbackEventNotificationConfig.TYPE_NAME,
                 LegacyAlarmCallbackEventNotificationConfig.class,
                 LegacyAlarmCallbackEventNotification.class,
@@ -170,5 +182,12 @@ public class EventsModule extends PluginModule {
 
         // Change this if another aggregation search implementation should be used
         install(new FactoryModuleBuilder().implement(AggregationSearch.class, PivotAggregationSearch.class).build(AggregationSearch.Factory.class));
+
+        addMigration(V20230629140000_RenameFieldTypeOfEventDefinitionSeries.class);
+
+        serviceBinder().addBinding().to(NotificationSystemEventPublisher.class).in(Scopes.SINGLETON);
+
+        eventModifierBinder(); // Initialize event modifier binding to avoid errors when no modifiers are bound.
+        eventQuerySearchTypeSupplierBinder(); // Initialize binder to avoid errors when no suppliers are bound.
     }
 }

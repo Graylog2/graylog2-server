@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 const StatusIndicator = styled.div<{ $disabled: 'true' | 'false' }>(({ $disabled, theme }) => css`
-  display: flex;
+  display: inline-flex;
   border-radius: 50%;
   height: 10px;
   width: 10px;

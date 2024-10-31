@@ -1,0 +1,632 @@
+{
+  "id": "graylog-security-views__network-activity",
+  "type": "DASHBOARD",
+  "title": "Network Activity",
+  "summary": "Read Only Network",
+  "description": "in development",
+  "search_id": "656510c70548c8792779eea5",
+  "properties": [],
+  "state": {
+    "5ebe4f70-3dd7-436d-8242-3164bbbaea5c": {
+      "selected_fields": null,
+      "formatting": {
+        "highlighting": []
+      },
+      "titles": {
+        "tab": {
+          "title": "Network Activity"
+        },
+        "widget": {
+          "06b6a8fe-ca9e-4071-904b-4124897166f5": "Network Bytes by source_ip (top 15)",
+          "d2c435e0-cddf-4736-891d-32e6ea646de2": "DNS by query_result (Top 15)",
+          "a1b4618b-85ea-482f-b6d4-d1cc4d2c23a3": "Network Bytes by associated_ip (top 15)",
+          "53842767-d08f-49b8-b74d-7bbb3a4223c6": "Graylog Security Message Count Over Time",
+          "b05d8c60-e233-4124-914e-08e9cca12abd": "DNS Requests by event_source (Top 15)",
+          "a6b56dac-665f-4389-ac86-f0735e2df939": "DNS Activity by query_result (Top 15) (copy)",
+          "2ef0c2e6-c6c8-437f-a0ba-e0c1b91009fc": "DNS Requests by query_result (Top 15)",
+          "290208a4-93ba-4ced-8aa8-fdb4005956fe": "Network Bytes by associated_user_name (top 15)",
+          "d21bd643-9f36-419c-bed6-e060a6f8bd3b": "Network Activity by destination_ip (Top 15) (copy)",
+          "9d797358-899f-4d5f-a044-7c6ef706d9a9": "DNS Requests by event_source_product (Top 15)",
+          "e4d44e60-0097-4c85-9560-087be196e886": "Network Log Summary",
+          "803ef4db-8492-4397-b2fb-079e3e4b0e91": "DNS by query_result (Top 15)",
+          "d7afae99-eed7-433d-b963-19a4d6b3bbd8": "Network Bytes Received by associated_ip (top 15)",
+          "c91a611f-1a1b-4911-8dff-e9f8c2e95523": "Network Bytes (Sum)",
+          "abc12481-c27c-466c-ba3a-30d8de904dc2": "Network Log Summary (copy)",
+          "dd4949ee-adee-41c3-adfc-6c69314c8e94": "Network Bytes by destination_ip (top 15)",
+          "c60b43eb-57d4-4bc4-9064-1e396c877356": "Network Activity by destination_ip (Top 15)",
+          "290a4d6b-c43c-42c7-a06a-c2facb527e30": "Network Bytes by event_source (top 15)"
+        }
+      },
+      "widgets": [
+        {
+          "id": "2ef0c2e6-c6c8-437f-a0ba-e0c1b91009fc",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#4b6ab7"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "query_result"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND query_result) AND gim_event_category:(\"name resolution\")"
+          },
+          "streams": []
+        },
+        {
+          "id": "a1b4618b-85ea-482f-b6d4-d1cc4d2c23a3",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "sum(network_bytes)",
+                  "chart_color": "#758085"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "associated_ip"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "sum(network_bytes)"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "sum(network_bytes)",
+                "direction": "Descending"
+              }
+            ],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "stack",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(network_bytes AND associated_ip)"
+          },
+          "streams": []
+        },
+        {
+          "id": "290208a4-93ba-4ced-8aa8-fdb4005956fe",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "sum(network_bytes)",
+                  "chart_color": "#758085"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "associated_user_name"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "sum(network_bytes)"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "sum(network_bytes)",
+                "direction": "Descending"
+              }
+            ],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "stack",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category) AND _exists_:(associated_user_name AND network_bytes) AND gim_event_category:(network)"
+          },
+          "streams": []
+        },
+        {
+          "id": "290a4d6b-c43c-42c7-a06a-c2facb527e30",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "sum(network_bytes)",
+                  "chart_color": "#758085"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "event_source"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "sum(network_bytes)"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "sum(network_bytes)",
+                "direction": "Descending"
+              }
+            ],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "stack",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND event_source) AND gim_event_category:(network)"
+          },
+          "streams": []
+        },
+        {
+          "id": "06b6a8fe-ca9e-4071-904b-4124897166f5",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "sum(network_bytes)",
+                  "chart_color": "#758085"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "source_ip"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "sum(network_bytes)"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "sum(network_bytes)",
+                "direction": "Descending"
+              }
+            ],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "stack",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND network_bytes AND source_ip) AND gim_event_category:(network)"
+          },
+          "streams": []
+        },
+        {
+          "id": "9d797358-899f-4d5f-a044-7c6ef706d9a9",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#4b6ab7"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "event_source_product"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND event_source_product) AND gim_event_category:(\"name resolution\")"
+          },
+          "streams": []
+        },
+        {
+          "id": "c91a611f-1a1b-4911-8dff-e9f8c2e95523",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "sum(network_bytes)",
+                  "chart_color": "#4c575d"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "auto",
+                    "scaling": 1
+                  }
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "sum(network_bytes)"
+              }
+            ],
+            "sort": [],
+            "visualization": "area",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND timestamp AND network_bytes) AND gim_event_category:(network)"
+          },
+          "streams": []
+        },
+        {
+          "id": "b05d8c60-e233-4124-914e-08e9cca12abd",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#4b6ab7"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "event_source"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_source AND gim_event_category) AND gim_event_category:(\"name resolution\")"
+          },
+          "streams": []
+        },
+        {
+          "id": "dd4949ee-adee-41c3-adfc-6c69314c8e94",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "sum(network_bytes)",
+                  "chart_color": "#758085"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "destination_ip"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "sum(network_bytes)"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "sum(network_bytes)",
+                "direction": "Descending"
+              }
+            ],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "stack",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND network_bytes AND destination_ip) AND gim_event_category:(network)"
+          },
+          "streams": []
+        }
+      ],
+      "widget_mapping": {
+        "06b6a8fe-ca9e-4071-904b-4124897166f5": [
+          "d4b777c8-a08f-43b2-9ce6-769ca8ff5b37"
+        ],
+        "a1b4618b-85ea-482f-b6d4-d1cc4d2c23a3": [
+          "53fc12e9-990c-4463-afb0-5e9f39892a60"
+        ],
+        "b05d8c60-e233-4124-914e-08e9cca12abd": [
+          "bc72e61e-9f67-4606-ac9b-bc9bf05643a2"
+        ],
+        "2ef0c2e6-c6c8-437f-a0ba-e0c1b91009fc": [
+          "00d9b465-3654-4cfc-bfc4-8c9d4b2b9638"
+        ],
+        "290208a4-93ba-4ced-8aa8-fdb4005956fe": [
+          "273e4a5c-2e84-47ca-8c8e-6aa56c2aa67a"
+        ],
+        "9d797358-899f-4d5f-a044-7c6ef706d9a9": [
+          "2416aa11-d8c1-4d77-862e-7000e060a996"
+        ],
+        "c91a611f-1a1b-4911-8dff-e9f8c2e95523": [
+          "ed157f68-1bd1-4a06-91f6-37b37a377d62"
+        ],
+        "dd4949ee-adee-41c3-adfc-6c69314c8e94": [
+          "7ff77c06-4f85-4586-b4e2-16dcff9a860f"
+        ],
+        "290a4d6b-c43c-42c7-a06a-c2facb527e30": [
+          "bd49d534-92cc-4b70-be56-1c8e2ffeb79f"
+        ]
+      },
+      "positions": {
+        "06b6a8fe-ca9e-4071-904b-4124897166f5": {
+          "col": 1,
+          "row": 45,
+          "height": 4,
+          "width": 6
+        },
+        "a1b4618b-85ea-482f-b6d4-d1cc4d2c23a3": {
+          "col": 1,
+          "row": 53,
+          "height": 4,
+          "width": 6
+        },
+        "b05d8c60-e233-4124-914e-08e9cca12abd": {
+          "col": 7,
+          "row": 57,
+          "height": 4,
+          "width": 6
+        },
+        "2ef0c2e6-c6c8-437f-a0ba-e0c1b91009fc": {
+          "col": 7,
+          "row": 53,
+          "height": 4,
+          "width": 6
+        },
+        "290208a4-93ba-4ced-8aa8-fdb4005956fe": {
+          "col": 7,
+          "row": 49,
+          "height": 4,
+          "width": 6
+        },
+        "9d797358-899f-4d5f-a044-7c6ef706d9a9": {
+          "col": 1,
+          "row": 57,
+          "height": 4,
+          "width": 6
+        },
+        "c91a611f-1a1b-4911-8dff-e9f8c2e95523": {
+          "col": 1,
+          "row": 42,
+          "height": 3,
+          "width": "Infinity"
+        },
+        "dd4949ee-adee-41c3-adfc-6c69314c8e94": {
+          "col": 7,
+          "row": 45,
+          "height": 4,
+          "width": 6
+        },
+        "290a4d6b-c43c-42c7-a06a-c2facb527e30": {
+          "col": 1,
+          "row": 49,
+          "height": 4,
+          "width": 6
+        }
+      }
+    }
+  },
+  "created_at": "2021-03-15T20:32:50.170Z",
+  "owner": "john.hartley"
+}

@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Improve logic which controls when we show the query input completions."
+
+issues = ["16207"]
+pulls = ["16168"]
+

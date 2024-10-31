@@ -85,7 +85,7 @@ const SelectPopoverFormattedExample = createReactClass({
   formatItem(item) {
     return (
       <span>
-        <Icon name="square" fixedWidth style={{ color: item }} /> {item}
+        <Icon name="square" style={{ color: item }} /> {item}
       </span>
     )
   },

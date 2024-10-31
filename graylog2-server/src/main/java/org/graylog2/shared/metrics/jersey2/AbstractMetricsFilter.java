@@ -16,12 +16,13 @@
  */
 package org.graylog2.shared.metrics.jersey2;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 
@@ -38,7 +39,7 @@ public abstract class AbstractMetricsFilter implements ContainerRequestFilter, C
             return name(method.getDeclaringClass(), explicitName);
         }
         return name(name(method.getDeclaringClass(),
-                method.getName()),
+                        method.getName()),
                 suffixes);
     }
 

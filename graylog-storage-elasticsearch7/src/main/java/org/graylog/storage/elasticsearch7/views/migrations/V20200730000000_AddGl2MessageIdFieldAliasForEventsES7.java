@@ -24,7 +24,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMap
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog2.indexer.ElasticsearchException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Set;

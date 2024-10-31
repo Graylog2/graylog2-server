@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { render, screen } from 'wrappedTestingLibrary';
+import { act, render, screen } from 'wrappedTestingLibrary';
 import React from 'react';
 import Immutable, { OrderedSet } from 'immutable';
 import userEvent from '@testing-library/user-event';
 
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
 
 jest.mock('views/logic/slices/viewSlice', () => ({
@@ -44,9 +44,7 @@ describe('AdaptableQueryTabsConfiguration', () => {
     window.confirm = oldConfirm;
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   const renderConfiguration = () => render((
     <TestStoreProvider>
@@ -95,10 +93,14 @@ describe('AdaptableQueryTabsConfiguration', () => {
       hidden: true,
     });
 
-    userEvent.click(deleteButton);
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await userEvent.click(deleteButton);
+    });
 
     const submitButton = await screen.findByTitle('Update configuration');
-    userEvent.click(submitButton);
+
+    await userEvent.click(submitButton);
 
     await expect(setQueriesOrder).toHaveBeenCalledWith(Immutable.OrderedSet(['queryId-1']));
 

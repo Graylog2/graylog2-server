@@ -33,7 +33,9 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import useAppDispatch from 'stores/useAppDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
+import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 
+import TableHead from './TableHead';
 import DataTableEntry from './DataTableEntry';
 import MessagesTable from './MessagesTable';
 import deduplicateValues from './DeduplicateValues';
@@ -45,12 +47,13 @@ import type { VisualizationComponentProps } from '../aggregationbuilder/Aggregat
 import { makeVisualization, retrieveChartData } from '../aggregationbuilder/AggregationBuilder';
 
 type Props = VisualizationComponentProps & {
-  data: { [key: string]: Rows } & { events?: Events },
-  striped?: boolean,
   bordered?: boolean,
   borderedHeader?: boolean,
-  stickyHeader?: boolean,
   condensed?: boolean,
+  data: { [key: string]: Rows } & { events?: Events },
+  setLoadingState: (loading: boolean) => void
+  stickyHeader?: boolean,
+  striped?: boolean,
 };
 
 const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>) => stickyLeftMarginsByColumnIndex.map(({ index, leftMargin }) => `
@@ -61,18 +64,21 @@ const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnInde
     }
   `).concat((' ; '));
 
-const THead = styled.thead(({ stickyLeftMarginsByColumnIndex }: {
-  stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
-}) => css`
+const THead = styled(TableHead)<{
+    $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
+}>(({ $stickyLeftMarginsByColumnIndex, theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
+
   & tr.pivot-header-row {
-    & ${getStylesForPinnedColumns('th', stickyLeftMarginsByColumnIndex)}
+    & ${getStylesForPinnedColumns('th', $stickyLeftMarginsByColumnIndex)}
   }
 `);
-const TBody = styled.tbody(({ stickyLeftMarginsByColumnIndex }: {
-  stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
-}) => css`
+
+const TBody = styled.tbody<{
+  $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
+}>(({ $stickyLeftMarginsByColumnIndex }) => css`
   & tr {
-    & ${getStylesForPinnedColumns('td', stickyLeftMarginsByColumnIndex)}
+    & ${getStylesForPinnedColumns('td', $stickyLeftMarginsByColumnIndex)}
   }
 `);
 
@@ -118,15 +124,16 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
 };
 
 const DataTable = ({
+  bordered = false,
+  borderedHeader = true,
+  condensed = true,
   config,
   data,
-  fields,
-  striped,
-  bordered,
-  borderedHeader,
-  stickyHeader,
-  condensed,
   editing,
+  fields,
+  setLoadingState,
+  stickyHeader = true,
+  striped = true,
 }: Props) => {
   const formContext = useContext(FormikContext);
   const onRenderComplete = useContext(RenderCompletionCallback);
@@ -194,6 +201,7 @@ const DataTable = ({
   }, [formContext?.dirty, editing, widget?.config, widget?.id, dispatch]);
 
   const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup } = config;
+  const widgetUnits = useWidgetUnits(config);
 
   const rows = retrieveChartData(data) ?? [];
 
@@ -247,7 +255,8 @@ const DataTable = ({
                         columnPivots={columnFieldNames}
                         columnPivotValues={actualColumnPivotFields}
                         types={fields}
-                        series={series} />
+                        series={series}
+                        units={widgetUnits} />
       )
     );
   });
@@ -259,11 +268,11 @@ const DataTable = ({
       <div className={styles.scrollContainer}>
         <MessagesTable striped={striped}
                        bordered={bordered}
-                       borderedHeader={borderedHeader}
                        stickyHeader={stickyHeader}
                        condensed={condensed}>
-          <THead stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
+          <THead $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
             <Headers actualColumnPivotFields={actualColumnPivotFields}
+                     borderedHeader={borderedHeader}
                      columnPivots={columnPivots}
                      fields={fields}
                      rollup={rollup}
@@ -272,24 +281,17 @@ const DataTable = ({
                      onSortChange={_onSortChange}
                      sortConfigMap={sortConfigMap}
                      onSetColumnsWidth={onSetColumnsWidth}
+                     setLoadingState={setLoadingState}
                      pinnedColumns={pinnedColumns}
                      togglePin={togglePin} />
           </THead>
-          <TBody stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
+          <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
             {formattedRows}
           </TBody>
         </MessagesTable>
       </div>
     </div>
   );
-};
-
-DataTable.defaultProps = {
-  condensed: true,
-  striped: true,
-  bordered: false,
-  stickyHeader: true,
-  borderedHeader: true,
 };
 
 const ConnectedDataTable = makeVisualization(DataTable, 'table');

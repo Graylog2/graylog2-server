@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
@@ -53,6 +54,10 @@ public class DropMessage extends AbstractFunction<Void> {
                         messageParam
                 ))
                 .description("Discards a message from further processing, after completing the current stage")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Drop message")
+                .ruleBuilderTitle("Remove message from the processing pipeline after current stage")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

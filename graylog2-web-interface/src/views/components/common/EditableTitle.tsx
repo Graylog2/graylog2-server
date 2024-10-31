@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import styles from './EditableTitle.css';
@@ -36,7 +35,7 @@ const StyledInput = styled.input(({ theme }) => css`
   padding: 2px 3px;
   font-size: ${theme.fonts.size.large};
   
-  :focus {
+  &:focus {
     border-color: ${theme.colors.input.borderFocus};
     outline: none;
   }
@@ -54,12 +53,6 @@ type State = {
 };
 
 export default class EditableTitle extends React.Component<Props, State> {
-  static propTypes = {
-    disabled: PropTypes.bool,
-    onChange: PropTypes.func,
-    value: PropTypes.string.isRequired,
-  };
-
   static defaultProps = {
     disabled: false,
     onChange: () => {},

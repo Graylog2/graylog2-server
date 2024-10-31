@@ -22,8 +22,8 @@ import org.graylog.security.events.AuthServiceBackendSavedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class CSPEventListener {
@@ -41,7 +41,7 @@ public class CSPEventListener {
     public void handleBackendCreated(AuthServiceBackendSavedEvent event) {
         try {
             LOG.debug("Updating CSP for authentication service <{}>", event.authServiceId());
-            cspService.buildConnectSrc();
+            cspService.updateConnectSrc();
         } catch (Exception e) {
             LOG.warn("Failed to update CSP for authentication service <{}>", event.authServiceId(), e);
         }

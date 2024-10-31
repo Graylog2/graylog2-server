@@ -19,7 +19,7 @@ import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import type { ThunkActionHandler } from 'views/components/actions/ActionHandler';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
@@ -35,7 +35,7 @@ const AggregateActionHandler: ThunkActionHandler<{ widget?: Widget }> = ({
     .newId()
     .config(AggregationWidgetConfig.builder()
       .rowPivots([pivotForField(field, type)])
-      .series([Series.forFunction('count()')])
+      .series([Series.forFunction('count()'), Series.forFunction('percentage()')])
       .visualization(DataTable.type)
       .build());
   const newWidget = duplicateCommonWidgetSettings(newWidgetBuilder, widget).build();

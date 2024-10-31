@@ -48,6 +48,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,8 +70,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * Utility class for various tool/helper functions.
  */
 public final class Tools {
-    private static final byte[] EMPTY_BYTE_ARRAY_4 = {0,0,0,0};
-    private static final byte[] EMPTY_BYTE_ARRAY_16 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    private static final byte[] EMPTY_BYTE_ARRAY_4 = {0, 0, 0, 0};
+    private static final byte[] EMPTY_BYTE_ARRAY_16 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     private static final String ES_DATE_FORMAT_JODA = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String ES_DATE_FORMAT_NO_MS = "yyyy-MM-dd HH:mm:ss";
@@ -77,6 +80,7 @@ public final class Tools {
     public static final DateTimeFormatter ES_DATE_FORMAT_NO_MS_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS).withZoneUTC();
     public static final DateTimeFormatter ISO_DATE_FORMAT_FORMATTER = ISODateTimeFormat.dateTime().withZoneUTC();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
     private Tools() {
     }
@@ -378,6 +382,11 @@ public final class Tools {
         return ISODateTimeFormat.dateTime().print(time);
     }
 
+
+    public static ZonedDateTime jodaToJavaUTC(DateTime dateTime) {
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(dateTime.getMillis()), ZoneId.of("UTC"));
+    }
+
     /**
      * Try to parse a date in ES_DATE_FORMAT format considering it is in UTC and convert it to an ISO8601 date.
      * If an error is encountered in the process, it will return the original string.
@@ -447,7 +456,7 @@ public final class Tools {
 
     public static Number getNumber(Object o, Number defaultValue) {
         if (o instanceof Number) {
-            return (Number)o;
+            return (Number) o;
         }
 
         try {
@@ -574,7 +583,7 @@ public final class Tools {
         }
 
         final String path = firstNonNull(uri.getPath(), "/");
-        if(path.endsWith("/")) {
+        if (path.endsWith("/")) {
             return uri;
         } else {
             try {
@@ -660,5 +669,9 @@ public final class Tools {
         } catch (Exception ignored) {
             return Optional.empty();
         }
+    }
+
+    public static int availableProcessors() {
+        return AVAILABLE_PROCESSORS;
     }
 }

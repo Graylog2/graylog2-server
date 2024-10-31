@@ -22,6 +22,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.fields.providers.FieldValueProvider;
 import org.graylog.events.notifications.EventNotification;
@@ -29,6 +30,8 @@ import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorParameters;
+import org.graylog.events.processor.aggregation.EventQuerySearchTypeSupplier;
+import org.graylog.events.processor.modifier.EventModifier;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
@@ -59,6 +62,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
+import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -68,9 +72,10 @@ import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
+import org.graylog2.streams.StreamDeletionGuard;
+import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 import org.graylog2.web.PluginUISettingsProvider;
 
-import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -120,6 +125,10 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addInitializer(Class<? extends Service> initializerClass) {
         Multibinder<Service> serviceBinder = serviceBinder();
         serviceBinder.addBinding().to(initializerClass);
+    }
+
+    protected void addFilteredMessageOutput(String name, Class<? extends FilteredMessageOutput> filteredMessageOutputClass) {
+        filteredOutputsMapBinder().addBinding(name).to(filteredMessageOutputClass);
     }
 
     // This should only be used by plugins that have been built before Graylog 3.0.1.
@@ -243,6 +252,22 @@ public abstract class PluginModule extends Graylog2Module {
         eventProcessorBinder().addBinding(name).to(factoryClass);
         registerJacksonSubtype(configClass, name);
         registerJacksonSubtype(parametersClass, name);
+    }
+
+    protected Multibinder<EventModifier> eventModifierBinder() {
+        return Multibinder.newSetBinder(binder(), EventModifier.class);
+    }
+
+    protected void addEventModifier(Class<? extends EventModifier> eventModifierClass) {
+        eventModifierBinder().addBinding().to(eventModifierClass);
+    }
+
+    protected Multibinder<EventQuerySearchTypeSupplier> eventQuerySearchTypeSupplierBinder() {
+        return Multibinder.newSetBinder(binder(), EventQuerySearchTypeSupplier.class);
+    }
+
+    protected void addEventQuerySearchTypeSupplier(Class<? extends EventQuerySearchTypeSupplier> eventModifierClass) {
+        eventQuerySearchTypeSupplierBinder().addBinding().to(eventModifierClass);
     }
 
     private MapBinder<String, EventStorageHandler.Factory> eventStorageHandlerBinder() {
@@ -420,5 +445,21 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addEntityScope(Class<? extends EntityScope> entityScopeType) {
         Multibinder<EntityScope> scopeBinder = Multibinder.newSetBinder(binder(), EntityScope.class);
         scopeBinder.addBinding().to(entityScopeType);
+    }
+
+    protected MapBinder<String, TelemetryMetricSupplier> telemetryMetricSupplierBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, TelemetryMetricSupplier.class);
+    }
+
+    protected void addTelemetryMetricProvider(String eventId, Class<? extends TelemetryMetricSupplier> eventSupplier) {
+        telemetryMetricSupplierBinder().addBinding(eventId).to(eventSupplier);
+    }
+
+    protected void addTelemetryMetricProvider(String eventId, TelemetryMetricSupplier eventSupplier) {
+        telemetryMetricSupplierBinder().addBinding(eventId).toInstance(eventSupplier);
+    }
+
+    protected void addStreamDeletionGuard(Class<? extends StreamDeletionGuard> streamDeletionGuard) {
+        streamDeletionGuardBinder().addBinding().to(streamDeletionGuard);
     }
 }

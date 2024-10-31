@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import URI from 'urijs';
 
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
-import useScopePermissions from 'hooks/useScopePermissions';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
@@ -29,14 +29,21 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useHistory from 'routing/useHistory';
+import useQuery from 'routing/useQuery';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
 const EditEventDefinitionPage = () => {
   const params = useParams<{definitionId?: string}>();
+  const { step } = useQuery();
   const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = React.useState<EventDefinition>(undefined);
   const history = useHistory();
+  const navigate = useNavigate();
+
+  const goToOverview = useCallback(() => {
+    navigate(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [navigate]);
 
   React.useEffect(() => {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
@@ -60,8 +67,6 @@ const EditEventDefinitionPage = () => {
     }
   }, [params, currentUser, history]);
 
-  const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
-
   const streamsWithMissingPermissions = () => {
     const streams = eventDefinition?.config?.streams || [];
 
@@ -74,11 +79,16 @@ const EditEventDefinitionPage = () => {
 
   const missingStreams = streamsWithMissingPermissions();
 
+  const updateURLStepQueryParam = (newStep: string) => {
+    const newUrl = new URI(window.location.href).removeSearch('step').addQuery('step', newStep);
+    history.replace(newUrl.resource());
+  };
+
   if (missingStreams.length > 0) {
     return <StreamPermissionErrorPage error={null} missingStreamIds={missingStreams} />;
   }
 
-  if (!eventDefinition || loadingScopePermissions) {
+  if (!eventDefinition) {
     return (
       <DocumentTitle title="Edit Event Definition">
         <span>
@@ -102,26 +112,16 @@ const EditEventDefinitionPage = () => {
           Event Definitions allow you to create Events from different Conditions and alert on them.
         </span>
       </PageHeader>
-      {scopePermissions.is_mutable ? (
-        <Row className="content">
-          <Col md={12}>
-            <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
-          </Col>
-        </Row>
-      ) : (
-        <Row className="content">
-          <Col md={12}>
-            <Row>
-              <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
-                <div style={{ textAlign: 'center' }}>
-                  <p>This particular Event Definition has been marked as immutable when it was created, therefore it cannot be edited.</p>
-                </div>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      )}
-
+      <Row className="content">
+        <Col md={12}>
+          <EventDefinitionFormContainer action="edit"
+                                        initialStep={step as string}
+                                        onChangeStep={updateURLStepQueryParam}
+                                        eventDefinition={eventDefinition}
+                                        onSubmit={goToOverview}
+                                        onCancel={goToOverview} />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

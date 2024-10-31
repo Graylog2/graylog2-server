@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixing broken streams page if streams without `matching_type` exist."
+
+issues = ["16474"]
+pulls = ["16522"]

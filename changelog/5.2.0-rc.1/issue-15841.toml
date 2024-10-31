@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fixes problems with editing Search Filters of entities installed via Content Packs. Search Filters of those types of entities are not inlined during Content Pack installation and can be edited."
+
+issues = ["15841"]
+pulls = ["16085","Graylog2/graylog-plugin-enterprise#5560"]

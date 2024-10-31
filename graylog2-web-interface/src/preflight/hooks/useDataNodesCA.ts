@@ -16,6 +16,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import type { DataNodesCA } from 'preflight/types';
 import type FetchError from 'logic/errors/FetchError';
@@ -33,19 +34,42 @@ const useDataNodesCA = (): {
   error: FetchError,
   isInitialLoading: boolean
 } => {
+  const [metaData, setMetaData] = useState<{
+    error: FetchError | null,
+    isInitialLoading: boolean,
+  }>({
+    error: null,
+    isInitialLoading: false,
+  });
   const {
     data,
     isFetching,
-    error,
-    isInitialLoading,
   } = useQuery<DataNodesCA, FetchError>({
     queryKey: QUERY_KEY,
     queryFn: fetchDataNodesCA,
     initialData: undefined,
-    retry: 3000,
+    refetchInterval: 3000,
+    retry: false,
+    onError: (newError) => {
+      setMetaData({
+        error: newError,
+        isInitialLoading: false,
+      });
+    },
+    onSuccess: () => {
+      setMetaData({
+        error: null,
+        isInitialLoading: false,
+      });
+    },
   });
 
-  return { data, isFetching, error, isInitialLoading };
+  return {
+    data,
+    isFetching,
+    isInitialLoading: metaData.isInitialLoading,
+    error: metaData.error,
+  };
 };
 
 export default useDataNodesCA;

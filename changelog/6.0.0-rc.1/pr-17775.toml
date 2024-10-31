@@ -1,0 +1,4 @@
+type = "a"
+message = "Adding a resource to manage the CA to regular Graylog (not only during preflight)"
+
+pulls = ["17775"]

@@ -32,10 +32,10 @@ type Result = {
   positions: { [key: string]: WidgetPosition },
 };
 
-type ViewCreator = (streamId: string | string[] | undefined | null) => Promise<Result>;
+type ViewCreator = (streamId: string | string[] | undefined | null, streamCategory: string | string[] | undefined | null) => Promise<Result>;
 type DefaultWidgets = Record<ViewType, ViewCreator>;
 
-type Decorator = { stream: string | null };
+type Decorator = { stream: string | null, category: string | null };
 
 export const matchesDecoratorStream = (streamId: string | string[] | undefined | null) => {
   if (!streamId) {
@@ -49,13 +49,33 @@ export const matchesDecoratorStream = (streamId: string | string[] | undefined |
   return ({ stream }: Decorator) => stream === streamId;
 };
 
+export const matchesDecoratorStreamCategories = (streamCategory: string | string[] | undefined | null) => {
+  if (!streamCategory) {
+    return ({ category }: Decorator) => category === null;
+  }
+
+  if (streamCategory instanceof Array) {
+    return ({ category }: Decorator) => streamCategory.includes(category);
+  }
+
+  return ({ category }: Decorator) => category === streamCategory;
+};
+
 const _defaultWidgets: DefaultWidgets = {
-  [View.Type.Search]: async (streamId: string | string[] | undefined | null) => {
+  [View.Type.Search]: async (streamId: string | string[] | undefined | null, streamCategory: string | string[] | undefined | null) => {
     const decorators = await DecoratorsActions.list();
     const byStreamId = matchesDecoratorStream(streamId);
+    const byStreamCategory = matchesDecoratorStreamCategories(streamCategory);
     const streamDecorators = decorators ? decorators.filter(byStreamId) : [];
+    const streamCategoryDecorators = decorators?.length ? decorators.filter(byStreamCategory) : [];
+    // eslint-disable-next-line no-nested-ternary
+    const allDecorators = streamDecorators.length && streamCategoryDecorators.length
+      ? [...streamDecorators, ...streamCategoryDecorators]
+      : streamDecorators.length
+        ? streamDecorators
+        : streamCategoryDecorators;
     const histogram = resultHistogram();
-    const messageTable = allMessagesTable(undefined, streamDecorators);
+    const messageTable = allMessagesTable(undefined, allDecorators);
     const widgets = [
       histogram,
       messageTable,
@@ -85,8 +105,8 @@ const _defaultWidgets: DefaultWidgets = {
   },
 };
 
-export default async (type: ViewType, streamId?: string | string[] | undefined) => {
-  const { titles, widgets, positions } = await _defaultWidgets[type](streamId);
+export default async (type: ViewType, streamId?: string | string[] | undefined, streamCategory?: string | string[] | undefined) => {
+  const { titles, widgets, positions } = await _defaultWidgets[type](streamId, streamCategory);
 
   return ViewState.create()
     .toBuilder()

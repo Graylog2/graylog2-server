@@ -23,13 +23,13 @@ import { manager as exampleRole } from 'fixtures/roles';
 import TeamsSection from './TeamsSection';
 
 describe('<TeamsSection />', () => {
-  it('should display info if license is not present', () => {
+  it('should display info if license is not present', async () => {
     render(<TeamsSection role={exampleRole} />);
 
-    expect(screen.getByText('Enterprise Feature')).toBeInTheDocument();
+    expect(await screen.findByText('Enterprise Feature')).toBeInTheDocument();
   });
 
-  it('should display enterprise role teams assignment plugin', () => {
+  it('should display enterprise role teams assignment plugin', async () => {
     PluginStore.register(new PluginManifest({}, {
       teams: {
         RoleTeamsAssignment: () => <>RoleTeamsAssignment</>,
@@ -38,6 +38,6 @@ describe('<TeamsSection />', () => {
 
     render(<TeamsSection role={exampleRole} />);
 
-    expect(screen.getByText('RoleTeamsAssignment')).toBeInTheDocument();
+    expect(await screen.findByText('RoleTeamsAssignment')).toBeInTheDocument();
   });
 });

@@ -19,8 +19,11 @@ package org.graylog2.streams;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import jakarta.inject.Provider;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
@@ -35,7 +38,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.inject.Provider;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +63,7 @@ public class StreamRouterEngineTest {
     private Provider<Stream> defaultStreamProvider;
 
     private StreamMetrics streamMetrics;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
@@ -195,14 +198,14 @@ public class StreamRouterEngineTest {
     public void testInvertedContainsMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
         final StreamRuleMock rule = new StreamRuleMock(
-            ImmutableMap.<String, Object>builder()
-                .put("_id", new ObjectId())
-                .put("field", "testfield")
-                .put("inverted", true)
-                .put("value", "testvalue")
-                .put("type", StreamRuleType.CONTAINS.toInteger())
-                .put("stream_id", stream.getId())
-                .build()
+                ImmutableMap.<String, Object>builder()
+                        .put("_id", new ObjectId())
+                        .put("field", "testfield")
+                        .put("inverted", true)
+                        .put("value", "testvalue")
+                        .put("type", StreamRuleType.CONTAINS.toInteger())
+                        .put("stream_id", stream.getId())
+                        .build()
         );
 
         stream.setStreamRules(Lists.newArrayList(rule));
@@ -784,6 +787,6 @@ public class StreamRouterEngineTest {
     }
 
     private Message getMessage() {
-        return new Message("test message", "localhost", new DateTime(DateTimeZone.UTC));
+        return messageFactory.createMessage("test message", "localhost", new DateTime(DateTimeZone.UTC));
     }
 }

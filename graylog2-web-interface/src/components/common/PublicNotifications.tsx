@@ -16,7 +16,6 @@
  */
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import type { PublicNotificationsHooks } from 'theme/types';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -39,7 +38,7 @@ const ShortContent = styled.p`
   font-weight: bold;
 `;
 
-const LongContent = styled.div(({ $visible }: {$visible: boolean}) => css`
+const LongContent = styled.div<{ $visible: boolean}>(({ $visible }) => css`
   white-space: pre-wrap;
   display: ${$visible ? 'block' : 'none'};
   padding-top: 12px;
@@ -48,10 +47,6 @@ const LongContent = styled.div(({ $visible }: {$visible: boolean}) => css`
 const StyledAlert = styled(Alert)`
   margin-bottom: 6px;
   padding-right: 9px;
-  
-  &.alert-dismissable .close {
-    right: 12px;
-  }
 `;
 
 const Wrapper = styled.div`
@@ -67,7 +62,7 @@ const defaultNotifications: PublicNotificationsHooks = {
   }),
 };
 
-const PublicNotifications = ({ readFromConfig }: Props) => {
+const PublicNotifications = ({ readFromConfig = false }: Props) => {
   const customizationHook = usePluginEntities('customization.publicNotifications');
   const { usePublicNotifications } = customizationHook[0]?.hooks || defaultNotifications;
   const [showReadMore, setShowReadMore] = useState<string>(undefined);
@@ -98,8 +93,7 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
     const _dismiss = () => onDismissPublicNotification(notificationId);
 
     return (
-      <StyledAlert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} key={title}>
-        {!hiddenTitle && (<h3>{title}</h3>)}
+      <StyledAlert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} key={title} title={!hiddenTitle && title}>
         <FlexWrap>
           <ShortContent>{shortMessage}</ShortContent>
           {longMessage && <Button bsStyle="link" onClick={toggleReadMore}>Read {showReadMore === notificationId ? 'Less' : 'More'}</Button>}
@@ -114,14 +108,6 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
   }
 
   return null;
-};
-
-PublicNotifications.propTypes = {
-  readFromConfig: PropTypes.bool,
-};
-
-PublicNotifications.defaultProps = {
-  readFromConfig: false,
 };
 
 export default PublicNotifications;

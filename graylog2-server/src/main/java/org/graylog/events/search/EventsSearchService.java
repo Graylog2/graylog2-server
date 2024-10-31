@@ -28,7 +28,8 @@ import org.graylog2.plugin.database.Persisted;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -155,6 +156,7 @@ public class EventsSearchService {
                 .map(eventDefinitionService::get)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toMap(EventDefinitionDto::id, d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description())));
+                .collect(Collectors.toMap(EventDefinitionDto::id,
+                        d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description(), d.remediationSteps())));
     }
 }

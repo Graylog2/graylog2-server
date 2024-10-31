@@ -24,7 +24,7 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class PurgeExpiredSidecarsThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(PurgeExpiredSidecarsThread.class);

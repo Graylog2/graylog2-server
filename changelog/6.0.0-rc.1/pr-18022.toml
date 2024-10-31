@@ -1,0 +1,5 @@
+type = "C"
+message = "Trigger system notification for IO exceptions during HTTP data adapater lookup."
+
+pulls = ["18022"]
+issues=["Graylog2/graylog-plugin-enterprise#6292"]

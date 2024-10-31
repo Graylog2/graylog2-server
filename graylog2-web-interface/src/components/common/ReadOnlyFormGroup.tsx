@@ -15,26 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Col, Row, HelpBlock } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 const StyledRow = styled(Row)`
-  :not(:last-child) {
+  &:not(:last-child) {
     margin-bottom: 7px;
   }
 `;
 
 type Props = {
   label: React.ReactElement | string,
-  value: unknown,
+  value: React.ReactNode,
   help?: string,
   className?: string,
 };
 
-const LabelCol = styled(Col)(({ theme }: { theme: DefaultTheme }) => css`
+const LabelCol = styled(Col)(({ theme }) => css`
   font-weight: bold;
 
   @media (min-width: ${theme.breakpoints.min.md}) {
@@ -42,15 +41,15 @@ const LabelCol = styled(Col)(({ theme }: { theme: DefaultTheme }) => css`
   }
 `);
 
-const BooleanIcon = styled(Icon)(({ theme, value }: { theme: DefaultTheme, value: Props['value']}) => `
+const BooleanIcon = styled(Icon)<{ value: Props['value'] }>(({ theme, value }) => css`
   color: ${value ? theme.colors.variant.success : theme.colors.variant.danger};
 `);
 
 const BooleanValue = ({ value }: { value: boolean }) => (
-  <><BooleanIcon name={value ? 'check-circle' : 'times-circle'} value={value} /> {value ? 'yes' : 'no'}</>
+  <><BooleanIcon name={value ? 'check_circle' : 'cancel'} value={value} /> {value ? 'yes' : 'no'}</>
 );
 
-const readableValue = (value: Props['value']) => {
+const readableValue = (value: Props['value']): React.ReactNode => {
   if (typeof value === 'boolean') {
     return <BooleanValue value={value} />;
   }
@@ -74,10 +73,5 @@ const ReadOnlyFormGroup = ({ label, value, help, className }: Props) => (
     </Col>
   </StyledRow>
 );
-
-ReadOnlyFormGroup.defaultProps = {
-  help: undefined,
-  className: undefined,
-};
 
 export default ReadOnlyFormGroup;

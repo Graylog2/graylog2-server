@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
@@ -37,16 +37,11 @@ type State = {
   editing: boolean,
 };
 
-class DecoratorSummary extends React.Component<Props, State> {
-  static propTypes = {
-    decorator: PropTypes.object.isRequired,
-    decoratorTypes: PropTypes.object.isRequired,
-    disableMenu: PropTypes.bool,
-    typeDefinition: PropTypes.object.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    onUpdate: PropTypes.func.isRequired,
-  };
+const SpacedActions = styled.div`
+  margin-left: 5px;
+`;
 
+class DecoratorSummary extends React.Component<Props, State> {
   static defaultProps = {
     disableMenu: false,
   };
@@ -118,11 +113,13 @@ class DecoratorSummary extends React.Component<Props, State> {
     const { decorator } = this.props;
 
     return (
-      <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions">
-        <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
-        <MenuItem divider />
-        <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
-      </DropdownButton>
+      <SpacedActions>
+        <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions">
+          <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
+          <MenuItem divider />
+          <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
+        </DropdownButton>
+      </SpacedActions>
     );
   };
 
@@ -146,7 +143,7 @@ class DecoratorSummary extends React.Component<Props, State> {
                                                 includeTitleField={false}
                                                 submitAction={this._handleSubmit}
                                                 cancelAction={this._closeEditForm}
-                                                wrapperComponent={wrapperComponent}
+                                                wrapperComponent={wrapperComponent as React.ComponentProps<typeof ConfigurationForm>['wrapperComponent']}
                                                 values={decorator.config} />
       )
       : (

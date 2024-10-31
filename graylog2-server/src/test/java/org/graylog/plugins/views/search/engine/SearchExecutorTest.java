@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.NotFoundException;
 import org.assertj.core.api.Condition;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -39,7 +40,9 @@ import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
+import org.graylog2.streams.StreamService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +53,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -60,6 +62,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -73,6 +76,12 @@ public class SearchExecutorTest {
     @Mock
     private QueryEngine queryEngine;
 
+    @Mock
+    private NodeId nodeId;
+
+    @Mock
+    private StreamService streamService;
+
     @Captor
     private ArgumentCaptor<SearchJob> searchJobCaptor;
 
@@ -80,7 +89,8 @@ public class SearchExecutorTest {
 
     @BeforeEach
     void setUp() {
-        final SearchJobService searchJobService = new InMemorySearchJobService();
+        doReturn("The-best-node").when(nodeId).getNodeId();
+        final SearchJobService searchJobService = new InMemorySearchJobService(nodeId);
         this.searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,
@@ -91,8 +101,8 @@ public class SearchExecutorTest {
                                         Optional.of((queryString, job, query) -> PositionTrackingQuery.of("decorated"))
                                 )
                         )
-                )));
-        when(queryEngine.execute(any(), any())).thenAnswer(invocation -> {
+                ), streamService));
+        when(queryEngine.execute(any(), any(), any())).thenAnswer(invocation -> {
             final SearchJob searchJob = invocation.getArgument(0);
             searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
             searchJob.seal();
@@ -107,7 +117,7 @@ public class SearchExecutorTest {
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> this.searchExecutor.execute("search1", searchUser, ExecutionState.empty()))
+                .isThrownBy(() -> this.searchExecutor.executeSync("search1", searchUser, ExecutionState.empty()))
                 .withMessage("No search found with id <search1>.");
     }
 
@@ -124,7 +134,7 @@ public class SearchExecutorTest {
 
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.of(search));
 
-        final SearchJob searchJob = this.searchExecutor.execute("search1", searchUser, ExecutionState.empty());
+        final SearchJob searchJob = this.searchExecutor.executeSync("search1", searchUser, ExecutionState.empty());
         assertThat(searchJob.getSearch().queries())
                 .are(new Condition<>(query -> query.usedStreamIds().equals(Collections.singleton("somestream")), "All accessible streams have been added"));
     }
@@ -143,9 +153,9 @@ public class SearchExecutorTest {
         final ExecutionState executionState = ExecutionState.builder()
                 .setGlobalOverride(ExecutionStateGlobalOverride.builder().timerange(absoluteRange).build())
                 .build();
-        this.searchExecutor.execute("search1", searchUser, executionState);
+        this.searchExecutor.executeSync("search1", searchUser, executionState);
 
-        verify(queryEngine, times(1)).execute(searchJobCaptor.capture(), anySet());
+        verify(queryEngine, times(1)).execute(searchJobCaptor.capture(), anySet(), any());
 
         final SearchJob executedJob = searchJobCaptor.getValue();
 
@@ -169,7 +179,7 @@ public class SearchExecutorTest {
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.of(search));
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
-                .isThrownBy(() -> this.searchExecutor.execute("search1", searchUser, ExecutionState.empty()));
+                .isThrownBy(() -> this.searchExecutor.executeSync("search1", searchUser, ExecutionState.empty()));
     }
 
     @Test
@@ -185,7 +195,7 @@ public class SearchExecutorTest {
                 ))
                 .build();
 
-        final SearchJob searchJob = this.searchExecutor.execute(search, searchUser, ExecutionState.empty());
+        final SearchJob searchJob = this.searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
 
         assertThat(searchJob.getSearch().queries())
                 .are(new Condition<>(query -> query.query().queryString().equals("decorated"), "Query string is decorated"));
@@ -209,7 +219,7 @@ public class SearchExecutorTest {
                 ))
                 .build();
 
-        final SearchJob searchJob = this.searchExecutor.execute(search, searchUser, ExecutionState.empty());
+        final SearchJob searchJob = this.searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
 
         final Query query = searchJob.getSearch().queries().stream().findFirst()
                 .orElseThrow(() -> new AssertionError("Search unexpectedly contains no queries."));

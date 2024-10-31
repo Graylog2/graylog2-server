@@ -28,18 +28,19 @@ import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
 
-import static javax.ws.rs.core.Response.accepted;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+import static jakarta.ws.rs.core.Response.accepted;
 
 /**
  * @deprecated shutting down the node using an API request is discouraged in favor of using a service manager to
- *         control the server process.
+ * control the server process.
  */
 @RequiresAuthentication
 @Path("/system/shutdown")

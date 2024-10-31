@@ -26,7 +26,7 @@ import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class PaginatedMongoDbRuleService extends PaginatedDbService<RuleDao> implements PaginatedRuleService {
     private static final String COLLECTION_NAME = "pipeline_processor_rules";

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { GRN, GRNType } from 'logic/permissions/types';
-import getShowRouteForEntity from 'routing/getShowRouteForEntity';
 
 const _convertEmptyString = (value: string) => (value === '' ? undefined : value);
 
@@ -26,10 +25,4 @@ export const getValuesFromGRN = (grn: GRN) => {
   const [resourceNameType, cluster, tenant, scope, type, id] = grnValues.map(_convertEmptyString);
 
   return { resourceNameType, cluster, tenant, scope, type: type as GRNType, id };
-};
-
-export const getShowRouteFromGRN = (grn: string) => {
-  const { id, type } = getValuesFromGRN(grn);
-
-  return getShowRouteForEntity(id, type);
 };

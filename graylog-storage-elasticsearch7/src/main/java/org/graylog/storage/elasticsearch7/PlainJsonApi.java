@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class PlainJsonApi {
     private final ObjectMapper objectMapper;

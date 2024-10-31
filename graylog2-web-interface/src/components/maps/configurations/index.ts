@@ -22,6 +22,7 @@ PluginStore.register(new PluginManifest({}, {
   systemConfigurations: [
     {
       component: GeoIpResolverConfig,
+      displayName: 'Geo-Location Processor',
       configType: 'org.graylog.plugins.map.config.GeoIpResolverConfig',
     },
   ],

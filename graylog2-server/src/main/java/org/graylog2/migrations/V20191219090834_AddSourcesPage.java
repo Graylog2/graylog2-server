@@ -24,7 +24,8 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 
 public class V20191219090834_AddSourcesPage extends Migration {

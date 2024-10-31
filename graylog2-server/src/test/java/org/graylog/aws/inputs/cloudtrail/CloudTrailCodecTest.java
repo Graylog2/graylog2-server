@@ -17,6 +17,8 @@
 package org.graylog.aws.inputs.cloudtrail;
 
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -28,12 +30,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class CloudTrailCodecTest {
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Test
     public void testAdditionalEventDataField() {
 
         final CloudTrailCodec codec = new CloudTrailCodec(Configuration.EMPTY_CONFIGURATION,
-                new ObjectMapperProvider().get());
+                new ObjectMapperProvider().get(), messageFactory);
 
         // Decode message with error code
         final RawMessage rawMessage = new RawMessage(("{\n" +
@@ -76,7 +79,7 @@ public class CloudTrailCodecTest {
     public void testNoAdditionalEventDataField() {
 
         final CloudTrailCodec codec = new CloudTrailCodec(Configuration.EMPTY_CONFIGURATION,
-                new ObjectMapperProvider().get());
+                new ObjectMapperProvider().get(), messageFactory);
 
         final RawMessage rawMessage = new RawMessage(("{\n" +
                 "\"eventVersion\": \"1.05\",\n" +

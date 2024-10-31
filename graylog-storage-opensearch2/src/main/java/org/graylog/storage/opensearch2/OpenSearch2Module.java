@@ -31,22 +31,27 @@ import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.indexer.datanode.ProxyRequestAdapter;
+import org.graylog2.indexer.datastream.DataStreamAdapter;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
 
 public class OpenSearch2Module extends VersionAwareModule {
-
     private final SearchVersion supportedVersion;
+    private final boolean useComposableIndexTemplates;
 
-    public OpenSearch2Module(final SearchVersion supportedVersion) {
+    public OpenSearch2Module(final SearchVersion supportedVersion, boolean useComposableIndexTemplates) {
         this.supportedVersion = supportedVersion;
+        this.useComposableIndexTemplates = useComposableIndexTemplates;
     }
 
     @Override
@@ -55,6 +60,13 @@ public class OpenSearch2Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS2.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
+        bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS2.class);
+        bindForSupportedVersion(SecurityAdapter.class).to(SecurityAdapterOS.class);
+        if (useComposableIndexTemplates) {
+            bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
+        } else {
+            bind(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
+        }
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS2.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS2.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
@@ -69,9 +81,12 @@ public class OpenSearch2Module extends VersionAwareModule {
 
         bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsOS2.class);
 
+        bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS2.class);
+        bindForSupportedVersion(RemoteReindexingMigrationAdapter.class).to(RemoteReindexingMigrationAdapterOS2.class);
+
         install(new FactoryModuleBuilder().build(ScrollResultOS2.Factory.class));
 
-        bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);
+        bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
     }
 

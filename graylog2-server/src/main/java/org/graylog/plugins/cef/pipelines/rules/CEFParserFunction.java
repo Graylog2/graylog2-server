@@ -30,7 +30,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,9 +80,9 @@ public class CEFParserFunction extends AbstractFunction<CEFParserResult> {
         final Map<String, Object> fields = new HashMap<>();
 
         /*
-          * Add all CEF standard fields. We are prefixing with cef_ to avoid overwriting existing fields or to be
-          * overwritten ourselves later in the processing. The user is encouraged to run another pipeline function
-          * to clean up field names if desired.
+         * Add all CEF standard fields. We are prefixing with cef_ to avoid overwriting existing fields or to be
+         * overwritten ourselves later in the processing. The user is encouraged to run another pipeline function
+         * to clean up field names if desired.
          */
         fields.put("cef_version", message.cefVersion());
         fields.put("device_vendor", message.deviceVendor());

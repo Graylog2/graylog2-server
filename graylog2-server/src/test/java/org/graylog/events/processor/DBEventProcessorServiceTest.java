@@ -22,10 +22,12 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
@@ -38,7 +40,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,6 +49,7 @@ import static org.mockito.Mockito.mock;
 
 public class DBEventProcessorServiceTest {
     public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
+    private static final String REMEDIATION_STEPS = "Remediation steps";
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
@@ -64,9 +66,11 @@ public class DBEventProcessorServiceTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorConfig.class, TestEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
+        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
 
-        this.dbService = new DBEventDefinitionService(mongodb.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper),
-                stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES));
+        this.dbService = new DBEventDefinitionService(mongoCollections,
+                stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
     }
 
     @Test
@@ -101,6 +105,7 @@ public class DBEventProcessorServiceTest {
         final EventDefinitionDto newDto = EventDefinitionDto.builder()
                 .title("Test")
                 .description("A test event definition")
+                .remediationSteps(REMEDIATION_STEPS)
                 .config(TestEventProcessorConfig.builder()
                         .message("This is a test event processor")
                         .searchWithinMs(1000)
@@ -118,6 +123,7 @@ public class DBEventProcessorServiceTest {
         assertThat(dto.id()).isNotBlank();
         assertThat(dto.title()).isEqualTo("Test");
         assertThat(dto.description()).isEqualTo("A test event definition");
+        assertThat(dto.remediationSteps()).isEqualTo(REMEDIATION_STEPS);
         assertThat(dto.priority()).isEqualTo(3);
         assertThat(dto.keySpec()).isEqualTo(ImmutableList.of("a", "b"));
         assertThat(dto.fieldSpec()).isEmpty();

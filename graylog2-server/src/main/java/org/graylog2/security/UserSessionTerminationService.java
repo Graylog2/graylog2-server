@@ -35,10 +35,12 @@ import org.graylog2.users.events.UserChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.io.Serializable;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -140,15 +142,15 @@ public class UserSessionTerminationService extends AbstractIdleService {
         clusterConfigService.write(GlobalTerminationRevisionConfig.withCurrentRevision());
     }
 
+    public List<Session> getActiveSessionsForUser(User user) {
+        return getSessionIDsForUser(user).stream().map(this::getActiveSessionForID).flatMap(Optional::stream).toList();
+    }
+
     private void terminateSessionsForUser(User user) {
         try {
-            final Set<String> sessionIds = getSessionIDsForUser(user);
-
-            for (final String sessionId : sessionIds) {
-                getActiveSessionForID(sessionId).ifPresent(session -> {
-                    LOG.info("Terminating session for user <{}/{}>", user.getName(), user.getId());
-                    session.stop();
-                });
+            for (final Session session : getActiveSessionsForUser(user)) {
+                LOG.info("Terminating session for user <{}/{}>", user.getName(), user.getId());
+                session.stop();
             }
         } catch (Exception e) {
             LOG.error("Couldn't terminate session for user <{}/{}>", user.getName(), user.getId(), e);

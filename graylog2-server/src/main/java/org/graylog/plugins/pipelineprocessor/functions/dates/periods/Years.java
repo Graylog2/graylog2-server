@@ -43,4 +43,16 @@ public class Years extends AbstractPeriodComponentFunction {
     protected String getDescription() {
         return "Create a period with a specified number of years.";
     }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Create period (years)";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Create a time period of '${value}' years";
+    }
 }

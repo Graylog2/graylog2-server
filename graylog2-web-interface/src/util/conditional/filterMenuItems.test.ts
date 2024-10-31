@@ -26,12 +26,12 @@ jest.mock('util/AppConfig', () => ({
 describe('filterMenuItems', () => {
   it('should filter items by path', () => {
     const items = [
-      { path: 'something', name: 'something' },
-      { path: 'delete-me', name: 'delete me' },
+      { path: 'something', description: 'something' },
+      { path: 'delete-me', description: 'delete me' },
     ];
 
     expect(filterMenuItems(items, ['delete-me'])).toEqual([
-      { path: 'something', name: 'something' },
+      { path: 'something', description: 'something' },
     ]);
   });
 });

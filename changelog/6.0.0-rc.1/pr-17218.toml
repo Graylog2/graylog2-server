@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Show ignore_null configuration on lookup cache form."
+
+issues = ["15200"]
+pulls = ["17218"]
+

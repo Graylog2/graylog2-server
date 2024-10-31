@@ -19,10 +19,9 @@ package org.graylog2.shared.messageq;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
-import org.graylog2.plugin.Message;
+import jakarta.inject.Inject;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import java.util.List;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -31,13 +30,13 @@ public interface MessageQueueAcknowledger {
 
     void acknowledge(@Nullable Object messageQueueId);
 
-    void acknowledge(Message message);
+    void acknowledge(Acknowledgeable message);
 
-    void acknowledge(List<Message> messages);
+    void acknowledge(List<? extends Acknowledgeable> messages);
 
     @AutoValue
     abstract class Metrics {
-        public static class Provider implements javax.inject.Provider<MessageQueueAcknowledger.Metrics> {
+        public static class Provider implements jakarta.inject.Provider<MessageQueueAcknowledger.Metrics> {
             private final MetricRegistry metricRegistry;
 
             @Inject

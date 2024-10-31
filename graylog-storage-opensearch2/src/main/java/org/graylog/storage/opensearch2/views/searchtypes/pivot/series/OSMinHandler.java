@@ -18,25 +18,25 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MinAggregationBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MinAggregationBuilder;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.SeriesAggregationBuilder;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class OSMinHandler extends OSPivotSeriesSpecHandler<Min, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Min minSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Min minSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final MinAggregationBuilder min = AggregationBuilders.min(name).field(minSpec.field());
         record(queryContext, pivot, minSpec, name, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min.class);
-        return Optional.of(min);
+        return List.of(SeriesAggregationBuilder.metric(min));
     }
 
     @Override

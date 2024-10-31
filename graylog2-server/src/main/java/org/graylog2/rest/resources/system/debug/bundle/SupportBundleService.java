@@ -16,10 +16,17 @@
  */
 package org.graylog2.rest.resources.system.debug.bundle;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ServerErrorException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 import okhttp3.ResponseBody;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -27,9 +34,12 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.shiro.subject.Subject;
+import org.graylog.security.certutil.KeyStoreDto;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.indexer.cluster.ClusterAdapter;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -39,9 +49,12 @@ import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.rest.models.system.responses.SystemProcessBufferDumpResponse;
 import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
+import org.graylog2.rest.resources.datanodes.DatanodeResolver;
+import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.ProxiedResource.CallResult;
+import org.graylog2.shared.rest.resources.system.RemoteDataNodeStatusResource;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemPluginResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
@@ -54,12 +67,6 @@ import org.slf4j.LoggerFactory;
 import retrofit2.Call;
 import retrofit2.http.GET;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ServerErrorException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -113,6 +120,7 @@ public class SupportBundleService {
 
     private final ExecutorService executor;
     private final NodeService nodeService;
+    private final org.graylog2.cluster.nodes.NodeService<DataNodeDto> datanodeService;
     private final RemoteInterfaceProvider remoteInterfaceProvider;
     private final Path bundleDir;
     private final ObjectMapper objectMapper;
@@ -120,20 +128,23 @@ public class SupportBundleService {
     private final VersionProbe elasticVersionProbe;
     private final List<URI> elasticsearchHosts;
     private final ClusterAdapter searchDbClusterAdapter;
-
+    private final DatanodeRestApiProxy datanodeProxy;
+    private final RemoteReindexingMigrationAdapter migrationService;
 
     @Inject
     public SupportBundleService(@Named("proxiedRequestsExecutorService") ExecutorService executor,
                                 NodeService nodeService,
+                                org.graylog2.cluster.nodes.NodeService<DataNodeDto> datanodeService,
                                 RemoteInterfaceProvider remoteInterfaceProvider,
                                 @Named("data_dir") Path dataDir,
                                 ObjectMapperProvider objectMapperProvider,
                                 ClusterStatsService clusterStatsService,
                                 VersionProbe searchDbProbe,
                                 @IndexerHosts List<URI> searchDbHosts,
-                                ClusterAdapter searchDbClusterAdapter) {
+                                ClusterAdapter searchDbClusterAdapter, DatanodeRestApiProxy datanodeProxy, RemoteReindexingMigrationAdapter migrationService) {
         this.executor = executor;
         this.nodeService = nodeService;
+        this.datanodeService = datanodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
         objectMapper = objectMapperProvider.get();
         bundleDir = dataDir.resolve(SUPPORT_BUNDLE_DIR_NAME);
@@ -141,6 +152,8 @@ public class SupportBundleService {
         this.elasticVersionProbe = searchDbProbe;
         this.elasticsearchHosts = searchDbHosts;
         this.searchDbClusterAdapter = searchDbClusterAdapter;
+        this.datanodeProxy = datanodeProxy;
+        this.migrationService = migrationService;
     }
 
     public void buildBundle(HttpHeaders httpHeaders, Subject currentSubject) {
@@ -155,14 +168,20 @@ public class SupportBundleService {
         try {
             bundleSpoolDir = prepareBundleSpoolDir();
             final Path finalSpoolDir = bundleSpoolDir; // needed for the lambda
+            final Path dataNodeDir = bundleSpoolDir.resolve("datanodes");
 
             // Fetch from all nodes in parallel
-            final List<CompletableFuture<Void>> futures = nodeManifests.entrySet().stream().map(entry ->
-                    CompletableFuture.runAsync(() -> fetchNodeInfos(proxiedResourceHelper, entry.getKey(), entry.getValue(), finalSpoolDir), executor)).toList();
+            final List<CompletableFuture<Void>> futures = Stream.concat(
+                    nodeManifests.entrySet().stream().map(entry ->
+                            CompletableFuture.runAsync(() -> fetchNodeInfos(proxiedResourceHelper, entry.getKey(), entry.getValue(), finalSpoolDir), executor)),
+                    datanodeService.allActive().values().stream().map(datanode ->
+                            CompletableFuture.runAsync(() -> fetchDataNodeInfos(proxiedResourceHelper, datanode, dataNodeDir), executor))
+            ).toList();
             for (CompletableFuture<Void> f : futures) {
                 f.get();
             }
             fetchClusterInfos(proxiedResourceHelper, nodeManifests, bundleSpoolDir);
+            fetchDataNodeMigrationInfos(dataNodeDir);
             writeZipFile(bundleSpoolDir);
         } catch (Exception e) {
             LOG.warn("Exception while trying to build support bundle", e);
@@ -202,6 +221,7 @@ public class SupportBundleService {
                     )
             );
             result.putAll(getClusterInfo());
+            result.putAll(getDatanodeInfo());
 
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(clusterJson, result);
         }
@@ -237,6 +257,13 @@ public class SupportBundleService {
         return clusterInfo;
     }
 
+    private Map<String, Object> getDatanodeInfo() {
+        Map<String, DataNodeDto> configuredDatanodes = datanodeService.allActive().values().stream()
+                .collect(Collectors.toMap(DataNodeDto::getHostname, d -> d));
+        Map<String, JsonNode> datanodeStatus = datanodeProxy.remoteInterface(DatanodeResolver.ALL_NODES_KEYWORD, RemoteDataNodeStatusResource.class, RemoteDataNodeStatusResource::status);
+        return Map.of("datanodes", Map.of("configured", configuredDatanodes, "running", datanodeStatus));
+    }
+
     private CompletableFuture<Object> timeLimitedOrErrorString(Supplier<Object> supplier, Executor executor) {
         return CompletableFuture.supplyAsync(supplier, executor)
                 .exceptionally(e -> Optional.ofNullable(e.getLocalizedMessage()).orElse(e.getClass().getSimpleName()))
@@ -256,9 +283,12 @@ public class SupportBundleService {
     }
 
     private void writeZipFile(Path tmpDir) throws IOException {
-        var zipFile = Path.of("." + BUNDLE_NAME_PREFIX + "-" + nowTimestamp() + ".zip");
+        var zipFile = Files.createFile(
+                bundleDir.resolve(Path.of("." + BUNDLE_NAME_PREFIX + "-" + nowTimestamp() + ".zip")),
+                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------"))
+        );
 
-        try (ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(bundleDir.resolve(zipFile).toFile()))) {
+        try (ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(zipFile.toFile()))) {
             try (final Stream<Path> walk = Files.walk(tmpDir)) {
                 walk.filter(p -> !Files.isDirectory(p)).forEach(p -> {
                     var zipEntry = new ZipEntry(tmpDir.relativize(p).toString());
@@ -276,7 +306,7 @@ public class SupportBundleService {
             LOG.warn("Failed to create zipfile <{}>", zipFile, e);
             throw e;
         }
-        Files.move(bundleDir.resolve(zipFile), bundleDir.resolve(Path.of(zipFile.toString().substring(1))));
+        Files.move(zipFile, bundleDir.resolve(Path.of(zipFile.getFileName().toString().substring(1))));
     }
 
     private Path prepareBundleSpoolDir() throws IOException {
@@ -342,6 +372,73 @@ public class SupportBundleService {
         } catch (Exception e) {
             LOG.warn("Failed to get system stats from node <{}>", nodeId, e);
         }
+
+        try (var certificatesFile = new FileOutputStream(nodeDir.resolve("certificates.json").toFile())) {
+            final ProxiedResource.NodeResponse<Map<String, KeyStoreDto>> certificatesResponse = proxiedResourceHelper.doNodeApiCall(nodeId,
+                    RemoteCertificatesResource.class, RemoteCertificatesResource::certificates, Function.identity(), CALL_TIMEOUT
+            );
+            if (certificatesResponse.entity().isPresent()) {
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(certificatesFile, certificatesResponse.entity().get());
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to get certificates from node <{}>", nodeId, e);
+        }
+    }
+
+
+    private void fetchDataNodeInfos(ProxiedResourceHelper proxiedResourceHelper, DataNodeDto datanode, Path dataNodeDir) {
+        final Path nodeDir = dataNodeDir.resolve(Objects.requireNonNull(datanode.getHostname()));
+        var ignored = nodeDir.toFile().mkdirs();
+
+        fetchDataNodeLogs(proxiedResourceHelper, datanode, nodeDir);
+        try (var certificatesFile = new FileOutputStream(nodeDir.resolve("certificates.json").toFile())) {
+
+            Map<String, Map<String, KeyStoreDto>> certificates = datanodeProxy.remoteInterface(datanode.getHostname(), RemoteCertificatesResource.class, RemoteCertificatesResource::certificates);
+            if (certificates.containsKey(datanode.getHostname())) {
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(certificatesFile, certificates.get(datanode.getHostname()));
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to get certificates from data node <{}>", datanode.getHostname(), e);
+        }
+    }
+
+    private void fetchDataNodeLogs(ProxiedResourceHelper proxiedResourceHelper, DataNodeDto datanode, Path nodeDir) {
+        getProxiedLog(datanode, nodeDir, "opensearch.log", RemoteDataNodeStatusResource::opensearchStdOut);
+        getProxiedLog(datanode, nodeDir, "opensearch.err", RemoteDataNodeStatusResource::opensearchStdErr);
+    }
+
+    private void getProxiedLog(DataNodeDto datanode, Path nodeDir, String logfile, Function<RemoteDataNodeStatusResource, Call<List<String>>> function) {
+        try (var opensearchLog = new FileOutputStream(nodeDir.resolve(logfile).toFile())) {
+
+            Map<String, List<String>> opensearchOut = datanodeProxy
+                    .remoteInterface(datanode.getHostname(), RemoteDataNodeStatusResource.class, function);
+            if (opensearchOut.containsKey(datanode.getHostname())) {
+                opensearchOut.get(datanode.getHostname()).stream()
+                        .map(line -> line + System.lineSeparator())
+                        .forEach(line -> {
+                            try {
+                                opensearchLog.write(line.getBytes(StandardCharsets.UTF_8));
+                            } catch (IOException e) {
+                                LOG.warn("Failed to write line <{}>", line, e);
+                            }
+                        });
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to get logs from data node <{}>", datanode.getHostname(), e);
+        }
+    }
+
+    private void fetchDataNodeMigrationInfos(Path dataNodeDir) {
+        var ignored = dataNodeDir.toFile().mkdirs();
+        migrationService.getLatestMigrationId()
+                .map(migrationService::status)
+                .ifPresent(status -> {
+                    try (FileOutputStream migrationJson = new FileOutputStream(dataNodeDir.resolve("migration.json").toFile())) {
+                        objectMapper.writerWithDefaultPrettyPrinter().writeValue(migrationJson, status);
+                    } catch (Exception e) {
+                        LOG.warn("Could not write data node migration infos.", e);
+                    }
+                });
     }
 
     @VisibleForTesting
@@ -501,7 +598,7 @@ public class SupportBundleService {
     }
 
     public void downloadBundle(String filename, OutputStream outputStream) throws IOException {
-        ensureFileWithinBundleDir(filename);
+        ensureFileWithinBundleDir(bundleDir, filename);
 
         try {
             final Path filePath = bundleDir.resolve(filename);
@@ -513,14 +610,15 @@ public class SupportBundleService {
         }
     }
 
-    private void ensureFileWithinBundleDir(String filename) throws IOException {
-        if (!bundleDir.resolve(filename).toFile().getCanonicalPath().startsWith(bundleDir.toFile().getCanonicalPath())) {
+    @VisibleForTesting
+    void ensureFileWithinBundleDir(Path bundleDir, String filename) {
+        if (!bundleDir.resolve(filename).toAbsolutePath().normalize().startsWith(bundleDir.toAbsolutePath().normalize())) {
             throw new NotFoundException();
         }
     }
 
     public void deleteBundle(String filename) throws IOException {
-        ensureFileWithinBundleDir(filename);
+        ensureFileWithinBundleDir(bundleDir, filename);
         final Path filePath = bundleDir.resolve(filename);
         Files.delete(filePath);
     }
@@ -553,10 +651,22 @@ public class SupportBundleService {
             return super.requestOnAllNodes(interfaceClass, fn, timeout);
         }
 
+        @Override
+        protected <RemoteInterfaceType, RemoteCallResponseType> NodeResponse<RemoteCallResponseType> requestOnLeader(
+                Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn, Class<RemoteInterfaceType> interfaceClass, Duration timeout) throws IOException {
+            return super.requestOnLeader(fn, interfaceClass, timeout);
+        }
     }
 
     interface RemoteSystemStatsResource {
         @GET("system/stats")
         Call<SystemStats> systemStats();
+
+    }
+
+    interface RemoteCertificatesResource {
+        @GET("certificates")
+        Call<Map<String, KeyStoreDto>> certificates();
+
     }
 }

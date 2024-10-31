@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed event aggregation handling when aggregating on missing fields"
+
+issues = ["17314"]
+pulls = ["17604"]

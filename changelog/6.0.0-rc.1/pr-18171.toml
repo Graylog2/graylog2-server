@@ -1,0 +1,6 @@
+type = "f"
+message = "Fix unintended HTML-escaping in system notification messages."
+
+issues = ["Graylog2/graylog-plugin-enterprise#6525"]
+pulls = ["18171"]
+

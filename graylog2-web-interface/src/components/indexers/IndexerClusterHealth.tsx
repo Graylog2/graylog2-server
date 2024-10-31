@@ -46,8 +46,8 @@ const getIndexerClusterHealth = () => {
   return fetchPeriodically('GET', url);
 };
 
-const getIndexerClusterName = () => {
-  const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.name().url);
+const getIndexerClusterName = (): Promise<{ name: string, distribution: string }> => {
+  const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.info().url);
 
   return fetchPeriodically('GET', url);
 };
@@ -77,7 +77,7 @@ type Props = {
   minimal?: boolean,
 };
 
-const IndexerClusterHealth = ({ minimal }: Props) => {
+const IndexerClusterHealth = ({ minimal = false }: Props) => {
   const currentUser = useCurrentUser();
   const userHasRequiredPermissions = isPermitted(currentUser.permissions, 'indexercluster:read');
   const { health, name, loading, error, isSuccess } = useLoadHealthAndName(userHasRequiredPermissions);
@@ -91,21 +91,21 @@ const IndexerClusterHealth = ({ minimal }: Props) => {
       <Col md={12}>
         {!minimal && (
           <Header>
-            <h2>Elasticsearch cluster</h2>
-            <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Elasticsearch setup documentation" displayIcon />
+            <h2>{name?.distribution || 'Elasticsearch'} cluster</h2>
+            {name?.distribution === 'OpenSearch' ? (
+              <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch setup documentation" displayIcon />
+            ) : (
+              <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Elasticsearch setup documentation" displayIcon />
+            )}
           </Header>
         )}
 
         {isSuccess && <IndexerClusterHealthSummary health={health} name={name} />}
         {loading && <p><Spinner /></p>}
-        {error && <IndexerClusterHealthError error={error} />}
+        {error && <IndexerClusterHealthError error={error} name={name} />}
       </Col>
     </Row>
   );
-};
-
-IndexerClusterHealth.defaultProps = {
-  minimal: false,
 };
 
 export default IndexerClusterHealth;

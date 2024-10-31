@@ -50,6 +50,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
+import static org.graylog2.indexer.MongoIndexSet.hotIndexName;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -64,21 +65,7 @@ public class MongoIndexSetTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
-
-    @Mock
-    private Indices indices;
-    @Mock
-    private AuditEventSender auditEventSender;
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-    @Mock
-    private IndexRangeService indexRangeService;
-    @Mock
-    private SystemJobManager systemJobManager;
-    @Mock
-    private SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
-    @Mock
-    private ActivityWriter activityWriter;
-
     private final IndexSetConfig config = IndexSetConfig.create(
             "Test",
             "Test",
@@ -97,7 +84,18 @@ public class MongoIndexSetTest {
             1,
             false
     );
-
+    @Mock
+    private Indices indices;
+    @Mock
+    private AuditEventSender auditEventSender;
+    @Mock
+    private IndexRangeService indexRangeService;
+    @Mock
+    private SystemJobManager systemJobManager;
+    @Mock
+    private SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
+    @Mock
+    private ActivityWriter activityWriter;
     private MongoIndexSet mongoIndexSet;
 
     @Before
@@ -110,6 +108,7 @@ public class MongoIndexSetTest {
         assertThat(mongoIndexSet.extractIndexNumber("graylog_0")).contains(0);
         assertThat(mongoIndexSet.extractIndexNumber("graylog_4")).contains(4);
         assertThat(mongoIndexSet.extractIndexNumber("graylog_52")).contains(52);
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_warm_1")).contains(1);
     }
 
     @Test
@@ -234,7 +233,7 @@ public class MongoIndexSetTest {
     }
 
     @Test
-    public void testCleanupAliases() throws Exception {
+    public void testCleanupAliases() {
         final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cleanupAliases(ImmutableSet.of("graylog_2", "graylog_3", "foobar"));
         verify(indices).removeAliases("graylog_deflector", ImmutableSet.of("graylog_2", "foobar"));
@@ -349,6 +348,12 @@ public class MongoIndexSetTest {
         final MongoIndexSet mongoIndexSet = createIndexSet(restoredArchives);
 
         assertThat(mongoIndexSet.isManagedIndex(indexName)).isTrue();
+    }
+
+    @Test
+    public void testHotIndexNameOfWarmIndex() {
+        assertThat(hotIndexName("gl_warm_1")).isEqualTo("gl_1");
+        assertThat(hotIndexName("gl_testwarm_1")).isEqualTo("gl_testwarm_1");
     }
 
     private MongoIndexSet createIndexSet(IndexSetConfig indexSetConfig) {

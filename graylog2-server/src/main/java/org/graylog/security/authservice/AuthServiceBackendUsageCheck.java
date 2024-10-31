@@ -18,7 +18,8 @@ package org.graylog.security.authservice;
 
 import org.graylog2.shared.users.UserService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 public class AuthServiceBackendUsageCheck {

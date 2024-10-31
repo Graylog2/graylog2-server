@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Checkbox } from 'components/bootstrap';
 
 import Icon from './Icon';
 
-const ItemWrap = styled.li(({ padded }: { padded: boolean }) => css`
-  padding: ${padded ? '10px 5px' : ''};
+const ItemWrap = styled.li<{ $padded: boolean }>(({ $padded }) => css`
+  padding: ${$padded ? '10px 5px' : ''};
 `);
 
 const Container = styled.div(({ theme }) => css`
@@ -48,27 +47,17 @@ const Toggle = styled.div`
   margin-right: 5px;
 `;
 
-const IconStack = styled.div(({ theme }) => css`
-  &.fa-stack {
-    cursor: pointer;
-    font-size: ${theme.fonts.size.large};
-    line-height: 20px;
-    width: 1em;
-    height: 1em;
-    vertical-align: text-top;
+const IconContainer = styled.div(({ theme }) => css`
+  cursor: pointer;
+  font-size: ${theme.fonts.size.large};
+  line-height: 20px;
+  width: 1em;
+  height: 1em;
+  vertical-align: text-top;
 
-    &:hover [class*='fa-'] {
-      color: ${theme.colors.variant.primary};
-      opacity: 1;
-    }
-  }
-
-  [class*='fa-']:first-child {
-    opacity: 0;
-
-    ~ [class*='fa-']:hover {
-      color: ${theme.colors.global.contentBackground};
-    }
+  &:hover {
+    color: ${theme.colors.variant.primary};
+    opacity: 1;
   }
 `);
 
@@ -116,53 +105,23 @@ type Props = React.ComponentProps<typeof Checkbox> & {
   children?: React.ReactNode,
   padded?: boolean,
   readOnly?: boolean,
-  onChange?: (e: React.MouseEvent<Checkbox>) => void,
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
 };
 
 type State = {
   expanded: boolean,
 };
 
+interface CheckboxInstance {
+  indeterminate: boolean,
+  click: () => void,
+}
+
 /**
  * The ExpandableListItem is needed to render a ExpandableList.
  */
 class ExpandableListItem extends React.Component<Props, State> {
-  private _checkbox: Checkbox | undefined;
-
-  static propTypes = {
-    /** Is the Item checked */
-    checked: PropTypes.bool,
-    /**
-     * Indicates whether the checkbox on this item should be in an indetermined state or not.
-     * This is mostly helpful to represent cases where the element is only partially checked,
-     * for instance when ExpandableListItem's child is an ExpandableList and some of its items
-     * are checked, but others are not.
-     */
-    indetermined: PropTypes.bool,
-    /** Is the item selectable */
-    selectable: PropTypes.bool,
-    /** Is the Item expandable */
-    expandable: PropTypes.bool,
-    /** Is the Item expanded */
-    expanded: PropTypes.bool,
-    /** Forces to stay expanded regardless of clicking on the arrow */
-    stayExpanded: PropTypes.bool,
-    /** The header of the item */
-    header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
-    /** The possible subheader of the item */
-    subheader: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-    /** Can be a html tag or again a ExpandableList */
-    children: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.arrayOf(PropTypes.element),
-    ]),
-    /** Leave space before and after list item */
-    padded: PropTypes.bool,
-    /** Mark checkbox as read only */
-    readOnly: PropTypes.bool,
-    /** onChange handler for the checkbox */
-    onChange: PropTypes.func,
-  };
+  private _checkbox: CheckboxInstance | undefined;
 
   static defaultProps = {
     checked: false,
@@ -231,16 +190,20 @@ class ExpandableListItem extends React.Component<Props, State> {
     const inputProps = _filterInputProps(otherProps);
 
     return (
-      <ItemWrap padded={padded}>
+      <ItemWrap $padded={padded}>
         <Container>
-          {selectable && <Checkbox inputRef={(ref) => { this._checkbox = ref; }} inline checked={checked} {...inputProps} />}
-          {expandable
-          && (
-            <Toggle>
-              <IconStack className="fa-stack" tabIndex={0} onClick={this._toggleExpand}>
-                <Icon name="circle" className="fa-stack-1x" />
-                <Icon name={`angle-${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
-              </IconStack>
+          {selectable && (
+          <Checkbox inputRef={(ref) => { this._checkbox = ref; }}
+                    inline
+                    title="Select item"
+                    checked={checked}
+                    {...inputProps} />
+          )}
+          {expandable && (
+            <Toggle role="button" tabIndex={0} onClick={this._toggleExpand} title={`${expanded ? 'Shrink' : 'Expand'} list item`}>
+              <IconContainer>
+                <Icon name={expanded ? 'expand_circle_up' : 'expand_circle_down'} />
+              </IconContainer>
             </Toggle>
           )}
           <HeaderWrap className="header">

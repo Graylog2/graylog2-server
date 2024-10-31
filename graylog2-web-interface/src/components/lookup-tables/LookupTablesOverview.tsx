@@ -18,78 +18,34 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import {
-  OverlayTrigger,
   PaginatedList,
   SearchForm,
-  Icon,
   Spinner,
   NoSearchResult,
   NoEntitiesExist,
 } from 'components/common';
-import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
+import { Row, Col, Table } from 'components/bootstrap';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import type { LookupTable, LookupTableAdapter, LookupTableCache, PaginationType } from 'logic/lookup-tables/types';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
+import QueryHelper from 'components/common/QueryHelper';
 
 import Styles from './Overview.css';
 
 const ScrollContainer = styled.div`
   overflow-x: auto;
 `;
-
-const buildHelpPopover = () => (
-  <Popover id="search-query-help"
-           className={Styles.popoverWide}
-           title="Search Syntax Help"
-           data-app-section="lookup_tables_query_helper"
-           data-event-element="Available search fields">
-    <p><strong>Available search fields</strong></p>
-    <Table condensed>
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>id</td>
-          <td>Lookup Table ID</td>
-        </tr>
-        <tr>
-          <td>title</td>
-          <td>The title of the lookup table</td>
-        </tr>
-        <tr>
-          <td>name</td>
-          <td>The reference name of the lookup table</td>
-        </tr>
-        <tr>
-          <td>description</td>
-          <td>The description of lookup table</td>
-        </tr>
-      </tbody>
-    </Table>
-    <p><strong>Examples</strong></p>
-    <p>
-      Find lookup tables by parts of their names:<br />
-      <kbd>name:geoip</kbd><br />
-      <kbd>name:geo</kbd>
-    </p>
-    <p>
-      Searching without a field name matches against the <code>title</code> field:<br />
-      <kbd>geoip</kbd> <br />is the same as<br />
-      <kbd>title:geoip</kbd>
-    </p>
-  </Popover>
+const queryExample = (
+  <p>
+    Searching without a field name matches against the <code>title</code> field:<br />
+    <kbd>geoip</kbd> <br />is the same as<br />
+    <kbd>title:geoip</kbd>
+  </p>
 );
-
 const queryHelpComponent = (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
-    <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
-  </OverlayTrigger>
+  <QueryHelper entityName="lookup table" commonFields={['id', 'title', 'name', 'description']} example={queryExample} />
 );
 
 type ItemProps = {

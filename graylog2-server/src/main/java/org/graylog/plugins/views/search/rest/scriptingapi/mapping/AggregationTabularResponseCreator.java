@@ -34,7 +34,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -90,7 +91,7 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
     }
 
     private List<List<Object>> getDatarows(final AggregationRequestSpec searchRequestSpec,
-                                                  final PivotResult pivotResult, List<SeriesSpec> seriesSpecs, SearchUser searchUser) {
+                                           final PivotResult pivotResult, List<SeriesSpec> seriesSpecs, SearchUser searchUser) {
         final int numGroupings = searchRequestSpec.groupings().size();
 
         final Set<FieldDecorator> cachedDecorators = this.decorators.stream().map(CachingDecorator::new).collect(Collectors.toSet());
@@ -113,7 +114,7 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
 
     private Stream<Object> decorateGroupings(ImmutableList<String> keys, AggregationRequestSpec searchRequestSpec, Set<FieldDecorator> decorators, SearchUser searchUser) {
         List<Object> result = new ArrayList<>();
-        for(int i = 0; i < keys.size(); i++) {
+        for (int i = 0; i < keys.size(); i++) {
             final String value = keys.get(i);
             final RequestedField field = searchRequestSpec.groupings().get(i).requestedField();
             final Object decorated = decorate(decorators, field, value, searchUser);

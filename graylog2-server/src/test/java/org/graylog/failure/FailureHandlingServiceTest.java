@@ -20,13 +20,16 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.awaitility.Awaitility;
-import org.awaitility.Duration;
+import org.awaitility.Durations;
+import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,19 +46,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MessagesExtension.class)
 public class FailureHandlingServiceTest {
 
     private final Configuration configuration = mock(Configuration.class);
     private final MessageQueueAcknowledger acknowledger = mock(MessageQueueAcknowledger.class);
     private final MetricRegistry metricRegistry = new MetricRegistry();
+    private MessageFactory messageFactory;
 
     private FailureSubmissionQueue failureSubmissionQueue;
 
     @BeforeEach
-    public void setup() {
+    public void setup(MessageFactory messageFactory) {
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
 
         failureSubmissionQueue = new FailureSubmissionQueue(configuration, metricRegistry);
+        this.messageFactory = messageFactory;
     }
 
     @Test
@@ -75,7 +81,7 @@ public class FailureHandlingServiceTest {
         //when
         failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         //then
@@ -107,7 +113,7 @@ public class FailureHandlingServiceTest {
         //when
         failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         //then
@@ -140,7 +146,7 @@ public class FailureHandlingServiceTest {
         // when
         failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
@@ -170,7 +176,7 @@ public class FailureHandlingServiceTest {
         failureSubmissionQueue.submitBlocking(indexingFailureBatch2);
         failureSubmissionQueue.submitBlocking(indexingFailureBatch1);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
@@ -199,7 +205,7 @@ public class FailureHandlingServiceTest {
 
         failureSubmissionQueue.submitBlocking(processingFailureBatch);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
@@ -224,7 +230,7 @@ public class FailureHandlingServiceTest {
 
         failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
@@ -269,7 +275,7 @@ public class FailureHandlingServiceTest {
     private ProcessingFailure createProcessingFailure(boolean ack) {
         return new ProcessingFailure(
                 ProcessingFailureCause.UNKNOWN, "Failure Message", "Failure Details",
-                Tools.nowUTC(), new Message(ImmutableMap.of("_id", "1234")), ack);
+                Tools.nowUTC(), messageFactory.createMessage(ImmutableMap.of("_id", "1234")), ack);
     }
 
     private FailureBatch indexingFailureBatch(IndexingFailure indexingFailure) {

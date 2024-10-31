@@ -19,25 +19,25 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ExtendedStats;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class ESStdDevHandler extends ESPivotSeriesSpecHandler<StdDev, ExtendedStats> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder stddev = AggregationBuilders.extendedStats(name).field(stddevSpec.field());
         record(queryContext, pivot, stddevSpec, name, ExtendedStats.class);
-        return Optional.of(stddev);
+        return List.of(SeriesAggregationBuilder.metric(stddev));
     }
 
     @Override

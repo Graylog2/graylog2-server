@@ -16,7 +16,8 @@
  */
 package org.graylog.plugins.views.search.export;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
+
 import java.util.Optional;
 
 public interface ExportFormat {

@@ -31,7 +31,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.ws.rs.ForbiddenException;
+import jakarta.ws.rs.ForbiddenException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

@@ -20,6 +20,16 @@ import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.Search;
@@ -49,22 +59,15 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -78,6 +81,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final SearchExecutionGuard executionGuard;
     private final ExportJobService exportJobService;
     private final QueryValidationService queryValidationService;
+    private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
 
     //allow mocking
     Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsync;
@@ -90,13 +94,27 @@ public class MessagesResource extends RestResource implements PluginRestResource
             SearchDomain searchDomain,
             SearchExecutionGuard executionGuard,
             @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
-            ExportJobService exportJobService, QueryValidationService queryValidationService) {
+            ExportJobService exportJobService,
+            QueryValidationService queryValidationService,
+            StreamService streamService) {
+        this(exporter, commandFactory, searchDomain, executionGuard, eventBus, exportJobService, queryValidationService, categories -> streamService.mapCategoriesToIds(categories).stream());
+    }
+
+    MessagesResource(MessagesExporter exporter,
+                     CommandFactory commandFactory,
+                     SearchDomain searchDomain,
+                     SearchExecutionGuard executionGuard,
+                     @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
+                     ExportJobService exportJobService,
+                     QueryValidationService queryValidationService,
+                     Function<Collection<String>, Stream<String>> streamCategoryMapper) {
         this.commandFactory = commandFactory;
         this.searchDomain = searchDomain;
         this.executionGuard = executionGuard;
         this.exportJobService = exportJobService;
         this.queryValidationService = queryValidationService;
         this.messagesExporterFactory = context -> new AuditingMessagesExporter(context, eventBus, exporter);
+        this.streamCategoryMapper = streamCategoryMapper;
     }
 
     @ApiOperation(
@@ -124,7 +142,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), searchUser::canReadStream);
 
-         ExportMessagesCommand command = commandFactory.buildFromRequest(request);
+        ExportMessagesCommand command = commandFactory.buildFromRequest(request);
 
         return asyncRunner.apply(chunkConsumer -> exporter().export(command, chunkConsumer));
     }
@@ -133,7 +151,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
         MessagesRequest request = requestFromClient != null ? requestFromClient : MessagesRequest.withDefaults();
 
         if (request.streams().isEmpty()) {
-            request = request.withStreams(searchUser.streams().loadAll());
+            request = request.withStreams(searchUser.streams().loadMessageStreamsWithFallback());
         }
 
         if (!request.timeZone().isPresent()) {
@@ -242,8 +260,8 @@ public class MessagesResource extends RestResource implements PluginRestResource
         Search search = searchDomain.getForUser(searchId, searchUser)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
 
-        search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadAll());
-
+        search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadMessageStreamsWithFallback());
+        search = search.addStreamsToQueriesWithCategories(streamCategoryMapper, searchUser);
         search = search.applyExecutionState(executionState);
 
         executionGuard.check(search, searchUser::canReadStream);

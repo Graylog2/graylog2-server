@@ -18,12 +18,15 @@ package org.graylog2.indexer.indices;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
+import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +44,8 @@ public interface IndicesAdapter {
 
     void create(String indexName, IndexSettings indexSettings);
 
+    void create(String index, IndexSettings indexSettings, @Nullable Map<String, Object> mapping);
+
     /**
      * Add fields to an existing index or to change search only settings of existing fields
      * @param indexName existing index name
@@ -48,6 +53,8 @@ public interface IndicesAdapter {
      * @param mapping field mappings
      */
     void updateIndexMapping(@Nonnull String indexName, @Nonnull String mappingType, @Nonnull Map<String, Object> mapping);
+
+    Map<String, Object> getIndexMapping(@Nonnull String index);
 
     /**
      * Updates the metadata field (_meta) of an index mapping
@@ -58,7 +65,7 @@ public interface IndicesAdapter {
     void updateIndexMetaData(@Nonnull String indexName, @Nonnull Map<String, Object> metaData, boolean mergeExisting);
     Map<String, Object> getIndexMetaData(@Nonnull String indexName);
 
-    boolean ensureIndexTemplate(String templateName, Map<String, Object> template);
+    boolean ensureIndexTemplate(String templateName, Template template);
 
     boolean indexTemplateExists(String templateName);
 
@@ -96,6 +103,10 @@ public interface IndicesAdapter {
 
     JsonNode getIndexStats(Collection<String> index);
 
+    IndexSetStats getIndexSetStats();
+
+    List<ShardsInfo> getShardsInfo(String indexName);
+
     IndicesBlockStatus getIndicesBlocksStatus(List<String> indices);
 
     boolean exists(String indexName) throws IOException;
@@ -124,4 +135,6 @@ public interface IndicesAdapter {
     String getIndexId(String index);
 
     void refresh(String... indices);
+
+    Optional<WarmIndexInfo> getWarmIndexInfo(String indexOrAlias);
 }

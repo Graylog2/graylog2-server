@@ -22,7 +22,9 @@ import org.graylog2.shared.users.Role;
 import org.mongojack.Id;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;

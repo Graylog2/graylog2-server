@@ -1,0 +1,4 @@
+type = "f"
+message = "DNS Resolver Pool warning log message now accurately reflects configured `dns_lookup_adapter_resolver_pool_size` value."
+
+pulls = ["16475"]

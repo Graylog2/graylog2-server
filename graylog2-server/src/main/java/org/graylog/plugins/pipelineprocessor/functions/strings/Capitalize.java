@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nonnull;
 import java.util.Locale;
 
 public class Capitalize extends StringUtilsFunction {
@@ -42,5 +43,17 @@ public class Capitalize extends StringUtilsFunction {
     @Override
     protected String apply(String value, Locale unused) {
         return StringUtils.capitalize(value);
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Capitalize string";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Capitalize '${value}' by changing the first letter to title case (upper case)";
     }
 }

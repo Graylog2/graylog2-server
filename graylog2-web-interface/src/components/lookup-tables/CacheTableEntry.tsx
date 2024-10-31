@@ -28,6 +28,8 @@ import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCaches
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
   cache: LookupTableCache,
@@ -43,6 +45,7 @@ const Actions = styled(ButtonToolbar)`
 const CacheTableEntry = ({ cache }: Props) => {
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
+  const sendTelemetry = useSendTelemetry();
 
   const countMap = {
     requests: `org.graylog2.lookup.caches.${cache.id}.requests`,
@@ -89,9 +92,16 @@ const CacheTableEntry = ({ cache }: Props) => {
     const shouldDelete = window.confirm(`Are you sure you want to delete cache "${cache.title}"?`);
 
     if (shouldDelete) {
-      LookupTableCachesActions.delete(cache.id).then(() => LookupTableCachesActions.reloadPage());
+      LookupTableCachesActions.delete(cache.id).then(() => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.CACHE_DELETED, {
+          app_pathname: 'lut',
+          app_section: 'lut_cache',
+        });
+
+        LookupTableCachesActions.reloadPage();
+      });
     }
-  }, [cache.title, cache.id]);
+  }, [cache.title, cache.id, sendTelemetry]);
 
   return (
     <tbody>
@@ -118,7 +128,7 @@ const CacheTableEntry = ({ cache }: Props) => {
               <Button bsSize="xsmall"
                       onClick={handleEdit}
                       role="button"
-                      name="edit">
+                      name="edit_square">
                 Edit
               </Button>
               <Button bsSize="xsmall"

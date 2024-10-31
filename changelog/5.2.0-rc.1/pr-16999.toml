@@ -1,0 +1,5 @@
+type = "f"
+message = "Aligning order of precedence of auth info in proxied resources with general authentication logic."
+
+issues = ["16985"]
+pulls = ["16999"]

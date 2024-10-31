@@ -23,6 +23,8 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.mongodb.DuplicateKeyException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SimpleSession;
@@ -30,7 +32,8 @@ import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -44,8 +47,19 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
     private final MongoDBSessionService mongoDBSessionService;
 
     @Inject
-    public MongoDbSessionDAO(MongoDBSessionService mongoDBSessionService) {
+    public MongoDbSessionDAO(MongoDBSessionService mongoDBSessionService, EventBus eventBus) {
         this.mongoDBSessionService = mongoDBSessionService;
+        eventBus.register(this);
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void sessionDeleted(SessionDeletedEvent event) {
+        final Session cachedSession = getCachedSession(event.sessionId());
+        if (cachedSession != null) {
+            LOG.debug("Removing deleted session from cache.");
+            uncache(cachedSession);
+        }
     }
 
     @Override
@@ -59,12 +73,12 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         fields.put("start_timestamp", session.getStartTimestamp());
         fields.put("last_access_time", session.getLastAccessTime());
         fields.put("timeout", session.getTimeout());
-        Map<String, Object> attributes = Maps.newHashMap();
+        Map<Object, Object> attributes = Maps.newHashMap();
         for (Object key : session.getAttributeKeys()) {
             attributes.put(key.toString(), session.getAttribute(key));
         }
-        fields.put("attributes", attributes);
         final MongoDbSession dbSession = new MongoDbSession(fields);
+        dbSession.setAttributes(attributes);
         final String objectId = mongoDBSessionService.saveWithoutValidation(dbSession);
         LOG.debug("Created session {}", objectId);
 

@@ -29,11 +29,12 @@ import org.graylog2.shared.system.stats.network.NetworkStats;
 import org.graylog2.shared.system.stats.os.OsStats;
 import org.graylog2.shared.system.stats.process.ProcessStats;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 @Api(value = "System/Stats", description = "Node system stats")
 @Path("/system/stats")
@@ -50,7 +51,7 @@ public class StatsResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "System information about this node.",
-            notes = "This resource returns information about the system this node is running on.")
+                  notes = "This resource returns information about the system this node is running on.")
     public SystemStats systemStats() {
         return statsService.systemStatsWithoutNetwork();
     }
@@ -59,7 +60,7 @@ public class StatsResource extends RestResource {
     @Path("/fs")
     @Timed
     @ApiOperation(value = "Filesystem information about this node.",
-            notes = "This resource returns information about the filesystems of this node.")
+                  notes = "This resource returns information about the filesystems of this node.")
     public FsStats fsStats() {
         return statsService.fsStats();
     }
@@ -68,7 +69,7 @@ public class StatsResource extends RestResource {
     @Path("/jvm")
     @Timed
     @ApiOperation(value = "JVM information about this node.",
-            notes = "This resource returns information about the Java Virtual Machine of this node.")
+                  notes = "This resource returns information about the Java Virtual Machine of this node.")
     public JvmStats jvmStats() {
         return statsService.jvmStats();
     }
@@ -77,7 +78,7 @@ public class StatsResource extends RestResource {
     @Path("/network")
     @Timed
     @ApiOperation(value = "Networking information about this node.",
-            notes = "This resource returns information about the networking system this node is running with.")
+                  notes = "This resource returns information about the networking system this node is running with.")
     public NetworkStats networkStats() {
         return statsService.networkStats();
     }
@@ -86,7 +87,7 @@ public class StatsResource extends RestResource {
     @Path("/os")
     @Timed
     @ApiOperation(value = "OS information about this node.",
-            notes = "This resource returns information about the operating system this node is running on.")
+                  notes = "This resource returns information about the operating system this node is running on.")
     public OsStats osStats() {
         return statsService.osStats();
     }
@@ -95,7 +96,7 @@ public class StatsResource extends RestResource {
     @Path("/process")
     @Timed
     @ApiOperation(value = "Process information about this node.",
-            notes = "This resource returns information about the process this node is running as.")
+                  notes = "This resource returns information about the process this node is running as.")
     public ProcessStats processStats() {
         return statsService.processStats();
     }

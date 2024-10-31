@@ -22,15 +22,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.bson.Document;
+import jakarta.validation.constraints.NotBlank;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 @JsonDeserialize(builder = ViewSummaryDTO.Builder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @WithBeanGetter
-public abstract class ViewSummaryDTO implements ViewLike {
+public abstract class ViewSummaryDTO implements ViewLike, MongoEntity {
     @ObjectId
     @Id
     @Nullable
@@ -78,6 +78,9 @@ public abstract class ViewSummaryDTO implements ViewLike {
 
     @JsonProperty(ViewDTO.FIELD_CREATED_AT)
     public abstract DateTime createdAt();
+
+    @JsonProperty(ViewDTO.FIELD_LAST_UPDATED_AT)
+    public abstract DateTime lastUpdatedAt();
 
     @JsonProperty(ViewDTO.FIELD_FAVORITE)
     @MongoIgnore
@@ -133,6 +136,9 @@ public abstract class ViewSummaryDTO implements ViewLike {
         @JsonProperty(ViewDTO.FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);
 
+        @JsonProperty(ViewDTO.FIELD_LAST_UPDATED_AT)
+        public abstract Builder lastUpdatedAt(DateTime lastUpdatedAt);
+
         @JsonProperty(ViewDTO.FIELD_FAVORITE)
         @MongoIgnore
         public abstract Builder favorite(boolean favorite);
@@ -146,6 +152,7 @@ public abstract class ViewSummaryDTO implements ViewLike {
                     .properties(ImmutableSet.of())
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC))
+                    .lastUpdatedAt(DateTime.now(DateTimeZone.UTC))
                     .favorite(false);
         }
 

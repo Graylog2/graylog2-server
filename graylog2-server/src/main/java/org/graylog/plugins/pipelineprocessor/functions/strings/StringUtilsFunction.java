@@ -22,7 +22,9 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
+import javax.annotation.Nonnull;
 import java.util.Locale;
 
 public abstract class StringUtilsFunction extends AbstractFunction<String> {
@@ -33,7 +35,7 @@ public abstract class StringUtilsFunction extends AbstractFunction<String> {
     private final ParameterDescriptor<String, Locale> localeParam;
 
     public StringUtilsFunction() {
-        valueParam = ParameterDescriptor.string(VALUE).description("The input string").build();
+        valueParam = ParameterDescriptor.string(VALUE).ruleBuilderVariable().description("The input string").build();
         localeParam = ParameterDescriptor.string(LOCALE, Locale.class)
                 .optional()
                 .transform(Locale::forLanguageTag)
@@ -63,6 +65,10 @@ public abstract class StringUtilsFunction extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(params.build())
                 .description(description())
+                .ruleBuilderEnabled()
+                .ruleBuilderName(getRuleBuilderName())
+                .ruleBuilderTitle(getRuleBuilderTitle())
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 
@@ -73,4 +79,10 @@ public abstract class StringUtilsFunction extends AbstractFunction<String> {
     protected abstract boolean isLocaleAware();
 
     protected abstract String apply(String value, Locale locale);
+
+    @Nonnull
+    protected abstract String getRuleBuilderName();
+
+    @Nonnull
+    protected abstract String getRuleBuilderTitle();
 }

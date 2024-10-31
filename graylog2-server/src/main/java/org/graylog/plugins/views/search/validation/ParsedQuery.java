@@ -19,7 +19,8 @@ package org.graylog.plugins.views.search.validation;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ public abstract class ParsedQuery {
     public abstract String query();
 
     public abstract ImmutableList<ParsedTerm> terms();
+
     public abstract ImmutableList<ImmutableToken> tokens();
 
     public static ParsedQuery.Builder builder() {

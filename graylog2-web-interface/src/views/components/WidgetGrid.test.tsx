@@ -24,14 +24,14 @@ import _Widget from 'views/logic/widgets/Widget';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import type View from 'views/logic/views/View';
 import { createViewWithWidgets } from 'fixtures/searches';
 
 import WidgetGrid from './WidgetGrid';
 
 jest.mock('./widgets/Widget', () => () => 'widget');
-// eslint-disable-next-line react/prop-types
+
 jest.mock('components/common/ReactGridContainer', () => ({ children }) => <span>{children}</span>);
 
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
@@ -46,14 +46,8 @@ const SimpleWidgetGrid = ({ view }: { view?: View }) => (
   </TestStoreProvider>
 );
 
-SimpleWidgetGrid.defaultProps = {
-  view: undefined,
-};
-
 describe('<WidgetGrid />', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('should render with minimal props', () => {
     const wrapper = mount(<SimpleWidgetGrid />);

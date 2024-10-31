@@ -19,13 +19,21 @@ package org.graylog2.rest.resources.system.indices;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
-import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
-import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
-import com.fasterxml.jackson.module.jsonSchema.types.StringSchema;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWrapper;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.types.ObjectSchema;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.types.StringSchema;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -36,16 +44,9 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -79,7 +80,7 @@ public class RetentionStrategyResource extends RestResource {
     @Path("strategies")
     @Timed
     @ApiOperation(value = "List available retention strategies",
-            notes = "This resource returns a list of all available retention strategies on this Graylog node.")
+                  notes = "This resource returns a list of all available retention strategies on this Graylog node.")
     public RetentionStrategies list() {
         final Set<RetentionStrategyDescription> strategies = retentionStrategies.keySet()
                 .stream()
@@ -96,9 +97,9 @@ public class RetentionStrategyResource extends RestResource {
     @Path("strategies/{strategy}")
     @Timed
     @ApiOperation(value = "Show JSON schema for configuration of given retention strategies",
-            notes = "This resource returns a JSON schema for the configuration of the given retention strategy.")
+                  notes = "This resource returns a JSON schema for the configuration of the given retention strategy.")
     public RetentionStrategyDescription configSchema(@ApiParam(name = "strategy", value = "The name of the retention strategy", required = true)
-                                   @PathParam("strategy") @NotEmpty String strategyName) {
+                                                     @PathParam("strategy") @NotEmpty String strategyName) {
         return getRetentionStrategyDescription(strategyName);
     }
 

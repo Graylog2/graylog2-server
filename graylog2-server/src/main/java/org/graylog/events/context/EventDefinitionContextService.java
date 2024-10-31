@@ -31,7 +31,8 @@ import org.graylog.scheduler.JobTriggerStatus;
 import org.joda.time.DateTime;
 import org.mongojack.DBQuery;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

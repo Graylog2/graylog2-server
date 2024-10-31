@@ -22,7 +22,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.handler.traffic.GlobalTrafficShapingHandler;
 import io.netty.handler.traffic.TrafficCounter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashMap;
 import java.util.Map;
 

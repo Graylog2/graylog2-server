@@ -18,6 +18,10 @@ package org.graylog.storage.opensearch2.views;
 
 import com.google.common.collect.Maps;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -27,6 +31,8 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.QueryExecutionStats;
+import org.graylog.plugins.views.search.engine.monitoring.collection.StatsCollector;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -35,11 +41,13 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.action.ShardOperationFailedException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.PlainActionFuture;
+import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
+import org.graylog.shaded.opensearch2.org.opensearch.core.action.ShardOperationFailedException;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
@@ -49,13 +57,15 @@ import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamService;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -66,7 +76,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchBackend.class);
@@ -77,6 +88,8 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     private final OSGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
+    private final StatsCollector<QueryExecutionStats> executionStatsCollector;
+    private final StreamService streamService;
 
     @Inject
     public OpenSearchBackend(Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -84,6 +97,8 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                              IndexLookup indexLookup,
                              OSGeneratedQueryContext.Factory queryContextFactory,
                              UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
+                             StatsCollector<QueryExecutionStats> executionStatsCollector,
+                             StreamService streamService,
                              @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.openSearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
@@ -91,6 +106,8 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
+        this.executionStatsCollector = executionStatsCollector;
+        this.streamService = streamService;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -101,7 +118,12 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     @Override
-    public OSGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors) {
+    public StatsCollector<QueryExecutionStats> getExecutionStatsCollector() {
+        return this.executionStatsCollector;
+    }
+
+    @Override
+    public OSGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors, DateTimeZone timezone) {
         final BackendQuery backendQuery = query.query();
 
         final Set<SearchType> searchTypes = query.searchTypes();
@@ -117,7 +139,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .forEach(boolQuery::filter);
 
         // add the optional root query filters
-        generateFilterClause(query.filter()).map(boolQuery::filter);
+        generateFilterClause(query.filter()).ifPresent(boolQuery::filter);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQuery)
@@ -125,7 +147,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .size(0)
                 .trackTotalHits(true);
 
-        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
+        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors, timezone);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
                 .forEach(searchType -> {
@@ -150,8 +172,12 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                                             ),
                                             "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
                                     )
-                            )
-                            .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
+                            );
+
+                    if (effectiveStreamIds.stream().noneMatch(s -> s.startsWith(Stream.DATASTREAM_PREFIX))) {
+                        searchTypeOverrides
+                                .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
+                    }
 
                     searchType.query().ifPresent(searchTypeQuery -> {
                         final QueryBuilder normalizedSearchTypeQuery = translateQueryString(searchTypeQuery.queryString());
@@ -202,6 +228,16 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     @Override
+    public Set<IndexRange> indexRangesForStreamsInTimeRange(Set<String> streamIds, TimeRange timeRange) {
+        return indexLookup.indexRangesForStreamsInTimeRange(streamIds, timeRange);
+    }
+
+    @Override
+    public Optional<String> streamTitle(String streamId) {
+        return Optional.ofNullable(streamService.streamTitleFromCache(streamId));
+    }
+
+    @Override
     @WithSpan
     public QueryResult doRun(SearchJob job, Query query, OSGeneratedQueryContext queryContext) {
         if (query.searchTypes().isEmpty()) {
@@ -226,8 +262,8 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             .filter(s -> s.id().equalsIgnoreCase(searchTypeId)).findFirst()
                             .flatMap(searchType -> {
                                 if (searchType.effectiveStreams().isEmpty()
-                                        && !query.globalOverride().flatMap(GlobalOverride::timerange).isPresent()
-                                        && !searchType.timerange().isPresent()) {
+                                        && query.globalOverride().flatMap(GlobalOverride::timerange).isEmpty()
+                                        && searchType.timerange().isEmpty()) {
                                     return Optional.empty();
                                 }
                                 return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(query.effectiveStreams(searchType), query.effectiveTimeRange(searchType)));
@@ -235,14 +271,20 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             .orElse(affectedIndices);
 
                     Set<String> indices = affectedIndicesForSearchType.isEmpty() ? Collections.singleton("") : affectedIndicesForSearchType;
-                    return new SearchRequest()
+                    final SearchRequest searchRequest = new SearchRequest()
                             .source(searchTypeQueries.get(searchTypeId))
                             .indices(indices.toArray(new String[0]))
-                            .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
+                            .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+                    if (!SearchJob.NO_CANCELLATION.equals(job.getCancelAfterSeconds())) {
+                        searchRequest.setCancelAfterTimeInterval(new TimeValue(job.getCancelAfterSeconds(), TimeUnit.SECONDS));
+                    }
+                    return searchRequest;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
-        final List<MultiSearchResponse.Item> results = client.msearch(searches, "Unable to perform search query: ");
+        final PlainActionFuture<MultiSearchResponse> mSearchFuture = client.cancellableMsearch(searches);
+        job.setSearchEngineTaskFuture(mSearchFuture);
+        final List<MultiSearchResponse.Item> results = getResults(mSearchFuture, searches.size());
 
         for (SearchType searchType : query.searchTypes()) {
             final String searchTypeId = searchType.id();
@@ -292,6 +334,16 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .build();
     }
 
+    @NotNull
+    private static List<MultiSearchResponse.Item> getResults(PlainActionFuture<MultiSearchResponse> mSearchFuture,
+                                                             final int numSearchTypes) {
+        try {
+            return Arrays.asList(mSearchFuture.get().getResponses());
+        } catch (InterruptedException | ExecutionException e) {
+            return Collections.nCopies(numSearchTypes, new MultiSearchResponse.Item(null, e));
+        }
+    }
+
     private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {
         if (multiSearchResponse.isFailure()) {
             return Optional.of(new ElasticsearchException(multiSearchResponse.getFailureMessage(), multiSearchResponse.getFailure()));
@@ -301,13 +353,13 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         if (searchResponse != null && searchResponse.getFailedShards() > 0) {
             final List<Throwable> shardFailures = Arrays.stream(searchResponse.getShardFailures())
                     .map(ShardOperationFailedException::getCause)
-                    .collect(Collectors.toList());
+                    .toList();
             final List<String> nonNumericFieldErrors = shardFailures
                     .stream()
-                    .filter(shardFailure -> shardFailure.getMessage().contains("Expected numeric type on field"))
                     .map(Throwable::getMessage)
+                    .filter(message -> message.contains("Expected numeric type on field"))
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
             if (!nonNumericFieldErrors.isEmpty()) {
                 return Optional.of(new FieldTypeException("Unable to perform search query: ", nonNumericFieldErrors));
             }
@@ -316,7 +368,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                     .stream()
                     .map(Throwable::getMessage)
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
             return Optional.of(new ElasticsearchException("Unable to perform search query: ", errors));
         }
 

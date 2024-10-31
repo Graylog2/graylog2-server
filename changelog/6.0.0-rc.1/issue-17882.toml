@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed error when attempting to share entities with stream dependencies."
+
+issues = ["17882"]
+pulls = ["17891"]

@@ -31,13 +31,15 @@ type Props = {
   compact?: boolean,
 }
 
-const ResumeStartupButton = ({ setIsWaitingForStartup, children, variant, compact }: Props) => {
+const ResumeStartupButton = ({ setIsWaitingForStartup, children = 'Resume startup', variant, compact = false }: Props) => {
   const { data: dataNodes } = useDataNodes();
 
   const onResumeStartup = useCallback(() => {
     // eslint-disable-next-line no-alert
-    if (dataNodes?.length || window.confirm('Are you sure you want to resume startup without a running Graylog data node?')) {
-      fetch('POST', qualifyUrl('/api/status/finish-config'), undefined, false)
+    if (dataNodes?.length || window.confirm('Are you sure you want to resume startup without a running Graylog data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.')) {
+      const status = (dataNodes?.length) ? 'finish' : 'skip';
+
+      fetch('POST', qualifyUrl(`/api/status/${status}-config`), undefined, false)
         .then(() => {
           setIsWaitingForStartup(true);
         })
@@ -52,18 +54,11 @@ const ResumeStartupButton = ({ setIsWaitingForStartup, children, variant, compac
 
   return (
     <Button variant={variant}
-            compact={compact}
-            size="xs"
+            size={compact ? 'compact-xs' : 'xs'}
             onClick={onResumeStartup}>
       {children}
     </Button>
   );
-};
-
-ResumeStartupButton.defaultProps = {
-  variant: undefined,
-  compact: false,
-  children: 'Resume startup',
 };
 
 export default ResumeStartupButton;

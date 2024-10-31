@@ -14,19 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import type { SearchesConfig } from 'components/search/SearchConfig';
+import useClusterConfig from 'hooks/useClusterConfig';
 
-import { useStore } from 'stores/connect';
-import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
+type Result = { config: SearchesConfig, refresh: () => void };
 
-const useSearchConfiguration = () => {
-  const { searchesClusterConfig } = useStore(SearchConfigStore);
+const useSearchConfiguration = (): Result => {
+  const { data: config, refetch } = useClusterConfig<SearchesConfig>('org.graylog2.indexer.searches.SearchesClusterConfig');
 
-  useEffect(() => {
-    SearchConfigActions.refresh();
-  }, []);
-
-  return { config: searchesClusterConfig };
+  return { config, refresh: refetch };
 };
 
 export default useSearchConfiguration;

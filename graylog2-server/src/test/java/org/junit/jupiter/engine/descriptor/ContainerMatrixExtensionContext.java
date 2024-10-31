@@ -17,7 +17,7 @@
 package org.junit.jupiter.engine.descriptor;
 
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExecutableInvoker;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.engine.EngineExecutionListener;
@@ -31,10 +31,9 @@ public class ContainerMatrixExtensionContext extends AbstractExtensionContext<Co
 
     ContainerMatrixExtensionContext(EngineExecutionListener engineExecutionListener,
                                     ContainerMatrixEngineDescriptor testDescriptor,
-                                    JupiterConfiguration configuration,
-                                    ExecutableInvoker executableInvoker) {
+                                    JupiterConfiguration configuration) {
 
-        super(null, engineExecutionListener, testDescriptor, configuration, executableInvoker);
+        super(null, engineExecutionListener, testDescriptor, configuration, ExtensionContext::getExecutableInvoker);
     }
 
     @Override

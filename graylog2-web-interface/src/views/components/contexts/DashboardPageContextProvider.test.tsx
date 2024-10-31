@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
-import { useLocation } from 'react-router-dom';
 
+import useLocation from 'routing/useLocation';
 import { asMock } from 'helpers/mocking';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 
 import type { DashboardPageContextType } from './DashboardPageContext';
@@ -31,11 +31,9 @@ const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
-  useLocation: jest.fn(() => ({
-    pathname: '',
-    search: '',
-  })),
 }));
+
+jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '', pathname: '' })));
 
 const emptyLocation = {
   pathname: '',
@@ -46,9 +44,7 @@ const emptyLocation = {
 };
 
 describe('DashboardPageContextProvider', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useLocation).mockReturnValue(emptyLocation);

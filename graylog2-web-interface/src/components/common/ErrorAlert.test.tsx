@@ -20,32 +20,33 @@ import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 import ErrorAlert from './ErrorAlert';
 
 describe('ErrorAlert', () => {
-  it('should display an Error', () => {
+  it('should display an Error', async () => {
     render(<ErrorAlert>Franz</ErrorAlert>);
 
-    expect(screen.queryByText('Franz')).not.toBeNull();
+    await screen.findByText('Franz');
+
     expect(screen.queryByText('Runtime Error')).toBeNull();
   });
 
-  it('should display an Runtime Error', () => {
+  it('should display an Runtime Error', async () => {
     render(<ErrorAlert runtimeError>Franz</ErrorAlert>);
 
-    expect(screen.queryByText('Franz')).not.toBeNull();
-    expect(screen.queryByText('Runtime Error')).not.toBeNull();
+    await screen.findByText('Franz');
+    await screen.findByText('Runtime Error');
   });
 
-  it('should display nothing without children', () => {
+  it('should display nothing without children', async () => {
     render(<ErrorAlert />);
 
     expect(screen.queryByText('Franz')).toBeNull();
     expect(screen.queryByText('Runtime Error')).toBeNull();
   });
 
-  it('should call onClose handler', () => {
+  it('should call onClose handler', async () => {
     const onClose = jest.fn();
     render(<ErrorAlert onClose={onClose}>Franz</ErrorAlert>);
 
-    const closeBtn = screen.getByRole('button');
+    const closeBtn = await screen.findByRole('button');
 
     fireEvent.click(closeBtn);
 

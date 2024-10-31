@@ -14,32 +14,52 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
-import * as GraylogSawmill from '@graylog/sawmill';
-import type { TChangeMode, TThemeMode } from '@graylog/sawmill';
+import type { ColorScheme } from '@graylog/sawmill';
+import SawmillSC from '@graylog/sawmill/styled-components';
+import { MantineProvider } from '@mantine/core';
+import type { MantineTheme } from '@graylog/sawmill/mantine';
+import SawmillMantine from '@graylog/sawmill/mantine';
 
 import { DEFAULT_THEME_MODE } from './constants';
+
+import 'material-symbols/rounded.css';
 
 type Props = {
   children: React.ReactNode,
 };
 
-const Sawmill = GraylogSawmill.default;
+const useSCTheme = (
+  setColorScheme: (newColorScheme: ColorScheme) => void,
+  mantineTheme: MantineTheme,
+) => useMemo(() => {
+  const theme = SawmillSC(mantineTheme);
 
-const PreflightThemeProvider = ({ children }: Props) => {
-  const [mode, setMode] = useState<TThemeMode>(DEFAULT_THEME_MODE);
-
-  const handleModeChange: TChangeMode = (nextMode) => {
-    setMode(nextMode);
+  const onChangeColorScheme = (nextMode: ColorScheme) => {
+    setColorScheme(nextMode);
   };
 
-  const theme = new Sawmill(GraylogSawmill[mode], mode, handleModeChange);
+  return ({
+    ...theme,
+    changeMode: onChangeColorScheme,
+  });
+}, [mantineTheme, setColorScheme]);
+
+const PreflightThemeProvider = ({ children }: Props) => {
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(DEFAULT_THEME_MODE);
+  const mantineTheme = useMemo(
+    () => SawmillMantine({ colorScheme }),
+    [colorScheme],
+  );
+  const scTheme = useSCTheme(setColorScheme, mantineTheme);
 
   return (
-    <ThemeProvider theme={theme}>
-      {children}
-    </ThemeProvider>
+    <MantineProvider theme={mantineTheme} forceColorScheme={colorScheme}>
+      <ThemeProvider theme={scTheme}>
+        {children}
+      </ThemeProvider>
+    </MantineProvider>
   );
 };
 

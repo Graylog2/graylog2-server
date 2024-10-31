@@ -16,42 +16,37 @@
  */
 package org.graylog2.indexer.indexset;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.configuration.IndexSetsDefaultConfiguration;
-import org.graylog2.migrations.MaintenanceStrategiesHelper;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
-import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-import org.joda.time.Duration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.inject.Inject;
+import org.graylog2.datatiering.DataTieringChecker;
+import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
+import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 
-import javax.inject.Inject;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 public class IndexSetConfigFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(IndexSetConfigFactory.class);
-    private final ElasticsearchConfiguration elasticsearchConfiguration;
-    private final MaintenanceStrategiesHelper maintenanceStrategiesHelper;
-    private final ClusterConfigService clusterConfigService;
+
+    private final DataTieringChecker dataTieringChecker;
+    private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
 
     @Inject
-    public IndexSetConfigFactory(ElasticsearchConfiguration elasticsearchConfiguration,
-                                 MaintenanceStrategiesHelper maintenanceStrategiesHelper, ClusterConfigService clusterConfigService) {
-        this.elasticsearchConfiguration = elasticsearchConfiguration;
-        this.maintenanceStrategiesHelper = maintenanceStrategiesHelper;
-        this.clusterConfigService = clusterConfigService;
+    public IndexSetConfigFactory(DataTieringChecker dataTieringChecker,
+                                 IndexSetDefaultTemplateService indexSetDefaultTemplateService) {
+        this.dataTieringChecker = dataTieringChecker;
+        this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
+    }
+
+    private static ZonedDateTime getCreationDate() {
+        return ZonedDateTime.now(ZoneOffset.UTC);
+    }
+
+    private static DataTieringConfig getDataTieringConfig(IndexSetTemplateConfig defaultConfig) {
+        return defaultConfig.useLegacyRotation() ? null : defaultConfig.dataTieringConfig();
     }
 
     public IndexSetConfig.Builder createDefault() {
-        final IndexSetsDefaultConfiguration defaultConfig = clusterConfigService.get(IndexSetsDefaultConfiguration.class);
-        if (defaultConfig == null) {
-            // Valid case for migrations that existed before in-DB index configuration was established in Graylog 5.1
-            LOG.debug("Could not find IndexSetsDefaultConfiguration. Falling back to server configuration values.");
-            return createInitialFromServerConfig();
-        }
+        IndexSetTemplateConfig defaultConfig = indexSetDefaultTemplateService.getOrCreateDefaultConfig();
 
         return IndexSetConfig.builder()
                 .creationDate(getCreationDate())
@@ -60,35 +55,11 @@ public class IndexSetConfigFactory {
                 .replicas(defaultConfig.replicas())
                 .indexOptimizationDisabled(defaultConfig.indexOptimizationDisabled())
                 .indexOptimizationMaxNumSegments(defaultConfig.indexOptimizationMaxNumSegments())
-                .fieldTypeRefreshInterval(Duration.standardSeconds(
-                        defaultConfig.fieldTypeRefreshIntervalUnit().toSeconds(defaultConfig.fieldTypeRefreshInterval())))
+                .fieldTypeRefreshInterval(defaultConfig.fieldTypeRefreshInterval())
                 .rotationStrategyClass(defaultConfig.rotationStrategyClass())
-                .rotationStrategy(defaultConfig.rotationStrategyConfig())
+                .rotationStrategyConfig(defaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(defaultConfig.retentionStrategyClass())
-                .retentionStrategy(defaultConfig.retentionStrategyConfig());
+                .retentionStrategyConfig(defaultConfig.retentionStrategyConfig())
+                .dataTieringConfig(dataTieringChecker.isEnabled() ? getDataTieringConfig(defaultConfig) : null);
     }
-
-    private IndexSetConfig.Builder createInitialFromServerConfig() {
-        final ImmutablePair<String, RotationStrategyConfig> rotationConfig =
-                maintenanceStrategiesHelper.readRotationConfigFromServerConf();
-        final ImmutablePair<String, RetentionStrategyConfig> retentionConfig =
-                maintenanceStrategiesHelper.readRetentionConfigFromServerConf();
-        return IndexSetConfig.builder()
-                .creationDate(getCreationDate())
-                .shards(elasticsearchConfiguration.getShards())
-                .replicas(elasticsearchConfiguration.getReplicas())
-                .rotationStrategyClass(rotationConfig.left)
-                .rotationStrategy(rotationConfig.right)
-                .retentionStrategyClass(retentionConfig.left)
-                .retentionStrategy(retentionConfig.right)
-                .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
-                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
-                .fieldTypeRefreshInterval(IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
-    }
-
-    private static ZonedDateTime getCreationDate() {
-        return ZonedDateTime.now(ZoneOffset.UTC);
-    }
-
 }

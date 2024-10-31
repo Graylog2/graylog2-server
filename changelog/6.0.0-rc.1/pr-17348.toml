@@ -1,0 +1,8 @@
+type = "a"
+message = """
+Adding Data Tiering functionality to Graylog Open providing users with a more intuitive and flexible
+approach to configuring index rotation, retention, and data tiering.
+"""
+
+issues = ["Graylog2/graylog-plugin-enterprise#6023"]
+pulls = ["17348", "Graylog2/graylog-plugin-enterprise#6091"]

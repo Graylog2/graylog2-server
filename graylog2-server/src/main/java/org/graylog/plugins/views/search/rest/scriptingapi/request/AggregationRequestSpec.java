@@ -19,11 +19,11 @@ package org.graylog.plugins.views.search.rest.scriptingapi.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 public record AggregationRequestSpec(@JsonProperty("query") String queryString,
                                      @JsonProperty("streams") Set<String> streams,
+                                     @JsonProperty("stream_categories") Set<String> streamCategories,
                                      @JsonProperty("timerange") TimeRange timerange,
                                      @JsonProperty("group_by") @Valid @NotEmpty List<Grouping> groupings,
                                      @JsonProperty("metrics") @Valid @NotEmpty List<Metric> metrics) implements SearchRequestSpec {
@@ -45,6 +46,9 @@ public record AggregationRequestSpec(@JsonProperty("query") String queryString,
         }
         if (streams == null) {
             streams = Set.of();
+        }
+        if (streamCategories == null) {
+            streamCategories = Set.of();
         }
     }
 

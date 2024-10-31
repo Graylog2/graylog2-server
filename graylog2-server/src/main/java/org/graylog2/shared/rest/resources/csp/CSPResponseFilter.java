@@ -16,20 +16,22 @@
  */
 package org.graylog2.shared.rest.resources.csp;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import static org.graylog2.shared.rest.resources.csp.CSPDynamicFeature.CSP_NONCE_PROPERTY;
 
 public class CSPResponseFilter implements ContainerResponseFilter {
     public final static String CSP_HEADER = "Content-Security-Policy";
     private final static String noncePattern = "\\{nonce}";
-    private String value;
+    private String group;
+    private final CSPService cspService;
 
-    public CSPResponseFilter(String value) {
-        this.value = value;
+    public CSPResponseFilter(String group, CSPService cspService) {
+        this.group = group;
+        this.cspService = cspService;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class CSPResponseFilter implements ContainerResponseFilter {
         final MultivaluedMap<String, Object> headers = responseContext.getHeaders();
         if (!headers.containsKey(CSP_HEADER)) {
             final var cspNonce = (String) requestContext.getProperty(CSP_NONCE_PROPERTY);
-            final var valueWithNonce = value.replaceAll(noncePattern, cspNonce);
+            final var valueWithNonce = cspService.cspString(group).replaceAll(noncePattern, cspNonce);
             headers.add(CSP_HEADER, valueWithNonce);
         }
     }

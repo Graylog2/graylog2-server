@@ -14,27 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import $ from 'jquery';
+import isString from 'lodash/isString';
 
 import ModalSubmit from 'components/common/ModalSubmit';
-import StringUtils from 'util/StringUtils';
 
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  backdrop: boolean|'static'|undefined,
-  submitButtonDisabled: boolean,
-  formProps: object,
-  bsSize: 'lg'|'large'|'sm'|'small',
+  backdrop?: boolean | 'static' | undefined
+  submitButtonDisabled?: boolean
+  formProps?: object
+  bsSize?: 'lg' | 'large' | 'sm' | 'small'
   show: boolean,
-  submitButtonText: string,
-  onSubmitForm: (event) => void,
+  submitButtonText?: string
+  onSubmitForm?: (event) => void
   onCancel: () => void,
-  title: string|React.ReactNode,
+  title: string | React.ReactNode,
   children: React.ReactNode,
+  modalTitle?: string | undefined,
 };
 
 /**
@@ -43,15 +43,16 @@ type Props = {
  */
 const BootstrapModalForm = ({
   backdrop,
-  submitButtonDisabled,
-  formProps,
+  submitButtonDisabled = false,
+  formProps = {},
   bsSize,
   show,
-  submitButtonText,
+  submitButtonText = 'Submit',
   onSubmitForm,
   onCancel,
   title,
   children,
+  modalTitle,
   ...restProps
 }: Props) => {
   const form = useRef(null);
@@ -79,12 +80,14 @@ const BootstrapModalForm = ({
     </div>
   );
 
+  const _title = useMemo<string | undefined>(() => (isString(title) ? title : modalTitle), [modalTitle, title]);
+
   return (
     <BootstrapModalWrapper bsSize={bsSize}
                            showModal={show}
                            backdrop={backdrop}
                            onHide={onCancel}
-                           data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}
+                           title={_title}
                            {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
@@ -104,35 +107,6 @@ const BootstrapModalForm = ({
       </form>
     </BootstrapModalWrapper>
   );
-};
-
-BootstrapModalForm.propTypes = {
-  backdrop: PropTypes.oneOf([true, false, 'static']),
-  bsSize: PropTypes.oneOf(['lg', 'large', 'sm', 'small']),
-  /* Modal title */
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
-  /* Form contents, included in the modal body */
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
-  onSubmitForm: PropTypes.func,
-  onCancel: PropTypes.func.isRequired,
-  /* Object with additional props to pass to the form */
-  formProps: PropTypes.object,
-  /* Text to use in the submit button. "Submit" is the default */
-  submitButtonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-  submitButtonDisabled: PropTypes.bool,
-  show: PropTypes.bool.isRequired,
-};
-
-BootstrapModalForm.defaultProps = {
-  backdrop: undefined,
-  formProps: {},
-  submitButtonText: 'Submit',
-  submitButtonDisabled: false,
-  onSubmitForm: undefined,
-  bsSize: undefined,
 };
 
 export default BootstrapModalForm;

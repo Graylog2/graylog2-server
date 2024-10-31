@@ -1,0 +1,76 @@
+rule "csvmap"
+when true
+then
+    let csv = "v1,v2,v3";
+    let map =  csv_to_map(
+        value: csv,
+        fieldNames: "k1,k2,k3"
+    );
+    set_fields(fields: map, prefix: "test1_");
+
+    let csv = "v1;v2;v3";
+    let map =  csv_to_map(
+        value: csv,
+        fieldNames: "k1;k2;k3",
+        separator: ";ignorerest"
+    );
+    set_fields(fields: map, prefix: "test2_");
+
+    let csv = "'v1','v2','v3'";
+    let map =  csv_to_map(
+        value: csv,
+        fieldNames: "k1,k2,k3",
+        quoteChar: "'"
+    );
+    set_fields(fields: map, prefix: "test3_");
+
+    let csv = "'v1','v2'extra,'v3'";
+    let map =  csv_to_map(
+        value: csv,
+        fieldNames: "'k1','k2','k3'",
+        quoteChar: "'",
+        strictQuotes: true
+    );
+    set_fields(fields: map, prefix: "test4_");
+
+    let csv = "v1, v2, v3";
+    let map =  csv_to_map(
+        value: csv,
+        fieldNames: "k1,k2,k3",
+        trimLeadingWhitespace: true
+    );
+    set_fields(fields: map, prefix: "test5_");
+
+    let csv = "v1,'v%,2',v3";
+    let map =  csv_to_map(
+        value: csv,
+        fieldNames: "k1,k2,k3",
+        quoteChar: "'",
+        escapeChar: "%"
+    );
+    set_fields(fields: map, prefix: "test99_");
+
+    let csv = "v1,v2,v3";
+    let map =  csv_to_map(
+        value: csv,
+        fieldNames: "k1,k2,k3,k4"
+    );
+    set_fields(fields: map, prefix: "should_not_exist_");
+
+    let csv = "v1,v2,v3,v4";
+    let map =  csv_to_map(
+        value: csv,
+        fieldNames: "k1,k2,k3",
+        ignoreExtraFieldNames: true
+    );
+    set_fields(fields: map, prefix: "should_not_exist_");
+
+    let csv = "v1,v2,v3";
+        let map =  csv_to_map(
+            value: csv,
+            fieldNames: "k1,k2,k3,k4",
+            ignoreExtraFieldNames: true
+        );
+    set_fields(fields: map, prefix: "ignore_extra_field_names_");
+
+end

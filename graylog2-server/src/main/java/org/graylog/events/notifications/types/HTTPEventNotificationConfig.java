@@ -45,6 +45,7 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
 
     private static final String FIELD_URL = "url";
     private static final String FIELD_BASIC_AUTH = "basic_auth";
+    private static final String FIELD_API_KEY_AS_HEADER = "api_key_as_header";
     private static final String FIELD_API_KEY = "api_key";
     private static final String FIELD_API_SECRET = "api_secret";
     private static final String FIELD_SKIP_TLS_VERIFICATION = "skip_tls_verification";
@@ -52,6 +53,9 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
     @JsonProperty(FIELD_BASIC_AUTH)
     @Nullable
     public abstract EncryptedValue basicAuth();
+
+    @JsonProperty(FIELD_API_KEY_AS_HEADER)
+    public abstract boolean apiKeyAsHeader();
 
     @JsonProperty(FIELD_API_KEY)
     @Nullable
@@ -67,6 +71,7 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
     @JsonProperty(FIELD_SKIP_TLS_VERIFICATION)
     public abstract boolean skipTLSVerification();
 
+    @Override
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
         return EventNotificationExecutionJob.Data.builder().eventDto(dto).build();
@@ -77,6 +82,7 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
     }
 
     public abstract Builder toBuilder();
+    @Override
     @JsonIgnore
     public ValidationResult validate() {
         final ValidationResult validation = new ValidationResult();
@@ -130,6 +136,7 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
             return new AutoValue_HTTPEventNotificationConfig.Builder()
                     .basicAuth(EncryptedValue.createUnset())
                     .apiSecret(EncryptedValue.createUnset())
+                    .apiKeyAsHeader(false)
                     .apiKey("")
                     .skipTLSVerification(false)
                     .type(TYPE_NAME);
@@ -137,6 +144,9 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
 
         @JsonProperty(FIELD_BASIC_AUTH)
         public abstract Builder basicAuth(EncryptedValue basicAuth);
+
+        @JsonProperty(FIELD_API_KEY_AS_HEADER)
+        public abstract Builder apiKeyAsHeader(boolean apiKey);
 
         @JsonProperty(FIELD_API_KEY)
         public abstract Builder apiKey(String apiKey);

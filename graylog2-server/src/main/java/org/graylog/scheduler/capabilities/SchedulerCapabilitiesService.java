@@ -16,7 +16,8 @@
  */
 package org.graylog.scheduler.capabilities;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 

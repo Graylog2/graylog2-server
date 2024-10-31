@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
-import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { Icon, IconButton } from 'components/common';
+import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 
 const Container = styled.div(({ theme }) => css`
   display: flex;
@@ -28,13 +28,23 @@ const Container = styled.div(({ theme }) => css`
   border-radius: 3px;
   border: 1px solid ${theme.colors.variant.lighter.default};
   background-color: ${theme.colors.variant.lightest.default};
+  flex-direction: column;
+  position: relative;
 `);
 
 const ElementActions = styled.div`
   display: flex;
-  flex-direction: column;
-  min-width: 25px;
-  margin-left: 5px;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  top: 5px;
+`;
+
+const StyledIconButton = styled(IconButton)`
+  width: fit-content;
+  height: fit-content;
 `;
 
 const ElementConfiguration = styled.div`
@@ -47,41 +57,32 @@ const DragHandle = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 25px;
 `;
 
 type Props = {
   children: React.ReactNode,
   onRemove?: () => void,
   elementTitle: string,
-  draggableProps?: DraggableProvidedDraggableProps;
-  dragHandleProps?: DraggableProvidedDragHandleProps;
+  draggableProps?: DraggableProps;
+  dragHandleProps?: DragHandleProps;
   className?: string,
   testIdPrefix?: string,
 };
 
-const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(({ children, onRemove, testIdPrefix, dragHandleProps, className, draggableProps, elementTitle }: Props, ref) => (
+const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(({ children, onRemove, testIdPrefix = 'configuration', dragHandleProps, className, draggableProps, elementTitle }: Props, ref) => (
   <Container className={className} ref={ref} {...(draggableProps ?? {})}>
+    <ElementActions>
+      {dragHandleProps && (
+      <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
+        <Icon size="sm" name="drag_indicator" />
+      </DragHandle>
+      )}
+      {onRemove && <StyledIconButton size="sm" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
+    </ElementActions>
     <ElementConfiguration>
       {children}
     </ElementConfiguration>
-    <ElementActions>
-      {dragHandleProps && (
-        <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-          <Icon name="bars" />
-        </DragHandle>
-      )}
-      {onRemove && <IconButton onClick={onRemove} name="trash-alt" title={`Remove ${elementTitle}`} />}
-    </ElementActions>
   </Container>
 ));
-
-ElementConfigurationContainer.defaultProps = {
-  className: undefined,
-  draggableProps: undefined,
-  dragHandleProps: undefined,
-  onRemove: undefined,
-  testIdPrefix: 'configuration',
-};
 
 export default ElementConfigurationContainer;

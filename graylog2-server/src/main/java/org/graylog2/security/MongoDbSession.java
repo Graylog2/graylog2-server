@@ -64,27 +64,25 @@ public class MongoDbSession extends PersistedImpl {
 
     @SuppressForbidden("Deliberate use of ObjectInputStream")
     public Map<Object, Object> getAttributes() {
-        final Object attributes = fields.get("attributes");
-        if (attributes == null) {
-            return null;
-        }
-        final ByteArrayInputStream bis = new ByteArrayInputStream((byte[]) attributes);
         try {
+            final Object attributes = fields.get("attributes");
+            if (attributes == null) {
+                return null;
+            }
+            final ByteArrayInputStream bis = new ByteArrayInputStream((byte[]) attributes);
+
             // FIXME: This could break backward compatibility if different Java versions are being used.
             final ObjectInputStream ois = new ObjectInputStream(bis);
             final Object o = ois.readObject();
             return (Map<Object, Object>) o;
-        } catch (IOException e) {
-            LOG.error("little io. wow.", e);
-        } catch (ClassNotFoundException e) {
-            LOG.error("wrong thingy in db", e);
+        } catch (Exception e) {
+            LOG.error("Error deserializing binary stream for attributes from Mongo: {}", e.getMessage(), e);
         }
         return null;
     }
 
     @SuppressForbidden("Deliberate use of ObjectOutputStream")
     public void setAttributes(Map<Object, Object> attributes) {
-
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
             // FIXME: This could break backward compatibility if different Java versions are being used.
@@ -93,7 +91,7 @@ public class MongoDbSession extends PersistedImpl {
             oos.close();
             fields.put("attributes", bos.toByteArray());
         } catch (IOException e) {
-            LOG.error("too bad :(", e);
+            LOG.error("Error serializing into binary stream for attributes in Mongo: {}", e.getMessage(), e);
         }
     }
 

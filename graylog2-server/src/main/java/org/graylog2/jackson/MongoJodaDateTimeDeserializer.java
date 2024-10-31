@@ -19,6 +19,7 @@ package org.graylog2.jackson;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
+import org.bson.BsonTimestamp;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -42,6 +43,8 @@ public final class MongoJodaDateTimeDeserializer extends StdScalarDeserializer<D
                 if (embeddedObject instanceof Date) {
                     final Date date = (Date) embeddedObject;
                     return new DateTime(date, DateTimeZone.UTC);
+                } else if (embeddedObject instanceof BsonTimestamp bsonTimestamp) {
+                    return new DateTime(bsonTimestamp.getTime() * 1000L, DateTimeZone.UTC);
                 } else {
                     throw new IllegalStateException("Unsupported token: " + jsonParser.currentToken());
                 }

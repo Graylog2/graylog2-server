@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -31,8 +32,8 @@ public class Concat extends AbstractFunction<String> {
     private final ParameterDescriptor<String, String> secondParam;
 
     public Concat() {
-        firstParam = ParameterDescriptor.string("first").description("First string").build();
-        secondParam = ParameterDescriptor.string("second").description("Second string").build();
+        firstParam = ParameterDescriptor.string("first").ruleBuilderVariable().description("First string").build();
+        secondParam = ParameterDescriptor.string("second").ruleBuilderVariable().description("Second string").build();
     }
 
     @Override
@@ -50,6 +51,10 @@ public class Concat extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(of(firstParam, secondParam))
                 .description("Concatenates two strings")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Concatenate strings")
+                .ruleBuilderTitle("Concatenate '${first}' and '${second}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }

@@ -16,6 +16,8 @@
  */
 package org.graylog2.periodical;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -27,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -120,6 +120,6 @@ public class ESVersionCheckPeriodical extends Periodical {
     }
 
     private boolean compatible(SearchVersion initialElasticsearchMajorVersion, SearchVersion version) {
-        return initialElasticsearchMajorVersion.version().getMajorVersion() == version.version().getMajorVersion();
+        return initialElasticsearchMajorVersion.version().majorVersion() == version.version().majorVersion();
     }
 }

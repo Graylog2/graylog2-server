@@ -80,11 +80,11 @@ const useStartPageOptions = (userId, permissions) => {
   const [userSearches, setUserSearches] = useState<Option[]>([]);
   const [isLoadingUserEntities, setIsLoadingUserEntities] = useState(false);
 
-  const { data: allDashboards, isInitialLoading: isLoadingAllDashboards } = useDashboards({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allDashboards, isInitialLoading: isLoadingAllDashboards } = useDashboards({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' }, scope: 'read' }, { enabled: selectedUserIsAdmin });
   const { data: allStreams, isInitialLoading: isLoadingAllStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
   const { data: allSearches, isInitialLoading: isLoadingAllSearches } = useSavedSearches({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
   const allDashboardsOptions = (allDashboards?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
-  const allStreamsOptions = (allStreams?.elements ?? []).map(({ id, title }) => ({ value: id, label: title }));
+  const allStreamsOptions = (allStreams?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
   const allSearchesOptions = (allSearches?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
 
   useEffect(() => {
@@ -138,7 +138,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
 
   return (
     <Field name="startpage">
-      {({ field: { name, value, onChange } }) => {
+      {({ field: { name, value, onChange }, meta }) => {
         const type = value?.type ?? 'dashboard';
 
         const error = value?.id && options.findIndex(({ value: v }) => v === value.id) < 0
@@ -158,7 +158,8 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
                  label="Start page"
                  help="Select the page the user sees right after log in. Only entities are selectable which the user has permissions for."
                  labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
+                 wrapperClassName="col-sm-9"
+                 error={meta?.error}>
             <>
               <Container>
                 <TypeSelect options={typeOptions}

@@ -1,0 +1,4 @@
+type = "f"
+message = "Sort function names, add rule builder fragments with implicit to_string, fix string parameter handling in fragments."
+
+pulls = ["15785"]

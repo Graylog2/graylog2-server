@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.Configuration;
+import org.graylog2.outputs.BatchSizeConfig;
+import org.joda.time.Period;
 
 import java.nio.file.Path;
 
@@ -46,7 +48,7 @@ public abstract class ExposedConfiguration {
     public abstract int outputBufferProcessors();
 
     @JsonProperty("output_batch_size")
-    public abstract int outputBatchSize();
+    public abstract BatchSizeConfig outputBatchSize();
 
     @JsonProperty("processor_wait_strategy")
     public abstract String processorWaitStrategy();
@@ -100,6 +102,9 @@ public abstract class ExposedConfiguration {
     @JsonProperty("stale_leader_timeout")
     public abstract int staleLeaderTimeout();
 
+    @JsonProperty("minimum_auto_refresh_interval")
+    public abstract Period minimumAutoRefreshInterval();
+
     public static ExposedConfiguration create(Configuration configuration) {
         return create(
                 configuration.getInputbufferProcessors(),
@@ -119,7 +124,8 @@ public abstract class ExposedConfiguration {
                 configuration.getStreamProcessingTimeout(),
                 configuration.getStreamProcessingMaxFaults(),
                 configuration.getOutputModuleTimeout(),
-                configuration.getStaleLeaderTimeout());
+                configuration.getStaleLeaderTimeout(),
+                configuration.getMinimumAutoRefreshInterval());
     }
 
     @JsonCreator
@@ -127,7 +133,7 @@ public abstract class ExposedConfiguration {
             @JsonProperty("inputbuffer_processors") int inputBufferProcessors,
             @JsonProperty("processbuffer_processors") int processBufferProcessors,
             @JsonProperty("outputbuffer_processors") int outputBufferProcessors,
-            @JsonProperty("output_batch_size") int outputBatchSize,
+            @JsonProperty("output_batch_size") BatchSizeConfig outputBatchSize,
             @JsonProperty("processor_wait_strategy") String processorWaitStrategy,
             @JsonProperty("inputbuffer_wait_strategy") String inputBufferWaitStrategy,
             @JsonProperty("inputbuffer_ring_size") int inputBufferRingSize,
@@ -141,7 +147,8 @@ public abstract class ExposedConfiguration {
             @JsonProperty("stream_processing_timeout") long streamProcessingTimeout,
             @JsonProperty("stream_processing_max_faults") int streamProcessingMaxFaults,
             @JsonProperty("output_module_timeout") long outputModuleTimeout,
-            @JsonProperty("stale_leader_timeout") int staleLeaderTimeout) {
+            @JsonProperty("stale_leader_timeout") int staleLeaderTimeout,
+            @JsonProperty("minimum_auto_refresh_interval") Period minimumAutoRefreshInterval) {
         return new AutoValue_ExposedConfiguration(
                 inputBufferProcessors,
                 processBufferProcessors,
@@ -160,7 +167,8 @@ public abstract class ExposedConfiguration {
                 streamProcessingTimeout,
                 streamProcessingMaxFaults,
                 outputModuleTimeout,
-                staleLeaderTimeout);
+                staleLeaderTimeout,
+                minimumAutoRefreshInterval);
     }
 
 }

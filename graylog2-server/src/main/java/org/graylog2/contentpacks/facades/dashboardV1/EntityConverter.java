@@ -35,7 +35,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,7 +55,7 @@ public class EntityConverter {
 
     @Inject
     public EntityConverter(DashboardWidgetConverter dashboardWidgetConverter) {
-       this.dashboardWidgetConverter = dashboardWidgetConverter;
+        this.dashboardWidgetConverter = dashboardWidgetConverter;
     }
 
     public ViewEntity convert(DashboardEntity dashboardEntity, Map<String, ValueReference> parameters) {
@@ -111,7 +112,7 @@ public class EntityConverter {
     private void createSearchTypes(Map<DashboardWidgetEntity, List<WidgetEntity>> widgets,
                                    Map<String, Set<String>> widgetMapping,
                                    Set<SearchTypeEntity> searchTypes) {
-        for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry: widgets.entrySet()) {
+        for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry : widgets.entrySet()) {
             widgetEntityListEntry.getValue().forEach(widgetEntity -> {
                 final List<SearchTypeEntity> currentSearchTypes;
                 currentSearchTypes = widgetEntity.createSearchTypeEntity();

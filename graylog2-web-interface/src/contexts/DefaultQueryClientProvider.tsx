@@ -29,6 +29,12 @@ const defaultOptions = {
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      networkMode: 'always' as const,
+      retry: (failureCount, error) => {
+        if (error.status >= 400 && error.status < 500) return false;
+
+        return failureCount < 4;
+      },
     },
   },
 };
@@ -42,10 +48,6 @@ const DefaultQueryClientProvider = ({ children, options: optionsProp }: Props) =
       {children}
     </QueryClientProvider>
   );
-};
-
-DefaultQueryClientProvider.defaultProps = {
-  options: undefined,
 };
 
 export default DefaultQueryClientProvider;

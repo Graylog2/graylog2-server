@@ -43,7 +43,7 @@ public class WhoisIpLookupResult extends ForwardingMap<String, Object> {
     }
 
     public String getOrganization() {
-        if(Strings.isNullOrEmpty(organization)) {
+        if (Strings.isNullOrEmpty(organization)) {
             return NA;
         } else {
             return organization;
@@ -51,7 +51,7 @@ public class WhoisIpLookupResult extends ForwardingMap<String, Object> {
     }
 
     public String getCountryCode() {
-        if(Strings.isNullOrEmpty(countryCode)) {
+        if (Strings.isNullOrEmpty(countryCode)) {
             return NA;
         } else {
             return countryCode;
@@ -66,7 +66,7 @@ public class WhoisIpLookupResult extends ForwardingMap<String, Object> {
         final StringBuilder keyOrg = new StringBuilder();
         final StringBuilder keyCountryCode = new StringBuilder();
 
-        if(prefix != null && !prefix.isEmpty()) {
+        if (prefix != null && !prefix.isEmpty()) {
             keyOrg.append(prefix).append("_");
             keyCountryCode.append(prefix).append("_");
         }
@@ -74,10 +74,10 @@ public class WhoisIpLookupResult extends ForwardingMap<String, Object> {
         keyOrg.append("whois_organization");
         keyCountryCode.append("whois_country_code");
 
-        return new HashMap<String, Object>(){{
-            put(keyOrg.toString(), getOrganization());
-            put(keyCountryCode.toString(), getCountryCode());
-        }};
+        final var results = new HashMap<String, Object>();
+        results.put(keyOrg.toString(), getOrganization());
+        results.put(keyCountryCode.toString(), getCountryCode());
+        return results;
     }
 
     @Override

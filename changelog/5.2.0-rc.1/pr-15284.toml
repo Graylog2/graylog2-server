@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Improving decorator config by showing map of all decorators present."
+
+issues = ["14546"]
+pulls = ["15284"]
+

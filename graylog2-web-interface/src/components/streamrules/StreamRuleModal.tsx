@@ -27,7 +27,7 @@ import {
   Select,
   ModalSubmit,
   InputOptionalInfo,
-  Spinner,
+  Spinner, BrandIcon,
 } from 'components/common';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
 import { Col, Well, Input, Modal, Row } from 'components/bootstrap';
@@ -76,7 +76,13 @@ const StreamRuleModal = ({
   submitButtonText,
   submitLoadingText,
   onSubmit,
-  initialValues,
+  initialValues = {
+    field: '',
+    type: 1,
+    value: '',
+    inverted: false,
+    description: '',
+  },
 }: Props) => {
   const { inputs } = useStore(StreamRulesInputsStore);
   const { data: streamRuleTypes } = useStreamRuleTypes();
@@ -107,9 +113,7 @@ const StreamRuleModal = ({
   return (
     <Modal title={title}
            onHide={onClose}
-           show
-           data-app-section="manage_stream_rules"
-           data-event-element={title}>
+           show>
       <Formik<FormValues> initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
         {({ values, setFieldValue, isSubmitting, isValidating }) => (
           <Form>
@@ -201,7 +205,7 @@ const StreamRuleModal = ({
                       The server will try to convert to strings or numbers based on the matcher type as well as it can.
 
                       <br /><br />
-                      <Icon name="github" type="brand" />&nbsp;
+                      <BrandIcon name="github" />&nbsp;
                       <a href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
                          target="_blank"
                          rel="noopener noreferrer"> Take a look at the matcher code on GitHub
@@ -210,7 +214,7 @@ const StreamRuleModal = ({
                       Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
                                                                               title="More information"
                                                                               text={(
-                                                                                <Icon name="lightbulb"
+                                                                                <Icon name="lightbulb_circle"
                                                                                       type="regular" />
                                                                               )} />
                     </Well>
@@ -230,16 +234,6 @@ const StreamRuleModal = ({
       </Formik>
     </Modal>
   );
-};
-
-StreamRuleModal.defaultProps = {
-  initialValues: {
-    field: '',
-    type: 1,
-    value: '',
-    inverted: false,
-    description: '',
-  },
 };
 
 export default StreamRuleModal;

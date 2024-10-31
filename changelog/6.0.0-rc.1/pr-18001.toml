@@ -1,0 +1,4 @@
+type = "added"
+message = "Added state map and corresponding rest resources for datanode migration wizard"
+
+pulls = ["18001"]

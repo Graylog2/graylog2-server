@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
+import jakarta.ws.rs.NotFoundException;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
@@ -50,7 +51,6 @@ import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListCon
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -85,9 +85,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.ws.rs.NotFoundException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -105,16 +103,14 @@ public class ViewFacadeTest {
     public static class TestSearchDBService extends SearchDbService {
         protected TestSearchDBService(MongoConnection mongoConnection,
                                       MongoJackObjectMapperProvider mapper) {
-            super(mongoConnection, mapper, dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
+            super(new MongoCollections(mapper, mongoConnection), dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
         }
     }
 
     public static class TestViewService extends ViewService {
-        protected TestViewService(MongoConnection mongoConnection,
-                                  MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                                  ClusterConfigService clusterConfigService,
+        protected TestViewService(ClusterConfigService clusterConfigService,
                                   MongoCollections mongoCollections) {
-            super(mongoConnection, mongoJackObjectMapperProvider, clusterConfigService,
+            super(clusterConfigService,
                     dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class), mongoCollections);
         }
     }
@@ -133,7 +129,6 @@ public class ViewFacadeTest {
     private TestViewSummaryService viewSummaryService;
     private TestSearchDBService searchDbService;
     private final String viewId = "5def958063303ae5f68eccae"; /* stored in database */
-    private final String newViewId = "5def958063303ae5f68edead";
     private final String newStreamId = "5def958063303ae5f68ebeaf";
     private final String streamId = "5cdab2293d27467fbe9e8a72"; /* stored in database */
     private UserService userService;
@@ -156,10 +151,9 @@ public class ViewFacadeTest {
         objectMapper.registerSubtypes(EventList.class);
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
-        final MongoCollections mongoCollections = new MongoCollections(
-                new CommonMongoJackObjectMapperProvider(() -> objectMapper), mongoConnection);
+        final MongoCollections mongoCollections = new MongoCollections(mapper, mongoConnection);
         searchDbService = new TestSearchDBService(mongoConnection, mapper);
-        viewService = new TestViewService(mongoConnection, mapper, null, mongoCollections);
+        viewService = new TestViewService(null, mongoCollections);
         viewSummaryService = new TestViewSummaryService(mongoConnection, mapper, mongoCollections);
         userService = mock(UserService.class);
 
@@ -240,8 +234,7 @@ public class ViewFacadeTest {
     public void itShouldCreateADTOFromAnEntity() throws Exception {
         final StreamImpl stream = new StreamImpl(Collections.emptyMap());
         final Entity viewEntity = createViewEntity();
-        final Map<EntityDescriptor, Object> nativeEntities = new HashMap<>(1);
-        nativeEntities.put(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), stream);
+        final Map<EntityDescriptor, Object> nativeEntities = Map.of(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), stream);
         final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
                 mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
         when(userService.load("testuser")).thenReturn(fakeUser);
@@ -278,7 +271,7 @@ public class ViewFacadeTest {
     @Test
     @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldResolveDependencyForCreation() {
-        final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(streamId, ModelTypes.STREAM_V1);
+        final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(streamId, ModelTypes.STREAM_REF_V1);
         final EntityDescriptor viewEntityDescriptor = EntityDescriptor.create(viewId, ModelTypes.SEARCH_V1);
         Graph graph = facade.resolveNativeEntity(viewEntityDescriptor);
 
@@ -327,6 +320,7 @@ public class ViewFacadeTest {
                 .formatting(FormattingSettings.builder().highlighting(ImmutableSet.of()).build())
                 .displayModeSettings(DisplayModeSettings.empty())
                 .build();
+        String newViewId = "5def958063303ae5f68edead";
         final ViewEntity entity = ViewEntity.builder()
                 .type(ViewEntity.Type.SEARCH)
                 .summary(ValueReference.of("summary"))

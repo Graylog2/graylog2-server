@@ -17,21 +17,30 @@
 package org.graylog2.indexer.messages;
 
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -40,9 +49,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -50,6 +61,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.messages.ImmutableMessage.wrap;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -57,9 +69,12 @@ import static org.mockito.Mockito.verify;
 public abstract class MessagesIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "messages_it_deflector";
 
+    private static final Logger LOG = LoggerFactory.getLogger(MessagesIT.class);
+
     protected Messages messages;
 
     protected static final IndexSet indexSet = new MessagesTestIndexSet();
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     protected MessagesAdapter createMessagesAdapter() {
         return searchServer().adapters().messagesAdapter();
@@ -118,10 +133,11 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         // Check if we can index about 300MB of messages (once the large batch gets split up)
         final int MESSAGECOUNT = 101;
         // Each Message is about 1 MB
-        final List<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
-        final List<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
+        final List<MessageWithIndex> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
+        var results = this.messages.bulkIndex(largeMessageBatch);
 
-        assertThat(failedItems).isEmpty();
+        assertThat(results.errors()).isEmpty();
+        assertThat(results.successes()).hasSize(MESSAGECOUNT);
 
         Thread.sleep(2000); // wait for ES to finish indexing
 
@@ -137,11 +153,12 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     public void unevenTooLargeBatchesGetSplitUp() throws Exception {
         final int MESSAGECOUNT = 100;
         final int LARGE_MESSAGECOUNT = 20;
-        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
+        final List<MessageWithIndex> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
         messageBatch.addAll(createMessageBatch(1024 * 1024 * 5, LARGE_MESSAGECOUNT));
-        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+        var results = this.messages.bulkIndex(messageBatch);
 
-        assertThat(failedItems).isEmpty();
+        assertThat(results.errors()).isEmpty();
+        assertThat(results.successes()).hasSize(MESSAGECOUNT + LARGE_MESSAGECOUNT);
 
         client().refreshNode(); // wait for ES to finish indexing
 
@@ -151,21 +168,40 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     @Test
     public void conflictingFieldTypesErrorAreReported() throws Exception {
         final String fieldName = "_ourcustomfield";
-        final Message message1 = new Message("One message", "loghost-a", now());
+        final Message message1 = messageFactory.createMessage("One message", "loghost-a", now());
         message1.addField(fieldName, 42);
-        final Message message2 = new Message("Another message", "loghost-b", now());
+        final Message message2 = messageFactory.createMessage("Another message", "loghost-b", now());
         message2.addField(fieldName, "fourty-two");
 
-        final List<Map.Entry<IndexSet, Message>> messageBatch = ImmutableList.of(
-                entry(indexSet, message1),
-                entry(indexSet, message2)
+        final List<MessageWithIndex> messageBatch = List.of(
+                new MessageWithIndex(wrap(message1), indexSet),
+                new MessageWithIndex(wrap(message2), indexSet)
         );
 
-        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+        var results = this.messages.bulkIndex(messageBatch);
 
-        assertThat(failedItems).hasSize(1);
+        assertThat(results.errors()).hasSize(1);
 
         verify(failureSubmissionService).submitIndexingErrors(argThat(arg -> arg.size() == 1));
+    }
+
+    @Test
+    public void messagesWithTheSameIdCanBeIngestedIntoMultipleIndices() {
+        final Message message1 = messageFactory.createMessage(Map.of("_id", "1234", "message", "One message", "source", "loghost-a", "timestamp", now()));
+        final Message message2 = messageFactory.createMessage(Map.of("_id", "1234", "message", "One message", "source", "loghost-a", "timestamp", now()));
+
+        final TestIndexSet indexSet2 = new TestIndexSet(indexSet.getConfig().toBuilder().indexPrefix("message_it2").build());
+        client().createIndex("message_it2_deflector");
+        client().waitForGreenStatus("message_it2_deflector");
+
+        final List<MessageWithIndex> messageBatch = List.of(
+                new MessageWithIndex(wrap(message1), indexSet),
+                new MessageWithIndex(wrap(message2), indexSet2)
+        );
+        var results = this.messages.bulkIndex(messageBatch);
+
+        assertThat(results.errors()).hasSize(0);
+        assertThat(results.successes()).hasSize(2);
     }
 
     @Test
@@ -173,21 +209,38 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         triggerFloodStage(INDEX_NAME);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final AtomicBoolean succeeded = new AtomicBoolean(false);
-        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
+        final List<MessageWithIndex> messageBatch = createMessageBatch(1024, 50);
 
-        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+        final Future<IndexingResults> resultsFuture = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
 
         countDownLatch.await();
 
         resetFloodStage(INDEX_NAME);
+        waitForClusterBlockRelease();
 
-        final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
-        assertThat(failedItems).isEmpty();
+        var results = resultsFuture.get(3, TimeUnit.MINUTES);
+        assertThat(results.errors()).isEmpty();
 
         client().refreshNode();
 
         assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
         assertThat(succeeded.get()).isTrue();
+    }
+
+
+    private void waitForClusterBlockRelease() throws ExecutionException, RetryException {
+        RetryerBuilder.<String>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(20))
+                .withRetryListener(new RetryListener() {
+                    @Override
+                    public <V> void onRetry(Attempt<V> attempt) {
+                        LOG.info("Waiting for cluster block to be automatically released, attempt {}", attempt.getAttemptNumber());
+                    }
+                })
+                .retryIfResult(clusterBlockValue -> Objects.equals("true", clusterBlockValue))
+                .build()
+                .call(() -> client().getClusterSetting("cluster.blocks.create_index"));
     }
 
     private Messages.IndexingListener createIndexingListener(CountDownLatch retryLatch, AtomicBoolean successionFlag) {
@@ -216,18 +269,18 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().addAliasMapping(index1, INDEX_NAME);
         client().addAliasMapping(index2, INDEX_NAME);
 
-        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
+        final ArrayList<MessageWithIndex> messageBatch = createMessageBatch(1024, 50);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final AtomicBoolean succeeded = new AtomicBoolean(false);
 
-        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+        final Future<IndexingResults> resultsFuture = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
 
         countDownLatch.await();
 
         client().removeAliasMapping(index2, INDEX_NAME);
 
-        final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
-        assertThat(failedItems).isEmpty();
+        var results = resultsFuture.get(3, TimeUnit.MINUTES);
+        assertThat(results.errors()).isEmpty();
 
         client().refreshNode();
 
@@ -237,15 +290,15 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @Test
     public void properlySerializesCustomObjectsInMessageField() throws IOException {
-        final Message message = new Message("Some message", "somesource", now());
+        final Message message = messageFactory.createMessage("Some message", "somesource", now());
         message.addField("custom_object", new TextNode("foo"));
-        final List<Map.Entry<IndexSet, Message>> messageBatch = ImmutableList.of(
-                Maps.immutableEntry(indexSet, message)
+        final List<MessageWithIndex> messageBatch = List.of(
+                new MessageWithIndex(wrap(message), indexSet)
         );
 
-        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+        var results = this.messages.bulkIndex(messageBatch);
 
-        assertThat(failedItems).isEmpty();
+        assertThat(results.errors()).isEmpty();
 
         client().refreshNode();
 
@@ -254,7 +307,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(resultMessage.getMessage().getField("custom_object")).isEqualTo("foo");
     }
 
-    private Future<List<String>> background(Callable<List<String>> task) {
+    private Future<IndexingResults> background(Callable<IndexingResults> task) {
         final ExecutorService executor = Executors.newFixedThreadPool(1,
                 new ThreadFactoryBuilder().setNameFormat("messages-it-%d").build());
 
@@ -285,12 +338,12 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         return DateTime.now(DateTimeZone.UTC);
     }
 
-    private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {
-        final ArrayList<Map.Entry<IndexSet, Message>> messageList = new ArrayList<>();
+    private ArrayList<MessageWithIndex> createMessageBatch(int size, int count) {
+        final ArrayList<MessageWithIndex> messageList = new ArrayList<>();
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", now())));
+            messageList.add(new MessageWithIndex(wrap(messageFactory.createMessage(i + message, "source", now())), indexSet));
         }
         return messageList;
     }

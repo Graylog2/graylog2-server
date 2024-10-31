@@ -16,15 +16,16 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useCallback } from 'react';
+import { useMemo } from 'react';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
+import useSelectedEntities from './hooks/useSelectedEntities';
 import TableCell from './TableCell';
 import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
 
-const ActionsCell = styled.th`
+const ActionsCell = styled.td`
   text-align: right;
 
   .btn-toolbar {
@@ -44,10 +45,9 @@ type Props<Entity extends EntityBase> = {
   displayActions: boolean,
   entity: Entity,
   index: number,
-  isSelected: boolean,
-  onToggleEntitySelect: (entityId: string) => void,
-  rowActions?: (entity: Entity) => React.ReactNode,
+  actions?: (entity: Entity) => React.ReactNode,
   entityAttributesAreCamelCase: boolean,
+  isEntitySelectable: (entity: Entity) => boolean,
 };
 
 const TableRow = <Entity extends EntityBase>({
@@ -56,27 +56,27 @@ const TableRow = <Entity extends EntityBase>({
   displaySelect,
   displayActions,
   entity,
-  isSelected,
-  onToggleEntitySelect,
-  rowActions,
+  actions,
   index,
   actionsRef,
   entityAttributesAreCamelCase,
+  isEntitySelectable,
 }: Props<Entity>) => {
-  const toggleRowSelect = useCallback(
-    () => onToggleEntitySelect(entity.id),
-    [entity.id, onToggleEntitySelect],
-  );
-
-  const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
+  const { toggleEntitySelect, selectedEntities } = useSelectedEntities();
+  const isSelected = !!selectedEntities?.includes(entity.id);
+  const actionButtons = displayActions ? <ButtonToolbar>{actions(entity)}</ButtonToolbar> : null;
+  const isSelectDisabled = useMemo(() => !(displaySelect && isEntitySelectable(entity)), [displaySelect, entity, isEntitySelectable]);
+  const title = `${isSelected ? 'Deselect' : 'Select'} entity`;
 
   return (
     <tr>
       {displaySelect && (
-        <td>
-          <RowCheckbox onChange={toggleRowSelect}
-                       title={`${isSelected ? 'Deselect' : 'Select'} entity`}
-                       checked={isSelected} />
+        <td aria-label="Select cell">
+          <RowCheckbox onChange={() => toggleEntitySelect(entity.id)}
+                       title={title}
+                       checked={isSelected}
+                       disabled={isSelectDisabled}
+                       aria-label={title} />
         </td>
       )}
       {columns.map((column) => {
@@ -92,15 +92,11 @@ const TableRow = <Entity extends EntityBase>({
       })}
       {displayActions ? (
         <ActionsCell>
-          {index === 0 ? <ActionsRef ref={actionsRef}>{actionButtons}</ActionsRef> : actionButtons}
+          <ActionsRef ref={index === 0 ? actionsRef : undefined}>{actionButtons}</ActionsRef>
         </ActionsCell>
       ) : null}
     </tr>
   );
-};
-
-TableRow.defaultProps = {
-  rowActions: undefined,
 };
 
 export default React.memo(TableRow);

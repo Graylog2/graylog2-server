@@ -19,8 +19,8 @@ package org.graylog2.system.urlwhitelist;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class UrlWhitelistNotificationService {

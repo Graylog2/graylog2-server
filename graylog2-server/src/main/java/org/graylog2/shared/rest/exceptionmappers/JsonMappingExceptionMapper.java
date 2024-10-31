@@ -17,22 +17,87 @@
 package org.graylog2.shared.rest.exceptionmappers;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import org.graylog2.plugin.rest.ApiError;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.exc.PropertyBindingException;
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
+import com.google.common.base.Joiner;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
+import org.graylog2.plugin.rest.RequestError;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static javax.ws.rs.core.Response.status;
+import static jakarta.ws.rs.core.Response.status;
 
 @Provider
 public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingException> {
     @Override
     public Response toResponse(JsonMappingException e) {
-        final String message = firstNonNull(e.getMessage(), "Couldn't process JSON input");
-        final ApiError apiError = ApiError.create(message);
+        final var errorPath = errorPath(e);
+        final var location = e.getLocation();
+        final String message = errorWithJsonPath(e, errorPath);
+        final var referencePath = referencePath(e);
+        final var apiError = RequestError.create(message, location.getLineNr(), location.getColumnNr(), errorPath, referencePath);
         return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
+    }
+
+    private String referencePath(JsonMappingException e) {
+        final var sb = new StringBuilder().append(e.getPathReference());
+
+        if (e instanceof ValueInstantiationException vie) {
+            if (!sb.isEmpty()) {
+                sb.append("->");
+            }
+            sb.append(vie.getType().getRawClass().getCanonicalName());
+        }
+
+        return sb.toString();
+    }
+
+    private String errorPath(final JsonMappingException e) {
+        return e.getPath().stream()
+                .map(path -> {
+                    final var fieldName = path.getFieldName();
+                    if (fieldName == null && path.getIndex() != -1) {
+                        return "[" + path.getIndex() + "]";
+                    }
+                    return fieldName;
+                })
+                .collect(Collectors.joining("."));
+    }
+
+    private String errorWithJsonPath(final JsonMappingException e, String path) {
+        final var location = "[" + e.getLocation().getLineNr() + ", " + e.getLocation().getColumnNr() + "]";
+        final var quotedPath = "\"" + path + "\"";
+        final var messagePrefix = "Error at " + quotedPath + " " + location;
+
+
+        if (e instanceof PropertyBindingException propertyBindingException) {
+            final Collection<Object> knownPropertyIds = firstNonNull(propertyBindingException.getKnownPropertyIds(), Collections.emptyList());
+            final StringBuilder message = new StringBuilder("Unable to map property ")
+                    .append(propertyBindingException.getPropertyName())
+                    .append(".\nKnown properties include: ");
+            Joiner.on(", ").appendTo(message, knownPropertyIds);
+            return message.toString();
+        }
+        if (e instanceof MismatchedInputException mismatchedInputException) {
+            final var targetType = mismatchedInputException.getTargetType();
+            if (targetType != null) {
+                return messagePrefix + ": Must be of type " + mismatchedInputException.getTargetType().getSimpleName();
+            } else {
+                return messagePrefix + ": " + mismatchedInputException.getMessage();
+            }
+        } else {
+            final var cause = e.getCause();
+            final String problemMessage = firstNonNull(cause, e).getMessage();
+            final String message = firstNonNull(problemMessage, "Couldn't process JSON input");
+
+            return messagePrefix + ": " + message;
+        }
     }
 }

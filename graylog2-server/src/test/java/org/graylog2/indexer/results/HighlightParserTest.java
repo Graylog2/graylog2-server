@@ -37,7 +37,7 @@ public class HighlightParserTest {
         final Multimap<String, Range<Integer>> result = HighlightParser.extractHighlightRanges(highlights);
 
         assertThat(result).isNotNull();
-        assertThat(result.get("message")).isNotNull()
+        assertThat(result.get("message"))
                 .isNotEmpty()
                 .containsExactly(Range.closed(0, 4));
     }
@@ -52,13 +52,13 @@ public class HighlightParserTest {
         final Multimap<String, Range<Integer>> result = HighlightParser.extractHighlightRanges(highlights);
 
         assertThat(result).isNotNull();
-        assertThat(result.get("message")).isNotNull()
+        assertThat(result.get("message"))
                 .isNotEmpty()
                 .containsExactly(
                         Range.closed(1, 4),
                         Range.closed(36, 39)
                 );
-        assertThat(result.get("full_message")).isNotNull()
+        assertThat(result.get("full_message"))
                 .isNotEmpty()
                 .containsExactly(
                         Range.closed(21, 24),
@@ -75,7 +75,7 @@ public class HighlightParserTest {
         final Multimap<String, Range<Integer>> result = HighlightParser.extractHighlightRanges(highlights);
 
         assertThat(result).isNotNull();
-        assertThat(result.get("message")).isNotNull()
+        assertThat(result.get("message"))
                 .isNotEmpty()
                 .containsExactly(
                         Range.closed(1, 4),

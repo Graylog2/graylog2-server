@@ -20,8 +20,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.joda.time.DateTime;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,6 +38,7 @@ public abstract class EventReplayInfo {
     public static final String FIELD_TIMERANGE_END = "timerange_end";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_FILTERS = "filters";
 
     @JsonProperty(FIELD_TIMERANGE_START)
     public abstract DateTime timerangeStart();
@@ -48,8 +52,12 @@ public abstract class EventReplayInfo {
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
 
+    @JsonProperty(FIELD_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
+
     public static Builder builder() {
-        return new AutoValue_EventReplayInfo.Builder();
+        return new AutoValue_EventReplayInfo.Builder()
+                .filters(Collections.emptyList());
     }
 
     public abstract Builder toBuilder();
@@ -68,11 +76,14 @@ public abstract class EventReplayInfo {
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
 
+        @JsonProperty(FIELD_FILTERS)
+        public abstract Builder filters(List<UsedSearchFilter> filters);
+
         public abstract EventReplayInfo build();
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventReplayInfo.Builder();
+            return builder();
         }
     }
 }

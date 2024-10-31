@@ -22,7 +22,6 @@ import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.Test;
 
@@ -104,8 +103,6 @@ public class SearchTest {
 
         assertThat(search.usedStreamIds()).containsExactlyInAnyOrder("c", "d", "e");
     }
-
-    private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
 
     @Test
     void keepsSingleSearchTypeWhenOverridden() {

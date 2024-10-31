@@ -21,6 +21,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.ServiceUnavailableException;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -28,6 +36,7 @@ import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
 import org.graylog2.rest.models.count.responses.MessageCountResponse;
@@ -41,14 +50,6 @@ import org.graylog2.rest.resources.system.DeflectorResource;
 import org.graylog2.rest.resources.system.IndexRangesResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.ServiceUnavailableException;
-import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -56,10 +57,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.graylog2.rest.models.system.indexer.responses.IndexSummary.TierType.HOT;
+import static org.graylog2.rest.models.system.indexer.responses.IndexSummary.TierType.WARM;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Indexer/Overview", description = "Indexing overview", tags={CLOUD_VISIBLE})
+@Api(value = "Indexer/Overview", description = "Indexing overview", tags = {CLOUD_VISIBLE})
 @Path("/system/indexer/overview")
 public class IndexerOverviewResource extends RestResource {
     private final DeflectorResource deflectorResource;
@@ -69,6 +72,7 @@ public class IndexerOverviewResource extends RestResource {
     private final IndexSetRegistry indexSetRegistry;
     private final Indices indices;
     private final Cluster cluster;
+    private final IndicesAdapter indicesAdapter;
 
     @Inject
     public IndexerOverviewResource(DeflectorResource deflectorResource,
@@ -77,7 +81,8 @@ public class IndexerOverviewResource extends RestResource {
                                    Counts counts,
                                    IndexSetRegistry indexSetRegistry,
                                    Indices indices,
-                                   Cluster cluster) {
+                                   Cluster cluster,
+                                   IndicesAdapter indicesAdapter) {
         this.deflectorResource = deflectorResource;
         this.indexerClusterResource = indexerClusterResource;
         this.indexRangesResource = indexRangesResource;
@@ -85,6 +90,7 @@ public class IndexerOverviewResource extends RestResource {
         this.indexSetRegistry = indexSetRegistry;
         this.indices = indices;
         this.cluster = cluster;
+        this.indicesAdapter = indicesAdapter;
     }
 
     @GET
@@ -141,22 +147,17 @@ public class IndexerOverviewResource extends RestResource {
         final List<IndexSummary> indexSummaries = new ArrayList<>();
         while (fields.hasNext()) {
             final Map.Entry<String, JsonNode> entry = fields.next();
-            indexSummaries.add(buildIndexSummary(entry, indexRanges, deflectorSummary, areReopened));
+            indexSummaries.add(buildIndexSummary(entry.getKey(), entry, indexRanges, deflectorSummary, areReopened));
 
         }
-        indices.getClosedIndices(indexSet).forEach(indexName -> indexSummaries.add(IndexSummary.create(
-                indexName,
-                null,
-                indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexName)).findFirst().orElse(null),
-                indexName.equals(deflectorSummary.currentTarget()),
-                true,
-                false
-        )));
+        indices.getClosedIndices(indexSet).forEach(indexName ->
+                indexSummaries.add(buildClosedIndexSummary(indexName, indexRanges, deflectorSummary)));
         indexSummaries.sort(Comparator.comparing(IndexSummary::indexName, new NumberBasedIndexNameComparator(MongoIndexSet.SEPARATOR)));
         return indexSummaries;
     }
 
-    private IndexSummary buildIndexSummary(Map.Entry<String, JsonNode> indexStats,
+    private IndexSummary buildIndexSummary(String indexName,
+                                           Map.Entry<String, JsonNode> indexStats,
                                            List<IndexRangeSummary> indexRanges,
                                            DeflectorSummary deflectorSummary,
                                            Map<String, Boolean> areReopened) {
@@ -167,6 +168,7 @@ public class IndexerOverviewResource extends RestResource {
         final long deleted = docs.path("deleted").asLong();
         final JsonNode store = primaries.path("store");
         final long sizeInBytes = store.path("size_in_bytes").asLong();
+        final long shardCount = indicesAdapter.getShardsInfo(indexName).size();
 
         final Optional<IndexRangeSummary> range = indexRanges.stream()
                 .filter(indexRangeSummary -> indexRangeSummary.indexName().equals(index))
@@ -175,12 +177,30 @@ public class IndexerOverviewResource extends RestResource {
         final boolean isReopened = areReopened.get(index);
 
         return IndexSummary.create(
-                indexStats.getKey(),
+                indexName,
                 IndexSizeSummary.create(count, deleted, sizeInBytes),
                 range.orElse(null),
                 isDeflector,
                 false,
-                isReopened);
+                isReopened,
+                getTierType(indexName),
+                shardCount);
+    }
+
+    private IndexSummary.TierType getTierType(String indexName) {
+        return indicesAdapter.getWarmIndexInfo(indexName).isPresent() ? WARM : HOT;
+    }
+
+    private IndexSummary buildClosedIndexSummary(String indexName, List<IndexRangeSummary> indexRanges, DeflectorSummary deflectorSummary) {
+        return IndexSummary.create(
+                indexName,
+                null,
+                indexRanges.stream().filter(indexRangeSummary -> indexRangeSummary.indexName().equals(indexName)).findFirst().orElse(null),
+                indexName.equals(deflectorSummary.currentTarget()),
+                true,
+                false,
+                getTierType(indexName),
+                0L);
     }
 
 }

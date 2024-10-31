@@ -22,11 +22,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.ClearSc
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchScrollRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 public class ScrollResultES7 extends ChunkedQueryResultES7 {
 
@@ -39,20 +39,25 @@ public class ScrollResultES7 extends ChunkedQueryResultES7 {
     }
 
     @AssistedInject
-    public ScrollResultES7(ElasticsearchClient client,
+    public ScrollResultES7(ResultMessageFactory resultMessagseFactory,
+                           ElasticsearchClient client,
                            @Assisted SearchResponse initialResult,
                            @Assisted("query") String query,
                            @Assisted("scroll") String scroll,
                            @Assisted List<String> fields,
                            @Assisted int limit) {
-        super(client, initialResult, query, fields, limit);
-        checkArgument(initialResult.getScrollId() != null, "Unable to extract scroll id from supplied search result!");
+        super(resultMessagseFactory, client, initialResult, query, fields, limit);
         this.scroll = scroll;
 
     }
 
     @Override
+    @Nullable
     protected SearchResponse nextSearchResult() throws IOException {
+        if (this.lastSearchResponse.getScrollId() == null) {
+            //with ignore_unavailable=true and no available indices, response does not contain scrollId
+            return null;
+        }
         final SearchScrollRequest scrollRequest = new SearchScrollRequest(this.lastSearchResponse.getScrollId());
         scrollRequest.scroll(TimeValue.parseTimeValue(this.scroll, DEFAULT_SCROLL, "scroll time"));
         return client.executeWithIOException((c, requestOptions) -> c.scroll(scrollRequest, requestOptions),
@@ -61,6 +66,10 @@ public class ScrollResultES7 extends ChunkedQueryResultES7 {
 
     @Override
     public void cancel() throws IOException {
+        if (this.lastSearchResponse.getScrollId() == null) {
+            //with ignore_unavailable=true and no available indices, response does not contain scrollId, there is nothing to cancel
+            return;
+        }
         final ClearScrollRequest request = new ClearScrollRequest();
         request.addScrollId(this.lastSearchResponse.getScrollId());
 

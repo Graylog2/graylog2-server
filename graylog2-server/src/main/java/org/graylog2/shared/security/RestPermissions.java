@@ -41,6 +41,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String AUTH_SERVICE_GLOBAL_CONFIG_EDIT = "authserviceglobalconfig:edit";
     public static final String AUTH_SERVICE_TEST_BACKEND_EXECUTE = "authservicetestbackend:execute";
     public static final String BUFFERS_READ = "buffers:read";
+    public static final String GRAYLOG_CA_CLIENTCERT_CREATE = "ca_clientcert:create";
+    public static final String GRAYLOG_CA_CLIENTCERT_DELETE = "ca_clientcert:delete";
     public static final String CATALOG_LIST = "catalog:list";
     public static final String CATALOG_RESOLVE = "catalog:resolve";
     public static final String CLUSTER_CONFIG_ENTRY_CREATE = "clusterconfigentry:create";
@@ -52,6 +54,14 @@ public class RestPermissions implements PluginPermissions {
     public static final String CONTENT_PACK_READ = "contentpack:read";
     public static final String CONTENT_PACK_INSTALL = "contentpack:install";
     public static final String CONTENT_PACK_UNINSTALL = "contentpack:uninstall";
+    public static final String DATANODE_OPENSEARCH_PROXY = "datanode:opensearchproxy";
+    public static final String DATANODE_READ = "datanode:read";
+    public static final String DATANODE_REMOVE = "datanode:remove";
+    public static final String DATANODE_RESET = "datanode:reset";
+    public static final String DATANODE_REST_PROXY = "datanode:restproxy";
+    public static final String DATANODE_STOP = "datanode:stop";
+    public static final String DATANODE_START = "datanode:start";
+    public static final String DATANODE_MIGRATION = "datanode:migration";
     public static final String DASHBOARDS_CREATE = "dashboards:create";
     public static final String DASHBOARDS_EDIT = "dashboards:edit";
     public static final String DASHBOARDS_READ = "dashboards:read";
@@ -72,6 +82,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String EVENT_NOTIFICATIONS_READ = "eventnotifications:read";
     public static final String FIELDNAMES_READ = "fieldnames:read";
     public static final String GRANTS_OVERVIEW_READ = "grantsoverview:read";
+    public static final String GRAYLOG_CA_CREATE = "graylog_ca:create";
+    public static final String GRAYLOG_CA_READ = "graylog_ca:read";
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
     public static final String INDEXRANGES_READ = "indexranges:read";
     public static final String INDEXRANGES_REBUILD = "indexranges:rebuild";
@@ -108,7 +120,9 @@ public class RestPermissions implements PluginPermissions {
     public static final String METRICS_READ = "metrics:read";
     public static final String METRICS_READALL = "metrics:readall";
     public static final String METRICS_READHISTORY = "metrics:readhistory";
-    @Deprecated public static final String NODE_SHUTDOWN = "node:shutdown";
+    @Deprecated
+    public static final String NODE_SHUTDOWN = "node:shutdown";
+    public static final String MONITORING_READ = "monitoring:read";
     public static final String NOTIFICATIONS_DELETE = "notifications:delete";
     public static final String NOTIFICATIONS_READ = "notifications:read";
     public static final String OUTPUTS_CREATE = "outputs:create";
@@ -124,6 +138,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String SEARCHES_KEYWORD = "searches:keyword";
     public static final String SEARCHES_RELATIVE = "searches:relative";
     public static final String SOURCES_READ = "sources:read";
+    public static final String STREAM_DESTINATION_FILTERS_CREATE = "stream_destination_filters:create";
+    public static final String STREAM_DESTINATION_FILTERS_DELETE = "stream_destination_filters:delete";
+    public static final String STREAM_DESTINATION_FILTERS_EDIT = "stream_destination_filters:edit";
+    public static final String STREAM_DESTINATION_FILTERS_READ = "stream_destination_filters:read";
     public static final String STREAM_OUTPUTS_CREATE = "stream_outputs:create";
     public static final String STREAM_OUTPUTS_DELETE = "stream_outputs:delete";
     public static final String STREAM_OUTPUTS_READ = "stream_outputs:read";
@@ -144,6 +162,18 @@ public class RestPermissions implements PluginPermissions {
     public static final String THREADS_DUMP = "threads:dump";
     public static final String PROCESSBUFFER_DUMP = "processbuffer:dump";
     public static final String THROUGHPUT_READ = "throughput:read";
+    public static final String TYPE_MAPPINGS_CREATE = "typemappings:create";
+    public static final String TYPE_MAPPINGS_DELETE = "typemappings:delete";
+    public static final String TYPE_MAPPINGS_EDIT = "typemappings:edit";
+    public static final String TYPE_MAPPINGS_READ = "typemappings:read";
+    public static final String MAPPING_PROFILES_CREATE = "mappingprofiles:create";
+    public static final String MAPPING_PROFILES_DELETE = "mappingprofiles:delete";
+    public static final String MAPPING_PROFILES_EDIT = "mappingprofiles:edit";
+    public static final String MAPPING_PROFILES_READ = "mappingprofiles:read";
+    public static final String INDEX_SET_TEMPLATES_CREATE = "indexset_templates:create";
+    public static final String INDEX_SET_TEMPLATES_DELETE = "indexset_templates:delete";
+    public static final String INDEX_SET_TEMPLATES_EDIT = "indexset_templates:edit";
+    public static final String INDEX_SET_TEMPLATES_READ = "indexset_templates:read";
     public static final String URL_WHITELIST_READ = "urlwhitelist:read";
     public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";
@@ -184,6 +214,18 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DASHBOARDS_CREATE, ""))
             .add(create(DASHBOARDS_EDIT, ""))
             .add(create(DASHBOARDS_READ, ""))
+            .add(create(DATANODE_READ, ""))
+            .add(create(DATANODE_REMOVE, ""))
+            .add(create(DATANODE_RESET, ""))
+            .add(create(DATANODE_STOP, ""))
+            .add(create(DATANODE_START, ""))
+            .add(create(DATANODE_MIGRATION, ""))
+            .add(create(DATANODE_OPENSEARCH_PROXY, ""))
+            .add(create(DATANODE_REST_PROXY, ""))
+            .add(create(GRAYLOG_CA_CREATE, ""))
+            .add(create(GRAYLOG_CA_READ, ""))
+            .add(create(GRAYLOG_CA_CLIENTCERT_CREATE, ""))
+            .add(create(GRAYLOG_CA_CLIENTCERT_DELETE, ""))
             .add(create(DECORATORS_CREATE, ""))
             .add(create(DECORATORS_EDIT, ""))
             .add(create(DECORATORS_READ, ""))
@@ -208,6 +250,10 @@ public class RestPermissions implements PluginPermissions {
             .add(create(INDEXSETS_DELETE, ""))
             .add(create(INDEXSETS_EDIT, ""))
             .add(create(INDEXSETS_READ, ""))
+            .add(create(INDEX_SET_TEMPLATES_CREATE, ""))
+            .add(create(INDEX_SET_TEMPLATES_DELETE, ""))
+            .add(create(INDEX_SET_TEMPLATES_EDIT, ""))
+            .add(create(INDEX_SET_TEMPLATES_READ, ""))
             .add(create(INDICES_CHANGESTATE, ""))
             .add(create(INDICES_DELETE, ""))
             .add(create(INDICES_FAILURES, ""))
@@ -285,6 +331,14 @@ public class RestPermissions implements PluginPermissions {
             .add(create(SEARCH_FILTERS_READ, ""))
             .add(create(SEARCH_FILTERS_EDIT, ""))
             .add(create(SEARCH_FILTERS_DELETE, ""))
+            .add(create(TYPE_MAPPINGS_CREATE, ""))
+            .add(create(TYPE_MAPPINGS_DELETE, ""))
+            .add(create(TYPE_MAPPINGS_EDIT, ""))
+            .add(create(TYPE_MAPPINGS_READ, ""))
+            .add(create(MAPPING_PROFILES_CREATE, ""))
+            .add(create(MAPPING_PROFILES_DELETE, ""))
+            .add(create(MAPPING_PROFILES_EDIT, ""))
+            .add(create(MAPPING_PROFILES_READ, ""))
             .build();
 
     // Standard set of PERMISSIONS of readers.

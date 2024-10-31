@@ -1,0 +1,7 @@
+rule "listcount"
+when true
+then
+   let list = [1,2,3,4];
+   let count = list_count(list);
+   set_field("count", count);
+end

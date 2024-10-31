@@ -19,11 +19,9 @@ package org.graylog.events.notifications.types;
 import com.floreysoft.jmte.Engine;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
-import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.email.EmailFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,13 +40,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class EmailSenderTest {
     @Mock
-    private EmailRecipients.Factory emailRecpientsFactory;
-    @Mock
     private NotificationService notificationService;
     @Mock
     private NodeId nodeId;
-    @Mock
-    private ObjectMapperProvider objectMapperProvider;
     @Mock
     private EmailFactory emailFactory;
     @Mock
@@ -60,7 +54,7 @@ class EmailSenderTest {
     void setUp() throws EmailException {
         when(emailFactory.htmlEmail()).thenReturn(htmlEmail);
 
-        emailSender = new EmailSender(emailRecpientsFactory, notificationService, nodeId, objectMapperProvider,
+        emailSender = new EmailSender(notificationService, nodeId,
                 new Engine(), new HtmlSafeJmteEngineProvider().get(), emailFactory);
     }
 

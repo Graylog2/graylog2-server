@@ -25,22 +25,21 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.events.fields.providers.FieldValueProvider;
 import org.graylog.events.processor.EventProcessor;
-import org.graylog.events.processor.aggregation.AggregationFunction;
 import org.graylog.events.processor.storage.EventStorageHandler;
+import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.util.Arrays;
-import java.util.Locale;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -58,13 +57,12 @@ public class AvailableEntityTypesResource extends RestResource implements Plugin
     @Inject
     public AvailableEntityTypesResource(Map<String, EventProcessor.Factory> eventProcessorFactories,
                                         Map<String, FieldValueProvider.Factory> fieldValueProviders,
-                                        Map<String, EventStorageHandler.Factory> storageHandlerFactories) {
+                                        Map<String, EventStorageHandler.Factory> storageHandlerFactories,
+                                        Map<String, SeriesDescription> aggregationFunctions) {
         this.eventProcessorTypes = eventProcessorFactories.keySet();
         this.fieldValueProviderTypes = fieldValueProviders.keySet();
         this.storageHandlerFactories = storageHandlerFactories.keySet();
-        this.aggregationFunctions = Arrays.stream(AggregationFunction.values())
-                .map(fn -> fn.name().toLowerCase(Locale.US))
-                .collect(Collectors.toSet());
+        this.aggregationFunctions = aggregationFunctions.keySet();
     }
 
     @GET

@@ -22,8 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Period;
+
+import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MAX;
+import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MIN;
 
 
 @JsonAutoDetect
@@ -31,20 +35,16 @@ import org.joda.time.Period;
 @WithBeanGetter
 @JsonDeserialize(builder = TimeBasedSizeOptimizingStrategyConfig.Builder.class)
 public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationStrategyConfig {
-    public static final String INDEX_LIFETIME_MIN = "index_lifetime_min";
-    public static final String INDEX_LIFETIME_MAX = "index_lifetime_max";
-
-    public static final Period DEFAULT_LIFETIME_MIN = Period.days(30);
-    public static final Period DEFAULT_LIFETIME_MAX = Period.days(40);
-    @JsonProperty(INDEX_LIFETIME_MIN)
-    public abstract Period indexLifetimeMin();
-
-    @JsonProperty(INDEX_LIFETIME_MAX)
-    public abstract Period indexLifetimeMax();
 
     public static Builder builder() {
         return Builder.create();
     }
+
+    @JsonProperty(FIELD_INDEX_LIFETIME_MIN)
+    public abstract Period indexLifetimeMin();
+
+    @JsonProperty(FIELD_INDEX_LIFETIME_MAX)
+    public abstract Period indexLifetimeMax();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -52,17 +52,17 @@ public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationS
         public static Builder create() {
             return new AutoValue_TimeBasedSizeOptimizingStrategyConfig.Builder()
                     .type(TimeBasedSizeOptimizingStrategyConfig.class.getCanonicalName())
-                    .indexLifetimeMin(DEFAULT_LIFETIME_MIN)
-                    .indexLifetimeMax(DEFAULT_LIFETIME_MAX);
+                    .indexLifetimeMin(IndexLifetimeConfig.DEFAULT_LIFETIME_MIN)
+                    .indexLifetimeMax(IndexLifetimeConfig.DEFAULT_LIFETIME_MAX);
         }
 
         @JsonProperty(TYPE_FIELD)
         public abstract Builder type(String type);
 
-        @JsonProperty(INDEX_LIFETIME_MIN)
+        @JsonProperty(FIELD_INDEX_LIFETIME_MIN)
         public abstract Builder indexLifetimeMin(Period softLimit);
 
-        @JsonProperty(INDEX_LIFETIME_MAX)
+        @JsonProperty(FIELD_INDEX_LIFETIME_MAX)
         public abstract Builder indexLifetimeMax(Period hardLimit);
 
         public abstract TimeBasedSizeOptimizingStrategyConfig build();

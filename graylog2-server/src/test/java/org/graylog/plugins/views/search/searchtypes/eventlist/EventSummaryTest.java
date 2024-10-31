@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.searchtypes.eventlist;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.event.EventDto;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
@@ -25,9 +24,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,16 +34,22 @@ public class EventSummaryTest {
     @Test
     public void testParseRawEvent() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final List<String> streams = new ArrayList<>();
-        streams.add("stream-id-1");
-        streams.add("stream-id-2");
-        final Map<String, Object> rawEvent = ImmutableMap.of(
-                EventDto.FIELD_ID, "dead-beef",
-                EventDto.FIELD_MESSAGE, "message",
-                EventDto.FIELD_SOURCE_STREAMS, streams,
-                EventDto.FIELD_EVENT_TIMESTAMP, now.toString(Tools.ES_DATE_FORMAT_FORMATTER),
-                EventDto.FIELD_ALERT, false
-        );
+        final var streams = Set.of("stream-id-1", "stream-id-2");
+        final var rawEvent = EventDto.builder()
+                .id("dead-beef")
+                .message("message")
+                .sourceStreams(streams)
+                .eventTimestamp(now)
+                .alert(false)
+                .eventDefinitionId("deadbeef")
+                .priority(2)
+                .keyTuple(List.of())
+                .eventDefinitionType("aggregation-v1")
+                .processingTimestamp(now)
+                .streams(Set.of())
+                .source("localhost")
+                .fields(Map.of())
+                .build();
 
         EventSummary eventSummary = EventSummary.parse(rawEvent);
         assertThat(eventSummary.id()).isEqualTo("dead-beef");

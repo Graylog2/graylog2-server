@@ -16,42 +16,47 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class OpensearchBinPreflightCheck implements PreflightCheck {
 
-    private final Path opensearchDir;
+    private final Supplier<OpensearchDistribution> opensearchDistributionSupplier;
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchBinPreflightCheck.class);
 
     @Inject
     public OpensearchBinPreflightCheck(DatanodeConfiguration datanodeConfiguration) {
-        this(datanodeConfiguration.opensearchDistribution().directory());
+        this(datanodeConfiguration.opensearchDistributionProvider()::get);
     }
 
-    public OpensearchBinPreflightCheck(Path opensearchBaseDirectory) {
-        this.opensearchDir = opensearchBaseDirectory;
+    OpensearchBinPreflightCheck(Supplier<OpensearchDistribution> distribution) {
+        this.opensearchDistributionSupplier = distribution;
     }
 
     @Override
     public void runCheck() throws PreflightCheckException {
+        final OpensearchDistribution distribution = opensearchDistributionSupplier.get();
+        final Path opensearchDir = distribution.directory();
+
         if (!Files.isDirectory(opensearchDir)) {
             throw new PreflightCheckException("Opensearch base directory " + opensearchDir + " doesn't exist!");
         }
 
-        final Path binPath = opensearchDir.resolve(Paths.get("bin", "opensearch"));
+        final Path binPath = distribution.getOpensearchExecutable();
 
         if (!Files.exists(binPath)) {
             throw new PreflightCheckException("Opensearch binary " + binPath + " doesn't exist!");

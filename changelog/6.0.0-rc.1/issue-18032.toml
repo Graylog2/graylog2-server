@@ -1,0 +1,5 @@
+type = "a"
+message = "Added 'field_value_suggestion_mode' config parameter, that allows to switch field value suggestions off, turn them on and turn them on only for textual fields."
+
+issues = ["18032"]
+pulls = ["18095"]

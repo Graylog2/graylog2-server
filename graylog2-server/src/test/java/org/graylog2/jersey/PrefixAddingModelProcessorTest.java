@@ -24,9 +24,10 @@ import org.graylog2.Configuration;
 import org.graylog2.shared.rest.HideOnCloud;
 import org.junit.Test;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+
 import java.util.Locale;
 import java.util.Map;
 

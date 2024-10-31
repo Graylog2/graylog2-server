@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,9 +34,9 @@ import java.util.Objects;
 /**
  * A {@code FileInfo} presents a concise way of checking for file modification based on its file system attributes.
  * <p>
- *     Construct it via its {@link FileInfo#forPath(Path)} method and later use the {@link #checkForChange()} method
- *     whenever you want to act if a modification has occurred. The returned {@link Change} object contains whether
- *     the file has actually changed and the new file info object to use in future checks.
+ * Construct it via its {@link FileInfo#forPath(Path)} method and later use the {@link #checkForChange()} method
+ * whenever you want to act if a modification has occurred. The returned {@link Change} object contains whether
+ * the file has actually changed and the new file info object to use in future checks.
  * </p>
  */
 @AutoValue

@@ -69,14 +69,14 @@ const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => 
   }
 };
 
-const useFieldTypes = (streams: Array<string>, timerange: TimeRange): { data: FieldTypeMapping[], refetch: () => void } => {
+const useFieldTypes = (streams: Array<string>, timerange: TimeRange, enabled: boolean = true): { data: FieldTypeMapping[], refetch: () => void, isLoading?: boolean, isFetching?: boolean } => {
   const { userTimezone } = useUserDateTime();
   const _timerange = useMemo(() => normalizeTimeRange(timerange, userTimezone), [timerange, userTimezone]);
 
   return useQuery(
     ['fieldTypes', streams, _timerange],
     () => fetchAllFieldTypes(streams, _timerange),
-    { staleTime: 30000, refetchOnWindowFocus: false, cacheTime: 0 },
+    { staleTime: 30000, refetchOnWindowFocus: false, cacheTime: 0, enabled },
   );
 };
 

@@ -35,7 +35,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -163,7 +164,7 @@ public class FormattedEmailAlertSender implements AlertSender {
 
     private void sendEmail(String emailAddress, Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
         LOG.debug("Sending mail to " + emailAddress);
-        if(!configuration.isEnabled()) {
+        if (!configuration.isEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
 
@@ -182,7 +183,7 @@ public class FormattedEmailAlertSender implements AlertSender {
 
     @Override
     public void sendEmails(Stream stream, EmailRecipients recipients, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
-        if(!configuration.isEnabled()) {
+        if (!configuration.isEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
 
@@ -193,11 +194,11 @@ public class FormattedEmailAlertSender implements AlertSender {
         final Set<String> recipientsSet = recipients.getEmailRecipients();
         if (recipientsSet.size() == 0) {
             final Notification notification = notificationService.buildNow()
-                .addNode(nodeId.getNodeId())
-                .addType(Notification.Type.GENERIC)
-                .addSeverity(Notification.Severity.NORMAL)
-                .addDetail("title", "Stream \"" + stream.getTitle() + "\" is alerted, but no recipients have been defined!")
-                .addDetail("description", "To fix this, go to the alerting configuration of the stream and add at least one alert recipient.");
+                    .addNode(nodeId.getNodeId())
+                    .addType(Notification.Type.GENERIC)
+                    .addSeverity(Notification.Severity.NORMAL)
+                    .addDetail("title", "Stream \"" + stream.getTitle() + "\" is alerted, but no recipients have been defined!")
+                    .addDetail("description", "To fix this, go to the alerting configuration of the stream and add at least one alert recipient.");
             notificationService.publishIfFirst(notification);
         }
 

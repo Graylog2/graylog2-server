@@ -26,7 +26,6 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.mongojack.DBSort;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -37,7 +36,7 @@ public interface ViewUtils<T> {
 
     default Stream<T> findViews(SearchUser searchUser,
                                 Bson query,
-                                DBSort.SortBuilder sort) {
+                                Bson sort) {
         var user = searchUser.getUser().getId();
         final AggregateIterable<T> result = collection().aggregate(List.of(
                 Aggregates.match(query),

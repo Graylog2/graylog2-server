@@ -19,20 +19,27 @@ package org.graylog.security.certutil.console;
 import java.util.Locale;
 
 public interface CommandLineConsole {
-    String readLine(String format, Object... args) throws ConsoleException;
-    char[] readPassword(String format, Object... args) throws ConsoleException;
+    String readLine(Prompt prompt) throws ConsoleException;
+    char[] readPassword(Prompt prompt) throws ConsoleException;
 
-    default boolean readBoolean(String format, Object... args) {
-        final String response = readLine(format, args)
+    default boolean readBoolean(Prompt prompt) {
+        final String response = readLine(prompt)
                 .trim().toLowerCase(Locale.ROOT);
         return response.equals("y") || response.equals("yes");
     }
 
-    default int readInt(String format, Object... args) {
-        final String response = readLine(format, args)
+    default int readInt(Prompt prompt) {
+        final String response = readLine(prompt)
                 .trim().toLowerCase(Locale.ROOT);
         return Integer.parseInt(response);
     }
 
     void printLine(String line);
+
+    static Prompt prompt(String query) {
+        return new Prompt(query);
+    }
+
+    record Prompt(String question) {
+    }
 }

@@ -27,8 +27,8 @@ import org.graylog2.shared.system.stats.os.OsStats;
 import org.graylog2.shared.system.stats.process.ProcessProbe;
 import org.graylog2.shared.system.stats.process.ProcessStats;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class StatsService {

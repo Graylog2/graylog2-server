@@ -17,8 +17,10 @@
 package org.graylog2.rest.resources.users;
 
 import com.google.common.collect.ImmutableSet;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
+import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
@@ -30,6 +32,7 @@ import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.PasswordAlgorithmFactory;
+import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
@@ -45,7 +48,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -90,15 +94,22 @@ public class UsersResourceTest {
     private Subject subject;
     @Mock
     private UserManagementService userManagementService;
+    @Mock
+    private UserSessionTerminationService sessionTerminationService;
+    @Mock
+    private DefaultSecurityManager securityManager;
+    @Mock
+    private GlobalAuthServiceConfig globalAuthServiceConfig;
 
     UserImplFactory userImplFactory;
 
     @Before
     public void setUp() throws Exception {
         userImplFactory = new UserImplFactory(new Configuration(),
-                                              new Permissions(ImmutableSet.of(new RestPermissions())));
+                new Permissions(ImmutableSet.of(new RestPermissions())));
         usersResource = new TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
-                                              roleService, sessionService, new HttpConfiguration(), subject);
+                roleService, sessionService, new HttpConfiguration(), subject,
+                sessionTerminationService, securityManager, globalAuthServiceConfig);
     }
 
     /**
@@ -123,9 +134,9 @@ public class UsersResourceTest {
 
     private CreateUserRequest buildCreateUserRequest() {
         return CreateUserRequest.create(USERNAME, PASSWORD, EMAIL,
-                                        FIRST_NAME, LAST_NAME, Collections.singletonList(""),
-                                        TIMEZONE, SESSION_TIMEOUT,
-                                        startPage, Collections.emptyList(), false);
+                FIRST_NAME, LAST_NAME, Collections.singletonList(""),
+                TIMEZONE, SESSION_TIMEOUT,
+                startPage, Collections.emptyList(), false);
     }
 
     /**
@@ -139,8 +150,10 @@ public class UsersResourceTest {
         public TestUsersResource(UserManagementService userManagementService, PaginatedUserService paginatedUserService,
                                  AccessTokenService accessTokenService, RoleService roleService,
                                  MongoDBSessionService sessionService, HttpConfiguration configuration,
-                                 Subject subject) {
-            super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService);
+                                 Subject subject, UserSessionTerminationService sessionTerminationService,
+                                 DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig) {
+            super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService,
+                    sessionTerminationService, securityManager, globalAuthServiceConfig);
             this.subject = subject;
             super.configuration = configuration;
         }
@@ -158,7 +171,7 @@ public class UsersResourceTest {
         public UserImplFactory(Configuration configuration, Permissions permissions) {
             this.permissions = permissions;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(),
-                                                                         new SHA1HashPasswordAlgorithm("TESTSECRET"));
+                    new SHA1HashPasswordAlgorithm("TESTSECRET"));
         }
 
         @Override

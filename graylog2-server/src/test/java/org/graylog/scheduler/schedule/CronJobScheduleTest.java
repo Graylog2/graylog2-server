@@ -18,13 +18,13 @@ package org.graylog.scheduler.schedule;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
-import org.assertj.core.data.MapEntry;
-import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.events.JobSchedulerTestClock;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,15 +66,20 @@ class CronJobScheduleTest {
     }
 
     @Test
-    void testToDbUpdate() {
-        final CronJobSchedule cronJobSchedule = CronJobSchedule.builder().cronExpression("0 0 1 * * ? *").build();
-        final Optional<Map<String, Object>> update = cronJobSchedule.toDBUpdate("schedule_");
-        assertThat(update)
-                .isPresent()
-                .hasValueSatisfying(u -> {
-                    assertThat(u).contains(MapEntry.entry("schedule_cron_expression", "0 0 1 * * ? *"));
-                    assertThat(u).contains(MapEntry.entry("schedule_type", "cron"));
-                    assertThat(u).contains(MapEntry.entry("schedule_timezone", "UTC")); // some timezone should always be persisted
-                });
+    void testCalculateNextTime() {
+        final long midnight01Jan2020Millis = 1577836800000L;
+        final DateTime midnight01Jan2020 = new DateTime(midnight01Jan2020Millis, DateTimeZone.UTC);
+        final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
+        // Every hour between 0800 and 1700.
+        CronJobSchedule cronJobSchedule = CronJobSchedule.builder().cronExpression("0 0 8-17 1/1 * ? *").build();
+        Optional<DateTime> next = cronJobSchedule.calculateNextTime(midnight01Jan2020.plusSeconds(30), midnight01Jan2020, clock);
+        assertThat(next).isPresent();
+        assertThat(next.get().getMillis()).isEqualTo(midnight01Jan2020Millis + (8 * 3600000));
+
+        // 01 Jan 2020 is a Wednesday. Skip Wednesday and next execution should be 24 hours later.
+        cronJobSchedule = CronJobSchedule.builder().cronExpression("0 0 * ? * MON,TUE,THU,FRI *").build();
+        next = cronJobSchedule.calculateNextTime(midnight01Jan2020.plusSeconds(30), midnight01Jan2020, clock);
+        assertThat(next).isPresent();
+        assertThat(next.get().getMillis()).isEqualTo(midnight01Jan2020Millis + (24 * 3600000));
     }
 }

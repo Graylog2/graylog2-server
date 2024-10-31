@@ -22,12 +22,11 @@ import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
-import org.graylog2.system.shutdown.GracefulShutdownHook;
-import org.graylog2.system.shutdown.GracefulShutdownService;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
@@ -43,9 +42,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * Worker pool to execute jobs.
  */
-public class JobWorkerPool implements GracefulShutdownHook {
+public class JobWorkerPool {
     public interface Factory {
-        JobWorkerPool create(String name, int poolSize, Runnable shutdownCallback);
+        JobWorkerPool create(String name, int poolSize);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(JobWorkerPool.class);
@@ -56,15 +55,11 @@ public class JobWorkerPool implements GracefulShutdownHook {
     private final int poolSize;
     private final ExecutorService executor;
     private final Semaphore slots;
-    private final Runnable shutdownCallback;
 
     @Inject
     public JobWorkerPool(@Assisted String name,
                          @Assisted int poolSize,
-                         @Assisted Runnable shutdownCallback,
-                         GracefulShutdownService gracefulShutdownService,
                          MetricRegistry metricRegistry) {
-        this.shutdownCallback = shutdownCallback;
         this.poolSize = poolSize;
         checkArgument(NAME_PATTERN.matcher(name).matches(), "Pool name must match %s", NAME_PATTERN);
 
@@ -72,7 +67,6 @@ public class JobWorkerPool implements GracefulShutdownHook {
         this.slots = new Semaphore(poolSize, true);
 
         registerMetrics(metricRegistry, poolSize);
-        gracefulShutdownService.register(this);
     }
 
     /**
@@ -133,13 +127,10 @@ public class JobWorkerPool implements GracefulShutdownHook {
         }
     }
 
-    @Override
-    public void doGracefulShutdown() throws Exception {
+    public void shutdown(Duration timeout) throws InterruptedException {
         executor.shutdown();
-        if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-            LOG.warn("Timeout shutting down worker pool after 60 seconds");
-        } else {
-            shutdownCallback.run();
+        if (!executor.awaitTermination(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
+            LOG.warn("Timeout shutting down worker pool after {} ms", timeout.toMillis());
         }
     }
 

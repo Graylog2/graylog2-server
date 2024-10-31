@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 import type { FormikProps } from 'formik';
@@ -49,7 +48,7 @@ type Props = {
 const Section = styled.div`
   margin-bottom: 25px;
 
-  :last-child {
+  &:last-child {
     margin-bottom: 0;
   }
 `;
@@ -80,7 +79,7 @@ const EntityShareSettings = ({
   entityTitle,
   setDisableSubmit,
   granteesSelectFormRef,
-  showShareableEntityURL,
+  showShareableEntityURL = true,
   entityTypeTitle,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
@@ -117,7 +116,7 @@ const EntityShareSettings = ({
     <>
       <Section>
         <GranteesSelectorHeadline>
-          Add collaborator
+          Add Collaborator
         </GranteesSelectorHeadline>
         <p>
           {description}
@@ -135,7 +134,7 @@ const EntityShareSettings = ({
                       onDelete={_handleDeletion}
                       onCapabilityChange={_handleSelection}
                       selectedGrantees={selectedGrantees}
-                      title="Current collaborators" />
+                      title="Collaborators" />
       </Section>
       {validationResults?.failed && (
         <Section>
@@ -156,20 +155,6 @@ const EntityShareSettings = ({
       )}
     </>
   );
-};
-
-EntityShareSettings.propTypes = {
-  description: PropTypes.string.isRequired,
-  entityGRN: PropTypes.string.isRequired,
-  entityShareState: PropTypes.object.isRequired,
-  setDisableSubmit: PropTypes.func.isRequired,
-  showShareableEntityURL: PropTypes.bool,
-  entityTypeTitle: PropTypes.string,
-};
-
-EntityShareSettings.defaultProps = {
-  showShareableEntityURL: true,
-  entityTypeTitle: undefined,
 };
 
 export default EntityShareSettings;

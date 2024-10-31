@@ -27,7 +27,8 @@ import org.graylog2.shared.ServerVersion;
 import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.joda.time.DateTime;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;

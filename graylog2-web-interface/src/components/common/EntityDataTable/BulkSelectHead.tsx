@@ -21,12 +21,13 @@ import uniq from 'lodash/uniq';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { Th } from 'components/common/EntityDataTable/TableHead';
 
 type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
 const useCheckboxStatus = <Entity extends EntityBase>(data: Readonly<Array<Entity>>, selectedEntityIds: Array<string>) => {
   const checkboxRef = useRef<HTMLInputElement>();
-
   const checkboxStatus: CheckboxStatus = useMemo(() => {
     const selectedEntities = data.filter(({ id }) => selectedEntityIds.includes(id));
 
@@ -61,15 +62,12 @@ const useCheckboxStatus = <Entity extends EntityBase>(data: Readonly<Array<Entit
 
 type Props<Entity extends EntityBase> = {
   data: Readonly<Array<Entity>>,
-  selectedEntities: Array<string>,
-  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>,
 }
 
 const BulkSelectHead = <Entity extends EntityBase>({
   data,
-  setSelectedEntities,
-  selectedEntities,
 }: Props<Entity>) => {
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
   const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'Select'} all visible entities`;
 
@@ -86,13 +84,14 @@ const BulkSelectHead = <Entity extends EntityBase>({
   };
 
   return (
-    <td style={{ width: `${BULK_SELECT_COLUMN_WIDTH}px` }}>
+    <Th $width={BULK_SELECT_COLUMN_WIDTH}>
       <RowCheckbox inputRef={(ref) => { checkboxRef.current = ref; }}
                    onChange={onBulkSelect}
                    checked={checkboxStatus === 'CHECKED'}
                    title={title}
-                   disabled={!data?.length} />
-    </td>
+                   disabled={!data?.length}
+                   aria-label={title} />
+    </Th>
   );
 };
 

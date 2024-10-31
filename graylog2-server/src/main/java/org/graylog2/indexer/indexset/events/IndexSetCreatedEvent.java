@@ -23,7 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @AutoValue
 @WithBeanGetter

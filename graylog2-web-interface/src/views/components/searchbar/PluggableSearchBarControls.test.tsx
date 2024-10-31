@@ -24,7 +24,6 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import PluggableSearchBarControls from './PluggableSearchBarControls';
 
 jest.mock('hooks/usePluginEntities');
-jest.mock('hooks/useFeature', () => (key) => key === 'search_filter');
 
 jest.mock('logic/local-storage/Store', () => ({
   get: jest.fn(),
@@ -80,12 +79,12 @@ describe('PluggableSearchBarControls', () => {
     Store.get.mockReturnValue(true);
     const { container } = render(<PluggableSearchBarControls />);
 
-    expect(container.firstChild).toBeNull();
+    expect(container.children).toHaveLength(2);
   });
 
   it('should not render anything when there are no pluggable controls and `showLeftControls` is `false`', () => {
     const { container } = render(<PluggableSearchBarControls showLeftControls={false} />);
 
-    expect(container.firstChild).toBeNull();
+    expect(container.children).toHaveLength(2);
   });
 });

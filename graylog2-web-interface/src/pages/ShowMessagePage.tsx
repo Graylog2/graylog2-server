@@ -14,30 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useContext } from 'react';
 import * as Immutable from 'immutable';
 
+import useMessage from 'views/hooks/useMessage';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
 import { Col, Row } from 'components/bootstrap';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import MessageDetail from 'views/components/messagelist/MessageDetail';
 import withParams from 'routing/withParams';
-import type { Stream } from 'views/stores/StreamsStore';
 import type { Input } from 'components/messageloaders/Types';
-import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import type { Message } from 'views/components/messagelist/Types';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
-import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
-import { MessagesActions } from 'stores/messages/MessagesStore';
 import { NodesActions } from 'stores/nodes/NodesStore';
 import { isLocalNode } from 'views/hooks/useIsLocalNode';
 import PluggableStoreProvider from 'components/PluggableStoreProvider';
 import View from 'views/logic/views/View';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import SingleMessageFieldTypesProvider from 'views/components/fieldtypes/SingleMessageFieldTypesProvider';
+import StreamsContext from 'contexts/StreamsContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 type Props = {
   params: {
@@ -46,35 +43,13 @@ type Props = {
   },
 };
 
-const useStreams = () => {
-  const [streams, setStreams] = useState<Immutable.Map<string, Stream>>();
-  const [allStreams, setAllStreams] = useState<Immutable.List<Stream>>();
-
-  useEffect(() => {
-    StreamsStore.listStreams().then((newStreams) => {
-      if (newStreams) {
-        const streamsMap = Object.fromEntries(newStreams.map((stream) => [stream.id, stream]));
-
-        setStreams(Immutable.Map(streamsMap));
-        setAllStreams(Immutable.List(newStreams));
-      }
-    });
-  }, [setStreams, setAllStreams]);
-
-  return { streams, allStreams };
-};
-
-const useMessage = (index: string, messageId: string) => {
-  const [message, setMessage] = useState<Message | undefined>();
+const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | undefined) => {
   const [inputs, setInputs] = useState<Immutable.Map<string, Input>>(Immutable.Map());
 
   useEffect(() => {
-    const fetchData = async () => {
-      const _message = await MessagesActions.loadMessage(index, messageId);
-      setMessage(_message);
-
-      if (_message.source_input_id && (await isLocalNode(_message.fields.gl2_source_node))) {
-        const input = await InputsActions.get(_message.source_input_id);
+    const fetchInputs = async () => {
+      if (sourceInputId && (await isLocalNode(gl2SourceNode))) {
+        const input = await InputsActions.get(sourceInputId);
 
         if (input) {
           const newInputs = Immutable.Map({ [input.id]: input });
@@ -84,31 +59,10 @@ const useMessage = (index: string, messageId: string) => {
       }
     };
 
-    fetchData();
-  }, [index, messageId, setMessage, setInputs]);
+    fetchInputs();
+  }, [setInputs, sourceInputId, gl2SourceNode]);
 
-  return { message, inputs };
-};
-
-type FieldTypesProviderProps = {
-  children: React.ReactNode,
-  streams: Array<string>,
-  timestamp: string,
-};
-
-const FieldTypesProvider = ({ streams, timestamp, children }: FieldTypesProviderProps) => {
-  const { data: fieldTypes } = useFieldTypes(streams, { type: 'absolute', from: timestamp, to: timestamp });
-  const types = useMemo(() => {
-    const fieldTypesList = Immutable.List(fieldTypes);
-
-    return ({ all: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) });
-  }, [fieldTypes]);
-
-  return (
-    <FieldTypesContext.Provider value={types}>
-      {children}
-    </FieldTypesContext.Provider>
-  );
+  return inputs;
 };
 
 type MessageFields = {
@@ -121,22 +75,23 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
     throw new Error('index and messageId need to be specified!');
   }
 
-  const { streams, allStreams } = useStreams();
-  const { message, inputs } = useMessage(index, messageId);
+  const streams = useContext(StreamsContext);
+  const streamsMap = Immutable.Map(Object.fromEntries(streams.map((stream) => [stream.id, stream])));
+  const streamsList = Immutable.List(streams);
+  const { data: message } = useMessage(index, messageId);
+  const inputs = useInputs(message?.source_input_id, message?.fields.gl2_source_node);
 
   useEffect(() => { NodesActions.list(); }, []);
 
   const isLoaded = useMemo(() => (message !== undefined
-    && streams !== undefined
-    && inputs !== undefined
-    && allStreams !== undefined), [message, streams, inputs, allStreams]);
+    && inputs !== undefined), [message, inputs]);
 
   const view = useMemo(() => View.create(), []);
   const executionState = useMemo(() => SearchExecutionState.empty(), []);
 
   if (isLoaded) {
     const { streams: messageStreams, timestamp } = message.fields as MessageFields;
-    const fieldTypesStreams = messageStreams.filter((streamId) => streams.has(streamId));
+    const fieldTypesStreams = messageStreams.filter((streamId) => streamsMap.has(streamId));
 
     return (
       <PluggableStoreProvider view={view} initialQuery="none" isNew={false} executionState={executionState}>
@@ -144,16 +99,20 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
           <Row className="content" id="sticky-augmentations-container">
             <Col md={12}>
               <WindowDimensionsContextProvider>
-                <FieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
-                  <InteractiveContext.Provider value={false}>
-                    <MessageDetail fields={Immutable.List()}
-                                   streams={streams}
-                                   allStreams={allStreams}
-                                   disableSurroundingSearch
-                                   inputs={inputs}
-                                   message={message} />
-                  </InteractiveContext.Provider>
-                </FieldTypesProvider>
+                <SingleMessageFieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
+                  <FieldTypesContext.Consumer>
+                    {({ all }) => (
+                      <InteractiveContext.Provider value={false}>
+                        <MessageDetail fields={all}
+                                       streams={streamsMap}
+                                       allStreams={streamsList}
+                                       disableSurroundingSearch
+                                       inputs={inputs}
+                                       message={message} />
+                      </InteractiveContext.Provider>
+                    )}
+                  </FieldTypesContext.Consumer>
+                </SingleMessageFieldTypesProvider>
               </WindowDimensionsContextProvider>
             </Col>
           </Row>
@@ -163,13 +122,6 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   }
 
   return <Spinner data-testid="spinner" />;
-};
-
-ShowMessagePage.propTypes = {
-  params: PropTypes.exact({
-    index: PropTypes.string.isRequired,
-    messageId: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default withParams(ShowMessagePage);

@@ -26,7 +26,8 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 @JsonAutoDetect
 @AutoValue

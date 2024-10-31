@@ -29,7 +29,8 @@ import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.plugin.Message;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

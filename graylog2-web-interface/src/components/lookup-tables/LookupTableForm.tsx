@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { Formik, Form } from 'formik';
-import PropTypes from 'prop-types';
 import _omit from 'lodash/omit';
 import type { LookupTable } from 'src/logic/lookup-tables/types';
 
@@ -27,6 +26,8 @@ import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker 
 import useScopePermissions from 'hooks/useScopePermissions';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type LookupTableType = LookupTable & {
   enable_single_value: boolean,
@@ -51,13 +52,14 @@ const INIT_TABLE_VALUES: LookupTableType = {
 
 type Props = {
   saved: () => void,
-  create: boolean,
-  table: LookupTableType,
+  create?: boolean
+  table?: LookupTableType
 };
 
-const LookupTableForm = ({ saved, create, table }: Props) => {
+const LookupTableForm = ({ saved, create = true, table = INIT_TABLE_VALUES }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
 
   const validate = (values: LookupTableType) => {
     const errors = {};
@@ -83,6 +85,11 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
   };
 
   const handleSubmit = (values: LookupTableType) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CREATED' : 'UPDATED'], {
+      app_pathname: 'lut',
+      app_section: 'lut',
+    });
+
     let promise: Promise<any>;
 
     const valuesToSave: LookupTable = _omit(values, ['enable_single_value', 'enable_multi_value']);
@@ -93,7 +100,9 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
       promise = LookupTablesActions.update(valuesToSave);
     }
 
-    return promise.then(() => saved());
+    return promise.then(() => {
+      saved();
+    });
   };
 
   const initialValues: LookupTableType = {
@@ -244,17 +253,6 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
       )}
     </Formik>
   );
-};
-
-LookupTableForm.propTypes = {
-  saved: PropTypes.func.isRequired,
-  create: PropTypes.bool,
-  table: PropTypes.object,
-};
-
-LookupTableForm.defaultProps = {
-  create: true,
-  table: INIT_TABLE_VALUES,
 };
 
 export default LookupTableForm;

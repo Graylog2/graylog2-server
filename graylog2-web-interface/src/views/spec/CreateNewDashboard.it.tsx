@@ -27,9 +27,11 @@ import Routes from 'routing/Routes';
 import AppRouter from 'routing/AppRouter';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import StreamsContext from 'contexts/StreamsContext';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { defaultPerspective as mockDefaultPerspective } from 'fixtures/perspectives';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
+import type { Stream } from 'logic/streams/types';
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
@@ -45,7 +47,7 @@ jest.mock('stores/users/CurrentUserStore', () => ({
   ),
 }));
 
-jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => () => ({
   data: {
     list: [],
     pagination: { total: 0 },
@@ -79,9 +81,32 @@ jest.mock('stores/sessions/SessionStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/queryinput/QueryInput', () => () => <span>Query Editor</span>);
+jest.mock('views/components/searchbar/queryinput/QueryInput');
 
 jest.unmock('logic/rest/FetchProvider');
+
+jest.mock('views/hooks/useMinimumRefreshInterval', () => () => ({
+  data: 'PT1S',
+  isInitialLoading: false,
+}));
+
+jest.mock('hooks/useSearchConfiguration', () => () => ({
+  config: {
+    auto_refresh_timerange_options: {
+      PT1S: '1 second',
+      PT1M: 'Only a minute',
+    },
+    default_auto_refresh_option: 'PT5S',
+  },
+  refresh: jest.fn(),
+}));
+
+jest.mock('components/perspectives/hooks/useActivePerspective', () => ({
+  __esModule: true,
+  default: () => ({
+    activePerspective: mockDefaultPerspective,
+  }),
+}));
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -94,9 +119,7 @@ const testTimeout = applyTimeoutMultiplier(30000);
 const setInitialUrl = (url: string) => asMock(createBrowserRouter).mockImplementation((routes) => createMemoryRouter(routes, { initialEntries: [url] }));
 
 describe('Create a new dashboard', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
@@ -106,7 +129,7 @@ describe('Create a new dashboard', () => {
     <DefaultProviders>
       <DefaultQueryClientProvider>
         <CurrentUserProvider>
-          <StreamsContext.Provider value={[{ id: 'stream-1', title: 'Stream 1' }]}>
+          <StreamsContext.Provider value={[{ id: 'stream-1', title: 'Stream 1' } as Stream]}>
             <AppRouter />
           </StreamsContext.Provider>
         </CurrentUserProvider>

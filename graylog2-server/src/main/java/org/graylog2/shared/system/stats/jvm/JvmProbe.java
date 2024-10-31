@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.system.stats.jvm;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class JvmProbe {

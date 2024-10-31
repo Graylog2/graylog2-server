@@ -48,7 +48,7 @@ export const MetricsActions = singletonActions(
   }),
 );
 
-type CounterMetric = {
+export type CounterMetric = {
   metric: {
     count: number,
   },
@@ -62,34 +62,60 @@ export type GaugeMetric = {
   type: 'gauge',
 };
 
-type MeterMetric = {
-  metric: {
-    rate: {
-      total: number,
-    },
+type Rate = {
+  rate: {
+    total: number,
+    mean: number,
+    one_minute: number,
+    five_minute: number,
+    fifteen_minute: number,
   },
+  rate_unit: string,
+};
+
+export type MeterMetric = {
+  metric: Rate,
   type: 'meter',
 };
 
-type TimerMetric = {
-  metric: {
-    rate: {
-      total: number,
-    },
+type Timing = {
+  '95th_percentile': number,
+  '98th_percentile': number,
+  '99th_percentile': number,
+  'std_dev': number,
+  mean: number,
+  min: number,
+  max: number,
+};
+
+export type TimerMetric = {
+  metric: Rate & {
+    time: Timing,
   },
   type: 'timer',
 };
+
+export type HistogramMetric = {
+  metric: {
+    time: Timing,
+    count: number,
+  }
+  type: 'histogram',
+}
 
 type BaseMetric<T> = {
   full_name: string,
   name: string,
 } & T;
 
+export type Metric = BaseMetric<CounterMetric>
+  | BaseMetric<GaugeMetric>
+  | BaseMetric<MeterMetric>
+  | BaseMetric<TimerMetric>
+  | BaseMetric<HistogramMetric>;
+
 export type NodeMetric = {
-  [metricName: string]: BaseMetric<CounterMetric>
-    | BaseMetric<GaugeMetric>
-    | BaseMetric<MeterMetric>
-    | BaseMetric<TimerMetric>,
+  [metricName: string]: Metric,
 };
 
 export type ClusterMetric = {
@@ -199,6 +225,7 @@ export const MetricsStore = singletonStore(
     },
     names() {
       if (!this.nodes) {
+        // eslint-disable-next-line no-console
         console.warn('Node list not yet available, not fetching metrics.');
 
         return;
@@ -207,9 +234,10 @@ export const MetricsStore = singletonStore(
       const promise = this._allResults(Object.keys(this.nodes).map((nodeId) => {
         const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url);
 
-        return fetch('GET', url).then((response) => ({ nodeId: nodeId, names: response.metrics }), (error) =>
-        // When fetching metrics fails, keep previous available metrics around, letting user see them
-          ({ nodeId: nodeId, names: this.metricsNames[nodeId], error: error }),
+        return fetch('GET', url).then(
+          (response) => ({ nodeId: nodeId, names: response.metrics }),
+          // When fetching metrics fails, keep previous available metrics around, letting user see them
+          (error) => ({ nodeId: nodeId, names: this.metricsNames[nodeId], error: error }),
         );
       })).then((responses) => {
         const metricsNames = {};

@@ -14,27 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
+import type { ColorScheme } from '@graylog/sawmill';
+
 const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-export type ThemeMode = 'teint' | 'noir';
+export type LegacyColorScheme = 'teint' | 'noir';
 export type PreferencesThemeMode = 'themeMode';
 
 const PREFERENCES_THEME_MODE: PreferencesThemeMode = 'themeMode';
 const ROOT_FONT_SIZE = 16; // This value is also being maintained as @font-size-base in bootstrap-config.js
-const THEME_MODE_LIGHT = 'teint';
-const THEME_MODE_DARK = 'noir';
-const DEFAULT_THEME_MODE: ThemeMode = prefersDarkMode ? THEME_MODE_DARK : THEME_MODE_LIGHT;
-const THEME_MODES: Array<ThemeMode> = [THEME_MODE_LIGHT, THEME_MODE_DARK];
+
+const LEGACY_COLOR_SCHEME_LIGHT = 'teint';
+const LEGACY_COLOR_SCHEME_DARK = 'noir';
+const DEFAULT_THEME_MODE: ColorScheme = prefersDarkMode ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
+const LEGACY_DEFAULT_THEME_MODE: LegacyColorScheme = prefersDarkMode ? LEGACY_COLOR_SCHEME_DARK : LEGACY_COLOR_SCHEME_LIGHT;
+const COLOR_SCHEMES: Array<ColorScheme> = [COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK];
 const INPUT_BORDER_RADIUS = 0;
 const NAV_ITEM_HEIGHT = '50px';
 
 export {
   DEFAULT_THEME_MODE,
+  LEGACY_DEFAULT_THEME_MODE,
+  LEGACY_COLOR_SCHEME_DARK,
+  LEGACY_COLOR_SCHEME_LIGHT,
   PREFERENCES_THEME_MODE,
   ROOT_FONT_SIZE,
-  THEME_MODE_LIGHT,
-  THEME_MODE_DARK,
-  THEME_MODES,
+  COLOR_SCHEME_LIGHT,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEMES,
   INPUT_BORDER_RADIUS,
   NAV_ITEM_HEIGHT,
 };

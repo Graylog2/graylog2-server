@@ -24,6 +24,8 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.Set;
 
 public interface Event extends Indexable {
     @Override
@@ -101,6 +103,12 @@ public interface Event extends Indexable {
 
     EventReplayInfo getReplayInfo();
 
+    OptionalDouble getScore(String name);
+
+    void setScore(String name, double riskScore);
+
+    void addAssociatedAssets(Set<String> associatedAssets);
+
     EventDto toDto();
 
     static Event fromDto(EventDto from) {
@@ -112,6 +120,7 @@ public interface Event extends Indexable {
         event.setFields(from.fields());
         event.setGroupByFields(from.groupByFields());
         event.setPriority(from.priority());
+        from.scores().forEach(event::setScore);
 
         from.timerangeStart().ifPresent(event::setTimerangeStart);
         from.timerangeEnd().ifPresent(event::setTimerangeEnd);

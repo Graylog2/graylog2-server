@@ -57,13 +57,14 @@ const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filt
   return (
     <OverlayDropdown show={show}
                      closeOnSelect={false}
-                     renderToggle={({ onToggle, toggleTarget }) => (
-                       <CenteredButton bsSize="xsmall" onClick={onToggle} title="Change filter value" ref={toggleTarget}>
+                     toggleChild={(
+                       <CenteredButton bsSize="xsmall" title="Change filter value">
                          {filterValueRenderer ? filterValueRenderer(value, title) : title}
                        </CenteredButton>
                      )}
                      placement="bottom"
-                     onToggle={_onToggle}>
+                     onToggle={_onToggle}
+                     dropdownZIndex={1050}>
       <FilterConfiguration attribute={attribute}
                            filterValueRenderer={filterValueRenderer}
                            onSubmit={onSubmit}
@@ -114,7 +115,7 @@ const ActiveFilter = ({
                              filterValueRenderer={filterValueRenderer} />
       )}
       <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, value)} title="Delete filter">
-        <Icon name="times" />
+        <Icon name="close" />
       </CenteredButton>
     </Container>
   );
