@@ -22,30 +22,37 @@ import UserNotification from 'util/UserNotification';
 import DisableSubmissionStateContext from 'views/components/contexts/DisableSubmissionStateContext';
 import useAppDispatch from 'stores/useAppDispatch';
 import { updateWidget } from 'views/logic/slices/widgetActions';
+import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 
 import WidgetEditApplyAllChangesContext from './WidgetEditApplyAllChangesContext';
+
+const useBindApplyChanges = () => {
+  const applyChangesRef = useRef(null);
+
+  const bindApplyChanges = useCallback((updateWidgetConfig) => {
+    applyChangesRef.current = updateWidgetConfig;
+  }, []);
+
+  return { applyChangesRef, bindApplyChanges };
+};
 
 type Props = {
   widget: Widget,
   children: React.ReactNode,
 }
 
-const WidgetEditApplyAllChangesProvider = ({ children, widget }: Props) => {
+const useApplyAllWidgetChanges = (
+  widget: Widget,
+  applySearchControlsChanges: React.RefObject<(widget: Widget) => Widget>,
+  applyElementConfigurationChanges: React.RefObject<(widgetConfig: WidgetConfig) => WidgetConfig>,
+) => {
   const { setDisabled } = useContext(DisableSubmissionStateContext);
-  const setDisableWidgetEditSubmit = useCallback((disabled: boolean) => setDisabled('widget-edit-apply-all-changes', disabled), [setDisabled]);
-  const applySearchControlsChanges = useRef(null);
-  const applyElementConfigurationChanges = useRef(null);
   const dispatch = useAppDispatch();
+  const setDisableWidgetEditSubmit = useCallback(
+    (disabled: boolean) => setDisabled('widget-edit-apply-all-changes', disabled),
+    [setDisabled]);
 
-  const bindApplySearchControlsChanges = useCallback((updateWidgetConfig) => {
-    applySearchControlsChanges.current = updateWidgetConfig;
-  }, []);
-
-  const bindApplyElementConfigurationChanges = useCallback((_updateWidget) => {
-    applyElementConfigurationChanges.current = _updateWidget;
-  }, []);
-
-  const applyAllWidgetChanges = useCallback(() => {
+  return useCallback(() => {
     let newWidget = widget;
     let hasChanges = false;
 
@@ -79,7 +86,13 @@ const WidgetEditApplyAllChangesProvider = ({ children, widget }: Props) => {
     }
 
     return Promise.resolve();
-  }, [widget, setDisableWidgetEditSubmit, dispatch]);
+  }, [widget, applySearchControlsChanges, applyElementConfigurationChanges, setDisableWidgetEditSubmit, dispatch]);
+};
+
+const WidgetEditApplyAllChangesProvider = ({ children, widget }: Props) => {
+  const { applyChangesRef: applySearchControlsChanges, bindApplyChanges: bindApplySearchControlsChanges } = useBindApplyChanges();
+  const { applyChangesRef: applyElementConfigurationChanges, bindApplyChanges: bindApplyElementConfigurationChanges } = useBindApplyChanges();
+  const applyAllWidgetChanges = useApplyAllWidgetChanges(widget, applySearchControlsChanges, applyElementConfigurationChanges);
 
   const contextValue = useMemo(() => ({
     applyAllWidgetChanges,
