@@ -21,7 +21,7 @@ import UserNotification from 'preflight/util/UserNotification';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { type Attribute } from 'stores/PaginationTypes';
 
-export type PaginatedResponse<T, M = any> = {
+export type PaginatedResponse<T, M = unknown> = {
   list: Array<T>,
   pagination: {
     total: number
@@ -34,7 +34,7 @@ export type FetchOptions = {
   refetchInterval?: number,
 };
 
-const useFetchEntities = <T, M = any>({
+const useFetchEntities = <T, M = unknown>({
   fetchKey,
   searchParams,
   fetchEntities,
