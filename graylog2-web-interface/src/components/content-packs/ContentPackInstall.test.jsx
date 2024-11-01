@@ -17,7 +17,7 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
