@@ -152,13 +152,14 @@ type EditWrapperProps = {
   editing: boolean,
   fields: FieldTypeMappingsList,
   id: string,
-  onToggleEdit: () => void,
   onCancelEdit: () => void,
+  onToggleEdit: () => void,
   onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => void,
+  showQueryControls?: boolean,
   type: string,
 };
 
-const EditWrapper = ({
+export const EditWrapper = ({
   children,
   config,
   editing,
@@ -168,12 +169,17 @@ const EditWrapper = ({
   onCancelEdit,
   onWidgetConfigChange,
   type,
+  showQueryControls,
 }: EditWrapperProps) => {
   const EditComponent = useMemo(() => _editComponentForType(type), [type]);
   const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
 
   return editing ? (
-    <EditWidgetFrame onSubmit={onToggleEdit} onCancel={onCancelEdit} displaySubmitActions={!hasOwnSubmitButton}>
+    <EditWidgetFrame onSubmit={onToggleEdit}
+                     onCancel={onCancelEdit}
+                     onChange={onWidgetConfigChange}
+                     displaySubmitActions={!hasOwnSubmitButton}
+                     showQueryControls={showQueryControls}>
       <EditComponent config={config}
                      fields={fields}
                      editing={editing}
@@ -282,6 +288,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
         </InteractiveContext.Consumer>
         <EditWrapper onToggleEdit={onToggleEdit}
                      onCancelEdit={onCancelEdit}
+                     showQueryControls={isDashboard}
                      onWidgetConfigChange={onWidgetConfigChange}
                      config={config}
                      editing={editing}
