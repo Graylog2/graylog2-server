@@ -973,6 +973,7 @@
                             -Xep:NonAtomicVolatileUpdate:ERROR
                             -Xep:PrimitiveAtomicReference:ERROR
                             -Xep:WildcardImport:ERROR
+                            -Xep:JavaDurationGetSecondsToToSeconds:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
