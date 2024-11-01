@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
 import Delayed from './Delayed';
 
