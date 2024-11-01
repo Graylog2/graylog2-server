@@ -158,7 +158,7 @@ describe('<ContentPackEditParameters />', () => {
         .toEqual('Give a default value if the parameter is not optional.');
     });
 
-    it('should validate the parameter input from type double', () => {
+    it('should validate the parameter input from type integer', () => {
       wrapper.find('select#type').simulate('change', { target: { name: 'type', value: 'integer' } });
       wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'test' } });
       wrapper.find('form').at(0).simulate('submit');
@@ -172,7 +172,7 @@ describe('<ContentPackEditParameters />', () => {
         .toEqual('Give a default value if the parameter is not optional.');
     });
 
-    it('should validate the parameter input from type double', () => {
+    it('should validate the parameter input from type boolean', () => {
       wrapper.find('select#type').simulate('change', { target: { name: 'type', value: 'boolean' } });
       wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'test' } });
       wrapper.find('form').at(0).simulate('submit');

@@ -66,6 +66,9 @@ class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps> {
     onChange: () => {},
     onBlur: () => {},
     error: undefined,
+    type: undefined,
+    name: undefined,
+    defaultValue: undefined,
   };
 
   private fieldInput: Input;

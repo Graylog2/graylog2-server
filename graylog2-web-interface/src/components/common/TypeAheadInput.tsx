@@ -188,8 +188,10 @@ class TypeAheadInput extends React.Component<TypeAheadInputProps, {
   }
 
   // @ts-ignore
+  // eslint-disable-next-line react/no-unused-class-component-methods
   getValue = () => $(this.fieldInput).typeahead('val');
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   clear = () => {
     // @ts-ignore
     $(this.fieldInput).typeahead('val', '');
