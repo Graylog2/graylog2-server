@@ -5,17 +5,18 @@ class Component1 extends React.Component {
     return (<span>
       Type 'hello': <input value={this.props.input_value} onChange={this.props.onChange} />
     </span>);
-  },
-});
+  }
+}
 
 class WizardExample extends React.Component {
   constructor() {
     this.state = {
       input_value: "",
     };
+    this.onChange = this.onChange.bind(this);
   }
 
-  onChange = (e) => {
+  onChange(e) {
     this.setState({ input_value: e.target.value });
   };
 
@@ -62,13 +63,15 @@ class ControlledWizardExample extends React.Component {
       activeStep: 'Key3',
       input_value: "",
     };
+    this.onChange = this.onChange.bind(this);
+    this.changeStep = this.changeStep.bind(this);
   }
 
-  onChange = (e) => {
+  onChange(e) {
     this.setState({ input_value: e.target.value });
   }
 
-  changeStep = (nextStep) => {
+  changeStep(nextStep) {
     if (nextStep === 'Key2') {
       this.setState({ activeStep: 'Key3' });
       return;

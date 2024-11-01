@@ -14,9 +14,10 @@ class TypeAheadDataFilterExample extends React.Component {
       list: list,
       filteredList: list,
     };
+    this.onDataFiltered = this.onDataFiltered.bind(this);
   }
 
-  onDataFiltered = (filteredList) => {
+  onDataFiltered(filteredList) {
     this.setState({ filteredList: filteredList });
   };
 

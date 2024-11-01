@@ -6,9 +6,10 @@ class TimeUnitInputExample extends React.Component {
       unit: 'MINUTES',
       enabled: false,
     };
+    this.onChange = this.onChange.bind(this);
   }
 
-  onChange = (value, unit, checked) => {
+  onChange(value, unit, checked) {
     this.setState({ value: value, unit: unit, enabled: checked });
   };
 

@@ -9,9 +9,10 @@ class MarkdownSourceEditor extends React.Component {
 - The code we write is written in Markdown
 `,
     };
+    this.handleChange = this.handleChange.bind(this);
   }
 
-  handleChange = (nextValue) => {
+  handleChange(nextValue) {
     this.setState({ code: nextValue });
   }
 
@@ -45,9 +46,10 @@ class TextSourceEditor extends React.Component {
 }
 `,
     };
+    this.handleChange = this.handleChange.bind(this);
   }
 
-  handleChange = (nextValue) => {
+  handleChange(nextValue) {
     this.setState({ code: nextValue });
   };
 
@@ -87,9 +89,10 @@ class JsonSourceEditor extends React.Component {
 }
 `,
     };
+    this.handleChange = this.handleChange.bind(this);
   }
 
-  handleChange = (nextValue) => {
+  handleChange(nextValue) {
     this.setState({ code: nextValue });
   };
 

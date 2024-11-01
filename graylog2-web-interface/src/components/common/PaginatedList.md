@@ -11,9 +11,10 @@ class PaginatedListExample extends React.Component {
       items: items,
       pageSize: 5,
     };
+    this.onPageChange = this.onPageChange.bind(this);
   };
 
-  onPageChange= (currentPage, pageSize) => {
+  onPageChange(currentPage, pageSize) {
     this.setState({
       currentPage: currentPage - 1,
       pageSize: pageSize,

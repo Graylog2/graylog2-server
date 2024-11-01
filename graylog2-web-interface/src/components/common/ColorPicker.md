@@ -5,9 +5,10 @@ class ColorPickerExample extends React.Component {
     this.state = {
       color: undefined,
     };
+    this.handleColorChange = this.handleColorChange.bind(this);
   };
 
-  handleColorChange = (color) => {
+  handleColorChange(color) {
     this.setState({ color: color });
   };
 

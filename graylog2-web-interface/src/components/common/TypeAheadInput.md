@@ -5,9 +5,10 @@ class TypeAheadInputExample extends React.Component {
     this.state = {
       selectedNumber: undefined,
     };
+    this.onChange = this.onChange.bind(this);
   }
 
-  onChange = (event, selectedNumber) => {
+  onChange(event, selectedNumber) {
     this.setState({ selectedNumber: selectedNumber.number });
   }
 

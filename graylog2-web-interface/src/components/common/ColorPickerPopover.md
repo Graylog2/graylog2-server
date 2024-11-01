@@ -6,9 +6,10 @@ class ColorPickerOverlayExample extends React.Component {
     this.state = {
       color: undefined,
     };
+    this.handleColorChange = this.handleColorChange.bind(this);
   }
 
-  handleColorChange = (color, _, hidePopover) => {
+  handleColorChange(color, _, hidePopover) {
     hidePopover();
     this.setState({ color: color });
   };

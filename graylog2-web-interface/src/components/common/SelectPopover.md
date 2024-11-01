@@ -16,9 +16,10 @@ class SelectPopoverExample extends React.Component {
     this.state = {
       selectedColor: undefined,
     };
+    this.handleItemSelect = this.handleItemSelect.bind(this);
   }
 
-  handleItemSelect = (item) => {
+  handleItemSelect(item) {
     this.setState({ selectedColor: item[0] });
   };
 
@@ -76,9 +77,10 @@ class SelectPopoverFormattedExample extends React.Component {
     this.state = {
       selectedColors: [],
     };
+    this.handleItemSelect = this.handleItemSelect.bind(this);
   }
 
-  handleItemSelect = (item) => {
+  handleItemSelect(item) {
     this.setState({ selectedColors: item });
   };
 

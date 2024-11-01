@@ -14,9 +14,10 @@ class SortableListExample extends React.Component {
       ],
       sortedList: [],
     };
+    this.onSortList = this.onSortList.bind(this);
   }
 
-  onSortList = (nextSortedList) => {
+  onSortList(nextSortedList) {
     this.setState({ sortedList: nextSortedList });
   };
 

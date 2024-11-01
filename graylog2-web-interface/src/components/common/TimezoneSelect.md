@@ -4,9 +4,10 @@ class TimezoneSelectExample extends React.Component {
     this.state = {
       tz: 'Africa/Timbuktu',
     };
+    this.onChange = this.onChange.bind(this);
   }
 
-  onChange = (nextTZ) => {
+  onChange(nextTZ) {
     this.setState({ tz: nextTZ });
   };
 

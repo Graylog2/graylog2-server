@@ -14,9 +14,10 @@ class SelectableListExample extends React.Component {
         { label: 'Cuatro', value: 'four' },
       ],
     };
+    this.onChange = this.onChange.bind(this);
   }
 
-  onChange = (nextSelectedOptions) => {
+  onChange(nextSelectedOptions) {
     this.setState({ selectedOptions: nextSelectedOptions });
   };
 

@@ -8,14 +8,16 @@ class SearchFormExample extends React.Component {
     this.state = {
       query: '',
     };
+    this.onSearch = this.onSearch.bind(this);
+    this.onReset = this.onReset.bind(this);
   }
 
-  onSearch = (query, resetState) => {
+  onSearch(query, resetState) {
     this.setState({ query: query });
     setTimeout(resetState, 2 * 1000);
   };
 
-  onReset = () => {
+  onReset() {
     this.setState({ query: '' });
   };
 
@@ -50,18 +52,21 @@ class SearchFormExample extends React.Component {
       queryTemplate: 'test',
       query: '',
     };
+    this.onQueryTemplateChange = this.onQueryTemplateChange.bind(this);
+    this.onSearch = this.onSearch.bind(this);
+    this.onReset = this.onReset.bind(this);
   }
 
-  onQueryTemplateChange = (e) => {
+  onQueryTemplateChange(e) {
     this.setState({ queryTemplate: e.target.value });
   };
 
-  onSearch = (query, resetState) => {
+  onSearch(query, resetState) {
     this.setState({ query: query });
     setTimeout(resetState, 2 * 1000);
   };
 
-  onReset = () => {
+  onReset() {
     this.setState({ query: '' });
   };
 

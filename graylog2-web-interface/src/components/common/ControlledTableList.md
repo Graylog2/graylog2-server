@@ -14,9 +14,10 @@ class ControlledTableListExample extends React.Component {
         { id: '5', title: 'Five', secret_key: 'cinco', description: 'Fifth number' },
       ]),
     };
+    this.formatItems = this.formatItems.bind(this);
   };
 
-  formatItems = (items) => {
+  formatItems(items) {
     return items.map(item => {
       return (
         <ControlledTableList.Item key={item.id}>

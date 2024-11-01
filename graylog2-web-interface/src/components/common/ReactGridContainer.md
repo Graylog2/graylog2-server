@@ -11,9 +11,10 @@ class ReactGridContainerExample extends React.Component {
         '4': { col: 8, row: 0, height: 1, width: 4 },
       },
     };
+    this.onPositionsChange = this.onPositionsChange.bind(this);
   }
 
-  onPositionsChange = (nextPositions) => {
+  onPositionsChange(nextPositions) {
     console.log('positions changed to ', nextPositions);
   };
 
@@ -23,7 +24,7 @@ class ReactGridContainerExample extends React.Component {
         {id}
       </div>
     );
-  },
+  }
 
   render() {
     const { positions } = this.state;
@@ -70,17 +71,19 @@ class ReactGridContainerExampleLocked extends React.Component {
       locked: false,
       isResizable: false,
     };
+    this.toggleLocked = this.toggleLocked.bind(this);
+    this.toggleIsResizable = this.toggleIsResizable.bind(this);
   }
 
   onPositionsChange(nextPositions) {
     console.log('positions changed to ', nextPositions);
   }
 
-  toggleLocked = () => {
+  toggleLocked() {
     this.setState({ locked: !this.state.locked });
   };
 
-  toggleIsResizable = () => {
+  toggleIsResizable() {
     this.setState({ isResizable: !this.state.isResizable });
   };
 

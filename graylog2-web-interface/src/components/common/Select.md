@@ -10,9 +10,10 @@ class SimpleSelect extends React.Component {
       ],
       selectedOption: '',
     };
+    this.onChange = this.onChange.bind(this);
   }
 
-  onChange = (nextValue) => {
+  onChange(nextValue) {
     this.setState({selectedOption: nextValue});
   };
 
@@ -49,9 +50,10 @@ class SimpleSelect extends React.Component {
       ],
       selectedOptions: 'one;three;five',
     };
+    this.onChange = this.onChange.bind(this);
   }
 
-  onChange = (nextValue) => {
+  onChange(nextValue) {
     this.setState({selectedOptions: nextValue});
   };
 
