@@ -26,7 +26,21 @@ export type Locales = {
   display_name: string,
 }
 type SystemStoreState = {
-  system: {},
+  system: {
+    cluster_id: string,
+    codename: string,
+    facility: string,
+    hostname: string,
+    is_leader: boolean,
+    is_processing: boolean,
+    lb_status: string,
+    lifecycle: string,
+    node_id: string,
+    operating_system: string,
+    started_at: string,
+    timezone: string,
+    version: string,
+  },
   locales: Array<Locales>,
 }
 export const SystemStore = singletonStore(

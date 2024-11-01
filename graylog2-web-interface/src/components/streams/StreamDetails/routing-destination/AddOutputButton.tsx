@@ -106,7 +106,7 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
               bsSize="sm"
               onClick={onShowAddOutput}
               title="Edit Output">
-        <Icon name="add" size="sm" /> Add Output
+        <Icon name="add" size="sm" /> Add output
       </Button>
       {showAddOutput && (
       <BootstrapModalWrapper showModal
