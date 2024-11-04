@@ -41,7 +41,7 @@ const SidecarAdministrationPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <CollectorsAdministrationContainer nodeId={nodeId} />
+          <CollectorsAdministrationContainer nodeId={nodeId as string} />
         </Col>
       </Row>
     </DocumentTitle>

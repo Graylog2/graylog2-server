@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>6.2.0-alpha.1</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -102,8 +102,8 @@
         <aws-java-sdk-2.version>2.29.3</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
-        <bouncycastle.version>1.78.1</bouncycastle.version>
-        <byte-buddy.version>1.15.7</byte-buddy.version>
+        <bouncycastle.version>1.79</bouncycastle.version>
+        <byte-buddy.version>1.15.10</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.177</classgraph.version>
@@ -155,7 +155,7 @@
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.114.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.66.Final</netty-tcnative-boringssl-static.version>
+        <netty-tcnative-boringssl-static.version>2.0.68.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.32.0</opentelemetry.version>
@@ -599,12 +599,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -973,6 +973,7 @@
                             -Xep:NonAtomicVolatileUpdate:ERROR
                             -Xep:PrimitiveAtomicReference:ERROR
                             -Xep:WildcardImport:ERROR
+                            -Xep:JavaDurationGetSecondsToToSeconds:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
