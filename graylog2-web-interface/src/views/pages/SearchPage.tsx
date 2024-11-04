@@ -57,13 +57,13 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
 };
 
 const SearchPage = ({
-  children = null,
+  children,
   isNew,
   view: viewPromise,
   loadNewView: _loadNewView = defaultLoadNewView,
   loadView: _loadView = defaultLoadView,
   executionState: initialExecutionState = SearchExecutionState.empty(),
-  searchResult = null,
+  searchResult,
   forceSideBarPinned = false,
   skipNoStreamsCheck = false,
 }: Props) => {
