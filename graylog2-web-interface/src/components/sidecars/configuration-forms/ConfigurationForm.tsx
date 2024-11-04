@@ -85,6 +85,7 @@ const ConfigurationForm = ({
       const nextValidation = clone(validation);
 
       if (checkForRequiredFields && !_isTemplateSet(nextFormData.template)) {
+        // @ts-expect-error
         nextValidation.errors.template = ['Please fill out the configuration field.'];
         nextValidation.failed = true;
       }
@@ -162,12 +163,12 @@ const ConfigurationForm = ({
     _formDataUpdate('tags')(nextTagsArray);
   };
 
-  const _getCollectorDefaultTemplate = (collectorId: string | number) => {
+  const _getCollectorDefaultTemplate = (collectorId: string) => {
     const storedTemplate = defaultTemplates.current[collectorId];
 
     if (storedTemplate !== undefined) {
       // eslint-disable-next-line no-promise-executor-return
-      return new Promise((resolve) => resolve(storedTemplate));
+      return new Promise<string>((resolve) => resolve(storedTemplate));
     }
 
     return CollectorsActions.getCollector(collectorId).then((collector) => {

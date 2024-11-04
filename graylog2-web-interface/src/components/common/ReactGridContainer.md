@@ -1,10 +1,9 @@
 Regular `ReactGridContainer`:
 ```js
-import createReactClass from 'create-react-class';
-
-const ReactGridContainerExample = createReactClass({
-  getInitialState() {
-    return {
+class ReactGridContainerExample extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       positions: {
         '1': { col: 0, row: 0, height: 1, width: 2 },
         '2': { col: 2, row: 0, height: 1, width: 4 },
@@ -12,11 +11,12 @@ const ReactGridContainerExample = createReactClass({
         '4': { col: 8, row: 0, height: 1, width: 4 },
       },
     };
-  },
+    this.onPositionsChange = this.onPositionsChange.bind(this);
+  }
 
   onPositionsChange(nextPositions) {
     console.log('positions changed to ', nextPositions);
-  },
+  };
 
   widgetDiv(id) {
     return (
@@ -24,7 +24,7 @@ const ReactGridContainerExample = createReactClass({
         {id}
       </div>
     );
-  },
+  }
 
   render() {
     const { positions } = this.state;
@@ -47,8 +47,8 @@ const ReactGridContainerExample = createReactClass({
         {this.widgetDiv(4)}
       </ReactGridContainer>
     );
-  },
-});
+  }
+}
 
 <ReactGridContainerExample />
 ```
@@ -56,12 +56,12 @@ const ReactGridContainerExample = createReactClass({
 
 Lock or block resizing in `ReactGridContainer`:
 ```js
-import createReactClass from 'create-react-class';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 
-const ReactGridContainerExampleLocked = createReactClass({
-  getInitialState() {
-    return {
+class ReactGridContainerExampleLocked extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       positions: {
         '1': { col: 0, row: 0, height: 1, width: 2 },
         '2': { col: 2, row: 0, height: 1, width: 4 },
@@ -71,19 +71,21 @@ const ReactGridContainerExampleLocked = createReactClass({
       locked: false,
       isResizable: false,
     };
-  },
+    this.toggleLocked = this.toggleLocked.bind(this);
+    this.toggleIsResizable = this.toggleIsResizable.bind(this);
+  }
 
   onPositionsChange(nextPositions) {
     console.log('positions changed to ', nextPositions);
-  },
+  }
 
   toggleLocked() {
     this.setState({ locked: !this.state.locked });
-  },
+  };
 
   toggleIsResizable() {
     this.setState({ isResizable: !this.state.isResizable });
-  },
+  };
 
   widgetDiv(id) {
     return (
@@ -91,7 +93,7 @@ const ReactGridContainerExampleLocked = createReactClass({
         {id}
       </div>
     );
-  },
+  }
 
   render() {
     const { positions, locked, isResizable } = this.state;
@@ -128,8 +130,8 @@ const ReactGridContainerExampleLocked = createReactClass({
         </ReactGridContainer>
       </div>
     );
-  },
-});
+  }
+}
 
 <ReactGridContainerExampleLocked />
 ```
