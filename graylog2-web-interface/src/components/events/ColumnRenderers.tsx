@@ -16,15 +16,12 @@
  */
 import * as React from 'react';
 import type Immutable from 'immutable';
-import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
-import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
-import type { SearchParams } from 'stores/PaginationTypes';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -34,18 +31,11 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import type { EventsAdditionalData } from 'components/events/events/fetchEvents';
+import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 
-const useEventsContext = (keyFn: (options: SearchParams) => Array<unknown>) => {
-  const { searchParams } = useTableFetchContext();
-  const queryClient = useQueryClient();
-
-  return useMemo<EventsAdditionalData['context']>(() => queryClient.getQueryData<PaginatedResponse<Event, EventsAdditionalData>>(keyFn(searchParams))?.meta?.context, [keyFn, queryClient, searchParams]);
-};
-
-const EventDefinitionRenderer = ({ eventDefinitionId, keyFn, permissions }: { eventDefinitionId: string, permissions: Immutable.List<string>, keyFn: (options: SearchParams) => Array<unknown> }) => {
-  const eventsContext = useEventsContext(keyFn);
+const EventDefinitionRenderer = ({ eventDefinitionId, permissions }: { eventDefinitionId: string, permissions: Immutable.List<string> }) => {
+  const { meta: { context: eventsContext } } = useMetaDataContext<EventsAdditionalData>();
   const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
 
   if (!eventDefinitionContext) {
@@ -88,8 +78,8 @@ const GroupByFieldsRenderer = ({ groupByFields }: {groupByFields: Record<string,
     : <EventFields fields={groupByFields} />
 );
 
-const RemediationStepRenderer = ({ eventDefinitionId, keyFn }: { eventDefinitionId: string, keyFn: (options: SearchParams) => Array<unknown> }) => {
-  const eventsContext = useEventsContext(keyFn);
+const RemediationStepRenderer = ({ eventDefinitionId }: { eventDefinitionId: string }) => {
+  const { meta: { context: eventsContext } } = useMetaDataContext<EventsAdditionalData>();
   const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
 
   return (
@@ -120,7 +110,7 @@ const MessageRenderer = ({ message, eventId }: { message: string, eventId: strin
   return <StyledDiv onClick={toggleExtraSection}>{message}</StyledDiv>;
 };
 
-const customColumnRenderers = (permissions: Immutable.List<string>, keyFn: (options: SearchParams) => Array<unknown>): ColumnRenderers<Event> => ({
+const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRenderers<Event> => ({
   attributes: {
     message: {
       minWidth: 300,
@@ -138,7 +128,7 @@ const customColumnRenderers = (permissions: Immutable.List<string>, keyFn: (opti
       staticWidth: 100,
     },
     event_definition_id: {
-      renderCell: (_eventDefinitionId: string) => <EventDefinitionRenderer permissions={permissions} eventDefinitionId={_eventDefinitionId} keyFn={keyFn} />,
+      renderCell: (_eventDefinitionId: string) => <EventDefinitionRenderer permissions={permissions} eventDefinitionId={_eventDefinitionId} />,
     },
     priority: {
       renderCell: (_priority: number) => <PriorityRenderer priority={_priority} />,
@@ -157,7 +147,7 @@ const customColumnRenderers = (permissions: Immutable.List<string>, keyFn: (opti
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event) => <RemediationStepRenderer keyFn={keyFn} eventDefinitionId={event.event_definition_id} />,
+      renderCell: (_, event: Event) => <RemediationStepRenderer eventDefinitionId={event.event_definition_id} />,
     },
   },
 });

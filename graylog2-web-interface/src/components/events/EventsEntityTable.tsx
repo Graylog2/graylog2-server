@@ -35,7 +35,7 @@ const EventsEntityTable = () => {
   const currentUser = useCurrentUser();
   const { stream_id: streamId } = useQuery();
 
-  const columnRenderers = useMemo(() => CustomColumnRenderers(currentUser.permissions, keyFn), [currentUser.permissions]);
+  const columnRenderers = useMemo(() => CustomColumnRenderers(currentUser.permissions), [currentUser.permissions]);
   const { columnOrder, defaultLayout } = useMemo(() => getStreamTableElements(), []);
   const _fetchEvents = useCallback((searchParams: SearchParams): Promise<PaginatedResponse<Event, EventsAdditionalData>> => fetchEvents(searchParams, streamId as string), [streamId]);
   const { entityActions, expandedSections } = useTableElements({ defaultLayout });
