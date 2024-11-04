@@ -42,6 +42,7 @@ type Props = React.PropsWithChildren<{
   loadView?: (history: HistoryFunction, viewId: string) => unknown,
   executionState?: SearchExecutionState,
   searchResult?: SearchExecutionResult,
+  skipNoStreamsCheck?: boolean,
 }>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -55,13 +56,14 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
 };
 
 const SearchPage = ({
-  children,
+  children = undefined,
   isNew,
   view: viewPromise,
   loadNewView: _loadNewView = defaultLoadNewView,
   loadView: _loadView = defaultLoadView,
   executionState: initialExecutionState,
-  searchResult,
+  searchResult = undefined,
+  skipNoStreamsCheck = false,
 }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
@@ -89,7 +91,7 @@ const SearchPage = ({
               <ViewLoaderContext.Provider value={loadView}>
                 <AutoRefreshProvider>
                   {children}
-                  <IfUserHasAccessToAnyStream>
+                  <IfUserHasAccessToAnyStream skipNoStreamsCheck={skipNoStreamsCheck}>
                     <Search />
                   </IfUserHasAccessToAnyStream>
                 </AutoRefreshProvider>

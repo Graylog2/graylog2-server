@@ -59,6 +59,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     public static final String FIELD_REQUIRES = "requires";
     static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
+    public static final String FIELD_SKIP_NO_STREAMS_CHECK = "skip_no_streams_check";
 
     // generated during build to help quickly find a parameter by name.
     private ImmutableMap<String, Parameter> parameterIndex;
@@ -87,6 +88,9 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
+
+    @JsonProperty(FIELD_SKIP_NO_STREAMS_CHECK)
+    public abstract boolean skipNoStreamsCheck();
 
     @Override
     @JsonIgnore
@@ -130,7 +134,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
         final Set<String> defaultStreams = defaultStreamsSupplier.get();
 
-        if (defaultStreams.isEmpty()) {
+        if (!skipNoStreamsCheck() && defaultStreams.isEmpty()) {
             throw new MissingStreamPermissionException("User doesn't have access to any streams",
                     Collections.emptySet());
         }
@@ -204,6 +208,9 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);
 
+        @JsonProperty(FIELD_SKIP_NO_STREAMS_CHECK)
+        public abstract Builder skipNoStreamsCheck(boolean skipNoStreamsCheck);
+
         abstract Search autoBuild();
 
         @JsonCreator
@@ -211,7 +218,8 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
             return new AutoValue_Search.Builder()
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC))
-                    .parameters(of());
+                    .parameters(of())
+                    .skipNoStreamsCheck(false);
         }
 
         public Search build() {
