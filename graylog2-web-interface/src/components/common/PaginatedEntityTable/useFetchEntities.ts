@@ -21,13 +21,12 @@ import UserNotification from 'preflight/util/UserNotification';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { type Attribute } from 'stores/PaginationTypes';
 
-export type PaginatedResponse<T, D = any> = {
+export type PaginatedResponse<T> = {
   list: Array<T>,
   pagination: {
     total: number
   },
   attributes: Array<Attribute>,
-  meta?: D
 }
 
 export type FetchOptions = {
