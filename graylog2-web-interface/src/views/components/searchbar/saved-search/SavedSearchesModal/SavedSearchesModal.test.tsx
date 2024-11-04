@@ -105,7 +105,7 @@ describe('SavedSearchesModal', () => {
       });
 
       render(<SavedSearchesModal toggleModal={() => {}}
-                                 deleteSavedSearch={() => Promise.resolve(paginatedSavedSearches.list[0])}
+                                 deleteSavedSearch={() => Promise.resolve()}
                                  activeSavedSearchId="search-id-0" />);
 
       await screen.findByText('No saved searches have been created yet.');
@@ -121,7 +121,7 @@ describe('SavedSearchesModal', () => {
       });
 
       render(<SavedSearchesModal toggleModal={() => {}}
-                                 deleteSavedSearch={() => Promise.resolve(paginatedSavedSearches.list[0])}
+                                 deleteSavedSearch={() => Promise.resolve()}
                                  activeSavedSearchId="search-id-0" />);
 
       await screen.findByText('search-title-0');
@@ -131,7 +131,7 @@ describe('SavedSearchesModal', () => {
     it('should handle toggle modal', async () => {
       const onToggleModal = jest.fn();
       const { getByText } = render(<SavedSearchesModal toggleModal={onToggleModal}
-                                                       deleteSavedSearch={() => Promise.resolve(defaultPaginatedSearches.list[0])}
+                                                       deleteSavedSearch={() => Promise.resolve()}
                                                        activeSavedSearchId="search-id-0" />);
 
       await screen.findByText('search-title-0');
@@ -145,7 +145,7 @@ describe('SavedSearchesModal', () => {
 
     it('should call `onDelete` if saved search is deleted', async () => {
       window.confirm = jest.fn(() => true);
-      const onDelete = jest.fn(() => Promise.resolve(defaultPaginatedSearches.list[0]));
+      const onDelete = jest.fn(() => Promise.resolve());
 
       render(<SavedSearchesModal toggleModal={() => {}}
                                  deleteSavedSearch={onDelete}
@@ -167,7 +167,7 @@ describe('SavedSearchesModal', () => {
       render(
         <ViewLoaderContext.Provider value={onLoad}>
           <SavedSearchesModal toggleModal={() => {}}
-                              deleteSavedSearch={() => Promise.resolve(defaultPaginatedSearches.list[0])}
+                              deleteSavedSearch={() => Promise.resolve()}
                               activeSavedSearchId="search-id-0" />
         </ViewLoaderContext.Provider>,
       );
@@ -200,7 +200,7 @@ describe('SavedSearchesModal', () => {
       });
 
       render(<SavedSearchesModal toggleModal={() => {}}
-                                 deleteSavedSearch={() => Promise.resolve(defaultPaginatedSearches.list[0])}
+                                 deleteSavedSearch={() => Promise.resolve()}
                                  activeSavedSearchId="search-id-0" />);
 
       const pageSizeDropdown = await screen.findByRole('button', {
