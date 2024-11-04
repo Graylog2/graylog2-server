@@ -14,25 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  '@emotion/react',
-  '@mantine/core',
-  '@tanstack/react-query',
-  'chroma-js',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment',
-  'moment-timezone',
-  'react',
-  'react-bootstrap',
-  'react-dom',
-  'react-redux',
-  'react-router',
-  'react-router-bootstrap',
-  'redux',
-  'reflux',
-  'reflux-core',
-  'styled-components',
-  'use-query-params',
-];
+import * as React from 'react';
+
+import { singleton } from 'logic/singleton';
+
+type ContextValue = {
+  meta: unknown,
+} | undefined
+
+const EntityTableMetaDataContext = React.createContext<ContextValue>(undefined);
+
+export default singleton('contexts.EntityTableMetaDataContext', () => EntityTableMetaDataContext);

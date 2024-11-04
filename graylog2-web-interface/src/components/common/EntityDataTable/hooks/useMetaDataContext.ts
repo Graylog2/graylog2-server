@@ -14,25 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  '@emotion/react',
-  '@mantine/core',
-  '@tanstack/react-query',
-  'chroma-js',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment',
-  'moment-timezone',
-  'react',
-  'react-bootstrap',
-  'react-dom',
-  'react-redux',
-  'react-router',
-  'react-router-bootstrap',
-  'redux',
-  'reflux',
-  'reflux-core',
-  'styled-components',
-  'use-query-params',
-];
+import { useContext } from 'react';
+
+import MetaDataContext from 'components/common/EntityDataTable/contexts/MetaDataContext';
+
+const useMetaDataContext = <M = unknown>() => {
+  const context = useContext(MetaDataContext);
+
+  if (!context) {
+    throw new Error('useMetaDataContext hook needs to be used inside MetaDataProvider');
+  }
+
+  return context as {meta: M };
+};
+
+export default useMetaDataContext;

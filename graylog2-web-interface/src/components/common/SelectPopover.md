@@ -1,5 +1,4 @@
 ```js
-import createReactClass from 'create-react-class';
 import { Button } from 'components/bootstrap';
 
 const items = [
@@ -11,16 +10,18 @@ const items = [
   'Yellow',
 ];
 
-const SelectPopoverExample = createReactClass({
-  getInitialState() {
-    return {
+class SelectPopoverExample extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       selectedColor: undefined,
     };
-  },
+    this.handleItemSelect = this.handleItemSelect.bind(this);
+  }
 
   handleItemSelect(item) {
     this.setState({ selectedColor: item[0] });
-  },
+  };
 
   render() {
     const selectedColor = this.state.selectedColor;
@@ -42,13 +43,12 @@ const SelectPopoverExample = createReactClass({
       </div>
     );
   }
-});
+}
 
 <SelectPopoverExample />
 ```
 
 ```js
-import createReactClass from 'create-react-class';
 import { Button, Badge } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
@@ -71,16 +71,18 @@ const items = [
   'Yellow',
 ];
 
-const SelectPopoverFormattedExample = createReactClass({
-  getInitialState() {
-    return {
+class SelectPopoverFormattedExample extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       selectedColors: [],
     };
-  },
+    this.handleItemSelect = this.handleItemSelect.bind(this);
+  }
 
   handleItemSelect(item) {
     this.setState({ selectedColors: item });
-  },
+  };
 
   formatItem(item) {
     return (
@@ -88,7 +90,7 @@ const SelectPopoverFormattedExample = createReactClass({
         <Icon name="square" style={{ color: item }} /> {item}
       </span>
     )
-  },
+  };
 
   render() {
     const selectedColors = this.state.selectedColors;
@@ -111,7 +113,7 @@ const SelectPopoverFormattedExample = createReactClass({
       </div>
     );
   }
-});
+}
 
 <SelectPopoverFormattedExample />
 ```
