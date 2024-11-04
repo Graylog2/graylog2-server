@@ -53,8 +53,11 @@ export type RefType<Configuration extends object> = {
 }
 
 const defaultConfigFields = {};
+const defaultCancelAction = () => {};
+const defaultInitialValues = {};
+
 const ConfigurationForm = forwardRef(<Configuration extends object>({
-  cancelAction = () => {},
+  cancelAction = defaultCancelAction,
   configFields = defaultConfigFields,
   children = null,
   titleHelpText = '',
@@ -63,8 +66,8 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
   title = null,
   titleValue: initialTitleValue = '',
   typeName,
-  values: initialValues = {},
-  wrapperComponent: WrapperComponent = BootstrapModalForm as unknown as Props<{ }>['wrapperComponent'],
+  values: initialValues = defaultInitialValues,
+  wrapperComponent: WrapperComponent = BootstrapModalForm as Props<Configuration>['wrapperComponent'],
   submitButtonText,
 } : Props<Configuration>, ref: React.ForwardedRef<RefType<Configuration>>) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
