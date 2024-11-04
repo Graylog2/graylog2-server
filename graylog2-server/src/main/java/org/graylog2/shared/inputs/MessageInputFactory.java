@@ -58,7 +58,7 @@ public class MessageInputFactory {
             input.setNodeId(nodeId);
         }
 
-        if (featureFlags.isOn("SETUP_MODE")) {
+        if (featureFlags.isOn("SETUP_MODE") && input.supportsSetupMode()) {
             input.setDesiredState(IOState.Type.SETUP);
         }
 

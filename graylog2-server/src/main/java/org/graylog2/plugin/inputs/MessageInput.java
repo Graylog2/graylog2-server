@@ -462,6 +462,10 @@ public abstract class MessageInput implements Stoppable {
         }
     }
 
+    public boolean supportsSetupMode() {
+        return true;
+    }
+
     public abstract static class Descriptor extends AbstractDescriptor {
         protected Descriptor() {
             super();
