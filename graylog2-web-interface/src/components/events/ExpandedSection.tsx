@@ -23,8 +23,9 @@ import type { Attribute } from 'stores/PaginationTypes';
 import type { Event } from 'components/events/events/types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import CustomColumnRenderers from 'components/events/ColumnRenderers';
-import { keyFn } from 'components/events/events/fetchEvents';
 import { Table } from 'components/bootstrap';
+import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
+import type { EventsAdditionalData } from 'components/events/events/fetchEvents';
 
 type Props = {
   defaultLayout: Parameters<typeof useTableLayout>[0],
@@ -36,6 +37,7 @@ const TD = styled.td`
 `;
 
 const ExpandedSection = ({ defaultLayout, event }: Props) => {
+  const { meta } = useMetaDataContext<EventsAdditionalData>();
   const { layoutConfig: { displayedAttributes }, isInitialLoading } = useTableLayout(defaultLayout);
   const { attributes } = useTableFetchContext();
 
@@ -49,7 +51,7 @@ const ExpandedSection = ({ defaultLayout, event }: Props) => {
 
   const currentUser = useCurrentUser();
 
-  const { attributes: attributesRenderers } = useMemo(() => CustomColumnRenderers(currentUser.permissions, keyFn), [currentUser.permissions]);
+  const { attributes: attributesRenderers } = useMemo(() => CustomColumnRenderers(currentUser.permissions), [currentUser.permissions]);
 
   return (
     <Table condensed striped>
@@ -61,7 +63,7 @@ const ExpandedSection = ({ defaultLayout, event }: Props) => {
           return (
             <tr key={attribute.id}>
               <TD><b>{attribute.title}</b></TD>
-              <td>{renderCell ? renderCell(value, event, attribute) : value}</td>
+              <td>{renderCell ? renderCell(value, event, attribute, meta) : value}</td>
             </tr>
           );
         })}
