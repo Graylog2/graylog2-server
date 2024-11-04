@@ -347,6 +347,7 @@ const deriveNameFromParameters = (functionName: string, parameters: Parameter[])
 
 const bannedFunctionNames = {
   delete: 'remove',
+  export: 'export_',
 };
 
 const unbanFunctionname = (nickname: string): string => (Object.keys(bannedFunctionNames).includes(nickname) ? bannedFunctionNames[nickname] : nickname);
@@ -427,7 +428,7 @@ const importDeclaration = ts.factory.createImportDeclaration(
 
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 
-const cleanIdentifier = (name: string) => name.replace(/\//g, '');
+const cleanIdentifier = (name: string) => name.replace(/[/-]/g, '');
 
 function emitSummary(apis: Array<Api>) {
   const packageIndexFile = ts.createSourceFile('index.ts', '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
