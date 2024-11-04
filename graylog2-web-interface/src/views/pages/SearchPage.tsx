@@ -109,6 +109,7 @@ SearchPage.defaultProps = {
   loadView: defaultLoadView,
   executionState: SearchExecutionState.empty(),
   searchResult: undefined,
+  skipNoStreamsCheck: false,
 };
 
 export default React.memo(SearchPage);
