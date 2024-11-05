@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { isPermitted } from 'util/PermissionsMixin';
-
 import * as React from 'react';
 
+import { isPermitted } from 'util/PermissionsMixin';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useEventById from 'hooks/useEventById';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
@@ -58,7 +57,7 @@ export const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
 const EventDetailsWrapper = ({ eventId }: { eventId: string }) => {
   const puggableEventDetails = usePluggableEventDetails(eventId);
 
-  if (false) {
+  if (puggableEventDetails?.length) {
     return <>{puggableEventDetails}</>;
   }
 

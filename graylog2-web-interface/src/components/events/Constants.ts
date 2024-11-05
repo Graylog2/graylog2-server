@@ -71,7 +71,7 @@ export const detailsAttributes: Array<Attribute> = [
   },
   {
     id: 'fields',
-    title: 'Additional fields',
+    title: 'Additional Fields',
     type: 'STRING',
     sortable: false,
   },

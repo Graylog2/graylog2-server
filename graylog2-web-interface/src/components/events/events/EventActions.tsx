@@ -35,7 +35,7 @@ const EventActions = ({ event, wrapper: Wrapper = DefaultWrapper }: { event: Eve
   const hasReplayInfo = !!event.replay_info;
 
   const moreActions = [
-    hasReplayInfo ? <MenuItem><LinkToReplaySearch id={event.id} isEvent /></MenuItem> : null,
+    hasReplayInfo ? <MenuItem key="replay_info"><LinkToReplaySearch id={event.id} isEvent /></MenuItem> : null,
     pluggableActions.length ? <MenuItem divider key="divider" /> : null,
     pluggableActions.length ? pluggableActions : null,
   ].filter(Boolean);
