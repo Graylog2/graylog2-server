@@ -38,6 +38,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
@@ -52,6 +53,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -277,7 +279,12 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                 validationResult.addError(FIELD_CRON_EXPRESSION, "Cron expression must not be empty when using cron scheduling");
             } else {
                 try {
+                    // Will throw an exception if the expression is invalid.
                     CronUtils.validateExpression(cronExpression());
+                    if (!CronUtils.validateCronFrequency(cronExpression(), cronTimezone(), Duration.ofMinutes(5),
+                            JobSchedulerSystemClock.INSTANCE)) {
+                        validationResult.addError(FIELD_CRON_EXPRESSION, "Event definition frequency cannot be less than 5 minutes.");
+                    }
                 } catch (Exception e) {
                     validationResult.addError(FIELD_CRON_EXPRESSION, e.getMessage());
                 }
