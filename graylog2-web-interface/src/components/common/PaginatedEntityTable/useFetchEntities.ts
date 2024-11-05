@@ -21,19 +21,20 @@ import UserNotification from 'preflight/util/UserNotification';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { type Attribute } from 'stores/PaginationTypes';
 
-export type PaginatedResponse<T> = {
+export type PaginatedResponse<T, M = unknown> = {
   list: Array<T>,
   pagination: {
     total: number
   },
   attributes: Array<Attribute>,
+  meta?: M
 }
 
 export type FetchOptions = {
   refetchInterval?: number,
 };
 
-const useFetchEntities = <T>({
+const useFetchEntities = <T, M = unknown>({
   fetchKey,
   searchParams,
   fetchEntities,
@@ -43,13 +44,13 @@ const useFetchEntities = <T>({
 }: {
   fetchKey: Array<unknown>,
   searchParams: SearchParams,
-  fetchEntities: (searchParams: SearchParams) => Promise<PaginatedResponse<T>>
+  fetchEntities: (searchParams: SearchParams) => Promise<PaginatedResponse<T, M>>
   enabled: boolean,
   humanName: string
   fetchOptions?: FetchOptions,
 }): {
   isInitialLoading: boolean,
-  data: PaginatedResponse<T>,
+  data: PaginatedResponse<T, M>,
   refetch: () => void,
 } => {
   const { data, isInitialLoading, refetch } = useQuery(

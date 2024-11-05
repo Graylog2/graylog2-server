@@ -21,10 +21,11 @@ import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { Collector } from 'components/sidecars/types';
 
 import CollectorList from './CollectorList';
 
-const validateCollector = (collector) => CollectorsActions.validate(collector);
+const validateCollector = (collector: Collector) => CollectorsActions.validate(collector);
 
 const loadCollectors = () => {
   CollectorsActions.list({});

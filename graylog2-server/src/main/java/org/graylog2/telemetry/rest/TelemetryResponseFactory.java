@@ -17,7 +17,10 @@
 package org.graylog2.telemetry.rest;
 
 import com.google.common.base.Strings;
+import jakarta.annotation.Nullable;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
+import org.graylog2.system.traffic.TrafficCounterService.TrafficHistogram;
+import org.graylog2.system.traffic.TrafficCounterService.TrafficHistograms;
 import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.joda.time.DateTime;
 
@@ -86,23 +89,32 @@ class TelemetryResponseFactory {
     Map<String, Object> createClusterInfo(String clusterId,
                                           DateTime clusterCreationDate,
                                           Map<String, Map<String, Object>> nodes,
-                                          long averageLastMonthTraffic,
+                                          TrafficHistogram trafficLastMonth,
                                           long usersCount,
                                           int licenseCount,
-                                          String installationSource
-    ) {
+                                          String installationSource,
+                                          @Nullable TrafficHistograms enterpriseTraffic) {
         Map<String, Object> clusterInfo = new LinkedHashMap<>();
         clusterInfo.put("cluster_id", clusterId);
         clusterInfo.put("cluster_creation_date", clusterCreationDate);
         clusterInfo.put("nodes_count", nodes.size());
-        clusterInfo.put("traffic_last_month", averageLastMonthTraffic);
+        clusterInfo.put("traffic_last_month", sumTraffic(trafficLastMonth.output()));
+        clusterInfo.put("data_warehouse_output_traffic_last_month", 0);
+        clusterInfo.put("input_traffic_last_month", sumTraffic(trafficLastMonth.input()));
         clusterInfo.put("users_count", usersCount);
         clusterInfo.put("license_count", licenseCount);
         clusterInfo.put("node_leader_app_version", leaderNodeVersion(nodes));
         clusterInfo.put("installation_source", installationSource);
         clusterInfo.put("nodes", nodes);
+        if (enterpriseTraffic != null) {
+            clusterInfo.put("data_warehouse_accounted_output_traffic_last_month", enterpriseTraffic.sumTraffic("data_warehouse_indexed_output"));
+            clusterInfo.put("data_warehouse_not_accounted_output_traffic_last_month", enterpriseTraffic.sumTraffic("data_warehouse_not_indexed_output"));
+        }
         return clusterInfo;
+    }
 
+    private static long sumTraffic(Map<DateTime, Long> traffic) {
+        return traffic.values().stream().mapToLong(Long::longValue).sum();
     }
 
     private Object leaderNodeVersion(Map<String, Map<String, Object>> nodes) {
