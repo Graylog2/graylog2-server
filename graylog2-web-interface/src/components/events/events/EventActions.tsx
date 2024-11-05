@@ -22,7 +22,7 @@ import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkT
 import type { Event } from 'components/events/events/types';
 import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
 
-const DefaultWrapper = ({ children }) => (
+const DefaultWrapper = ({ children }: React.PropsWithChildren) => (
   <ButtonToolbar>
     <MoreActions>
       {children}
@@ -30,7 +30,7 @@ const DefaultWrapper = ({ children }) => (
   </ButtonToolbar>
 );
 
-const EventActions = ({ event, wrapper: Wrapper = DefaultWrapper }: { event: Event, wrapper?: React.ComponentType }) => {
+const EventActions = ({ event, wrapper: Wrapper = DefaultWrapper }: { event: Event, wrapper?: React.ComponentType<React.PropsWithChildren> }) => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(event.id);
   const hasReplayInfo = !!event.replay_info;
 

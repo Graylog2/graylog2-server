@@ -15,15 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import { styled } from 'styled-components';
 
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Event } from 'components/events/events/types';
-import useCurrentUser from 'hooks/useCurrentUser';
-import CustomColumnRenderers from 'components/events/ColumnRenderers';
-import { Table } from 'components/bootstrap';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 import type { EventsAdditionalData } from 'components/events/fetchEvents';
 import EventDetailsTable from 'components/events/events/EventDetailsTable';
@@ -32,10 +28,6 @@ type Props = {
   defaultLayout: Parameters<typeof useTableLayout>[0],
   event: Event,
 }
-
-const TD = styled.td`
-    white-space: nowrap;
-`;
 
 const ExpandedSection = ({ defaultLayout, event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();

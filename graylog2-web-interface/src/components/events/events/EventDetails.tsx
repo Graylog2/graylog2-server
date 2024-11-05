@@ -16,27 +16,13 @@
  */
 import React, { useMemo } from 'react';
 
-import usePluginEntities from 'hooks/usePluginEntities';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import EventDetailsTable from 'components/events/events/EventDetailsTable';
 import { detailsAttributes } from 'components/events/Constants';
 import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
 import type { EventsAdditionalData } from 'components/events/fetchEvents';
 import EventActions from 'components/events/events/EventActions';
-
-import DropdownButton from '../../bootstrap/DropdownButton';
-
-export const usePluggableEventActions = (eventId: string) => {
-  const pluggableEventActions = usePluginEntities('views.components.eventActions');
-
-  return pluggableEventActions.filter(
-    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
-  ).map(
-    ({ component: PluggableEventAction, key }) => (
-      <PluggableEventAction key={key} eventId={eventId} />
-    ),
-  );
-};
+import DropdownButton from 'components/bootstrap/DropdownButton';
 
 type Props = {
   event: Event,
