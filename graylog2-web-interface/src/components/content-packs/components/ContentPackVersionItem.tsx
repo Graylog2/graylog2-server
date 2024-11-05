@@ -31,11 +31,12 @@ import {
   MenuItem,
   Modal,
 } from 'components/bootstrap';
-import type { ContentPackVersionsType, ContentPackInstallation } from 'components/content-packs/Types';
+import type { ContentPackInstallation } from 'components/content-packs/Types';
+import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 
 type Props = {
   pack: ContentPackInstallation
-  contentPackRevisions: ContentPackVersionsType,
+  contentPackRevisions: ContentPackRevisions,
   onDeletePack?: (id: string, rev: number) => void
   onChange?: (id: string) => void
   onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void

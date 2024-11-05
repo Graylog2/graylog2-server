@@ -25,7 +25,7 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 type PipelineConnectionsActionsType = {
   list: () => Promise<unknown>,
   connectToStream: () => Promise<unknown>,
-  connectToPipeline: () => Promise<unknown>,
+  connectToPipeline: (connections: PipelineConnectionsType) => Promise<unknown>,
 }
 export const PipelineConnectionsActions = singletonActions(
   'core.PipelineConnections',
@@ -48,7 +48,7 @@ type PipelineReverseConnectionsType = {
 };
 
 type PipelineConnectionsStoreState = {
-  connections: any,
+  connections: PipelineConnectionsType[],
 }
 export const PipelineConnectionsStore = singletonStore(
   'core.PipelineConnections',

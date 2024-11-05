@@ -16,6 +16,9 @@
  */
 package org.graylog2.telemetry.enterprise;
 
+import jakarta.annotation.Nullable;
+import org.graylog2.system.traffic.TrafficCounterService;
+
 import java.util.List;
 
 public interface TelemetryEnterpriseDataProvider {
@@ -24,4 +27,6 @@ public interface TelemetryEnterpriseDataProvider {
 
     int teamsCount(String userId);
 
+    @Nullable
+    TrafficCounterService.TrafficHistograms enterpriseTraffic();
 }

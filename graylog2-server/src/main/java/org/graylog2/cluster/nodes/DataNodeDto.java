@@ -71,8 +71,14 @@ public abstract class DataNodeDto extends NodeDto {
 
     @JsonProperty("version_compatible")
     public boolean isCompatibleWithVersion() {
-        return getDatanodeVersion() != null &&
-                Version.CURRENT_CLASSPATH.compareTo(new Version(com.github.zafarkhaja.semver.Version.valueOf(getDatanodeVersion()))) == 0;
+        return Optional.ofNullable(getDatanodeVersion())
+                .map(datanodeVersion -> isVersionEqualIgnoreBuildMetadata(datanodeVersion, Version.CURRENT_CLASSPATH))
+                .orElse(false);
+    }
+
+    protected static boolean isVersionEqualIgnoreBuildMetadata(String datanodeVersion, Version serverVersion) {
+        final com.github.zafarkhaja.semver.Version datanode = com.github.zafarkhaja.semver.Version.parse(datanodeVersion);
+        return serverVersion.getVersion().compareToIgnoreBuildMetadata(datanode) == 0;
     }
 
     @Nullable

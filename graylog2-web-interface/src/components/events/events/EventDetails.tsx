@@ -87,12 +87,14 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
               <i>No remediation steps</i>
             )}
           </dd>
-          {event.replay_info && (
+          {!event.event_definition_type.startsWith('system-notifications') && (
             <>
               <dt>Actions</dt>
+              {event.replay_info && (
               <dd>
                 <LinkToReplaySearch id={event.id} isEvent />
               </dd>
+              )}
               {pluggableActions}
             </>
           )}
