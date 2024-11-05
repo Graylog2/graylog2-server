@@ -15,14 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
 
 import { ButtonToolbar, MenuItem } from 'components/bootstrap';
 import { MoreActions } from 'components/common/EntityDataTable';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
-import usePluginEntities from 'hooks/usePluginEntities';
 import type { Event } from 'components/events/events/types';
-import type { EventActionComponentProps } from 'views/types';
 import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
 
 const DefaultWrapper = ({ children }) => (
@@ -39,8 +36,8 @@ const EventActions = ({ event, wrapper: Wrapper = DefaultWrapper }: { event: Eve
 
   const moreActions = [
     hasReplayInfo ? <MenuItem><LinkToReplaySearch id={event.id} isEvent /></MenuItem> : null,
-    pluggableActions.length && hasReplayInfo ? <MenuItem divider key="divider" /> : null,
-    pluggableActions.length && hasReplayInfo ? pluggableActions : null,
+    pluggableActions.length ? <MenuItem divider key="divider" /> : null,
+    pluggableActions.length ? pluggableActions : null,
   ].filter(Boolean);
 
   return moreActions.length ? (
