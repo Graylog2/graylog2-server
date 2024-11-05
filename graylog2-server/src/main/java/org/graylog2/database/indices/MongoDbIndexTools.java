@@ -45,7 +45,7 @@ public class MongoDbIndexTools<T> {
 
     // MongoDB Indexes cannot be altered once created.
     public static void ensureTTLIndex(MongoCollection<Document> collection, Duration ttl, String fieldUpdatedAt) {
-        final IndexOptions indexOptions = new IndexOptions().expireAfter(ttl.getSeconds(), TimeUnit.SECONDS);
+        final IndexOptions indexOptions = new IndexOptions().expireAfter(ttl.toSeconds(), TimeUnit.SECONDS);
         final Bson updatedAtKey = Indexes.ascending(fieldUpdatedAt);
         for (Document document : collection.listIndexes()) {
             final Set<String> keySet = document.get(INDEX_DOCUMENT_KEY, Document.class).keySet();
