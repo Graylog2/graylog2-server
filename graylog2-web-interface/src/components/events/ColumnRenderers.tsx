@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { isPermitted } from 'util/PermissionsMixin';
+
 import * as React from 'react';
 import type Immutable from 'immutable';
 import { useMemo } from 'react';
@@ -22,7 +24,6 @@ import isEmpty from 'lodash/isEmpty';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
-import { isPermitted } from 'util/PermissionsMixin';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { Event } from 'components/events/events/types';
@@ -31,8 +32,9 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import type { EventsAdditionalData } from 'components/events/events/fetchEvents';
+import type { EventsAdditionalData } from 'components/events/fetchEvents';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
+import { Timestamp } from 'components/common';
 
 const EventDefinitionRenderer = ({ eventDefinitionId, permissions }: { eventDefinitionId: string, permissions: Immutable.List<string> }) => {
   const { meta: { context: eventsContext } } = useMetaDataContext<EventsAdditionalData>();
@@ -110,6 +112,14 @@ const MessageRenderer = ({ message, eventId }: { message: string, eventId: strin
   return <StyledDiv onClick={toggleExtraSection}>{message}</StyledDiv>;
 };
 
+const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => eventData.timerange_start && eventData.timerange_end && (
+<div>
+  <Timestamp dateTime={eventData.timerange_start} />
+      &ensp;&mdash;&ensp;
+  <Timestamp dateTime={eventData.timerange_end} />
+</div>
+);
+
 const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRenderers<Event> => ({
   attributes: {
     message: {
@@ -148,6 +158,9 @@ const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRende
     },
     remediation_steps: {
       renderCell: (_, event: Event) => <RemediationStepRenderer eventDefinitionId={event.event_definition_id} />,
+    },
+    timerange_start: {
+      renderCell: (_, event: Event) => <TimeRangeRenderer eventData={event} />,
     },
   },
 });

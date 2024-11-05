@@ -15,17 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import isEmpty from 'lodash/isEmpty';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import { Col, Row } from 'components/bootstrap';
-import { Timestamp } from 'components/common';
-import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
-import EventFields from 'components/events/events/EventFields';
-import EventDefinitionLink from 'components/event-definitions/event-definitions/EventDefinitionLink';
-import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
-import PriorityName from 'components/events/events/PriorityName';
+import EventDetailsTable from 'components/events/events/EventDetailsTable';
+import { detailsAttributes } from 'components/events/Constants';
+import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
+import type { EventsAdditionalData } from 'components/events/fetchEvents';
+import EventActions from 'components/events/events/EventActions';
+
+import DropdownButton from '../../bootstrap/DropdownButton';
 
 export const usePluggableEventActions = (eventId: string) => {
   const pluggableEventActions = usePluginEntities('views.components.eventActions');
@@ -44,85 +43,23 @@ type Props = {
   eventDefinitionContext: EventDefinitionContext,
 };
 
+const attributesList = detailsAttributes.map(({ id, title }) => ({ id, title }));
+
+const ActionsWrapper = ({ children }) => (
+  <DropdownButton title="Actions"
+                  buttonTitle="Actions">
+    {children}
+  </DropdownButton>
+);
+
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
-  const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
-  const pluggableActions = usePluggableEventActions(event.id);
-
-  const plugin = useMemo(() => {
-    if (event.event_definition_type === undefined) {
-      return null;
-    }
-
-    return eventDefinitionTypes.find((edt) => edt.type === event.event_definition_type);
-  }, [event, eventDefinitionTypes]);
+  const meta = useMemo(() => ({ context: { event_definitions: eventDefinitionContext } }), [eventDefinitionContext]);
 
   return (
-    <Row>
-      <Col md={6}>
-        <dl>
-          <dt>ID</dt>
-          <dd>{event.id}</dd>
-          <dt>Priority</dt>
-          <dd>
-            <PriorityName priority={event.priority} />
-          </dd>
-          <dt>Timestamp</dt>
-          <dd> <Timestamp dateTime={event.timestamp} />
-          </dd>
-          <dt>Event Definition</dt>
-          <dd>
-            <EventDefinitionLink event={event} eventDefinitionContext={eventDefinitionContext} />
-            &emsp;
-            ({(plugin && plugin.displayName) || event.event_definition_type})
-          </dd>
-          <dt>Remediation Steps</dt>
-          <dd>
-            {eventDefinitionContext?.remediation_steps ? (
-              <MarkdownPreview show
-                               withFullView
-                               noBorder
-                               noBackground
-                               value={eventDefinitionContext.remediation_steps} />
-            ) : (
-              <i>No remediation steps</i>
-            )}
-          </dd>
-          {event.replay_info && (
-            <>
-              <dt>Actions</dt>
-              <dd>
-                <LinkToReplaySearch id={event.id} isEvent />
-              </dd>
-              {pluggableActions}
-            </>
-          )}
-        </dl>
-      </Col>
-      <Col md={6}>
-        <dl>
-          {event.timerange_start && event.timerange_end && (
-            <>
-              <dt>Aggregation time range</dt>
-              <dd>
-                <Timestamp dateTime={event.timerange_start} />
-                &ensp;&mdash;&ensp;
-                <Timestamp dateTime={event.timerange_end} />
-              </dd>
-            </>
-          )}
-          <dt>Event Key</dt>
-          <dd>{event.key || 'No Key set for this Event.'}</dd>
-          <dt>Additional Fields</dt>
-          {isEmpty(event.fields)
-            ? <dd>No additional Fields added to this Event.</dd>
-            : <EventFields fields={event.fields} />}
-          <dt>Group-By Fields</dt>
-          {isEmpty(event.group_by_fields)
-            ? <dd>No group-by fields on this Event.</dd>
-            : <EventFields fields={event.group_by_fields} />}
-        </dl>
-      </Col>
-    </Row>
+    <MetaDataProvider<EventsAdditionalData> meta={meta}>
+      <EventDetailsTable attributesList={attributesList} event={event} meta={meta} />
+      <EventActions event={event} wrapper={ActionsWrapper} />
+    </MetaDataProvider>
   );
 };
 

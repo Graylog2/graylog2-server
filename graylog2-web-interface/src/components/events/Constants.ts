@@ -19,41 +19,18 @@ import type { Sort, Attribute } from 'stores/PaginationTypes';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
-export const additionalAttributes: Array<Attribute> = [
+export const detailsAttributes: Array<Attribute> = [
+  {
+    id: 'id',
+    title: 'ID',
+    type: 'STRING',
+    sortable: true,
+  },
   {
     id: 'priority',
     title: 'Priority',
     type: 'STRING',
     sortable: true,
-    searchable: false,
-  },
-  {
-    id: 'message',
-    title: 'Description',
-    type: 'STRING',
-    sortable: false,
-    searchable: false,
-  },
-  {
-    id: 'key',
-    title: 'Key',
-    type: 'STRING',
-    sortable: true,
-    searchable: false,
-  },
-  {
-    id: 'alert',
-    title: 'Type',
-    type: 'BOOLEAN',
-    sortable: true,
-    filterable: true,
-    filter_options: [{ value: 'false', title: 'Event' }, { value: 'true', title: 'Alert' }],
-  },
-  {
-    id: 'event_definition_id',
-    title: 'Event Definition',
-    type: 'STRING',
-    sortable: false,
     searchable: false,
   },
   {
@@ -64,16 +41,33 @@ export const additionalAttributes: Array<Attribute> = [
     filterable: true,
   },
   {
-    id: 'id',
-    title: 'ID',
+    id: 'event_definition_id',
+    title: 'Event Definition',
     type: 'STRING',
-    sortable: true,
+    sortable: false,
+    searchable: false,
   },
   {
     id: 'event_definition_type',
     title: 'Event Definition Type',
     type: 'STRING',
     sortable: true,
+  },
+  {
+    id: 'remediation_steps',
+    title: 'Remediation Steps',
+    sortable: false,
+  },
+  {
+    id: 'timerange_start',
+    title: 'Aggregation time range',
+  },
+  {
+    id: 'key',
+    title: 'Key',
+    type: 'STRING',
+    sortable: true,
+    searchable: false,
   },
   {
     id: 'fields',
@@ -86,11 +80,24 @@ export const additionalAttributes: Array<Attribute> = [
     title: 'Group-By Fields',
     sortable: false,
   },
+];
+export const additionalAttributes: Array<Attribute> = [
   {
-    id: 'remediation_steps',
-    title: 'Remediation Steps',
+    id: 'message',
+    title: 'Description',
+    type: 'STRING',
     sortable: false,
+    searchable: false,
   },
+  {
+    id: 'alert',
+    title: 'Type',
+    type: 'BOOLEAN',
+    sortable: true,
+    filterable: true,
+    filter_options: [{ value: 'false', title: 'Event' }, { value: 'true', title: 'Alert' }],
+  },
+  ...detailsAttributes,
 ];
 
 const getStreamTableElements = () => {
@@ -120,6 +127,7 @@ const getStreamTableElements = () => {
     'fields',
     'group_by_fields',
     'remediation_steps',
+    'timerange_start',
   ];
 
   return {

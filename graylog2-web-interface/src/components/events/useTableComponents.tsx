@@ -16,7 +16,7 @@
  */
 import React, { useCallback, useMemo } from 'react';
 
-import EventActions from 'components/events/EventActions';
+import EventActions from 'components/events/events/EventActions';
 import type { Event } from 'components/events/events/types';
 import ExpandedSection from 'components/events/ExpandedSection';
 import type useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';

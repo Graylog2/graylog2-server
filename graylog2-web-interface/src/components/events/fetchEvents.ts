@@ -15,16 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import * as URLUtils from 'util/URLUtils';
+import { adjustFormat } from 'util/DateTime';
+
 import moment from 'moment';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
-import * as URLUtils from 'util/URLUtils';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
-import type { Event } from 'components/events/events/types';
+import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import { additionalAttributes } from 'components/events/Constants';
 import { extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
-import { adjustFormat } from 'util/DateTime';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 const url = URLUtils.qualifyUrl('/events/search');
@@ -67,14 +68,9 @@ const getConcatenatedQuery = (query: string, streamId: string) => {
 };
 
 export const keyFn = (searchParams: SearchParams) => ['events', 'search', searchParams];
-type EventContext = {
-  id: string,
-  title: string,
-  description: string,
-  remediation_steps: string,
-}
+
 export type EventsAdditionalData = {
-  context: {event_definitions: Record<string, EventContext>, streams: Record<string, EventContext>},
+  context: {event_definitions?: EventDefinitionContext, streams?: EventDefinitionContext},
 }
 const fetchEvents = (searchParams: SearchParams, streamId: string): Promise<PaginatedResponse<Event, EventsAdditionalData>> => fetch('POST', url, {
   query: getConcatenatedQuery(searchParams.query, streamId),

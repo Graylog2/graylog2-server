@@ -14,14 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
-import { ButtonToolbar, MenuItem } from 'components/bootstrap';
-import { MoreActions } from 'components/common/EntityDataTable';
-import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 import usePluginEntities from 'hooks/usePluginEntities';
-import type { Event } from 'components/events/events/types';
 import type { EventActionComponentProps } from 'views/types';
 
 const usePluggableEventActions = (eventId: string) => {
@@ -47,26 +42,4 @@ const usePluggableEventActions = (eventId: string) => {
   return ({ actions, actionModals });
 };
 
-const EventActions = ({ event }: { event: Event }) => {
-  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(event.id);
-  const hasReplayInfo = !!event.replay_info;
-
-  const moreActions = [
-    hasReplayInfo ? <MenuItem><LinkToReplaySearch id={event.id} isEvent /></MenuItem> : null,
-    pluggableActions.length && hasReplayInfo ? <MenuItem divider key="divider" /> : null,
-    pluggableActions.length && hasReplayInfo ? pluggableActions : null,
-  ].filter(Boolean);
-
-  return moreActions.length ? (
-    <>
-      <ButtonToolbar>
-        <MoreActions>
-          {moreActions}
-        </MoreActions>
-      </ButtonToolbar>
-      {pluggableActionModals}
-    </>
-  ) : null;
-};
-
-export default EventActions;
+export default usePluggableEventActions;

@@ -25,7 +25,8 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import CustomColumnRenderers from 'components/events/ColumnRenderers';
 import { Table } from 'components/bootstrap';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
-import type { EventsAdditionalData } from 'components/events/events/fetchEvents';
+import type { EventsAdditionalData } from 'components/events/fetchEvents';
+import EventDetailsTable from 'components/events/events/EventDetailsTable';
 
 type Props = {
   defaultLayout: Parameters<typeof useTableLayout>[0],
@@ -49,27 +50,7 @@ const ExpandedSection = ({ defaultLayout, event }: Props) => {
     return attributes.filter(({ id }) => !displayedAttributesSet.has(id)).map(({ id, title }: Attribute) => ({ id, title }));
   }, [attributes, displayedAttributes, isInitialLoading]);
 
-  const currentUser = useCurrentUser();
-
-  const { attributes: attributesRenderers } = useMemo(() => CustomColumnRenderers(currentUser.permissions), [currentUser.permissions]);
-
-  return (
-    <Table condensed striped>
-      <tbody>
-        {nonDisplayedAttributes.map((attribute) => {
-          const renderCell = attributesRenderers[attribute.id]?.renderCell;
-          const value = event[attribute.id];
-
-          return (
-            <tr key={attribute.id}>
-              <TD><b>{attribute.title}</b></TD>
-              <td>{renderCell ? renderCell(value, event, attribute, meta) : value}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </Table>
-  );
+  return <EventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />;
 };
 
 export default ExpandedSection;
