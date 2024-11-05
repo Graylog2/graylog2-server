@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isPermitted } from 'util/PermissionsMixin';
 
 import * as React from 'react';
 import type Immutable from 'immutable';
@@ -22,6 +21,7 @@ import { useMemo } from 'react';
 import styled from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
 
+import { isPermitted } from 'util/PermissionsMixin';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import { Link } from 'components/common/router';

@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { ExportPayload } from 'util/MessagesExportUtils';
-
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
 import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 
+import type { ExportPayload } from 'util/MessagesExportUtils';
 import type { IconName } from 'components/common/Icon';
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
