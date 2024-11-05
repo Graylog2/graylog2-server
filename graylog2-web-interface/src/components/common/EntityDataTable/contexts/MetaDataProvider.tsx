@@ -15,22 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import { useMemo } from 'react';
 
-import StreamsContext from 'contexts/StreamsContext';
-import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
+import MetaDataContext from 'components/common/EntityDataTable/contexts/MetaDataContext';
 
-type Props = {
-  children: React.ReactElement,
-  skipNoStreamsCheck?: boolean,
+type Props<M> = React.PropsWithChildren<{
+  meta: M
+}>;
+
+const MetaDataProvider = <Meta = unknown>({ children, meta }: Props<Meta>) => {
+  const contextValue = useMemo(() => ({ meta }), [meta]);
+
+  return (
+    <MetaDataContext.Provider value={contextValue}>
+      {children}
+    </MetaDataContext.Provider>
+  );
 };
 
-export default ({ children, skipNoStreamsCheck = false }: Props) => {
-  const streams = useContext(StreamsContext);
-
-  if (skipNoStreamsCheck) {
-    return children;
-  }
-
-  return (streams && streams.length > 0 ? children : <UserHasNoStreamAccess />);
-};
+export default MetaDataProvider;

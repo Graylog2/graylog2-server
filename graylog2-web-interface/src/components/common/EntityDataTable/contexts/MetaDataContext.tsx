@@ -15,22 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 
-import StreamsContext from 'contexts/StreamsContext';
-import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
+import { singleton } from 'logic/singleton';
 
-type Props = {
-  children: React.ReactElement,
-  skipNoStreamsCheck?: boolean,
-};
+type ContextValue = {
+  meta: unknown,
+} | undefined
 
-export default ({ children, skipNoStreamsCheck = false }: Props) => {
-  const streams = useContext(StreamsContext);
+const EntityTableMetaDataContext = React.createContext<ContextValue>(undefined);
 
-  if (skipNoStreamsCheck) {
-    return children;
-  }
-
-  return (streams && streams.length > 0 ? children : <UserHasNoStreamAccess />);
-};
+export default singleton('contexts.EntityTableMetaDataContext', () => EntityTableMetaDataContext);

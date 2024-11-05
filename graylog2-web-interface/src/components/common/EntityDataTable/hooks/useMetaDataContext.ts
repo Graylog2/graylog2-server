@@ -14,23 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 import { useContext } from 'react';
 
-import StreamsContext from 'contexts/StreamsContext';
-import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
+import MetaDataContext from 'components/common/EntityDataTable/contexts/MetaDataContext';
 
-type Props = {
-  children: React.ReactElement,
-  skipNoStreamsCheck?: boolean,
-};
+const useMetaDataContext = <M = unknown>() => {
+  const context = useContext(MetaDataContext);
 
-export default ({ children, skipNoStreamsCheck = false }: Props) => {
-  const streams = useContext(StreamsContext);
-
-  if (skipNoStreamsCheck) {
-    return children;
+  if (!context) {
+    throw new Error('useMetaDataContext hook needs to be used inside MetaDataProvider');
   }
 
-  return (streams && streams.length > 0 ? children : <UserHasNoStreamAccess />);
+  return context as {meta: M };
 };
+
+export default useMetaDataContext;
