@@ -255,8 +255,8 @@ public class Configuration extends CaConfiguration {
             set a default 30-day automatic certificate renewal policy and create a self-signed CA. This CA
             will be used to sign certificates for SSL communication between the server and datanodes.
             """)
-    @Parameter(value = "autosecurity")
-    private boolean autosecurity = false;
+    @Parameter(value = "selfsigned_startup")
+    private boolean selfsignedStartup = false;
 
     public static final String INSTALL_HTTP_CONNECTION_TIMEOUT = "install_http_connection_timeout";
     public static final String INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL = "install_output_buffer_drain_interval";
@@ -568,8 +568,8 @@ public class Configuration extends CaConfiguration {
         return queryLatencyMonitoringWindowSize;
     }
 
-    public boolean autosecurityEnabled() {
-        return autosecurity;
+    public boolean selfsignedStartupEnabled() {
+        return selfsignedStartup;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

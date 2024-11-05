@@ -42,22 +42,22 @@ import java.util.concurrent.ExecutionException;
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV,
                                    additionalConfigurationParameters = {
                                            @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_AUTOSECURITY", value = "true"),
+                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
                                            @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
                                    })
-public class DatanodeAutosecurityIT {
+public class DatanodeSelfsignedStartupIT {
 
 
     private final Logger log = LoggerFactory.getLogger(DatanodeProvisioningIT.class);
 
     private final GraylogApis apis;
 
-    public DatanodeAutosecurityIT(GraylogApis apis) {
+    public DatanodeSelfsignedStartupIT(GraylogApis apis) {
         this.apis = apis;
     }
 
     @ContainerMatrixTest
-    public void testAutosecurity() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, ExecutionException, RetryException {
+    public void testSelfsignedStartup() throws ExecutionException, RetryException {
         testEncryptedConnectionToOpensearch();
     }
 

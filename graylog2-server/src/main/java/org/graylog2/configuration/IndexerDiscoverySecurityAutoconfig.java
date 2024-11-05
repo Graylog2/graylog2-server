@@ -46,7 +46,7 @@ public class IndexerDiscoverySecurityAutoconfig implements IndexerDiscoveryListe
         this.caKeystore = caKeystore;
     }
 
-    public void configureAutosecurity() {
+    public void configureSelfsignedStartup() {
         final PreflightConfigResult preflightConfigResult = preflightConfigService.getPreflightConfigResult();
         if (preflightConfigResult == PreflightConfigResult.UNKNOWN) {
             LOG.info("Setting preflight config to FINISHED");
@@ -70,9 +70,9 @@ public class IndexerDiscoverySecurityAutoconfig implements IndexerDiscoveryListe
 
     @Override
     public void beforeIndexerDiscovery() {
-        if (configuration.autosecurityEnabled()) {
-            LOG.info("Security autoconfig enabled, configuring renewal policy and CA if needed");
-            configureAutosecurity();
+        if (configuration.selfsignedStartupEnabled()) {
+            LOG.info("Self-signed security startup enabled, configuring renewal policy and CA if needed");
+            configureSelfsignedStartup();
         }
     }
 
