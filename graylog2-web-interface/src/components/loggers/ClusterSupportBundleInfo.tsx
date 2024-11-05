@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+/// <reference path="./types.ts" />
 import * as React from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';

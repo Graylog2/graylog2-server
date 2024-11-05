@@ -14,25 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  '@emotion/react',
-  '@mantine/core',
-  '@tanstack/react-query',
-  'chroma-js',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment',
-  'moment-timezone',
-  'react',
-  'react-bootstrap',
-  'react-dom',
-  'react-redux',
-  'react-router',
-  'react-router-bootstrap',
-  'redux',
-  'reflux',
-  'reflux-core',
-  'styled-components',
-  'use-query-params',
-];
+import * as React from 'react';
+import { useMemo } from 'react';
+
+import MetaDataContext from 'components/common/EntityDataTable/contexts/MetaDataContext';
+
+type Props<M> = React.PropsWithChildren<{
+  meta: M
+}>;
+
+const MetaDataProvider = <Meta = unknown>({ children, meta }: Props<Meta>) => {
+  const contextValue = useMemo(() => ({ meta }), [meta]);
+
+  return (
+    <MetaDataContext.Provider value={contextValue}>
+      {children}
+    </MetaDataContext.Provider>
+  );
+};
+
+export default MetaDataProvider;
