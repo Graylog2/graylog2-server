@@ -37,7 +37,7 @@ const GraphWrapper = styled.div<{
   width: ${$width}px
 `);
 
-const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
+const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
   const theme = useTheme();
   const isCloud = AppConfig.isCloud();
 
