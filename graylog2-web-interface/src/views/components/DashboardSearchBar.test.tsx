@@ -31,7 +31,7 @@ import OriginalDashboardSearchBar from './DashboardSearchBar';
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
-
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/hooks/useAutoRefresh');
 
 jest.mock('views/hooks/useMinimumRefreshInterval', () => () => ({
