@@ -33,7 +33,7 @@ import EventsRefreshControls from 'components/events/events/EventsRefreshControl
 
 import QueryHelper from '../common/QueryHelper';
 
-const NewItem = () => {
+const RefreshControls = () => {
   const { refetch } = useTableFetchContext();
 
   return <AutoRefreshProvider onRefresh={refetch}><EventsRefreshControls disable={false} /></AutoRefreshProvider>;
@@ -62,7 +62,7 @@ const EventsEntityTable = () => {
                                  entityAttributesAreCamelCase={false}
                                  filterValueRenderers={FilterValueRenderers}
                                  columnRenderers={columnRenderers}
-                                 topRightCol={<NewItem />} />
+                                 topRightCol={<RefreshControls />} />
   );
 };
 
