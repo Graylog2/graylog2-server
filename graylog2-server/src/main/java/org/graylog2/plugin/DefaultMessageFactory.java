@@ -16,6 +16,8 @@
  */
 package org.graylog2.plugin;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.joda.time.DateTime;
 
@@ -24,18 +26,25 @@ import java.util.Map;
 // Intentionally package-private to enforce usage of injected MessageFactory.
 @Singleton
 class DefaultMessageFactory implements MessageFactory {
+    private final boolean cleanKeyKeepsSpaceAndSlash;
+
+    @Inject
+    public DefaultMessageFactory(@Named("clean_key_keeps_space_and_slash") final boolean cleanKeyKeepsSpaceAndSlash) {
+        this.cleanKeyKeepsSpaceAndSlash = cleanKeyKeepsSpaceAndSlash;
+    }
+
     @Override
     public Message createMessage(final String message, final String source, final DateTime timestamp) {
-        return new Message(message, source, timestamp);
+        return new Message(message, source, timestamp, cleanKeyKeepsSpaceAndSlash);
     }
 
     @Override
     public Message createMessage(final Map<String, Object> fields) {
-        return new Message(fields);
+        return new Message(fields, cleanKeyKeepsSpaceAndSlash);
     }
 
     @Override
     public Message createMessage(final String id, Map<String, Object> newFields) {
-        return new Message(id, newFields);
+        return new Message(id, newFields, cleanKeyKeepsSpaceAndSlash);
     }
 }

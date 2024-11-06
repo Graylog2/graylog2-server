@@ -49,7 +49,7 @@ export const InputStaticFieldsStore = singletonStore(
     },
 
     destroy(input, name) {
-      const url = URLUtils.qualifyUrl(`${this.sourceUrl(input.id)}/${name}`);
+      const url = URLUtils.qualifyUrl(`${this.sourceUrl(input.id)}/${encodeURIComponent(name)}`);
       const promise = fetch('DELETE', url);
 
       promise

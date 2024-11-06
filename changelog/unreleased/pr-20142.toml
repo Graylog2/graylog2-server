@@ -1,0 +1,5 @@
+type = "a"
+message = "allowing ' ' and '/' in fieldnames"
+
+issues = []
+pulls = ["20142"]

@@ -217,9 +217,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     @Deprecated
     public static final String FIELD_GL2_SOURCE_RADIO_INPUT = "gl2_source_radio_input";
 
-    // Matches whole field names containing a-z, A-Z, 0-9, period char, -, or @.
-    private static final CharMatcher VALID_KEY_CHAR_MATCHER = inRange('a', 'z').or(inRange('A', 'Z')).or(inRange('0', '9')).or(anyOf(".@-_")).precomputed();
-    private static final CharMatcher INVALID_KEY_CHAR_MATCHER = VALID_KEY_CHAR_MATCHER.negate().precomputed();
+    // Matches whole field names containing a-z, A-Z, 0-9, period char, -, " ", / or @
+    private static final CharMatcher VALID_KEY_CHAR_MATCHER = inRange('a', 'z').or(inRange('A', 'Z')).or(inRange('0', '9')).or(anyOf(".@-_ /")).precomputed();
+    private static final CharMatcher VALID_KEY_CHAR_MATCHER_WITHOUT_SPACE_AND_SLASH = inRange('a', 'z').or(inRange('A', 'Z')).or(inRange('0', '9')).or(anyOf(".@-_")).precomputed();
+    private CharMatcher INVALID_KEY_CHAR_MATCHER;
 
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
@@ -369,7 +370,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
-    Message(final String message, final String source, final DateTime timestamp) {
+    Message(final String message, final String source, final DateTime timestamp, final boolean cleanKeyKeepsSpaceAndSlash) {
+        setInvalidKeyCharMatcher(cleanKeyKeepsSpaceAndSlash);
         fields.put(FIELD_ID, new UUID().toString());
         addRequiredField(FIELD_MESSAGE, message);
         addRequiredField(FIELD_SOURCE, source);
@@ -377,15 +379,20 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
-    Message(final Map<String, Object> fields) {
-        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))));
+    Message(final Map<String, Object> fields, final boolean cleanKeyKeepsSpaceAndSlash) {
+        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))), cleanKeyKeepsSpaceAndSlash);
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
-    Message(String id, Map<String, Object> newFields) {
+    Message(String id, Map<String, Object> newFields, final boolean cleanKeyKeepsSpaceAndSlash) {
         Preconditions.checkArgument(id != null, "message id cannot be null");
+        setInvalidKeyCharMatcher(cleanKeyKeepsSpaceAndSlash);
         fields.put(FIELD_ID, id);
         addFields(newFields);
+    }
+
+    private void setInvalidKeyCharMatcher(final boolean cleanKeyKeepsSpaceAndSlash) {
+        this.INVALID_KEY_CHAR_MATCHER = cleanKeyKeepsSpaceAndSlash ? VALID_KEY_CHAR_MATCHER.negate().precomputed() : VALID_KEY_CHAR_MATCHER_WITHOUT_SPACE_AND_SLASH.negate().precomputed();
     }
 
     public boolean isComplete() {
@@ -652,11 +659,16 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return sizeCounter.getCount();
     }
 
-    public static boolean validKey(final String key) {
-        return VALID_KEY_CHAR_MATCHER.matchesAllOf(key);
+    // assumes that filtering null or keys of length 0 have been filtered before calling this method
+    private static boolean hasLeadingOrTrailingWhitespace(String str) {
+        return Character.isWhitespace(str.charAt(0)) || Character.isWhitespace(str.charAt(str.length() - 1));
     }
 
-    public static String cleanKey(final String key) {
+    public static boolean validKey(final String key) {
+        return key != null && !key.isBlank() && !hasLeadingOrTrailingWhitespace(key) && VALID_KEY_CHAR_MATCHER.matchesAllOf(key);
+    }
+
+    public String cleanKey(final String key) {
         return INVALID_KEY_CHAR_MATCHER.replaceFrom(key, KEY_REPLACEMENT_CHAR);
     }
 
