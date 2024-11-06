@@ -64,7 +64,7 @@ const useClusterSupportBundle = () => {
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const { data, refetch } = useQuery<BundleFile[]>(
     ['supportBundleList', 'overview'],
-    defaultOnError(fetchSupportBundleList, 'Loading Support Bundle list failed with status', 'Could not load Support Bundle list.'),
+    () => defaultOnError(fetchSupportBundleList(), 'Loading Support Bundle list failed with status', 'Could not load Support Bundle list.'),
     {
       keepPreviousData: true,
     },

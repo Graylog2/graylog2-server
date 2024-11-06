@@ -42,7 +42,7 @@ function fetchScopePermissions() {
 const useGetPermissionsByScope = (entity: Partial<GenericEntityType>) => {
   const { data, isLoading } = useQuery<EntityScopeType, Error>(
     ['scope-permissions'],
-    onError(fetchScopePermissions, (e) => UserNotification.error(e.message)),
+    () => onError(fetchScopePermissions(), (e) => UserNotification.error(e.message)),
     {
       retry: 1,
       cacheTime: 1000 * 60 * 60 * 3, // cache for 3 hours

@@ -68,7 +68,7 @@ const useSavedSearches = (searchParams: SearchParams, { enabled }: Options = { e
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     ['saved-searches', 'overview', searchParams],
-    defaultOnError(() => fetchSavedSearches(searchParams), 'Loading saved searches failed with status', 'Could not load saved searches'),
+    () => defaultOnError(fetchSavedSearches(searchParams), 'Loading saved searches failed with status', 'Could not load saved searches'),
     {
       keepPreviousData: true,
       enabled,

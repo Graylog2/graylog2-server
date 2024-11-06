@@ -1,16 +1,14 @@
 import UserNotification from 'preflight/util/UserNotification';
 
-export function onError<T, E = Error>(fn: () => Promise<T>, handler: (e: E) => void) {
-  return async () => {
-    try {
-      return await fn();
-    } catch (e) {
-      handler(e);
-      throw e;
-    }
-  };
+export async function onError<T, E = Error>(promise: Promise<T>, handler: (e: E) => void) {
+  try {
+    return await promise;
+  } catch (e) {
+    handler(e);
+    throw e;
+  }
 }
 
-export function defaultOnError<T>(fn: () => Promise<T>, message: string, title: string) {
-  return onError(fn, (error: Error) => UserNotification.error(`${message}: ${error}`, title));
+export function defaultOnError<T>(promise: Promise<T>, message: string, title: string) {
+  return onError(promise, (error: Error) => UserNotification.error(`${message}: ${error}`, title));
 }
