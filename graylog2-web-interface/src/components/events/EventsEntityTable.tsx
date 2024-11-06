@@ -20,7 +20,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useTableElements from 'components/events/useTableComponents';
 import CustomColumnRenderers from 'components/events/ColumnRenderers';
 import getStreamTableElements from 'components/events/Constants';
-import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import PaginatedEntityTable, { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
 import type { EventsAdditionalData } from 'components/events/fetchEvents';
 import fetchEvents, { keyFn } from 'components/events/fetchEvents';
@@ -28,8 +28,16 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { Event } from 'components/events/events/types';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useQuery from 'routing/useQuery';
+import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
+import EventsRefreshControls from 'components/events/events/EventsRefreshControls';
 
 import QueryHelper from '../common/QueryHelper';
+
+const NewItem = () => {
+  const { refetch } = useTableFetchContext();
+
+  return <AutoRefreshProvider onRefresh={refetch}><EventsRefreshControls disable={false} /></AutoRefreshProvider>;
+};
 
 const EventsEntityTable = () => {
   const currentUser = useCurrentUser();
@@ -53,7 +61,8 @@ const EventsEntityTable = () => {
                                   // bulkSelection={{ actions: bulkActions }}
                                  entityAttributesAreCamelCase={false}
                                  filterValueRenderers={FilterValueRenderers}
-                                 columnRenderers={columnRenderers} />
+                                 columnRenderers={columnRenderers}
+                                 topRightCol={<NewItem />} />
   );
 };
 

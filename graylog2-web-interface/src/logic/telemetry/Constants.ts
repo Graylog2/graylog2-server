@@ -28,6 +28,8 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_STREAM_INPUT_CHANGED: 'Search Stream Input Changed',
   SEARCH_REFRESH_CONTROL_PRESET_SELECTED: 'Search Refresh Control Preset Selected',
   SEARCH_REFRESH_CONTROL_TOGGLED: 'Search Refresh Control Toggled',
+  ALERTS_REFRESH_CONTROL_PRESET_SELECTED: 'Alerts Refresh Control Preset Selected',
+  ALERTS_REFRESH_CONTROL_TOGGLED: 'Alerts Refresh Control Toggled',
   SEARCH_BUTTON_CLICKED: 'Search Button Clicked',
   SEARCH_WIDGET_EXPORT_DOWNLOADED: 'Search Widget Export Downloaded',
   SEARCH_TIMERANGE_PRESET_ADD_QUICK_ACCESS: 'Search TimeRange Preset Add Quick Access',
