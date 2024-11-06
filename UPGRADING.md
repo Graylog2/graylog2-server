@@ -5,6 +5,12 @@ Upgrading to Graylog 6.2.x
 
 - tbd
 
+## Configuration File Changes
+
+| Option        | Action     | Description                                    |
+|---------------|------------|------------------------------------------------|
+| `tbd`         | **added**  |                                                |
+
 ## Default Configuration Changes
 
 - tbd
