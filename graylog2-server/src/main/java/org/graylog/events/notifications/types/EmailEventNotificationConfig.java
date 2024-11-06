@@ -395,6 +395,10 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 .lookupSenderEmail(ValueReference.of(lookupSenderEmail()))
                 .lookupReplyToEmail(ValueReference.of(lookupReplyToEmail()))
                 .singleEmail(ValueReference.of(singleEmail()))
+                .ccUsers(ccUsers())
+                .ccEmails(ccEmails())
+                .bccUsers(bccUsers())
+                .bccEmails(bccEmails())
                 .lookupCcEmails(ValueReference.of(lookupCcEmails()))
                 .lookupBccEmails(ValueReference.of(lookupBccEmails()));
         if (lookupRecipientEmails()) {
