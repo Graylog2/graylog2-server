@@ -22,6 +22,7 @@ import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { DataNodesCA } from 'components/datanode/Types';
+import { onSettled } from 'util/conditional/onError';
 
 export const QUERY_KEY = ['data-nodes', 'ca-status'];
 const fetchDataNodesCA = (): Promise<DataNodesCA> => (
@@ -46,22 +47,20 @@ const useDataNodesCA = (refetchInterval: number | false = 3000): {
     isFetching,
   } = useQuery<DataNodesCA, FetchError>({
     queryKey: QUERY_KEY,
-    queryFn: fetchDataNodesCA,
-    initialData: undefined,
-    refetchInterval,
-    retry: false,
-    onError: (newError) => {
-      setMetaData({
-        error: newError,
-        isInitialLoading: false,
-      });
-    },
-    onSuccess: () => {
+    queryFn: () => onSettled(fetchDataNodesCA(), () => {
       setMetaData({
         error: null,
         isInitialLoading: false,
       });
-    },
+    }, (newError: FetchError) => {
+      setMetaData({
+        error: newError,
+        isInitialLoading: false,
+      });
+    }),
+    initialData: undefined,
+    refetchInterval,
+    retry: false,
   });
 
   return {

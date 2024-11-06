@@ -17,9 +17,9 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'preflight/util/UserNotification';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { type Attribute } from 'stores/PaginationTypes';
+import { defaultOnError } from 'util/conditional/onError';
 
 export type PaginatedResponse<T, M = unknown> = {
   list: Array<T>,
@@ -55,12 +55,9 @@ const useFetchEntities = <T, M = unknown>({
 } => {
   const { data, isInitialLoading, refetch } = useQuery(
     fetchKey,
-    () => fetchEntities(searchParams),
+    () => defaultOnError(fetchEntities(searchParams), `Fetching ${humanName} failed with status`, `Could not retrieve ${humanName}`),
     {
       enabled,
-      onError: (error) => {
-        UserNotification.error(`Fetching ${humanName} failed with status: ${error}`, `Could not retrieve ${humanName}`);
-      },
       keepPreviousData: true,
       ...fetchOptions,
     },
