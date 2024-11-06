@@ -33,7 +33,7 @@ const DefaultWrapper = ({ children }: React.PropsWithChildren) => (
 const EventActions = ({ event, wrapper: Wrapper = DefaultWrapper }: { event: Event, wrapper?: React.ComponentType<React.PropsWithChildren> }) => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(event.id);
   const hasReplayInfo = !!event.replay_info;
-  const isNotSystemEvent= !event.event_definition_type.startsWith('system-notifications');
+  const isNotSystemEvent = !event.event_definition_type.startsWith('system-notifications');
 
   const moreActions = [
     hasReplayInfo ? <MenuItem key="replay_info"><LinkToReplaySearch id={event.id} isEvent /></MenuItem> : null,
