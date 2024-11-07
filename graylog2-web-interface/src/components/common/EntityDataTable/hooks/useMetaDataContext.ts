@@ -14,12 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* https://github.com/facebook/react/issues/7371
- *
- * findDomNode with refs is not supported by the react-test-renderer.
- * So we need to mock the findDOMNode function for TableList respectievly
- * for its child component TypeAheadDataFilter.
- */
-jest.mock('react-dom', () => ({
-  findDOMNode: () => ({}),
-}));
+import { useContext } from 'react';
+
+import MetaDataContext from 'components/common/EntityDataTable/contexts/MetaDataContext';
+
+const useMetaDataContext = <M = unknown>() => {
+  const context = useContext(MetaDataContext);
+
+  if (!context) {
+    throw new Error('useMetaDataContext hook needs to be used inside MetaDataProvider');
+  }
+
+  return context as {meta: M };
+};
+
+export default useMetaDataContext;

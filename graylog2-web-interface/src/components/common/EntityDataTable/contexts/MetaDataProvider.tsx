@@ -14,15 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import * as React from 'react';
+import { useMemo } from 'react';
 
-import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
+import MetaDataContext from 'components/common/EntityDataTable/contexts/MetaDataContext';
 
-describe('<ContentPackUploadControls />', () => {
-  it('should render', async () => {
-    render(<ContentPackUploadControls />);
+type Props<M> = React.PropsWithChildren<{
+  meta: M
+}>;
 
-    await screen.findByRole('button', { name: /upload/i });
-  });
-});
+const MetaDataProvider = <Meta = unknown>({ children, meta }: Props<Meta>) => {
+  const contextValue = useMemo(() => ({ meta }), [meta]);
+
+  return (
+    <MetaDataContext.Provider value={contextValue}>
+      {children}
+    </MetaDataContext.Provider>
+  );
+};
+
+export default MetaDataProvider;

@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import * as React from 'react';
 
-import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
+import { singleton } from 'logic/singleton';
 
-describe('<ContentPackUploadControls />', () => {
-  it('should render', async () => {
-    render(<ContentPackUploadControls />);
+type ContextValue = {
+  meta: unknown,
+} | undefined
 
-    await screen.findByRole('button', { name: /upload/i });
-  });
-});
+const EntityTableMetaDataContext = React.createContext<ContextValue>(undefined);
+
+export default singleton('contexts.EntityTableMetaDataContext', () => EntityTableMetaDataContext);

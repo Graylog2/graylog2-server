@@ -14,10 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { act } from 'react';
 import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
-import { act } from 'react';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
@@ -26,7 +24,7 @@ import Entity from 'logic/content-packs/Entity';
 import { SEARCH_DEBOUNCE_THRESHOLD } from '../common/SearchForm';
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
-jest.useFakeTimers('modern');
+jest.useFakeTimers();
 
 describe('<ContentPackSelection />', () => {
   it('should render with empty content pack', () => {
@@ -205,7 +203,7 @@ describe('<ContentPackSelection />', () => {
 
       act(() => {
         touchAllFields(wrapper);
-        wrapper.instance()._validate();
+        (wrapper.instance() as ContentPackSelection)._validate();
       });
 
       wrapper.update();
@@ -216,7 +214,7 @@ describe('<ContentPackSelection />', () => {
 
       act(() => {
         touchAllFields(wrapper2);
-        wrapper2.instance()._validate();
+        (wrapper2.instance() as ContentPackSelection)._validate();
       });
 
       wrapper2.update();
@@ -228,7 +226,7 @@ describe('<ContentPackSelection />', () => {
 
       act(() => {
         touchAllFields(wrapper1);
-        wrapper1.instance()._validate();
+        (wrapper1.instance() as ContentPackSelection)._validate();
       });
 
       wrapper1.update();
@@ -240,7 +238,7 @@ describe('<ContentPackSelection />', () => {
 
       act(() => {
         touchAllFields(wrapper0);
-        wrapper0.instance()._validate();
+        (wrapper0.instance() as ContentPackSelection)._validate();
       });
 
       wrapper0.update();
@@ -249,7 +247,7 @@ describe('<ContentPackSelection />', () => {
     });
 
     it('should validate that URLs only have http or https protocols', () => {
-      const contentPack = { name: 'name', summary: 'summary', vendor: 'vendor' };
+      const contentPack: Record<string, string> = { name: 'name', summary: 'summary', vendor: 'vendor' };
       const protocols = [
         // eslint-disable-next-line no-script-url
         { protocol: 'javascript:', errors: 1 },
@@ -263,8 +261,8 @@ describe('<ContentPackSelection />', () => {
         const invalidWrapper = mount(<ContentPackSelection contentPack={contentPack} entities={entities} />);
 
         act(() => {
-          invalidWrapper.instance()._handleTouched('url');
-          invalidWrapper.instance()._validate();
+          (invalidWrapper.instance() as ContentPackSelection)._handleTouched('url');
+          (invalidWrapper.instance() as ContentPackSelection)._validate();
         });
 
         invalidWrapper.update();

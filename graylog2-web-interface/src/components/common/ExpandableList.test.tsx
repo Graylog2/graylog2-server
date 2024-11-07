@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import 'helpers/mocking/react-dom_mock';
 import userEvent from '@testing-library/user-event';
 
 import ExpandableList from 'components/common/ExpandableList';

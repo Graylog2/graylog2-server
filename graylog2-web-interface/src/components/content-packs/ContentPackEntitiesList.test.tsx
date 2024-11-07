@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
-import 'helpers/mocking/react-dom_mock';
 import userEvent from '@testing-library/user-event';
 
 import ContentPack from 'logic/content-packs/ContentPack';
