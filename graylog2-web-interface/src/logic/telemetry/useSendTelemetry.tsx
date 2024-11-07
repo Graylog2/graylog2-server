@@ -21,7 +21,8 @@ import type { DataRouterContextObject } from 'react-router/dist/lib/context';
 
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
-import { currentPathnameWithoutPrefix } from 'util/URLUtils';
+import { currentPathname, stripPrefixFromPathname } from 'util/URLUtils';
+import { singleton } from 'logic/singleton';
 
 const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
   if (!dataRouterContext?.router?.routes) {
@@ -29,10 +30,10 @@ const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
   }
 
   const { router: { routes } } = dataRouterContext;
-  const pathname = currentPathnameWithoutPrefix();
+  const pathname = currentPathname();
   const matches = matchRoutes(routes, pathname);
 
-  return matches.at(-1).route.path;
+  return stripPrefixFromPathname(matches?.at(-1)?.route.path);
 };
 
 const useSendTelemetry = () => {
@@ -49,4 +50,4 @@ const useSendTelemetry = () => {
   }, [dataRouterContext, sendTelemetry]);
 };
 
-export default useSendTelemetry;
+export default singleton('core.useSendTelemetry', () => useSendTelemetry);
