@@ -14,10 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { act } from 'react';
 import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
-import { act } from 'react';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
@@ -71,7 +69,7 @@ describe('<ContentPackInstall />', () => {
     wrapper.find('input#comment').simulate('change', { target: { value: 'Test' } });
 
     act(() => {
-      wrapper.instance().onInstall();
+      (wrapper.instance() as ContentPackInstall).onInstall();
     });
 
     expect(installFn.mock.calls.length).toBe(1);
@@ -85,7 +83,7 @@ describe('<ContentPackInstall />', () => {
     wrapper.find('input').at(1).simulate('change', { target: { value: '' } });
 
     act(() => {
-      wrapper.instance().onInstall();
+      (wrapper.instance() as ContentPackInstall).onInstall();
     });
 
     expect(installFn.mock.calls.length).toBe(0);
