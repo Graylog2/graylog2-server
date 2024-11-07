@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -42,14 +41,6 @@ const PipelineConnectionsList = ({ pipeline, connections, streams, streamsFormat
       {streamsUsingPipeline.length === 0 ? noConnectionsMessage : streamsFormatter(streamsUsingPipeline)}
     </span>
   );
-};
-
-PipelineConnectionsList.propTypes = {
-  pipeline: PropTypes.object.isRequired,
-  connections: PropTypes.array.isRequired,
-  streams: PropTypes.array.isRequired,
-  streamsFormatter: PropTypes.func.isRequired,
-  noConnectionsMessage: PropTypes.node,
 };
 
 export default PipelineConnectionsList;

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import Input from 'components/bootstrap/Input';
@@ -81,15 +80,6 @@ const NumberField = ({ autoFocus = false, field, onChange, title, typeName, valu
            {...validationSpecs}
            autoFocus={autoFocus} />
   );
-};
-
-NumberField.propTypes = {
-  autoFocus: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.number,
 };
 
 export default NumberField;

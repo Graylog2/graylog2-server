@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import { Modal } from 'components/bootstrap';
 import { Wizard } from 'components/common';
 import { INPUT_WIZARD_STEPS } from 'contexts/InputSetupWizardContext';
 import useInputSetupWizard from 'hooks/useInputSetupWizard';
@@ -23,7 +24,7 @@ import useInputSetupWizard from 'hooks/useInputSetupWizard';
 import CategoryStep from './CategoryStep';
 
 const InputSetupWizard = () => {
-  const { activeStep, setActiveStep } = useInputSetupWizard();
+  const { activeStep, setActiveStep, show, closeWizard } = useInputSetupWizard();
 
   const steps = [{
     key: INPUT_WIZARD_STEPS.SELECT_CATEGORY,
@@ -37,13 +38,19 @@ const InputSetupWizard = () => {
     ),
   }];
 
+  if (!show) return null;
+
   return (
-    <Wizard activeStep={activeStep}
-            hidePreviousNextButtons
-            horizontal
-            justified
-            onStepChange={setActiveStep}
-            steps={steps} />
+    <Modal show onHide={closeWizard}>
+      <Modal.Body>
+        <Wizard activeStep={activeStep}
+                hidePreviousNextButtons
+                horizontal
+                justified
+                onStepChange={setActiveStep}
+                steps={steps} />
+      </Modal.Body>
+    </Modal>
   );
 };
 

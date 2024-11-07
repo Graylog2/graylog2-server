@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
@@ -48,10 +47,5 @@ const ConnectionErrors = ({ errors, message = 'There was an error' }: Props) => 
     </ErrorsList>
   </NotificationContainer>
 );
-
-ConnectionErrors.propTypes = {
-  errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  message: PropTypes.string,
-};
 
 export default ConnectionErrors;

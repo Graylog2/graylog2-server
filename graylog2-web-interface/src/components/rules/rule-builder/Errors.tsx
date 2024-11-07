@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/bootstrap';
 
@@ -54,12 +53,6 @@ const Errors = ({ objectWithErrors } : Props) => {
       </Col>
     </ErrorsContainer>
   );
-};
-
-Errors.propTypes = {
-  objectWithErrors: PropTypes.shape({
-    errors: PropTypes.arrayOf(PropTypes.string),
-  }),
 };
 
 export default Errors;

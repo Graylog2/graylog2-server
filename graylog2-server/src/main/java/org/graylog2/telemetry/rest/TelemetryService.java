@@ -226,5 +226,4 @@ public class TelemetryService {
                 "data_nodes_count", dataNodes.size()
         );
     }
-
 }

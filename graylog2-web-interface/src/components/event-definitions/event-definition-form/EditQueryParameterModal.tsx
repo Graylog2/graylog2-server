@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import React from 'react';
 
@@ -23,6 +22,7 @@ import { Button, BootstrapModalForm } from 'components/bootstrap';
 import type { LookupTable } from 'logic/lookup-tables/types';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import type { ValidationState } from 'components/common/types';
 
 type Props = {
   queryParameters: Array<LookupTableParameterJson>,
@@ -42,14 +42,6 @@ type State = {
 }
 
 class EditQueryParameterModal extends React.Component<Props, State> {
-  static propTypes = {
-    queryParameters: PropTypes.array.isRequired,
-    queryParameter: PropTypes.object.isRequired,
-    lookupTables: PropTypes.array.isRequired,
-    onChange: PropTypes.func.isRequired,
-    embryonic: PropTypes.bool.isRequired,
-  };
-
   constructor(props) {
     super(props);
 
@@ -125,8 +117,8 @@ class EditQueryParameterModal extends React.Component<Props, State> {
     const { queryParameter, validation, showModal } = this.state;
 
     const validationState: {
-      lookupTable?: [string, string],
-      key?: [string, string],
+      lookupTable?: [ValidationState, string],
+      key?: [ValidationState, string],
     } = {
       lookupTable: validation.lookupTable ? ['error', validation.lookupTable] : undefined,
       key: validation.key ? ['error', validation.key] : undefined,

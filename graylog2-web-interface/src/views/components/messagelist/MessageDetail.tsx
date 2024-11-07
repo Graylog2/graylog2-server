@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useState, useMemo, useContext, useCallback } from 'react';
 import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import styled from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -32,7 +30,6 @@ import Routes from 'routing/Routes';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Input } from 'components/messageloaders/Types';
 import type { Stream } from 'views/stores/StreamsStore';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
 import FormatAssetList from 'views/components/messagelist/FormatAssetList';
@@ -185,19 +182,6 @@ const MessageDetail = ({
       </MessageDetailProviders>
     </AdditionalContext.Provider>
   );
-};
-
-MessageDetail.propTypes = {
-  allStreams: ImmutablePropTypes.list,
-  disableMessageActions: PropTypes.bool,
-  disableSurroundingSearch: PropTypes.bool,
-  disableTestAgainstStream: PropTypes.bool,
-  expandAllRenderAsync: PropTypes.bool,
-  fields: ImmutablePropTypes.list,
-  inputs: ImmutablePropTypes.map,
-  message: CustomPropTypes.Message.isRequired,
-  showTimestamp: PropTypes.bool,
-  streams: ImmutablePropTypes.map,
 };
 
 export default MessageDetail;

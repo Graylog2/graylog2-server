@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { TextField } from 'components/configurationforms';
@@ -50,13 +49,6 @@ const TitleField = ({ typeName, helpText = '', value = '', onChange = () => {} }
                onChange={onChange}
                autoFocus />
   );
-};
-
-TitleField.propTypes = {
-  helpText: PropTypes.string,
-  onChange: PropTypes.func,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.string,
 };
 
 export default TitleField;

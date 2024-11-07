@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Button } from 'components/bootstrap';
 import ExternalLink from 'components/common/ExternalLink';
@@ -34,24 +33,5 @@ const ExternalLinkButton = ({ bsStyle = 'default', target = '_blank', className 
     <ExternalLink iconName={iconName}>{children}</ExternalLink>
   </Button>
 );
-
-ExternalLinkButton.propTypes = {
-  /** Link to the external location. */
-  href: PropTypes.string.isRequired,
-  /** Text for the button. (should be one line) */
-  children: PropTypes.node.isRequired,
-  /** Button style. (bootstrap style name) */
-  bsStyle: PropTypes.string,
-  /** Button size. (bootstrap size name) */
-  bsSize: PropTypes.string,
-  /** Browser window target attribute for the external link. */
-  target: PropTypes.string,
-  /** Icon name to use for the indicator icon. */
-  iconName: PropTypes.string,
-  /** Additional class name to adjust styling of the button. */
-  className: PropTypes.string,
-  /** Render a disabled button if this is <code>true</code>. */
-  disabled: PropTypes.bool,
-};
 
 export default ExternalLinkButton;

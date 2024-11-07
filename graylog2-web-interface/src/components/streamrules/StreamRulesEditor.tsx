@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -167,12 +166,6 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
       </Col>
     </Row>
   );
-};
-
-StreamRulesEditor.propTypes = {
-  streamId: PropTypes.string.isRequired,
-  messageId: PropTypes.string,
-  index: PropTypes.string,
 };
 
 export default StreamRulesEditor;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 
@@ -32,10 +31,6 @@ const CurrentUserPreferencesProvider = ({ children }: { children: React.ReactEle
       </UserPreferencesContext.Provider>
     )
     : children;
-};
-
-CurrentUserPreferencesProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default CurrentUserPreferencesProvider;

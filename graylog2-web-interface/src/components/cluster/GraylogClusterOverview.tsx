@@ -16,7 +16,6 @@
  */
 
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -111,12 +110,6 @@ const GraylogClusterOverview = ({ layout = 'default', children = null, showLicen
       </Row>
     </GraphDaysContextProvider>
   );
-};
-
-GraylogClusterOverview.propTypes = {
-  layout: PropTypes.oneOf(['default', 'compact']),
-  children: PropTypes.node,
-  showLicenseGraph: PropTypes.bool,
 };
 
 export default GraylogClusterOverview;

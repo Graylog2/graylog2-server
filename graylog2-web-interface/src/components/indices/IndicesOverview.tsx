@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import type { IndexSummary } from 'stores/indexers/IndexerOverviewStore';
@@ -54,12 +53,6 @@ const IndicesOverview = ({ indexDetails, indices, indexSetId }: Props) => {
       )}
     </>
   );
-};
-
-IndicesOverview.propTypes = {
-  indexDetails: PropTypes.array.isRequired,
-  indices: PropTypes.array.isRequired,
-  indexSetId: PropTypes.string.isRequired,
 };
 
 export default IndicesOverview;

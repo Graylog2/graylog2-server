@@ -111,6 +111,7 @@ public class TelemetryResponseFactory {
         clusterInfo.put("installation_source", installationSource);
         clusterInfo.set("nodes", mapper.convertValue(nodes, JsonNode.class));
         return clusterInfo;
+
     }
 
     private static long sumTraffic(Map<DateTime, Long> traffic) {

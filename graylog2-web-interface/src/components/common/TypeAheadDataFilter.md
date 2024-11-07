@@ -1,9 +1,8 @@
 ```js
-import createReactClass from 'create-react-class';
 const lodash = require('lodash');
 
-const TypeAheadDataFilterExample = createReactClass({
-  getInitialState() {
+class TypeAheadDataFilterExample extends React.Component {
+  constructor() {
     const list = [
       { id: '1', title: 'One', description: 'First number', tags: ['one', 'number'] },
       { id: '2', title: 'Two', description: 'Second number', tags: ['two', 'number'] },
@@ -11,15 +10,16 @@ const TypeAheadDataFilterExample = createReactClass({
       { id: '4', title: 'Four', description: 'Fourth number', tags: ['four', 'number'] },
       { id: '5', title: 'A', description: 'First letter', tags: ['a', 'letter'] },
     ];
-    return {
+    this.state = {
       list: list,
       filteredList: list,
     };
-  },
+    this.onDataFiltered = this.onDataFiltered.bind(this);
+  }
 
   onDataFiltered(filteredList) {
     this.setState({ filteredList: filteredList });
-  },
+  };
 
   render() {
     const { list, filteredList } = this.state;
@@ -45,8 +45,8 @@ const TypeAheadDataFilterExample = createReactClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 <TypeAheadDataFilterExample />
 ```

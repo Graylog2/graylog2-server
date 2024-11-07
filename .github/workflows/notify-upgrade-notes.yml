@@ -1,0 +1,31 @@
+# This workflow sends a Slack notification to the configured channels
+# when the UPGRADING.md file is updated. This is used by the docs team.
+
+name: "Notify UPGRADING.md update"
+run-name: "Notify UPGRADING.md update (${{ github.ref_name}}/${{ github.sha }})"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+      - "[0-9].[0-9]" # Stable branches
+    paths:
+      - "UPGRADING.md"
+
+jobs:
+  notify:
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Send Slack message"
+        uses: "slackapi/slack-github-action@v1"
+        env:
+          SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+        with:
+          channel-id: "${{ vars.SLACK_UPGRADE_NOTIFY_CHANNELS }}"
+          slack-message: |
+            The Graylog ${{ github.ref_name || "test" }}/UPGRADING.md file was updated:
+
+            Content: https://github.com/Graylog2/graylog2-server/blob/${{ github.sha || "test" }}/UPGRADING.md
+            Commit: https://github.com/Graylog2/graylog2-server/commit/${{ github.sha || "test" }}
