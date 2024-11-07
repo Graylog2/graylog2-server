@@ -59,6 +59,11 @@ public class IndicesDirectoryController {
             directoryReadableValidator.validate(dataTargetDir.toUri().toString(), dataTargetDir);
             final IndexerDirectoryInformation info = indicesDirectoryParser.parse(dataTargetDir);
             final Version currentVersion = Version.fromString(opensearchVersion);
+
+            if (info.nodes().isEmpty() || info.nodes().stream().allMatch(n -> n.indices().isEmpty())) {
+                throw new IllegalArgumentException("Your configured opensearch_data_location directory " + dataTargetDir.toAbsolutePath() + " doesn't contain any indices! Migration can't continue!");
+            }
+
             final List<String> compatibilityErrors = info.nodes().stream()
                     .filter(node -> !isNodeCompatible(node, currentVersion))
                     .map(node -> String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, node.nodeVersion()))

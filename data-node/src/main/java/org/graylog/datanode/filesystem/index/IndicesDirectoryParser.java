@@ -66,7 +66,7 @@ public class IndicesDirectoryParser {
         final Path nodesPath = path.resolve("nodes");
 
         if (!Files.exists(nodesPath)) {
-            throw new IllegalArgumentException("Your configured opensearch_data_location directory " + path.toAbsolutePath() + " doesn't contain any indices! Migration can't continue!");
+            return IndexerDirectoryInformation.empty(path);
         }
 
         try (final Stream<Path> nodes = Files.list(nodesPath)) {
@@ -75,11 +75,6 @@ public class IndicesDirectoryParser {
                     .map(this::parseNode)
                     .filter(node -> !node.isEmpty())
                     .toList();
-
-            if (nodeInformation.isEmpty() || nodeInformation.stream().allMatch(n -> n.indices().isEmpty())) {
-                throw new IllegalArgumentException("Your configured opensearch_data_location directory " + path.toAbsolutePath() + " doesn't contain any indices! Migration can't continue!");
-            }
-
             return new IndexerDirectoryInformation(path, nodeInformation);
         } catch (IOException e) {
             throw new IndexerInformationParserException("Failed to list nodes", e);

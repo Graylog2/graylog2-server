@@ -134,8 +134,9 @@ class IndicesDirectoryParserTest {
 
     @Test
     void testEmptyDataDir(@TempDir Path tempDir) {
-        Assertions.assertThatThrownBy(() -> parser.parse(tempDir))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("doesn't contain any indices! Migration can't continue!");
+        final IndexerDirectoryInformation result = parser.parse(tempDir);
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.nodes()).isEmpty();
+
     }
 }
