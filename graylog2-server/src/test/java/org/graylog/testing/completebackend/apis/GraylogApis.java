@@ -16,6 +16,10 @@
  */
 package org.graylog.testing.completebackend.apis;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.rholder.retry.RetryException;
+import com.google.common.collect.ImmutableMap;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.FailureConfig;
@@ -23,14 +27,20 @@ import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
+import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
@@ -255,5 +265,60 @@ public class GraylogApis implements GraylogRestApi {
                             }
                         })
                 );
+    }
+
+    public class SearchEnvironment implements Closeable {
+        private final Map<String, Object> MANDATORY_MESSAGE_FIELDS = Map.of(
+                "source", "test-environment",
+                "host", "test-environment",
+                "short_message", "an ingested test message"
+        );
+
+        private final String randomId;
+        private final String streamId;
+        private final String indexSetId;
+        private final PortBoundGelfInputApi gelfPort;
+        private final ObjectMapper objectMapper;
+
+        private SearchEnvironment(String randomId, String streamId, String indexSetId, PortBoundGelfInputApi gelfPort) {
+            this.randomId = randomId;
+            this.streamId = streamId;
+            this.indexSetId = indexSetId;
+            this.gelfPort = gelfPort;
+            this.objectMapper = new ObjectMapperProvider().get();
+        }
+
+        public void ingestMessage(Map<String, Object> message) {
+            final var messageWithTag = ImmutableMap.builder()
+                    .putAll(MANDATORY_MESSAGE_FIELDS)
+                    .putAll(message)
+                    .put("test-environment", randomId)
+                    .build();
+            try {
+                this.gelfPort.postMessage(objectMapper.writeValueAsString(messageWithTag));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Error serializing message for ingestion: ", e);
+            }
+        }
+
+        public ValidatableResponse executePivot(Pivot pivot) {
+            final var pivotForStream = pivot.toBuilder().streams(Set.of(streamId)).build();
+            return search().executePivot(pivotForStream);
+        }
+
+        @Override
+        public void close() {
+            streams().deleteStream(streamId);
+            indices().deleteIndexSet(indexSetId, true);
+        }
+    }
+
+    public SearchEnvironment createEnvironment(PortBoundGelfInputApi gelfPort) throws ExecutionException, RetryException {
+        final var randomId = RandomStringUtils.secure().next(8);
+        final var indexSetId = this.indices().createIndexSet("Test Environment " + randomId, "", "test-environment-" + randomId);
+        this.indices().waitForIndexNames(indexSetId);
+        final var streamId = this.streams().createStream("Test Stream " + randomId, indexSetId, true, DefaultStreamMatches.REMOVE, Streams.StreamRule.exact(randomId, "test-environment", false));
+
+        return new SearchEnvironment(randomId, streamId, indexSetId, gelfPort);
     }
 }

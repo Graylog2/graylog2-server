@@ -19,14 +19,15 @@ package org.graylog.testing.completebackend.apis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
 import io.restassured.path.json.JsonPath;
-import io.restassured.specification.RequestSpecification;
+import io.restassured.response.ValidatableResponse;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
@@ -35,9 +36,11 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 
@@ -65,8 +68,6 @@ public class Search implements GraylogRestApi {
     private boolean captureMessage(String message) {
         return searchAllMessages().contains(message);
     }
-
-
 
     private boolean captureMessages(Consumer<List<String>> messagesCaptor) {
         List<String> messages = searchAllMessages();
@@ -151,5 +152,34 @@ public class Search implements GraylogRestApi {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize Search", e);
         }
+    }
+
+    public ValidatableResponse executePivot(Pivot pivot) {
+        final var pivotName = "pivotaggregation";
+        final var pivotPath = "results.query1.search_types." + pivotName;
+        final Pivot pivotWithId = pivot.toBuilder()
+                .id(pivotName)
+                .build();
+
+        final SearchDTO search = SearchDTO.builder()
+                .queries(QueryDTO.builder()
+                        .timerange(RelativeRange.create(0))
+                        .id("query1")
+                        .query(ElasticsearchQueryString.of("source:pivot-fixtures"))
+                        .searchTypes(Set.of(pivotWithId))
+                        .build())
+                .build();
+
+        return given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(toJsonString(search))
+                .post("/views/search/sync")
+                .then()
+                .log().ifError()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .body("execution.done", equalTo(true))
+                .body("execution.completed_exceptionally", equalTo(false));
     }
 }
