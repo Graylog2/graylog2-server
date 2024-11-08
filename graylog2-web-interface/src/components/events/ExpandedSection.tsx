@@ -19,9 +19,8 @@ import React, { useMemo } from 'react';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import type { Attribute } from 'stores/PaginationTypes';
-import type { Event } from 'components/events/events/types';
+import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
-import type { EventsAdditionalData } from 'components/events/fetchEvents';
 import EventDetailsTable from 'components/events/events/EventDetailsTable';
 
 type Props = {

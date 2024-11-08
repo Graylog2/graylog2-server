@@ -14,17 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 import { styled } from 'styled-components';
 
-import useCurrentUser from 'hooks/useCurrentUser';
-import CustomColumnRenderers from 'components/events/ColumnRenderers';
 import { Table } from 'components/bootstrap';
-import type { Event } from 'components/events/events/types';
-import type { EventsAdditionalData } from 'components/events/fetchEvents';
+import type { Event, EventsAdditionalData } from 'components/events/events/types';
+import useColumnRenderers from 'components/events/events/hooks/useColumnRenderes';
 
 const TD = styled.td`
-    white-space: nowrap;
+  white-space: nowrap;
 `;
 
 type Props = {
@@ -34,9 +32,7 @@ type Props = {
 }
 
 const EventDetailsTable = ({ event, attributesList, meta }: Props) => {
-  const currentUser = useCurrentUser();
-
-  const { attributes: attributesRenderers } = useMemo(() => CustomColumnRenderers(currentUser.permissions), [currentUser.permissions]);
+  const { attributes: attributesRenderers } = useColumnRenderers();
 
   return (
     <Table condensed striped>

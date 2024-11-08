@@ -100,8 +100,8 @@ export const additionalAttributes: Array<Attribute> = [
   ...detailsAttributes,
 ];
 
-const getStreamTableElements = () => {
-  const defaultLayout = {
+export const eventsTableElements = {
+  defaultLayout: {
     entityTableId: EVENTS_ENTITY_TABLE_ID,
     defaultPageSize: 20,
     defaultSort: { attributeId: 'timestamp', direction: 'desc' } as Sort,
@@ -114,8 +114,8 @@ const getStreamTableElements = () => {
       'event_definition_type',
       'timestamp',
     ],
-  };
-  const columnOrder = [
+  },
+  columnOrder: [
     'message',
     'id',
     'priority',
@@ -128,12 +128,5 @@ const getStreamTableElements = () => {
     'group_by_fields',
     'remediation_steps',
     'timerange_start',
-  ];
-
-  return {
-    defaultLayout,
-    columnOrder,
-  };
+  ],
 };
-
-export default getStreamTableElements;

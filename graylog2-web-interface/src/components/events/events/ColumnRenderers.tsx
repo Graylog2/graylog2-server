@@ -26,13 +26,12 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { Event } from 'components/events/events/types';
+import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import PriorityName from 'components/events/events/PriorityName';
 import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import type { EventsAdditionalData } from 'components/events/fetchEvents';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 import { Timestamp } from 'components/common';
 
@@ -44,19 +43,21 @@ const EventDefinitionRenderer = ({ eventDefinitionId, permissions }: { eventDefi
     return <em>{eventDefinitionId}</em>;
   }
 
-  return (
-    <>{isPermitted(permissions,
-      `eventdefinitions:edit:${eventDefinitionContext.id}`)
-      ? <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>{eventDefinitionContext.title}</Link>
-      : eventDefinitionContext.title}
-    </>
-  );
+  if (isPermitted(permissions, `eventdefinitions:edit:${eventDefinitionContext.id}`)) {
+    return (
+      <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
+        {eventDefinitionContext.title}
+      </Link>
+    );
+  }
+
+  return <>{eventDefinitionContext.title}</>;
 };
 
-const EventDefinitionTypeRenderer = ({ type }: { type: unknown }) => {
+const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
   const plugin = useMemo(() => {
-    if (type === undefined) {
+    if (!type) {
       return null;
     }
 
@@ -66,9 +67,7 @@ const EventDefinitionTypeRenderer = ({ type }: { type: unknown }) => {
   return <>{(plugin && plugin.displayName) || type}</>;
 };
 
-const PriorityRenderer = ({ priority }: { priority: number }) => <PriorityName priority={priority} />;
-
-const FieldsRenderer = ({ fields }: { fields: Record<string, string> }) => (
+const FieldsRenderer = ({ fields }: { fields: { [fieldName: string]: string } }) => (
   isEmpty(fields)
     ? <em>No additional Fields added to this Event.</em>
     : <EventFields fields={fields} />
@@ -141,11 +140,11 @@ const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRende
       renderCell: (_eventDefinitionId: string) => <EventDefinitionRenderer permissions={permissions} eventDefinitionId={_eventDefinitionId} />,
     },
     priority: {
-      renderCell: (_priority: number) => <PriorityRenderer priority={_priority} />,
+      renderCell: (_priority: number) => <PriorityName priority={_priority} />,
       staticWidth: 100,
     },
     event_definition_type: {
-      renderCell: (_type) => <EventDefinitionTypeRenderer type={_type} />,
+      renderCell: (_type: string) => <EventDefinitionTypeRenderer type={_type} />,
       staticWidth: 200,
     },
     fields: {

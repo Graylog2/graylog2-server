@@ -22,7 +22,7 @@ import { adjustFormat } from 'util/DateTime';
 import type { SearchParams } from 'stores/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
-import type { Event, EventDefinitionContext } from 'components/events/events/types';
+import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import { additionalAttributes } from 'components/events/Constants';
 import { extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
@@ -68,9 +68,6 @@ const getConcatenatedQuery = (query: string, streamId: string) => {
 
 export const keyFn = (searchParams: SearchParams) => ['events', 'search', searchParams];
 
-export type EventsAdditionalData = {
-  context: {event_definitions?: EventDefinitionContext, streams?: EventDefinitionContext},
-}
 const fetchEvents = (searchParams: SearchParams, streamId: string): Promise<PaginatedResponse<Event, EventsAdditionalData>> => fetch('POST', url, {
   query: getConcatenatedQuery(searchParams.query, streamId),
   page: searchParams.page,

@@ -14,46 +14,40 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback } from 'react';
 
-import useCurrentUser from 'hooks/useCurrentUser';
 import useTableElements from 'components/events/useTableComponents';
-import CustomColumnRenderers from 'components/events/ColumnRenderers';
-import getStreamTableElements from 'components/events/Constants';
+import { eventsTableElements } from 'components/events/Constants';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
-import type { EventsAdditionalData } from 'components/events/fetchEvents';
 import fetchEvents, { keyFn } from 'components/events/fetchEvents';
 import type { SearchParams } from 'stores/PaginationTypes';
-import type { Event } from 'components/events/events/types';
-import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useQuery from 'routing/useQuery';
+import useColumnRenderers from 'components/events/events/hooks/useColumnRenderes';
 
 import QueryHelper from '../common/QueryHelper';
 
 const EventsEntityTable = () => {
-  const currentUser = useCurrentUser();
   const { stream_id: streamId } = useQuery();
 
-  const columnRenderers = useMemo(() => CustomColumnRenderers(currentUser.permissions), [currentUser.permissions]);
-  const { columnOrder, defaultLayout } = useMemo(() => getStreamTableElements(), []);
-  const _fetchEvents = useCallback((searchParams: SearchParams): Promise<PaginatedResponse<Event, EventsAdditionalData>> => fetchEvents(searchParams, streamId as string), [streamId]);
-  const { entityActions, expandedSections } = useTableElements({ defaultLayout });
+  const columnRenderers = useColumnRenderers();
+  const _fetchEvents = useCallback((searchParams: SearchParams) => fetchEvents(searchParams, streamId as string), [streamId]);
+  const { entityActions, expandedSections } = useTableElements({ defaultLayout: eventsTableElements.defaultLayout });
 
   return (
-    <PaginatedEntityTable<Event> humanName="events"
-                                 columnsOrder={columnOrder}
-                                 queryHelpComponent={<QueryHelper entityName="events" />}
-                                 entityActions={entityActions}
-                                 tableLayout={defaultLayout}
-                                 fetchEntities={_fetchEvents}
-                                 keyFn={keyFn}
-                                 actionsCellWidth={100}
-                                 expandedSectionsRenderer={expandedSections}
-                                  // bulkSelection={{ actions: bulkActions }}
-                                 entityAttributesAreCamelCase={false}
-                                 filterValueRenderers={FilterValueRenderers}
-                                 columnRenderers={columnRenderers} />
+    <PaginatedEntityTable<Event, EventsAdditionalData> humanName="events"
+                                                       columnsOrder={eventsTableElements.columnOrder}
+                                                       queryHelpComponent={<QueryHelper entityName="events" />}
+                                                       entityActions={entityActions}
+                                                       tableLayout={eventsTableElements.defaultLayout}
+                                                       fetchEntities={_fetchEvents}
+                                                       keyFn={keyFn}
+                                                       actionsCellWidth={100}
+                                                       expandedSectionsRenderer={expandedSections}
+                                                       entityAttributesAreCamelCase={false}
+                                                       filterValueRenderers={FilterValueRenderers}
+                                                       columnRenderers={columnRenderers} />
   );
 };
 
