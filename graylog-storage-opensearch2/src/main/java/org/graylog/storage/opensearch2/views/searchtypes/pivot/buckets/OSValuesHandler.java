@@ -23,6 +23,8 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
@@ -44,6 +46,7 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.PivotBucket;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,15 +56,18 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
     private static final String AGG_NAME = "agg";
     private static final ImmutableList<String> MISSING_BUCKET_KEYS = ImmutableList.of(MissingBucketConstants.MISSING_BUCKET_NAME);
-    private static final BucketOrder defaultOrder = BucketOrder.count(false);
+    public static final BucketOrder DEFAULT_ORDER = BucketOrder.count(false);
+    public static final String SORT_HELPER = "sort_helper";
 
     @Nonnull
     @Override
     public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
-        final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
+        final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, DEFAULT_ORDER);
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
-        final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit, bucketSpec.skipEmptyValues());
+        final var termsAggregation = createTerms(orderedBuckets, ordering, limit, bucketSpec.skipEmptyValues());
+
+        applyOrdering(pivot, termsAggregation, orderedBuckets, ordering, queryContext);
 
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
@@ -77,15 +83,14 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 .otherBucket(true);
     }
 
-    private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit, boolean skipEmptyValues) {
-        return createScriptedTerms(valueBuckets, ordering, limit);
+    private TermsAggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit, boolean skipEmptyValues) {
+        return createScriptedTerms(valueBuckets, limit);
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, List<BucketOrder> ordering, int limit) {
+    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
-                .size(limit)
-                .order(ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering);
+                .size(limit);
     }
 
     private Script scriptForPivots(Collection<String> pivots) {
@@ -99,6 +104,30 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                         """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
+    }
+
+    private TermsAggregationBuilder applyOrdering(Pivot pivot, TermsAggregationBuilder terms, List<String> buckets, List<BucketOrder> ordering, OSGeneratedQueryContext queryContext) {
+        return sortsOnNumericPivotField(pivot, queryContext)
+                .map(pivotSort -> terms
+                        .subAggregation(AggregationBuilders.max(SORT_HELPER).field(pivotSort.field()))
+                        .order(BucketOrder.aggregation(SORT_HELPER, SortSpec.Direction.Ascending.equals(pivotSort.direction()))))
+                .orElseGet(() -> terms
+                        .order(ordering.isEmpty() ? List.of(DEFAULT_ORDER) : ordering));
+    }
+
+    private Optional<PivotSort> sortsOnNumericPivotField(Pivot pivot, OSGeneratedQueryContext queryContext) {
+        return Optional.ofNullable(pivot.sort())
+                .filter(sorts -> sorts.size() == 1)
+                .map(sorts -> sorts.get(0))
+                .filter(sort -> sort instanceof PivotSort)
+                .map(sort -> (PivotSort) sort)
+                .filter(pivotSort -> queryContext.fieldType(pivot.effectiveStreams(), pivotSort.field())
+                        .filter(this::isNumericFieldType)
+                        .isPresent());
+    }
+
+    private boolean isNumericFieldType(String fieldType) {
+        return fieldType.equals("long") || fieldType.equals("double") || fieldType.equals("float");
     }
 
     @Override
