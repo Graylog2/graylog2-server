@@ -25,8 +25,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import type { Message } from './Types';
 
-import CustomHighlighting from '../highlighting/CustomHighlighting';
-
 type Props = {
   message: Message,
   fields: FieldTypeMappingsList,
@@ -50,14 +48,10 @@ const MessageFields = ({ message, fields }: Props) => {
       const { type } = fields.find((t) => t.name === key, undefined, FieldTypeMapping.create(key, FieldType.Unknown));
 
       return (
-        <CustomHighlighting key={key}
-                            field={key}
-                            value={formattedFields[key]}>
-          <MessageField fieldName={key}
-                        fieldType={type}
-                        message={message}
-                        value={formattedFields[key]} />
-        </CustomHighlighting>
+        <MessageField fieldName={key}
+                      fieldType={type}
+                      message={message}
+                      value={formattedFields[key]} />
       );
     });
 
