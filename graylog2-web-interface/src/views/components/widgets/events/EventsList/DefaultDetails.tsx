@@ -38,8 +38,7 @@ const ActionsWrapper = ({ children }) => (
 );
 
 const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
-  const meta = useMemo(() => ({ context: { event_definitions: {[eventDefinitionContext.id]: eventDefinitionContext} } }), [eventDefinitionContext]);
-  console.log({ meta, event });
+  const meta = useMemo(() => ({ context: { event_definitions: { [event.event_definition_id]: eventDefinitionContext } } }), [event.event_definition_id, eventDefinitionContext]);
 
   return (
     <MetaDataProvider<EventsAdditionalData> meta={meta}>
