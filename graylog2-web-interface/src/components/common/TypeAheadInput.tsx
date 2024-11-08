@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import ReactDOM from 'react-dom';
 import escape from 'lodash/escape';
 import $ from 'jquery';
 import 'typeahead.js';
@@ -189,8 +188,10 @@ class TypeAheadInput extends React.Component<TypeAheadInputProps, {
   }
 
   // @ts-ignore
+  // eslint-disable-next-line react/no-unused-class-component-methods
   getValue = () => $(this.fieldInput).typeahead('val');
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   clear = () => {
     // @ts-ignore
     $(this.fieldInput).typeahead('val', '');
@@ -204,8 +205,7 @@ class TypeAheadInput extends React.Component<TypeAheadInputProps, {
 
   _updateTypeahead = ({ suggestions, displayKey, suggestionText, onTypeaheadLoaded, onSuggestionSelected }) => {
     this.fieldInput = this.fieldInputElem.getInputDOMNode();
-    // eslint-disable-next-line react/no-find-dom-node
-    this.fieldFormGroup = ReactDOM.findDOMNode(this.fieldInputElem);
+    this.fieldFormGroup = this.fieldInputElem.getInputDOMNode();
 
     const $fieldInput = $(this.fieldInput);
 
