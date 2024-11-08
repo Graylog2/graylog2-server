@@ -111,18 +111,21 @@ const MessageRenderer = ({ message, eventId }: { message: string, eventId: strin
   return <StyledDiv onClick={toggleExtraSection}>{message}</StyledDiv>;
 };
 
-const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => eventData.timerange_start && eventData.timerange_end && (
+const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => eventData.timerange_start && eventData.timerange_end ? (
 <div>
-  <Timestamp dateTime={eventData.timerange_start} />
+  <Timestamp dateTime={new Date()} />
       &ensp;&mdash;&ensp;
-  <Timestamp dateTime={eventData.timerange_end} />
+  <Timestamp dateTime={new Date()} />
 </div>
-);
+) : (
+  <em>No time range</em>
+)
 
 const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRenderers<Event> => ({
   attributes: {
     message: {
       minWidth: 300,
+      width: 0.7,
       renderCell: (_message: string, event) => <MessageRenderer message={_message} eventId={event.id} />,
     },
     key: {
@@ -137,6 +140,8 @@ const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRende
       staticWidth: 100,
     },
     event_definition_id: {
+      minWidth: 300,
+      width: 0.3,
       renderCell: (_eventDefinitionId: string) => <EventDefinitionRenderer permissions={permissions} eventDefinitionId={_eventDefinitionId} />,
     },
     priority: {
@@ -160,6 +165,7 @@ const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRende
     },
     timerange_start: {
       renderCell: (_, event: Event) => <TimeRangeRenderer eventData={event} />,
+      staticWidth: 320,
     },
   },
 });
