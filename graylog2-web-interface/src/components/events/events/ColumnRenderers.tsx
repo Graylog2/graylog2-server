@@ -111,15 +111,15 @@ const MessageRenderer = ({ message, eventId }: { message: string, eventId: strin
   return <StyledDiv onClick={toggleExtraSection}>{message}</StyledDiv>;
 };
 
-const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => eventData.timerange_start && eventData.timerange_end ? (
-<div>
-  <Timestamp dateTime={new Date()} />
+const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => (eventData.timerange_start && eventData.timerange_end ? (
+  <div>
+    <Timestamp dateTime={new Date()} />
       &ensp;&mdash;&ensp;
-  <Timestamp dateTime={new Date()} />
-</div>
+    <Timestamp dateTime={new Date()} />
+  </div>
 ) : (
   <em>No time range</em>
-)
+));
 
 const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRenderers<Event> => ({
   attributes: {
