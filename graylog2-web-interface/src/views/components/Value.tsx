@@ -21,6 +21,7 @@ import styled from 'styled-components';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
 
 import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
@@ -37,13 +38,26 @@ const ValueActionTitle = styled.span`
   white-space: nowrap;
 `;
 
+type TypeSpecificValueWithHighlightProps = {
+  field: string,
+  value?: any,
+  type?: FieldType
+  render?: React.ComponentType<ValueRendererProps>,
+}
+const TypeSpecificValueWithHighlight = ({ field, value, type, render }: TypeSpecificValueWithHighlightProps) => (
+  <CustomHighlighting field={field}
+                      value={value}>
+    <TypeSpecificValue field={field} value={value} type={type} render={render} />
+  </CustomHighlighting>
+);
+
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
 const InteractiveValue = ({ field, value, render, type }: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
   const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
-  const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
+  const element = <TypeSpecificValueWithHighlight field={field} value={value} type={type} render={Component} />;
 
   return (
     <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
@@ -60,9 +74,15 @@ InteractiveValue.defaultProps = {
 
 const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => (
   <InteractiveContext.Consumer>
+<<<<<<< HEAD
     {(interactive) => ((interactive)
       ? <InteractiveValue field={field} value={value} render={render} type={type} />
       : <span><TypeSpecificValue field={field} value={value} render={render} type={type} /></span>)}
+=======
+    {(interactive) => (interactive
+      ? <InteractiveValue field={field} value={value} render={render} type={type} unit={unit} />
+      : <span><TypeSpecificValueWithHighlight field={field} value={value} render={render} type={type} unit={unit} /></span>)}
+>>>>>>> 166bc862f9 (Fix custom highlighting of field values for message details in message table.)
   </InteractiveContext.Consumer>
 );
 
