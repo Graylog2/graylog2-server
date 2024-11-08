@@ -104,7 +104,7 @@ public class InputEventListener {
         final boolean startInput;
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
-            startInput = inputState.getState() == IOState.Type.RUNNING;
+            startInput = inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.SETUP;
             inputRegistry.remove(inputState);
         } else {
             startInput = false;

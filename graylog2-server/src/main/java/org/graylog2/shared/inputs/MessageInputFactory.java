@@ -65,6 +65,12 @@ public class MessageInputFactory {
         return input;
     }
 
+    public MessageInput create(InputCreateRequest lr, String user, String nodeId, IOState.Type state) throws NoSuchInputTypeException {
+        final MessageInput input = create(lr, user, nodeId);
+        input.setDesiredState(state);
+        return input;
+    }
+
     public Map<String, InputDescription> getAvailableInputs() {
         final Map<String, InputDescription> result = Maps.newHashMap();
         for (final Map.Entry<String, MessageInput.Factory<? extends MessageInput>> factories : inputFactories.entrySet()) {
