@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 
 export async function onError<T, E = Error>(promise: Promise<T>, handler: (e: E) => void) {
   try {
