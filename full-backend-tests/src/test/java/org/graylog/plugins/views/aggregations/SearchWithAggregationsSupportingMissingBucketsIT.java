@@ -49,9 +49,6 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     @SuppressWarnings("unused")
     //use this fixtureType:474877 in all fixtures to assure this test isolation from the others
     private static final String FIXTURE_TYPE_FIELD_VALUE = "474877";
-    private static final String QUERY_ID = "q1";
-    private static final String SEARCH_TYPE_ID = "st1";
-    private static final String PIVOT_RESULTS_PATH = "results." + QUERY_ID + ".search_types." + SEARCH_TYPE_ID;
 
     private final GraylogApis api;
 
@@ -66,7 +63,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
 
     private ValidatableResponse execute(Pivot pivot) {
         return api.search().executePivot(pivot)
-                .body(PIVOT_RESULTS_PATH + ".total", equalTo(5));
+                .body(".total", equalTo(5));
     }
 
     @ContainerMatrixTest
@@ -79,7 +76,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(".rows", hasSize(5))
                 .body(".total", equalTo(5))
                 .body(".rows.find{ it.key[0] == 'Joe' }", notNullValue())
@@ -116,7 +113,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(".rows", hasSize(4))
                 .body(".total", equalTo(5))
                 .body(".rows.find{ it.key[0] == 'Joe' }", notNullValue())
@@ -151,7 +148,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(tupledItemPath(MISSING_BUCKET_NAME, "Cooper"), hasItems(List.of(1, 60.0f)))
                 .body(tupledItemPath("Bob", MISSING_BUCKET_NAME), hasItems(List.of(1, 60.0f)))
                 .body(tupledItemPath("Joe", "Smith"), hasItems(List.of(1, 50.0f)))
@@ -182,7 +179,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(".rows", hasSize(4))
                 .body(".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
                 .body(".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
@@ -208,7 +205,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+        validatableResponse
                 .body(".rows", hasSize(6))
                 .body(".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
                 .body(".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
@@ -233,7 +230,6 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse
-                .rootPath(PIVOT_RESULTS_PATH)
                 .body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(1, 60.0f));
     }
 
@@ -248,7 +244,6 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
 
         //General verification
         validatableResponse.body("execution.done", equalTo(true))
-                .rootPath(PIVOT_RESULTS_PATH)
                 .body(".rows", hasSize(5))
                 .body(".total", equalTo(5))
                 .body(".rows.find{ it.key == ['60'] }", notNullValue())

@@ -180,6 +180,7 @@ public class Search implements GraylogRestApi {
                 .log().ifValidationFails()
                 .statusCode(200)
                 .body("execution.done", equalTo(true))
-                .body("execution.completed_exceptionally", equalTo(false));
+                .body("execution.completed_exceptionally", equalTo(false))
+                .rootPath(pivotPath);
     }
 }

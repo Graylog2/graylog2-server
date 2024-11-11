@@ -912,6 +912,6 @@ public class SearchAggregationsIT {
 
     private ValidatableResponse executePivot(Pivot pivot) {
         return api.search().executePivot(pivot)
-                .body(PIVOT_PATH + ".total", equalTo(1000));
+                .body(".total", equalTo(1000));
     }
 }
