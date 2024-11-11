@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const config = {
-  preset: 'jest-preset-graylog',
-  setupFiles: [
-    '<rootDir>/test/setup-jest.js',
-    'trace-unhandled/register',
-  ],
-  setupFilesAfterEnv: [
-    'jest-enzyme',
-    '<rootDir>/test/configure-testing-library.js',
-  ],
-  testEnvironment: '<rootDir>/test/integration-environment.js',
-  testRegex: '\\.it\\.[jt]sx?$',
+import { useContext } from 'react';
+
+import MetaDataContext from 'components/common/EntityDataTable/contexts/MetaDataContext';
+
+const useMetaDataContext = <M = unknown>() => {
+  const context = useContext(MetaDataContext);
+
+  if (!context) {
+    throw new Error('useMetaDataContext hook needs to be used inside MetaDataProvider');
+  }
+
+  return context as {meta: M };
 };
 
-module.exports = config;
+export default useMetaDataContext;

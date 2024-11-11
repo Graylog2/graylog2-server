@@ -1,21 +1,20 @@
 Light-themed editor:
 ```js
-import createReactClass from 'create-react-class';
-
-const MarkdownSourceEditor = createReactClass({
-  getInitialState() {
-    return {
+class MarkdownSourceEditor extends React.Component {
+  constructor(props) {
+    this.state = {
       code: `## Markdown text
 
 - This is an example of a source text editor
 - The code we write is written in Markdown
 `,
     };
-  },
+    this.handleChange = this.handleChange.bind(this);
+  }
 
   handleChange(nextValue) {
     this.setState({ code: nextValue });
-  },
+  }
 
   render() {
     const { code } = this.state;
@@ -30,29 +29,29 @@ const MarkdownSourceEditor = createReactClass({
         <pre>{code}</pre>
       </div>
     );
-  },
-});
+  }
+}
 
 <MarkdownSourceEditor />
 ```
 
 Read-only dark-themed editor:
 ```js
-import createReactClass from 'create-react-class';
-
-const TextSourceEditor = createReactClass({
-  getInitialState() {
-    return {
+class TextSourceEditor extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       code: `function foobar() {
   console.log('this is some source code!');
 }
 `,
     };
-  },
+    this.handleChange = this.handleChange.bind(this);
+  }
 
   handleChange(nextValue) {
     this.setState({ code: nextValue });
-  },
+  };
 
   render() {
     const { code } = this.state;
@@ -69,19 +68,18 @@ const TextSourceEditor = createReactClass({
                           theme="dark"
                           value={code} />
     );
-  },
-});
+  }
+}
 
 <TextSourceEditor />
 ```
 
 Non-resizable editor without toolbar and with custom height and width:
 ```js
-import createReactClass from 'create-react-class';
-
-const JsonSourceEditor = createReactClass({
-  getInitialState() {
-    return {
+class JsonSourceEditor extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       code: `{
   "key": "value",
   "foo": [
@@ -91,11 +89,12 @@ const JsonSourceEditor = createReactClass({
 }
 `,
     };
-  },
+    this.handleChange = this.handleChange.bind(this);
+  }
 
   handleChange(nextValue) {
     this.setState({ code: nextValue });
-  },
+  };
 
   render() {
     const { code } = this.state;
@@ -109,8 +108,8 @@ const JsonSourceEditor = createReactClass({
                       width={400}
                       value={code} />
       );
-  },
-});
+  }
+}
 
 <JsonSourceEditor />
 ```
