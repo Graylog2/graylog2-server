@@ -14,18 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const config = {
-  preset: 'jest-preset-graylog',
-  setupFiles: [
-    '<rootDir>/test/setup-jest.js',
-    'trace-unhandled/register',
-  ],
-  setupFilesAfterEnv: [
-    'jest-enzyme',
-    '<rootDir>/test/configure-testing-library.js',
-  ],
-  testEnvironment: '<rootDir>/test/integration-environment.js',
-  testRegex: '\\.it\\.[jt]sx?$',
-};
+import * as React from 'react';
 
-module.exports = config;
+const TestInputStep = () => (
+  <div>Test Input Step</div>
+);
+
+export default TestInputStep;

@@ -81,7 +81,7 @@ const PipelineDetailsPage = () => {
   const _savePipeline = (_pipeline, callback) => {
     const requestPipeline = {
       ..._pipeline,
-      source: SourceGenerator.generatePipeline(pipeline),
+      source: SourceGenerator.generatePipeline(_pipeline),
     };
 
     const promise = requestPipeline.id

@@ -16,7 +16,7 @@
  */
 import { useContext } from 'react';
 
-import InputSetupWizardContext from 'contexts/InputSetupWizardContext';
+import InputSetupWizardContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardContext';
 
 const useInputSetupWizard = () => {
   const inputSetupWizard = useContext(InputSetupWizardContext);

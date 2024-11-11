@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-const CategoryStep = () => (
-  <div>Category Step</div>
-);
+import TestInputStep from './TestInputStep';
 
-export default CategoryStep;
+export { default as TestInputStep } from './TestInputStep';
+
+export default TestInputStep;
