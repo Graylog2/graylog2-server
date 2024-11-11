@@ -161,7 +161,7 @@ public class Search implements GraylogRestApi {
 
         final SearchDTO search = SearchDTO.builder()
                 .queries(QueryDTO.builder()
-                        .timerange(RelativeRange.create(0))
+                        .timerange(RelativeRange.allTime())
                         .id("query1")
                         .query(ElasticsearchQueryString.of(queryString))
                         .searchTypes(Set.of(pivotWithId))

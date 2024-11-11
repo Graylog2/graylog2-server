@@ -62,7 +62,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     }
 
     private ValidatableResponse execute(Pivot pivot) {
-        return api.search().executePivot(pivot)
+        return api.search().executePivot(pivot, "fixtureType:" + FIXTURE_TYPE_FIELD_VALUE)
                 .body(".total", equalTo(5));
     }
 
