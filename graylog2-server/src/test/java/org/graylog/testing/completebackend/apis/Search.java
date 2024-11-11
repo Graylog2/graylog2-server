@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -93,7 +92,7 @@ public class Search implements GraylogRestApi {
      * @return all messages' "message" field as List<String>
      */
     public List<String> searchAllMessages() {
-        return searchAllMessagesInTimeRange(allMessagesTimeRange());
+        return searchAllMessagesInTimeRange(RelativeRange.allTime());
     }
 
     public List<String> searchAllMessagesInTimeRange(TimeRange timeRange) {
@@ -139,11 +138,6 @@ public class Search implements GraylogRestApi {
     @SuppressWarnings("SameParameterValue")
     private static String allMessagesJsonPath(String queryId, String messageListId) {
         return "results." + queryId + ".search_types." + messageListId + ".messages.message.message";
-    }
-
-
-    public AbsoluteRange allMessagesTimeRange() {
-        return AbsoluteRange.create("2010-01-01T00:00:00.0Z", "2050-01-01T00:00:00.0Z");
     }
 
     public String toJsonString(Object s) {
