@@ -20,6 +20,7 @@ import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
 import { IfPermitted, Spinner, SearchForm } from 'components/common';
+import useFeature from 'hooks/useFeature';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import EntityList from 'components/common/EntityList';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
@@ -29,7 +30,7 @@ import { useStore } from 'stores/connect';
 import type { StoreState } from 'stores/StoreTypes';
 import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { Input } from 'components/messageloaders/Types';
-import { InputSetupWizard, useInputSetupWizard } from 'components/inputs/InputSetupWizard';
+import { InputSetupWizard, INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
 
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
@@ -96,13 +97,13 @@ type Props = {
 }
 
 const InputsList = ({ permissions, node }: Props) => {
-  const { show: showInputSetupWizard } = useInputSetupWizard();
-
   useEffect(() => {
     InputTypesActions.list();
     InputsActions.list();
     SingleNodeActions.get();
   }, []);
+
+  const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
 
   const currentNode = useStore(SingleNodeStore);
   const { globalInputs, localInputs } = useStore(InputsStore, (inputsStore) => _splitInputs(inputsStore, node));
@@ -120,7 +121,7 @@ const InputsList = ({ permissions, node }: Props) => {
 
   return (
     <div>
-      {showInputSetupWizard && (<InputSetupWizard />)}
+      {inputSetupFeatureFlagIsEnabled && (<InputSetupWizard />)}
       {!node && (
         <IfPermitted permissions="inputs:create">
           <CreateInputControl />
