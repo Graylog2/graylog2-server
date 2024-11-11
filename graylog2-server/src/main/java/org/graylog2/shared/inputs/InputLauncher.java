@@ -19,8 +19,10 @@ package org.graylog2.shared.inputs;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.buffers.InputBuffer;
@@ -28,8 +30,6 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,10 +47,12 @@ public class InputLauncher {
     private final ExecutorService executor;
     private final Configuration configuration;
     private final LeaderElectionService leaderElectionService;
+    private final FeatureFlags featureFlags;
 
     @Inject
     public InputLauncher(IOState.Factory<MessageInput> inputStateFactory, InputBuffer inputBuffer, PersistedInputs persistedInputs,
-                         InputRegistry inputRegistry, MetricRegistry metricRegistry, Configuration configuration, LeaderElectionService leaderElectionService) {
+                         InputRegistry inputRegistry, MetricRegistry metricRegistry, Configuration configuration, LeaderElectionService leaderElectionService,
+                         FeatureFlags featureFlags) {
         this.inputStateFactory = inputStateFactory;
         this.inputBuffer = inputBuffer;
         this.persistedInputs = persistedInputs;
@@ -58,6 +60,7 @@ public class InputLauncher {
         this.executor = executorService(metricRegistry);
         this.configuration = configuration;
         this.leaderElectionService = leaderElectionService;
+        this.featureFlags = featureFlags;
     }
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {
@@ -73,7 +76,11 @@ public class InputLauncher {
 
         final IOState<MessageInput> inputState;
         if (inputRegistry.getInputState(input.getId()) == null) {
-            inputState = inputStateFactory.create(input);
+            if (featureFlags.isOn("SETUP_MODE") && input.getDesiredState() == IOState.Type.SETUP) {
+                inputState = inputStateFactory.create(input, IOState.Type.SETUP);
+            } else {
+                inputState = inputStateFactory.create(input);
+            }
             inputRegistry.add(inputState);
         } else {
             inputState = inputRegistry.getInputState(input.getId());
@@ -83,6 +90,11 @@ public class InputLauncher {
                 }
             }
             inputState.setStoppable(input);
+        }
+
+        // Do not launch if currently in setup mode
+        if (inputState.getState() == IOState.Type.SETUP) {
+            return inputState;
         }
 
         executor.submit(new Runnable() {
@@ -132,6 +144,8 @@ public class InputLauncher {
                 LOG.info("Launching input {} - desired state is {}",
                         input.toIdentifier(), input.getDesiredState());
                 input.initialize();
+                launch(input);
+            } else if (input.getDesiredState().equals(IOState.Type.SETUP)) {
                 launch(input);
             } else {
                 LOG.info("Not auto-starting input {} - desired state is {}",
