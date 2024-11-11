@@ -33,6 +33,7 @@ import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { Plugin } from 'stores/system/SystemPluginsStore';
 import type { Input } from 'components/messageloaders/Types';
 import type { InputDescription } from 'stores/inputs/InputTypesStore';
+import type { SystemOverview } from 'stores/cluster/types';
 
 type InputState = {
   detailed_message:string,
@@ -57,29 +58,13 @@ type JvmInformation = {
   info: string
 }
 
-type ClusterOverview = {
-  facility: string
-  codename: string
-  node_id: string
-  cluster_id: string
-  version: string
-  started_at: string
-  hostname: string
-  lifecycle: string
-  lb_status: string
-  timezone: string
-  operating_system: string
-  is_processing: boolean
-  is_leader: boolean
-}
-
 type Props = {
   node: NodeInfo,
   plugins?: Array<Plugin>
   inputStates?: Array<InputState>
-  inputDescriptions?: Array<InputDescription>
+  inputDescriptions?: { [type: string]: InputDescription },
   jvmInformation?: JvmInformation
-  systemOverview: ClusterOverview,
+  systemOverview: SystemOverview,
 }
 
 const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInformation, systemOverview }: Props) => {

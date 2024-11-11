@@ -28,8 +28,7 @@ import type { Input } from 'components/messageloaders/Types';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
-import useInputSetupWizard from 'hooks/useInputSetupWizard';
-import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
+import { INPUT_SETUP_MODE_FEATURE_FLAG, useInputSetupWizard } from 'components/inputs/InputSetupWizard';
 
 type Props = {
   input: Input
@@ -77,7 +76,7 @@ const InputStateControl = ({ input } : Props) => {
       app_action_value: 'setup-input',
     });
 
-    openWizard(input.id);
+    openWizard({ inputId: input.id });
   };
 
   if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {

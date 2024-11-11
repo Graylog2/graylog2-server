@@ -14,5 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+export { default as InputSetupWizardProvider } from './contexts/InputSetupWizardProvider';
 export { default as InputSetupWizard } from './InputSetupWizard';
+export { default as useInputSetupWizard } from './hooks/useInputSetupWizard';
+export * from './types';
 export * from './constants';

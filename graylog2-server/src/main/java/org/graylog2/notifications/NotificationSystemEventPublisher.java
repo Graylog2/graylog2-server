@@ -127,7 +127,7 @@ public class NotificationSystemEventPublisher extends AbstractExecutionThreadSer
         shutdownTask.set(scheduler.schedule(() -> {
             LOG.error("Notification queue was not drained within {}. Forcefully terminating.", shutdownTimeout);
             this.executionThread.interrupt();
-        }, shutdownTimeout.getSeconds(), TimeUnit.SECONDS));
+        }, shutdownTimeout.toSeconds(), TimeUnit.SECONDS));
     }
 
     @Override

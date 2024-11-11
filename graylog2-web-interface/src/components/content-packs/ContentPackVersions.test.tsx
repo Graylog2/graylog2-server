@@ -18,7 +18,6 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import 'helpers/mocking/react-dom_mock';
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 

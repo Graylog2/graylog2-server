@@ -17,7 +17,6 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import 'helpers/mocking/react-dom_mock';
 import MockStore from 'helpers/mocking/StoreMock';
 
 import UrlWhiteListConfig from './UrlWhiteListConfig';
