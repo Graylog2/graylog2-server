@@ -55,7 +55,8 @@ public abstract class RestOperationParameters {
 
     public static Builder builder() {
         return new AutoValue_RestOperationParameters.Builder()
-                .attempts_count(DEFAULT_ATTEMPTS_COUNT);
+                .attempts_count(DEFAULT_ATTEMPTS_COUNT)
+                .relaxedHTTPSValidation(false);
     }
 
     abstract Builder toBuilder();
