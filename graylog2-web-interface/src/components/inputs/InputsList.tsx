@@ -20,6 +20,7 @@ import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
 import { IfPermitted, Spinner, SearchForm } from 'components/common';
+import useFeature from 'hooks/useFeature';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import EntityList from 'components/common/EntityList';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
@@ -29,8 +30,7 @@ import { useStore } from 'stores/connect';
 import type { StoreState } from 'stores/StoreTypes';
 import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { Input } from 'components/messageloaders/Types';
-import InputSetupWizardProvider from 'contexts/InputSetupWizardProvider';
-import InputSetupWizard from 'components/inputs/InputSetupWizard';
+import { InputSetupWizard, INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
 
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
@@ -103,6 +103,8 @@ const InputsList = ({ permissions, node }: Props) => {
     SingleNodeActions.get();
   }, []);
 
+  const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+
   const currentNode = useStore(SingleNodeStore);
   const { globalInputs, localInputs } = useStore(InputsStore, (inputsStore) => _splitInputs(inputsStore, node));
   const [filter, setFilter] = useState<string>();
@@ -118,56 +120,54 @@ const InputsList = ({ permissions, node }: Props) => {
   }
 
   return (
-    <InputSetupWizardProvider>
-      <InputSetupWizard />
-      <div>
-        {!node && (
+    <div>
+      {inputSetupFeatureFlagIsEnabled && (<InputSetupWizard />)}
+      {!node && (
         <IfPermitted permissions="inputs:create">
           <CreateInputControl />
         </IfPermitted>
-        )}
+      )}
 
-        <InputListRow id="filter-input" className="content">
-          <Col md={12}>
-            <SearchForm onSearch={setFilter}
-                        topMargin={0}
-                        onReset={resetFilter}
-                        placeholder="Filter by title" />
-            <br />
-            <h2>
-              Global inputs
-              &nbsp;
-              <small>{globalInputs.length} configured{nodeAffix}</small>
-            </h2>
-            <EntityList bsNoItemsStyle="info"
-                        noItemsText={globalInputs.length <= 0 ? 'There are no global inputs.'
-                          : 'No global inputs match the filter'}
-                        items={filteredGlobalInputs.map((input) => (
-                          <InputListItem key={input.id}
-                                         input={input}
-                                         currentNode={currentNode}
-                                         permissions={permissions} />
-                        ))} />
-            <br />
-            <br />
-            <h2>
-              Local inputs
-              &nbsp;
-              <small>{localInputs.length} configured{nodeAffix}</small>
-            </h2>
-            <EntityList bsNoItemsStyle="info"
-                        noItemsText={localInputs.length <= 0 ? 'There are no local inputs.'
-                          : 'No local inputs match the filter'}
-                        items={filteredLocalInputs.map((input) => (
-                          <InputListItem key={input.id}
-                                         input={input}
-                                         currentNode={currentNode}
-                                         permissions={permissions} />
-                        ))} />
-          </Col>
-        </InputListRow>
-      </div>
-    </InputSetupWizardProvider>
+      <InputListRow id="filter-input" className="content">
+        <Col md={12}>
+          <SearchForm onSearch={setFilter}
+                      topMargin={0}
+                      onReset={resetFilter}
+                      placeholder="Filter by title" />
+          <br />
+          <h2>
+            Global inputs
+            &nbsp;
+            <small>{globalInputs.length} configured{nodeAffix}</small>
+          </h2>
+          <EntityList bsNoItemsStyle="info"
+                      noItemsText={globalInputs.length <= 0 ? 'There are no global inputs.'
+                        : 'No global inputs match the filter'}
+                      items={filteredGlobalInputs.map((input) => (
+                        <InputListItem key={input.id}
+                                       input={input}
+                                       currentNode={currentNode}
+                                       permissions={permissions} />
+                      ))} />
+          <br />
+          <br />
+          <h2>
+            Local inputs
+            &nbsp;
+            <small>{localInputs.length} configured{nodeAffix}</small>
+          </h2>
+          <EntityList bsNoItemsStyle="info"
+                      noItemsText={localInputs.length <= 0 ? 'There are no local inputs.'
+                        : 'No local inputs match the filter'}
+                      items={filteredLocalInputs.map((input) => (
+                        <InputListItem key={input.id}
+                                       input={input}
+                                       currentNode={currentNode}
+                                       permissions={permissions} />
+                      ))} />
+        </Col>
+      </InputListRow>
+    </div>
   );
 };
 

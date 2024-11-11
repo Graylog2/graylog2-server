@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const config = {
-  preset: 'jest-preset-graylog',
-  setupFiles: [
-    '<rootDir>/test/setup-jest.js',
-    'trace-unhandled/register',
-  ],
-  setupFilesAfterEnv: [
-    'jest-enzyme',
-    '<rootDir>/test/configure-testing-library.js',
-  ],
-  testEnvironment: '<rootDir>/test/integration-environment.js',
-  testRegex: '\\.it\\.[jt]sx?$',
+import { useContext } from 'react';
+
+import InputSetupWizardContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardContext';
+
+const useInputSetupWizard = () => {
+  const inputSetupWizard = useContext(InputSetupWizardContext);
+
+  if (!inputSetupWizard) {
+    throw new Error('useInputSetupWizard hook needs to be used inside InputSetupWizardContext.Provider');
+  }
+
+  return inputSetupWizard;
 };
 
-module.exports = config;
+export default useInputSetupWizard;
