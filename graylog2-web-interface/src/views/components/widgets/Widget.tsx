@@ -251,18 +251,21 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
 
   const { config } = widget;
   const isFocused = focusedWidget?.id === id;
+  const titleIcon = (
+    <IfDashboard>
+      {!editing && (
+        <WidgetWarmTierAlert widgetId={id} activeQuery={activeQuery} />
+      )}
+    </IfDashboard>
+  );
 
   return (
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
-        <IfDashboard>
-          {!editing && (
-            <WidgetWarmTierAlert widgetId={id} activeQuery={activeQuery} />
-          )}
-        </IfDashboard>
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader title={title}
+                          titleIcon={titleIcon}
                           hideDragHandle={!interactive || isFocused}
                           loading={loading}
                           editing={editing}

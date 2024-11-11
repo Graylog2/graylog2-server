@@ -82,9 +82,18 @@ type Props = {
   title: string,
   loading?: boolean
   editing: boolean,
+  titleIcon?: React.ReactNode,
 };
 
-const WidgetHeader = ({ children = null, onRename, hideDragHandle = false, title, loading = false, editing }: Props) => (
+const WidgetHeader = ({
+  title,
+  editing,
+  hideDragHandle = false,
+  loading = false,
+  children = null,
+  titleIcon = null,
+  onRename = null,
+}: Props) => (
   <Container>
     <Col>
       {hideDragHandle || <DragHandleContainer className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="drag_indicator" /></DragHandleContainer>}
@@ -92,15 +101,18 @@ const WidgetHeader = ({ children = null, onRename, hideDragHandle = false, title
         <TitleInputWrapper>
           <TitleInput type="text"
                       id="widget-title"
-                      onChange={(e) => onRename(e.target.value)}
+                      onChange={(e) => onRename && onRename(e.target.value)}
                       value={title}
                       required />
         </TitleInputWrapper>
       ) : (
-        <EditableTitle key={title}
-                       disabled={!onRename}
-                       value={title}
-                       onChange={onRename} />
+        <>
+          <EditableTitle key={title}
+                         disabled={!onRename}
+                         value={title}
+                         onChange={onRename} />
+          {titleIcon}
+        </>
       )}
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>

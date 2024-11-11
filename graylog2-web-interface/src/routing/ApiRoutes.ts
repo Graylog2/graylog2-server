@@ -194,6 +194,7 @@ const ApiRoutes = {
     list: () => ({ url: '/cluster/inputstates' }),
     start: (inputId: string) => ({ url: `/cluster/inputstates/${inputId}` }),
     stop: (inputId: string) => ({ url: `/cluster/inputstates/${inputId}` }),
+    setup: (inputId: string) => ({ url: `/cluster/inputstates/setup/${inputId}` }),
   },
   ClusterLoggersResource: {
     loggers: () => ({ url: '/cluster/system/loggers' }),

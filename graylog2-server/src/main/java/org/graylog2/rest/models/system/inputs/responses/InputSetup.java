@@ -14,18 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+package org.graylog2.rest.models.system.inputs.responses;
 
-import InputSetupWizardContext from 'contexts/InputSetupWizardContext';
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
-const useInputSetupWizard = () => {
-  const inputSetupWizard = useContext(InputSetupWizardContext);
+@AutoValue
+@WithBeanGetter
+@JsonAutoDetect
+public abstract class InputSetup {
 
-  if (!inputSetupWizard) {
-    throw new Error('useInputSetupWizard hook needs to be used inside InputSetupWizardContext.Provider');
-  }
+    @JsonProperty
+    public abstract String id();
 
-  return inputSetupWizard;
-};
-
-export default useInputSetupWizard;
+    @JsonCreator
+    public static InputSetup create(@JsonProperty("id") String id) {
+        return new AutoValue_InputSetup(id);
+    }
+}
