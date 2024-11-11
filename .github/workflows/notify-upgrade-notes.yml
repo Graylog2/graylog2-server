@@ -5,6 +5,7 @@ name: "Notify UPGRADING.md update"
 run-name: "Notify UPGRADING.md update (${{ github.ref_name}}/${{ github.sha }})"
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "master"
@@ -23,5 +24,8 @@ jobs:
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
         with:
           channel-id: "${{ vars.SLACK_UPGRADE_NOTIFY_CHANNELS }}"
-          slack-message: >
-            The Graylog [${{ github.ref_name }}/UPGRADING.md](https://github.com/Graylog2/graylog2-server/blob/${{ github.sha }}/UPGRADING.md) was updated in commit [${{ github.sha }}](https://github.com/Graylog2/graylog2-server/commit/${{ github.sha }}).
+          slack-message: |
+            The Graylog ${{ github.ref_name || "test" }}/UPGRADING.md file was updated:
+
+            Content: https://github.com/Graylog2/graylog2-server/blob/${{ github.sha || "test" }}/UPGRADING.md
+            Commit: https://github.com/Graylog2/graylog2-server/commit/${{ github.sha || "test" }}
