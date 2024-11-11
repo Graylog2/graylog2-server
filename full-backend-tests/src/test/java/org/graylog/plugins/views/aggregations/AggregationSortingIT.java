@@ -68,14 +68,19 @@ public class AggregationSortingIT {
 
             final var pivotBuilder = Pivot.builder()
                     .rowGroups(Values.builder()
-                            .fields(List.of(nonNumericField, numericField)).limit(10).build());
+                            .fields(List.of(nonNumericField, numericField)).limit(10).build())
+                    .series(List.of())
+                    .rollup(false);
 
             api.search().waitForMessage("sorting on numeric pivot test 1");
+
+            env.waitForFieldTypes(numericField);
+
             final var resultDesc = env.executePivot(
                             pivotBuilder
                                     .sort(PivotSort.create(numericField, SortSpec.Direction.Descending))
-                                    .build())
-                    .log().body(true);
+                                    .build()
+            );
             assertThat(resultDesc).isNotNull();
 
             expectKeys(resultDesc, "25", "15", "9", "8", "4", "2", "1");
@@ -90,7 +95,7 @@ public class AggregationSortingIT {
     }
 
     private void expectKeys(ValidatableResponse response, String... values) {
-        for (int i = 0; i <= values.length; i++) {
+        for (int i = 0; i < values.length; i++) {
             response.body(".rows[" + i + "].key[1]", is(values[i]));
         }
     }

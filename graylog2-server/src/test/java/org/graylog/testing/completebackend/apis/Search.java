@@ -155,6 +155,10 @@ public class Search implements GraylogRestApi {
     }
 
     public ValidatableResponse executePivot(Pivot pivot) {
+        return executePivot(pivot, "source:pivot-fixtures");
+    }
+
+    public ValidatableResponse executePivot(Pivot pivot, String queryString) {
         final var pivotName = "pivotaggregation";
         final var pivotPath = "results.query1.search_types." + pivotName;
         final Pivot pivotWithId = pivot.toBuilder()
@@ -165,7 +169,7 @@ public class Search implements GraylogRestApi {
                 .queries(QueryDTO.builder()
                         .timerange(RelativeRange.create(0))
                         .id("query1")
-                        .query(ElasticsearchQueryString.of("source:pivot-fixtures"))
+                        .query(ElasticsearchQueryString.of(queryString))
                         .searchTypes(Set.of(pivotWithId))
                         .build())
                 .build();
