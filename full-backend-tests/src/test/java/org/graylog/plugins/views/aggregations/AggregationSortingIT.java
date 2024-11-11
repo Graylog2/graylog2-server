@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.aggregations;
 
 import com.github.rholder.retry.RetryException;
+import io.restassured.response.ValidatableResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
@@ -36,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
+import static org.hamcrest.Matchers.is;
 
 @ContainerMatrixTestsConfiguration(searchVersions = {ES7, OS1, OS2_LATEST})
 public class AggregationSortingIT {
@@ -53,22 +55,43 @@ public class AggregationSortingIT {
 
     @ContainerMatrixTest
     void sortingOnNumericPivotFieldSortsNumerically() throws ExecutionException, RetryException {
+        final var numericField = "numeric_field";
+        final var nonNumericField = "non_numeric_field";
         try (final var env = createEnvironment()) {
             for (final var value : Set.of(9, 8, 4, 25, 2, 15, 1)) {
                 env.ingestMessage(Map.of(
-                        "non_numeric_field", "foo",
-                        "numeric_field", value,
+                        nonNumericField, "foo",
+                        numericField, value,
                         "short_message", "sorting on numeric pivot test " + value
                 ));
             }
 
-            api.search().waitForMessage("sorting on numeric pivot test 1");
-            final var result = env.executePivot(Pivot.builder()
+            final var pivotBuilder = Pivot.builder()
                     .rowGroups(Values.builder()
-                            .fields(List.of("non_numeric_field", "numeric_field")).limit(10).build())
-                    .sort(PivotSort.create("numeric_field", SortSpec.Direction.Descending))
-                    .build()).log().body(true);
-            assertThat(result).isNotNull();
+                            .fields(List.of(nonNumericField, numericField)).limit(10).build());
+
+            api.search().waitForMessage("sorting on numeric pivot test 1");
+            final var resultDesc = env.executePivot(
+                            pivotBuilder
+                                    .sort(PivotSort.create(numericField, SortSpec.Direction.Descending))
+                                    .build())
+                    .log().body(true);
+            assertThat(resultDesc).isNotNull();
+
+            expectKeys(resultDesc, "25", "15", "9", "8", "4", "2", "1");
+
+            final var resultAsc = env.executePivot(
+                    pivotBuilder
+                            .sort(PivotSort.create(numericField, SortSpec.Direction.Ascending))
+                            .build());
+
+            expectKeys(resultAsc, "1", "2", "4", "8", "9", "15", "25");
+        }
+    }
+
+    private void expectKeys(ValidatableResponse response, String... values) {
+        for (int i = 0; i <= values.length; i++) {
+            response.body(".rows[" + i + "].key[1]", is(values[i]));
         }
     }
 
