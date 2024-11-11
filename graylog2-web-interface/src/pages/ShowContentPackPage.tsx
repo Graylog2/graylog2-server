@@ -35,7 +35,7 @@ import useParams from 'routing/useParams';
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
 const ShowContentPackPage = () => {
-  const { contentPackRevisions, installations, constraints } = useStore(ContentPacksStore);
+  const { contentPackRevisions, installations, constraints, selectedVersion: currentVersion } = useStore(ContentPacksStore);
   const history = useHistory();
   const params = useParams<{ contentPackId: string }>();
 
@@ -59,7 +59,7 @@ const ShowContentPackPage = () => {
     });
 
     ContentPacksActions.installList(params.contentPackId);
-  }, []);
+  }, [history, params?.contentPackId]);
 
   const _onVersionChanged = (newVersion) => {
     setSelectedVersion(newVersion);
@@ -95,7 +95,7 @@ const ShowContentPackPage = () => {
       setUninstallEntities(result.entities);
     });
 
-    setSelectedVersion(true);
+    setShowModal(true);
     setUninstallContentPackId(contentPackId);
     setUninstallInstallId(installId);
   };
@@ -175,8 +175,8 @@ const ShowContentPackPage = () => {
           </Col>
           <Col md={8} className="content">
             {/* @ts-ignore */}
-            <ContentPackDetails contentPack={contentPackRevisions.contentPack(selectedVersion)}
-                                constraints={constraints[selectedVersion]}
+            <ContentPackDetails contentPack={contentPackRevisions.contentPack(selectedVersion ?? currentVersion)}
+                                constraints={constraints[selectedVersion ?? currentVersion]}
                                 showConstraints
                                 verbose />
           </Col>
