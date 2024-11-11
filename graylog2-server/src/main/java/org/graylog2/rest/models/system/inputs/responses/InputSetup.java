@@ -14,9 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.rest.models.system.inputs.responses;
 
-export { default as InputSetupWizardProvider } from './contexts/InputSetupWizardProvider';
-export { default as InputSetupWizard } from './InputSetupWizard';
-export { default as useInputSetupWizard } from './hooks/useInputSetupWizard';
-export * from './types';
-export * from './constants';
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
+
+@AutoValue
+@WithBeanGetter
+@JsonAutoDetect
+public abstract class InputSetup {
+
+    @JsonProperty
+    public abstract String id();
+
+    @JsonCreator
+    public static InputSetup create(@JsonProperty("id") String id) {
+        return new AutoValue_InputSetup(id);
+    }
+}

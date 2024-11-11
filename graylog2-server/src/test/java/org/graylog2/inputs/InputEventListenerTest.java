@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -46,6 +47,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class InputEventListenerTest {
+    private static final String INPUT_ID = "input-id";
+    private static final String THIS_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
+    private static final String OTHER_NODE_ID = "c0c0a000-0000-4000-a000-000000000000";
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -55,16 +60,19 @@ public class InputEventListenerTest {
     private InputRegistry inputRegistry;
     @Mock
     private InputService inputService;
-    public static final String THIS_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
-    public static final String OTHER_NODE_ID = "c0c0a000-0000-4000-a000-000000000000";
-    private final NodeId nodeId = new SimpleNodeId(THIS_NODE_ID);
-    private InputEventListener listener;
     @Mock
     private LeaderElectionService leaderElectionService;
     @Mock
     private PersistedInputs persistedInputs;
     @Mock
     private ServerStatus serverStatus;
+    @Mock
+    private IOState<MessageInput> inputState;
+    @Mock
+    private Input input;
+
+    private final NodeId nodeId = new SimpleNodeId(THIS_NODE_ID);
+    private InputEventListener listener;
 
     @Before
     public void setUp() throws Exception {
@@ -74,227 +82,199 @@ public class InputEventListenerTest {
 
     @Test
     public void inputCreatedDoesNothingIfInputDoesNotExist() throws Exception {
-        final String inputId = "input-id";
-        when(inputService.find(inputId)).thenThrow(NotFoundException.class);
+        when(inputService.find(INPUT_ID)).thenThrow(NotFoundException.class);
 
-        listener.inputCreated(InputCreated.create(inputId));
+        listener.inputCreated(InputCreated.create(INPUT_ID));
 
         verifyNoMoreInteractions(inputLauncher, inputRegistry);
     }
 
     @Test
     public void inputCreatedStopsInputIfItIsRunning() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked")
-        final IOState<MessageInput> inputState = mock(IOState.class);
-        when(inputService.find(inputId)).thenReturn(input);
-        when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
 
-        listener.inputCreated(InputCreated.create(inputId));
+        listener.inputCreated(InputCreated.create(INPUT_ID));
 
         verify(inputRegistry, times(1)).remove(inputState);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void inputCreatedDoesNotStopInputIfItIsNotRunning() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        when(inputService.find(inputId)).thenReturn(input);
-        when(inputRegistry.getInputState(inputId)).thenReturn(null);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(null);
 
-        listener.inputCreated(InputCreated.create(inputId));
+        listener.inputCreated(InputCreated.create(INPUT_ID));
 
-        verify(inputRegistry, never()).remove(any(IOState.class));
+        verify(inputRegistry, never()).remove(Mockito.<IOState<MessageInput>>any());
     }
 
     @Test
     public void inputCreatedStartsGlobalInputOnOtherNode() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        when(inputService.find(inputId)).thenReturn(input);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
         when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
         when(input.isGlobal()).thenReturn(true);
 
         final MessageInput messageInput = mock(MessageInput.class);
         when(inputService.getMessageInput(input)).thenReturn(messageInput);
 
-        listener.inputCreated(InputCreated.create(inputId));
+        listener.inputCreated(InputCreated.create(INPUT_ID));
 
         verify(inputLauncher, times(1)).launch(messageInput);
     }
 
     @Test
     public void inputCreatedDoesNotStartLocalInputOnAnyNode() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        when(inputService.find(inputId)).thenReturn(input);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
         when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
         when(input.isGlobal()).thenReturn(false);
 
         final MessageInput messageInput = mock(MessageInput.class);
         when(inputService.getMessageInput(input)).thenReturn(messageInput);
 
-        listener.inputCreated(InputCreated.create(inputId));
+        listener.inputCreated(InputCreated.create(INPUT_ID));
 
         verify(inputLauncher, never()).launch(messageInput);
     }
 
     @Test
     public void inputCreatedStartsLocalInputOnLocalNode() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        when(inputService.find(inputId)).thenReturn(input);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
         when(input.getNodeId()).thenReturn(THIS_NODE_ID);
         when(input.isGlobal()).thenReturn(false);
 
         final MessageInput messageInput = mock(MessageInput.class);
         when(inputService.getMessageInput(input)).thenReturn(messageInput);
 
-        listener.inputCreated(InputCreated.create(inputId));
+        listener.inputCreated(InputCreated.create(INPUT_ID));
 
         verify(inputLauncher, times(1)).launch(messageInput);
     }
 
     @Test
     public void inputUpdatedDoesNothingIfInputDoesNotExist() throws Exception {
-        final String inputId = "input-id";
-        when(inputService.find(inputId)).thenThrow(NotFoundException.class);
+        when(inputService.find(INPUT_ID)).thenThrow(NotFoundException.class);
 
-        listener.inputUpdated(InputUpdated.create(inputId));
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
         verifyNoMoreInteractions(inputLauncher, inputRegistry);
     }
 
     @Test
     public void inputUpdatedStopsInputIfItIsRunning() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked")
-        final IOState<MessageInput> inputState = mock(IOState.class);
-        when(inputService.find(inputId)).thenReturn(input);
-        when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
 
-        listener.inputUpdated(InputUpdated.create(inputId));
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
         verify(inputRegistry, times(1)).remove(inputState);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void inputUpdatedDoesNotStopInputIfItIsNotRunning() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        when(inputService.find(inputId)).thenReturn(input);
-        when(inputRegistry.getInputState(inputId)).thenReturn(null);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(null);
 
-        listener.inputUpdated(InputUpdated.create(inputId));
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
-        verify(inputRegistry, never()).remove(any(IOState.class));
+        verify(inputRegistry, never()).remove(Mockito.<IOState<MessageInput>>any());
     }
 
     @Test
-    public void inputUpdatedRestartsGlobalInputOnAnyNode() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked")
-        final IOState<MessageInput> inputState = mock(IOState.class);
-        when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
-        when(inputService.find(inputId)).thenReturn(input);
-        when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
+    public void inputUpdateLaunchInputsInSetupMode() throws Exception {
+        when(inputState.getState()).thenReturn(IOState.Type.SETUP);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
         when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
         when(input.isGlobal()).thenReturn(true);
 
         final MessageInput messageInput = mock(MessageInput.class);
         when(inputService.getMessageInput(input)).thenReturn(messageInput);
 
-        listener.inputUpdated(InputUpdated.create(inputId));
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
+
+        verify(inputLauncher, times(1)).launch(messageInput);
+    }
+
+    @Test
+    public void inputUpdatedRestartsGlobalInputOnAnyNode() throws Exception {
+        when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
+        when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
+        when(input.isGlobal()).thenReturn(true);
+
+        final MessageInput messageInput = mock(MessageInput.class);
+        when(inputService.getMessageInput(input)).thenReturn(messageInput);
+
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
         verify(inputLauncher, times(1)).launch(messageInput);
     }
 
     @Test
     public void inputUpdatedDoesNotStartLocalInputOnOtherNode() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked")
-        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
-        when(inputService.find(inputId)).thenReturn(input);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
         when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
         when(input.isGlobal()).thenReturn(false);
 
         final MessageInput messageInput = mock(MessageInput.class);
         when(inputService.getMessageInput(input)).thenReturn(messageInput);
 
-        listener.inputUpdated(InputUpdated.create(inputId));
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
         verify(inputLauncher, never()).launch(messageInput);
     }
 
     @Test
     public void inputUpdatedRestartsLocalInputOnLocalNode() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked")
-        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
-        when(inputService.find(inputId)).thenReturn(input);
-        when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
         when(input.getNodeId()).thenReturn(THIS_NODE_ID);
         when(input.isGlobal()).thenReturn(false);
 
         final MessageInput messageInput = mock(MessageInput.class);
         when(inputService.getMessageInput(input)).thenReturn(messageInput);
 
-        listener.inputUpdated(InputUpdated.create(inputId));
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
         verify(inputLauncher, times(1)).launch(messageInput);
     }
 
     @Test
     public void inputUpdatedDoesNotStartLocalInputOnLocalNodeIfItWasNotRunning() throws Exception {
-        final String inputId = "input-id";
-        final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked")
-        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputState.getState()).thenReturn(IOState.Type.STOPPED);
-        when(inputService.find(inputId)).thenReturn(input);
-        when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
         when(input.getNodeId()).thenReturn(THIS_NODE_ID);
         when(input.isGlobal()).thenReturn(false);
 
         final MessageInput messageInput = mock(MessageInput.class);
         when(inputService.getMessageInput(input)).thenReturn(messageInput);
 
-        listener.inputUpdated(InputUpdated.create(inputId));
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
         verify(inputLauncher, never()).launch(messageInput);
     }
 
     @Test
-    public void inputDeletedStopsInputIfItIsRunning() throws Exception {
-        final String inputId = "input-id";
-        @SuppressWarnings("unchecked")
-        final IOState<MessageInput> inputState = mock(IOState.class);
+    public void inputDeletedStopsInputIfItIsRunning() {
         when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
-        when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
 
-        listener.inputDeleted(InputDeleted.create(inputId));
+        listener.inputDeleted(InputDeleted.create(INPUT_ID));
 
         verify(inputRegistry, never()).remove(any(MessageInput.class));
     }
 
     @Test
-    public void inputDeletedDoesNothingIfInputIsNotRunning() throws Exception {
-        final String inputId = "input-id";
-        @SuppressWarnings("unchecked")
-        final IOState<MessageInput> inputState = mock(IOState.class);
+    public void inputDeletedDoesNothingIfInputIsNotRunning() {
         when(inputState.getState()).thenReturn(null);
-        when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
 
-        listener.inputDeleted(InputDeleted.create(inputId));
+        listener.inputDeleted(InputDeleted.create(INPUT_ID));
 
         verify(inputRegistry, never()).remove(any(MessageInput.class));
     }
