@@ -98,7 +98,7 @@ const URLUtils = {
     try {
       // eslint-disable-next-line
       new URL(str);
-    } catch (e) {
+    } catch (ignored) {
       isValid = false;
     }
 
