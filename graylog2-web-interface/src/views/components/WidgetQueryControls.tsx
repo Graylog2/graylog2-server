@@ -73,7 +73,7 @@ import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
-import QueryInput from './searchbar/queryinput/AsyncQueryInput';
+import ViewsQueryInput from './searchbar/ViewsQueryInput';
 import SearchBarForm from './searchbar/SearchBarForm';
 import WidgetQueryOverride from './WidgetQueryOverride';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
@@ -260,21 +260,21 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                         {({ warnings }) => (
                           <PluggableCommands usage="widget_query">
                             {(customCommands) => (
-                              <QueryInput value={value}
-                                          view={view}
-                                          timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
-                                          streams={values?.streams}
-                                          placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                          error={error}
-                                          ref={editorRef}
-                                          disableExecution={disableSearchSubmit}
-                                          isValidating={isValidatingQuery}
-                                          warning={warnings.queryString}
-                                          validate={validateForm}
-                                          name={name}
-                                          onChange={onChange}
-                                          onExecute={handleSubmit as () => void}
-                                          commands={customCommands} />
+                              <ViewsQueryInput value={value}
+                                               view={view}
+                                               timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
+                                               streams={values?.streams}
+                                               placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                               error={error}
+                                               ref={editorRef}
+                                               disableExecution={disableSearchSubmit}
+                                               isValidating={isValidatingQuery}
+                                               warning={warnings.queryString}
+                                               validate={validateForm}
+                                               name={name}
+                                               onChange={onChange}
+                                               onExecute={handleSubmit as () => void}
+                                               commands={customCommands} />
                             )}
                           </PluggableCommands>
                         )}
@@ -299,8 +299,6 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
     </FormWarningsProvider>
   );
 };
-
-WidgetQueryControls.propTypes = {};
 
 export default connect(
   WidgetQueryControls,

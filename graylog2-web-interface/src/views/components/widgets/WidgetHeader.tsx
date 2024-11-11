@@ -15,14 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Spinner, Icon } from 'components/common';
 import EditableTitle from 'views/components/common/EditableTitle';
 import { Input } from 'components/bootstrap';
-
-import CustomPropTypes from '../CustomPropTypes';
 
 const LoadingSpinner = styled(Spinner)`
   margin-left: 10px;
@@ -112,13 +109,5 @@ const WidgetHeader = ({ children = null, onRename, hideDragHandle = false, title
     </WidgetActionDropdown>
   </Container>
 );
-
-WidgetHeader.propTypes = {
-  children: CustomPropTypes.OneOrMoreChildren,
-  onRename: PropTypes.func,
-  hideDragHandle: PropTypes.bool,
-  title: PropTypes.node.isRequired,
-  loading: PropTypes.bool,
-};
 
 export default WidgetHeader;

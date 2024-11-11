@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import URI from 'urijs';
-import PropTypes from 'prop-types';
 
 import * as URLUtils from 'util/URLUtils';
 import { DocumentTitle, ExternalLinkButton, PageHeader, Spinner } from 'components/common';
@@ -24,8 +23,6 @@ import { NodesList } from 'components/nodes';
 import type { NodeInfo } from 'stores/nodes/NodesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
-
-import useCurrentUser from '../hooks/useCurrentUser';
 
 const GLOBAL_API_BROWSER_URL = '/api-browser/global/index.html';
 
@@ -52,12 +49,7 @@ const GlobalAPIButton = ({ nodes }: { nodes: { [nodeId: string]: NodeInfo } }) =
   return null;
 };
 
-GlobalAPIButton.propTypes = {
-  nodes: PropTypes.object.isRequired,
-};
-
 const NodesPage = () => {
-  const currentUser = useCurrentUser();
   const { nodes } = useStore(NodesStore);
 
   return (
@@ -71,7 +63,7 @@ const NodesPage = () => {
             will be persisted to disk, even when processing is disabled.
           </span>
         </PageHeader>
-        <NodesList permissions={currentUser.permissions} nodes={nodes} />
+        <NodesList nodes={nodes} />
       </div>
     </DocumentTitle>
   );

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import type { ForwardedRef } from 'react';
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
@@ -48,14 +47,17 @@ type Props<Configuration extends object> = {
   submitButtonText?: string,
 }
 
-type RefType<Configuration extends object> = {
+export type RefType<Configuration extends object> = {
   open: () => void,
   getValue: () => ConfigurationFormData<Configuration>,
 }
 
 const defaultConfigFields = {};
+const defaultCancelAction = () => {};
+const defaultInitialValues = {};
+
 const ConfigurationForm = forwardRef(<Configuration extends object>({
-  cancelAction = () => {},
+  cancelAction = defaultCancelAction,
   configFields = defaultConfigFields,
   children = null,
   titleHelpText = '',
@@ -64,8 +66,8 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
   title = null,
   titleValue: initialTitleValue = '',
   typeName,
-  values: initialValues = {},
-  wrapperComponent: WrapperComponent = BootstrapModalForm as unknown as Props<{ }>['wrapperComponent'],
+  values: initialValues = defaultInitialValues,
+  wrapperComponent: WrapperComponent = BootstrapModalForm as Props<Configuration>['wrapperComponent'],
   submitButtonText,
 } : Props<Configuration>, ref: React.ForwardedRef<RefType<Configuration>>) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
@@ -247,21 +249,6 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     </WrapperComponent>
   );
 });
-
-ConfigurationForm.propTypes = {
-  cancelAction: PropTypes.func,
-  configFields: PropTypes.any,
-  children: PropTypes.any,
-  titleHelpText: PropTypes.string,
-  includeTitleField: PropTypes.bool,
-  submitAction: PropTypes.func.isRequired,
-  title: PropTypes.any,
-  titleValue: PropTypes.string,
-  typeName: PropTypes.string,
-  values: PropTypes.object,
-  wrapperComponent: PropTypes.any,
-  submitButtonText: PropTypes.string,
-};
 
 export default ConfigurationForm as <T extends object>(
   props: Props<T> & { ref?: ForwardedRef<RefType<T>> },

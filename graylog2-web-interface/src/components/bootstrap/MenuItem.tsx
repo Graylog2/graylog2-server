@@ -38,6 +38,7 @@ const IconWrapper = styled.div`
 type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void
 
 type Props<T = undefined> = React.PropsWithChildren<{
+  active?: boolean,
   className?: string,
   component?: 'a',
   'data-tab-id'?: string,

@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 
 const Errors = styled.div(({ theme }) => css`
@@ -43,10 +42,6 @@ const FormErrors = ({ errors = {} }: { errors: { [name: string]: string }}) => {
       ))}
     </Errors>
   );
-};
-
-FormErrors.propTypes = {
-  errors: PropTypes.object,
 };
 
 export default FormErrors;

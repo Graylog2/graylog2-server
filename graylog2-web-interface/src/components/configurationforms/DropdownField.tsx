@@ -16,7 +16,6 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import type { DropdownField as DropdownFieldType } from 'components/configurationforms/types';
 import { Input } from 'components/bootstrap';
@@ -62,16 +61,6 @@ const DropdownField = ({ autoFocus = false, field, onChange, title, typeName, va
       {options}
     </Input>
   );
-};
-
-DropdownField.propTypes = {
-  autoFocus: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.string,
-  addPlaceholder: PropTypes.bool,
 };
 
 export default DropdownField;

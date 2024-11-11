@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
@@ -145,14 +144,6 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
       </ControlledTableList>
     </span>
   );
-};
-
-TokenList.propTypes = {
-  tokens: PropTypes.arrayOf(PropTypes.object),
-  onDelete: PropTypes.func,
-  onCreate: PropTypes.func,
-  creatingToken: PropTypes.bool,
-  deletingToken: PropTypes.string,
 };
 
 export default TokenList;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import last from 'lodash/last';
 import sortBy from 'lodash/sortBy';
 import { useTheme } from 'styled-components';
@@ -109,13 +108,6 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   highlights.push(rest(lastRange.start + lastRange.length));
 
   return <div>{highlights}</div>;
-};
-
-PossiblyHighlight.propTypes = {
-  color: PropTypes.object,
-  field: PropTypes.string.isRequired,
-  value: PropTypes.any,
-  highlightRanges: PropTypes.object,
 };
 
 export default PossiblyHighlight;

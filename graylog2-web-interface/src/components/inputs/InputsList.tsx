@@ -29,6 +29,7 @@ import { useStore } from 'stores/connect';
 import type { StoreState } from 'stores/StoreTypes';
 import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { Input } from 'components/messageloaders/Types';
+import { InputSetupWizard, useInputSetupWizard } from 'components/inputs/InputSetupWizard';
 
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
@@ -95,6 +96,8 @@ type Props = {
 }
 
 const InputsList = ({ permissions, node }: Props) => {
+  const { show: showInputSetupWizard } = useInputSetupWizard();
+
   useEffect(() => {
     InputTypesActions.list();
     InputsActions.list();
@@ -117,10 +120,11 @@ const InputsList = ({ permissions, node }: Props) => {
 
   return (
     <div>
+      {showInputSetupWizard && (<InputSetupWizard />)}
       {!node && (
-      <IfPermitted permissions="inputs:create">
-        <CreateInputControl />
-      </IfPermitted>
+        <IfPermitted permissions="inputs:create">
+          <CreateInputControl />
+        </IfPermitted>
       )}
 
       <InputListRow id="filter-input" className="content">

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
@@ -152,13 +151,6 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
       </Col>
     </Row>
   );
-};
-
-FieldsForm.propTypes = {
-  currentUser: PropTypes.object.isRequired,
-  eventDefinition: PropTypes.object.isRequired,
-  validation: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
 };
 
 export default FieldsForm;

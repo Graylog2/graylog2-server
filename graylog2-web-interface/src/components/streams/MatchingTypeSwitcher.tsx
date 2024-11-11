@@ -53,6 +53,7 @@ type Props = {
 
 const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
   const [matchingType, setMatchingType] = useState<'AND'|'OR'|undefined>(undefined);
+  const disabled = stream.is_default || !stream.is_editable;
 
   const handleTypeChange = (newValue: 'AND'|'OR') => {
     StreamsStore.update(stream.id, { matching_type: newValue }, (response) => {
@@ -72,12 +73,14 @@ const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
                type="radio"
                label="A message must match all of the following rules"
                checked={stream.matching_type === 'AND'}
-               onChange={() => setMatchingType('AND')} />
+               onChange={() => setMatchingType('AND')}
+               disabled={disabled} />
         <Input id="streamrule-or-connector"
                type="radio"
                label="A message must match at least one of the following rules"
                checked={stream.matching_type === 'OR'}
-               onChange={() => setMatchingType('OR')} />
+               onChange={() => setMatchingType('OR')}
+               disabled={disabled} />
       </div>
       {matchingType && (
         <ConfirmDialog show

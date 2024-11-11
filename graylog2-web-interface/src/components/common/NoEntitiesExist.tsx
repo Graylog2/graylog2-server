@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { Alert } from 'components/bootstrap';
 
@@ -30,9 +29,5 @@ type Props = {
 const NoEntitiesExist = ({ children = 'No entities exist.' }: Props) => (
   <Alert className="no-bm">{children}</Alert>
 );
-
-NoEntitiesExist.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.node]),
-};
 
 export default NoEntitiesExist;

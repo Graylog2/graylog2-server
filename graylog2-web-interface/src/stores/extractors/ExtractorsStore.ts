@@ -117,7 +117,7 @@ type ExtractorsActionsType = {
   save: (inputId: string, extractor: ExtractorType) => Promise<unknown>,
   update: (inputId: string, extractor: ExtractorType, calledFromMethod: boolean) => Promise<unknown>,
   delete: (inputId: string, extractor: ExtractorType) => Promise<unknown>,
-  order: { asyncResult: true },
+  order: (inputId: string, orderedExtractors: Array<ExtractorType>) => Promise<unknown>,
   import: (inputId: string, orderedExtractors: Array<ExtractorType>) => Promise<unknown>,
 };
 

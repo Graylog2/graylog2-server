@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState, useCallback, useContext } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { MenuItem } from 'components/bootstrap';
@@ -78,13 +77,6 @@ const QueryTitle = ({ active, allowsClosing = true, id, onRemove, openEditModal,
       )}
     </Container>
   );
-};
-
-QueryTitle.propTypes = {
-  allowsClosing: PropTypes.bool,
-  onRemove: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  openEditModal: PropTypes.func.isRequired,
 };
 
 export default QueryTitle;
