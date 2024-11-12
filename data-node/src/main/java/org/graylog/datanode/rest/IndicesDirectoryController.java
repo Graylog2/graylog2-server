@@ -64,7 +64,7 @@ public class IndicesDirectoryController {
             final List<String> compatibilityWarnings = new ArrayList<>();
 
             if (info.nodes().isEmpty() || info.nodes().stream().allMatch(n -> n.indices().isEmpty())) {
-                compatibilityWarnings.add("Your configured opensearch_data_location directory " + dataTargetDir.toAbsolutePath() + " doesn't contain any indices! Migration can't continue!");
+                compatibilityWarnings.add("Your configured opensearch_data_location directory " + dataTargetDir.toAbsolutePath() + " doesn't contain any indices! Do you want to continue without migrating existing data?");
             }
 
             final List<String> compatibilityErrors = info.nodes().stream()
