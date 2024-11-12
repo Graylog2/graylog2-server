@@ -26,6 +26,7 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +54,7 @@ public class FailureHandlingServiceTest {
     private final MessageQueueAcknowledger acknowledger = mock(MessageQueueAcknowledger.class);
     private final MetricRegistry metricRegistry = new MetricRegistry();
     private MessageFactory messageFactory;
+    private final ObjectMapperProvider objectMapperProvider = mock(ObjectMapperProvider.class);
 
     private FailureSubmissionQueue failureSubmissionQueue;
 
@@ -73,7 +75,7 @@ public class FailureHandlingServiceTest {
         final FailureHandler fallbackIndexingFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackIndexingFailureHandler,
-                Set.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger);
+                Set.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger, metricRegistry, objectMapperProvider);
 
         underTest.startAsync();
         underTest.awaitRunning();
@@ -105,7 +107,7 @@ public class FailureHandlingServiceTest {
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger);
+                ImmutableSet.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger, metricRegistry, objectMapperProvider);
 
         underTest.startAsync();
         underTest.awaitRunning();
@@ -138,7 +140,7 @@ public class FailureHandlingServiceTest {
         final FailureHandler fallbackIndexingFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackIndexingFailureHandler,
-                ImmutableSet.of(customIndexingFailureHandler1, customIndexingFailureHandler2), failureSubmissionQueue, configuration, acknowledger);
+                ImmutableSet.of(customIndexingFailureHandler1, customIndexingFailureHandler2), failureSubmissionQueue, configuration, acknowledger, metricRegistry, objectMapperProvider);
 
         underTest.startAsync();
         underTest.awaitRunning();
@@ -167,7 +169,7 @@ public class FailureHandlingServiceTest {
         doThrow(new RuntimeException()).when(fallbackIndexingFailureHandler).handle(indexingFailureBatch2);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackIndexingFailureHandler,
-                ImmutableSet.of(), failureSubmissionQueue, configuration, acknowledger);
+                ImmutableSet.of(), failureSubmissionQueue, configuration, acknowledger, metricRegistry, objectMapperProvider);
 
         underTest.startAsync();
         underTest.awaitRunning();
@@ -197,7 +199,7 @@ public class FailureHandlingServiceTest {
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
                 ImmutableSet.of(customFailureHandler1, customFailureHandler2),
-                failureSubmissionQueue, configuration, acknowledger);
+                failureSubmissionQueue, configuration, acknowledger, metricRegistry, objectMapperProvider);
 
         // when
         underTest.startAsync();
@@ -222,7 +224,7 @@ public class FailureHandlingServiceTest {
         final FailureHandler customFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger);
+                ImmutableSet.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger, metricRegistry, objectMapperProvider);
 
         // when
         underTest.startAsync();
@@ -246,7 +248,7 @@ public class FailureHandlingServiceTest {
 
         final FailureSubmissionQueue failureSubmissionQueue = mock(FailureSubmissionQueue.class);
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(), failureSubmissionQueue, configuration, acknowledger);
+                ImmutableSet.of(), failureSubmissionQueue, configuration, acknowledger, metricRegistry, objectMapperProvider);
 
         when(configuration.getFailureHandlingShutdownAwait()).thenReturn(com.github.joschi.jadconfig.util.Duration.milliseconds(300));
         when(failureSubmissionQueue.consumeBlockingWithTimeout(300L))

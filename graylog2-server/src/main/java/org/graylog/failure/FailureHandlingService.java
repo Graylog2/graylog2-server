@@ -166,16 +166,20 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
     }
 
     private void updateMetrics(Failure failure) {
+        if (failure == null || failure.failedMessage() == null) {
+            return;
+        }
+
         final Map<String, Object> searchObject = failure.failedMessage().toElasticSearchObject(objectMapper, dummyMeter);
-        final String inputId = searchObject.get(Message.FIELD_GL2_SOURCE_INPUT).toString();
+        final Object inputId = searchObject.get(Message.FIELD_GL2_SOURCE_INPUT);
         if (inputId != null) {
             switch (failure.failureType()) {
                 case INDEXING -> {
-                    final String indexingFailureMetricName = name("org.graylog2", inputId, "failures.indexing");
+                    final String indexingFailureMetricName = name("org.graylog2", inputId.toString(), "failures.indexing");
                     metricRegistry.meter(indexingFailureMetricName).mark();
                 }
                 case PROCESSING -> {
-                    final String processingFailureMetricName = name("org.graylog2", inputId, "failures.processing");
+                    final String processingFailureMetricName = name("org.graylog2", inputId.toString(), "failures.processing");
                     metricRegistry.meter(processingFailureMetricName).mark();
                 }
             }
