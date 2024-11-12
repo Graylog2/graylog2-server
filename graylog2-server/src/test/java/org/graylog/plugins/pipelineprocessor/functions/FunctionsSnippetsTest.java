@@ -906,7 +906,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
 
     @Test
-    void multiGrok() {
+    public void multiGrok() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
 
