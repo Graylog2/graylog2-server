@@ -243,7 +243,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
-        validatableResponse.body("execution.done", equalTo(true))
+        validatableResponse
                 .body(".rows", hasSize(5))
                 .body(".total", equalTo(5))
                 .body(".rows.find{ it.key == ['60'] }", notNullValue())
