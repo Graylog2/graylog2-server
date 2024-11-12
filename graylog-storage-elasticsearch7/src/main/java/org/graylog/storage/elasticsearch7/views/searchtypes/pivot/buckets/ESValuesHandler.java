@@ -55,7 +55,6 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
     private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
     private static final String AGG_NAME = "agg";
-    private static final ImmutableList<String> MISSING_BUCKET_KEYS = ImmutableList.of(MissingBucketConstants.MISSING_BUCKET_NAME);
     public static final BucketOrder DEFAULT_ORDER = BucketOrder.count(false);
     public static final String SORT_HELPER = "sort_helper";
 
@@ -67,7 +66,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final var termsAggregation = createTerms(orderedBuckets, ordering, limit);
 
-        applyOrdering(pivot, termsAggregation, orderedBuckets, ordering, queryContext);
+        applyOrdering(pivot, termsAggregation, ordering, queryContext);
 
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
@@ -108,7 +107,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         return new Script(scriptSource);
     }
 
-    private TermsAggregationBuilder applyOrdering(Pivot pivot, TermsAggregationBuilder terms, List<String> buckets, List<BucketOrder> ordering, ESGeneratedQueryContext queryContext) {
+    private TermsAggregationBuilder applyOrdering(Pivot pivot, TermsAggregationBuilder terms, List<BucketOrder> ordering, ESGeneratedQueryContext queryContext) {
         return sortsOnNumericPivotField(pivot, queryContext)
                 .map(pivotSort -> terms
                         .subAggregation(AggregationBuilders.max(SORT_HELPER).field(pivotSort.field()))

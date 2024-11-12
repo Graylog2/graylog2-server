@@ -55,7 +55,6 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
     private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
     private static final String AGG_NAME = "agg";
-    private static final ImmutableList<String> MISSING_BUCKET_KEYS = ImmutableList.of(MissingBucketConstants.MISSING_BUCKET_NAME);
     public static final BucketOrder DEFAULT_ORDER = BucketOrder.count(false);
     public static final String SORT_HELPER = "sort_helper";
 
@@ -65,9 +64,9 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, DEFAULT_ORDER);
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
-        final var termsAggregation = createTerms(orderedBuckets, ordering, limit, bucketSpec.skipEmptyValues());
+        final var termsAggregation = createTerms(orderedBuckets, limit);
 
-        applyOrdering(pivot, termsAggregation, orderedBuckets, ordering, queryContext);
+        applyOrdering(pivot, termsAggregation, ordering, queryContext);
 
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
@@ -83,7 +82,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 .otherBucket(true);
     }
 
-    private TermsAggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit, boolean skipEmptyValues) {
+    private TermsAggregationBuilder createTerms(List<String> valueBuckets, int limit) {
         return createScriptedTerms(valueBuckets, limit);
     }
 
@@ -106,7 +105,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         return new Script(scriptSource);
     }
 
-    private TermsAggregationBuilder applyOrdering(Pivot pivot, TermsAggregationBuilder terms, List<String> buckets, List<BucketOrder> ordering, OSGeneratedQueryContext queryContext) {
+    private TermsAggregationBuilder applyOrdering(Pivot pivot, TermsAggregationBuilder terms, List<BucketOrder> ordering, OSGeneratedQueryContext queryContext) {
         return sortsOnNumericPivotField(pivot, queryContext)
                 .map(pivotSort -> terms
                         .subAggregation(AggregationBuilders.max(SORT_HELPER).field(pivotSort.field()))
