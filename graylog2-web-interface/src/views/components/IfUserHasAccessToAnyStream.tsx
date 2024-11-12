@@ -25,7 +25,7 @@ type Props = {
   skipNoStreamsCheck?: boolean,
 };
 
-const IfUserHasAccessToAnyStream = ({ children, skipNoStreamsCheck = false }: Props) => {
+const IfUserHasAccessToAnyStream = ({ children, skipNoStreamsCheck }: Props) => {
   const streams = useContext(StreamsContext);
 
   if (skipNoStreamsCheck) {

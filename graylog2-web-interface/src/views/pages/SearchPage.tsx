@@ -56,14 +56,14 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
 };
 
 const SearchPage = ({
-  children = undefined,
+  children,
   isNew,
   view: viewPromise,
   loadNewView: _loadNewView = defaultLoadNewView,
   loadView: _loadView = defaultLoadView,
   executionState: initialExecutionState,
-  searchResult = undefined,
-  skipNoStreamsCheck = false,
+  searchResult,
+  skipNoStreamsCheck,
 }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
