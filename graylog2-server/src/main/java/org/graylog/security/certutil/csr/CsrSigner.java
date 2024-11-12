@@ -81,7 +81,7 @@ public class CsrSigner {
 
     public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, @NotNull Duration certificateLifetime) throws Exception {
         Instant validFrom = Instant.now(clock);
-        var validUntil = validFrom.plus(certificateLifetime);
+        final Instant validUntil = validFrom.plus(certificateLifetime);
         return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
     }
 

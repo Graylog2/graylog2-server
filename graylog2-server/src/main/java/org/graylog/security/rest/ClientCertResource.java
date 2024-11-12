@@ -49,12 +49,12 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/ca/clientcert")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@Api(value = "CA CLient Certificates", description = "Certificate Authority Client Certificates", tags = {CLOUD_VISIBLE})
-public class CAClientResource extends RestResource {
+@Api(value = "Client Certificates", description = "Certificate Authority Client Certificates", tags = {CLOUD_VISIBLE})
+public class ClientCertResource extends RestResource {
     private final ClientCertGenerator clientCertGenerator;
 
     @Inject
-    public CAClientResource(final ClientCertGenerator clientCertGenerator) {
+    public ClientCertResource(final ClientCertGenerator clientCertGenerator) {
         this.clientCertGenerator = clientCertGenerator;
     }
 
