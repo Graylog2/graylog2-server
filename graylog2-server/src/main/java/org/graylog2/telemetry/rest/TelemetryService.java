@@ -16,6 +16,7 @@
  */
 package org.graylog2.telemetry.rest;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.hash.HashCode;
@@ -32,9 +33,8 @@ import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.traffic.TrafficCounterService;
+import org.graylog2.telemetry.TelemetryDataProvider;
 import org.graylog2.telemetry.cluster.TelemetryClusterService;
-import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
-import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.graylog2.telemetry.user.db.DBTelemetryUserSettingsService;
 import org.graylog2.telemetry.user.db.TelemetryUserSettingsDto;
 import org.graylog2.users.events.UserDeletedEvent;
@@ -58,7 +58,6 @@ public class TelemetryService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TelemetryService.class);
     private final TrafficCounterService trafficCounterService;
-    private final TelemetryEnterpriseDataProvider enterpriseDataProvider;
     private final UserService userService;
     private final Set<PluginMetaData> pluginMetaDataSet;
     private final ClusterAdapter elasticClusterAdapter;
@@ -70,12 +69,12 @@ public class TelemetryService {
     private final String installationSource;
     private final NodeService<DataNodeDto> nodeService;
     private final boolean runsWithDatanode;
+    private final Set<TelemetryDataProvider> telemetryDataProviders;
 
     @Inject
     public TelemetryService(
             @Named(TELEMETRY_ENABLED) boolean isTelemetryEnabled,
             TrafficCounterService trafficCounterService,
-            TelemetryEnterpriseDataProvider enterpriseDataProvider,
             UserService userService,
             Set<PluginMetaData> pluginMetaDataSet,
             ClusterAdapter elasticClusterAdapter,
@@ -86,10 +85,10 @@ public class TelemetryService {
             TelemetryClusterService telemetryClusterService,
             @Named("installation_source") String installationSource,
             NodeService<DataNodeDto> nodeService,
-            @RunsWithDataNode boolean runsWithDatanode) {
+            @RunsWithDataNode boolean runsWithDatanode,
+            Set<TelemetryDataProvider> telemetryDataProviders) {
         this.isTelemetryEnabled = isTelemetryEnabled;
         this.trafficCounterService = trafficCounterService;
-        this.enterpriseDataProvider = enterpriseDataProvider;
         this.userService = userService;
         this.pluginMetaDataSet = pluginMetaDataSet;
         this.elasticClusterAdapter = elasticClusterAdapter;
@@ -100,24 +99,29 @@ public class TelemetryService {
         this.installationSource = installationSource;
         this.nodeService = nodeService;
         this.runsWithDatanode = runsWithDatanode;
+        this.telemetryDataProviders = telemetryDataProviders;
         eventBus.register(this);
     }
 
-    public Map<String, Object> getTelemetryResponse(User currentUser) {
+
+    public ObjectNode getTelemetryResponse(User currentUser) {
         TelemetryUserSettings telemetryUserSettings = getTelemetryUserSettings(currentUser);
         if (isTelemetryEnabled && telemetryUserSettings.telemetryEnabled()) {
             DateTime clusterCreationDate = telemetryClusterService.getClusterCreationDate().orElse(null);
             String clusterId = telemetryClusterService.getClusterId();
 
-            List<TelemetryLicenseStatus> licenseStatuses = enterpriseDataProvider.licenseStatus();
-            return telemetryResponseFactory.createTelemetryResponse(
-                    getClusterInfo(clusterId, clusterCreationDate, licenseStatuses),
+            ObjectNode telemetryResponse = telemetryResponseFactory.createTelemetryResponse(
+                    getClusterInfo(clusterId, clusterCreationDate),
                     getUserInfo(currentUser, clusterId),
                     getPluginInfo(),
                     getSearchClusterInfo(),
-                    licenseStatuses,
                     telemetryUserSettings,
                     getDataNodeInfo());
+            for (TelemetryDataProvider telemetryDataProvider : telemetryDataProviders) {
+                telemetryResponse = telemetryDataProvider.apply(telemetryResponse, currentUser.getId());
+            }
+
+            return telemetryResponse;
         } else {
             return telemetryResponseFactory.createTelemetryDisabledResponse(telemetryUserSettings);
         }
@@ -163,7 +167,7 @@ public class TelemetryService {
         dbTelemetryUserSettingsService.delete(userId);
     }
 
-    private Map<String, Object> getUserInfo(User currentUser, String clusterId) {
+    private ObjectNode getUserInfo(User currentUser, String clusterId) {
         try {
             if (currentUser == null) {
                 LOG.debug("Couldn't create user telemetry data, because no current user exists!");
@@ -172,27 +176,24 @@ public class TelemetryService {
             return telemetryResponseFactory.createUserInfo(
                     generateUserHash(currentUser, clusterId),
                     currentUser.isLocalAdmin(),
-                    currentUser.getRoleIds().size(),
-                    enterpriseDataProvider.teamsCount(currentUser.getId()));
+                    currentUser.getRoleIds().size());
         } catch (NoSuchAlgorithmException e) {
             LOG.debug("Couldn't create user telemetry data, because user couldn't be hashed!", e);
             return null;
         }
     }
 
-    private Map<String, Object> getClusterInfo(String clusterId, DateTime clusterCreationDate, List<TelemetryLicenseStatus> licenseStatuses) {
+    private ObjectNode getClusterInfo(String clusterId, DateTime clusterCreationDate) {
         return telemetryResponseFactory.createClusterInfo(
                 clusterId,
                 clusterCreationDate,
                 telemetryClusterService.nodesTelemetryInfo(),
                 trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(30), TrafficCounterService.Interval.DAILY),
                 userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count(),
-                licenseStatuses.size(),
-                installationSource,
-                enterpriseDataProvider.enterpriseTraffic());
+                installationSource);
     }
 
-    private Map<String, Object> getPluginInfo() {
+    private ObjectNode getPluginInfo() {
         boolean isEnterprisePluginInstalled = pluginMetaDataSet.stream().anyMatch(p -> "Graylog Enterprise".equals(p.getName()));
         List<String> plugins = pluginMetaDataSet.stream().map(p -> f("%s:%s", p.getName(), p.getVersion())).toList();
         return telemetryResponseFactory.createPluginInfo(isEnterprisePluginInstalled, plugins);
@@ -204,7 +205,7 @@ public class TelemetryService {
         return HashCode.fromBytes(messageDigest.digest()).toString();
     }
 
-    private Map<String, Object> getSearchClusterInfo() {
+    private ObjectNode getSearchClusterInfo() {
         Map<String, NodeInfo> nodesInfo = elasticClusterAdapter.nodesInfo();
         String version = elasticsearchVersion.toString();
         if (runsWithDatanode) {
