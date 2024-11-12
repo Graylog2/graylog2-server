@@ -107,6 +107,8 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     private TermsAggregationBuilder applyOrdering(Pivot pivot, TermsAggregationBuilder terms, List<BucketOrder> ordering, OSGeneratedQueryContext queryContext) {
         return sortsOnNumericPivotField(pivot, queryContext)
+                /* When we sort on a numeric pivot field, we create a metric sub-aggregation for that field, which returns
+                the numeric value of it, so that we can sort on it numerically. Any metric aggregation (min/max/avg) will work. */
                 .map(pivotSort -> terms
                         .subAggregation(AggregationBuilders.max(SORT_HELPER).field(pivotSort.field()))
                         .order(BucketOrder.aggregation(SORT_HELPER, SortSpec.Direction.Ascending.equals(pivotSort.direction()))))
