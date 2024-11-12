@@ -16,12 +16,12 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type {
   IndexSetTemplate,
 } from 'components/indices/IndexSetTemplates/types';
+import { defaultOnError } from 'util/conditional/onError';
 
 const fetchBuiltInIndexSetTemplates = async (warmTierEnabled: boolean) => {
   const url = qualifyUrl(`/system/indices/index_sets/templates/built-in?warm_tier_enabled=${warmTierEnabled}`);
@@ -36,12 +36,8 @@ const useBuiltInTemplates = (warmTierEnabled: boolean, { enabled } = { enabled: 
 } => {
   const { data, isLoading, refetch } = useQuery(
     ['indexSetTemplatesBuiltIn', warmTierEnabled],
-    () => fetchBuiltInIndexSetTemplates(warmTierEnabled),
+    () => defaultOnError(fetchBuiltInIndexSetTemplates(warmTierEnabled), 'Loading built in index set templates failed with status', 'Could not load built in index set templates'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading built in index set templates failed with status: ${errorThrown}`,
-          'Could not load built in index set templates');
-      },
       keepPreviousData: true,
       enabled,
     },

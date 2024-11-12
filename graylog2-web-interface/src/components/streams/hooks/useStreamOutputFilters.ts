@@ -17,13 +17,13 @@
 import { useQuery } from '@tanstack/react-query';
 import * as Immutable from 'immutable';
 
-import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
+import { defaultOnError } from 'util/conditional/onError';
 
 type PaginatedResponse = {
   total: number,
@@ -77,12 +77,10 @@ const useStreamOutputFilters = (streamId: string, destinationType: string, pagin
 } => {
   const { data, refetch, isLoading, isSuccess } = useQuery(
     keyFn(streamId, destinationType, pagination),
-    () => fetchStreamOutputFilters(streamId, { ...pagination, query: `destination_type:${destinationType}` }),
+    () => defaultOnError(fetchStreamOutputFilters(streamId, { ...pagination, query: `destination_type:${destinationType}` }),
+      'Loading stream output filters failed with status',
+      'Could not load stream output filters'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading stream output filters failed with status: ${errorThrown}`,
-          'Could not load stream output filters');
-      },
       keepPreviousData: true,
     },
   );
