@@ -57,15 +57,15 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
 };
 
 const SearchPage = ({
-  children = undefined,
+  children,
   isNew,
   view: viewPromise,
   loadNewView: _loadNewView = defaultLoadNewView,
   loadView: _loadView = defaultLoadView,
   executionState: initialExecutionState,
-  searchResult = undefined,
-  forceSideBarPinned = false,
-  skipNoStreamsCheck = false,
+  searchResult,
+  forceSideBarPinned,
+  skipNoStreamsCheck
 }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
@@ -112,6 +112,7 @@ SearchPage.defaultProps = {
   executionState: SearchExecutionState.empty(),
   searchResult: undefined,
   forceSideBarPinned: false,
+  skipNoStreamsCheck: false,
 };
 
 export default React.memo(SearchPage);
