@@ -25,7 +25,7 @@ type Props = {
   skipNoStreamsCheck?: boolean,
 };
 
-export default ({ children, skipNoStreamsCheck = false }: Props) => {
+const IfUserHasAccessToAnyStream = ({ children, skipNoStreamsCheck }: Props) => {
   const streams = useContext(StreamsContext);
 
   if (skipNoStreamsCheck) {
@@ -34,3 +34,9 @@ export default ({ children, skipNoStreamsCheck = false }: Props) => {
 
   return (streams && streams.length > 0 ? children : <UserHasNoStreamAccess />);
 };
+
+IfUserHasAccessToAnyStream.defaultProps = {
+  skipNoStreamsCheck: false,
+};
+
+export default IfUserHasAccessToAnyStream;
