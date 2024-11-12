@@ -52,14 +52,14 @@ public class ClientCertGenerator {
 
     public ClientCert generateClientCert(final String principal,
                                          final String role,
-                                         final char[] privateKeyPassword) throws ClientCertGenerationException {
+                                         final char[] privateKeyPassword,
+                                         Duration certificateLifetime) throws ClientCertGenerationException {
         try {
-            var renewalPolicy = this.clusterConfigService.get(RenewalPolicy.class);
             final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(principal).isCA(false).validity(Duration.ofDays(10 * 365)));
             final KeyStore keystore = keyPair.toKeystore(CertConstants.DATANODE_KEY_ALIAS, privateKeyPassword);
             final InMemoryKeystoreInformation keystoreInformation = new InMemoryKeystoreInformation(keystore, privateKeyPassword);
             var csr = CsrGenerator.generateCSR(keystoreInformation, CertConstants.DATANODE_KEY_ALIAS, principal, List.of(principal));
-            final CertificateChain certChain = caKeystore.signCertificateRequest(new CertificateSigningRequest(principal, csr), renewalPolicy);
+            final CertificateChain certChain = caKeystore.signCertificateRequest(new CertificateSigningRequest(principal, csr), certificateLifetime);
             securityAdapter.addUserToRoleMapping(role, principal);
             return new ClientCert(principal, role, serializeAsPEM(certChain.caCertificates().iterator().next()), serializeAsPEM(keyPair.privateKey()), serializeAsPEM(certChain.signedCertificate()));
         } catch (Exception e) {
