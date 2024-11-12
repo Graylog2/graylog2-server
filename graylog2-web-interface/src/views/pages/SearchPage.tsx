@@ -65,7 +65,7 @@ const SearchPage = ({
   executionState: initialExecutionState,
   searchResult,
   forceSideBarPinned,
-  skipNoStreamsCheck
+  skipNoStreamsCheck,
 }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
