@@ -20,8 +20,10 @@ import com.github.rholder.retry.RetryException;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -92,6 +94,98 @@ public class AggregationSortingIT {
 
             expectKeys(resultAsc, "1", "2", "4", "8", "9", "15", "25");
         }
+    }
+
+    @ContainerMatrixTest
+    void sortingOnNonNumericPivotFieldSortsLexicographically() throws ExecutionException, RetryException {
+        final var numericField = "numeric_field";
+        final var nonNumericField = "non_numeric_field";
+        try (final var env = createEnvironment()) {
+            for (final var value : Set.of("B", "C", "D", "A", "E")) {
+                env.ingestMessage(Map.of(
+                        nonNumericField, value,
+                        numericField, 42,
+                        "short_message", "sorting on non-numeric pivot test " + value
+                ));
+            }
+
+            final var pivotBuilder = Pivot.builder()
+                    .rowGroups(Values.builder()
+                            .fields(List.of(numericField, nonNumericField)).limit(10).build())
+                    .series(List.of())
+                    .rollup(false);
+
+            api.search().waitForMessage("sorting on non-numeric pivot test E");
+
+            env.waitForFieldTypes(numericField);
+
+            final var resultDesc = env.executePivot(
+                    pivotBuilder
+                            .sort(PivotSort.create(nonNumericField, SortSpec.Direction.Ascending))
+                            .build()
+            );
+            assertThat(resultDesc).isNotNull();
+
+            expectKeys(resultDesc, "A", "B", "C", "D", "E");
+
+            final var resultAsc = env.executePivot(
+                    pivotBuilder
+                            .sort(PivotSort.create(nonNumericField, SortSpec.Direction.Descending))
+                            .build());
+
+            expectKeys(resultAsc, "E", "D", "C", "B", "A");
+        }
+    }
+
+    @ContainerMatrixTest
+    void sortingOnBothNumericFieldAndMetric() throws ExecutionException, RetryException {
+        final var numericField = "numeric_field";
+        final var nonNumericField = "non_numeric_field";
+        try (final var env = createEnvironment()) {
+            for (final var value : List.of(2, 4, 9, 1, 25, 2, 9, 4, 15)) {
+                env.ingestMessage(Map.of(
+                        nonNumericField, "Test",
+                        numericField, value,
+                        "short_message", "Ingesting value " + value
+                ));
+            }
+
+            api.search().waitForMessage("Ingesting value 15");
+
+            env.waitForFieldTypes(numericField);
+
+            final var pivotBuilder = Pivot.builder()
+                    .rowGroups(Values.builder()
+                            .fields(List.of(nonNumericField, numericField)).limit(10).build())
+                    .series(List.of(Count.builder().build()))
+                    .rollup(false);
+
+            final var resultAsc = env.executePivot(
+                    pivotBuilder
+                            .sort(
+                                    PivotSort.create(numericField, SortSpec.Direction.Ascending),
+                                    SeriesSort.create("count()", SortSpec.Direction.Descending)
+                            )
+                            .build()
+            );
+
+            expectKeys(resultAsc, "1", "2", "4", "9", "15", "25");
+
+            final var resultDesc = env.executePivot(
+                    pivotBuilder
+                            .sort(
+                                    PivotSort.create(numericField, SortSpec.Direction.Descending),
+                                    SeriesSort.create("count()", SortSpec.Direction.Descending)
+                            )
+                            .build()
+            );
+
+            expectKeys(resultDesc, "25", "15", "9", "4", "2", "1");
+        }
+    }
+
+    private List<List<String>> extractKeys(ValidatableResponse result) {
+        return result.extract().jsonPath().getList("results.query1.search_types.pivotaggregation.rows.key");
     }
 
     private void expectKeys(ValidatableResponse response, String... values) {
