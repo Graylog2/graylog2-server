@@ -21,6 +21,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
@@ -33,6 +34,17 @@ import com.mongodb.DBObject;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import org.bson.types.ObjectId;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
@@ -49,11 +61,13 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputDiagnostics;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueMapperConfig;
@@ -72,6 +86,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
+
 public class InputServiceImpl extends PersistedServiceImpl implements InputService {
     private static final Logger LOG = LoggerFactory.getLogger(InputServiceImpl.class);
 
@@ -81,6 +97,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     private final EventBus clusterEventBus;
     private final DBCollection dbCollection;
     private final ObjectMapper objectMapper;
+    private final SearchExecutor searchExecutor;
 
     @Inject
     public InputServiceImpl(MongoConnection mongoConnection,
@@ -88,7 +105,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
                             ConverterFactory converterFactory,
                             MessageInputFactory messageInputFactory,
                             ClusterEventBus clusterEventBus,
-                            ObjectMapper objectMapper) {
+                            ObjectMapper objectMapper,
+                            SearchExecutor searchExecutor) {
         super(mongoConnection);
         this.extractorFactory = extractorFactory;
         this.converterFactory = converterFactory;
@@ -96,6 +114,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         this.clusterEventBus = clusterEventBus;
         this.dbCollection = collection(InputImpl.class);
         this.objectMapper = objectMapper.copy();
+        this.searchExecutor = searchExecutor;
+
         EncryptedValueMapperConfig.enableDatabase(this.objectMapper);
     }
 
@@ -559,6 +579,28 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             LOG.error("Missing or invalid input configuration.", e);
             throw new BadRequestException("Missing or invalid input configuration.", e);
         }
+    }
+
+    @Override
+    public InputDiagnostics getInputDiagnostics(Input input, SearchUser searchUser) {
+        final SearchType searchType = Pivot.builder()
+                .rollup(true)
+                .rowGroups(Values.builder().fields(List.of("streams")).build())
+                .series(Count.builder().build())
+                .build();
+        final Search search = Search.builder()
+                .queries(ImmutableSet.of(
+                        Query.builder()
+                                .query(ElasticsearchQueryString.of(FIELD_GL2_SOURCE_INPUT + ":" + input.getId()))
+                                .searchTypes(Collections.singleton(searchType))
+                                .timerange(RelativeRange.create(900))
+                                .build()
+                ))
+                .build();
+        final SearchJob searchJob = this.searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
+
+        Map<String, Long> streamCounts = new HashMap<>();
+        return new InputDiagnostics(streamCounts);
     }
 
 }

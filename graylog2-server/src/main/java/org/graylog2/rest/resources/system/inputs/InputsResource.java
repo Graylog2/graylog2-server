@@ -22,8 +22,25 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -35,6 +52,7 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
+import org.graylog2.rest.models.system.inputs.responses.InputDiagnostics;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputsList;
 import org.graylog2.shared.inputs.MessageInputFactory;
@@ -42,24 +60,6 @@ import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -106,6 +106,20 @@ public class InputsResource extends AbstractInputsResource {
         final Input input = inputService.find(inputId);
 
         return getInputSummary(input);
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Get diagnostic information of a single input")
+    @Path("/diagnostics/{inputId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input.")
+    })
+    public InputDiagnostics diagnostics(@ApiParam(name = "inputId", required = true)
+                                        @PathParam("inputId") String inputId,
+                                        @Context SearchUser searchUser) throws org.graylog2.database.NotFoundException {
+        checkPermission(RestPermissions.INPUTS_READ, inputId);
+        return inputService.getInputDiagnostics(inputService.find(inputId), searchUser);
     }
 
     @GET
