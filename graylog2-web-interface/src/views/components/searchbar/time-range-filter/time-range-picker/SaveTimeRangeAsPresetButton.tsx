@@ -96,7 +96,6 @@ const TimeRangeAddToQuickListForm = ({ children, addTimerange, toggleModal, show
       </Popover.Target>
       <Popover.Dropdown title="Save as preset"
                         id="time-range-preset-popover"
-                        style={{position: 'absolute'}}
                         data-testid="time-range-preset-popover">
         <Formik<FormValues> onSubmit={onSubmit} initialValues={{ description: '' }} validate={validate}>
           {({ isValid, submitForm }) => (
