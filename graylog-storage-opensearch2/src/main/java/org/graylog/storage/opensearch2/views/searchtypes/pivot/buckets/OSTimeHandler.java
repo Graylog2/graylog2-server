@@ -77,7 +77,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                         .order(ordering.orders())
                         .format(DATE_TIME_FORMAT);
 
-                ordering.subAggregations().forEach(builder::subAggregation);
+                ordering.sortingAggregations().forEach(builder::subAggregation);
 
                 setInterval(builder, dateHistogramInterval);
 

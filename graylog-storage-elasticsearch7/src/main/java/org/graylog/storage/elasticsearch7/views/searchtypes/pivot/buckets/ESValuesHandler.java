@@ -67,7 +67,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final var termsAggregation = createTerms(orderedBuckets, limit);
 
         termsAggregation.order(ordering.orders());
-        ordering.subAggregations().forEach(termsAggregation::subAggregation);
+        ordering.sortingAggregations().forEach(termsAggregation::subAggregation);
 
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
