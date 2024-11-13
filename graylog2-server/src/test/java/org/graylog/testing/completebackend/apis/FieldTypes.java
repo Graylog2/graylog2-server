@@ -21,6 +21,7 @@ import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +65,7 @@ public class FieldTypes implements GraylogRestApi {
             } else {
                 return Optional.empty();
             }
-        }, "Timed out waiting for field definition");
+        }, "Timed out waiting for field definition", Duration.ofSeconds(30));
     }
 
     public Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(String... fieldName) {

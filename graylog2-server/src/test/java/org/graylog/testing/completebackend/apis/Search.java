@@ -33,6 +33,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -70,6 +71,11 @@ public class Search implements GraylogRestApi {
         return this;
     }
 
+    public Search waitForMessages(Collection<String> messages, TimeRange timeRange, Set<String> streams) {
+        waitFor(() -> searchAllMessages(timeRange, streams).containsAll(messages), "Timed out waiting for messages to be present", Duration.ofSeconds(300));
+        return this;
+    }
+
     private boolean captureMessage(String message) {
         return searchAllMessages().contains(message);
     }
@@ -102,10 +108,14 @@ public class Search implements GraylogRestApi {
     }
 
     public List<String> searchAllMessagesInTimeRange(TimeRange timeRange) {
+        return searchAllMessages(timeRange, Set.of());
+    }
+
+    public List<String> searchAllMessages(TimeRange timeRange, Set<String> streams) {
         String queryId = "query-id";
         String messageListId = "message-list-id";
 
-        String body = allMessagesJson(queryId, messageListId, timeRange);
+        String body = allMessagesJson(queryId, messageListId, timeRange, streams);
 
         final JsonPath response = given()
                 .spec(api.requestSpecification())
@@ -125,8 +135,8 @@ public class Search implements GraylogRestApi {
         return response.getList(allMessagesJsonPath(queryId, messageListId), String.class);
     }
 
-    private String allMessagesJson(String queryId, String messageListId, TimeRange timeRange) {
-        MessageList messageList = MessageList.builder().id(messageListId).build();
+    private String allMessagesJson(String queryId, String messageListId, TimeRange timeRange, Set<String> streams) {
+        MessageList messageList = MessageList.builder().streams(streams).id(messageListId).build();
         QueryDTO q = QueryDTO.builder()
                 .id(queryId)
                 .query(ElasticsearchQueryString.of(""))
@@ -180,6 +190,7 @@ public class Search implements GraylogRestApi {
                 .build();
 
         return given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .when()
                 .body(toJsonString(search))

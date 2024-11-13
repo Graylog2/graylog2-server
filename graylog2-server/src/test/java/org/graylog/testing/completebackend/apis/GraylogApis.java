@@ -32,11 +32,13 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -306,6 +308,10 @@ public class GraylogApis implements GraylogRestApi {
 
         public ValidatableResponse executePivot(Pivot pivot) {
             return search().executePivot(pivot, "", Set.of(streamId));
+        }
+
+        public void waitForMessages(Collection<String> messages) {
+            search().waitForMessages(messages, RelativeRange.allTime(), Set.of(streamId));
         }
 
         @Override

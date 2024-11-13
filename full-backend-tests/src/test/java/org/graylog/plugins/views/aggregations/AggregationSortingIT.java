@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
@@ -43,6 +44,9 @@ import static org.hamcrest.Matchers.is;
 
 @ContainerMatrixTestsConfiguration(searchVersions = {ES7, OS1, OS2_LATEST})
 public class AggregationSortingIT {
+    private static final String numericField = "numeric_field";
+    private static final String nonNumericField = "non_numeric_field";
+
     private final GraylogApis api;
     private PortBoundGelfInputApi gelfInput;
 
@@ -57,18 +61,18 @@ public class AggregationSortingIT {
 
     @ContainerMatrixTest
     void sortingOnNumericPivotFieldSortsNumerically() throws ExecutionException, RetryException {
-        final var numericField = "numeric_field";
-        final var nonNumericField = "non_numeric_field";
         final var values = Set.of(9, 8, 4, 25, 2, 15, 1);
         final var messagePrefix = "sorting on numeric pivot test ";
         try (final var env = createEnvironment()) {
-            for (final var value : values) {
-                env.ingestMessage(Map.of(
-                        nonNumericField, "foo",
-                        numericField, value,
-                        "short_message", messagePrefix + value
-                ));
-            }
+            IntStream.range(0, 3).forEach((i) -> {
+                for (final var value : values) {
+                    env.ingestMessage(Map.of(
+                            nonNumericField, "foo",
+                            numericField, value,
+                            "short_message", messagePrefix + value
+                    ));
+                }
+            });
 
             final var pivotBuilder = Pivot.builder()
                     .rowGroups(Values.builder()
@@ -76,7 +80,7 @@ public class AggregationSortingIT {
                     .series(List.of())
                     .rollup(false);
 
-            api.search().waitForMessages(values.stream().map(value -> messagePrefix + value).toList());
+            env.waitForMessages(values.stream().map(value -> messagePrefix + value).toList());
 
             env.waitForFieldTypes(numericField);
 
@@ -100,18 +104,18 @@ public class AggregationSortingIT {
 
     @ContainerMatrixTest
     void sortingOnNonNumericPivotFieldSortsLexicographically() throws ExecutionException, RetryException {
-        final var numericField = "numeric_field";
-        final var nonNumericField = "non_numeric_field";
         final var values = Set.of("B", "C", "D", "A", "E");
         final var messagePrefix = "sorting on non-numeric pivot test ";
         try (final var env = createEnvironment()) {
-            for (final var value : values) {
-                env.ingestMessage(Map.of(
-                        nonNumericField, value,
-                        numericField, 42,
-                        "short_message", messagePrefix + value
-                ));
-            }
+            IntStream.range(0, 3).forEach((i) -> {
+                for (final var value : values) {
+                    env.ingestMessage(Map.of(
+                            nonNumericField, value,
+                            numericField, 42,
+                            "short_message", messagePrefix + value
+                    ));
+                }
+            });
 
             final var pivotBuilder = Pivot.builder()
                     .rowGroups(Values.builder()
@@ -119,7 +123,7 @@ public class AggregationSortingIT {
                     .series(List.of())
                     .rollup(false);
 
-            api.search().waitForMessages(values.stream().map(value -> messagePrefix + value).toList());
+            env.waitForMessages(values.stream().map(value -> messagePrefix + value).toList());
 
             env.waitForFieldTypes(numericField);
 
@@ -143,20 +147,20 @@ public class AggregationSortingIT {
 
     @ContainerMatrixTest
     void sortingOnBothNumericFieldAndMetric() throws ExecutionException, RetryException {
-        final var numericField = "numeric_field";
-        final var nonNumericField = "non_numeric_field";
         final var values = List.of(2, 4, 9, 1, 25, 2, 9, 4, 15);
         final var messagePrefix = "Ingesting value ";
         try (final var env = createEnvironment()) {
-            for (final var value : values) {
-                env.ingestMessage(Map.of(
-                        nonNumericField, "Test",
-                        numericField, value,
-                        "short_message", messagePrefix + value
-                ));
-            }
+            IntStream.range(0, 3).forEach((i) -> {
+                for (final var value : values) {
+                    env.ingestMessage(Map.of(
+                            nonNumericField, "Test",
+                            numericField, value,
+                            "short_message", messagePrefix + value
+                    ));
+                }
+            });
 
-            api.search().waitForMessages(values.stream().distinct().map(value -> messagePrefix + value).toList());
+            env.waitForMessages(values.stream().distinct().map(value -> messagePrefix + value).toList());
 
             env.waitForFieldTypes(numericField);
 
@@ -188,10 +192,6 @@ public class AggregationSortingIT {
 
             expectKeys(resultDesc, "25", "15", "9", "4", "2", "1");
         }
-    }
-
-    private List<List<String>> extractKeys(ValidatableResponse result) {
-        return result.extract().jsonPath().getList("results.query1.search_types.pivotaggregation.rows.key");
     }
 
     private void expectKeys(ValidatableResponse response, String... values) {
