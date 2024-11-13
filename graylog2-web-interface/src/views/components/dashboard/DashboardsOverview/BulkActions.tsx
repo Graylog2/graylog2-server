@@ -23,8 +23,8 @@ import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import MenuItem from 'components/bootstrap/MenuItem';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { MenuItemDelete } from 'components/bootstrap';
 
 const VIEWS_BULK_DELETE_API_ROUTE = '/views/bulk_delete';
 
@@ -60,7 +60,7 @@ const BulkActions = () => {
 
   return (
     <BulkActionsDropdown>
-      <MenuItem onSelect={onDelete}>Delete</MenuItem>
+      <MenuItemDelete onSelect={onDelete}>Delete</MenuItemDelete>
     </BulkActionsDropdown>
   );
 };
