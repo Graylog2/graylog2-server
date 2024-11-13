@@ -2,4 +2,4 @@ type = "fixed"
 message = "Fix handling of path prefix in `useSendTelemetry`."
 
 issues = ["20899"]
-pulls = ["20909"]
+pulls = ["20951"]
