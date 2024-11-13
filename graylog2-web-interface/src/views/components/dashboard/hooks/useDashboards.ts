@@ -16,13 +16,13 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type { SearchParams, PaginatedListJSON, Attribute } from 'stores/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -76,12 +76,8 @@ const useDashboards = (searchParams: SearchParamsForDashboards, { enabled }: Opt
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     keyFn(searchParams),
-    () => fetchDashboards(searchParams),
+    () => defaultOnError(fetchDashboards(searchParams), 'Loading dashboards failed with status', 'Could not load dashboards'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,
-          'Could not load dashboards');
-      },
       keepPreviousData: true,
       enabled,
     },
