@@ -174,7 +174,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
   }, [colors, interactive, layout, theme]);
 };
 
-const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfig, color: ColorMapper) => ChartColor) => {
+const usePlotChartData = (chartData: Array<any>, setChartColor: (data: ChartConfig, color: ColorMapper) => ChartColor) => {
   const theme = useTheme();
   const { colors } = useContext(ChartColorContext);
 
@@ -206,7 +206,7 @@ const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfi
 const GenericPlot = ({ chartData, layout = {}, setChartColor, onClickMarker = () => {}, onHoverMarker = () => {}, onUnhoverMarker = () => {}, onZoom = () => {}, onAfterPlot = () => {} }: Props) => {
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);
-  const plotChartData = usePlotChatData(chartData, setChartColor);
+  const plotChartData = usePlotChartData(chartData, setChartColor);
   const onRenderComplete = useContext(RenderCompletionCallback);
 
   const _onRelayout = useCallback((axis: Axis) => {
