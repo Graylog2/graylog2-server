@@ -61,7 +61,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     @Nonnull
     @Override
     public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
-        final var ordering = orderListForPivot(pivot, queryContext, DEFAULT_ORDER);
+        final var ordering = orderListForPivot(pivot, queryContext, DEFAULT_ORDER, query);
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final var termsAggregation = createTerms(orderedBuckets, limit);

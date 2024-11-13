@@ -72,7 +72,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
         } else {
             for (String timeField : timeSpec.fields()) {
                 final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(interval.toDateInterval(query.effectiveTimeRange(pivot)).toString());
-                final var ordering = orderListForPivot(pivot, queryContext, defaultOrder);
+                final var ordering = orderListForPivot(pivot, queryContext, defaultOrder, query);
                 final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
                         .field(timeField)
                         .order(ordering.orders())

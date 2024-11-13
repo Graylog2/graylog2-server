@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -50,14 +51,14 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
 
     public record SortOrders(List<BucketOrder> orders, List<AggregationBuilder> subAggregations) {}
 
-    protected SortOrders orderListForPivot(Pivot pivot, OSGeneratedQueryContext queryContext, BucketOrder defaultOrder) {
+    protected SortOrders orderListForPivot(Pivot pivot, OSGeneratedQueryContext queryContext, BucketOrder defaultOrder, Query query) {
         final List<AggregationBuilder> subaggregations = new ArrayList<>();
         final List<BucketOrder> ordering = pivot.sort()
                 .stream()
                 .map(sortSpec -> {
                     final var isAscending = sortSpec.direction().equals(SortSpec.Direction.Ascending);
                     if (sortSpec instanceof PivotSort pivotSort) {
-                        if (isSortOnNumericPivotField(pivot, pivotSort, queryContext)) {
+                        if (isSortOnNumericPivotField(pivot, pivotSort, queryContext, query)) {
                             /* When we sort on a numeric pivot field, we create a metric sub-aggregation for that field, which returns
                             the numeric value of it, so that we can sort on it numerically. Any metric aggregation (min/max/avg) will work. */
                             final var aggregationName = "sort_helper" + pivotSort.field();
@@ -95,8 +96,8 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                 : new SortOrders(ordering, List.copyOf(subaggregations));
     }
 
-    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, OSGeneratedQueryContext queryContext) {
-        return queryContext.fieldType(pivot.effectiveStreams(), pivotSort.field())
+    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, OSGeneratedQueryContext queryContext, Query query) {
+        return queryContext.fieldType(query.effectiveStreams(pivot), pivotSort.field())
                 .filter(this::isNumericFieldType)
                 .isPresent();
     }
