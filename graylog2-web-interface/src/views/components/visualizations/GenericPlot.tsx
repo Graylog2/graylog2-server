@@ -182,7 +182,7 @@ const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfi
     if (setChartColor && colors) {
       const conf = setChartColor(chart, colors);
 
-      if (chart.type === 'pie') {
+      if (chart.type === 'pie' || chart.type === 'bar') {
         conf.outsidetextfont = { color: theme.colors.global.textDefault };
       }
 
