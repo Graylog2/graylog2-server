@@ -35,13 +35,16 @@ type Props = {
 const ClientCertForm = ({ onCancel }: Props) => {
   const [clientCerts, setClientCerts] = useState(null);
   const { onCreateClientCert } = useCreateDataNodeClientCert();
+
   const onSubmit = (formValues: ClientCertFormValues) => {
     const { lifetimeValue, lifetimeUnit, ...restValues } = formValues;
     const requestValues = {
       ...restValues,
       certificate_lifetime: moment.duration(lifetimeValue, lifetimeUnit as unknown as moment.unitOfTime.DurationConstructor).toJSON(),
     };
+
     return onCreateClientCert(requestValues).then((certs) => setClientCerts(certs)).catch(() => {});
+
   };
 
   return (
@@ -51,12 +54,12 @@ const ClientCertForm = ({ onCancel }: Props) => {
       </Modal.Header>
       {!clientCerts && (
         <Formik initialValues={{
-                  principal: '',
-                  role: 'all_access',
-                  password: '',
-                  lifetimeValue: 30,
-                  lifetimeUnit: 'days',
-                } as ClientCertFormValues}
+          principal: '',
+          role: 'all_access',
+          password: '',
+          lifetimeValue: 30,
+          lifetimeUnit: 'days',
+        } as ClientCertFormValues}
                 onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}>
           {({ isSubmitting, values, setFieldValue }) => (
             <Form>
