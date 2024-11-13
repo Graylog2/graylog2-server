@@ -44,6 +44,7 @@ public class ClientCertResourceIT {
                 {"organization":"graylog integration tests"}
                 """, Response.Status.CREATED.getStatusCode());
 
+        // these roles are supported: all_access,security_rest_api_access,readall
         final ValidatableResponse response = api.post("/ca/clientcert", """
                 {
                     "principal": "admin",
