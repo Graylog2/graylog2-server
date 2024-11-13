@@ -15,16 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Field, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import { useState } from 'react';
-import capitalize from 'lodash/capitalize';
+import moment from 'moment';
 
 import { FormikInput, TimeUnitInput } from 'components/common';
-import { Input, Button, ButtonToolbar, Modal } from 'components/bootstrap';
+import { Button, ButtonToolbar, Modal } from 'components/bootstrap';
 import type { ClientCertFormValues } from 'components/datanode/hooks/useCreateDataNodeClientCert';
 import useCreateDataNodeClientCert from 'components/datanode/hooks/useCreateDataNodeClientCert';
 import ClientCertificateView from 'components/datanode/client-certificate/ClientCertificateView';
-import Select from 'components/common/Select';
 
 import { TIME_UNITS_UPPER } from '../Constants';
 import ModalSubmit from '../../common/ModalSubmit';
@@ -36,8 +35,14 @@ type Props = {
 const ClientCertForm = ({ onCancel }: Props) => {
   const [clientCerts, setClientCerts] = useState(null);
   const { onCreateClientCert } = useCreateDataNodeClientCert();
-  const onSubmit = (formValues: ClientCertFormValues) => onCreateClientCert(formValues).then((certs) => setClientCerts(certs))
-    .catch(() => {});
+  const onSubmit = (formValues: ClientCertFormValues) => {
+    const { lifetimeValue, lifetimeUnit, ...restValues } = formValues;
+    const requestValues = {
+      ...restValues,
+      certificate_lifetime: moment.duration(lifetimeValue, lifetimeUnit as unknown as moment.unitOfTime.DurationConstructor).toJSON(),
+    };
+    return onCreateClientCert(requestValues).then((certs) => setClientCerts(certs)).catch(() => {});
+  };
 
   return (
     <>
@@ -46,14 +51,13 @@ const ClientCertForm = ({ onCancel }: Props) => {
       </Modal.Header>
       {!clientCerts && (
         <Formik initialValues={{
-          principal: '',
-          role: 'all_access',
-          password: '',
-          lifetimeValue: 30,
-          lifetimeUnit: 'days',
-          mode: 'AUTOMATIC',
-        } as ClientCertFormValues}
-        onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}>
+                  principal: '',
+                  role: 'all_access',
+                  password: '',
+                  lifetimeValue: 30,
+                  lifetimeUnit: 'days',
+                } as ClientCertFormValues}
+                onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}>
           {({ isSubmitting, values, setFieldValue }) => (
             <Form>
               <Modal.Body>
@@ -74,19 +78,6 @@ const ClientCertForm = ({ onCancel }: Props) => {
                              type="password"
                              label="Password"
                              required />
-                <Field name="mode">
-                  {({ field: { name, value, onChange } }) => (
-                    <Input id={name} label="Certificate Renewal Mode">
-                      <Select options={['AUTOMATIC', 'MANUAL'].map((mode) => ({ label: capitalize(mode), value: mode }))}
-                              clearable={false}
-                              name={name}
-                              value={value ?? 'AUTOMATIC'}
-                              aria-label="Select certificate renewal mode"
-                              size="small"
-                              onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
-                    </Input>
-                  )}
-                </Field>
                 <TimeUnitInput label="Certificate Lifetime"
                                update={(value, unit) => {
                                  setFieldValue('lifetimeValue', value);
