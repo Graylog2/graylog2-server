@@ -20,7 +20,6 @@ import { OrderedMap } from 'immutable';
 
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { UrlQueryFilters, Filters, Filter } from 'components/common/EntityFilters/types';
 import type { Attributes, Attribute } from 'stores/PaginationTypes';
@@ -31,6 +30,7 @@ import {
   isAttributeWithRelatedCollection,
 } from 'components/common/EntityFilters/helpers/AttributeIdentification';
 import { timeRangeTitle, extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
+import { defaultOnError } from 'util/conditional/onError';
 
 type CollectionsByAttributeId = {
   [attributeId: string]: string | undefined
@@ -173,12 +173,8 @@ const useFiltersWithTitle = (
   const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId);
   const { data, isInitialLoading, isError } = useQuery(
     ['entity_titles', payload],
-    () => fetchFilterTitles(payload),
+    () => defaultOnError(fetchFilterTitles(payload), 'Loading filter titles failed with status', 'Could not load streams'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading filter titles failed with status: ${errorThrown}`,
-          'Could not load streams');
-      },
       keepPreviousData: true,
       enabled: enabled && !!payload.entities.length,
     },

@@ -16,12 +16,12 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type {
   IndexSetTemplate,
 } from 'components/indices/IndexSetTemplates/types';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA: IndexSetTemplate = {
   title: null,
@@ -50,12 +50,8 @@ const useTemplate = (id: string): {
 } => {
   const { data, isFetched, isFetching, isSuccess, isError, refetch } = useQuery(
     ['indexSetTemplate', id],
-    () => fetchIndexSetTemplate(id),
+    () => defaultOnError(fetchIndexSetTemplate(id), 'Loading index set template failed with status', 'Could not load index set template'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index set template failed with status: ${errorThrown}`,
-          'Could not load index set template');
-      },
       keepPreviousData: true,
       enabled: !!id,
     },

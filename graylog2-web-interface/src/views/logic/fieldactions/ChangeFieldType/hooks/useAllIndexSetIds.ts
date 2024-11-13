@@ -16,9 +16,9 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { defaultOnError } from 'util/conditional/onError';
 
 export type SimpleIndexSet = { id: string, type: string };
 type IndexSetsState = Array<SimpleIndexSet>;
@@ -44,13 +44,7 @@ const useAllIndexSetIds = (streams: Array<string>): {
 } => {
   const { data, isLoading, refetch } = useQuery(
     ['allIndexSetIds', ...streams],
-    () => fetchAllIndexSetIds(streams),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index sets with field type change support failed with status: ${errorThrown}`,
-          'Could not load index sets with field type change support');
-      },
-    },
+    () => defaultOnError(fetchAllIndexSetIds(streams), 'Loading index sets with field type change support failed with status', 'Could not load index sets with field type change support'),
   );
 
   return ({

@@ -23,6 +23,7 @@ import fetch from 'logic/rest/FetchProvider';
 import type { Attribute, SearchParams, PaginatedResponseType } from 'stores/PaginationTypes';
 import type FetchError from 'logic/errors/FetchError';
 import type { DataNodes } from 'components/datanode/Types';
+import { defaultOnError } from 'util/conditional/onError';
 
 export const bulkRemoveDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
   try {
@@ -173,12 +174,8 @@ const useDataNodes = (searchParams: SearchParams = {
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery<DataNodeResponse, FetchError>(
     keyFn(searchParams),
-    () => fetchDataNodes(searchParams),
+    () => defaultOnError(fetchDataNodes(searchParams), 'Loading Data Nodes failed with status', 'Could not load Data Nodes.'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Data Nodes failed with status: ${errorThrown}`,
-          'Could not load Data Nodes.');
-      },
       notifyOnChangeProps: ['data', 'error'],
       refetchInterval,
       enabled,
