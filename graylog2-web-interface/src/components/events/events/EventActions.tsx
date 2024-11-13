@@ -27,17 +27,21 @@ const EventActions = ({ event }: { event: Event }) => {
   const { toggleSection } = useExpandedSections();
   const toggleExtraSection = () => toggleSection(event.id, 'restFieldsExpandedSection');
 
-  return moreActions.length ? (
+  return (
     <>
       <ButtonToolbar>
         <Button bsSize="xs" onClick={toggleExtraSection}>Details</Button>
-        <MoreActions>
-          {moreActions}
-        </MoreActions>
+        {
+          moreActions.length ? (
+            <MoreActions>
+              {moreActions}
+            </MoreActions>
+          ) : null
+        }
       </ButtonToolbar>
       {pluggableActionModals}
     </>
-  ) : null;
+  );
 };
 
 export default EventActions;
