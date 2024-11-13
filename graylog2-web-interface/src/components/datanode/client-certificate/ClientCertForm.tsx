@@ -44,7 +44,6 @@ const ClientCertForm = ({ onCancel }: Props) => {
     };
 
     return onCreateClientCert(requestValues).then((certs) => setClientCerts(certs)).catch(() => {});
-
   };
 
   return (
