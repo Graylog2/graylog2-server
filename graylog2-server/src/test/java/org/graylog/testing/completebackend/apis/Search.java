@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -61,7 +62,11 @@ public class Search implements GraylogRestApi {
 
 
     public Search waitForMessages(String... messages) {
-        waitFor(() -> searchAllMessages().containsAll(Arrays.asList(messages)), "Timed out waiting for message to be present");
+        return waitForMessages(Arrays.asList(messages));
+    }
+
+    public Search waitForMessages(Collection<String> messages) {
+        waitFor(() -> searchAllMessages().containsAll(messages), "Timed out waiting for messages to be present");
         return this;
     }
 

@@ -59,12 +59,14 @@ public class AggregationSortingIT {
     void sortingOnNumericPivotFieldSortsNumerically() throws ExecutionException, RetryException {
         final var numericField = "numeric_field";
         final var nonNumericField = "non_numeric_field";
+        final var values = Set.of(9, 8, 4, 25, 2, 15, 1);
+        final var messagePrefix = "sorting on numeric pivot test ";
         try (final var env = createEnvironment()) {
-            for (final var value : Set.of(9, 8, 4, 25, 2, 15, 1)) {
+            for (final var value : values) {
                 env.ingestMessage(Map.of(
                         nonNumericField, "foo",
                         numericField, value,
-                        "short_message", "sorting on numeric pivot test " + value
+                        "short_message", messagePrefix + value
                 ));
             }
 
@@ -74,7 +76,7 @@ public class AggregationSortingIT {
                     .series(List.of())
                     .rollup(false);
 
-            api.search().waitForMessage("sorting on numeric pivot test 1");
+            api.search().waitForMessages(values.stream().map(value -> messagePrefix + value).toList());
 
             env.waitForFieldTypes(numericField);
 
@@ -100,12 +102,14 @@ public class AggregationSortingIT {
     void sortingOnNonNumericPivotFieldSortsLexicographically() throws ExecutionException, RetryException {
         final var numericField = "numeric_field";
         final var nonNumericField = "non_numeric_field";
+        final var values = Set.of("B", "C", "D", "A", "E");
+        final var messagePrefix = "sorting on non-numeric pivot test ";
         try (final var env = createEnvironment()) {
-            for (final var value : Set.of("B", "C", "D", "A", "E")) {
+            for (final var value : values) {
                 env.ingestMessage(Map.of(
                         nonNumericField, value,
                         numericField, 42,
-                        "short_message", "sorting on non-numeric pivot test " + value
+                        "short_message", messagePrefix + value
                 ));
             }
 
@@ -115,7 +119,7 @@ public class AggregationSortingIT {
                     .series(List.of())
                     .rollup(false);
 
-            api.search().waitForMessage("sorting on non-numeric pivot test E");
+            api.search().waitForMessages(values.stream().map(value -> messagePrefix + value).toList());
 
             env.waitForFieldTypes(numericField);
 
@@ -141,16 +145,18 @@ public class AggregationSortingIT {
     void sortingOnBothNumericFieldAndMetric() throws ExecutionException, RetryException {
         final var numericField = "numeric_field";
         final var nonNumericField = "non_numeric_field";
+        final var values = List.of(2, 4, 9, 1, 25, 2, 9, 4, 15);
+        final var messagePrefix = "Ingesting value ";
         try (final var env = createEnvironment()) {
-            for (final var value : List.of(2, 4, 9, 1, 25, 2, 9, 4, 15)) {
+            for (final var value : values) {
                 env.ingestMessage(Map.of(
                         nonNumericField, "Test",
                         numericField, value,
-                        "short_message", "Ingesting value " + value
+                        "short_message", messagePrefix + value
                 ));
             }
 
-            api.search().waitForMessage("Ingesting value 15");
+            api.search().waitForMessages(values.stream().distinct().map(value -> messagePrefix + value).toList());
 
             env.waitForFieldTypes(numericField);
 
