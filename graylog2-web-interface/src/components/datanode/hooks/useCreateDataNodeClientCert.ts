@@ -24,6 +24,9 @@ export type ClientCertFormValues = {
   principal : string,
   role : string,
   password : string,
+  mode: 'AUTOMATIC' | 'MANUAL',
+  lifetimeValue: number,
+  lifetimeUnit: string,
 }
 export type ClientCertCreateResponse = {
   principal: string,
