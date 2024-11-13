@@ -162,6 +162,7 @@ const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRende
     },
     remediation_steps: {
       renderCell: (_, event: Event) => <RemediationStepRenderer eventDefinitionId={event.event_definition_id} />,
+      width: 0.3,
     },
     timerange_start: {
       renderCell: (_, event: Event) => <TimeRangeRenderer eventData={event} />,
