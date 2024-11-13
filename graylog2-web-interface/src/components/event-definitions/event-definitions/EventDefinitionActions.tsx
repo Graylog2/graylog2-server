@@ -27,7 +27,7 @@ import {
 } from 'components/common';
 import {
   ButtonToolbar,
-  MenuItem,
+  MenuItem, MenuItemDelete,
 } from 'components/bootstrap';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
@@ -272,11 +272,12 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
-              <MenuItem disabled={isSystemEventDefinition() || isSigmaEventDefinition()}
-                        title={getDeleteActionTitle()}
-                        onClick={isSystemEventDefinition() || isSigmaEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
-                        data-testid="delete-button">Delete
-              </MenuItem>
+              <MenuItemDelete disabled={isSystemEventDefinition() || isSigmaEventDefinition()}
+                              title={getDeleteActionTitle()}
+                              onClick={isSystemEventDefinition() || isSigmaEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
+                              data-testid="delete-button">
+                Delete
+              </MenuItemDelete>
             </IfPermitted>
           )}
           {

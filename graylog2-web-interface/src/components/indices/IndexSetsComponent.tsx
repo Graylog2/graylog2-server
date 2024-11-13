@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import { Link, LinkContainer } from 'components/common/router';
-import { Button, Col, DropdownButton, Label, MenuItem, Row } from 'components/bootstrap';
+import { Button, Col, DropdownButton, Label, MenuItem, Row, MenuItemDelete } from 'components/bootstrap';
 import { EntityList, EntityListItem, PaginatedList, SearchForm, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
@@ -157,7 +157,7 @@ const IndexSetsComponent = () => {
                     disabled={!indexSet.can_be_default || indexSet.default}>Set as default
           </MenuItem>
           <MenuItem divider />
-          <MenuItem onSelect={onDelete(indexSet)} variant="danger">Delete</MenuItem>
+          <MenuItemDelete onSelect={onDelete(indexSet)}>Delete</MenuItemDelete>
         </DropdownButton>
       </ButtonToolbar>
     );

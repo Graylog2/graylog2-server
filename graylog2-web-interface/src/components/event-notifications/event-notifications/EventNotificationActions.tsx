@@ -21,7 +21,7 @@ import UserNotification from 'util/UserNotification';
 import { ConfirmDialog, IfPermitted, ShareButton } from 'components/common';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { MenuItem, ButtonToolbar } from 'components/bootstrap';
+import { MenuItem, ButtonToolbar, MenuItemDelete } from 'components/bootstrap';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import EntityShareModal from 'components/permissions/EntityShareModal';
@@ -105,7 +105,7 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
             </IfPermitted>
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
-              <MenuItem onClick={onDelete} variant="danger">Delete</MenuItem>
+              <MenuItemDelete onClick={onDelete}>Delete</MenuItemDelete>
             </IfPermitted>
           </IfPermitted>
         </MoreActions>

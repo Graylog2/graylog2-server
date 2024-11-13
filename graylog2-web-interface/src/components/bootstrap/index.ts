@@ -38,6 +38,7 @@ export { default as ListGroup } from './ListGroup';
 export { default as ListGroupItem } from './ListGroupItem';
 export { default as Menu } from './Menu';
 export { default as MenuItem } from './MenuItem';
+export { default as MenuItemDelete } from './MenuItemDelete';
 export { default as Modal } from './Modal';
 export { default as Nav } from './Nav';
 export { default as NavDropdown } from './NavDropdown';

@@ -33,7 +33,7 @@ import {
   Button,
   DropdownButton,
   Label,
-  MenuItem,
+  MenuItem, MenuItemDelete,
 } from 'components/bootstrap';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
@@ -139,7 +139,7 @@ const EventDefinitionEntry = ({
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
-              <MenuItem onClick={handleDelete} variant="danger">Delete</MenuItem>
+              <MenuItemDelete onClick={handleDelete}>Delete</MenuItemDelete>
             </IfPermitted>
           )}
         </DropdownButton>

@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
-import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem, MenuItemDelete } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
@@ -96,7 +96,7 @@ class ConfigurationRow extends React.Component<ConfigurationRowProps, {
               <MenuItem onSelect={() => this.openModal()}>Clone</MenuItem>
 
               <MenuItem divider />
-              <MenuItem onSelect={this._handleDelete} variant="danger">Delete</MenuItem>
+              <MenuItemDelete onSelect={this._handleDelete}>Delete</MenuItemDelete>
             </MoreActions>
             {showModal && (
             <CopyConfigurationModal configuration={configuration}

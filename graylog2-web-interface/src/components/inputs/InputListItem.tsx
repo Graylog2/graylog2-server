@@ -22,7 +22,7 @@ import { useStore } from 'stores/connect';
 import AppConfig from 'util/AppConfig';
 import { LinkContainer } from 'components/common/router';
 import { isPermitted } from 'util/PermissionsMixin';
-import { DropdownButton, MenuItem, Col, Button } from 'components/bootstrap';
+import { DropdownButton, MenuItem, Col, Button, MenuItemDelete } from 'components/bootstrap';
 import { ConfirmDialog, EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
 import { ConfigurationWell } from 'components/configurationforms';
 import Routes from 'routing/Routes';
@@ -244,7 +244,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
         <MenuItem key={`divider-${input.id}`} divider />
       </IfPermitted>
       <IfPermitted permissions="inputs:terminate">
-        <MenuItem key={`delete-input-${input.id}`} onSelect={deleteInput}>Delete input</MenuItem>
+        <MenuItemDelete key={`delete-input-${input.id}`} onSelect={deleteInput}>Delete input</MenuItemDelete>
       </IfPermitted>
     </DropdownButton>,
   );

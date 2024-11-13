@@ -31,7 +31,7 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import IfSearch from 'views/components/search/IfSearch';
-import { MenuItem } from 'components/bootstrap';
+import { MenuItem, MenuItemDelete } from 'components/bootstrap';
 import type Widget from 'views/logic/widgets/Widget';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
@@ -273,9 +273,9 @@ const WidgetActionsMenu = ({
           </IfDashboard>
           <ExtraDropdownWidgetActions widget={widget} />
           <MenuItem divider />
-          <MenuItem onSelect={onDelete}>
+          <MenuItemDelete onSelect={onDelete}>
             Delete
-          </MenuItem>
+          </MenuItemDelete>
         </WidgetActionDropdown>
 
         {showCopyToDashboard && (
