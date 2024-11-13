@@ -16,7 +16,7 @@
  */
 import React, { useCallback } from 'react';
 
-import useTableElements from 'components/events/useTableComponents';
+import useTableElements from 'components/events/events/hooks/useTableComponents';
 import { eventsTableElements } from 'components/events/Constants';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';

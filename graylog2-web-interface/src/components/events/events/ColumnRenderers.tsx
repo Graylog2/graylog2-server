@@ -32,12 +32,11 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 import { Timestamp } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
 
-const EventDefinitionRenderer = ({ eventDefinitionId, permissions }: { eventDefinitionId: string, permissions: Immutable.List<string> }) => {
-  const { meta: { context: eventsContext } } = useMetaDataContext<EventsAdditionalData>();
+const EventDefinitionRenderer = ({ eventDefinitionId, permissions, meta }: { eventDefinitionId: string, permissions: Immutable.List<string>, meta: EventsAdditionalData }) => {
+  const { context: eventsContext } = meta;
   const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
 
   if (!eventDefinitionContext) {
@@ -80,8 +79,8 @@ const GroupByFieldsRenderer = ({ groupByFields }: {groupByFields: Record<string,
     : <EventFields fields={groupByFields} />
 );
 
-const RemediationStepRenderer = ({ eventDefinitionId }: { eventDefinitionId: string }) => {
-  const { meta: { context: eventsContext } } = useMetaDataContext<EventsAdditionalData>();
+const RemediationStepRenderer = ({ eventDefinitionId, meta }: { eventDefinitionId: string, meta: EventsAdditionalData }) => {
+  const { context: eventsContext } = meta;
   const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
 
   return (
@@ -143,7 +142,7 @@ const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRende
     event_definition_id: {
       minWidth: 300,
       width: 0.3,
-      renderCell: (_eventDefinitionId: string) => <EventDefinitionRenderer permissions={permissions} eventDefinitionId={_eventDefinitionId} />,
+      renderCell: (_eventDefinitionId: string, _, __, meta: EventsAdditionalData) => <EventDefinitionRenderer meta={meta} permissions={permissions} eventDefinitionId={_eventDefinitionId} />,
     },
     priority: {
       renderCell: (_priority: number) => <PriorityName priority={_priority} />,
@@ -162,7 +161,7 @@ const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRende
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event) => <RemediationStepRenderer eventDefinitionId={event.event_definition_id} />,
+      renderCell: (_, event: Event, __, meta) => <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />,
       width: 0.3,
     },
     timerange_start: {
