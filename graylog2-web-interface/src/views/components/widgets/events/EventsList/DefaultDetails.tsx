@@ -20,8 +20,8 @@ import type { Event, EventDefinitionContext, EventsAdditionalData } from 'compon
 import EventDetailsTable from 'components/events/events/EventDetailsTable';
 import { detailsAttributes } from 'components/events/Constants';
 import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
-import EventActions from 'components/events/events/EventActions';
 import DropdownButton from 'components/bootstrap/DropdownButton';
+import useEventAction from 'components/events/events/hooks/useEventAction';
 
 type Props = {
   event: Event,
@@ -38,12 +38,16 @@ const ActionsWrapper = ({ children }) => (
 );
 
 const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
+  const { moreActions, pluggableActionModals } = useEventAction(event);
   const meta = useMemo(() => ({ context: { event_definitions: { [event.event_definition_id]: eventDefinitionContext } } }), [event.event_definition_id, eventDefinitionContext]);
 
   return (
     <MetaDataProvider<EventsAdditionalData> meta={meta}>
       <EventDetailsTable attributesList={attributesList} event={event} meta={meta} />
-      <EventActions event={event} wrapper={ActionsWrapper} />
+      <ActionsWrapper>
+        {moreActions}
+      </ActionsWrapper>
+      {pluggableActionModals}
     </MetaDataProvider>
   );
 };

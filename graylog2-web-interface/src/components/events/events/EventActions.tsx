@@ -16,36 +16,25 @@
  */
 import * as React from 'react';
 
-import { ButtonToolbar, MenuItem } from 'components/bootstrap';
+import { ButtonToolbar, Button } from 'components/bootstrap';
 import { MoreActions } from 'components/common/EntityDataTable';
-import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 import type { Event } from 'components/events/events/types';
-import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
+import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import useEventAction from 'components/events/events/hooks/useEventAction';
 
-const DefaultWrapper = ({ children }: React.PropsWithChildren) => (
-  <ButtonToolbar>
-    <MoreActions>
-      {children}
-    </MoreActions>
-  </ButtonToolbar>
-);
-
-const EventActions = ({ event, wrapper: Wrapper = DefaultWrapper }: { event: Event, wrapper?: React.ComponentType<React.PropsWithChildren> }) => {
-  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(event.id);
-  const hasReplayInfo = !!event.replay_info;
-  const isNotSystemEvent = !event.event_definition_type.startsWith('system-notifications');
-
-  const moreActions = [
-    hasReplayInfo ? <MenuItem key="replay_info"><LinkToReplaySearch id={event.id} isEvent /></MenuItem> : null,
-    pluggableActions.length && hasReplayInfo && isNotSystemEvent ? <MenuItem divider key="divider" /> : null,
-    pluggableActions.length && isNotSystemEvent ? pluggableActions : null,
-  ].filter(Boolean);
+const EventActions = ({ event }: { event: Event }) => {
+  const { moreActions, pluggableActionModals } = useEventAction(event);
+  const { toggleSection } = useExpandedSections();
+  const toggleExtraSection = () => toggleSection(event.id, 'restFieldsExpandedSection');
 
   return moreActions.length ? (
     <>
-      <Wrapper>
-        {moreActions}
-      </Wrapper>
+      <ButtonToolbar>
+        <Button bsSize="xs" onClick={toggleExtraSection}>Details</Button>
+        <MoreActions>
+          {moreActions}
+        </MoreActions>
+      </ButtonToolbar>
       {pluggableActionModals}
     </>
   ) : null;
