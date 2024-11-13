@@ -34,12 +34,12 @@ import Select from 'components/common/Select';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 
+import { TIME_UNITS, TIME_UNITS_UPPER } from '../Constants';
+
 type RenewalPolicy = {
   mode: 'AUTOMATIC' | 'MANUAL',
   certificate_lifetime: string,
 }
-const TIME_UNITS = ['hours', 'days', 'months', 'years'] as const;
-const TIME_UNITS_UPPER = TIME_UNITS.map((unit) => unit.toLocaleUpperCase());
 
 type FormConfig = {
   mode: RenewalPolicy['mode'],

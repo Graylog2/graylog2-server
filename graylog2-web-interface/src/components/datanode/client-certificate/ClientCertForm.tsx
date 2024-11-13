@@ -15,15 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Formik, Form } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { useState } from 'react';
+import capitalize from 'lodash/capitalize';
 
-import { FormikInput } from 'components/common';
-import { Button, ButtonToolbar, Modal } from 'components/bootstrap';
+import { FormikInput, TimeUnitInput } from 'components/common';
+import { Input, Button, ButtonToolbar, Modal } from 'components/bootstrap';
 import type { ClientCertFormValues } from 'components/datanode/hooks/useCreateDataNodeClientCert';
 import useCreateDataNodeClientCert from 'components/datanode/hooks/useCreateDataNodeClientCert';
 import ClientCertificateView from 'components/datanode/client-certificate/ClientCertificateView';
+import Select from 'components/common/Select';
 
+import { TIME_UNITS_UPPER } from '../Constants';
 import ModalSubmit from '../../common/ModalSubmit';
 
 type Props = {
@@ -42,8 +45,15 @@ const ClientCertForm = ({ onCancel }: Props) => {
         <Modal.Title>Create client certificate</Modal.Title>
       </Modal.Header>
       {!clientCerts && (
-        <Formik initialValues={{ principal: '', role: 'all_access', password: '' }} onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}>
-          {({ isSubmitting }) => (
+        <Formik initialValues={{ 
+          principal: '',
+          role: 'all_access',
+          password: '',
+          lifetimeValue: 30,
+          lifetimeUnit: 'days',
+          mode: 'AUTOMATIC',
+        } as ClientCertFormValues} onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}>
+          {({ isSubmitting, values, setFieldValue }) => (
             <Form>
               <Modal.Body>
                 <FormikInput id="principal"
@@ -63,6 +73,29 @@ const ClientCertForm = ({ onCancel }: Props) => {
                              type="password"
                              label="Password"
                              required />
+                <Field name="mode">
+                  {({ field: { name, value, onChange } }) => (
+                    <Input id={name} label="Certificate Renewal Mode">
+                      <Select options={['AUTOMATIC', 'MANUAL'].map((mode) => ({ label: capitalize(mode), value: mode }))}
+                              clearable={false}
+                              name={name}
+                              value={value ?? 'AUTOMATIC'}
+                              aria-label="Select certificate renewal mode"
+                              size="small"
+                              onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+                    </Input>
+                  )}
+                </Field>
+                <TimeUnitInput label="Certificate Lifetime"
+                               update={(value, unit) => {
+                                 setFieldValue('lifetimeValue', value);
+                                 setFieldValue('lifetimeUnit', unit);
+                               }}
+                               value={values.lifetimeValue}
+                               unit={values.lifetimeUnit.toLocaleUpperCase()}
+                               enabled
+                               hideCheckbox
+                               units={TIME_UNITS_UPPER} />
               </Modal.Body>
               <Modal.Footer>
                 <ModalSubmit onCancel={() => onCancel()}
