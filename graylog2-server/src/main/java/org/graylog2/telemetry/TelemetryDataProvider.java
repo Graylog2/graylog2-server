@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* https://github.com/facebook/react/issues/7371
- *
- * findDomNode with refs is not supported by the react-test-renderer.
- * So we need to mock the findDOMNode function for TableList respectievly
- * for its child component TypeAheadDataFilter.
- */
-jest.mock('react-dom', () => ({
-  findDOMNode: () => ({}),
-}));
+package org.graylog2.telemetry;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+public interface TelemetryDataProvider {
+
+    ObjectNode apply(ObjectNode data, String userId);
+}

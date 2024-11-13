@@ -14,19 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.telemetry.enterprise;
+import * as React from 'react';
 
-import jakarta.annotation.Nullable;
-import org.graylog2.system.traffic.TrafficCounterService;
+const TestInputStep = () => (
+  <div>Test Input Step</div>
+);
 
-import java.util.List;
-
-public interface TelemetryEnterpriseDataProvider {
-
-    List<TelemetryLicenseStatus> licenseStatus();
-
-    int teamsCount(String userId);
-
-    @Nullable
-    TrafficCounterService.TrafficHistograms enterpriseTraffic();
-}
+export default TestInputStep;
