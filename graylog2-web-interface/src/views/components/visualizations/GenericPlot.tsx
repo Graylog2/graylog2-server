@@ -182,9 +182,7 @@ const usePlotChartData = (chartData: Array<any>, setChartColor: (data: ChartConf
     if (setChartColor && colors) {
       const conf = setChartColor(chart, colors);
 
-      if (chart.type === 'pie' || chart.type === 'bar') {
-        conf.outsidetextfont = { color: theme.colors.global.textDefault };
-      }
+      conf.outsidetextfont = { color: theme.colors.global.textDefault };
 
       if (chart?.name === eventsDisplayName) {
         const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
