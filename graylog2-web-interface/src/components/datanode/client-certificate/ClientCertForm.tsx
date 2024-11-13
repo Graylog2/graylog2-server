@@ -45,14 +45,15 @@ const ClientCertForm = ({ onCancel }: Props) => {
         <Modal.Title>Create client certificate</Modal.Title>
       </Modal.Header>
       {!clientCerts && (
-        <Formik initialValues={{ 
+        <Formik initialValues={{
           principal: '',
           role: 'all_access',
           password: '',
           lifetimeValue: 30,
           lifetimeUnit: 'days',
           mode: 'AUTOMATIC',
-        } as ClientCertFormValues} onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}>
+        } as ClientCertFormValues}
+        onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}>
           {({ isSubmitting, values, setFieldValue }) => (
             <Form>
               <Modal.Body>
