@@ -24,11 +24,11 @@ const EventFields = ({ fields }: Props) => {
   const fieldNames = Object.keys(fields);
 
   return (
-    <ul>
+    <>
       {fieldNames.map((fieldName) => (
-        <li key={fieldName}><b>{fieldName}</b> {fields[fieldName]}</li>
+        <div key={fieldName}><b>{fieldName}</b> {fields[fieldName]}</div>
       ))}
-    </ul>
+    </>
   );
 };
 
