@@ -24,7 +24,7 @@ import fetchEvents, { keyFn } from 'components/events/fetchEvents';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useQuery from 'routing/useQuery';
-import useColumnRenderers from 'components/events/events/hooks/useColumnRenderes';
+import useColumnRenderers from 'components/events/events/ColumnRenderers';
 
 import QueryHelper from '../common/QueryHelper';
 

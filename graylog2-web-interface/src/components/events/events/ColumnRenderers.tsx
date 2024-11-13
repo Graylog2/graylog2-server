@@ -16,8 +16,8 @@
  */
 
 import * as React from 'react';
-import type Immutable from 'immutable';
 import { useMemo } from 'react';
+import type Immutable from 'immutable';
 import styled from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
 
@@ -34,6 +34,7 @@ import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 import { Timestamp } from 'components/common';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 const EventDefinitionRenderer = ({ eventDefinitionId, permissions }: { eventDefinitionId: string, permissions: Immutable.List<string> }) => {
   const { meta: { context: eventsContext } } = useMetaDataContext<EventsAdditionalData>();
@@ -171,4 +172,10 @@ const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRende
   },
 });
 
-export default customColumnRenderers;
+const useColumnRenderers = () => {
+  const currentUser = useCurrentUser();
+
+  return useMemo(() => customColumnRenderers(currentUser.permissions), [currentUser.permissions]);
+};
+
+export default useColumnRenderers;

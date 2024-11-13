@@ -19,7 +19,7 @@ import { styled } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
-import useColumnRenderers from 'components/events/events/hooks/useColumnRenderes';
+import useColumnRenderers from 'components/events/events/ColumnRenderers';
 
 const TD = styled.td`
   white-space: nowrap;
