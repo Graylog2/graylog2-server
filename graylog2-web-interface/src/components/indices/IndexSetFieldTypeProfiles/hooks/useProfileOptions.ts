@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import type { ProfileOptions } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import UserNotification from 'util/UserNotification';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = [];
 
@@ -37,12 +37,8 @@ const useProfileOptions = (): {
 } => {
   const { data, isLoading, refetch } = useQuery(
     ['indexSetFieldTypeProfileOptions'],
-    () => fetchProfileOptions(),
+    () => defaultOnError(fetchProfileOptions(), 'Loading index field type profile options failed with status', 'Could not load index field type profile options'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index field type profile options failed with status: ${errorThrown}`,
-          'Could not load index field type profile options');
-      },
       keepPreviousData: true,
     },
   );
