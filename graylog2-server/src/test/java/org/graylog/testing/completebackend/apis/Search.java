@@ -22,6 +22,7 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -153,6 +154,10 @@ public class Search implements GraylogRestApi {
     }
 
     public ValidatableResponse executePivot(Pivot pivot, String queryString) {
+        return executePivot(pivot, queryString, Set.of());
+    }
+
+    public ValidatableResponse executePivot(Pivot pivot, String queryString, Set<String> streams) {
         final var pivotName = "pivotaggregation";
         final var pivotPath = "results.query1.search_types." + pivotName;
         final Pivot pivotWithId = pivot.toBuilder()
@@ -164,6 +169,7 @@ public class Search implements GraylogRestApi {
                         .timerange(RelativeRange.allTime())
                         .id("query1")
                         .query(ElasticsearchQueryString.of(queryString))
+                        .filter(StreamFilter.anyIdOf(streams.toArray(new String[0])))
                         .searchTypes(Set.of(pivotWithId))
                         .build())
                 .build();

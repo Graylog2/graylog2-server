@@ -305,8 +305,7 @@ public class GraylogApis implements GraylogRestApi {
         }
 
         public ValidatableResponse executePivot(Pivot pivot) {
-            final var pivotForStream = pivot.toBuilder().streams(Set.of(streamId)).build();
-            return search().executePivot(pivotForStream, "");
+            return search().executePivot(pivot, "", Set.of(streamId));
         }
 
         @Override
