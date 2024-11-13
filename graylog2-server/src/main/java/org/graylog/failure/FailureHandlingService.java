@@ -16,9 +16,6 @@
  */
 package org.graylog.failure;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import jakarta.inject.Inject;
@@ -26,19 +23,15 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Message;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * A service consuming and processing failure batches submitted via {@link FailureSubmissionQueue}.
@@ -61,9 +54,6 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
     private final Configuration configuration;
     private final MessageQueueAcknowledger acknowledger;
     private Thread executionThread;
-    private final MetricRegistry metricRegistry;
-    private final ObjectMapper objectMapper;
-    private final Meter dummyMeter = new Meter();
 
     @Inject
     public FailureHandlingService(
@@ -71,16 +61,12 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
             Set<FailureHandler> failureHandlers,
             FailureSubmissionQueue failureSubmissionQueue,
             Configuration configuration,
-            MessageQueueAcknowledger acknowledger,
-            MetricRegistry metricRegistry,
-            ObjectMapperProvider objectMapperProvider) {
+            MessageQueueAcknowledger acknowledger) {
         this.fallbackFailureHandlerAsList = Lists.newArrayList(fallbackFailureHandler);
         this.failureHandlers = failureHandlers;
         this.failureSubmissionQueue = failureSubmissionQueue;
         this.configuration = configuration;
         this.acknowledger = acknowledger;
-        this.metricRegistry = metricRegistry;
-        this.objectMapper = objectMapperProvider.get();
     }
 
     @Override
@@ -142,8 +128,6 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
     }
 
     private void handle(FailureBatch failureBatch) {
-        failureBatch.getFailures().forEach(this::updateMetrics);
-
         suitableHandlers(failureBatch)
                 .forEach(handler -> {
                     try {
@@ -162,27 +146,6 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
 
         if (!requiresAcknowledgement.isEmpty()) {
             acknowledger.acknowledge(requiresAcknowledgement);
-        }
-    }
-
-    private void updateMetrics(Failure failure) {
-        if (failure == null || failure.failedMessage() == null) {
-            return;
-        }
-
-        final Map<String, Object> searchObject = failure.failedMessage().toElasticSearchObject(objectMapper, dummyMeter);
-        final Object inputId = searchObject.get(Message.FIELD_GL2_SOURCE_INPUT);
-        if (inputId != null) {
-            switch (failure.failureType()) {
-                case INDEXING -> {
-                    final String indexingFailureMetricName = name("org.graylog2", inputId.toString(), "failures.indexing");
-                    metricRegistry.meter(indexingFailureMetricName).mark();
-                }
-                case PROCESSING -> {
-                    final String processingFailureMetricName = name("org.graylog2", inputId.toString(), "failures.processing");
-                    metricRegistry.meter(processingFailureMetricName).mark();
-                }
-            }
         }
     }
 
