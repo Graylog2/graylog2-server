@@ -61,12 +61,13 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     @Nonnull
     @Override
     public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
-        final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, DEFAULT_ORDER);
+        final var ordering = orderListForPivot(pivot, queryContext, DEFAULT_ORDER);
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
-        final var termsAggregation = createTerms(orderedBuckets, ordering, limit);
+        final var termsAggregation = createTerms(orderedBuckets, limit);
 
-        applyOrdering(pivot, termsAggregation, ordering, queryContext);
+        termsAggregation.order(ordering.orders());
+        ordering.subAggregations().forEach(termsAggregation::subAggregation);
 
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
@@ -83,15 +84,14 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     }
 
 
-    private TermsAggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
-        return createScriptedTerms(valueBuckets, ordering, limit);
+    private TermsAggregationBuilder createTerms(List<String> valueBuckets, int limit) {
+        return createScriptedTerms(valueBuckets, limit);
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, List<BucketOrder> ordering, int limit) {
+    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
-                .size(limit)
-                .order(ordering);
+                .size(limit);
     }
 
     private Script scriptForPivots(Collection<String> pivots) {
