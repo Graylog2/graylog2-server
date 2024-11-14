@@ -16,7 +16,7 @@
  */
 import React, { useState } from 'react';
 
-import { Button, ButtonToolbar, MenuItem, MenuItemDelete } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { ConfirmDialog } from 'components/common';
 import { LinkContainer } from 'components/common/router';
@@ -84,9 +84,9 @@ const TemplateActions = ({ id, title, built_in, isDefault, isEnabled } : Props) 
           <MenuItem onSelect={onSetAsDefault}>
             Set as default
           </MenuItem>
-          <MenuItemDelete onSelect={onDelete}>
+          <DeleteMenuItem onSelect={onDelete}>
             Delete
-          </MenuItemDelete>
+          </DeleteMenuItem>
         </MoreActions>
         )}
       </ButtonToolbar>

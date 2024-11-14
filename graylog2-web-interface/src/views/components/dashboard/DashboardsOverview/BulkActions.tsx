@@ -24,7 +24,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import { MenuItemDelete } from 'components/bootstrap';
+import { DeleteMenuItem } from 'components/bootstrap';
 
 const VIEWS_BULK_DELETE_API_ROUTE = '/views/bulk_delete';
 
@@ -60,7 +60,7 @@ const BulkActions = () => {
 
   return (
     <BulkActionsDropdown>
-      <MenuItemDelete onSelect={onDelete}>Delete</MenuItemDelete>
+      <DeleteMenuItem onSelect={onDelete}>Delete</DeleteMenuItem>
     </BulkActionsDropdown>
   );
 };

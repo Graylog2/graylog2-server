@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, Col, Label, Row, MenuItem, MenuItemDelete } from 'components/bootstrap';
+import { Button, Col, Label, Row, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import { IconButton } from 'components/common';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
@@ -194,7 +194,7 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
               <MenuItem onClick={onInsertAbove}>Insert above</MenuItem>
               <MenuItem onClick={onInsertBelow}>Insert below</MenuItem>
               <MenuItem divider />
-              <MenuItemDelete onClick={onDelete}>Delete</MenuItemDelete>
+              <DeleteMenuItem onClick={onDelete}>Delete</DeleteMenuItem>
             </OverlayDropdownButton>
           </ActionsContainer>
         )}

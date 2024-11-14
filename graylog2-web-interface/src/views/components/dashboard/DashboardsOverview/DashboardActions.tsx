@@ -19,7 +19,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import UserNotification from 'util/UserNotification';
 import { ShareButton } from 'components/common';
-import { MenuItem, MenuItemDelete } from 'components/bootstrap';
+import { MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -92,9 +92,9 @@ const DashboardDeleteAction = ({ dashboard, refetchDashboards, isEvidenceModal =
   }, [dashboard, deselectEntity, refetchDashboards, paginationQueryParameter]);
 
   return isEvidenceModal ? null : (
-    <MenuItemDelete onClick={onDashboardDelete}>
+    <DeleteMenuItem onClick={onDashboardDelete}>
       Delete
-    </MenuItemDelete>
+    </DeleteMenuItem>
   );
 };
 

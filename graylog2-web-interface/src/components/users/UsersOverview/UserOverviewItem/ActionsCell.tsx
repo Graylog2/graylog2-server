@@ -22,7 +22,7 @@ import { LinkContainer } from 'components/common/router';
 import type UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
-import { Button, MenuItem, ButtonToolbar, MenuItemDelete } from 'components/bootstrap';
+import { Button, MenuItem, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
 import { OverlayTrigger, IfPermitted } from 'components/common';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -135,11 +135,11 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
               {accountStatus === 'enabled' ? 'Disable' : 'Enable'}
             </MenuItem>
           )}
-          <MenuItemDelete id={`delete-user-${id}`}
+          <DeleteMenuItem id={`delete-user-${id}`}
                           title={`Delete user ${fullName}`}
                           onClick={_deleteUser}>
             Delete
-          </MenuItemDelete>
+          </DeleteMenuItem>
         </IfPermitted>
       </MoreActions>
     </>

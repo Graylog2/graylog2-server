@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useCallback } from 'react';
 
 import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
-import { Button, ButtonToolbar, MenuItem, MenuItemDelete } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import Routes from 'routing/Routes';
@@ -234,9 +234,9 @@ const StreamActions = ({
         </IfPermitted>
 
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <MenuItemDelete onSelect={toggleDeleteModal} disabled={isDefaultStream}>
+          <DeleteMenuItem onSelect={toggleDeleteModal} disabled={isDefaultStream}>
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
-          </MenuItemDelete>
+          </DeleteMenuItem>
         </IfPermitted>
       </MoreActions>
       {showUpdateModal && (

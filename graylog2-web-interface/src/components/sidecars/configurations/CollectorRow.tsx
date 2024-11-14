@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 import upperFirst from 'lodash/upperFirst';
 
 import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, MenuItem, Button, MenuItemDelete } from 'components/bootstrap';
+import { ButtonToolbar, MenuItem, Button, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import { MoreActions } from 'components/common/EntityDataTable';
@@ -60,7 +60,7 @@ const CollectorRow = ({ collector, onClone, onDelete, validateCollector }: Props
                                 validateCollector={validateCollector}
                                 copyCollector={onClone} />
             <MenuItem divider />
-            <MenuItemDelete onSelect={handleDelete}>Delete</MenuItemDelete>
+            <DeleteMenuItem onSelect={handleDelete}>Delete</DeleteMenuItem>
           </MoreActions>
         </ButtonToolbar>
       </td>

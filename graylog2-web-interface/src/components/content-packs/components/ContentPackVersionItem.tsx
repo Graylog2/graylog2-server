@@ -30,7 +30,7 @@ import {
   ButtonToolbar,
   MenuItem,
   Modal,
-  MenuItemDelete,
+  DeleteMenuItem,
 } from 'components/bootstrap';
 import type { ContentPackInstallation } from 'components/content-packs/Types';
 import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
@@ -98,9 +98,9 @@ const ContentPackVersionItem = ({
               <MenuItem>Create New From Revision</MenuItem>
             </LinkContainer>
             <MenuItem divider />
-            <MenuItemDelete onClick={() => { onDeletePack(pack.id, pack.rev); }}>
+            <DeleteMenuItem onClick={() => { onDeletePack(pack.id, pack.rev); }}>
               Delete
-            </MenuItemDelete>
+            </DeleteMenuItem>
           </DropdownButton>
         </ButtonToolbar>
       </td>

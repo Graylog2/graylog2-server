@@ -30,7 +30,7 @@ import StopStreamsAction from 'components/streams/StreamsOverview/BulkActions/St
 import SearchStreamsAction from 'components/streams/StreamsOverview/BulkActions/SearchStreamsAction';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import IfPermitted from 'components/common/IfPermitted';
-import { MenuItemDelete } from 'components/bootstrap';
+import { DeleteMenuItem } from 'components/bootstrap';
 
 import StartStreamsAction from './StartStreamsAction';
 import AssignIndexSetModal from './AssignIndexSetModal';
@@ -98,7 +98,7 @@ const BulkActions = ({ indexSets }: Props) => {
                            refetchStreams={refetchStreams}
                            descriptor={descriptor} />
 
-        <MenuItemDelete onSelect={onDelete}>Delete</MenuItemDelete>
+        <DeleteMenuItem onSelect={onDelete}>Delete</DeleteMenuItem>
       </BulkActionsDropdown>
     </>
   );
