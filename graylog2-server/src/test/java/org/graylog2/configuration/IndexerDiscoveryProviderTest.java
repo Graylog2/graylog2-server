@@ -62,8 +62,8 @@ class IndexerDiscoveryProviderTest {
 
     @Test
     void testListeners() {
-        final IndexerDiscoveryListener listerer1 = Mockito.mock(IndexerDiscoveryListener.class);
-        final IndexerDiscoveryListener listerer2 = Mockito.mock(IndexerDiscoveryListener.class);
+        final IndexerDiscoveryListener listener1 = Mockito.mock(IndexerDiscoveryListener.class);
+        final IndexerDiscoveryListener listener2 = Mockito.mock(IndexerDiscoveryListener.class);
 
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 Collections.emptyList(),
@@ -71,16 +71,16 @@ class IndexerDiscoveryProviderTest {
                 Duration.milliseconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED),
                 nodes(),
-                new HashSet<>(List.of(listerer1, listerer2))
+                new HashSet<>(List.of(listener1, listener2))
         );
 
         Assertions.assertThatThrownBy(provider::get)
                 .hasMessageContaining("Unable to retrieve Datanode connection");
 
-        Mockito.verify(listerer1, Mockito.times(1)).beforeIndexerDiscovery();
-        Mockito.verify(listerer1, Mockito.times(10)).onDiscoveryRetry();
-        Mockito.verify(listerer2, Mockito.times(1)).beforeIndexerDiscovery();
-        Mockito.verify(listerer2, Mockito.times(10)).onDiscoveryRetry();
+        Mockito.verify(listener1, Mockito.times(1)).beforeIndexerDiscovery();
+        Mockito.verify(listener1, Mockito.times(10)).onDiscoveryRetry();
+        Mockito.verify(listener2, Mockito.times(1)).beforeIndexerDiscovery();
+        Mockito.verify(listener2, Mockito.times(10)).onDiscoveryRetry();
 
     }
 

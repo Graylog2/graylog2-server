@@ -16,14 +16,11 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.RateLimiter;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.CsrRequester;
-import org.graylog.security.certutil.CertificateAuthorityChangedEvent;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
