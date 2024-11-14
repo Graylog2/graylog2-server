@@ -73,6 +73,7 @@
 
                             <execution>
                                 <id>yarn install</id>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
@@ -83,10 +84,10 @@
                             </execution>
                             <execution>
                                 <id>Generate backend API types</id>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
-                                <phase>compile</phase>
                                 <configuration>
                                     <arguments>generate:apidefs</arguments>
                                 </configuration>
