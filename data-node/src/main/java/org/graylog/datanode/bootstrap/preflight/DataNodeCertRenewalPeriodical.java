@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
-import com.google.common.util.concurrent.RateLimiter;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.configuration.DatanodeKeystore;
@@ -39,6 +38,7 @@ import java.util.function.Supplier;
 public class DataNodeCertRenewalPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeCertRenewalPeriodical.class);
     public static final Duration PERIODICAL_DURATION = Duration.ofSeconds(2);
+    public static final Duration CSR_TRIGGER_PERIOD_LIMIT = Duration.ofMinutes(5);
 
     private final DatanodeKeystore datanodeKeystore;
     private final Supplier<RenewalPolicy> renewalPolicySupplier;
@@ -47,13 +47,7 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private final Supplier<Boolean> isServerInPreflightMode;
 
-    /**
-     * We need to differentiate between interval of the task scheduling and actual automatic CSR request triggering.
-     * This prevents flooding the server with CSR requests, which would then lead to repeated certificate signing and
-     * repeated opensearch process reboots. We want to check if the CSR is needed very often,
-     * but we don't want to trigger it many times in a row.
-     */
-    private final RateLimiter rateLimiter;
+    private Instant lastCsrRequest;
 
     @Inject
     public DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, ClusterConfigService clusterConfigService, CsrRequester csrRequester, PreflightConfigService preflightConfigService) {
@@ -65,8 +59,6 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
         this.renewalPolicySupplier = renewalPolicySupplier;
         this.csrRequester = csrRequester;
         this.isServerInPreflightMode = isServerInPreflightMode;
-        // Max 1 CSR every minute
-        this.rateLimiter = RateLimiter.create(1.0 / Duration.ofMinutes(5).toSeconds());
     }
 
     @Override
@@ -97,7 +89,9 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
     }
 
     private void automaticRenewal() {
-        if (rateLimiter.tryAcquire()) {
+        final Instant now = Instant.now();
+        if (lastCsrRequest == null || now.minus(CSR_TRIGGER_PERIOD_LIMIT).isAfter(lastCsrRequest)) {
+            lastCsrRequest = now;
             csrRequester.triggerCertificateSigningRequest();
         }
     }
