@@ -160,10 +160,11 @@ public class FailureSubmissionService {
      */
     public void submitIndexingErrors(Collection<IndexingError> indexingErrors) {
         try {
+            indexingErrors.forEach(ie -> updateIndexingFailureMetric(ie.message()));
+
             final FailureBatch fb = FailureBatch.indexingFailureBatch(
                     indexingErrors.stream()
                             .filter(ie -> {
-                                updateIndexingFailureMetric(ie.message());
                                 if (!ie.message().supportsFailureHandling()) {
                                     logger.warn("Submitted a message with indexing errors, which doesn't support failure handling!");
                                     return false;
