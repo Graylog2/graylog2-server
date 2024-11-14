@@ -20,6 +20,7 @@ import jakarta.annotation.Nullable;
 import jakarta.ws.rs.BadRequestException;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.inputs.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -116,7 +117,7 @@ class InputsResourceTest {
         public InputsTestResource(InputService inputService,
                                   MessageInputFactory messageInputFactory,
                                   Configuration config) {
-            super(inputService, messageInputFactory, config);
+            super(inputService, mock(InputDiagnosticService.class), messageInputFactory, config);
             configuration = mock(HttpConfiguration.class);
             this.user = mock(User.class);
             lenient().when(user.getName()).thenReturn("foo");
