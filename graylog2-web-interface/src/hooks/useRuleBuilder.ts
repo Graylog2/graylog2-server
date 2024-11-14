@@ -22,6 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { BlockDict, RuleBuilderRule } from 'components/rules/rule-builder/types';
 import useParams from 'routing/useParams';
+import { defaultOnError } from 'util/conditional/onError';
 
 export const saveRuleSourceCode = (sourceCode: string) => {
   sessionStorage.setItem('rule_source_code', sourceCode);
@@ -89,34 +90,22 @@ const useRuleBuilder = () => {
 
   const { data: rule, refetch: refetchRule, isFetching: isLoadingRule } = useQuery<RuleBuilderRule|null>(
     ['rule'],
-    () => fetchRule(ruleId),
+    () => defaultOnError(fetchRule(ruleId), 'Loading Rule Builder Rule failed with status', 'Could not load Rule Builder Rule.'),
     {
       enabled,
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Rule Builder Rule failed with status: ${errorThrown}`,
-          'Could not load Rule Builder Rule.');
-      },
     },
   );
   const { data: conditionsDict, refetch: refetchConditionsDict, isFetching: isLoadingConditionsDict } = useQuery<Array<BlockDict>>(
     ['conditions'],
-    fetchConditionsDict,
+    () => defaultOnError(fetchConditionsDict(), 'Loading Rule Builder Conditions list failed with status', 'Could not load Rule Builder Conditions list.'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Rule Builder Conditions list failed with status: ${errorThrown}`,
-          'Could not load Rule Builder Conditions list.');
-      },
       keepPreviousData: true,
     },
   );
   const { data: actionsDict, refetch: refetchActionsDict, isFetching: isLoadingActionsDict } = useQuery<Array<BlockDict>>(
     ['actions'],
-    fetchActionsDict,
+    () => defaultOnError(fetchActionsDict(), 'Loading Rule Builder Actions list failed with status', 'Could not load Rule Builder Actions list.'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Rule Builder Actions list failed with status: ${errorThrown}`,
-          'Could not load Rule Builder Actions list.');
-      },
       keepPreviousData: true,
     },
   );
