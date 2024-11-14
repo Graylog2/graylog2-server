@@ -14,27 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.telemetry.enterprise;
+package org.graylog2.telemetry;
 
-import jakarta.annotation.Nullable;
-import org.graylog2.system.traffic.TrafficCounterService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.List;
+public interface TelemetryDataProvider {
 
-public class DefaultTelemetryEnterpriseDataProvider implements TelemetryEnterpriseDataProvider {
-    @Override
-    public List<TelemetryLicenseStatus> licenseStatus() {
-        return List.of();
-    }
-
-    @Override
-    public int teamsCount(String userId) {
-        return 0;
-    }
-
-    @Nullable
-    @Override
-    public TrafficCounterService.TrafficHistograms enterpriseTraffic() {
-        return null;
-    }
+    ObjectNode apply(ObjectNode data, String userId);
 }

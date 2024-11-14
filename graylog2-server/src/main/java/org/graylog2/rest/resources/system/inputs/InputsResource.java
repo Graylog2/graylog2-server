@@ -195,8 +195,7 @@ public class InputsResource extends AbstractInputsResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input input = inputService.find(inputId);
-
-        final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
+        final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node(), input.getDesiredState());
 
         messageInput.checkConfiguration();
 

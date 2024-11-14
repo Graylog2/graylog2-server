@@ -14,19 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.telemetry.enterprise;
+package org.graylog2.rest.models.system.inputs.responses;
 
-import jakarta.annotation.Nullable;
-import org.graylog2.system.traffic.TrafficCounterService;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
-import java.util.List;
+@AutoValue
+@WithBeanGetter
+@JsonAutoDetect
+public abstract class InputSetup {
 
-public interface TelemetryEnterpriseDataProvider {
+    @JsonProperty
+    public abstract String id();
 
-    List<TelemetryLicenseStatus> licenseStatus();
-
-    int teamsCount(String userId);
-
-    @Nullable
-    TrafficCounterService.TrafficHistograms enterpriseTraffic();
+    @JsonCreator
+    public static InputSetup create(@JsonProperty("id") String id) {
+        return new AutoValue_InputSetup(id);
+    }
 }

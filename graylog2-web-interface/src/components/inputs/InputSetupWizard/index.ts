@@ -19,3 +19,4 @@ export { default as InputSetupWizardProvider } from './contexts/InputSetupWizard
 export { default as InputSetupWizard } from './InputSetupWizard';
 export { default as useInputSetupWizard } from './hooks/useInputSetupWizard';
 export * from './types';
+export * from './constants';
