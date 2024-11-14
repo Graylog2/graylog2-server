@@ -24,13 +24,12 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import MenuItem from 'components/bootstrap/MenuItem';
+import { MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import StopStreamsAction from 'components/streams/StreamsOverview/BulkActions/StopStreamsAction';
 import SearchStreamsAction from 'components/streams/StreamsOverview/BulkActions/SearchStreamsAction';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import IfPermitted from 'components/common/IfPermitted';
-import { DeleteMenuItem } from 'components/bootstrap';
 
 import StartStreamsAction from './StartStreamsAction';
 import AssignIndexSetModal from './AssignIndexSetModal';

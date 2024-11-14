@@ -21,7 +21,7 @@ import { Link } from 'react-router-dom';
 
 import Icon from 'components/common/Icon';
 
-import Menu from './Menu';
+import Menu from '../Menu';
 
 const IconWrapper = styled.div`
   display: inline-flex;
