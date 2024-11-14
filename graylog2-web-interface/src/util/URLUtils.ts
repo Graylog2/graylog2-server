@@ -98,6 +98,7 @@ const URLUtils = {
     try {
       // eslint-disable-next-line
       new URL(str);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (ignored) {
       isValid = false;
     }
