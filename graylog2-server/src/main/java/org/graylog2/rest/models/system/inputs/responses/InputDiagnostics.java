@@ -18,8 +18,11 @@ package org.graylog2.rest.models.system.inputs.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.Map;
 
 public record InputDiagnostics(
-        @JsonProperty("stream_message_count") Map<String, Long> streamMessageCount) {}
+        @JsonProperty("stream_message_count") Map<String, Long> streamMessageCount) {
+    public static InputDiagnostics EMPTY_DIAGNOSTICS = new InputDiagnostics(Collections.emptyMap());
+}
 

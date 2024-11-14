@@ -45,6 +45,7 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.inputs.Input;
+import org.graylog2.inputs.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.encryption.EncryptedInputConfigs;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -81,13 +82,15 @@ public class InputsResource extends AbstractInputsResource {
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
 
     private final InputService inputService;
+    private final InputDiagnosticService inputDiagnosticService;
     private final MessageInputFactory messageInputFactory;
     private final Configuration config;
 
     @Inject
-    public InputsResource(InputService inputService, MessageInputFactory messageInputFactory, Configuration config) {
+    public InputsResource(InputService inputService, InputDiagnosticService inputDiagnosticService, MessageInputFactory messageInputFactory, Configuration config) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
+        this.inputDiagnosticService = inputDiagnosticService;
         this.messageInputFactory = messageInputFactory;
         this.config = config;
     }
@@ -119,7 +122,7 @@ public class InputsResource extends AbstractInputsResource {
                                         @PathParam("inputId") String inputId,
                                         @Context SearchUser searchUser) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
-        return inputService.getInputDiagnostics(inputService.find(inputId), searchUser);
+        return inputDiagnosticService.getInputDiagnostics(inputService.find(inputId), searchUser);
     }
 
     @GET

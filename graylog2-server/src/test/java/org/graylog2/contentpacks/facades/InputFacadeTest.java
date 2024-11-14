@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.graph.Graph;
 import org.apache.commons.collections.map.HashedMap;
-import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -142,10 +141,7 @@ public class InputFacadeTest {
                 Executors.newScheduledThreadPool(1));
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternRegistry, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
-        inputService = new InputServiceImpl(
-                mongodb.mongoConnection(), extractorFactory, converterFactory,
-                messageInputFactory, clusterEventBus, new ObjectMapperProvider().get(),
-                mock(SearchExecutor.class));
+        inputService = new InputServiceImpl(mongodb.mongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus, new ObjectMapperProvider().get());
         final InputRegistry inputRegistry = new InputRegistry();
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
         Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories = new HashMap<>();

@@ -16,7 +16,6 @@
  */
 package org.graylog2.inputs;
 
-import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.database.Persisted;
@@ -24,7 +23,6 @@ import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.rest.models.system.inputs.responses.InputDiagnostics;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 
 import java.util.Collection;
@@ -119,6 +117,4 @@ public interface InputService extends PersistedService {
     List<Map.Entry<String, String>> getStaticFields(Input input);
 
     void persistDesiredState(Input input, IOState.Type desiredState);
-
-    InputDiagnostics getInputDiagnostics(Input input, SearchUser currentUser);
 }

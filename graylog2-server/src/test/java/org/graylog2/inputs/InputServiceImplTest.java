@@ -17,7 +17,6 @@
 package org.graylog2.inputs;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.NotFoundException;
@@ -91,8 +90,7 @@ public class InputServiceImplTest {
                 converterFactory,
                 messageInputFactory,
                 clusterEventBus,
-                new ObjectMapperProvider().get(),
-                mock(SearchExecutor.class));
+                new ObjectMapperProvider().get());
     }
 
     @Test
