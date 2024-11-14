@@ -97,6 +97,7 @@ public record OpensearchConfiguration(
         List<String> javaOpts = new LinkedList<>();
         javaOpts.add("-Xms%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
         javaOpts.add("-Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
+        javaOpts.add("-Dopensearch.transport.cname_in_publish_address=true");
 
         opensearchSecurityConfiguration.getTruststore().ifPresent(truststore -> {
             javaOpts.add("-Djavax.net.ssl.trustStore=" + truststore.location().toAbsolutePath());
