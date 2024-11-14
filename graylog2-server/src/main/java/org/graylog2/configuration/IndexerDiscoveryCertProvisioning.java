@@ -14,21 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.preflight;
+package org.graylog2.configuration;
 
-import com.google.inject.AbstractModule;
+import jakarta.inject.Inject;
 import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioner;
-import org.graylog2.bootstrap.preflight.GraylogCertificateProvisionerImpl;
-import org.graylog2.cluster.certificates.CertificateExchange;
-import org.graylog2.cluster.certificates.CertificateExchangeImpl;
-import org.graylog2.configuration.IndexerDiscoverySecurityAutoconfig;
 
-public class GraylogServerProvisioningBindings extends AbstractModule {
+public class IndexerDiscoveryCertProvisioning implements IndexerDiscoveryListener {
+
+    private final GraylogCertificateProvisioner graylogCertificateProvisioner;
+
+    @Inject
+    public IndexerDiscoveryCertProvisioning(GraylogCertificateProvisioner graylogCertificateProvisioner) {
+        this.graylogCertificateProvisioner = graylogCertificateProvisioner;
+    }
 
     @Override
-    protected void configure() {
-        bind(CertificateExchange.class).to(CertificateExchangeImpl.class);
-        bind(GraylogCertificateProvisioner.class).to(GraylogCertificateProvisionerImpl.class);
-        bind(IndexerDiscoverySecurityAutoconfig.class);
+    public void beforeIndexerDiscovery() {
+
+    }
+
+    @Override
+    public void onDiscoveryRetry() {
+        // let's try to provision certificates, maybe there are datanodes waiting for these
+        graylogCertificateProvisioner.runProvisioning();
     }
 }

@@ -37,7 +37,8 @@ import java.util.function.Supplier;
 @Singleton
 public class DataNodeCertRenewalPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeCertRenewalPeriodical.class);
-    public static final Duration PERIODICAL_DURATION = Duration.ofMinutes(30);
+    public static final Duration PERIODICAL_DURATION = Duration.ofSeconds(2);
+    public static final Duration CSR_TRIGGER_PERIOD_LIMIT = Duration.ofMinutes(5);
 
     private final DatanodeKeystore datanodeKeystore;
     private final Supplier<RenewalPolicy> renewalPolicySupplier;
@@ -46,13 +47,11 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private final Supplier<Boolean> isServerInPreflightMode;
 
+    private Instant lastCsrRequest;
+
     @Inject
     public DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, ClusterConfigService clusterConfigService, CsrRequester csrRequester, PreflightConfigService preflightConfigService) {
         this(datanodeKeystore, () -> clusterConfigService.get(RenewalPolicy.class), csrRequester, () -> isInPreflight(preflightConfigService));
-    }
-
-    private static boolean isInPreflight(PreflightConfigService preflightConfigService) {
-        return preflightConfigService.getPreflightConfigResult() != PreflightConfigResult.FINISHED;
     }
 
     protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode) {
@@ -61,7 +60,6 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
         this.csrRequester = csrRequester;
         this.isServerInPreflightMode = isServerInPreflightMode;
     }
-
 
     @Override
     public void doRun() {
@@ -80,7 +78,10 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
                         case MANUAL -> manualRenewal();
                     }
                 });
+    }
 
+    private static boolean isInPreflight(PreflightConfigService preflightConfigService) {
+        return preflightConfigService.getPreflightConfigResult() != PreflightConfigResult.FINISHED;
     }
 
     private void manualRenewal() {
@@ -88,7 +89,11 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
     }
 
     private void automaticRenewal() {
-        csrRequester.triggerCertificateSigningRequest();
+        final Instant now = Instant.now();
+        if (lastCsrRequest == null || now.minus(CSR_TRIGGER_PERIOD_LIMIT).isAfter(lastCsrRequest)) {
+            lastCsrRequest = now;
+            csrRequester.triggerCertificateSigningRequest();
+        }
     }
 
     private boolean needsNewCertificate(RenewalPolicy renewalPolicy) {
