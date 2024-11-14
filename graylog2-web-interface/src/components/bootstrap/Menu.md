@@ -1,6 +1,6 @@
 #### Simple implementation
 ```tsx
-import { Menu, MenuItem, MenuItemDelete, Button } from 'components/bootstrap';
+import { Menu, MenuItem, DeleteMenuItem, Button } from 'components/bootstrap';
 
 <Menu>
   <Menu.Target>
@@ -9,7 +9,7 @@ import { Menu, MenuItem, MenuItemDelete, Button } from 'components/bootstrap';
   <Menu.Dropdown>
     <MenuItem onClick={() => console.log('on click menu item')}>Edit</MenuItem>
     <Menu.Divider />
-    <MenuItemDelete onClick={() => console.log('on click menu item')}>Delete</MenuItemDelete>
+    <DeleteMenuItem onClick={() => console.log('on click menu item')}>Delete</DeleteMenuItem>
   </Menu.Dropdown>
 </Menu>
 ```
