@@ -219,7 +219,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .isEmpty()) {
             return false;
         }
-        LOG.info("Suppressed notification in Cloud");
+        LOG.debug("Suppressed node_not_connected notification in Cloud");
         return true;
     }
 
