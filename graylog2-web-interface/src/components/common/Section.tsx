@@ -68,20 +68,22 @@ type Props = React.PropsWithChildren<{
  */
 const Section = ({
   title,
-  header,
-  actions,
-  headerLeftSection,
+  header = null,
+  actions = null,
+  headerLeftSection = null,
   collapsible = false,
   defaultClosed = false,
   onCollapse = () => {},
   disableCollapseButton = false,
-  children,
+  children = null,
 }: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
+
   const onToggle = () => {
     toggle();
     onCollapse(opened);
-  }
+  };
+
   const onHeaderClick = () => (!disableCollapseButton && onToggle());
 
   return (
@@ -92,6 +94,7 @@ const Section = ({
           {headerLeftSection && <FlexWrapper onClick={(e) => { e.stopPropagation(); }}>{headerLeftSection}</FlexWrapper>}
         </FlexWrapper>
         <FlexWrapper>
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           {actions && <div onClick={(e) => { e.stopPropagation(); }}>{actions}</div>}
           {collapsible && (
           <Button bsSize="sm"

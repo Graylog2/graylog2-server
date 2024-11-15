@@ -68,7 +68,7 @@ describe('Section', () => {
   });
 
   it('should execute onCollapse', async () => {
-    const onCollapse = jest.fn()
+    const onCollapse = jest.fn();
 
     render(
       <Section title="The Title" collapsible onCollapse={onCollapse}>
