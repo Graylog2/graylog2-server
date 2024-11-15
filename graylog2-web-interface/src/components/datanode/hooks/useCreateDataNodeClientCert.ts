@@ -24,7 +24,16 @@ export type ClientCertFormValues = {
   principal : string,
   role : string,
   password : string,
+  lifetimeValue: number,
+  lifetimeUnit: string,
 }
+export type CreateClientCertRequest = {
+  principal : string,
+  role : string,
+  password : string,
+  certificate_lifetime: string,
+}
+
 export type ClientCertCreateResponse = {
   principal: string,
   role: string,
@@ -32,7 +41,7 @@ export type ClientCertCreateResponse = {
   private_key: string,
   certificate: string,
 }
-const createClientCa = (clientCertFormData: ClientCertFormValues) => fetch<ClientCertCreateResponse>(
+const createClientCa = (clientCertFormData: CreateClientCertRequest) => fetch<ClientCertCreateResponse>(
   'POST',
   qualifyUrl('ca/clientcert'),
   clientCertFormData,
@@ -40,7 +49,7 @@ const createClientCa = (clientCertFormData: ClientCertFormValues) => fetch<Clien
 );
 
 const useCreateDataNodeClientCert = (): {
-  onCreateClientCert: (values: ClientCertFormValues) => Promise<ClientCertCreateResponse>,
+  onCreateClientCert: (values: CreateClientCertRequest) => Promise<ClientCertCreateResponse>,
   isLoading: boolean,
   isError: boolean,
   error: Error,

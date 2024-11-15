@@ -21,4 +21,5 @@ import org.joda.time.DateTime;
 public interface TrafficCounterCalculator {
 
     void calculate(DateTime previousMinute);
+
 }
