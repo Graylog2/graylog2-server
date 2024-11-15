@@ -203,7 +203,7 @@ public class FailureSubmissionService {
     private void updateProcessingFailureMetric(Message message) {
         Object inputId = message.getField(FIELD_GL2_SOURCE_INPUT);
         if (inputId != null) {
-            final String indexingFailureMetricName = name("org.graylog2", inputId.toString(), "failures.processing");
+            final String indexingFailureMetricName = name("org.graylog2.inputs", inputId.toString(), "failures.processing");
             metricRegistry.meter(indexingFailureMetricName).mark();
         }
     }
@@ -212,7 +212,7 @@ public class FailureSubmissionService {
         final Map<String, Object> searchObject = message.toElasticSearchObject(objectMapper, dummyMeter);
         Object inputId = searchObject.get(FIELD_GL2_SOURCE_INPUT);
         if (inputId != null) {
-            final String indexingFailureMetricName = name("org.graylog2", inputId.toString(), "failures.indexing");
+            final String indexingFailureMetricName = name("org.graylog2.inputs", inputId.toString(), "failures.indexing");
             metricRegistry.meter(indexingFailureMetricName).mark();
         }
     }
