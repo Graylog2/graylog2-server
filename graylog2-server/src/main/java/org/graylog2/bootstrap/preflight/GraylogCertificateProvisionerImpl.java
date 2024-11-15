@@ -58,7 +58,7 @@ public class GraylogCertificateProvisionerImpl implements GraylogCertificateProv
                 return;
             }
 
-            certificateExchange.signPendingCertificateRequests(request -> caKeystore.signCertificateRequest(request, renewalPolicy));
+            certificateExchange.signPendingCertificateRequests(request -> caKeystore.signCertificateRequest(request, renewalPolicy.parsedCertificateLifetime()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
