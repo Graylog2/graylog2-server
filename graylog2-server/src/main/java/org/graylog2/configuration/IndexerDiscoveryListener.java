@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight.web.resources.model;
+package org.graylog2.configuration;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotNull;
+public interface IndexerDiscoveryListener {
+    /**
+     * Triggered before we start with indexer discovery. Won't be triggered if there are any indexers
+     * explicitly defined in the configuration.
+     */
+    void beforeIndexerDiscovery();
 
-public record CreateClientCertRequest(
-        @JsonProperty("principal") String principal,
-        @JsonProperty("role") String role,
-        @JsonProperty("password") String password,
-        @JsonProperty("certificate_lifetime") @NotNull String certificateLifetime
-) {}
+    /**
+     * Triggered after each unsuccessful retry during indexer discovery
+     */
+    void onDiscoveryRetry();
+}
