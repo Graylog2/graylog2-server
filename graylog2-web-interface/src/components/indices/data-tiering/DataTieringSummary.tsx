@@ -18,7 +18,6 @@ import React from 'react';
 
 import type { DataTieringConfig } from 'components/indices/data-tiering';
 import { durationToRoundedDays } from 'components/indices/data-tiering';
-import { dataTieringPropType } from 'components/indices/data-tiering/types';
 
 type Props = {
   config: DataTieringConfig
@@ -36,9 +35,5 @@ const DataTieringSummary = ({ config } : Props) => (
     </dl>
   </div>
 );
-
-DataTieringSummary.propTypes = {
-  config: dataTieringPropType.isRequired,
-};
 
 export default DataTieringSummary;

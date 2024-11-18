@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { useEffect, useState } from 'react';
 
@@ -75,13 +74,6 @@ const LoadingIndicator = ({ text = 'Loading...', longWaitText = 'This is taking 
       </Container>
     </Delayed>
   );
-};
-
-LoadingIndicator.propTypes = {
-  /** Text to display while the indicator is shown. */
-  text: PropTypes.string,
-  longWaitText: PropTypes.string,
-  longWaitTimeout: PropTypes.number,
 };
 
 export default LoadingIndicator;

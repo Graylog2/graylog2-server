@@ -194,7 +194,7 @@ public class AmqpTransport extends ThrottleableTransport2 {
             } catch (Exception e) {
                 inputFailureRecorder.setFailing(getClass(), "Could not launch AMQP consumer.", e);
             }
-        }, 0, connectionRecoveryInterval().getSeconds(), TimeUnit.SECONDS);
+        }, 0, connectionRecoveryInterval().toSeconds(), TimeUnit.SECONDS);
     }
 
     private void cancelConsumerRunScheduler() {

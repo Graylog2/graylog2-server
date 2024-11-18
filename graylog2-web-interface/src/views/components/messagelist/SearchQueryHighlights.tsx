@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
@@ -37,10 +36,5 @@ const SearchQueryHighlights = ({ field, value }: Props) => (
     )}
   </AdditionalContext.Consumer>
 );
-
-SearchQueryHighlights.propTypes = {
-  field: PropTypes.string.isRequired,
-  value: PropTypes.any.isRequired,
-};
 
 export default SearchQueryHighlights;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { createContext, useEffect, useRef, useCallback, useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
 
 import type { RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
@@ -182,16 +181,4 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: 
       {children}
     </PipelineRulesContext.Provider>
   );
-};
-
-PipelineRulesProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  usedInPipelines: PropTypes.array,
-  rule: PropTypes.shape({
-    id: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    source: PropTypes.string,
-    simulator_message: PropTypes.string,
-  }),
 };

@@ -37,27 +37,39 @@ const CompatibilityCheckStep = ({ currentStep, onTriggerStep, hideActions }: Mig
   }
 
   const errors = Object.values(data || {}).flatMap((value) => (value?.compatibility_errors || []));
+  const warnings = Object.values(data || {}).flatMap((value) => (value?.compatibility_warnings || []));
   const isCompatible = errors.length === 0;
 
   return (
     <>
       <h3>Directory compatibility check</h3>
-      <CompatibilityAlert bsStyle={(!isError && isCompatible) ? 'success' : 'danger'}>
-        {isCompatible && <h4>Your existing OpenSearch data can be migrated to Data Node.</h4>}
-        {!isError && !isCompatible && (
-          <>
-            <h4>Your existing OpenSearch data cannot be migrated to Data Node.</h4>
-            <br />
-            Error: {errors} {errors.map((error) => <dd key={error}>{error}</dd>)}
-          </>
-        )}
-        {isError && (
-          <>
-            <h4>There was an error checking the compatibility</h4>
-            <p>{requestError.message}</p>
-          </>
-        )}
-      </CompatibilityAlert>
+      {isCompatible && !warnings.length && (
+        <CompatibilityAlert bsStyle="success">
+          <h4>Your existing OpenSearch data can be migrated to Data Node.</h4>
+        </CompatibilityAlert>
+      )}
+      {(!isCompatible || isError) && (
+        <CompatibilityAlert bsStyle="danger">
+          {!isError && !isCompatible && (
+            <>
+              <h4>Your existing OpenSearch data cannot be migrated to Data Node.</h4>
+              <br />
+              {errors.map((error) => <dd key={error}>{error}</dd>)}
+            </>
+          )}
+          {isError && (
+            <>
+              <h4>There was an error checking the compatibility</h4>
+              <p>{requestError.message}</p>
+            </>
+          )}
+        </CompatibilityAlert>
+      )}
+      {warnings.length > 0 && (
+        <CompatibilityAlert bsStyle="warning">
+          {warnings.map((warning) => <dd key={warning}>{warning}</dd>)}
+        </CompatibilityAlert>
+      )}
       <br />
       {!isCompatible && (<p>Your OpenSearch cluster cannot be migrated to this Data Node version because it&apos;s not compatible.</p>)}
       {isCompatible && data && Object.keys(data).map((hostname) => (

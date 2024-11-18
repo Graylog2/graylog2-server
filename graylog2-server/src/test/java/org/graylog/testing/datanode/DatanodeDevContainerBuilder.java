@@ -26,7 +26,6 @@ import java.util.Map;
 public interface DatanodeDevContainerBuilder {
     DatanodeDevContainerBuilder mongoDbUri(final String mongoDbUri);
     DatanodeDevContainerBuilder passwordSecret(final String passwordSecret);
-    DatanodeDevContainerBuilder rootPasswordSha2(final String rootPasswordSha2);
 
     DatanodeDevContainerBuilder rootUsername(String rootUsername);
 

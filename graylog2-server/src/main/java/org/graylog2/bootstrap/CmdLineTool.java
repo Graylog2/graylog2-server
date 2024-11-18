@@ -590,7 +590,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         return bootstrapConfigInjector;
     }
 
-    private void featureFlagsBinding(Binder binder) {
+    protected void featureFlagsBinding(Binder binder) {
         binder.bind(FeatureFlags.class).toInstance(featureFlags);
     }
 

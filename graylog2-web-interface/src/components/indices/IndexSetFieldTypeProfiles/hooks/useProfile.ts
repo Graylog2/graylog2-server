@@ -16,13 +16,13 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type {
   IndexSetFieldTypeProfileJson,
   IndexSetFieldTypeProfile,
 } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA: IndexSetFieldTypeProfile = {
   customFieldMappings: [],
@@ -52,12 +52,8 @@ const useProfile = (id: string): {
 } => {
   const { data, isFetched, isFetching, refetch } = useQuery(
     ['indexSetFieldTypeProfile', id],
-    () => fetchIndexSetFieldTypeProfile(id),
+    () => defaultOnError(fetchIndexSetFieldTypeProfile(id), 'Loading index field type profile failed with status', 'Could not load index field type profile'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index field type profile failed with status: ${errorThrown}`,
-          'Could not load index field type profile');
-      },
       keepPreviousData: true,
       enabled: !!id,
     },

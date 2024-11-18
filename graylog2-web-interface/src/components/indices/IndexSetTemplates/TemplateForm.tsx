@@ -18,7 +18,6 @@
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
@@ -31,7 +30,6 @@ import type {
 } from 'components/indices/Types';
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import type { IndexSetTemplateFormValues, IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { FormikInput, FormSubmit, InputOptionalInfo, Section, Spinner, TimeUnitInput } from 'components/common';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
@@ -362,11 +360,3 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
 };
 
 export default TemplateForm;
-
-TemplateForm.propTypes = {
-  initialValues: indexSetTemplatePropType,
-  submitButtonText: PropTypes.string.isRequired,
-  submitLoadingText: PropTypes.string.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-};

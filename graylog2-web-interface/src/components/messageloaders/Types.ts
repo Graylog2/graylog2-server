@@ -15,21 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export type Input = {
-  id: string,
+interface InputBase {
   title: string,
-  name: string,
   type: string,
-  attributes: {
-    [type: string]: any,
-  },
+  global: boolean,
+  node?: string,
+}
+
+export interface Input extends InputBase {
+  id: string,
+  name: string,
   created_at: string,
   creator_user_id: string,
   content_pack?: boolean,
-  global: boolean,
   static_fields: { [field: string]: any },
-  node?: string,
-};
+  attributes: {
+    [type: string]: any,
+  },
+}
+
+export interface ConfiguredInput extends InputBase {
+  configuration: {
+    [type: string]: any,
+  },
+}
 
 export type Codec ={
   type: string,

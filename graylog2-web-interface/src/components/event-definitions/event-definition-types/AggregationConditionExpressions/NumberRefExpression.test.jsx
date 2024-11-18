@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
 import NumberRefExpression from './NumberRefExpression';
 

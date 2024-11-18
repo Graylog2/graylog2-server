@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import ErrorPage from 'components/errors/ErrorPage';
 
@@ -32,10 +31,6 @@ const NotFoundPage = ({ displayPageLayout = true }: Props) => {
   );
 
   return (<ErrorPage title="Page not found" description={description} displayPageLayout={displayPageLayout} />);
-};
-
-NotFoundPage.propTypes = {
-  displayPageLayout: PropTypes.bool,
 };
 
 export default NotFoundPage;

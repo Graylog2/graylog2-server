@@ -24,6 +24,8 @@ import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
 import type { ColumnRenderer } from 'components/common/EntityDataTable/types';
+import type { StepType } from 'components/common/Wizard';
+import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 
 interface PluginRoute {
   path: string;
@@ -149,6 +151,12 @@ type DataTiering = {
   }>,
 }
 
+type InputSetupWizard = {
+  steps: {
+    [key in InputSetupWizardStep]?: StepType
+  }
+}
+
 type License = {
   EnterpriseTrafficGraph: React.ComponentType,
   LicenseGraphWithMetrics: React.ComponentType,
@@ -160,10 +168,16 @@ type License = {
   }>,
 }
 
-type FieldValueProvider = {
+export type FieldValueProvider = {
   type: string,
   displayName: string,
-  formComponent: React.ComponentType,
+  formComponent: React.ComponentType<{
+    fieldName: string,
+    config: EventDefinition['field_spec'][number],
+    onChange: (nextConfig: EventDefinition['field_spec'][number]) => void,
+    validation: any,
+    currentUser: User,
+  }>,
   summaryComponent: React.ComponentType<{
     fieldName: string,
     keys: Array<string>,
@@ -175,11 +189,7 @@ type FieldValueProvider = {
     table_name?: string,
     key_field?: string,
   },
-  requiredFields: {
-    template?: string,
-    table_name?: string,
-    key_field?: string,
-  },
+  requiredFields: string[],
 }
 
 interface PluginDataWarehouse {
@@ -232,6 +242,7 @@ declare module 'graylog-web-plugin/plugin' {
     globalNotifications?: Array<GlobalNotification>;
     fieldValueProviders?:Array<FieldValueProvider>;
     license?: Array<License>,
+    inputSetupWizard?: Array<InputSetupWizard>;
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,

@@ -22,6 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
+import { defaultOnError } from 'util/conditional/onError';
 
 export type BundleFile = {
   size: number;
@@ -63,12 +64,8 @@ const useClusterSupportBundle = () => {
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const { data, refetch } = useQuery<BundleFile[]>(
     ['supportBundleList', 'overview'],
-    fetchSupportBundleList,
+    () => defaultOnError(fetchSupportBundleList(), 'Loading Support Bundle list failed with status', 'Could not load Support Bundle list.'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Support Bundle list failed with status: ${errorThrown}`,
-          'Could not load Support Bundle list.');
-      },
       keepPreviousData: true,
     },
   );

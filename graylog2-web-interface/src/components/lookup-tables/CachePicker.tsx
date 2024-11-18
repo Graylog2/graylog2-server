@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useField } from 'formik';
 import type { LookupTableCache } from 'src/logic/lookup-tables/types';
 
@@ -53,10 +52,6 @@ const CachePicker = ({ caches = [] }: Props) => {
       </Input>
     </fieldset>
   );
-};
-
-CachePicker.propTypes = {
-  caches: PropTypes.array,
 };
 
 export default CachePicker;

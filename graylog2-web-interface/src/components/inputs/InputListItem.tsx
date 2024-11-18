@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import type { Input } from 'components/messageloaders/Types';
+import type { Input, ConfiguredInput } from 'components/messageloaders/Types';
 import { useStore } from 'stores/connect';
 import AppConfig from 'util/AppConfig';
 import { LinkContainer } from 'components/common/router';
@@ -37,10 +37,15 @@ import {
 } from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import type { InputStates } from 'stores/inputs/InputStatesStore';
+import { isInputInSetupMode, isInputRunning } from 'components/inputs/helpers/inputState';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import useFeature from 'hooks/useFeature';
+import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
 
 type Props = {
   input: Input,
@@ -66,6 +71,8 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const { inputTypes, inputDescriptions } = useStore(InputTypesStore);
+  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+  const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
 
   const deleteInput = () => {
     setShowConfirmDeleteDialog(true);
@@ -80,13 +87,31 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
     });
   };
 
-  const updateInput = (inputData: Input) => {
+  const updateInput = (inputData: ConfiguredInput) => {
     InputsActions.update(input.id, inputData);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_UPDATED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-edit',
     });
+  };
+
+  const enterInputSetupMode = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_ENTERED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_action_value: 'input-enter-setup',
+    });
+
+    InputStatesStore.setup(input);
+  };
+
+  const exitInputSetupMode = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_EXITED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_action_value: 'input-exit-setup',
+    });
+
+    InputStatesStore.stop(input);
   };
 
   const handleConfirmDelete = () => {
@@ -176,6 +201,23 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
                   disabled={definition === undefined}>
           Edit input
         </MenuItem>
+        {inputSetupFeatureFlagIsEnabled && (
+          isInputInSetupMode(inputStates, input.id) ? (
+            <MenuItem key={`remove-setup-mode-${input.id}`}
+                      onSelect={exitInputSetupMode}
+                      disabled={definition === undefined}>
+              Exit Setup mode
+            </MenuItem>
+          ) : (
+            !isInputRunning(inputStates, input.id) && (
+            <MenuItem key={`setup-mode-${input.id}`}
+                      onSelect={enterInputSetupMode}
+                      disabled={definition === undefined}>
+              Enter Setup mode
+            </MenuItem>
+            )
+          )
+        )}
       </IfPermitted>
 
       {input.global && (
@@ -220,8 +262,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
   const additionalContent = (
     <div>
       <Col md={8}>
-        <ConfigurationWell className="configuration-well"
-                           id={input.id}
+        <ConfigurationWell id={input.id}
                            configuration={input.attributes}
                            typeDefinition={definition || {}} />
         {showStaticFieldForm && (

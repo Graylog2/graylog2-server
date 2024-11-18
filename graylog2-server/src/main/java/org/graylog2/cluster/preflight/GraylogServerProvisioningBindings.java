@@ -21,6 +21,7 @@ import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioner;
 import org.graylog2.bootstrap.preflight.GraylogCertificateProvisionerImpl;
 import org.graylog2.cluster.certificates.CertificateExchange;
 import org.graylog2.cluster.certificates.CertificateExchangeImpl;
+import org.graylog2.configuration.IndexerDiscoverySecurityAutoconfig;
 
 public class GraylogServerProvisioningBindings extends AbstractModule {
 
@@ -28,5 +29,6 @@ public class GraylogServerProvisioningBindings extends AbstractModule {
     protected void configure() {
         bind(CertificateExchange.class).to(CertificateExchangeImpl.class);
         bind(GraylogCertificateProvisioner.class).to(GraylogCertificateProvisionerImpl.class);
+        bind(IndexerDiscoverySecurityAutoconfig.class);
     }
 }

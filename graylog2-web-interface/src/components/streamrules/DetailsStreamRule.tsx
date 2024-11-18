@@ -16,7 +16,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -134,17 +133,6 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
       )}
     </tr>
   );
-};
-
-DetailsStreamRule.propTypes = {
-  matchData: PropTypes.shape({
-    matches: PropTypes.bool,
-    rules: PropTypes.object,
-  }),
-  onDelete: PropTypes.func,
-  onSubmit: PropTypes.func,
-  stream: PropTypes.object.isRequired,
-  streamRule: PropTypes.object.isRequired,
 };
 
 export default DetailsStreamRule;

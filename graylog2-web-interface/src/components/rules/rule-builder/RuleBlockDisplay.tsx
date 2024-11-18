@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Button, Col, Label, Row, MenuItem } from 'components/bootstrap';
@@ -24,7 +23,7 @@ import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
 import type { BlockType, RuleBlock } from './types';
-import { ruleBlockPropType, RuleBuilderTypes } from './types';
+import { RuleBuilderTypes } from './types';
 import { useRuleBuilder } from './RuleBuilderContext';
 
 type Props = {
@@ -125,6 +124,7 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
     return (partsWithHighlight.map((item, index) => (
 
       (
+
         <React.Fragment key={index}>
           {item}
         </React.Fragment>
@@ -201,14 +201,6 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
       </Col>
     </StyledRow>
   );
-};
-
-RuleBlockDisplay.propTypes = {
-  block: ruleBlockPropType,
-  onDelete: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  negatable: PropTypes.bool,
-  onNegate: PropTypes.func.isRequired,
 };
 
 export default RuleBlockDisplay;

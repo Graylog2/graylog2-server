@@ -100,30 +100,23 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
         fixJdkOnMac(config);
-        configureS3RepositoryPlugin(config);
+        configureOpensearchKeystoreSecrets(config);
         final Path executable = config.opensearchDistribution().getOpensearchExecutable();
         writeOpenSearchConfig(config);
         resultHandler = new CommandLineProcessListener(listener);
         commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, config.getEnv());
     }
 
-    private void configureS3RepositoryPlugin(OpensearchConfiguration config) {
-        if (config.s3RepositoryConfiguration().isRepositoryEnabled()) {
-            final OpensearchCli opensearchCli = new OpensearchCli(config);
-            configureS3Credentials(opensearchCli, config);
-        } else {
-            LOG.info("No S3 repository configuration provided, skipping plugin initialization");
-        }
-    }
-
-    private void configureS3Credentials(OpensearchCli opensearchCli, OpensearchConfiguration config) {
+    private void configureOpensearchKeystoreSecrets(OpensearchConfiguration config) {
+        final OpensearchCli opensearchCli = new OpensearchCli(config);
         LOG.info("Creating opensearch keystore");
         final String createdMessage = opensearchCli.keystore().create();
         LOG.info(createdMessage);
-        LOG.info("Setting opensearch s3 repository keystore secrets");
-        opensearchCli.keystore().add("s3.client.default.access_key", config.s3RepositoryConfiguration().getS3ClientDefaultAccessKey());
-        opensearchCli.keystore().add("s3.client.default.secret_key", config.s3RepositoryConfiguration().getS3ClientDefaultSecretKey());
+        final Map<String, String> keystoreItems = config.getKeystoreItems();
+        keystoreItems.forEach((key, value) -> opensearchCli.keystore().add(key, value));
+        LOG.info("Added {} keystore items", keystoreItems.size());
     }
+
 
     private static Map<String, Object> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
         Map<String, Object> allArguments = new LinkedHashMap<>(config.asMap());

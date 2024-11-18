@@ -16,9 +16,9 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { SystemFieldTypes } from '@graylog/server-api';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
   fieldTypes: {},
@@ -36,12 +36,8 @@ const useFieldTypesForMappings = (): {
 } => {
   const { data, isLoading } = useQuery(
     ['fieldTypeOptions'],
-    fetchFieldTypes,
+    () => defaultOnError(fetchFieldTypes(), 'Loading field type options failed with status', 'Could not load field type options'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading field type options failed with status: ${errorThrown}`,
-          'Could not load field type options');
-      },
       keepPreviousData: true,
     },
   );

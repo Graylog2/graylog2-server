@@ -16,13 +16,12 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
-import WidgetModel from 'views/logic/widgets/Widget';
+import type WidgetModel from 'views/logic/widgets/Widget';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
@@ -252,18 +251,21 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
 
   const { config } = widget;
   const isFocused = focusedWidget?.id === id;
+  const titleIcon = (
+    <IfDashboard>
+      {!editing && (
+        <WidgetWarmTierAlert widgetId={id} activeQuery={activeQuery} />
+      )}
+    </IfDashboard>
+  );
 
   return (
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
-        <IfDashboard>
-          {!editing && (
-            <WidgetWarmTierAlert widgetId={id} activeQuery={activeQuery} />
-          )}
-        </IfDashboard>
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader title={title}
+                          titleIcon={titleIcon}
                           hideDragHandle={!interactive || isFocused}
                           loading={loading}
                           editing={editing}
@@ -306,14 +308,6 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
       </WidgetFrame>
     </WidgetColorContext>
   );
-};
-
-Widget.propTypes = {
-  editing: PropTypes.bool,
-  id: PropTypes.string.isRequired,
-  onPositionsChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  widget: PropTypes.instanceOf(WidgetModel).isRequired,
 };
 
 export default Widget;

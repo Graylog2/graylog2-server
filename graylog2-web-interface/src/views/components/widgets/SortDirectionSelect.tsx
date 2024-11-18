@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import Select from 'components/common/Select';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -37,11 +36,5 @@ const SortDirectionSelect = ({ direction, disabled = false, onChange = () => {} 
           placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
           value={direction ?? null} />
 );
-
-SortDirectionSelect.propTypes = {
-  direction: PropTypes.string,
-  disabled: PropTypes.bool,
-  onChange: PropTypes.func,
-};
 
 export default SortDirectionSelect;

@@ -16,10 +16,10 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
+import { defaultOnError } from 'util/conditional/onError';
 
 export type FieldOptions = Array<{ value: string, label: string, disabled: boolean }>;
 export type CurrentTypes = Record<string, string>;
@@ -49,12 +49,8 @@ const useIndexSetFieldTypesAll = (indexSetId: string): {
 } => {
   const { data, isLoading, refetch } = useQuery(
     ['indexSetFieldTypesAll', indexSetId],
-    () => fetchIndexSetFieldTypesAll(indexSetId),
+    () => defaultOnError(fetchIndexSetFieldTypesAll(indexSetId), 'Loading index field types failed with status', 'Could not load index field types'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index field types failed with status: ${errorThrown}`,
-          'Could not load index field types');
-      },
       keepPreviousData: true,
       enabled: !!indexSetId,
     },

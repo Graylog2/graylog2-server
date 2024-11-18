@@ -39,6 +39,7 @@ import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -62,8 +63,13 @@ class CsrSignerTest {
         var cert = createCert(keyPair);
         var privateKey = keyPair.getPrivate();
         var csr = createCSR(keyPair);
+        final Duration certificateLifetime = getCertificateLifetime(lifetime);
+        return new CsrSigner(fixedClock).sign(privateKey, cert, csr, certificateLifetime);
+    }
 
-        return new CsrSigner(fixedClock).sign(privateKey, cert, csr, new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, lifetime));
+    private static Duration getCertificateLifetime(String lifetime) {
+        final RenewalPolicy rp = new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, lifetime);
+        return rp.parsedCertificateLifetime();
     }
 
     @Test
