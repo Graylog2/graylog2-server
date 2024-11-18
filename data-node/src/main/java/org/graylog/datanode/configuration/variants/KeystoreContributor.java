@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight.web.resources.model;
+package org.graylog.datanode.configuration.variants;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotNull;
+import java.util.Map;
 
-public record CreateClientCertRequest(
-        @JsonProperty("principal") String principal,
-        @JsonProperty("role") String role,
-        @JsonProperty("password") String password,
-        @JsonProperty("certificate_lifetime") @NotNull String certificateLifetime
-) {}
+public interface KeystoreContributor {
+    /**
+     * @return collection of key-value pairs that should be added to the opensearch keystore (holding secrets)
+     */
+    Map<String, String> getKeystoreItems();
+}

@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight.web.resources.model;
+import * as React from 'react';
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotNull;
+import { Timestamp } from 'components/common';
+import type { IndexSummary } from 'stores/indexers/IndexerOverviewStore';
 
-public record CreateClientCertRequest(
-        @JsonProperty("principal") String principal,
-        @JsonProperty("role") String role,
-        @JsonProperty("password") String password,
-        @JsonProperty("certificate_lifetime") @NotNull String certificateLifetime
-) {}
+type Props = {
+  index?: IndexSummary;
+};
+
+const IndexSetOldestMessageCell = ({ index = null }: Props) => (
+  <Timestamp dateTime={index?.range?.begin} />
+);
+
+export default IndexSetOldestMessageCell;

@@ -53,6 +53,17 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     private static final String FIELD_LOOKUP_REPLY_TO_EMAIL = "lookup_reply_to_email";
     private static final String FIELD_REPLY_TO_LOOKUP_TABLE_NAME = "reply_to_lut_name";
     private static final String FIELD_REPLY_TO_LOOKUP_TABLE_KEY = "reply_to_lut_key";
+    private static final String FIELD_SINGLE_EMAIL = "single_email";
+    private static final String FIELD_CC_USERS = "cc_users";
+    private static final String FIELD_CC_EMAILS = "cc_emails";
+    private static final String FIELD_LOOKUP_CC_EMAILS = "lookup_cc_emails";
+    private static final String FIELD_CC_EMAILS_LOOKUP_TABLE_NAME = "cc_emails_lut_name";
+    private static final String FIELD_CC_EMAILS_LOOKUP_TABLE_KEY = "cc_emails_lut_key";
+    private static final String FIELD_BCC_USERS = "bcc_users";
+    private static final String FIELD_BCC_EMAILS = "bcc_emails";
+    private static final String FIELD_LOOKUP_BCC_EMAILS = "lookup_bcc_emails";
+    private static final String FIELD_BCC_EMAILS_LOOKUP_TABLE_NAME = "bcc_emails_lut_name";
+    private static final String FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY = "bcc_emails_lut_key";
 
     @JsonProperty(FIELD_SENDER)
     public abstract ValueReference sender();
@@ -105,6 +116,39 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
     public abstract ValueReference replyToLUTKey();
 
+    @JsonProperty(FIELD_SINGLE_EMAIL)
+    public abstract ValueReference singleEmail();
+
+    @JsonProperty(FIELD_CC_USERS)
+    public abstract Set<String> ccUsers();
+
+    @JsonProperty(FIELD_CC_EMAILS)
+    public abstract Set<String> ccEmails();
+
+    @JsonProperty(FIELD_LOOKUP_CC_EMAILS)
+    public abstract ValueReference lookupCcEmails();
+
+    @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_NAME)
+    public abstract ValueReference ccEmailsLUTName();
+
+    @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_KEY)
+    public abstract ValueReference ccEmailsLUTKey();
+
+    @JsonProperty(FIELD_BCC_USERS)
+    public abstract Set<String> bccUsers();
+
+    @JsonProperty(FIELD_BCC_EMAILS)
+    public abstract Set<String> bccEmails();
+
+    @JsonProperty(FIELD_LOOKUP_BCC_EMAILS)
+    public abstract ValueReference lookupBccEmails();
+
+    @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_NAME)
+    public abstract ValueReference bccEmailsLUTName();
+
+    @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY)
+    public abstract ValueReference bccEmailsLUTKey();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -129,7 +173,18 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                     .senderLUTKey(ValueReference.of(""))
                     .lookupReplyToEmail(ValueReference.of(false))
                     .replyToLUTName(ValueReference.of(""))
-                    .replyToLUTKey(ValueReference.of(""));
+                    .replyToLUTKey(ValueReference.of(""))
+                    .singleEmail(ValueReference.of(false))
+                    .ccUsers(Set.of())
+                    .ccEmails(Set.of())
+                    .bccUsers(Set.of())
+                    .bccEmails(Set.of())
+                    .lookupCcEmails(ValueReference.of(false))
+                    .ccEmailsLUTName(ValueReference.of(""))
+                    .ccEmailsLUTKey(ValueReference.of(""))
+                    .lookupBccEmails(ValueReference.of(false))
+                    .bccEmailsLUTName(ValueReference.of(""))
+                    .bccEmailsLUTKey(ValueReference.of(""));
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -183,6 +238,39 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
         public abstract Builder replyToLUTKey(ValueReference replyToLUTKey);
 
+        @JsonProperty(FIELD_SINGLE_EMAIL)
+        public abstract Builder singleEmail(ValueReference singleEmail);
+
+        @JsonProperty(FIELD_CC_USERS)
+        public abstract Builder ccUsers(Set<String> ccUsers);
+
+        @JsonProperty(FIELD_CC_EMAILS)
+        public abstract Builder ccEmails(Set<String> ccEmails);
+
+        @JsonProperty(FIELD_LOOKUP_CC_EMAILS)
+        public abstract Builder lookupCcEmails(ValueReference lookupCcEmails);
+
+        @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_NAME)
+        public abstract Builder ccEmailsLUTName(ValueReference ccEmailsLUTName);
+
+        @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_KEY)
+        public abstract Builder ccEmailsLUTKey(ValueReference ccEmailsLUTKey);
+
+        @JsonProperty(FIELD_BCC_USERS)
+        public abstract Builder bccUsers(Set<String> bccUsers);
+
+        @JsonProperty(FIELD_BCC_EMAILS)
+        public abstract Builder bccEmails(Set<String> bccEmails);
+
+        @JsonProperty(FIELD_LOOKUP_BCC_EMAILS)
+        public abstract Builder lookupBccEmails(ValueReference lookupBccEmails);
+
+        @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_NAME)
+        public abstract Builder bccEmailsLUTName(ValueReference bccEmailsLUTName);
+
+        @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY)
+        public abstract Builder bccEmailsLUTKey(ValueReference bccEmailsLUTKey);
+
         public abstract EmailEventNotificationConfigEntity build();
     }
 
@@ -196,7 +284,12 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                 .htmlBodyTemplate(htmlBodyTemplate().asString())
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
-                .timeZone(DateTimeZone.forID(timeZone().asString(parameters)));
+                .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
+                .singleEmail(singleEmail().asBoolean(parameters))
+                .ccUsers(ccUsers())
+                .ccEmails(ccEmails())
+                .bccUsers(bccUsers())
+                .bccEmails(bccEmails());
         final boolean lookupRecipientEmails = lookupRecipientEmails().asBoolean(parameters);
         builder.lookupRecipientEmails(lookupRecipientEmails);
         if (lookupRecipientEmails) {
@@ -214,6 +307,18 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         if (lookupReplyToEmail) {
             builder.replyToLUTName(replyToLUTName().asString(parameters))
                     .replyToLUTKey(replyToLUTKey().asString(parameters));
+        }
+        final boolean lookupCcEmails = lookupCcEmails().asBoolean(parameters);
+        builder.lookupCcEmails(lookupCcEmails);
+        if (lookupCcEmails) {
+            builder.ccEmailsLUTName(ccEmailsLUTName().asString(parameters))
+                    .ccEmailsLUTKey(ccEmailsLUTKey().asString(parameters));
+        }
+        final boolean lookupBccEmails = lookupBccEmails().asBoolean(parameters);
+        builder.lookupBccEmails(lookupBccEmails);
+        if (lookupBccEmails) {
+            builder.bccEmailsLUTName(bccEmailsLUTName().asString(parameters))
+                    .bccEmailsLUTKey(bccEmailsLUTKey().asString(parameters));
         }
         return builder.build();
     }

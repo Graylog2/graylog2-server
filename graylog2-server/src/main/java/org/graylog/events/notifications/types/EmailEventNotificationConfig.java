@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import jakarta.validation.constraints.NotBlank;
 import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
@@ -36,9 +37,6 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotBlank;
-
 import java.util.Set;
 
 @AutoValue
@@ -94,6 +92,17 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     private static final String FIELD_LOOKUP_REPLY_TO_EMAIL = "lookup_reply_to_email";
     private static final String FIELD_REPLY_TO_LOOKUP_TABLE_NAME = "reply_to_lut_name";
     private static final String FIELD_REPLY_TO_LOOKUP_TABLE_KEY = "reply_to_lut_key";
+    private static final String FIELD_SINGLE_EMAIL = "single_email";
+    private static final String FIELD_CC_USERS = "cc_users";
+    private static final String FIELD_CC_EMAILS = "cc_emails";
+    private static final String FIELD_LOOKUP_CC_EMAILS = "lookup_cc_emails";
+    private static final String FIELD_CC_EMAILS_LOOKUP_TABLE_NAME = "cc_emails_lut_name";
+    private static final String FIELD_CC_EMAILS_LOOKUP_TABLE_KEY = "cc_emails_lut_key";
+    private static final String FIELD_BCC_USERS = "bcc_users";
+    private static final String FIELD_BCC_EMAILS = "bcc_emails";
+    private static final String FIELD_LOOKUP_BCC_EMAILS = "lookup_bcc_emails";
+    private static final String FIELD_BCC_EMAILS_LOOKUP_TABLE_NAME = "bcc_emails_lut_name";
+    private static final String FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY = "bcc_emails_lut_key";
 
     @JsonProperty(FIELD_SENDER)
     public abstract String sender();
@@ -153,6 +162,43 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @Nullable
     public abstract String replyToLUTKey();
 
+    @JsonProperty(FIELD_SINGLE_EMAIL)
+    public abstract boolean singleEmail();
+
+    @JsonProperty(FIELD_CC_USERS)
+    public abstract Set<String> ccUsers();
+
+    @JsonProperty(FIELD_CC_EMAILS)
+    public abstract Set<String> ccEmails();
+
+    @JsonProperty(FIELD_LOOKUP_CC_EMAILS)
+    public abstract boolean lookupCcEmails();
+
+    @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_NAME)
+    @Nullable
+    public abstract String ccEmailsLUTName();
+
+    @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_KEY)
+    @Nullable
+    public abstract String ccEmailsLUTKey();
+
+    @JsonProperty(FIELD_BCC_USERS)
+    public abstract Set<String> bccUsers();
+
+    @JsonProperty(FIELD_BCC_EMAILS)
+    public abstract Set<String> bccEmails();
+
+    @JsonProperty(FIELD_LOOKUP_BCC_EMAILS)
+    public abstract boolean lookupBccEmails();
+
+    @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_NAME)
+    @Nullable
+    public abstract String bccEmailsLUTName();
+
+    @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY)
+    @Nullable
+    public abstract String bccEmailsLUTKey();
+
     @Override
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
@@ -201,6 +247,22 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 validation.addError(FIELD_REPLY_TO_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
             }
         }
+        if (lookupCcEmails()) {
+            if (Strings.isNullOrEmpty(ccEmailsLUTName())) {
+                validation.addError(FIELD_CC_EMAILS_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
+            }
+            if (Strings.isNullOrEmpty(ccEmailsLUTKey())) {
+                validation.addError(FIELD_CC_EMAILS_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
+            }
+        }
+        if (lookupBccEmails()) {
+            if (Strings.isNullOrEmpty(bccEmailsLUTName())) {
+                validation.addError(FIELD_BCC_EMAILS_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
+            }
+            if (Strings.isNullOrEmpty(bccEmailsLUTKey())) {
+                validation.addError(FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
+            }
+        }
 
         return validation;
     }
@@ -221,7 +283,14 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                     .htmlBodyTemplate("")
                     .lookupRecipientEmails(false)
                     .lookupSenderEmail(false)
-                    .lookupReplyToEmail(false);
+                    .lookupReplyToEmail(false)
+                    .singleEmail(false)
+                    .ccUsers(Set.of())
+                    .ccEmails(Set.of())
+                    .bccUsers(Set.of())
+                    .bccEmails(Set.of())
+                    .lookupCcEmails(false)
+                    .lookupBccEmails(false);
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -275,6 +344,39 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
         public abstract Builder replyToLUTKey(String replyToLUTKey);
 
+        @JsonProperty(FIELD_SINGLE_EMAIL)
+        public abstract Builder singleEmail(boolean singleEmail);
+
+        @JsonProperty(FIELD_CC_USERS)
+        public abstract Builder ccUsers(Set<String> ccUsers);
+
+        @JsonProperty(FIELD_CC_EMAILS)
+        public abstract Builder ccEmails(Set<String> ccEmails);
+
+        @JsonProperty(FIELD_LOOKUP_CC_EMAILS)
+        public abstract Builder lookupCcEmails(boolean lookupCcEmails);
+
+        @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_NAME)
+        public abstract Builder ccEmailsLUTName(String ccEmailsLUTName);
+
+        @JsonProperty(FIELD_CC_EMAILS_LOOKUP_TABLE_KEY)
+        public abstract Builder ccEmailsLUTKey(String ccEmailsLUTKey);
+
+        @JsonProperty(FIELD_BCC_USERS)
+        public abstract Builder bccUsers(Set<String> bccUsers);
+
+        @JsonProperty(FIELD_BCC_EMAILS)
+        public abstract Builder bccEmails(Set<String> bccEmails);
+
+        @JsonProperty(FIELD_LOOKUP_BCC_EMAILS)
+        public abstract Builder lookupBccEmails(boolean lookupBccEmails);
+
+        @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_NAME)
+        public abstract Builder bccEmailsLUTName(String bccEmailsLUTName);
+
+        @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY)
+        public abstract Builder bccEmailsLUTKey(String bccEmailsLUTKey);
+
         public abstract EmailEventNotificationConfig build();
     }
 
@@ -291,7 +393,14 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 .timeZone(ValueReference.of(timeZone().getID()))
                 .lookupRecipientEmails(ValueReference.of(lookupRecipientEmails()))
                 .lookupSenderEmail(ValueReference.of(lookupSenderEmail()))
-                .lookupReplyToEmail(ValueReference.of(lookupReplyToEmail()));
+                .lookupReplyToEmail(ValueReference.of(lookupReplyToEmail()))
+                .singleEmail(ValueReference.of(singleEmail()))
+                .ccUsers(ccUsers())
+                .ccEmails(ccEmails())
+                .bccUsers(bccUsers())
+                .bccEmails(bccEmails())
+                .lookupCcEmails(ValueReference.of(lookupCcEmails()))
+                .lookupBccEmails(ValueReference.of(lookupBccEmails()));
         if (lookupRecipientEmails()) {
             builder.recipientsLUTName(ValueReference.ofNullable(recipientsLUTName()))
                     .recipientsLUTKey(ValueReference.ofNullable(recipientsLUTKey()));
@@ -312,6 +421,20 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         } else {
             builder.replyToLUTName(ValueReference.of(""))
                     .replyToLUTKey(ValueReference.of(""));
+        }
+        if (lookupCcEmails()) {
+            builder.ccEmailsLUTName(ValueReference.ofNullable(ccEmailsLUTName()))
+                    .ccEmailsLUTKey(ValueReference.ofNullable(ccEmailsLUTKey()));
+        } else {
+            builder.ccEmailsLUTName(ValueReference.of(""))
+                    .ccEmailsLUTKey(ValueReference.of(""));
+        }
+        if (lookupBccEmails()) {
+            builder.bccEmailsLUTName(ValueReference.ofNullable(bccEmailsLUTName()))
+                    .bccEmailsLUTKey(ValueReference.ofNullable(bccEmailsLUTKey()));
+        } else {
+            builder.bccEmailsLUTName(ValueReference.of(""))
+                    .bccEmailsLUTKey(ValueReference.of(""));
         }
 
         return builder.build();
