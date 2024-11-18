@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import { useMemo } from 'react';
-import type Immutable from 'immutable';
 import styled from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
 
@@ -35,7 +34,8 @@ import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpa
 import { Timestamp } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
 
-const EventDefinitionRenderer = ({ eventDefinitionId, permissions, meta }: { eventDefinitionId: string, permissions: Immutable.List<string>, meta: EventsAdditionalData }) => {
+const EventDefinitionRenderer = ({ eventDefinitionId, meta }: { eventDefinitionId: string, meta: EventsAdditionalData }) => {
+  const { permissions } = useCurrentUser();
   const { context: eventsContext } = meta;
   const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
 
@@ -121,7 +121,7 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => (eventData.tim
   <em>No time range</em>
 ));
 
-const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRenderers<Event> => ({
+const customColumnRenderers = (): ColumnRenderers<Event> => ({
   attributes: {
     message: {
       minWidth: 300,
@@ -142,7 +142,7 @@ const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRende
     event_definition_id: {
       minWidth: 300,
       width: 0.3,
-      renderCell: (_eventDefinitionId: string, _, __, meta: EventsAdditionalData) => <EventDefinitionRenderer meta={meta} permissions={permissions} eventDefinitionId={_eventDefinitionId} />,
+      renderCell: (_eventDefinitionId: string, _, __, meta: EventsAdditionalData) => <EventDefinitionRenderer meta={meta} eventDefinitionId={_eventDefinitionId} />,
     },
     priority: {
       renderCell: (_priority: number) => <PriorityName priority={_priority} />,
@@ -171,10 +171,6 @@ const customColumnRenderers = (permissions: Immutable.List<string>): ColumnRende
   },
 });
 
-const useColumnRenderers = () => {
-  const currentUser = useCurrentUser();
-
-  return useMemo(() => customColumnRenderers(currentUser.permissions), [currentUser.permissions]);
-};
+const useColumnRenderers = () => useMemo(customColumnRenderers, []);
 
 export default useColumnRenderers;

@@ -16,10 +16,9 @@
  */
 import React, { useMemo } from 'react';
 
-import type { Event, EventDefinitionContext, EventsAdditionalData } from 'components/events/events/types';
+import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import EventDetailsTable from 'components/events/events/EventDetailsTable';
 import { detailsAttributes } from 'components/events/Constants';
-import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
 import DropdownButton from 'components/bootstrap/DropdownButton';
 import useEventAction from 'components/events/events/hooks/useEventAction';
 
@@ -42,13 +41,13 @@ const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
   const meta = useMemo(() => ({ context: { event_definitions: { [event.event_definition_id]: eventDefinitionContext } } }), [event.event_definition_id, eventDefinitionContext]);
 
   return (
-    <MetaDataProvider<EventsAdditionalData> meta={meta}>
+    <>
       <EventDetailsTable attributesList={attributesList} event={event} meta={meta} />
       <ActionsWrapper>
         {moreActions}
       </ActionsWrapper>
       {pluggableActionModals}
-    </MetaDataProvider>
+    </>
   );
 };
 
