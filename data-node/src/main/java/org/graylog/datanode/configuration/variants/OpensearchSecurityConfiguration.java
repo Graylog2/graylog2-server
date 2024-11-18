@@ -48,7 +48,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class OpensearchSecurityConfiguration {
+public class OpensearchSecurityConfiguration implements KeystoreContributor {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchSecurityConfiguration.class);
 
@@ -106,29 +106,37 @@ public class OpensearchSecurityConfiguration {
 
             config.put("plugins.security.ssl.transport.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.keystore_filepath", transportCertificate.location().getFileName().toString()); // todo: this should be computed as a relative path
-            config.put("plugins.security.ssl.transport.keystore_password", new String(transportCertificate.password()));
             config.put("plugins.security.ssl.transport.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.transport.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILE.toString());
-            config.put("plugins.security.ssl.transport.truststore_password", new String(truststore.password()));
 
             config.put("plugins.security.ssl.http.enabled", "true");
 
             config.put("plugins.security.ssl.http.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.http.keystore_filepath", httpCertificate.location().getFileName().toString());  // todo: this should be computed as a relative path
-            config.put("plugins.security.ssl.http.keystore_password", new String(httpCertificate.password()));
             config.put("plugins.security.ssl.http.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.http.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILE.toString());
-            config.put("plugins.security.ssl.http.truststore_password", new String(truststore.password()));
 
             // enable client cert auth
             config.put("plugins.security.ssl.http.clientauth_mode", "OPTIONAL");
         } else {
             config.put("plugins.security.disabled", "true");
             config.put("plugins.security.ssl.http.enabled", "false");
+        }
+        return config.build();
+    }
+
+    @Override
+    public Map<String, String> getKeystoreItems() {
+        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
+        if (securityEnabled()) {
+            config.put("plugins.security.ssl.transport.keystore_password_secure", new String(transportCertificate.password()));
+            config.put("plugins.security.ssl.transport.truststore_password_secure", new String(truststore.password()));
+            config.put("plugins.security.ssl.http.keystore_password_secure", new String(httpCertificate.password()));
+            config.put("plugins.security.ssl.http.truststore_password_secure", new String(truststore.password()));
         }
         return config.build();
     }
