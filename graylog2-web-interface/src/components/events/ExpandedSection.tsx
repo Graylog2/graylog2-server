@@ -41,6 +41,8 @@ const ExpandedSection = ({ defaultLayout, event }: Props) => {
     return attributes.filter(({ id }) => !displayedAttributesSet.has(id)).map(({ id, title }: Attribute) => ({ id, title }));
   }, [attributes, displayedAttributes, isInitialLoading]);
 
+  if (!nonDisplayedAttributes.length) return <em>No further details</em>;
+
   return <EventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />;
 };
 
