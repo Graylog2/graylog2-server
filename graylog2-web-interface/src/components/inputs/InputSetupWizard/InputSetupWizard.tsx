@@ -23,25 +23,24 @@ import { Wizard } from 'components/common';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 
-import { TestInputStep } from './steps';
+import { SetupRoutingStep } from './steps';
 
 const InputSetupWizard = () => {
-  const { activeStep, setActiveStep, show, closeWizard, wizardData } = useInputSetupWizard();
+  const { activeStep, setActiveStep, show, closeWizard } = useInputSetupWizard();
   const [orderedSteps, setOrderedSteps] = useState([]);
-  const { category, subcategory } = wizardData;
   const enterpriseSteps = PluginStore.exports('inputSetupWizard').find((plugin) => (!!plugin.steps))?.steps;
 
   const steps = useMemo(() => {
     const defaultSteps = {
-      [INPUT_WIZARD_STEPS.TEST_INPUT]: {
-        key: INPUT_WIZARD_STEPS.TEST_INPUT,
+      [INPUT_WIZARD_STEPS.SETUP_ROUTING]: {
+        key: INPUT_WIZARD_STEPS.SETUP_ROUTING,
         title: (
           <>
-            Test Input
+            Setup Routing
           </>
         ),
         component: (
-          <TestInputStep />
+          <SetupRoutingStep />
         ),
       },
     };
@@ -51,30 +50,9 @@ const InputSetupWizard = () => {
   }, [enterpriseSteps]);
 
   const determineFirstStep = useCallback(() => {
-    if (!category || !subcategory) {
-      if (steps[INPUT_WIZARD_STEPS.SELECT_CATEGORY]) {
-        setActiveStep(INPUT_WIZARD_STEPS.SELECT_CATEGORY);
-        setOrderedSteps([INPUT_WIZARD_STEPS.SELECT_CATEGORY]);
-
-        return;
-      }
-
-      setActiveStep(INPUT_WIZARD_STEPS.TEST_INPUT);
-      setOrderedSteps([INPUT_WIZARD_STEPS.TEST_INPUT]);
-
-      return;
-    }
-
-    if (steps[INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]) {
-      setActiveStep(INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE);
-      setOrderedSteps([INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]);
-
-      return;
-    }
-
-    setActiveStep(INPUT_WIZARD_STEPS.TEST_INPUT);
-    setOrderedSteps([INPUT_WIZARD_STEPS.TEST_INPUT]);
-  }, [setActiveStep, category, subcategory, steps]);
+    setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);
+    setOrderedSteps([INPUT_WIZARD_STEPS.SETUP_ROUTING]);
+  }, [setActiveStep]);
 
   useEffect(() => {
     if (!activeStep) {

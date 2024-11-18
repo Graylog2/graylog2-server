@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import TestInputStep from './TestInputStep';
+import SetupRoutingStep from './SetupRoutingStep';
 
-export { default as TestInputStep } from './TestInputStep';
+export { default as SetupRoutingStep } from './SetupRoutingStep';
 
-export default TestInputStep;
+export default SetupRoutingStep;

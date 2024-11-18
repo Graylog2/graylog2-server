@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 
-const TestInputStep = () => (
-  <div>Test Input Step</div>
+const SetupRoutingStep = () => (
+  <div>Setup Routing Step</div>
 );
 
-export default TestInputStep;
+export default SetupRoutingStep;
