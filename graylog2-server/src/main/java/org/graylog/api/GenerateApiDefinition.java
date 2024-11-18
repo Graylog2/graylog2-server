@@ -77,6 +77,7 @@ public class GenerateApiDefinition {
         }
         final String targetName = args[0];
         final Path targetPath = Paths.get(targetName);
+        final boolean isCloud = Boolean.parseBoolean(System.getProperty("IS_CLOUD"));
 
         deleteDirectory(targetPath.toFile());
         Files.createDirectories(targetPath);
@@ -87,7 +88,7 @@ public class GenerateApiDefinition {
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-        final Generator generator = new Generator(resourceClasses, Collections.emptyMap(), "/plugins", objectMapper, false);
+        final Generator generator = new Generator(resourceClasses, Collections.emptyMap(), "/plugins", objectMapper, isCloud, false);
 
         final Map<String, Object> overview = generator.generateOverview();
         writeJsonToFile(targetName + "/api.json", overview);
@@ -96,12 +97,14 @@ public class GenerateApiDefinition {
 
         apis.forEach(api -> {
             final String path = pathFromApi(api);
+            final String name = nameFromApi(api);
+            final String targetFile = targetName + "/" + name + ".json";
             try {
-                log("Writing " + path);
+                log("Writing " + targetFile);
                 final Map<String, Object> apiResponse = generator.generateForRoute(path, "/");
-                writeJsonToFile(targetName + path + ".json", apiResponse);
+                writeJsonToFile(targetFile, apiResponse);
             } catch (IOException e) {
-                log("Unable to write " + targetName + path + ":" + e);
+                log("Unable to write " + targetFile + ":" + e);
             }
         });
         log("Done.");
@@ -109,6 +112,10 @@ public class GenerateApiDefinition {
 
     private static String pathFromApi(Map<String, Object> api) {
         return (String) api.get("path");
+    }
+
+    private static String nameFromApi(Map<String, Object> api) {
+        return (String) api.get("name");
     }
 
     private static List<Map<String, Object>> retrieveApis(Map<String, Object> overview) {
