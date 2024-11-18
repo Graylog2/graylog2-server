@@ -18,9 +18,6 @@ package org.graylog.plugins.views.aggregations;
 
 import com.google.common.base.Joiner;
 import io.restassured.response.ValidatableResponse;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.rest.QueryDTO;
-import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
@@ -37,21 +34,17 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
-import static org.graylog.testing.utils.SerializationUtils.serialize;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -73,34 +66,6 @@ public class SearchAggregationsIT {
         this.api.backend().importElasticsearchFixture("random-http-logs.json", SearchAggregationsIT.class);
     }
 
-    private ValidatableResponse execute(Pivot pivot) {
-        final Pivot pivotWithId = pivot.toBuilder()
-                .id(PIVOT_NAME)
-                .build();
-
-        final SearchDTO search = SearchDTO.builder()
-                .queries(QueryDTO.builder()
-                        .timerange(RelativeRange.create(0))
-                        .id("query1")
-                        .query(ElasticsearchQueryString.of("source:pivot-fixtures"))
-                        .searchTypes(Set.of(pivotWithId))
-                        .build())
-                .build();
-
-        return given()
-                .spec(api.requestSpecification())
-                .when()
-                .body(serialize(search))
-                .post("/views/search/sync")
-                .then()
-                .log().ifError()
-                .log().ifValidationFails()
-                .statusCode(200)
-                .body("execution.done", equalTo(true))
-                .body("execution.completed_exceptionally", equalTo(false))
-                .body(PIVOT_PATH + ".total", equalTo(1000));
-    }
-
     @ContainerMatrixTest
     void testZeroPivots() {
         final Pivot pivot = Pivot.builder()
@@ -108,7 +73,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -126,7 +91,7 @@ public class SearchAggregationsIT {
                 .series(Latest.builder().field("http_method").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -145,7 +110,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -168,7 +133,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -190,7 +155,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -212,7 +177,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -235,7 +200,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -255,7 +220,7 @@ public class SearchAggregationsIT {
                 .series(Max.builder().field("took_ms").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -275,7 +240,7 @@ public class SearchAggregationsIT {
                 .series(Max.builder().field("took_ms").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -302,7 +267,7 @@ public class SearchAggregationsIT {
                 )
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -336,7 +301,7 @@ public class SearchAggregationsIT {
                 .series(Average.builder().field("took_ms").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -365,7 +330,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -388,7 +353,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -412,7 +377,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -459,7 +424,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(2));
@@ -482,7 +447,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -527,7 +492,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -574,7 +539,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -627,7 +592,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -664,7 +629,7 @@ public class SearchAggregationsIT {
                 .sort(SeriesSort.create("min(took_ms)", SortSpec.Direction.Ascending), SeriesSort.create("max(took_ms)", SortSpec.Direction.Descending))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -700,7 +665,7 @@ public class SearchAggregationsIT {
                 .sort(SeriesSort.create("min(took_ms)", SortSpec.Direction.Ascending), SeriesSort.create("max(took_ms)", SortSpec.Direction.Descending))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -731,7 +696,7 @@ public class SearchAggregationsIT {
                 .series(List.of(Max.builder().field("took_ms").build(), Min.builder().field("took_ms").build()))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -759,7 +724,7 @@ public class SearchAggregationsIT {
                 ))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -787,7 +752,7 @@ public class SearchAggregationsIT {
                 ))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -823,7 +788,7 @@ public class SearchAggregationsIT {
                 .series(Percentage.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -845,7 +810,7 @@ public class SearchAggregationsIT {
                 .series(Percentage.builder().strategy(Percentage.Strategy.COUNT).field("http_method").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -867,7 +832,7 @@ public class SearchAggregationsIT {
                 .series(Percentage.builder().strategy(Percentage.Strategy.COUNT).field("http_method").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -889,7 +854,7 @@ public class SearchAggregationsIT {
                 .series(Percentage.builder().strategy(Percentage.Strategy.SUM).field("took_ms").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -911,7 +876,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         final String searchTypeResult = PIVOT_PATH + ".rows";
         validatableResponse
@@ -943,5 +908,10 @@ public class SearchAggregationsIT {
 
     private String pathToMetricResult(Collection<String> keys, Collection<String> metric) {
         return pathToRow(keys) + "." + pathToValue(metric);
+    }
+
+    private ValidatableResponse executePivot(Pivot pivot) {
+        return api.search().executePivot(pivot)
+                .body(".total", equalTo(1000));
     }
 }

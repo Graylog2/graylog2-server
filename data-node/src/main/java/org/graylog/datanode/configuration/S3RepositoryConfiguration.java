@@ -18,14 +18,15 @@ package org.graylog.datanode.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.BooleanConverter;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.datanode.configuration.variants.KeystoreContributor;
 import org.graylog2.configuration.Documentation;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
-public class S3RepositoryConfiguration {
+public class S3RepositoryConfiguration implements KeystoreContributor {
 
     @Documentation("S3 repository access key for searchable snapshots")
     @Parameter(value = "s3_client_default_access_key")
@@ -99,5 +100,16 @@ public class S3RepositoryConfiguration {
 
     private boolean allBlank(String... properties) {
         return Arrays.stream(properties).allMatch(StringUtils::isBlank);
+    }
+
+    @Override
+    public Map<String, String> getKeystoreItems() {
+        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
+        if (isRepositoryEnabled()) {
+            config.put("s3.client.default.access_key", getS3ClientDefaultAccessKey());
+            config.put("s3.client.default.secret_key", getS3ClientDefaultSecretKey());
+
+        }
+        return config.build();
     }
 }

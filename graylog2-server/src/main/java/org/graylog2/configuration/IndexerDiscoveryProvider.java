@@ -27,7 +27,6 @@ import com.google.common.base.Suppliers;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
-import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioner;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -53,7 +53,8 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     private final List<URI> hosts;
     private final PreflightConfigService preflightConfigService;
     private final NodeService<DataNodeDto> nodeService;
-    private final GraylogCertificateProvisioner graylogCertificateProvisioner;
+
+    private final Set<IndexerDiscoveryListener> indexerDiscoveryListeners;
 
     private final Supplier<List<URI>> resultsCachingSupplier;
 
@@ -68,15 +69,16 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
             @Named("datanode_startup_connection_delay") Duration delayBetweenAttempts,
             PreflightConfigService preflightConfigService,
             NodeService<DataNodeDto> nodeService,
-            GraylogCertificateProvisioner graylogCertificateProvisioner) {
+            Set<IndexerDiscoveryListener> indexerDiscoveryListeners) {
         this.hosts = hosts;
         this.connectionAttempts = connectionAttempts;
         this.delayBetweenAttempts = delayBetweenAttempts;
         this.preflightConfigService = preflightConfigService;
         this.nodeService = nodeService;
-        this.graylogCertificateProvisioner = graylogCertificateProvisioner;
+        this.indexerDiscoveryListeners = indexerDiscoveryListeners;
         this.resultsCachingSupplier = Suppliers.memoize(this::doGet);
     }
+
 
     @Override
     public List<URI> get() {
@@ -89,6 +91,8 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
         if (hosts != null && !hosts.isEmpty()) {
             return hosts;
         }
+
+        indexerDiscoveryListeners.forEach(IndexerDiscoveryListener::beforeIndexerDiscovery);
 
         final PreflightConfigResult preflightResult = preflightConfigService.getPreflightConfigResult();
 
@@ -109,8 +113,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
                                     }
 
                                 }
-                                // let's try to provision certificates, maybe there are datanodes waiting for these
-                                graylogCertificateProvisioner.runProvisioning();
+                                indexerDiscoveryListeners.forEach(IndexerDiscoveryListener::onDiscoveryRetry);
                             }
                         })
                         .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
