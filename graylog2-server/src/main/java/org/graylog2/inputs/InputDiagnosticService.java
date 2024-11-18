@@ -18,6 +18,7 @@ package org.graylog2.inputs;
 
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.InternalServerErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -51,6 +52,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 import static org.graylog2.rest.models.system.inputs.responses.InputDiagnostics.EMPTY_DIAGNOSTICS;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class InputDiagnosticService {
     private static final Logger LOG = LoggerFactory.getLogger(InputDiagnosticService.class);
@@ -77,9 +79,10 @@ public class InputDiagnosticService {
 
         final Set<SearchError> errors = queryResult.errors();
         if (errors != null && !errors.isEmpty()) {
-            LOG.error("An error occurred while executing aggregation: {}",
+            String errorMsg = f("An error occurred while executing aggregation: %s",
                     errors.stream().map(SearchError::description).collect(Collectors.joining(", ")));
-            return EMPTY_DIAGNOSTICS;
+            LOG.error(errorMsg);
+            throw new InternalServerErrorException(errorMsg);
         }
 
         final SearchType.Result aggregationResult = queryResult.searchTypes().get(PIVOT_ID);
@@ -126,17 +129,18 @@ public class InputDiagnosticService {
 
     private static AbstractMap.SimpleEntry<String, Long> extractValues(PivotResult.Row r) {
         if (r.values().size() != 1) {
-            LOG.warn("Expected 1 value in aggregation result, but received [{}].", r.values().size());
-            return null;
+            String errorMsg = f("Expected 1 value in aggregation result, but received [%d].", r.values().size());
+            LOG.warn(errorMsg);
+            throw new InternalServerErrorException(errorMsg);
         }
         final String streamId = r.key().get(0);
         if (StringUtils.isEmpty(streamId)) {
-            LOG.warn("Expected a stream ID to be returned.");
-            return null;
+            String errorMsg = "Unable to retrieve stream ID from query result";
+            LOG.warn(errorMsg);
+            throw new InternalServerErrorException(errorMsg);
         }
 
         final Long count = (Long) r.values().get(0).value();
         return new AbstractMap.SimpleEntry<>(streamId, count);
     }
-
 }
