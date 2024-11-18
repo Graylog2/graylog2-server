@@ -94,6 +94,16 @@ public final class Streams implements GraylogRestApi {
 
         return streamId;
     }
+    
+    public void deleteStream(String streamId) {
+        waitForStreamRouterRefresh(() -> given()
+                .spec(api.requestSpecification())
+                .when()
+                .delete("/streams/" + streamId)
+                .then()
+                .log().ifError()
+                .statusCode(204));
+    }
 
     public ValidatableResponse getStream(String streamId) {
         return given()
