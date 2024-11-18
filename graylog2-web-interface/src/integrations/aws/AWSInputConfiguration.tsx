@@ -16,7 +16,8 @@
  */
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Routes from 'integrations/aws/common/Routes.js';
+
+import Routes from 'integrations/aws/common/Routes';
 
 type AWSInputConfigurationProps = {
   url?: string;
