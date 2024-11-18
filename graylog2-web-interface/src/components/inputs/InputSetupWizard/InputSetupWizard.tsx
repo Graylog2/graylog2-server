@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useCallback, useMemo, useState } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Modal } from 'components/bootstrap';
@@ -26,8 +26,7 @@ import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInp
 import { SetupRoutingStep } from './steps';
 
 const InputSetupWizard = () => {
-  const { activeStep, setActiveStep, show, closeWizard } = useInputSetupWizard();
-  const [orderedSteps, setOrderedSteps] = useState([]);
+  const { activeStep, setActiveStep, show, orderedSteps, setOrderedSteps, closeWizard } = useInputSetupWizard();
   const enterpriseSteps = PluginStore.exports('inputSetupWizard').find((plugin) => (!!plugin.steps))?.steps;
 
   const steps = useMemo(() => {
@@ -52,7 +51,7 @@ const InputSetupWizard = () => {
   const determineFirstStep = useCallback(() => {
     setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);
     setOrderedSteps([INPUT_WIZARD_STEPS.SETUP_ROUTING]);
-  }, [setActiveStep]);
+  }, [setActiveStep, setOrderedSteps]);
 
   useEffect(() => {
     if (!activeStep) {
@@ -62,7 +61,7 @@ const InputSetupWizard = () => {
     if (activeStep && orderedSteps.length < 1) {
       setOrderedSteps([activeStep]);
     }
-  }, [activeStep, determineFirstStep, orderedSteps]);
+  }, [activeStep, determineFirstStep, orderedSteps, setOrderedSteps]);
 
   if (!show || orderedSteps.length < 1) return null;
 

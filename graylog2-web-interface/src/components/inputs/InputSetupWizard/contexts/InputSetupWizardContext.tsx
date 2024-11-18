@@ -26,7 +26,11 @@ type InputSetupWizardContextType = {
   setStepData: (stepName: InputSetupWizardStep, data: object) => void,
   wizardData: WizardData,
   setWizardDataAttribute: (key: keyof WizardData, value: WizardData[typeof key]) => void,
+  orderedSteps: Array<InputSetupWizardStep>,
+  setOrderedSteps: (InputSetupWizardStep) => void,
   show: boolean,
+  hasPreviousStep: boolean,
+  hasNextStep: boolean,
   openWizard: (data?: WizardData) => void,
   closeWizard: () => void,
 };

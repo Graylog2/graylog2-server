@@ -24,9 +24,34 @@ const DEFAULT_ACTIVE_STEP = undefined;
 const DEFAULT_WIZARD_DATA = {};
 const DEFAULT_STEPS_DATA = {};
 
+const checkHasPreviousStep = (orderedSteps: Array<InputSetupWizardStep>, activeStep?: InputSetupWizardStep) => {
+  if (orderedSteps.length === 0 || !activeStep) return false;
+
+  const activeStepIndex = orderedSteps.indexOf(activeStep);
+
+  if (activeStepIndex === -1) return false;
+
+  if (activeStepIndex === 0) return false;
+
+  return true;
+};
+
+const checkHasNextStep = (orderedSteps: Array<InputSetupWizardStep>, activeStep?: InputSetupWizardStep) => {
+  if (orderedSteps.length === 0 || !activeStep) return false;
+
+  const activeStepIndex = orderedSteps.indexOf(activeStep);
+
+  if (activeStepIndex === -1) return false;
+
+  if (activeStepIndex === (orderedSteps.length - 1)) return false;
+
+  return true;
+};
+
 const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{}>) => {
   const [activeStep, setActiveStep] = useState<InputSetupWizardStep>(DEFAULT_ACTIVE_STEP);
   const [wizardData, setWizardData] = useState<WizardData>(DEFAULT_WIZARD_DATA);
+  const [orderedSteps, setOrderedSteps] = useState<Array<InputSetupWizardStep>>([]);
   const [stepsData, setStepsData] = useState<StepsData>(DEFAULT_STEPS_DATA);
   const [show, setShow] = useState<boolean>(false);
 
@@ -62,6 +87,9 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
     setShow(true);
   }, [wizardData]);
 
+  const hasPreviousStep = useMemo(() => checkHasPreviousStep(orderedSteps, activeStep), [orderedSteps, activeStep]);
+  const hasNextStep = useMemo(() => checkHasNextStep(orderedSteps, activeStep), [orderedSteps, activeStep]);
+
   const value = useMemo(() => ({
     setActiveStep,
     activeStep,
@@ -70,6 +98,10 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
     wizardData,
     setWizardDataAttribute,
     show,
+    orderedSteps,
+    setOrderedSteps,
+    hasPreviousStep,
+    hasNextStep,
     openWizard,
     closeWizard,
   }), [
@@ -80,6 +112,10 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
     wizardData,
     setWizardDataAttribute,
     show,
+    orderedSteps,
+    setOrderedSteps,
+    hasPreviousStep,
+    hasNextStep,
     openWizard,
     closeWizard,
   ]);
