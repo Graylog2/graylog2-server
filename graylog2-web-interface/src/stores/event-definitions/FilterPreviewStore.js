@@ -24,6 +24,7 @@ import UserNotification from 'util/UserNotification';
 import Search from 'views/logic/search/Search';
 import SearchResult from 'views/logic/SearchResult';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import { runPollJob } from 'views/stores/SearchJobs';
 
 export const FilterPreviewActions = singletonActions(
   'core.FilterPreview',
@@ -70,15 +71,6 @@ export const FilterPreviewStore = singletonStore(
 
       return URLUtils.qualifyUrl(uri.resource());
     },
-
-    resourceUrlStatus({ nodeId, jobId, query = {} }) {
-      const uri = new URI(`/views/searchjobs/${nodeId}/${jobId}/status`);
-
-      uri.query(query);
-
-      return URLUtils.qualifyUrl(uri.resource());
-    },
-
     /**
    * Method that creates a search query in the backend. This method does not execute the search, please call
    * `execute()` once the response of `create()` is resolved to execute the search.
@@ -117,7 +109,7 @@ export const FilterPreviewStore = singletonStore(
     },
 
     jobStatus(jobId, nodeId) {
-      return fetch('GET', this.resourceUrlStatus({ jobId, nodeId }));
+      return runPollJob({ nodeId, asyncSearchId: jobId });
     },
 
     trackJob(search, executionState) {
