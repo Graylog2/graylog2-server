@@ -23,7 +23,7 @@ import { Wizard } from 'components/common';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 
-import { SetupRoutingStep } from './steps';
+import { CreateStreamStep, InputDiagnosisStep, SetupRoutingStep, StartInputStep } from './steps';
 
 const InputSetupWizard = () => {
   const { activeStep, setActiveStep, show, orderedSteps, setOrderedSteps, closeWizard } = useInputSetupWizard();
@@ -40,6 +40,39 @@ const InputSetupWizard = () => {
         ),
         component: (
           <SetupRoutingStep />
+        ),
+      },
+      [INPUT_WIZARD_STEPS.CREATE_STREAM]: {
+        key: INPUT_WIZARD_STEPS.CREATE_STREAM,
+        title: (
+          <>
+            Create Stream
+          </>
+        ),
+        component: (
+          <CreateStreamStep />
+        ),
+      },
+      [INPUT_WIZARD_STEPS.START_INPUT]: {
+        key: INPUT_WIZARD_STEPS.START_INPUT,
+        title: (
+          <>
+            Start Input
+          </>
+        ),
+        component: (
+          <StartInputStep />
+        ),
+      },
+      [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
+        key: INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
+        title: (
+          <>
+            Input Diagnosis
+          </>
+        ),
+        component: (
+          <InputDiagnosisStep />
         ),
       },
     };

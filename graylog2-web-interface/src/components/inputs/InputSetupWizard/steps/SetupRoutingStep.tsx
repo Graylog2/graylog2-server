@@ -84,7 +84,6 @@ const SetupRoutingStep = () => {
         </Col>
         <Col md={6}>
           <StyledHeading>Route to a new Stream</StyledHeading>
-
           <Button onClick={() => onNextStep(true)} bsStyle="primary">Create Stream</Button>
         </Col>
       </Row>

@@ -14,8 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export { default as CreateStreamStep } from './CreateStreamStep';
-export { default as InputDiagnosisStep } from './InputDiagnosisStep';
-export { default as SetupRoutingStep } from './SetupRoutingStep';
-export { default as StartInputStep } from './StartInputStep';
+const CreateStreamStep = () => (
+  <div>
+    Create Stream
+  </div>
+);
+
+export default CreateStreamStep;
