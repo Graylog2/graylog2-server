@@ -68,13 +68,13 @@ const CategoryWrap = (categoryName, categoryColors) => (
             <SubcategoryName>{categoryName} &mdash; {name}</SubcategoryName>
 
             <Swatches>
-              {getValues(categoryColors[name], (subname) => (
+              {getValues(categoryColors[name], (subname) => typeof categoryColors[name][subname] === 'string' ? (
                 <StyledColorSwatch name={subname}
                                    categoryName={categoryName}
                                    color={categoryColors[name][subname]}
                                    copyText={`theme.colors.${categoryName}.${name}.${subname}`}
                                    key={`${categoryName}-${name}-${categoryColors[name][subname]}`} />
-              ))}
+              ) : null)}
             </Swatches>
           </div>
         )

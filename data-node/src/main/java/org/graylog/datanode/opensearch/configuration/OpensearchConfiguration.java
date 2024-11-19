@@ -20,6 +20,7 @@ import org.apache.commons.exec.OS;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
+import org.graylog.datanode.configuration.variants.KeystoreContributor;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.process.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
@@ -28,6 +29,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public record OpensearchConfiguration(
         OpensearchDistribution opensearchDistribution,
@@ -45,7 +48,7 @@ public record OpensearchConfiguration(
 
         String nodeSearchCacheSize,
         Map<String, Object> additionalConfiguration
-) {
+) implements KeystoreContributor {
     public Map<String, Object> asMap() {
 
         Map<String, Object> config = new LinkedHashMap<>();
@@ -97,6 +100,7 @@ public record OpensearchConfiguration(
         List<String> javaOpts = new LinkedList<>();
         javaOpts.add("-Xms%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
         javaOpts.add("-Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
+        javaOpts.add("-Dopensearch.transport.cname_in_publish_address=true");
 
         opensearchSecurityConfiguration.getTruststore().ifPresent(truststore -> {
             javaOpts.add("-Djavax.net.ssl.trustStore=" + truststore.location().toAbsolutePath());
@@ -121,5 +125,13 @@ public record OpensearchConfiguration(
 
     public boolean securityConfigured() {
         return opensearchSecurityConfiguration() != null;
+    }
+
+
+    @Override
+    public Map<String, String> getKeystoreItems() {
+        Stream<KeystoreContributor> keystoreContributorStream = Stream.of(opensearchSecurityConfiguration, s3RepositoryConfiguration);
+                return keystoreContributorStream.flatMap(config -> config.getKeystoreItems().entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

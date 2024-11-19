@@ -17,6 +17,7 @@
 import * as ts from 'typescript';
 import chunk from 'lodash/chunk';
 import uniq from 'lodash/uniq';
+import type { Expression } from 'typescript';
 
 import type { Api, Route, Operation, Parameter, Type, EnumType, TypeLiteral, Model } from 'generator/Api';
 
@@ -32,6 +33,7 @@ const typeMappings = {
   DateTime: 'string',
   ChunkedOutput: 'unknown',
   ZonedDateTime: 'string',
+  Object: 'any',
 };
 
 const emitNumberOrString = (type: string) => {
@@ -58,11 +60,12 @@ const emitIndexerSignature = (additionalProperties: Type) => (additionalProperti
 )] : []);
 
 // ===== Models ===== //
+const isOptional = (propDef: Type) => 'optional' in propDef && propDef.optional;
 const emitProps = (properties: Record<string, Type>) => Object.entries(properties)
   .map(([propName, propDef]) => ts.factory.createPropertySignature(
     [readonlyModifier],
     quotePropNameIfNeeded(propName),
-    undefined,
+    isOptional(propDef) ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     emitType(propDef),
   ));
@@ -246,28 +249,20 @@ const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryPar
   );
 };
 
-const isNumeric = (type: string) => ['integer', 'number'].includes(type);
-const isBoolean = (type: string) => ['boolean'].includes(type);
-
 const emitInitializer = (type: Type, defaultValue: string) => {
   const typeName = 'name' in type ? type.name : undefined;
 
-  if (typeName && isNumeric(typeName)) {
-    return ts.factory.createNumericLiteral(defaultValue);
+  if (typeName === 'string') {
+    return emitString(defaultValue);
   }
 
-  if (typeName && isBoolean(typeName)) {
-    switch (defaultValue) {
-      case 'true':
-        return ts.factory.createTrue();
-      case 'false':
-        return ts.factory.createFalse();
-      default:
-        throw new Error(`Invalid boolean value: ${defaultValue}`);
-    }
-  }
+  try {
+    const sf = ts.createSourceFile('<stdin>', `return ${defaultValue};`, ts.ScriptTarget.Latest);
 
-  return emitString(defaultValue);
+    return (sf.getChildAt(0).getChildAt(0) as any).expression as Expression;
+  } catch {
+    return emitString(defaultValue);
+  }
 };
 
 const sortByOptionality = (parameter1: Parameter, parameter2: Parameter) => Number(parameter2.required) - Number(parameter1.required);
@@ -347,6 +342,7 @@ const deriveNameFromParameters = (functionName: string, parameters: Parameter[])
 
 const bannedFunctionNames = {
   delete: 'remove',
+  export: 'export_',
 };
 
 const unbanFunctionname = (nickname: string): string => (Object.keys(bannedFunctionNames).includes(nickname) ? bannedFunctionNames[nickname] : nickname);
@@ -427,7 +423,7 @@ const importDeclaration = ts.factory.createImportDeclaration(
 
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 
-const cleanIdentifier = (name: string) => name.replace(/\//g, '');
+const cleanIdentifier = (name: string) => name.replace(/[/-]/g, '');
 
 function emitSummary(apis: Array<Api>) {
   const packageIndexFile = ts.createSourceFile('index.ts', '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);

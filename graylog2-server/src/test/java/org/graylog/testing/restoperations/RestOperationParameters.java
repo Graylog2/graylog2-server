@@ -34,6 +34,8 @@ public abstract class RestOperationParameters {
     @Nullable
     abstract Provider<String> jwtTokenProvider();
 
+    abstract boolean relaxedHTTPSValidation();
+
     private static final int DEFAULT_ATTEMPTS_COUNT = 160;
 
     abstract int attempts_count();
@@ -53,7 +55,8 @@ public abstract class RestOperationParameters {
 
     public static Builder builder() {
         return new AutoValue_RestOperationParameters.Builder()
-                .attempts_count(DEFAULT_ATTEMPTS_COUNT);
+                .attempts_count(DEFAULT_ATTEMPTS_COUNT)
+                .relaxedHTTPSValidation(false);
     }
 
     abstract Builder toBuilder();
@@ -69,5 +72,7 @@ public abstract class RestOperationParameters {
         public abstract Builder attempts_count(int attempts_count);
 
         public abstract RestOperationParameters build();
+
+        public abstract Builder relaxedHTTPSValidation(boolean relaxedHttpsValidation);
     }
 }
