@@ -1,0 +1,5 @@
+type = "a"
+message = "Implement common entity data table with sorting and filtering for events page"
+
+issues = ["20881"]
+pulls = ["20831", "graylog-plugin-enterprise#9020"]

@@ -14,22 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
-type Props = {
-  fields: Record<string, string>,
+import EventTypeLabel from 'components/events/events/EventTypeLabel';
+
+const FilterValueRenderers = {
+  alert: (value: 'true' | 'false') => (
+    <EventTypeLabel isAlert={value === 'true'} />
+  ),
 };
 
-const EventFields = ({ fields }: Props) => {
-  const fieldNames = Object.keys(fields);
-
-  return (
-    <>
-      {fieldNames.map((fieldName) => (
-        <div key={fieldName}><b>{fieldName}</b> {fields[fieldName]}</div>
-      ))}
-    </>
-  );
-};
-
-export default EventFields;
+export default FilterValueRenderers;
