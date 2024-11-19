@@ -22,37 +22,14 @@ import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
-import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
-import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.parser.ParseException;
-import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PaginatedList;
-import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.rest.models.PaginatedResponse;
-import org.graylog2.search.SearchQuery;
-import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -61,15 +38,43 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
+import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamService;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Api(value = "Pipelines/Pipelines", description = "Pipelines for the pipeline message processor", tags = {CLOUD_VISIBLE})
 @Path("/system/pipelines/pipeline")
@@ -84,21 +89,28 @@ public class PipelineResource extends RestResource implements PluginRestResource
             .put(PipelineDao.FIELD_TITLE, SearchQueryField.create(PipelineDao.FIELD_TITLE))
             .put(PipelineDao.FIELD_DESCRIPTION, SearchQueryField.create(PipelineDao.FIELD_DESCRIPTION))
             .build();
+    public static final String GL_INPUT_ROUTING_PIPELINE_PREFIX = "gl_input_routing_pipeline_";
 
     private final SearchQueryParser searchQueryParser;
     private final PaginatedPipelineService paginatedPipelineService;
 
     private final PipelineService pipelineService;
     private final PipelineRuleParser pipelineRuleParser;
+    private final RuleService ruleService;
+    private final StreamService streamService;
 
     @Inject
     public PipelineResource(PipelineService pipelineService,
                             PaginatedPipelineService paginatedPipelineService,
-                            PipelineRuleParser pipelineRuleParser) {
+                            PipelineRuleParser pipelineRuleParser,
+                            RuleService ruleService,
+                            StreamService streamService) {
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.paginatedPipelineService = paginatedPipelineService;
         this.searchQueryParser = new SearchQueryParser(PipelineDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.ruleService = ruleService;
+        this.streamService = streamService;
     }
 
     @ApiOperation(value = "Create a processing pipeline from source")
@@ -248,6 +260,79 @@ public class PipelineResource extends RestResource implements PluginRestResource
         }
 
         return PipelineSource.fromDao(pipelineRuleParser, savedPipeline);
+    }
+
+    public static record RoutingRequest(
+            String inputId,
+            String streamId,
+            boolean removeFromDefault
+    ) {}
+
+    @ApiOperation(value = "Create a stream routing pipeline rule")
+    @Path("/routing")
+    @PUT
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
+    public PipelineSource routing(@ApiParam(name = "body", required = true) @NotNull RoutingRequest request) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_EDIT, request.streamId());
+        checkPermission(PipelineRestPermissions.PIPELINE_RULE_CREATE);
+        final String pipelineName = GL_INPUT_ROUTING_PIPELINE_PREFIX + request.inputId();
+
+        String streamName;
+        try {
+            final Stream stream = streamService.load(request.streamId());
+            streamName = stream.getTitle();
+        } catch (NotFoundException e) {
+            throw new InternalServerErrorException(f("Unable to load stream %s", request.streamId()), e);
+        }
+
+        RuleDao ruleDao = createRoutingRule(request, streamName);
+        PipelineDao pipelineDao;
+        try {
+            pipelineDao = pipelineService.loadByName(pipelineName);
+        } catch (NotFoundException e) {
+            return createNewRouting(ruleDao, pipelineName);
+        }
+
+        PipelineSource pipelineSource = PipelineSource.fromDao(pipelineRuleParser, pipelineDao);
+        pipelineSource.stages().get(0).rules().add(ruleDao.title());
+        update(pipelineDao.id(), pipelineSource);
+
+        return pipelineSource;
+    }
+
+    private PipelineSource createNewRouting(RuleDao ruleDao, String pipelineName) {
+        final PipelineSource pipelineSource = PipelineSource.builder()
+                .title(pipelineName)
+                .description("GL generated pipeline")
+                .source("pipeline \"" + pipelineName + "\"\nstage 0 match either\nrule \"" + ruleDao.title() + "\"\nend")
+                .build();
+        return createFromParser(pipelineSource);
+    }
+
+    private RuleDao createRoutingRule(RoutingRequest request, String streamName) {
+        String ruleName = "route_to_" + streamName;
+        final Optional<RuleDao> ruleDaoOpt = ruleService.findByName(ruleName);
+        if (ruleDaoOpt.isPresent()) {
+            log.info(f("Routing rule %s already exists - skipping"), ruleName);
+            return ruleDaoOpt.get();
+        }
+
+        String ruleSource =
+                "rule \"" + ruleName + "\"\n"
+                        + "when has_field(\"gl2_source_input\") AND to_string($message.gl2_source_input)==\"" + request.inputId() + "\"\n"
+                        + "then\n"
+                        + "route_to_stream(id:\"" + request.streamId() + "\"";
+        if (request.removeFromDefault()) {
+            ruleSource += ", remove_from_default: true";
+        }
+        ruleSource += ");\nend\n";
+
+        RuleDao ruleDao = RuleDao.builder()
+                .title(ruleName)
+                .source(ruleSource)
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .build();
+        return ruleService.save(ruleDao);
     }
 
     @ApiOperation(value = "Delete a processing pipeline", notes = "It can take up to a second until the change is applied")
