@@ -37,7 +37,7 @@ import TeamsNotificationV2Details from './event-notifications/event-notification
 
 const bindings = {
   routes: [
-    { path: Routes.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp },
+    { path: Routes.unqualified.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp },
   ],
   inputConfiguration: [
     {
