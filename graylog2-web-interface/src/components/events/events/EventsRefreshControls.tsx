@@ -25,12 +25,11 @@ import useLocation from 'routing/useLocation';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import CommonRefreshControls from 'components/common/CommonRefreshControls';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
+import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
-type Props = {
-  disable?: boolean
-}
-
-const EventsRefreshControls = ({ disable = false }: Props) => {
+const EventsRefreshControls = () => {
+  const { refetch } = useTableFetchContext();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { config } = useSearchConfiguration();
@@ -64,14 +63,16 @@ const EventsRefreshControls = ({ disable = false }: Props) => {
   const intervalOptions = autoRefreshTimerangeOptions ? Object.entries(autoRefreshTimerangeOptions) : [];
 
   return (
-    <CommonRefreshControls disable={disable}
-                           intervalOptions={intervalOptions}
-                           isLoadingMinimumInterval={isLoadingMinimumInterval}
-                           minimumRefreshInterval={minimumRefreshInterval}
-                           defaultInterval={defaultInterval}
-                           humanName="Evets"
-                           onToggle={onToggle}
-                           onSelectInterval={onSelectInterval} />
+    <AutoRefreshProvider onRefresh={refetch}>
+      <CommonRefreshControls disable={false}
+                             intervalOptions={intervalOptions}
+                             isLoadingMinimumInterval={isLoadingMinimumInterval}
+                             minimumRefreshInterval={minimumRefreshInterval}
+                             defaultInterval={defaultInterval}
+                             humanName="Evets"
+                             onToggle={onToggle}
+                             onSelectInterval={onSelectInterval} />
+    </AutoRefreshProvider>
   );
 };
 

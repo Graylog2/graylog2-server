@@ -18,22 +18,15 @@ import React, { useCallback } from 'react';
 
 import useTableElements from 'components/events/events/hooks/useTableComponents';
 import { eventsTableElements } from 'components/events/Constants';
-import PaginatedEntityTable, { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
 import fetchEvents, { keyFn } from 'components/events/fetchEvents';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useQuery from 'routing/useQuery';
 import useColumnRenderers from 'components/events/events/ColumnRenderers';
-import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
 import EventsRefreshControls from 'components/events/events/EventsRefreshControls';
 import QueryHelper from 'components/common/QueryHelper';
-
-const RefreshControls = () => {
-  const { refetch } = useTableFetchContext();
-
-  return <AutoRefreshProvider onRefresh={refetch}><EventsRefreshControls disable={false} /></AutoRefreshProvider>;
-};
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
@@ -55,7 +48,7 @@ const EventsEntityTable = () => {
                                                        entityAttributesAreCamelCase={false}
                                                        filterValueRenderers={FilterValueRenderers}
                                                        columnRenderers={columnRenderers}
-                                                       topRightCol={<RefreshControls />} />
+                                                       topRightCol={<EventsRefreshControls />} />
   );
 };
 
