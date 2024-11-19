@@ -15,36 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect } from 'react';
-import { useFormikContext } from 'formik';
+import { useCallback } from 'react';
 
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import CommonRefreshControls from 'components/common/CommonRefreshControls';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
-
-const useDisableOnFormChange = () => {
-  const { refreshConfig, stopAutoRefresh } = useAutoRefresh();
-  const { dirty, isSubmitting } = useFormikContext();
-
-  useEffect(() => {
-    if (refreshConfig?.enabled && !isSubmitting && dirty) {
-      stopAutoRefresh();
-    }
-  }, [dirty, isSubmitting, refreshConfig?.enabled, stopAutoRefresh]);
-};
 
 type Props = {
   disable?: boolean
 }
 
-const RefreshControls = ({ disable = false }: Props) => {
-  const { dirty, submitForm } = useFormikContext();
+const EventsRefreshControls = ({ disable = false }: Props) => {
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { config } = useSearchConfiguration();
@@ -53,25 +39,20 @@ const RefreshControls = ({ disable = false }: Props) => {
 
   const defaultInterval = useDefaultInterval();
 
-  useDisableOnFormChange();
   const onSelectInterval = useCallback((interval: string) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_REFRESH_CONTROL_PRESET_SELECTED, {
       app_pathname: getPathnameWithoutId(location.pathname),
-      app_section: 'search-bar',
-      app_action_value: 'refresh-search-control-dropdown',
+      app_section: 'alerts-page',
+      app_action_value: 'refresh-alerts-control-dropdown',
       event_details: { interval: interval },
     });
-
-    if (dirty) {
-      submitForm();
-    }
-  }, [dirty, location.pathname, sendTelemetry, submitForm]);
+  }, [location.pathname, sendTelemetry]);
 
   const onToggle = useCallback((enabled) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {
-      app_pathname: 'search',
-      app_section: 'search-bar',
-      app_action_value: 'refresh-search-control-enable',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_REFRESH_CONTROL_TOGGLED, {
+      app_pathname: 'alerts',
+      app_section: 'alerts-page',
+      app_action_value: 'refresh-alerts-control-enable',
       event_details: { enabled },
     });
   }, [sendTelemetry]);
@@ -80,7 +61,7 @@ const RefreshControls = ({ disable = false }: Props) => {
     return null;
   }
 
-  const intervalOptions = Object.entries(autoRefreshTimerangeOptions);
+  const intervalOptions = autoRefreshTimerangeOptions ? Object.entries(autoRefreshTimerangeOptions) : [];
 
   return (
     <CommonRefreshControls disable={disable}
@@ -88,11 +69,10 @@ const RefreshControls = ({ disable = false }: Props) => {
                            isLoadingMinimumInterval={isLoadingMinimumInterval}
                            minimumRefreshInterval={minimumRefreshInterval}
                            defaultInterval={defaultInterval}
-                           humanName="Search"
+                           humanName="Evets"
                            onToggle={onToggle}
-                           onEnable={submitForm}
                            onSelectInterval={onSelectInterval} />
   );
 };
 
-export default RefreshControls;
+export default EventsRefreshControls;

@@ -1,0 +1,5 @@
+type = "a"
+message = "Add auto refresh to events page"
+
+issues = ["graylog-plugin-enterprise#8661"]
+pulls = ["20896"]
