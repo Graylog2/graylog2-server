@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { qualifyUrls } from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
 
 const AwsRoutes = {
   INTEGRATIONS: {
@@ -57,7 +58,7 @@ const DocsRoutes = {
 };
 
 export default {
-  ...qualifyUrls(AwsRoutes),
+  ...qualifyUrls(AwsRoutes, AppConfig.gl2AppPathPrefix()),
   unqualified: AwsRoutes,
 };
 
