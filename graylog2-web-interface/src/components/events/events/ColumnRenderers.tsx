@@ -98,6 +98,7 @@ const RemediationStepRenderer = ({ eventDefinitionId, meta }: { eventDefinitionI
 
 const StyledDiv = styled.div`
   cursor: pointer;
+
   &:hover {
     text-decoration: underline;
   }
