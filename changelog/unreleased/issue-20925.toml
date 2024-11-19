@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Fix failing of executing search on event definituon page"
+message = "Fix failing of executing search on event definition page"
 
 issues = ["20925"]
 pulls = ["20953"]
