@@ -57,8 +57,10 @@ const DocsRoutes = {
   },
 };
 
+const qualifiedRoutes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(AwsRoutes, AppConfig.gl2AppPathPrefix()) : AwsRoutes;
+
 export default {
-  ...qualifyUrls(AwsRoutes, AppConfig.gl2AppPathPrefix()),
+  ...qualifiedRoutes,
   unqualified: AwsRoutes,
 };
 
