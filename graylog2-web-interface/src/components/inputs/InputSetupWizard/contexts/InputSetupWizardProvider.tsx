@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import InputSetupWizardContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardContext';
-import type { InputSetupWizardStep, StepData, StepsData, WizardData } from 'components/inputs/InputSetupWizard/types';
+import type { InputSetupWizardStep, StepsData, WizardData } from 'components/inputs/InputSetupWizard/types';
 import { addStepAfter, getNextStep, checkHasPreviousStep, checkIsNextStepDisabled } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 
 const DEFAULT_ACTIVE_STEP = undefined;
@@ -31,13 +31,6 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
   const [orderedSteps, setOrderedSteps] = useState<Array<InputSetupWizardStep>>([]);
   const [stepsData, setStepsData] = useState<StepsData>(DEFAULT_STEPS_DATA);
   const [show, setShow] = useState<boolean>(false);
-
-  const updateStepData = useCallback(
-    (stepName: InputSetupWizardStep, data: StepData) => {
-      setStepsData({ ...stepsData, [stepName]: { ...stepsData[stepName], ...data } });
-    },
-    [stepsData],
-  );
 
   const updateWizardData = useCallback(
     (key: keyof WizardData, value: WizardData[typeof key]) => {
@@ -61,13 +54,6 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
     setWizardData({ ...wizardData, ...data });
     setShow(true);
   }, [wizardData]);
-
-  const enableNextStep = useCallback((step?: InputSetupWizardStep) => {
-    const nextStep = step ?? getNextStep(orderedSteps, activeStep);
-    if (!nextStep) return;
-
-    updateStepData(nextStep, { enabled: true });
-  }, [updateStepData, orderedSteps, activeStep]);
 
   const goToNextStep = useCallback((step?: InputSetupWizardStep) => {
     const nextStep = step ?? getNextStep(orderedSteps, activeStep);
@@ -97,27 +83,25 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
   const value = useMemo(() => ({
     setActiveStep,
     activeStep,
-    updateStepData,
     stepsData,
+    setStepsData,
     wizardData,
     updateWizardData,
     show,
     orderedSteps,
     setOrderedSteps,
-    enableNextStep,
     goToPreviousStep,
     goToNextStep,
     openWizard,
     closeWizard,
   }), [
     activeStep,
-    updateStepData,
     stepsData,
+    setStepsData,
     wizardData,
     updateWizardData,
     show,
     orderedSteps,
-    enableNextStep,
     goToPreviousStep,
     goToNextStep,
     openWizard,

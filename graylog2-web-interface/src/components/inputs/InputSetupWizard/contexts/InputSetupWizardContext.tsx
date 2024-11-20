@@ -17,19 +17,18 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-import type { InputSetupWizardStep, WizardData, StepData, StepsData } from 'components/inputs/InputSetupWizard/types';
+import type { InputSetupWizardStep, WizardData, StepsData } from 'components/inputs/InputSetupWizard/types';
 
 type InputSetupWizardContextType = {
   activeStep: InputSetupWizardStep | undefined,
   setActiveStep: (InputSetupWizardStep) => void,
   stepsData: StepsData,
-  updateStepData: (stepName: InputSetupWizardStep, data: StepData) => void,
+  setStepsData: (stepsData: StepsData) => void,
   wizardData: WizardData,
   updateWizardData: (key: keyof WizardData, value: WizardData[typeof key]) => void,
   orderedSteps: Array<InputSetupWizardStep>,
   setOrderedSteps: (steps: Array<InputSetupWizardStep>) => void,
   show: boolean,
-  enableNextStep: (step?: InputSetupWizardStep) => void,
   goToPreviousStep: () => void,
   goToNextStep: (step?: InputSetupWizardStep) => void,
   openWizard: (data?: WizardData) => void,

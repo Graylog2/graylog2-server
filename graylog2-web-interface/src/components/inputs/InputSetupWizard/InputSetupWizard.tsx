@@ -42,7 +42,7 @@ const InputSetupWizard = () => {
         component: (
           <SetupRoutingStep />
         ),
-        disabled: getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING, 'disabled') || true,
+        disabled: false,
       },
       [INPUT_WIZARD_STEPS.START_INPUT]: {
         key: INPUT_WIZARD_STEPS.START_INPUT,
@@ -54,7 +54,7 @@ const InputSetupWizard = () => {
         component: (
           <StartInputStep />
         ),
-        disabled: getStepData(stepsData, INPUT_WIZARD_STEPS.START_INPUT, 'disabled') || true,
+        disabled: !getStepData(stepsData, INPUT_WIZARD_STEPS.START_INPUT, 'enabled'),
       },
       [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
         key: INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
@@ -66,7 +66,7 @@ const InputSetupWizard = () => {
         component: (
           <InputDiagnosisStep />
         ),
-        disabled: getStepData(stepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, 'disabled') || true,
+        disabled: !getStepData(stepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, 'enabled'),
       },
     };
     if (enterpriseSteps) return { ...defaultSteps, ...enterpriseSteps };

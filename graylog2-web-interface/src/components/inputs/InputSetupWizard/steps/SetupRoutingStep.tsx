@@ -28,7 +28,7 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import type { StepData } from 'components/inputs/InputSetupWizard/types';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStream from 'components/inputs/InputSetupWizard/steps/components/CreateStream';
-import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
+import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 
 const DescriptionCol = styled(Col)(({ theme }) => css`
   margin-bottom: ${theme.spacings.sm};
@@ -50,7 +50,7 @@ interface RoutingStepData extends StepData {
 }
 
 const SetupRoutingStep = () => {
-  const { goToPreviousStep, goToNextStep, updateStepData, enableNextStep, orderedSteps, activeStep, stepsData } = useInputSetupWizard();
+  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsData, setStepsData } = useInputSetupWizard();
   const { data: streams, isLoading: isStreamsLoading } = useQuery<Array<Stream>>(['streamsMap'], StreamsActions.listStreams);
   const [selectedStream, setSelectedStream] = useState(undefined);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
@@ -60,8 +60,11 @@ const SetupRoutingStep = () => {
   const currentStepName = INPUT_WIZARD_STEPS.SETUP_ROUTING;
 
   useEffect(() => {
-    enableNextStep();
-  }, [enableNextStep]);
+    if (orderedSteps && activeStep && stepsData) {
+      const withNextStepEnabled = enableNextStep(orderedSteps, activeStep, stepsData);
+      setStepsData(withNextStepEnabled);
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const options = useMemo(() => {
     if (!streams) return [];
@@ -77,7 +80,10 @@ const SetupRoutingStep = () => {
   };
 
   const onNextStep = () => {
-    updateStepData(currentStepName, { stream: selectedStream, disabled: false } as RoutingStepData);
+    setStepsData(
+      updateStepData(stepsData, currentStepName, { stream: selectedStream, disabled: false } as RoutingStepData),
+    );
+
     goToNextStep();
   };
 

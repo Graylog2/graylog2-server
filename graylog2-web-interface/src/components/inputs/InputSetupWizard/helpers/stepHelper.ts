@@ -1,4 +1,21 @@
-import type { InputSetupWizardStep, StepsData } from 'components/inputs/InputSetupWizard/types';
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+
+import type { InputSetupWizardStep, StepsData, StepData } from 'components/inputs/InputSetupWizard/types';
 
 export const getStepData = (stepsData: StepsData, stepName: InputSetupWizardStep, key?: string) => {
   if (key) return stepsData[stepName] ? stepsData[stepName][key] : undefined;
@@ -50,4 +67,23 @@ export const addStepAfter = (orderedSteps: Array<InputSetupWizardStep>, step: In
   ];
 
   return newOrderedSteps;
+};
+
+export const updateStepData = (stepsData: StepsData, stepName: InputSetupWizardStep, data: StepData = {}) : StepsData => {
+  if (!stepsData || !stepName) return {};
+
+  return { ...stepsData, [stepName]: { ...stepsData[stepName], ...data } };
+};
+
+export const enableNextStep = (
+  orderedSteps: Array<InputSetupWizardStep>,
+  activeStep: InputSetupWizardStep,
+  stepsData: StepsData,
+  step?: InputSetupWizardStep,
+) : StepsData => {
+  const nextStep = step ?? getNextStep(orderedSteps, activeStep);
+
+  if (!nextStep) return stepsData;
+
+  return updateStepData(stepsData, nextStep, { enabled: true });
 };
