@@ -26,7 +26,7 @@ export type StreamConnectedPipelines = Array<Pick<PipelineType, 'id' | 'title'>>
 
 const fetchPipelinesConnectedStream = (streamId: string) => fetch('GET', qualifyUrl(ApiRoutes.StreamsApiController.stream_connected_pipelines(streamId).url));
 
-const usePipelinesConnectedStream = (streamId: string): {
+const usePipelinesConnectedStream = (streamId: string, enabled: boolean = true): {
   data: StreamConnectedPipelines,
   refetch: () => void,
   isInitialLoading: boolean,
@@ -38,6 +38,7 @@ const usePipelinesConnectedStream = (streamId: string): {
     () => fetchPipelinesConnectedStream(streamId),
     {
       notifyOnChangeProps: ['data', 'error'],
+      enabled: enabled,
     },
   );
 

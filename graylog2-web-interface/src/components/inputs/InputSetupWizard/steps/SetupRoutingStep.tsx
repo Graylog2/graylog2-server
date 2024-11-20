@@ -19,7 +19,7 @@ import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
-import { Button, Row, Col } from 'components/bootstrap';
+import { Alert, Button, Row, Col } from 'components/bootstrap';
 import { Select } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import { StreamsActions } from 'stores/streams/StreamsStore';
@@ -29,6 +29,7 @@ import type { StepData } from 'components/inputs/InputSetupWizard/types';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStream from 'components/inputs/InputSetupWizard/steps/components/CreateStream';
 import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
+import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
 const DescriptionCol = styled(Col)(({ theme }) => css`
   margin-bottom: ${theme.spacings.sm};
@@ -42,17 +43,22 @@ const ButtonCol = styled(Col)(({ theme }) => css`
   display: flex;
   justify-content: flex-end;
   gap: ${theme.spacings.xs};
-  margin-top: ${theme.spacings.md};
+  margin-top: ${theme.spacings.lg};
 `);
 
+const ConntectedPipelinesList = styled.ul`
+  list-style-type: disc;
+  padding-left: 20px;
+`;
+
 interface RoutingStepData extends StepData {
-  stream: string
+  streamId: string
 }
 
 const SetupRoutingStep = () => {
   const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsData, setStepsData } = useInputSetupWizard();
   const { data: streams, isLoading: isStreamsLoading } = useQuery<Array<Stream>>(['streamsMap'], StreamsActions.listStreams);
-  const [selectedStream, setSelectedStream] = useState(undefined);
+  const [selectedStreamId, setSelectedStreamId] = useState(undefined);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
@@ -66,6 +72,8 @@ const SetupRoutingStep = () => {
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
+
   const options = useMemo(() => {
     if (!streams) return [];
 
@@ -75,13 +83,13 @@ const SetupRoutingStep = () => {
       .map(({ title, id }) => ({ label: title, value: id }));
   }, [streams]);
 
-  const handleStreamSelect = (stream: string) => {
-    setSelectedStream(stream);
+  const handleStreamSelect = (streamId: string) => {
+    setSelectedStreamId(streamId);
   };
 
   const onNextStep = () => {
     setStepsData(
-      updateStepData(stepsData, currentStepName, { stream: selectedStream, disabled: false } as RoutingStepData),
+      updateStepData(stepsData, currentStepName, { streamId: selectedStreamId } as RoutingStepData),
     );
 
     goToNextStep();
@@ -97,6 +105,8 @@ const SetupRoutingStep = () => {
     goToPreviousStep();
   };
 
+  const streamHasConnectedPipelines = streamPipelinesData && streamPipelinesData?.length > 0;
+
   return (
     <>
       <Row>
@@ -105,6 +115,14 @@ const SetupRoutingStep = () => {
             Choose a Destination Stream to Route Messages from this Input to. Messages that are not
             routed to any streams will be sent to the &quot;All Messages&quot; Stream.
           </p>
+          {selectedStreamId && streamHasConnectedPipelines && (
+          <Alert title="Pipelines connected to stream" bsStyle="info">
+            The selected stream has existing pipelines connected to it:
+            <ConntectedPipelinesList>
+              {streamPipelinesData.map((pipeline) => <li key={pipeline.title}>{pipeline.title}</li>)}
+            </ConntectedPipelinesList>
+          </Alert>
+          )}
         </DescriptionCol>
       </Row>
       {showCreateStream ? (<CreateStream />) : (
@@ -117,7 +135,7 @@ const SetupRoutingStep = () => {
                       options={options}
                       clearable
                       placeholder="All messages (Default)"
-                      value={selectedStream} />
+                      value={selectedStreamId} />
             )}
           </Col>
           <Col md={6}>
