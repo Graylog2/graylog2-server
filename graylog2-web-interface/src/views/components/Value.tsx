@@ -74,15 +74,9 @@ InteractiveValue.defaultProps = {
 
 const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => (
   <InteractiveContext.Consumer>
-<<<<<<< HEAD
-    {(interactive) => ((interactive)
-      ? <InteractiveValue field={field} value={value} render={render} type={type} />
-      : <span><TypeSpecificValue field={field} value={value} render={render} type={type} /></span>)}
-=======
     {(interactive) => (interactive
-      ? <InteractiveValue field={field} value={value} render={render} type={type} unit={unit} />
-      : <span><TypeSpecificValueWithHighlight field={field} value={value} render={render} type={type} unit={unit} /></span>)}
->>>>>>> 166bc862f9 (Fix custom highlighting of field values for message details in message table.)
+      ? <InteractiveValue field={field} value={value} render={render} type={type} />
+      : <span><TypeSpecificValueWithHighlight field={field} value={value} render={render} type={type} /></span>)}
   </InteractiveContext.Consumer>
 );
 
