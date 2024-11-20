@@ -34,6 +34,7 @@ import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
+import org.graylog.events.procedures.EventProcedure;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog2.contentpacks.ContentPackable;
@@ -63,6 +64,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_REMEDIATION_STEPS = "remediation_steps";
+    public static final String FIELD_EVENT_PROCEDURE = "event_procedure";
     public static final String FIELD_NOTIFICATIONS = "notifications";
     public static final String FIELD_STATE = "state";
     public static final String FIELD_UPDATED_AT = "updated_at";
@@ -146,6 +148,12 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
     @JsonProperty(FIELD_STATE)
     public abstract EventDefinition.State state();
+
+    @Override
+    @Nullable
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(FIELD_EVENT_PROCEDURE)
+    public abstract EventProcedure eventProcedure();
 
     public static Builder builder() {
         return Builder.create();
@@ -248,6 +256,9 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
         @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
         public abstract Builder schedulerCtx(EventDefinitionContextService.SchedulerCtx schedulerCtx);
+
+        @JsonProperty(FIELD_EVENT_PROCEDURE)
+        public abstract Builder eventProcedure(EventProcedure eventProcedure);
 
         abstract EventDefinitionDto autoBuild();
 

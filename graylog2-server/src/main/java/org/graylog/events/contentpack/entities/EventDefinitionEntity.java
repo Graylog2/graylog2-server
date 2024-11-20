@@ -27,6 +27,7 @@ import jakarta.annotation.Nullable;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
+import org.graylog.events.procedures.EventProcedure;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog2.contentpacks.NativeEntityConverter;
@@ -61,6 +62,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     private static final String FIELD_IS_SCHEDULED = "is_scheduled";
     private static final String UPDATED_AT = "updated_at";
     private static final String MATCHED_AT = "matched_at";
+    private static final String FIELD_EVENT_PROCEDURE = "event_procedure";
 
     @JsonProperty(FIELD_TITLE)
     public abstract ValueReference title();
@@ -106,6 +108,10 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
 
     @JsonProperty(FIELD_IS_SCHEDULED)
     public abstract ValueReference isScheduled();
+
+    @Nullable
+    @JsonProperty(FIELD_EVENT_PROCEDURE)
+    public abstract EventProcedure eventProcedure();
 
     public static Builder builder() {
         return Builder.create();
@@ -161,6 +167,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
 
         @JsonProperty(FIELD_IS_SCHEDULED)
         public abstract Builder isScheduled(ValueReference isScheduled);
+
+        @JsonProperty(FIELD_EVENT_PROCEDURE)
+        public abstract Builder eventProcedure(EventProcedure eventProcedure);
 
         public abstract EventDefinitionEntity build();
     }
