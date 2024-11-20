@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.rest;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
@@ -41,10 +42,12 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
@@ -67,8 +70,10 @@ import org.joda.time.DateTimeZone;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -89,13 +94,14 @@ public class PipelineResource extends RestResource implements PluginRestResource
             .put(PipelineDao.FIELD_TITLE, SearchQueryField.create(PipelineDao.FIELD_TITLE))
             .put(PipelineDao.FIELD_DESCRIPTION, SearchQueryField.create(PipelineDao.FIELD_DESCRIPTION))
             .build();
-    public static final String GL_INPUT_ROUTING_PIPELINE_PREFIX = "gl_input_routing_pipeline_";
+    public static final String GL_INPUT_ROUTING_PIPELINE = "gl_input_routing_pipeline";
 
     private final SearchQueryParser searchQueryParser;
     private final PaginatedPipelineService paginatedPipelineService;
 
     private final PipelineService pipelineService;
     private final PipelineRuleParser pipelineRuleParser;
+    private final PipelineStreamConnectionsService connectionsService;
     private final RuleService ruleService;
     private final StreamService streamService;
 
@@ -103,12 +109,14 @@ public class PipelineResource extends RestResource implements PluginRestResource
     public PipelineResource(PipelineService pipelineService,
                             PaginatedPipelineService paginatedPipelineService,
                             PipelineRuleParser pipelineRuleParser,
+                            PipelineStreamConnectionsService connectionsService,
                             RuleService ruleService,
                             StreamService streamService) {
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.paginatedPipelineService = paginatedPipelineService;
         this.searchQueryParser = new SearchQueryParser(PipelineDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.connectionsService = connectionsService;
         this.ruleService = ruleService;
         this.streamService = streamService;
     }
@@ -263,19 +271,18 @@ public class PipelineResource extends RestResource implements PluginRestResource
     }
 
     public static record RoutingRequest(
-            String inputId,
-            String streamId,
-            boolean removeFromDefault
+            @JsonProperty(value = "input_id", required = true) String inputId,
+            @JsonProperty(value = "stream_id", required = true) String streamId,
+            @JsonProperty(value = "remove_from_default", required = true) boolean removeFromDefault
     ) {}
 
-    @ApiOperation(value = "Create a stream routing pipeline rule")
+    @ApiOperation(value = "Add a stream routing rule to the default routing pipeline.")
     @Path("/routing")
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
     public PipelineSource routing(@ApiParam(name = "body", required = true) @NotNull RoutingRequest request) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, request.streamId());
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_CREATE);
-        final String pipelineName = GL_INPUT_ROUTING_PIPELINE_PREFIX + request.inputId();
 
         String streamName;
         try {
@@ -288,32 +295,49 @@ public class PipelineResource extends RestResource implements PluginRestResource
         RuleDao ruleDao = createRoutingRule(request, streamName);
         PipelineDao pipelineDao;
         try {
-            pipelineDao = pipelineService.loadByName(pipelineName);
+            pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
         } catch (NotFoundException e) {
-            return createNewRouting(ruleDao, pipelineName);
+            // Create pipeline with first rule
+            return createRoutingPipeline(request, ruleDao);
         }
 
+        // Add rule to existing pipeline
         PipelineSource pipelineSource = PipelineSource.fromDao(pipelineRuleParser, pipelineDao);
-        pipelineSource.stages().get(0).rules().add(ruleDao.title());
-        update(pipelineDao.id(), pipelineSource);
+        final List<String> rules0 = pipelineSource.stages().get(0).rules();
+        if (rules0.stream().filter(ruleRef -> ruleRef.equals(ruleDao.title())).findFirst().isEmpty()) {
+            pipelineSource.stages().get(0).rules().add(ruleDao.title());
+            update(pipelineDao.id(), pipelineSource);
+        } else {
+            log.info(f("Routing for input <%s> already exists - skipping", request.inputId()));
+        }
 
         return pipelineSource;
     }
 
-    private PipelineSource createNewRouting(RuleDao ruleDao, String pipelineName) {
+    private PipelineSource createRoutingPipeline(RoutingRequest request, RuleDao ruleDao) {
+        List<StageSource> stages = java.util.List.of(StageSource.create(
+                0, Stage.Match.EITHER, java.util.List.of(ruleDao.title())));
         final PipelineSource pipelineSource = PipelineSource.builder()
-                .title(pipelineName)
+                .title(GL_INPUT_ROUTING_PIPELINE)
                 .description("GL generated pipeline")
-                .source("pipeline \"" + pipelineName + "\"\nstage 0 match either\nrule \"" + ruleDao.title() + "\"\nend")
+                .source("pipeline \"" + GL_INPUT_ROUTING_PIPELINE + "\"\nstage 0 match either\nrule \"" + ruleDao.title() + "\"\nend")
+                .stages(stages)
                 .build();
-        return createFromParser(pipelineSource);
+        final PipelineSource parsedSource = createFromParser(pipelineSource);
+
+        Set<String> pipelineIds = new HashSet<>();
+        pipelineIds.add(parsedSource.id());
+        final PipelineConnections pipelineConnections = PipelineConnections.create(null, request.streamId(), pipelineIds);
+        connectionsService.save(pipelineConnections);
+
+        return parsedSource;
     }
 
     private RuleDao createRoutingRule(RoutingRequest request, String streamName) {
-        String ruleName = "route_to_" + streamName;
+        String ruleName = "route_" + request.inputId() + "_to_" + streamName;
         final Optional<RuleDao> ruleDaoOpt = ruleService.findByName(ruleName);
         if (ruleDaoOpt.isPresent()) {
-            log.info(f("Routing rule %s already exists - skipping"), ruleName);
+            log.info(f("Routing rule %s already exists - skipping", ruleName));
             return ruleDaoOpt.get();
         }
 
