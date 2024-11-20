@@ -14,18 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
 
-import InputSetupWizardContext from 'contexts/InputSetupWizardContext';
+import TestInputStep from './TestInputStep';
 
-const useInputSetupWizard = () => {
-  const inputSetupWizard = useContext(InputSetupWizardContext);
+export { default as TestInputStep } from './TestInputStep';
 
-  if (!inputSetupWizard) {
-    throw new Error('useInputSetupWizard hook needs to be used inside InputSetupWizardContext.Provider');
-  }
-
-  return inputSetupWizard;
-};
-
-export default useInputSetupWizard;
+export default TestInputStep;

@@ -36,23 +36,25 @@ import org.graylog.security.certutil.csr.ClientCertGenerator;
 import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
+import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.rest.ApiError;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Path("/ca/clientcert")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@Api(value = "CA CLient Certificates", description = "Certificate Authority Client Certificates", tags = {CLOUD_VISIBLE})
-public class CAClientResource extends RestResource {
+@Api(value = "Client Certificates", description = "Certificate Authority Client Certificates", tags = {CLOUD_VISIBLE})
+public class ClientCertResource extends RestResource {
     private final ClientCertGenerator clientCertGenerator;
 
     @Inject
-    public CAClientResource(final ClientCertGenerator clientCertGenerator) {
+    public ClientCertResource(final ClientCertGenerator clientCertGenerator) {
         this.clientCertGenerator = clientCertGenerator;
     }
 
@@ -63,11 +65,17 @@ public class CAClientResource extends RestResource {
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_CREATE)
     public Response createClientCert(@ApiParam(name = "request", required = true) @NotNull @Valid CreateClientCertRequest request) {
         try {
-            var cert = clientCertGenerator.generateClientCert(request.principal(), request.role(), request.password().toCharArray());
+            final Duration certificateLifetime = certificateLifetime(request);
+            var cert = clientCertGenerator.generateClientCert(request.principal(), request.role(), request.password().toCharArray(), certificateLifetime);
             return Response.ok().entity(cert).build();
         } catch (ClientCertGenerationException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();
         }
+    }
+
+    private static Duration certificateLifetime(CreateClientCertRequest request) {
+        final RenewalPolicy rp = new RenewalPolicy(RenewalPolicy.Mode.MANUAL, request.certificateLifetime());
+        return rp.parsedCertificateLifetime();
     }
 
     @DELETE

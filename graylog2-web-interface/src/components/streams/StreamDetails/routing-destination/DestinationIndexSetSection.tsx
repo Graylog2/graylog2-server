@@ -19,7 +19,7 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
-import { Icon, Section, Spinner, Timestamp } from 'components/common';
+import { Icon, Section, Spinner } from 'components/common';
 import { IndexSetsStore, type IndexSet } from 'stores/indices/IndexSetsStore';
 import { Table, Button, Alert } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
@@ -35,6 +35,9 @@ import DestinationSwitch from 'components/streams/StreamDetails/routing-destinat
 import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
 import useIndexSetStats from 'hooks/useIndexSetStats';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
+import useIndexerOverview from 'hooks/useIndexerOverview';
+
+import IndexSetOldestMessageCell from './IndexSetOldestMessageCell';
 
 type Props = {
   indexSet: IndexSet,
@@ -49,12 +52,13 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const archivingEnabled = indexSet.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY || indexSet?.data_tiering?.archive_before_deletion;
   const { indexSets } = useStore(IndexSetsStore);
-  const { data, isLoading } = useStreamOutputFilters(stream.id, 'indexer', pagination);
+  const { data: streamOutputFilters, isLoading: isLoadingStreamOutputFilters } = useStreamOutputFilters(stream.id, 'indexer', pagination);
+  const { data: indexerOverview, isSuccess: isLoadingIndexerOverviewSuccess } = useIndexerOverview(indexSet.id);
   /* eslint-disable no-constant-condition */
   const title = true ? 'Enabled' : 'Disabled'; // TODO use api to check if enabled
   const { data: indexSetStats, isSuccess: isStatsLoaded } = useIndexSetStats(indexSet.id);
 
-  if (isLoading) {
+  if (isLoadingStreamOutputFilters) {
     <Spinner />;
   }
 
@@ -76,7 +80,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
                                     label={title}
                                     disabled
                                     onChange={() => {}} />
-                 <SectionCountLabel>FILTERS {data?.pagination?.total || 0}</SectionCountLabel>
+                 <SectionCountLabel>FILTERS {streamOutputFilters?.pagination?.total || 0}</SectionCountLabel>
                </>
              )}
              actions={(
@@ -102,11 +106,10 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
           <tr>
             <td>{indexSet?.title}</td>
             <td>{(isStatsLoaded && indexSetStats?.size) ? NumberUtils.formatBytes(indexSetStats.size) : 0}</td>
-            <td><Timestamp dateTime={indexSet.creation_date} /></td>
+            <td>{isLoadingIndexerOverviewSuccess && <IndexSetOldestMessageCell index={indexerOverview?.indices?.pop()} />}</td>
             <td>
               <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
             </td>
-            {}
             <td>
               <ActionButtonsWrap>
                 <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
@@ -122,7 +125,7 @@ const DestinationIndexSetSection = ({ indexSet, stream }: Props) => {
           </tr>
         </tbody>
       </Table>
-      {data && (<IndexSetFilters streamId={stream.id} paginatedFilters={data} onPaginationChange={onPaginationChange} />)}
+      {streamOutputFilters && (<IndexSetFilters streamId={stream.id} paginatedFilters={streamOutputFilters} onPaginationChange={onPaginationChange} />)}
     </Section>
   );
 };

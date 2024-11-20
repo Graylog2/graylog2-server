@@ -18,6 +18,8 @@ package org.graylog.datanode.opensearch.cli;
 
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 
+import java.nio.file.Path;
+
 /**
  * Collection of opensearch CLI tools. All of them need to have OPENSEARCH_PATH_CONF preconfigured, so they operate
  * on the correct version of configuration.
@@ -27,7 +29,14 @@ public class OpensearchCli {
     private final OpensearchKeystoreCli keystore;
 
     public OpensearchCli(OpensearchConfiguration config) {
-        this.keystore = new OpensearchKeystoreCli(config);
+        this(
+                config.datanodeDirectories().getOpensearchProcessConfigurationDir(),
+                config.opensearchDistribution().getOpensearchBinDirPath()
+        );
+    }
+
+    public OpensearchCli(Path configDir, Path binDir) {
+        this.keystore = new OpensearchKeystoreCli(configDir, binDir);
     }
 
     public OpensearchKeystoreCli keystore() {

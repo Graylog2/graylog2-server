@@ -17,9 +17,9 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { type PipelineType } from 'stores/pipelines/PipelinesStore';
-import UserNotification from 'util/UserNotification';
 import { PipelinesPipelines } from '@graylog/server-api';
 import type FetchError from 'logic/errors/FetchError';
+import { defaultOnError } from 'util/conditional/onError';
 
 type Options = {
   enabled: boolean,
@@ -32,12 +32,8 @@ const usePipelines = ({ enabled }: Options = { enabled: true }) : {
 } => {
   const { data, refetch, isInitialLoading } = useQuery<Array<PipelineType>, FetchError>(
     ['pipelines'],
-    () => PipelinesPipelines.getAll(),
+    () => defaultOnError(PipelinesPipelines.getAll(), 'Loading pipelines failed with status', 'Could not load pipelines'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading pipelines failed with status: ${errorThrown}`,
-          'Could not load pipelines');
-      },
       enabled,
     },
   );

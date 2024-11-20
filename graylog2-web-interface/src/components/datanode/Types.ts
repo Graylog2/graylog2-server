@@ -36,12 +36,14 @@ export type NodeInfo = {
   node_version: string,
 }
 export type CompatibilityResponseType = {
+  hostname: string,
   opensearch_version: string,
   info: {
     nodes: Array<NodeInfo>,
     opensearch_data_location: string,
   },
   compatibility_errors: Array<string>,
+  compatibility_warnings: Array<string>,
 };
 export type DataNode = {
   hostname: string,

@@ -14,10 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.datanode.configuration.variants;
 
-const CategoryStep = () => (
-  <div>Category Step</div>
-);
+import java.util.Map;
 
-export default CategoryStep;
+public interface KeystoreContributor {
+    /**
+     * @return collection of key-value pairs that should be added to the opensearch keystore (holding secrets)
+     */
+    Map<String, String> getKeystoreItems();
+}

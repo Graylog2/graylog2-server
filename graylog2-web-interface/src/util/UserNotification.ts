@@ -34,17 +34,17 @@ const defaultSettings = {
 };
 
 const UserNotification = {
-  error(message, title) {
-    toastr.error(message, title || 'Error', {
+  error(message: string, title?: string) {
+    toastr.error(message, title ?? 'Error', {
       ...defaultSettings,
       timeOut: 10000,
     });
   },
-  warning(message, title) {
-    toastr.warning(message, title || 'Attention', defaultSettings);
+  warning(message: string, title?: string) {
+    toastr.warning(message, title ?? 'Attention', defaultSettings);
   },
-  success(message, title) {
-    toastr.success(message, title || 'Information', defaultSettings);
+  success(message: string, title?: string) {
+    toastr.success(message, title ?? 'Information', defaultSettings);
   },
 };
 

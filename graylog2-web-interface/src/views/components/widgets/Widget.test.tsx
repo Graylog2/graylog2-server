@@ -377,33 +377,4 @@ describe('<Widget />', () => {
 
     expect(updateWidget).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
   });
-
-  it('shows an info when the widget accesses the Warm Tier', async () => {
-    render(<DummyWidget searchedIndices={
-[
-  {
-    index_name: 'aloho_warm_1016',
-    begin: 1709715731270,
-    end: 1709716042255,
-    is_warm_tiered: true,
-    stream_names: ['aloho', 'mora'],
-  },
-  {
-    index_name: 'aloho_1017',
-    begin: 1709716042283,
-    end: 1709716342274,
-    is_warm_tiered: false,
-    stream_names: ['lumos'],
-  },
-  {
-    index_name: 'aloho_1018',
-    begin: 0,
-    end: 0,
-    is_warm_tiered: false,
-    stream_names: [],
-  }]
-    } />);
-
-    await screen.findByText('This widget is retrieving data from the Warm Tier and may take longer to load.');
-  });
 });

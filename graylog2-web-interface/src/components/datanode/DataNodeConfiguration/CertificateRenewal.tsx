@@ -31,6 +31,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { Badge } from 'preflight/components/common';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { defaultOnError } from 'util/conditional/onError';
 
 import DataNodeBadge from '../DataNodeList/DataNodeBadge';
 
@@ -59,11 +60,7 @@ export const fetchDataNodes = () => fetchPeriodically<Array<DataNode>>('GET', qu
 const useDataNodes = () => {
   const { data, isInitialLoading } = useQuery({
     queryKey: ['data-nodes', 'overview'],
-    queryFn: fetchDataNodes,
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading Data Nodes failed with status: ${errorThrown}`,
-        'Could not load streams');
-    },
+    queryFn: () => defaultOnError(fetchDataNodes(), 'Loading Data Nodes failed with status', 'Could not load data nodes'),
     keepPreviousData: true,
     refetchInterval: 3000,
 

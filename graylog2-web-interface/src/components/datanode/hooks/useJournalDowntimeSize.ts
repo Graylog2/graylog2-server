@@ -18,8 +18,8 @@ import { useQuery } from '@tanstack/react-query';
 import moment from 'moment';
 
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
+import { defaultOnError } from 'util/conditional/onError';
 
 const fetchJournalDowntimeSize = async () => fetch('GET', qualifyUrl('/migration/journalestimate'));
 
@@ -36,12 +36,8 @@ const useJournalDowntimeSize = () : {
 } => {
   const { data, refetch, isInitialLoading, error, isError } = useQuery(
     ['JournalDowntimeSize'],
-    fetchJournalDowntimeSize,
+    () => defaultOnError(fetchJournalDowntimeSize(), 'Loading Data Node migration journal estimate', 'Could not load Data Node journal size estimate'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Data Node migration journal estimate: ${errorThrown}`,
-          'Could not load Data Node journal size estimate');
-      },
       notifyOnChangeProps: ['data', 'error'],
       refetchInterval: 5000,
     },

@@ -16,15 +16,15 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
-  elements: [],
+  list: [],
   attributes: [],
 };
 
@@ -46,23 +46,21 @@ type Options = {
   enabled: boolean,
 }
 
+type StreamsResponse = {
+  list: Array<Stream>,
+  pagination: { total: number }
+  attributes: Array<Attribute>
+};
+
 const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
-  data: {
-    list: Array<Stream>,
-    pagination: { total: number }
-    attributes: Array<Attribute>
-  },
+  data: StreamsResponse,
   refetch: () => void,
   isInitialLoading: boolean,
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     keyFn(searchParams),
-    () => fetchStreams(searchParams),
+    () => defaultOnError<StreamsResponse>(fetchStreams(searchParams), 'Loading streams failed with status', 'Could not load streams'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
-          'Could not load streams');
-      },
       keepPreviousData: true,
       enabled,
     },

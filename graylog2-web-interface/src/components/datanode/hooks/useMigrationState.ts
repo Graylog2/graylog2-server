@@ -20,6 +20,7 @@ import { useQuery } from '@tanstack/react-query';
 import UserNotification from 'util/UserNotification';
 import { Migration } from '@graylog/server-api';
 import type { MigrationState } from 'components/datanode/Types';
+import { onError } from 'util/conditional/onError';
 
 export const MIGRATION_STATE_QUERY_KEY = ['migration-state'];
 
@@ -29,9 +30,8 @@ const useMigrationState = (refetchInterval : number | false = false) : {
 } => {
   const { data, isLoading } = useQuery<MigrationState, Error>(
     MIGRATION_STATE_QUERY_KEY,
-    () => Migration.status(),
+    () => onError(Migration.status(), (error: Error) => UserNotification.error(error.message)),
     {
-      onError: (error: Error) => UserNotification.error(error.message),
       retry: 2,
       refetchInterval,
     },

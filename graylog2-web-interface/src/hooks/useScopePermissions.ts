@@ -21,6 +21,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
+import { onError } from 'util/conditional/onError';
 
 type ScopeParams = {
   is_mutable: boolean,
@@ -39,11 +40,10 @@ function fetchScopePermissions() {
 }
 
 const useGetPermissionsByScope = (entity: Partial<GenericEntityType>) => {
-  const { data, isLoading, error } = useQuery<EntityScopeType, Error>(
+  const { data, isLoading } = useQuery<EntityScopeType, Error>(
     ['scope-permissions'],
-    fetchScopePermissions,
+    () => onError(fetchScopePermissions(), (e) => UserNotification.error(e.message)),
     {
-      onError: () => UserNotification.error(error.message),
       retry: 1,
       cacheTime: 1000 * 60 * 60 * 3, // cache for 3 hours
       staleTime: 1000 * 60 * 60 * 3, // data is valid for 3 hours

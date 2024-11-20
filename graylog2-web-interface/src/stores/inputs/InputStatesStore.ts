@@ -86,15 +86,26 @@ export const InputStatesStore = singletonStore(
       const nodes = Object.keys(response).filter((node) => (input.global ? true : node === input.node));
       const failedNodes = nodes.filter((nodeId) => response[nodeId] === null);
 
+      const actionText = () => {
+        switch (action) {
+          case 'START':
+            return 'started';
+          case 'SETUP':
+            return 'put into setup mode';
+          default:
+            return 'stopped';
+        }
+      };
+
       if (failedNodes.length === 0) {
         UserNotification.success(`Request to ${action.toLowerCase()} input '${input.title}' was sent successfully.`,
-          `Input '${input.title}' will be ${action === 'START' ? 'started' : 'stopped'} shortly`);
+          `Input '${input.title}' will be ${actionText()} shortly`);
       } else if (failedNodes.length === nodes.length) {
         UserNotification.error(`Request to ${action.toLowerCase()} input '${input.title}' failed. Check your Graylog logs for more information.`,
-          `Input '${input.title}' could not be ${action === 'START' ? 'started' : 'stopped'}`);
+          `Input '${input.title}' could not be ${actionText()}`);
       } else {
         UserNotification.warning(`Request to ${action.toLowerCase()} input '${input.title}' failed in some nodes. Check your Graylog logs for more information.`,
-          `Input '${input.title}' could not be ${action === 'START' ? 'started' : 'stopped'} in all nodes`);
+          `Input '${input.title}' could not be ${actionText()} in all nodes`);
       }
     },
 
@@ -128,6 +139,23 @@ export const InputStatesStore = singletonStore(
           },
           (error) => {
             UserNotification.error(`Error stopping input '${input.title}': ${error}`, `Input '${input.title}' could not be stopped`);
+          },
+        );
+    },
+
+    setup(input) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.setup(input.id).url);
+
+      return fetch('PUT', url)
+        .then(
+          (response) => {
+            this._checkInputStateChangeResponse(input, response, 'SETUP');
+            this.list();
+
+            return response;
+          },
+          (error) => {
+            UserNotification.error(`Error entering setup mode '${input.title}': ${error}`, `Input '${input.title}' could not set to setup mode`);
           },
         );
     },
