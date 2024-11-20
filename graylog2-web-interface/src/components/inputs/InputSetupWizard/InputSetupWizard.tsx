@@ -22,11 +22,12 @@ import { Modal } from 'components/bootstrap';
 import { Wizard } from 'components/common';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
+import { getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 
-import { CreateStreamStep, InputDiagnosisStep, SetupRoutingStep, StartInputStep } from './steps';
+import { InputDiagnosisStep, SetupRoutingStep, StartInputStep } from './steps';
 
 const InputSetupWizard = () => {
-  const { activeStep, setActiveStep, show, orderedSteps, setOrderedSteps, closeWizard } = useInputSetupWizard();
+  const { activeStep, setActiveStep, show, orderedSteps, setOrderedSteps, stepsData, closeWizard } = useInputSetupWizard();
   const enterpriseSteps = PluginStore.exports('inputSetupWizard').find((plugin) => (!!plugin.steps))?.steps;
 
   const steps = useMemo(() => {
@@ -41,17 +42,7 @@ const InputSetupWizard = () => {
         component: (
           <SetupRoutingStep />
         ),
-      },
-      [INPUT_WIZARD_STEPS.CREATE_STREAM]: {
-        key: INPUT_WIZARD_STEPS.CREATE_STREAM,
-        title: (
-          <>
-            Create Stream
-          </>
-        ),
-        component: (
-          <CreateStreamStep />
-        ),
+        disabled: getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING, 'disabled') || true,
       },
       [INPUT_WIZARD_STEPS.START_INPUT]: {
         key: INPUT_WIZARD_STEPS.START_INPUT,
@@ -63,6 +54,7 @@ const InputSetupWizard = () => {
         component: (
           <StartInputStep />
         ),
+        disabled: getStepData(stepsData, INPUT_WIZARD_STEPS.START_INPUT, 'disabled') || true,
       },
       [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
         key: INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
@@ -74,16 +66,17 @@ const InputSetupWizard = () => {
         component: (
           <InputDiagnosisStep />
         ),
+        disabled: getStepData(stepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, 'disabled') || true,
       },
     };
     if (enterpriseSteps) return { ...defaultSteps, ...enterpriseSteps };
 
     return defaultSteps;
-  }, [enterpriseSteps]);
+  }, [enterpriseSteps, stepsData]);
 
   const determineFirstStep = useCallback(() => {
     setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);
-    setOrderedSteps([INPUT_WIZARD_STEPS.SETUP_ROUTING]);
+    setOrderedSteps([INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.START_INPUT, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]);
   }, [setActiveStep, setOrderedSteps]);
 
   useEffect(() => {

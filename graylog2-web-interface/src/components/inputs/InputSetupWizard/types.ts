@@ -18,7 +18,6 @@ export const INPUT_WIZARD_STEPS = {
   SELECT_CATEGORY: 'SELECT_CATEGORY',
   INPUT_DIAGNOSIS: 'INPUT_DIAGNOSIS',
   SETUP_ROUTING: 'SETUP_ROUTING',
-  CREATE_STREAM: 'CREATE_STREAM',
   START_INPUT: 'START_INPUT',
 } as const;
 
@@ -33,8 +32,12 @@ export const INPUT_WIZARD_SUBCATEGORIES = {
 export type InputSetupWizardStep = typeof INPUT_WIZARD_STEPS[keyof typeof INPUT_WIZARD_STEPS]
 export type InputSetupWizardCategory = typeof INPUT_WIZARD_CATEGORIES[keyof typeof INPUT_WIZARD_CATEGORIES]
 
+export interface StepData {
+  enabled?: boolean
+}
+
 export type StepsData = {
-  [key in InputSetupWizardStep]?: any
+  [key in InputSetupWizardStep]?: StepData
 }
 
 export type WizardData = {

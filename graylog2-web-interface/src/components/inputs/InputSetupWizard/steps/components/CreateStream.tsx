@@ -16,10 +16,16 @@
  */
 import * as React from 'react';
 
-const CreateStreamStep = () => (
-  <div>
-    Create Stream
-  </div>
+import { Row, Col } from 'components/bootstrap';
+
+const CreateStream = () => (
+  <Row>
+    <Col md={12}>
+      <h3>
+        Create new stream
+      </h3>
+    </Col>
+  </Row>
 );
 
-export default CreateStreamStep;
+export default CreateStream;

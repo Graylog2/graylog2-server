@@ -1,52 +1,29 @@
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
- * This program is free software: you can redistribute it and/or modify
+ * ThcheckIs program checkIs free software: you can redcheckIstribute it and/or modify
  * it under the terms of the Server Side Public License, version 1,
- * as published by MongoDB, Inc.
+ * as publcheckIshed by MongoDB, Inc.
  *
- * This program is distributed in the hope that it will be useful,
+ * ThcheckIs program checkIs dcheckIstributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * Server Side Public License for more details.
  *
  * You should have received a copy of the Server Side Public License
- * along with this program. If not, see
+ * along with thcheckIs program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import InputSetupWizardContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardContext';
-import type { InputSetupWizardStep, StepsData, WizardData } from 'components/inputs/InputSetupWizard/types';
+import type { InputSetupWizardStep, StepData, StepsData, WizardData } from 'components/inputs/InputSetupWizard/types';
+import { addStepAfter, getNextStep, checkHasPreviousStep, checkIsNextStepDisabled } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 
 const DEFAULT_ACTIVE_STEP = undefined;
 const DEFAULT_WIZARD_DATA = {};
 const DEFAULT_STEPS_DATA = {};
-
-const checkHasPreviousStep = (orderedSteps: Array<InputSetupWizardStep>, activeStep?: InputSetupWizardStep) => {
-  if (orderedSteps.length === 0 || !activeStep) return false;
-
-  const activeStepIndex = orderedSteps.indexOf(activeStep);
-
-  if (activeStepIndex === -1) return false;
-
-  if (activeStepIndex === 0) return false;
-
-  return true;
-};
-
-const checkHasNextStep = (orderedSteps: Array<InputSetupWizardStep>, activeStep?: InputSetupWizardStep) => {
-  if (orderedSteps.length === 0 || !activeStep) return false;
-
-  const activeStepIndex = orderedSteps.indexOf(activeStep);
-
-  if (activeStepIndex === -1) return false;
-
-  if (activeStepIndex === (orderedSteps.length - 1)) return false;
-
-  return true;
-};
 
 const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{}>) => {
   const [activeStep, setActiveStep] = useState<InputSetupWizardStep>(DEFAULT_ACTIVE_STEP);
@@ -55,16 +32,14 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
   const [stepsData, setStepsData] = useState<StepsData>(DEFAULT_STEPS_DATA);
   const [show, setShow] = useState<boolean>(false);
 
-  const setStepData = useCallback(
-    (stepName: InputSetupWizardStep, data: object) => {
-      setStepsData({ ...stepsData, [stepName]: data });
+  const updateStepData = useCallback(
+    (stepName: InputSetupWizardStep, data: StepData) => {
+      setStepsData({ ...stepsData, [stepName]: { ...stepsData[stepName], ...data } });
     },
     [stepsData],
   );
 
-  const getStepData = useCallback((stepName: InputSetupWizardStep) => (stepsData[stepName]), [stepsData]);
-
-  const setWizardDataAttribute = useCallback(
+  const updateWizardData = useCallback(
     (key: keyof WizardData, value: WizardData[typeof key]) => {
       setWizardData({ ...wizardData, [key]: value });
     },
@@ -87,35 +62,64 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
     setShow(true);
   }, [wizardData]);
 
-  const hasPreviousStep = useMemo(() => checkHasPreviousStep(orderedSteps, activeStep), [orderedSteps, activeStep]);
-  const hasNextStep = useMemo(() => checkHasNextStep(orderedSteps, activeStep), [orderedSteps, activeStep]);
+  const enableNextStep = useCallback((step?: InputSetupWizardStep) => {
+    const nextStep = step ?? getNextStep(orderedSteps, activeStep);
+    if (!nextStep) return;
+
+    updateStepData(nextStep, { enabled: true });
+  }, [updateStepData, orderedSteps, activeStep]);
+
+  const goToNextStep = useCallback((step?: InputSetupWizardStep) => {
+    const nextStep = step ?? getNextStep(orderedSteps, activeStep);
+
+    if (step) {
+      const newOrderedSteps = addStepAfter(orderedSteps, step, activeStep);
+      setOrderedSteps(newOrderedSteps);
+    }
+
+    if (!nextStep) return;
+
+    if (checkIsNextStepDisabled(orderedSteps, activeStep, stepsData, nextStep)) return;
+
+    const nextStepIndex = orderedSteps.indexOf(nextStep);
+
+    setActiveStep(orderedSteps[nextStepIndex]);
+  }, [activeStep, orderedSteps, stepsData]);
+
+  const goToPreviousStep = useCallback(() => {
+    if (!checkHasPreviousStep(orderedSteps, activeStep)) return;
+
+    const previousStepIndex = orderedSteps.indexOf(activeStep) - 1;
+
+    setActiveStep(orderedSteps[previousStepIndex]);
+  }, [activeStep, orderedSteps]);
 
   const value = useMemo(() => ({
     setActiveStep,
     activeStep,
-    getStepData,
-    setStepData,
+    updateStepData,
+    stepsData,
     wizardData,
-    setWizardDataAttribute,
+    updateWizardData,
     show,
     orderedSteps,
     setOrderedSteps,
-    hasPreviousStep,
-    hasNextStep,
+    enableNextStep,
+    goToPreviousStep,
+    goToNextStep,
     openWizard,
     closeWizard,
   }), [
-    setActiveStep,
     activeStep,
-    getStepData,
-    setStepData,
+    updateStepData,
+    stepsData,
     wizardData,
-    setWizardDataAttribute,
+    updateWizardData,
     show,
     orderedSteps,
-    setOrderedSteps,
-    hasPreviousStep,
-    hasNextStep,
+    enableNextStep,
+    goToPreviousStep,
+    goToNextStep,
     openWizard,
     closeWizard,
   ]);

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
@@ -25,7 +25,10 @@ import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInp
 import { StreamsActions } from 'stores/streams/StreamsStore';
 import type { Stream } from 'stores/streams/StreamsStore';
 import { defaultCompare } from 'logic/DefaultCompare';
+import type { StepData } from 'components/inputs/InputSetupWizard/types';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
+import CreateStream from 'components/inputs/InputSetupWizard/steps/components/CreateStream';
+import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 
 const DescriptionCol = styled(Col)(({ theme }) => css`
   margin-bottom: ${theme.spacings.sm};
@@ -42,10 +45,23 @@ const ButtonCol = styled(Col)(({ theme }) => css`
   margin-top: ${theme.spacings.md};
 `);
 
+interface RoutingStepData extends StepData {
+  stream: string
+}
+
 const SetupRoutingStep = () => {
-  const { hasPreviousStep, hasNextStep, setStepData } = useInputSetupWizard();
+  const { goToPreviousStep, goToNextStep, updateStepData, enableNextStep, orderedSteps, activeStep, stepsData } = useInputSetupWizard();
   const { data: streams, isLoading: isStreamsLoading } = useQuery<Array<Stream>>(['streamsMap'], StreamsActions.listStreams);
   const [selectedStream, setSelectedStream] = useState(undefined);
+  const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
+  const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
+  const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
+  const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsData);
+  const currentStepName = INPUT_WIZARD_STEPS.SETUP_ROUTING;
+
+  useEffect(() => {
+    enableNextStep();
+  }, [enableNextStep]);
 
   const options = useMemo(() => {
     if (!streams) return [];
@@ -56,8 +72,23 @@ const SetupRoutingStep = () => {
       .map(({ title, id }) => ({ label: title, value: id }));
   }, [streams]);
 
-  const onNextStep = (createNewStream = false) => {
-    setStepData(INPUT_WIZARD_STEPS.SETUP_ROUTING, { stream: selectedStream, createNewStream });
+  const handleStreamSelect = (stream: string) => {
+    setSelectedStream(stream);
+  };
+
+  const onNextStep = () => {
+    updateStepData(currentStepName, { stream: selectedStream, disabled: false } as RoutingStepData);
+    goToNextStep();
+  };
+
+  const handleBackClick = () => {
+    if (showCreateStream) {
+      setShowCreateStream(false);
+
+      return;
+    }
+
+    goToPreviousStep();
   };
 
   return (
@@ -70,28 +101,30 @@ const SetupRoutingStep = () => {
           </p>
         </DescriptionCol>
       </Row>
+      {showCreateStream ? (<CreateStream />) : (
+        <Row>
+          <Col md={6}>
+            <StyledHeading>Choose an existing Stream</StyledHeading>
+            {!isStreamsLoading && (
+              <Select inputId="streams"
+                      onChange={handleStreamSelect}
+                      options={options}
+                      clearable
+                      placeholder="All messages (Default)"
+                      value={selectedStream} />
+            )}
+          </Col>
+          <Col md={6}>
+            <StyledHeading>Route to a new Stream</StyledHeading>
+            <Button onClick={() => setShowCreateStream(true)} bsStyle="primary">Create Stream</Button>
+          </Col>
+        </Row>
+      )}
       <Row>
-        <Col md={6}>
-          <StyledHeading>Choose an existing Stream</StyledHeading>
-          {!isStreamsLoading && (
-          <Select inputId="streams"
-                  onChange={setSelectedStream}
-                  options={options}
-                  clearable
-                  placeholder="All messages (Default)"
-                  value={selectedStream} />
-          )}
-        </Col>
-        <Col md={6}>
-          <StyledHeading>Route to a new Stream</StyledHeading>
-          <Button onClick={() => onNextStep(true)} bsStyle="primary">Create Stream</Button>
-        </Col>
-      </Row>
-      <Row>
-        {(hasPreviousStep || hasNextStep) && (
+        {(hasPreviousStep || hasNextStep || showCreateStream) && (
           <ButtonCol md={12}>
-            {hasPreviousStep && (<Button>Back</Button>)}
-            {hasNextStep && (<Button onClick={onNextStep} bsStyle="primary">Finish & Start Input</Button>)}
+            {(hasPreviousStep || showCreateStream) && (<Button onClick={handleBackClick}>Back</Button>)}
+            {hasNextStep && (<Button disabled={isNextStepDisabled} onClick={onNextStep} bsStyle="primary">Finish & Start Input</Button>)}
           </ButtonCol>
         )}
       </Row>

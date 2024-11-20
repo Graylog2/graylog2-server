@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export { default as CreateStreamStep } from './CreateStreamStep';
 export { default as InputDiagnosisStep } from './InputDiagnosisStep';
 export { default as SetupRoutingStep } from './SetupRoutingStep';
 export { default as StartInputStep } from './StartInputStep';
