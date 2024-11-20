@@ -14,28 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2;
+package org.graylog2.plugin;
 
 import org.graylog2.shared.plugins.PluginLoader;
 
-/**
- * Helper class to hold configuration shared by all Graylog node types
- */
-public interface GraylogNodeConfiguration {
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-    boolean withMongoDb();
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SpecificNodePlugin {
 
-    boolean withScheduler();
+    PluginLoader.NodeType value();
 
-    boolean withEventBus();
-
-    boolean withPlugins();
-
-    PluginLoader.NodeType getPluginNodeType();
-
-    String getEnvironmentVariablePrefix();
-
-    String getSystemPropertyPrefix();
-
-    boolean isCloud();
 }

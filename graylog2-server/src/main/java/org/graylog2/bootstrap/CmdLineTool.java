@@ -54,7 +54,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.graylog2.Configuration;
 import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
@@ -84,7 +83,6 @@ import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
@@ -293,7 +291,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         featureFlags = getFeatureFlags(metricRegistry);
 
         if (configuration.withPlugins()) {
-            pluginLoader = getPluginLoader(getPluginLoaderConfig(configFile), chainingClassLoader);
+            pluginLoader = getPluginLoader(getPluginLoaderConfig(configFile), chainingClassLoader, configuration.getPluginNodeType());
         }
 
         installCommandConfig();
@@ -356,12 +354,8 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         startCommand();
     }
 
-    protected PluginLoader getPluginLoader(File pluginDir, ChainingClassLoader classLoader) {
-        return new PluginLoader(pluginDir, classLoader);
-    }
-
-    protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader) {
-        return new PluginLoader(pluginLoaderConfig.getPluginDir().toFile(), classLoader);
+    protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader, PluginLoader.NodeType nodeType) {
+        return new PluginLoader(pluginLoaderConfig.getPluginDir().toFile(), classLoader, nodeType);
     }
 
     private void installPluginBootstrapConfig(PluginLoader pluginLoader) {
@@ -472,7 +466,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         for (Plugin plugin : pluginLoader.loadPlugins(bootstrapConfigInjector)) {
             final PluginMetaData metadata = plugin.metadata();
 
-            final Configuration config = bootstrapConfigInjector.getInstance(Configuration.class);
+            final GraylogNodeConfiguration config = bootstrapConfigInjector.getInstance(configuration.getClass());
             // TODO do we want this here? We are also considering removing the deprecated CollectorPlugin entirely
             if (config.isCloud()) {
                 if (metadata.getUniqueId().equals("org.graylog.plugins.collector.CollectorPlugin")) {

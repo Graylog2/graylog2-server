@@ -28,6 +28,7 @@ import org.graylog2.plugin.PluginBootstrapConfig;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.PreflightCheckModule;
+import org.graylog2.plugin.SpecificNodePlugin;
 import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Objects.requireNonNull;
@@ -54,9 +56,18 @@ public class PluginLoader {
     private final File pluginDir;
     protected final ChainingClassLoader classLoader;
 
+    // when nodeType is set, only plugins annotated for this specific node type will be loaded.
+    // if it is not set, all plugins without the SpecificNodePlugin annotation will be loaded.
+    private final NodeType nodeType;
+
     public PluginLoader(File pluginDir, ChainingClassLoader classLoader) {
+        this(pluginDir, classLoader, null);
+    }
+
+    public PluginLoader(File pluginDir, ChainingClassLoader classLoader, NodeType nodeType) {
         this.pluginDir = requireNonNull(pluginDir);
         this.classLoader = requireNonNull(classLoader);
+        this.nodeType = nodeType;
 
         loadPluginJars();
     }
@@ -73,11 +84,26 @@ public class PluginLoader {
     }
 
     protected Iterable<Plugin> loadClassPathPlugins() {
-        return ServiceLoader.load(Plugin.class);
+        return filterPlugins(ServiceLoader.load(Plugin.class));
     }
 
     protected Iterable<Plugin> loadJarPlugins() {
-        return ImmutableSet.copyOf(ServiceLoader.load(Plugin.class, classLoader));
+        return ImmutableSet.copyOf(filterPlugins(ServiceLoader.load(Plugin.class, classLoader)));
+    }
+
+    private Iterable<Plugin> filterPlugins(ServiceLoader<Plugin> plugins) {
+        if (nodeType != null) {
+            return plugins.stream()
+                    .map(ServiceLoader.Provider::get)
+                    .filter(p -> p.getClass().isAnnotationPresent(SpecificNodePlugin.class) &&
+                            p.getClass().getAnnotation(SpecificNodePlugin.class).value() == nodeType
+                    )
+                    .collect(Collectors.toSet());
+        }
+        return plugins.stream()
+                .map(ServiceLoader.Provider::get)
+                .filter(p -> !p.getClass().isAnnotationPresent(SpecificNodePlugin.class))
+                .collect(Collectors.toSet());
     }
 
     @SuppressForbidden("Deliberate invocation of URL#getFile()")
@@ -133,6 +159,8 @@ public class PluginLoader {
             classLoader.addClassLoader(URLClassLoader.newInstance(sharedClassLoaderUrls.toArray(new URL[0])));
         }
     }
+
+    public enum NodeType {DATA_NODE}
 
     public static class PluginComparator implements Comparator<Plugin> {
         /**
