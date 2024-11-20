@@ -16,27 +16,21 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import jakarta.inject.Inject;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collections;
-import java.util.Set;
 
 public class OpensearchConfigSync implements PreflightCheck {
 
@@ -89,8 +83,7 @@ public class OpensearchConfigSync implements PreflightCheck {
     }
 
     private static void copyFromLocalFs(Path configRelativePath, Path target) throws URISyntaxException, IOException {
-        final Path resourcesRoot = Paths.get(OpensearchConfigSync.class.getResource("/").toURI());
-        final Path source = resourcesRoot.resolve(configRelativePath);
+        final Path source = Paths.get(OpensearchConfigSync.class.getResource("/" + configRelativePath.toString()).toURI());
         copyRecursively(source, target);
     }
 
