@@ -55,6 +55,13 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+
+        <!-- JVM version related settings - see: https://github.com/adoptium/temurin23-binaries/releases -->
+        <jvm.root>${project.build.directory}/jvm</jvm.root>
+        <jvm.version>23.0.1</jvm.version>
+        <jvm.build>11</jvm.build>
+        <jvm.sha256.aarch64>0b498a5b673cb50fe9cfd0a13bd39c7259b4fad4d930d614e1563aeb8bca7f0e</jvm.sha256.aarch64>
+        <jvm.sha256.x64>1233cbec40f05c76ad926b68521ae78c6ae4f454996ef549602be6987069fa77</jvm.sha256.x64>
     </properties>
 
     <dependencies>
@@ -605,6 +612,64 @@
                             </sha512>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>download-jvm-linux-x64</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://github.com/adoptium/temurin23-binaries/releases/download/jdk-${jvm.version}%2B${jvm.build}/OpenJDK23U-jre_x64_linux_hotspot_${jvm.version}_${jvm.build}.tar.gz
+                            </url>
+                            <sha256>${jvm.sha256.x64}</sha256>
+                            <outputFileName>
+                                temurin-jre-linux-x64-${jvm.version}-${jvm.build}.tar.gz
+                            </outputFileName>
+                            <fileMappers>
+                                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    <pattern>^jdk-\d+\.\d+\.\d+\+\d+-jre/</pattern>
+                                    <replacement>linux-x64/</replacement>
+                                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                            </fileMappers>
+                            <alwaysVerifyChecksum>true</alwaysVerifyChecksum>
+                            <cacheDirectory>${settings.localRepository}/.cache/download-maven-plugin-jvm</cacheDirectory>
+                            <failOnError>true</failOnError>
+                            <followRedirects>true</followRedirects>
+                            <outputDirectory>${jvm.root}</outputDirectory>
+                            <retries>5</retries>
+                            <unpack>true</unpack>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-jvm-linux-aarch64</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://github.com/adoptium/temurin23-binaries/releases/download/jdk-${jvm.version}%2B${jvm.build}/OpenJDK23U-jre_aarch64_linux_hotspot_${jvm.version}_${jvm.build}.tar.gz
+                            </url>
+                            <sha256>${jvm.sha256.aarch64}</sha256>
+                            <outputFileName>
+                                temurin-jre-linux-aarch64-${jvm.version}-${jvm.build}.tar.gz
+                            </outputFileName>
+                            <fileMappers>
+                                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    <pattern>^jdk-\d+\.\d+\.\d+\+\d+-jre/</pattern>
+                                    <replacement>linux-aarch64/</replacement>
+                                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                            </fileMappers>
+                            <alwaysVerifyChecksum>true</alwaysVerifyChecksum>
+                            <cacheDirectory>${settings.localRepository}/.cache/download-maven-plugin-jvm</cacheDirectory>
+                            <failOnError>true</failOnError>
+                            <followRedirects>true</followRedirects>
+                            <outputDirectory>${jvm.root}</outputDirectory>
+                            <retries>5</retries>
+                            <unpack>true</unpack>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -711,7 +776,6 @@
                     </execution>
                 </executions>
             </plugin>
-
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
