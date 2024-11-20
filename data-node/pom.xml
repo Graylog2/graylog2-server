@@ -45,6 +45,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <opensearch.version>2.15.0</opensearch.version>
+        <trino.version>464</trino.version>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -610,6 +611,21 @@
                             <sha512>
                                 de44a181133a33a08703e8464b52aa2ac29d1d9918d9478c307b98909a571baaaf0c9dcb664349802c3dd85fa53275bd2228248fd129179631b9096d470eb8d5
                             </sha512>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-trino</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://repo1.maven.org/maven2/io/trino/trino-server/${trino.version}/trino-server-${trino.version}.tar.gz
+                            </url>
+                            <outputFileName>trino-${trino.version}.tar.gz</outputFileName>
+                            <outputDirectory>${project.build.directory}/trino</outputDirectory>
+                            <unpack>true</unpack>
                         </configuration>
                     </execution>
                     <execution>
