@@ -83,6 +83,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -274,9 +275,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         if (!config.tags().isEmpty()) {
             final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
                     .map(Collector::nodeOperatingSystem).orElse("");
-            sidecarService.findByTagsAndOS(config.tags(), os)
-                    .map(Sidecar::nodeId)
-                    .forEach(etagService::invalidateRegistration);
+            try (final var stream = sidecarService.findByTagsAndOS(config.tags(), os)) {
+                stream.map(Sidecar::nodeId).forEach(etagService::invalidateRegistration);
+            }
         }
 
         return Response.ok().entity(config).build();
@@ -332,9 +333,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             final Set<String> tags = Sets.symmetricDifference(previousConfiguration.tags(), updatedConfiguration.tags());
             final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
                     .map(Collector::nodeOperatingSystem).orElse("");
-            sidecarService.findByTagsAndOS(tags, os)
-                    .map(Sidecar::nodeId)
-                    .forEach(etagService::invalidateRegistration);
+            try (final var stream = sidecarService.findByTagsAndOS(tags, os)) {
+                stream.map(Sidecar::nodeId).forEach(etagService::invalidateRegistration);
+            }
         }
 
         return Response.ok().entity(configurationService.save(updatedConfiguration)).build();
