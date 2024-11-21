@@ -113,7 +113,9 @@ class JobSchedulerServiceIT {
         );
 
         final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(
-                mongoDBTestService.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper));
+                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
+                        mongoDBTestService.mongoConnection()),
+                new MongoJackObjectMapperProvider(objectMapper));
         final JobScheduleStrategies scheduleStrategies = new JobScheduleStrategies(clock);
 
         final JobTriggerUpdates.Factory jobTriggerUpdatesFactory = trigger -> new JobTriggerUpdates(
