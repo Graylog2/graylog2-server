@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
@@ -363,7 +364,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
         return ruleService.save(ruleDao);
     }
 
-    private String createPipelineString(PipelineSource pipelineSource) {
+    @VisibleForTesting
+    public static String createPipelineString(PipelineSource pipelineSource) {
         StringBuilder result = new StringBuilder("pipeline \"" + pipelineSource.title() + "\"\n");
         for (int stageNr = 0; stageNr < pipelineSource.stages().size(); stageNr++) {
             StageSource currStage = pipelineSource.stages().get(stageNr);
@@ -371,8 +373,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
             for (String rule : currStage.rules()) {
                 result.append("rule \"").append(rule).append("\"\n");
             }
-            result.append("end");
         }
+        result.append("end");
 
         return result.toString();
     }
