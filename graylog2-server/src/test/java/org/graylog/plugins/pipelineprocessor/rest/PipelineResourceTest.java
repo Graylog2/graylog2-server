@@ -18,21 +18,23 @@ package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
+import jakarta.ws.rs.BadRequestException;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import jakarta.ws.rs.BadRequestException;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,11 +62,21 @@ public class PipelineResourceTest {
     @Mock
     private PaginatedPipelineService paginatedPipelineService;
 
+    @Mock
+    private PipelineStreamConnectionsService connectionsService;
+
+    @Mock
+    private RuleService ruleService;
+
+    @Mock
+    private StreamService streamService;
+
+
     private PipelineResource pipelineResource;
 
     @Before
     public void setup() {
-        pipelineResource = new PipelineResource(pipelineService, paginatedPipelineService, pipelineRuleParser);
+        pipelineResource = new PipelineResource(pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, ruleService, streamService);
     }
 
     @Test

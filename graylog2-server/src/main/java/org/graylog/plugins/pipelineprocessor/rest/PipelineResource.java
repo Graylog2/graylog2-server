@@ -78,6 +78,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -305,8 +306,11 @@ public class PipelineResource extends RestResource implements PluginRestResource
         PipelineSource pipelineSource = PipelineSource.fromDao(pipelineRuleParser, pipelineDao);
         final List<String> rules0 = pipelineSource.stages().get(0).rules();
         if (rules0.stream().filter(ruleRef -> ruleRef.equals(ruleDao.title())).findFirst().isEmpty()) {
-            pipelineSource.stages().get(0).rules().add(ruleDao.title());
-            update(pipelineDao.id(), pipelineSource);
+            rules0.add(ruleDao.title());
+            PipelineSource updated = pipelineSource.toBuilder()
+                    .source(createPipelineString(pipelineSource))
+                    .build();
+            update(pipelineDao.id(), updated);
         } else {
             log.info(f("Routing for input <%s> already exists - skipping", request.inputId()));
         }
@@ -327,7 +331,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
         Set<String> pipelineIds = new HashSet<>();
         pipelineIds.add(parsedSource.id());
-        final PipelineConnections pipelineConnections = PipelineConnections.create(null, request.streamId(), pipelineIds);
+        final PipelineConnections pipelineConnections = PipelineConnections.create(null, DEFAULT_STREAM_ID, pipelineIds);
         connectionsService.save(pipelineConnections);
 
         return parsedSource;
@@ -357,6 +361,20 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .build();
         return ruleService.save(ruleDao);
+    }
+
+    private String createPipelineString(PipelineSource pipelineSource) {
+        StringBuilder result = new StringBuilder("pipeline \"" + pipelineSource.title() + "\"\n");
+        for (int stageNr = 0; stageNr < pipelineSource.stages().size(); stageNr++) {
+            StageSource currStage = pipelineSource.stages().get(stageNr);
+            result.append("stage ").append(stageNr).append(" match ").append(currStage.match()).append('\n');
+            for (String rule : currStage.rules()) {
+                result.append("rule \"").append(rule).append("\"\n");
+            }
+            result.append("end");
+        }
+
+        return result.toString();
     }
 
     @ApiOperation(value = "Delete a processing pipeline", notes = "It can take up to a second until the change is applied")
