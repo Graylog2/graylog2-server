@@ -84,7 +84,7 @@
                             </execution>
                             <execution>
                                 <id>Generate backend API types</id>
-                                <phase>compile</phase>
+                                <phase>process-classes</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
@@ -94,7 +94,7 @@
                             </execution>
                             <execution>
                                 <id>yarn run build</id>
-                                <phase>compile</phase>
+                                <phase>process-classes</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
