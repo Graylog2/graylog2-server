@@ -31,12 +31,29 @@ import CreateStream from 'components/inputs/InputSetupWizard/steps/components/Cr
 import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
+const StepCol = styled(Col)(({ theme }) => css`
+  padding-left: ${theme.spacings.lg};
+  padding-right: ${theme.spacings.lg};
+  padding-top: ${theme.spacings.sm};
+`);
+
 const DescriptionCol = styled(Col)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
+  margin-bottom: ${theme.spacings.md};
 `);
 
 const StyledHeading = styled.h3(({ theme }) => css`
   margin-bottom: ${theme.spacings.md};
+`);
+
+const ExistingStreamCol = styled(Col)(({ theme }) => css`
+  padding-top: ${theme.spacings.sm};
+  padding-bottom: ${theme.spacings.md};
+`);
+
+const CreateStreamCol = styled(Col)(({ theme }) => css`
+  border-left: 1px solid ${theme.colors.cards.border};
+  padding-top: ${theme.spacings.sm};
+  padding-bottom: ${theme.spacings.md};
 `);
 
 const ButtonCol = styled(Col)(({ theme }) => css`
@@ -108,51 +125,57 @@ const SetupRoutingStep = () => {
   const streamHasConnectedPipelines = streamPipelinesData && streamPipelinesData?.length > 0;
 
   return (
-    <>
-      <Row>
-        <DescriptionCol md={12}>
-          <p>
-            Choose a Destination Stream to Route Messages from this Input to. Messages that are not
-            routed to any streams will be sent to the &quot;All Messages&quot; Stream.
-          </p>
-          {selectedStreamId && streamHasConnectedPipelines && (
-          <Alert title="Pipelines connected to stream" bsStyle="info">
-            The selected stream has existing pipelines connected to it:
-            <ConntectedPipelinesList>
-              {streamPipelinesData.map((pipeline) => <li key={pipeline.title}>{pipeline.title}</li>)}
-            </ConntectedPipelinesList>
-          </Alert>
-          )}
-        </DescriptionCol>
-      </Row>
-      {showCreateStream ? (<CreateStream />) : (
+    <Row>
+      <StepCol md={12}>
         <Row>
-          <Col md={6}>
-            <StyledHeading>Choose an existing Stream</StyledHeading>
-            {!isStreamsLoading && (
+          <DescriptionCol md={12}>
+            <p>
+              Choose a Destination Stream to Route Messages from this Input to. Messages that are not
+              routed to any streams will be sent to the &quot;All Messages&quot; Stream.
+            </p>
+          </DescriptionCol>
+        </Row>
+        {selectedStreamId && streamHasConnectedPipelines && (
+          <Row>
+            <Col md={12}>
+              <Alert title="Pipelines connected to stream" bsStyle="info">
+                The selected stream has existing pipelines connected to it:
+                <ConntectedPipelinesList>
+                  {streamPipelinesData.map((pipeline) => <li key={pipeline.title}>{pipeline.title}</li>)}
+                </ConntectedPipelinesList>
+              </Alert>
+            </Col>
+          </Row>
+        )}
+        {showCreateStream ? (<CreateStream />) : (
+          <Row>
+            <ExistingStreamCol md={6}>
+              <StyledHeading>Choose an existing Stream</StyledHeading>
+              {!isStreamsLoading && (
               <Select inputId="streams"
                       onChange={handleStreamSelect}
                       options={options}
                       clearable
                       placeholder="All messages (Default)"
                       value={selectedStreamId} />
-            )}
-          </Col>
-          <Col md={6}>
-            <StyledHeading>Route to a new Stream</StyledHeading>
-            <Button onClick={() => setShowCreateStream(true)} bsStyle="primary">Create Stream</Button>
-          </Col>
-        </Row>
-      )}
-      <Row>
+              )}
+            </ExistingStreamCol>
+            <CreateStreamCol md={6}>
+              <StyledHeading>Route to a new Stream</StyledHeading>
+              <Button onClick={() => setShowCreateStream(true)} bsStyle="primary">Create Stream</Button>
+            </CreateStreamCol>
+          </Row>
+        )}
         {(hasPreviousStep || hasNextStep || showCreateStream) && (
+        <Row>
           <ButtonCol md={12}>
             {(hasPreviousStep || showCreateStream) && (<Button onClick={handleBackClick}>Back</Button>)}
             {hasNextStep && (<Button disabled={isNextStepDisabled} onClick={onNextStep} bsStyle="primary">Finish & Start Input</Button>)}
           </ButtonCol>
+        </Row>
         )}
-      </Row>
-    </>
+      </StepCol>
+    </Row>
   );
 };
 
