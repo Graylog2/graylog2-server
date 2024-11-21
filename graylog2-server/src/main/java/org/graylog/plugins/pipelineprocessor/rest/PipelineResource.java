@@ -300,7 +300,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
             pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
         } catch (NotFoundException e) {
             // Create pipeline with first rule
-            return createRoutingPipeline(request, ruleDao);
+            return createRoutingPipeline(ruleDao);
         }
 
         // Add rule to existing pipeline
@@ -319,7 +319,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
         return pipelineSource;
     }
 
-    private PipelineSource createRoutingPipeline(RoutingRequest request, RuleDao ruleDao) {
+    private PipelineSource createRoutingPipeline(RuleDao ruleDao) {
         List<StageSource> stages = java.util.List.of(StageSource.create(
                 0, Stage.Match.EITHER, java.util.List.of(ruleDao.title())));
         final PipelineSource pipelineSource = PipelineSource.builder()
@@ -350,11 +350,9 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 "rule \"" + ruleName + "\"\n"
                         + "when has_field(\"gl2_source_input\") AND to_string($message.gl2_source_input)==\"" + request.inputId() + "\"\n"
                         + "then\n"
-                        + "route_to_stream(id:\"" + request.streamId() + "\"";
-        if (request.removeFromDefault()) {
-            ruleSource += ", remove_from_default: true";
-        }
-        ruleSource += ");\nend\n";
+                        + "route_to_stream(id:\"" + request.streamId() + "\""
+                        + ", remove_from_default: " + request.removeFromDefault()
+                        + ");\nend\n";
 
         RuleDao ruleDao = RuleDao.builder()
                 .title(ruleName)
