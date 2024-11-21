@@ -53,7 +53,7 @@ public class SidecarCollectorConfigurationFacadeTest {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final ConfigurationService configurationService = new ConfigurationService(
                 new MongoCollections(mapperProvider, mongodb.mongoConnection()),
-                new ConfigurationVariableService(mongodb.mongoConnection(), mapperProvider),
+                new ConfigurationVariableService(new MongoCollections(mapperProvider, mongodb.mongoConnection())),
                 new SecureFreemarkerConfigProvider());
 
         facade = new SidecarCollectorConfigurationFacade(objectMapper, configurationService);
