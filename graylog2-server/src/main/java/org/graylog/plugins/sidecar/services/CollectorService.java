@@ -19,7 +19,6 @@ package org.graylog.plugins.sidecar.services;
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bson.types.ObjectId;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -32,13 +31,9 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.ne;
 
 @Singleton
 public class CollectorService {
@@ -75,25 +70,8 @@ public class CollectorService {
         ).first();
     }
 
-    @Nullable
-    public Collector findByNameExcludeId(String name, String id) {
-        return collection.find(
-                and(
-                        eq("name", name),
-                        ne("_id", new ObjectId(id))
-                )
-        ).first();
-    }
-
     public long count() {
         return collection.countDocuments();
-    }
-
-    public List<Collector> allFilter(Predicate<Collector> filter) {
-        try (final Stream<Collector> collectorsStream = MongoUtils.stream(collection.find())) {
-            final Stream<Collector> filteredStream = filter == null ? collectorsStream : collectorsStream.filter(filter);
-            return filteredStream.collect(Collectors.toList());
-        }
     }
 
     public List<Collector> all() {
