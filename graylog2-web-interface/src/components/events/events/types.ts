@@ -45,3 +45,8 @@ export type EventDefinitionContext = {
   remediation_steps?: string,
   description?: string,
 };
+
+export type EventDefinitionContexts = { [eventDefinitionId: string]: EventDefinitionContext };
+export type EventsAdditionalData = {
+  context: { event_definitions?: EventDefinitionContexts, streams?: EventDefinitionContexts },
+}

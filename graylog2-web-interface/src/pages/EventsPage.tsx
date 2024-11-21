@@ -18,35 +18,30 @@ import React from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import EventsContainer from 'components/events/events/EventsContainer';
 import DocsHelper from 'util/DocsHelper';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
-import useQuery from 'routing/useQuery';
+import EventsEntityTable from 'components/events/EventsEntityTable';
 
-const EventsPage = () => {
-  const { stream_id: streamId } = useQuery();
+const EventsPage = () => (
+  <DocumentTitle title="Alerts &amp; Events">
+    <EventsPageNavigation />
+    <PageHeader title="Alerts &amp; Events"
+                documentationLink={{
+                  title: 'Alerts documentation',
+                  path: DocsHelper.PAGES.ALERTS,
+                }}>
+      <span>
+        Define Events through different conditions. Add Notifications to Events that require your attention
+        to create Alerts.
+      </span>
+    </PageHeader>
 
-  return (
-    <DocumentTitle title="Alerts &amp; Events">
-      <EventsPageNavigation />
-      <PageHeader title="Alerts &amp; Events"
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
-        <span>
-          Define Events through different conditions. Add Notifications to Events that require your attention
-          to create Alerts.
-        </span>
-      </PageHeader>
-
-      <Row className="content">
-        <Col md={12}>
-          <EventsContainer key={streamId as string} streamId={streamId as string} />
-        </Col>
-      </Row>
-    </DocumentTitle>
-  );
-};
+    <Row className="content">
+      <Col md={12}>
+        <EventsEntityTable />
+      </Col>
+    </Row>
+  </DocumentTitle>
+);
 
 export default EventsPage;

@@ -14,25 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import * as React from 'react';
 
-import Routes from 'integrations/aws/common/Routes';
+import EventTypeLabel from 'components/events/events/EventTypeLabel';
 
-type AWSInputConfigurationProps = {
-  url?: string;
+const FilterValueRenderers = {
+  alert: (value: 'true' | 'false') => (
+    <EventTypeLabel isAlert={value === 'true'} />
+  ),
 };
 
-const AWSInputConfiguration = ({
-  url = Routes.INTEGRATIONS.AWS.CLOUDWATCH.index,
-}: AWSInputConfigurationProps) => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate(url);
-  }, [url, navigate]);
-
-  return null;
-};
-
-export default AWSInputConfiguration;
+export default FilterValueRenderers;
