@@ -116,7 +116,7 @@
         <commons-validator.version>1.9.0</commons-validator.version>
         <commons-io.version>2.18.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.35.1</error-prone.version>
+        <error-prone.version>2.36.0</error-prone.version>
         <freemarker.version>2.3.33</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.1</geoip2.version>
@@ -923,6 +923,7 @@
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <compilerArgs>
                         <arg>-XDcompilePolicy=simple</arg>
+                        <arg>--should-stop=ifError=FLOW</arg>
                         <!--
                           We disabled checks that don't apply to us because we either don't use the platform or
                           library. (e.g., Android, Flogger) Disabling those checks improves compile times.
