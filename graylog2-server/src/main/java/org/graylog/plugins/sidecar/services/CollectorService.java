@@ -16,82 +16,97 @@
  */
 package org.graylog.plugins.sidecar.services;
 
-import org.graylog.plugins.sidecar.rest.models.Collector;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
-import org.graylog2.database.PaginatedList;
-import org.graylog2.search.SearchQuery;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-
-import javax.annotation.Nullable;
-
+import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.types.ObjectId;
+import org.graylog.plugins.sidecar.rest.models.Collector;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.search.SearchQuery;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.ne;
+
 @Singleton
-public class CollectorService extends PaginatedDbService<Collector> {
+public class CollectorService {
     public static final String COLLECTION_NAME = "sidecar_collectors";
 
+    private final MongoCollection<Collector> collection;
+    private final MongoUtils<Collector> mongoUtils;
+    private final MongoPaginationHelper<Collector> paginationHelper;
+
     @Inject
-    public CollectorService(MongoConnection mongoConnection,
-                            MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, Collector.class, COLLECTION_NAME);
+    public CollectorService(MongoCollections mongoCollections) {
+        collection = mongoCollections.collection(COLLECTION_NAME, Collector.class);
+        mongoUtils = mongoCollections.utils(collection);
+        paginationHelper = mongoCollections.paginationHelper(collection);
     }
 
     @Nullable
     public Collector find(String id) {
-        return db.findOne(DBQuery.is("_id", id));
+        return mongoUtils.getById(id).orElse(null);
     }
 
     @Nullable
     public Collector findByName(String name) {
-        return db.findOne(DBQuery.is("name", name));
+        return collection.find(eq("name", name)).first();
     }
 
     @Nullable
     public Collector findByNameAndOs(String name, String operatingSystem) {
-        return db.findOne(
-                DBQuery.and(
-                        DBQuery.is("name", name),
-                        DBQuery.is("node_operating_system", operatingSystem))
-        );
+        return collection.find(
+                and(
+                        eq("name", name),
+                        eq("node_operating_system", operatingSystem)
+                )
+        ).first();
     }
 
     @Nullable
     public Collector findByNameExcludeId(String name, String id) {
-        return db.findOne(
-                DBQuery.and(
-                        DBQuery.is("name", name),
-                        DBQuery.notEquals("_id", id))
-        );
+        return collection.find(
+                and(
+                        eq("name", name),
+                        ne("_id", new ObjectId(id))
+                )
+        ).first();
     }
 
     public long count() {
-        return db.count();
+        return collection.countDocuments();
     }
 
     public List<Collector> allFilter(Predicate<Collector> filter) {
-        try (final Stream<Collector> collectorsStream = streamAll()) {
+        try (final Stream<Collector> collectorsStream = MongoUtils.stream(collection.find())) {
             final Stream<Collector> filteredStream = filter == null ? collectorsStream : collectorsStream.filter(filter);
             return filteredStream.collect(Collectors.toList());
         }
     }
 
     public List<Collector> all() {
-        return allFilter(null);
+        return collection.find().into(new ArrayList<>());
     }
 
-    public PaginatedList<Collector> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, String order) {
-        final DBQuery.Query dbQuery = searchQuery.toDBQuery();
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
-        return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+    public PaginatedList<Collector> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField,
+                                                  SortOrder order) {
+        return paginationHelper
+                .filter(searchQuery.toBson())
+                .sort(order.toBsonSort(sortField))
+                .perPage(perPage)
+                .page(page);
     }
 
     public Collector fromRequest(Collector request) {
@@ -121,5 +136,17 @@ public class CollectorService extends PaginatedDbService<Collector> {
                 .id(null)
                 .name(name)
                 .build();
+    }
+
+    public Collector save(Collector collector) {
+        return mongoUtils.save(collector);
+    }
+
+    public int delete(String id) {
+        return mongoUtils.deleteById(id) ? 1 : 0;
+    }
+
+    public Optional<Collector> get(String id) {
+        return mongoUtils.getById(id);
     }
 }

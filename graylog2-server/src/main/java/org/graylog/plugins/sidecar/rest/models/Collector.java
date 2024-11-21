@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -29,7 +31,7 @@ import javax.annotation.Nullable;
 @AutoValue
 @JsonAutoDetect
 @JsonIgnoreProperties({"default_template_crc"})
-public abstract class Collector {
+public abstract class Collector implements BuildableMongoEntity<Collector, Collector.Builder> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_SERVICE_TYPE = "service_type";
@@ -77,15 +79,23 @@ public abstract class Collector {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements BuildableMongoEntity.Builder<Collector, Builder> {
         public abstract Builder id(String id);
+
         public abstract Builder name(String value);
+
         public abstract Builder serviceType(String serviceType);
+
         public abstract Builder nodeOperatingSystem(String nodeOperatingSystem);
+
         public abstract Builder executablePath(String executablePath);
+
         public abstract Builder executeParameters(String executeParameters);
+
         public abstract Builder validationParameters(String validationParameters);
+
         public abstract Builder defaultTemplate(String defaultTemplate);
+
         public abstract Collector build();
     }
 
