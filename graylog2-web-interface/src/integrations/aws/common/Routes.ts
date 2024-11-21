@@ -14,7 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const Routes = {
+import { qualifyUrls } from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
+
+const AwsRoutes = {
   INTEGRATIONS: {
     AWS: {
       CLOUDWATCH: {
@@ -54,6 +57,11 @@ const DocsRoutes = {
   },
 };
 
-export default Routes;
+const qualifiedRoutes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(AwsRoutes, AppConfig.gl2AppPathPrefix()) : AwsRoutes;
+
+export default {
+  ...qualifiedRoutes,
+  unqualified: AwsRoutes,
+};
 
 export { ApiRoutes, DocsRoutes };
