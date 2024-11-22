@@ -48,7 +48,7 @@ public class DBJobDefinitionService {
     public DBJobDefinitionService(MongoCollections mongoCollections, MongoJackObjectMapperProvider mapper) {
         collection = mongoCollections.collection(COLLECTION_NAME, JobDefinitionDto.class);
         mongoUtils = mongoCollections.utils(collection);
-        this.objectMapper = mapper.get();
+        objectMapper = mapper.get();
     }
 
     /**
@@ -121,5 +121,9 @@ public class DBJobDefinitionService {
 
     public Stream<JobDefinitionDto> streamAll() {
         return mongoUtils.stream(collection.find());
+    }
+
+    public JobDefinitionDto findOrCreate(JobDefinitionDto dto) {
+        return mongoUtils.getOrCreate(dto);
     }
 }

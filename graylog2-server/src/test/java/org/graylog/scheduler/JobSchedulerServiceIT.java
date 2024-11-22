@@ -77,7 +77,7 @@ class JobSchedulerServiceIT {
     SchedulerCapabilitiesService schedulerCapabilitiesService;
 
     private DBJobTriggerService jobTriggerService;
-    private DBCustomJobDefinitionService customJobDefinitionService;
+    private DBJobDefinitionService jobDefinitionService;
     private JobSchedulerService jobSchedulerService;
     private JobSchedulerClock clock;
 
@@ -100,12 +100,13 @@ class JobSchedulerServiceIT {
         final JobSchedulerConfig schedulerConfig = new TestSchedulerConfig();
         final Duration lockExpirationDuration = Duration.seconds(10);
 
-        customJobDefinitionService = new DBCustomJobDefinitionService(
-                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
-                        mongoDBTestService.mongoConnection()));
+        final var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        jobDefinitionService = new DBJobDefinitionService(
+                new MongoCollections(mapperProvider,
+                        mongoDBTestService.mongoConnection()), mapperProvider);
 
         jobTriggerService = new DBJobTriggerService(
-                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongoDBTestService.mongoConnection()),
+                new MongoCollections(mapperProvider, mongoDBTestService.mongoConnection()),
                 nodeId,
                 clock,
                 schedulerCapabilitiesService,
@@ -113,9 +114,9 @@ class JobSchedulerServiceIT {
         );
 
         final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(
-                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
+                new MongoCollections(mapperProvider,
                         mongoDBTestService.mongoConnection()),
-                new MongoJackObjectMapperProvider(objectMapper));
+                mapperProvider);
         final JobScheduleStrategies scheduleStrategies = new JobScheduleStrategies(clock);
 
         final JobTriggerUpdates.Factory jobTriggerUpdatesFactory = trigger -> new JobTriggerUpdates(
@@ -179,8 +180,8 @@ class JobSchedulerServiceIT {
 
         jobSchedulerService.startAsync().awaitRunning();
         try {
-            createTriggers(nLimited, customJobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
-            createTriggers(nUnlimited, customJobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
+            createTriggers(nLimited, jobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
+            createTriggers(nUnlimited, jobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
             outstandingJobs.await();
         } finally {
             jobSchedulerService.stopAsync().awaitTerminated();
@@ -220,8 +221,8 @@ class JobSchedulerServiceIT {
 
         jobSchedulerService.startAsync().awaitRunning();
         try {
-            createTriggers(nLimited, customJobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
-            createTriggers(nUnlimited, customJobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
+            createTriggers(nLimited, jobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
+            createTriggers(nUnlimited, jobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
             outstandingJobsTotal.await();
         } finally {
             jobSchedulerService.stopAsync().awaitTerminated();
@@ -253,8 +254,8 @@ class JobSchedulerServiceIT {
         jobSchedulerService.startAsync().awaitRunning();
         try {
             for (int i = 0; i < (nJobs / 2); i++) {
-                createTriggers(1, customJobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
-                createTriggers(1, customJobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
+                createTriggers(1, jobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
+                createTriggers(1, jobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
             }
             outstandingJobs.await();
         } finally {
