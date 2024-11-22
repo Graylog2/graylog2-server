@@ -254,7 +254,10 @@ public class Configuration {
     @Parameter(value = "metrics_policy")
     private String metricsPolicy = "gl-datanode-metrics-ism";
 
-    @Documentation(value = "Cache size for searchable snaphots")
+    /**
+     * @see <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/searchable_snapshot/#configuring-a-node-to-use-searchable-snapshots}">Searchable snapshots</a>
+     */
+    @Documentation(value = "Cache size for searchable snaphots. ")
     @Parameter(value = "node_search_cache_size")
     private String searchCacheSize = "10gb";
 
