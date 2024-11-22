@@ -19,61 +19,71 @@ package org.graylog.security.authservice;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.graylog.security.events.AuthServiceBackendDeletedEvent;
 import org.graylog.security.events.AuthServiceBackendSavedEvent;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.rest.PaginationParameters;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryParser;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 
-public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceBackendDTO> {
+public class DBAuthServiceBackendService {
+    public static final String COLLECTION_NAME = "auth_service_backends";
+
     private final Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories;
     private final EventBus eventBus;
     private final ClusterEventBus clusterEventBus;
     private static final Set<String> ALLOWED_FIELDS = ImmutableSet.of(AuthServiceBackendDTO.FIELD_TITLE, AuthServiceBackendDTO.FIELD_DESCRIPTION);
     private final SearchQueryParser searchQueryParser;
 
+    private final MongoCollection<AuthServiceBackendDTO> collection;
+    private final MongoUtils<AuthServiceBackendDTO> mongoUtils;
+    private final MongoPaginationHelper<AuthServiceBackendDTO> paginationHelper;
+
     @Inject
-    protected DBAuthServiceBackendService(MongoConnection mongoConnection,
-                                          MongoJackObjectMapperProvider mapper,
+    protected DBAuthServiceBackendService(MongoCollections mongoCollections,
                                           Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories,
                                           EventBus eventBus,
                                           ClusterEventBus clusterEventBus) {
-        super(mongoConnection, mapper, AuthServiceBackendDTO.class, "auth_service_backends");
         this.backendFactories = backendFactories;
         this.eventBus = eventBus;
         this.clusterEventBus = clusterEventBus;
         this.searchQueryParser = new SearchQueryParser(AuthServiceBackendDTO.FIELD_TITLE, ALLOWED_FIELDS);
+
+        collection = mongoCollections.collection(COLLECTION_NAME, AuthServiceBackendDTO.class);
+        mongoUtils = mongoCollections.utils(collection);
+        paginationHelper = mongoCollections.paginationHelper(collection);
     }
 
-    @Override
     public AuthServiceBackendDTO save(AuthServiceBackendDTO newBackend) {
-        AuthServiceBackendDTO authServiceBackendDTO = super.save(prepareUpdate(newBackend));
+        AuthServiceBackendDTO authServiceBackendDTO = mongoUtils.save(prepareUpdate(newBackend));
         clusterEventBus.post(AuthServiceBackendSavedEvent.create(authServiceBackendDTO.id()));
         return authServiceBackendDTO;
     }
 
-    @Override
     public int delete(String id) {
         checkArgument(isNotBlank(id), "id cannot be blank");
-        final int delete = super.delete(id);
+        final int delete = mongoUtils.deleteById(id) ? 1 : 0;
         if (delete > 0) {
             eventBus.post(AuthServiceBackendDeletedEvent.create(id));
         }
@@ -96,22 +106,40 @@ public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceB
                 .orElseThrow(() -> new IllegalArgumentException("Couldn't find backend implementation for type <" + existingBackend.config().type() + ">"));
     }
 
+    public Optional<AuthServiceBackendDTO> get(String id) {
+        return mongoUtils.getById(id);
+    }
+
     public long countBackends() {
-        return db.count();
+        return collection.countDocuments();
     }
 
     public PaginatedList<AuthServiceBackendDTO> findPaginated(PaginationParameters params,
                                                               Predicate<AuthServiceBackendDTO> filter) {
-        final String sortBy = defaultIfBlank(params.getSortBy(), "title");
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(params.getOrder(), sortBy);
 
-        DBQuery.Query dbQuery = DBQuery.empty();
+        final String sortBy = defaultIfBlank(params.getSortBy(), "title");
+        final Bson sort = SortOrder.fromString(params.getOrder()).toBsonSort(sortBy);
+
         final String query = params.getQuery();
+        Bson dbQuery = Filters.empty();
         if (!Strings.isNullOrEmpty(query)) {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
-            dbQuery = searchQuery.toDBQuery();
+            dbQuery = searchQuery.toBson();
         }
 
-        return findPaginatedWithQueryFilterAndSort(dbQuery, filter, sortBuilder, params.getPage(), params.getPerPage());
+        return paginationHelper
+                .filter(dbQuery)
+                .sort(sort)
+                .perPage(params.getPerPage())
+                .page(params.getPerPage(), filter);
+    }
+
+    @MustBeClosed
+    public Stream<AuthServiceBackendDTO> streamAll() {
+        return MongoUtils.stream(collection.find());
+    }
+
+    public Stream<AuthServiceBackendDTO> streamByIds(Set<String> idSet) {
+        return MongoUtils.stream(collection.find(stringIdsIn(idSet)));
     }
 }
