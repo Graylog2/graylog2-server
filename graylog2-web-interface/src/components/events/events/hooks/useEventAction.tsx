@@ -21,7 +21,7 @@ import { MenuItem } from 'components/bootstrap';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 
 const useEventAction = (event) => {
-  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(event.id);
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions([event.id]);
   const hasReplayInfo = !!event.replay_info;
   const isNotSystemEvent = !event.event_definition_type.startsWith('system-notifications');
 

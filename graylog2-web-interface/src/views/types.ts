@@ -270,7 +270,7 @@ type DashboardActionComponentProps<T> = {
 }
 
 type EventWidgetActionComponentProps<T> = {
-  eventId: string,
+  eventIds: Array<string>,
   modalRef: () => T,
 }
 
@@ -281,7 +281,7 @@ type DashboardActionModalProps<T> = React.PropsWithRef<{
 };
 
 type EventActionModalProps<T> = React.PropsWithRef<{
-  eventId: string,
+  eventIds: Array<string>,
 }> & {
   ref: React.LegacyRef<T>,
 }
@@ -316,6 +316,7 @@ type EventAction = {
   modal?: React.ComponentType<EventActionModalProps<unknown>>,
   component: React.ComponentType<EventActionComponentProps>,
   key: string,
+  isBulk?: boolean
 }
 
 type EventWidgetAction<T> = {
@@ -331,7 +332,7 @@ type AssetInformation = {
 }
 
 export type EventActionComponentProps = {
-  eventId: string,
+  eventIds: Array<string>,
   modalRef: () => unknown,
 }
 
