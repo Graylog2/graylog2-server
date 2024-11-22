@@ -22,15 +22,25 @@ import jakarta.annotation.Nonnull;
 import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+
+import static org.junit.Assert.fail;
 
 public class MinimalNode extends AbstractNodeCommand {
 
     public MinimalNode() {
         super(new MinimalNodeConfiguration());
-        URL resource = this.getClass().getResource("common-node.conf");
-        setConfigFile(resource.getPath());
+        URL resource = this.getClass().getResource("minimal-node.conf");
+        if (resource == null) {
+            fail("Cannot read configuration file");
+        }
+        try {
+            setConfigFile(resource.toURI().getPath());
+        } catch (URISyntaxException e) {
+            fail("Cannot read configuration file");
+        }
     }
 
     @Override
