@@ -60,6 +60,10 @@ const EmailNotificationSummary = ({
         <td>{notification.config.subject}</td>
       </tr>
       <tr>
+        <td>Send as Single Email</td>
+        <td>{notification.config.single_email}</td>
+      </tr>
+      <tr>
         <td>Use Lookup Table for Reply-To</td>
         <td>{notification.config.lookup_reply_to_email ? 'Yes' : 'No'}</td>
       </tr>
@@ -110,6 +114,65 @@ const EmailNotificationSummary = ({
             </td>
           </tr>
         )}
+
+      <tr>
+        <td>Users to CC</td>
+        <td>{notification.config.cc_users.join(', ') || 'No users will be cc\'d on this notification.'}</td>
+      </tr>
+      <tr>
+        <td>Use Lookup Table for CC Emails</td>
+        <td>{notification.config.lookup_cc_emails ? 'Yes' : 'No'}</td>
+      </tr>
+      {notification.config.lookup_cc_emails ? (
+        <>
+          <tr>
+            <td>CC Emails Lookup Table Name</td>
+            <td>{notification.config.cc_emails_lut_name}</td>
+          </tr>
+          <tr>
+            <td>CC Emails Lookup Table Key</td>
+            <td>{notification.config.cc_emails_lut_key}</td>
+          </tr>
+        </>
+      )
+        : (
+          <tr>
+            <td>CC Emails</td>
+            <td>
+              {notification.config.cc_emails.join(', ') || 'No email addresses are configured to be cc\'d on this notification.'}
+            </td>
+          </tr>
+        )}
+
+      <tr>
+        <td>Users to BCC</td>
+        <td>{notification.config.bcc_users.join(', ') || 'No users will be bcc\'d on this notification.'}</td>
+      </tr>
+      <tr>
+        <td>Use Lookup Table for BCC Emails</td>
+        <td>{notification.config.lookup_bcc_emails ? 'Yes' : 'No'}</td>
+      </tr>
+      {notification.config.lookup_bcc_emails ? (
+        <>
+          <tr>
+            <td>BCC Emails Lookup Table Name</td>
+            <td>{notification.config.bcc_emails_lut_name}</td>
+          </tr>
+          <tr>
+            <td>BCC Emails Lookup Table Key</td>
+            <td>{notification.config.bcc_emails_lut_key}</td>
+          </tr>
+        </>
+      )
+        : (
+          <tr>
+            <td>BCC Emails</td>
+            <td>
+              {notification.config.bcc_emails.join(', ') || 'No email addresses are configured to be bcc\'d on this notification.'}
+            </td>
+          </tr>
+        )}
+
       <tr>
         <td>Email Body</td>
         <td>
