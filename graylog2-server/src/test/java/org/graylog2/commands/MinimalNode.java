@@ -16,43 +16,21 @@
  */
 package org.graylog2.commands;
 
-import com.github.rvesse.airline.annotations.Command;
+import com.github.joschi.jadconfig.Parameter;
 import com.google.inject.Module;
 import jakarta.annotation.Nonnull;
+import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.net.URL;
 import java.util.List;
 
+public class MinimalNode extends AbstractNodeCommand {
 
-/**
- * This command will start an example node that waits for a few seconds and then stops again.
- * It's a demonstration of a minimal Graylog node.
- */
-@Command(name = "example", description = "Start an example node for a Graylog cluster")
-public class ExampleCommand extends AbstractNodeCommand {
-    private static final Logger LOG = LoggerFactory.getLogger(ExampleCommand.class);
-
-    public ExampleCommand() {
-        super(new ExampleCommandConfiguration());
-    }
-
-    @Override
-    public void run() {
-        super.run();
-    }
-
-    @Override
-    protected void startCommand() {
-        LOG.info("Starting example node");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            LOG.info("Interrupted...");
-            Thread.currentThread().interrupt();
-        }
-        LOG.info("Stopping example node");
+    public MinimalNode() {
+        super(new MinimalNodeConfiguration());
+        URL resource = this.getClass().getResource("common-node.conf");
+        setConfigFile(resource.getPath());
     }
 
     @Override
@@ -65,4 +43,38 @@ public class ExampleCommand extends AbstractNodeCommand {
         return List.of();
     }
 
+    @Override
+    protected void startCommand() {
+    }
+
+    static class MinimalNodeConfiguration implements CommonNodeConfiguration {
+        @Parameter("password_secret")
+        String passwordSecret;
+
+        @Parameter("node_id_file")
+        String nodeIdFile;
+
+        @Override
+        public boolean withPlugins() {
+            return false;
+        }
+
+        @Override
+        public boolean withEventBus() {
+            return false;
+        }
+
+        @Override
+        public boolean withScheduler() {
+            return false;
+        }
+
+        @Override
+        public boolean withMongoDb() {
+            return false;
+        }
+    }
 }
+
+
+

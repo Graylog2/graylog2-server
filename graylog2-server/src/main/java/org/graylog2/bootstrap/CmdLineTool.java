@@ -32,6 +32,7 @@ import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
 import com.github.luben.zstd.util.Native;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -631,5 +632,10 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
     protected Set<ServerStatus.Capability> capabilities() {
         return Collections.emptySet();
+    }
+
+    @VisibleForTesting
+    protected void setConfigFile(String configFile) {
+        this.configFile = configFile;
     }
 }
