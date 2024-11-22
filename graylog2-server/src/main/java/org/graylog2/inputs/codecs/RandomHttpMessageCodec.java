@@ -29,6 +29,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState;
 
@@ -57,18 +59,18 @@ public class RandomHttpMessageCodec extends AbstractCodec {
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
         if (!rawMessage.getCodecName().equals(getName())) {
-            log.error("Cannot decode payload type {}, skipping message {}",
-                    rawMessage.getCodecName(), rawMessage.getId());
-            return null;
+            throw InputProcessingException.create(
+                    "Cannot decode payload type %s, skipping message %s".formatted(rawMessage.getCodecName(), rawMessage.getId()),
+                    rawMessage, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
         }
         try {
             final GeneratorState state = objectMapper.readValue(rawMessage.getPayload(), GeneratorState.class);
-            final Message message = FakeHttpRawMessageGenerator.generateMessage(messageFactory, state);
-            return message;
+            return FakeHttpRawMessageGenerator.generateMessage(messageFactory, state);
         } catch (IOException e) {
-            log.error("Cannot decode message to class FakeHttpRawMessageGenerator.GeneratorState", e);
+            throw InputProcessingException.create(
+                    "Cannot decode message to class FakeHttpRawMessageGenerator.GeneratorState",
+                    rawMessage, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
         }
-        return null;
     }
 
     @Nullable

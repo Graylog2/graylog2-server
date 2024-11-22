@@ -28,6 +28,7 @@ import org.graylog2.plugin.inputs.annotations.Codec;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,14 +66,13 @@ public class BeatsCodec extends AbstractCodec {
         try {
             event = objectMapper.readValue(payload, TypeReferences.MAP_STRING_OBJECT);
         } catch (IOException e) {
-            LOG.error("Couldn't decode raw message {}", rawMessage);
-            return null;
+            throw InputProcessingException.create("Couldn't decode beats message",
+                    e, rawMessage, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
         }
 
         return parseEvent(event);
     }
 
-    @Nullable
     private Message parseEvent(Map<String, Object> event) {
         @SuppressWarnings("unchecked")
         final Map<String, String> metadata = (HashMap<String, String>) event.remove("@metadata");

@@ -38,6 +38,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.syslog4j.server.SyslogServerEventIF;
@@ -102,6 +103,8 @@ public class SyslogCodec extends AbstractCodec {
                 remoteAddress = address.getInetSocketAddress();
             }
             return parse(msg, remoteAddress == null ? null : remoteAddress.getAddress(), rawMessage.getTimestamp());
+        } catch (Exception e) {
+            throw InputProcessingException.create("Could not deserialize Syslog message.", e, rawMessage, msg);
         }
     }
 

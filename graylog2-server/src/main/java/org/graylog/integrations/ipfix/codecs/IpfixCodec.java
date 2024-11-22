@@ -43,6 +43,7 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -198,7 +199,7 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
                     .toMap(Tuple2::v1, Tuple2::v2);
 
             return rawIpfix.getDataSetsList().stream()
-                    .map(dataSet -> {
+                    .flatMap(dataSet -> {
                         final int templateId = dataSet.getTemplateId();
                         final ZonedDateTime flowExportTimestamp = ZonedDateTime.ofInstant(Instant.ofEpochSecond(dataSet.getTimestampEpochSeconds()), ZoneOffset.UTC);
                         final TemplateRecord templateRecord = templateRecordMap.get(templateId);
@@ -210,11 +211,9 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
                         return flows.stream()
                                 .map(flow -> formatFlow(flowExportTimestamp, sender, flow));
                     })
-                    .flatMap(messageStream -> messageStream)
                     .collect(Collectors.toList());
         } catch (InvalidProtocolBufferException e) {
-            LOG.error("Unable to parse ipfix journal message", e);
-            return Collections.emptyList();
+            throw InputProcessingException.create("Unable to parse ipfix journal message", rawMessage);
         }
     }
 

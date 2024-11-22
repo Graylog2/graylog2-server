@@ -38,6 +38,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -135,16 +136,16 @@ public class GelfCodec extends AbstractCodec {
                 throw new IOException("null result");
             }
         } catch (final Exception e) {
-            log.error("Could not parse JSON, first 400 characters: " +
-                    StringUtils.abbreviate(json, 403), e);
-            throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)", e);
+            throw InputProcessingException.create("JSON is null/could not be parsed (invalid JSON)",
+                    e, rawMessage, json);
         }
 
         try {
             validateGELFMessage(node, rawMessage.getId(), rawMessage.getRemoteAddress());
         } catch (IllegalArgumentException e) {
             log.trace("Invalid GELF message <{}>", node);
-            throw e;
+            throw InputProcessingException.create("Invalid GELF message <%s>".formatted(node),
+                    e, rawMessage, json);
         }
 
         // Timestamp.

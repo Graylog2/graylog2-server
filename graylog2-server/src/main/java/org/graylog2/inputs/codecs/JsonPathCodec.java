@@ -43,6 +43,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,13 +87,17 @@ public class JsonPathCodec extends AbstractCodec {
             try {
                 fields = flatten(json);
             } catch (JsonFlattenException e) {
-                LOG.warn("JSON contains type not supported by flatten method.", e);
+                throw InputProcessingException.create(
+                        "JSON contains type not supported by flatten method.", e, rawMessage, json);
             } catch (JsonProcessingException e) {
-                LOG.warn("Could not parse JSON.", e);
+                throw InputProcessingException.create(
+                        "Could not parse JSON.", e, rawMessage, json);
             }
         } else {
             if (jsonPath == null) {
-                return null;
+                throw InputProcessingException.create(
+                        "Field <%s> is empty for input with id <%s>".formatted(CK_PATH, rawMessage.getSourceNodes().get(0).inputId),
+                        rawMessage);
             }
             final String json = new String(rawMessage.getPayload(), charset);
             fields = read(json);
@@ -137,7 +142,7 @@ public class JsonPathCodec extends AbstractCodec {
         if (fields.toString().length() > 50) {
             shortMessage.append(fields.toString().substring(0, 50)).append("[...]");
         } else {
-            shortMessage.append(fields.toString());
+            shortMessage.append(fields);
         }
 
         return shortMessage.toString();
