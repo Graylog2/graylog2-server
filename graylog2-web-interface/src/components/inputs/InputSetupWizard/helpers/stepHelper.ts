@@ -26,7 +26,7 @@ export const getStepData = (stepsData: StepsData, stepName: InputSetupWizardStep
 export const getNextStep = (orderedSteps: Array<InputSetupWizardStep>, activeStep: InputSetupWizardStep) : InputSetupWizardStep | undefined => {
   const activeStepIndex = orderedSteps.indexOf(activeStep);
 
-  if(activeStepIndex < 0) return undefined;
+  if (activeStepIndex < 0) return undefined;
 
   return orderedSteps[activeStepIndex + 1];
 };
@@ -74,7 +74,7 @@ export const addStepAfter = (orderedSteps: Array<InputSetupWizardStep>, step: In
 export const updateStepData = (stepsData: StepsData, stepName: InputSetupWizardStep, data: StepData = {}) : StepsData => {
   if (!stepName) return {};
 
-  if (!stepsData) return { [stepName]: data }
+  if (!stepsData) return { [stepName]: data };
 
   return { ...stepsData, [stepName]: { ...stepsData[stepName], ...data } };
 };
