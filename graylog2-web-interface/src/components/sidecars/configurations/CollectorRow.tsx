@@ -29,7 +29,7 @@ import CopyCollectorModal from './CopyCollectorModal';
 
 type Props = {
   collector: Collector,
-  onClone: () => void,
+  onClone: (collector: string, name: string, callback: () => void) => void,
   onDelete: (collector: Collector) => void,
   validateCollector: (collector: Collector) => Promise<{ errors: { name: string[] } }>,
 }
