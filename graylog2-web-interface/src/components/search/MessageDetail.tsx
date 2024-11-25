@@ -66,7 +66,8 @@ const StreamLinks = ({ messageStreams, streamIds, streams }: {
     <>
       {streamIds.map((id) => streams.get(id))
         .filter((stream) => !!stream)
-        .map((stream) => <li key={stream.id}><StreamLink stream={stream} /></li>)}
+        .map((stream) => <li key={stream.id}><StreamLink stream={stream} /></li>)
+        .toArray()}
     </>
   );
 };
