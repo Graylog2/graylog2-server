@@ -35,6 +35,7 @@ import org.graylog2.plugin.database.users.User;
 import javax.annotation.Nullable;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -120,13 +121,12 @@ public class DBGrantService {
     }
 
     public List<GrantDTO> getForTargetAndGrantees(GRN target, Set<GRN> grantees) {
-        final var iterable = collection.find(
+        return collection.find(
                 and(
                         eq(GrantDTO.FIELD_TARGET, target),
                         in(GrantDTO.FIELD_GRANTEE, grantees)
                 )
-        );
-        return ImmutableList.copyOf(iterable);
+        ).into(new ArrayList<>());
     }
 
     public GrantDTO create(GrantDTO grantDTO, @Nullable User currentUser) {
@@ -193,7 +193,7 @@ public class DBGrantService {
     }
 
     public List<GrantDTO> getForTarget(GRN target) {
-        return ImmutableList.copyOf(collection.find(eq(GrantDTO.FIELD_TARGET, target.toString())));
+        return collection.find(eq(GrantDTO.FIELD_TARGET, target.toString())).into(new ArrayList<>());
     }
 
     public int deleteForGrantee(GRN grantee) {
@@ -209,13 +209,12 @@ public class DBGrantService {
     }
 
     public List<GrantDTO> getForTargetExcludingGrantee(GRN target, GRN grantee) {
-        final var iterable = collection.find(
+        return collection.find(
                 and(
                         eq(GrantDTO.FIELD_TARGET, target.toString()),
                         ne(GrantDTO.FIELD_GRANTEE, grantee.toString())
                 )
-        );
-        return ImmutableList.copyOf(iterable);
+        ).into(new ArrayList<>());
     }
 
     public Map<GRN, Set<GRN>> getOwnersForTargets(Collection<GRN> targets) {
