@@ -20,7 +20,7 @@ import usePluggableEventActions from 'components/events/events/hooks/usePluggabl
 import type { Event } from 'components/events/events/types';
 
 const useEventBulkAction = (events: Array<Event>) => {
-  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(events);
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(events, true);
 
   const actions = useMemo(() => [
     pluggableActions,
