@@ -41,7 +41,7 @@ public class PaginatedStreamService {
 
     @Inject
     public PaginatedStreamService(MongoCollections mongoCollections) {
-        this.collection = mongoCollections.nonEntityCollection(COLLECTION_NAME, StreamDTO.class);
+        this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
     }
 
     public long count() {
