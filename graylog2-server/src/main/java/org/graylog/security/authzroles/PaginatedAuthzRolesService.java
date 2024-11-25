@@ -55,8 +55,6 @@ public class PaginatedAuthzRolesService {
     public PaginatedAuthzRolesService(MongoCollections mongoCollections, UserService userService) {
         this.userService = userService;
 
-        // TODO: check if this avoids (de-)serialization, otherwise revert back to using untyped or create exception
-        //  in MongoCollections for Document.class
         collection = mongoCollections.collection(COLLECTION_NAME, AuthzRoleDTO.class);
         mongoUtils = mongoCollections.utils(collection);
         paginationHelper = mongoCollections.paginationHelper(collection);
@@ -68,7 +66,7 @@ public class PaginatedAuthzRolesService {
     }
 
     public ImmutableSet<String> getAllRoleIds() {
-        // Use a MongoCollection query here to avoid the mongojack deserializing and object creation overhead
+        // Use a projection here to avoid the mongojack deserializing and object creation overhead
         final FindIterable<Document> docs = documentCollection.find().projection(Projections.include("_id"));
 
         return StreamSupport.stream(docs.spliterator(), false)
