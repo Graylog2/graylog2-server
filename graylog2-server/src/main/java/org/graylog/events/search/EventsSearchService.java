@@ -18,6 +18,7 @@ package org.graylog.events.search;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
@@ -27,8 +28,6 @@ import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
-
-import jakarta.inject.Inject;
 
 import java.util.Collections;
 import java.util.List;
@@ -77,6 +76,8 @@ public class EventsSearchService {
             filterBuilder.addAll(Collections.singleton("(" + eventDefinitionFilter + ")"));
         }
 
+        parameters.filter().priority().ifPresent(priorityFilter -> filterBuilder.add("priority:" + mapPriority(priorityFilter)));
+
         switch (parameters.filter().alerts()) {
             case INCLUDE:
                 // Nothing to do
@@ -119,6 +120,15 @@ public class EventsSearchService {
                 .usedIndices(result.usedIndexNames())
                 .context(context)
                 .build();
+    }
+
+    private long mapPriority(String priorityFilter) {
+        return switch (priorityFilter) {
+            case "high" -> 3;
+            case "normal" -> 2;
+            case "low" -> 1;
+            default -> throw new IllegalStateException("Invalid priority: " + priorityFilter);
+        };
     }
 
     // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is

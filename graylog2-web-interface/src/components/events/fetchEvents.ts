@@ -30,7 +30,11 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 const url = URLUtils.qualifyUrl('/events/search');
 
 type FiltersResult = {
-  filter: { alerts?: string, event_definitions?: Array<string> },
+  filter: {
+    alerts?: string,
+    event_definitions?: Array<string>,
+    priority?: string,
+  },
   timerange?: { from?: string, to?: string, type: string, range?: number },
 };
 
@@ -50,6 +54,11 @@ const parseFilters = (filters: UrlQueryFilters) => {
   if (filters.get('event_definition_id')?.[0]) {
     const eventDefinitionId = filters.get('event_definition_id')[0];
     result.filter.event_definitions = [eventDefinitionId];
+  }
+
+  if (filters.get('priority')?.[0]) {
+    const priority = filters.get('priority')[0];
+    result.filter.priority = priority;
   }
 
   switch (filters?.get('alert')?.[0]) {

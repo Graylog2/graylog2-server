@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
@@ -29,6 +30,7 @@ import java.util.Set;
 public abstract class EventsSearchFilter {
     private static final String FIELD_ALERTS = "alerts";
     private static final String FIELD_EVENT_DEFINITIONS = "event_definitions";
+    private static final String FIELD_PRIORITY = "priority";
 
     public enum Alerts {
         @JsonProperty("include")
@@ -44,6 +46,9 @@ public abstract class EventsSearchFilter {
 
     @JsonProperty(FIELD_EVENT_DEFINITIONS)
     public abstract Set<String> eventDefinitions();
+
+    @JsonProperty(FIELD_PRIORITY)
+    public abstract Optional<String> priority();
 
     public static EventsSearchFilter empty() {
         return builder().build();
@@ -69,6 +74,9 @@ public abstract class EventsSearchFilter {
 
         @JsonProperty(FIELD_EVENT_DEFINITIONS)
         public abstract Builder eventDefinitions(Set<String> eventDefinitions);
+
+        @JsonProperty(FIELD_PRIORITY)
+        public abstract Builder priority(String priority);
 
         public abstract EventsSearchFilter build();
     }
