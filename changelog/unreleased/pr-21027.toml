@@ -1,0 +1,5 @@
+type = "a"
+message = "Add bulk action to events page"
+
+issues = ["graylog-plugin-enterprise#8663"]
+pulls = ["graylog-plugin-enterprise#9245", "21027"]
