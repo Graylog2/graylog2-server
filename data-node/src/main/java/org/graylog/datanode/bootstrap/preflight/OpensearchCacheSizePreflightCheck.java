@@ -22,6 +22,8 @@ import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -41,6 +43,8 @@ public class OpensearchCacheSizePreflightCheck implements PreflightCheck {
     private final Path opensearchDataLocation;
     private final Function<Path, Long> usableSpaceProvider;
 
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchCacheSizePreflightCheck.class);
+
     @Inject
     public OpensearchCacheSizePreflightCheck(Configuration datanodeConfiguration) {
         this(datanodeConfiguration.getNodeSearchCacheSize(), datanodeConfiguration.getOpensearchDataLocation(), OpensearchCacheSizePreflightCheck::getUsableSpace);
@@ -56,15 +60,21 @@ public class OpensearchCacheSizePreflightCheck implements PreflightCheck {
     public void runCheck() throws PreflightCheckException {
         final long usableSpace = usableSpaceProvider.apply(opensearchDataLocation);
         final long cacheSize = toBytes(this.configuredNodeSearchCacheSize);
+        final String usableHumanReadable = toHumanReadableSize(usableSpace);
         if (cacheSize >= usableSpace) {
-            final String usable = toHumanReadableSize(usableSpace);
             throw new PreflightCheckException("""
                     There is not enough usable space for the node search cache. Your system has only %s available.
                     Either decrease node_search_cache_size configuration or make sure that datanode has enough free disk space.
                     Current node_search_cache_size=%s"""
-                    .formatted(usable, this.configuredNodeSearchCacheSize));
-
+                    .formatted(usableHumanReadable, this.configuredNodeSearchCacheSize));
+        } else if (percentageUsage(usableSpace, cacheSize) > 80.0) {
+            LOG.warn("Your system is running out of disk space. Current node_search_cache_size is configured to {} " +
+                    "and your disk has only {} available.", this.configuredNodeSearchCacheSize, usableHumanReadable);
         }
+    }
+
+    private double percentageUsage(long usableSpace, long cacheSize) {
+        return 100.0 / usableSpace * cacheSize;
     }
 
     @Nonnull
@@ -92,7 +102,7 @@ public class OpensearchCacheSizePreflightCheck implements PreflightCheck {
         powerMap.put("KB", 1);
         if (matcher.find()) {
             String number = matcher.group(1);
-            int pow = powerMap.get(matcher.group(2).toUpperCase());
+            int pow = powerMap.get(matcher.group(2).toUpperCase(Locale.ROOT));
             BigDecimal bytes = new BigDecimal(number);
             bytes = bytes.multiply(BigDecimal.valueOf(1024).pow(pow));
             returnValue = bytes.longValue();

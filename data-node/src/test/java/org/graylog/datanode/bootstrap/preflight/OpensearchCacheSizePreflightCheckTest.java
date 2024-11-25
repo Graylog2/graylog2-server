@@ -39,9 +39,12 @@ class OpensearchCacheSizePreflightCheckTest {
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(PreflightCheckException.class)
                 .hasMessageContaining("There is not enough usable space for the node search cache");
+    }
 
-
+    @Test
+    void testValidConfiguration(@TempDir Path temp) {
         Assertions.assertThatNoException().isThrownBy(() -> new OpensearchCacheSizePreflightCheck("2gb", temp, path -> gbToBytes(15)).runCheck());
+        Assertions.assertThatNoException().isThrownBy(() -> new OpensearchCacheSizePreflightCheck("9gb", temp, path -> gbToBytes(10)).runCheck());
     }
 
     private static long gbToBytes(long gb) {
