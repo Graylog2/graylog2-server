@@ -37,7 +37,7 @@ public class MongoDbTemplateLoader implements TemplateLoader {
 
         final ObjectId objectId;
         try {
-            objectId = new ObjectId(id);
+            objectId = new ObjectId(unlocalize(id));
         } catch (IllegalArgumentException e) {
             // no ObjectID so skip MongoDB loader and try with next one
             return null;
