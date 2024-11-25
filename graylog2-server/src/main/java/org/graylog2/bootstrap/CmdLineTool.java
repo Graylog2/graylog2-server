@@ -604,10 +604,9 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         for (Message message : messages) {
             //noinspection ThrowableResultOfMethodCallIgnored
             final Throwable rootCause = ExceptionUtils.getRootCause(message.getCause());
-            if (rootCause instanceof NodeIdPersistenceException) {
-                //TODO: Check configuration
-//                LOG.error(UI.wallString(
-//                        "Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
+            if (configuration.withNodeIdFile() && rootCause instanceof NodeIdPersistenceException) {
+                LOG.error(UI.wallString(
+                        "Unable to read or persist your NodeId file. This means your node id file is not readable or writable by the current user. The following exception might give more information: " + message));
                 System.exit(-1);
             } else if (rootCause instanceof AccessDeniedException) {
                 LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));

@@ -42,6 +42,11 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
     }
 
     @Override
+    default boolean withNodeIdFile() {
+        return true;
+    }
+
+    @Override
     default String getEnvironmentVariablePrefix() {
         return "GRAYLOG_";
     };

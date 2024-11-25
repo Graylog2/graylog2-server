@@ -61,9 +61,6 @@ public class MinimalNode extends AbstractNodeCommand {
         @Parameter("password_secret")
         String passwordSecret;
 
-        @Parameter("node_id_file")
-        String nodeIdFile;
-
         @Override
         public boolean withPlugins() {
             return false;
@@ -81,6 +78,11 @@ public class MinimalNode extends AbstractNodeCommand {
 
         @Override
         public boolean withMongoDb() {
+            return false;
+        }
+
+        @Override
+        public boolean withNodeIdFile() {
             return false;
         }
     }
