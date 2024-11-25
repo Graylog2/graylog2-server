@@ -20,9 +20,7 @@ import usePluggableEventActions from 'components/events/events/hooks/usePluggabl
 import type { Event } from 'components/events/events/types';
 
 const useEventBulkAction = (events: Array<Event>) => {
-  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(events.map(({ id }: Event) => id));
-  // const hasReplayInfo = !!event.replay_info;
-  // const isNotSystemEvent = !event.event_definition_type.startsWith('system-notifications');
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(events);
 
   const actions = useMemo(() => [
     pluggableActions,

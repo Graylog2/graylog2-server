@@ -61,6 +61,7 @@ import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
+import type { Event } from 'components/events/events/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -270,7 +271,7 @@ type DashboardActionComponentProps<T> = {
 }
 
 type EventWidgetActionComponentProps<T> = {
-  eventIds: Array<string>,
+  eventId: string,
   modalRef: () => T,
 }
 
@@ -280,8 +281,14 @@ type DashboardActionModalProps<T> = React.PropsWithRef<{
   ref: React.LegacyRef<T>
 };
 
+type EventWidgetActionModalProps<T> = React.PropsWithRef<{
+  eventId: string,
+}> & {
+  ref: React.LegacyRef<T>,
+}
+
 type EventActionModalProps<T> = React.PropsWithRef<{
-  eventIds: Array<string>,
+  events: Array<Event>,
 }> & {
   ref: React.LegacyRef<T>,
 }
@@ -311,8 +318,8 @@ type DashboardAction<T> = {
   useCondition?: () => boolean,
 }
 
-type EventAction = {
-  useCondition: () => boolean,
+export type EventAction = {
+  useCondition: (events: Array<Event>) => boolean,
   modal?: React.ComponentType<EventActionModalProps<unknown>>,
   component: React.ComponentType<EventActionComponentProps>,
   key: string,
@@ -322,7 +329,7 @@ type EventAction = {
 type EventWidgetAction<T> = {
   key: string,
   component: React.ComponentType<EventWidgetActionComponentProps<T>>,
-  modal?: React.ComponentType<EventActionModalProps<T>>,
+  modal?: React.ComponentType<EventWidgetActionModalProps<T>>,
   useCondition?: () => boolean,
 }
 
@@ -332,7 +339,7 @@ type AssetInformation = {
 }
 
 export type EventActionComponentProps = {
-  eventIds: Array<string>,
+  events: Array<Event>,
   modalRef: () => unknown,
 }
 

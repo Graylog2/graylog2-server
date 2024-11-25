@@ -34,7 +34,7 @@ const usePluggableDashboardActions = (eventId: string) => {
   );
   const actions = availableActions.map(({ component: PluggableDashboardAction, key }) => (
     <PluggableDashboardAction key={`event-action-${key}`}
-                              eventIds={[eventId]}
+                              eventId={eventId}
                               modalRef={() => modalRefs.current[key]} />
   ));
 
@@ -42,7 +42,7 @@ const usePluggableDashboardActions = (eventId: string) => {
     .filter(({ modal }) => !!modal)
     .map(({ modal: ActionModal, key }) => (
       <ActionModal key={`event-action-modal-${key}`}
-                   eventIds={[eventId]}
+                   eventId={eventId}
                    ref={(r) => { modalRefs.current[key] = r; }} />
     ));
 
