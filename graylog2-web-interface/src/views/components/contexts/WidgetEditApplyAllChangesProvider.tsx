@@ -20,8 +20,6 @@ import { useContext, useRef, useCallback, useMemo } from 'react';
 import type Widget from 'views/logic/widgets/Widget';
 import UserNotification from 'util/UserNotification';
 import DisableSubmissionStateContext from 'views/components/contexts/DisableSubmissionStateContext';
-import useAppDispatch from 'stores/useAppDispatch';
-import { updateWidget } from 'views/logic/slices/widgetActions';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 
 import WidgetEditApplyAllChangesContext from './WidgetEditApplyAllChangesContext';
@@ -36,18 +34,13 @@ const useBindApplyChanges = () => {
   return { applyChangesRef, bindApplyChanges };
 };
 
-type Props = {
-  widget: Widget,
-  children: React.ReactNode,
-}
-
 const useApplyAllWidgetChanges = (
   widget: Widget,
   applySearchControlsChanges: React.RefObject<(widget: Widget) => Widget>,
   applyElementConfigurationChanges: React.RefObject<(widgetConfig: WidgetConfig) => WidgetConfig>,
+  onChange: (newWidget: Widget) => Promise<void>,
 ) => {
   const { setDisabled } = useContext(DisableSubmissionStateContext);
-  const dispatch = useAppDispatch();
   const setDisableWidgetEditSubmit = useCallback(
     (disabled: boolean) => setDisabled('widget-edit-apply-all-changes', disabled),
     [setDisabled]);
@@ -77,7 +70,7 @@ const useApplyAllWidgetChanges = (
     if (hasChanges) {
       setDisableWidgetEditSubmit(true);
 
-      return dispatch(updateWidget(widget.id, newWidget))
+      return onChange(newWidget)
         .catch((error) => {
           UserNotification.error(`Applying widget changes failed with status: ${error}`);
 
@@ -86,13 +79,19 @@ const useApplyAllWidgetChanges = (
     }
 
     return Promise.resolve();
-  }, [widget, applySearchControlsChanges, applyElementConfigurationChanges, setDisableWidgetEditSubmit, dispatch]);
+  }, [widget, applySearchControlsChanges, applyElementConfigurationChanges, setDisableWidgetEditSubmit, onChange]);
 };
 
-const WidgetEditApplyAllChangesProvider = ({ children, widget }: Props) => {
+type Props = {
+  widget: Widget,
+  children: React.ReactNode,
+  onChange: (newWidget: Widget) => Promise<void>,
+}
+
+const WidgetEditApplyAllChangesProvider = ({ children, widget, onChange }: Props) => {
   const { applyChangesRef: applySearchControlsChanges, bindApplyChanges: bindApplySearchControlsChanges } = useBindApplyChanges();
   const { applyChangesRef: applyElementConfigurationChanges, bindApplyChanges: bindApplyElementConfigurationChanges } = useBindApplyChanges();
-  const applyAllWidgetChanges = useApplyAllWidgetChanges(widget, applySearchControlsChanges, applyElementConfigurationChanges);
+  const applyAllWidgetChanges = useApplyAllWidgetChanges(widget, applySearchControlsChanges, applyElementConfigurationChanges, onChange);
 
   const contextValue = useMemo(() => ({
     applyAllWidgetChanges,

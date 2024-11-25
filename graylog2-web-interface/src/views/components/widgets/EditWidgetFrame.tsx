@@ -53,10 +53,11 @@ type Props = {
   onCancel: () => void,
   onSubmit: () => void,
   showQueryControls?: boolean,
-  onChange: (widgetId: string, newWidget: Widget) => Promise<void>,
+  onChange: (newWidget: Widget) => Promise<void>,
+  containerComponent?: React.ComponentType<React.PropsWithChildren>
 };
 
-const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = true, showQueryControls = true, onChange }: Props) => {
+const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = true, showQueryControls = true, onChange, containerComponent: ContainerComponent = WidgetOverrideElements }: Props) => {
   const widget = useContext(WidgetContext);
 
   if (!widget) {
@@ -64,7 +65,7 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = 
   }
 
   return (
-    <WidgetEditApplyAllChangesProvider widget={widget}>
+    <WidgetEditApplyAllChangesProvider widget={widget} onChange={onChange}>
       <DisableSubmissionStateProvider>
         <Container>
           {(showQueryControls && !widget.returnsAllRecords) && (
@@ -75,9 +76,9 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = 
             </QueryControls>
           )}
           <Visualization role="presentation">
-            <WidgetOverrideElements>
+            <ContainerComponent>
               {children}
-            </WidgetOverrideElements>
+            </ContainerComponent>
           </Visualization>
           {displaySubmitActions && (
             <div>

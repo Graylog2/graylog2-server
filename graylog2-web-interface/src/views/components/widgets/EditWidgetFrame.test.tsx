@@ -70,7 +70,7 @@ describe('EditWidgetFrame', () => {
     const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) => render((
       <TestStoreProvider>
         <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} {...props}>
+          <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} onChange={() => Promise.resolve()} {...props}>
             Hello World!
             These are some buttons!
           </EditWidgetFrame>
