@@ -1,0 +1,4 @@
+type = "f"
+message = "Reset `is_cancelled` flag on job trigger release."
+
+pulls = ["20287"]

@@ -42,7 +42,7 @@ const StyledPanel = styled(Panel)(({ theme }) => css`
 const StyledPanelHeading = styled(Panel.Heading)(({ theme }) => css`
   display: flex;
   justify-content: space-between;
-  background-color: ${theme.colors.table.row.backgroundAlt} !important;
+  background-color: ${theme.colors.table.row.backgroundStriped} !important;
   border: 0;
 `);
 
@@ -118,7 +118,7 @@ const FilterRulesFields = ({ type }: Props) => {
       <Panel.Collapse>
         <StyledPanelBody>
           {values.rule?.[`${type}s`]?.map((item, index) => (
-            // eslint-disable-next-line react/no-array-index-key
+
             <RuleBuilderBlock key={item.id}
                               blockDict={conditions || []}
                               block={item}

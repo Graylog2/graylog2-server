@@ -25,6 +25,8 @@ import { FormikInput } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type FormValues = {
   organization: string
@@ -39,6 +41,7 @@ const createCA = (caData: FormValues) => fetch(
 
 const CaCreateForm = () => {
   const queryClient = useQueryClient();
+  const sendTelemetry = useSendTelemetry();
 
   const { mutateAsync: onCreateCA } = useMutation(createCA, {
     onSuccess: () => {
@@ -50,7 +53,15 @@ const CaCreateForm = () => {
       UserNotification.error(`CA creation failed with error: ${error}`);
     },
   });
-  const onSubmit = (formValues: FormValues) => onCreateCA(formValues).catch(() => {});
+
+  const onSubmit = (formValues: FormValues) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_CREATE_CA_CLICKED, {
+      app_pathname: 'datanode',
+      app_section: 'migration',
+    });
+
+    return onCreateCA(formValues).catch(() => {});
+  };
 
   return (
     <div>

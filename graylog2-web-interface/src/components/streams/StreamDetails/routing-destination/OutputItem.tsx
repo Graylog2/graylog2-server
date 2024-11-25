@@ -39,7 +39,7 @@ const ActionButtonsWrap = styled.span(({ theme }) => css`
 const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeDefinition }: Props) => (
   <tr>
     <td>{output.title} <small>{`(Type: ${output.type})`}</small> </td>
-    {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+    {}
     <td>
       <ActionButtonsWrap className="align-right">
         <EditOutputButton disabled={isLoadingOutputTypes}

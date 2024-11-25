@@ -17,7 +17,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 
 import { Modal, ListGroup, ListGroupItem, Input } from 'components/bootstrap';
-import { PaginatedList, SearchForm, ModalSubmit, Spinner } from 'components/common';
+import { PaginatedList, SearchForm, ModalSubmit, Spinner, NoSearchResult } from 'components/common';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import type { SearchParams } from 'stores/PaginationTypes';
 
@@ -53,7 +53,7 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
       direction: 'asc',
     },
   });
-  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards } = useDashboards(searchParams);
+  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards } = useDashboards({ ...searchParams, scope: 'update' });
 
   useEffect(() => {
     setSelectedDashboard(null);
@@ -124,7 +124,7 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
                     );
                   })}
                 </ListGroup>
-              ) : <span>No dashboards found</span>}
+              ) : <NoSearchResult>No dashboards found.</NoSearchResult>}
             </PaginatedList>
             {showCreateNewDashboardCheckbox && (
               <Input type="checkbox"
@@ -149,11 +149,6 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
       </Modal.Footer>
     </Modal>
   );
-};
-
-CopyToDashboardForm.defaultProps = {
-  activeDashboardId: undefined,
-  onCreateNewDashboard: undefined,
 };
 
 export default CopyToDashboardForm;

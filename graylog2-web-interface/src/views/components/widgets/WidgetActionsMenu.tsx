@@ -155,7 +155,7 @@ const WidgetActionsMenu = ({
 }: Props) => {
   const widget = useContext(WidgetContext);
   const view = useView();
-  const { query, timerange, streams } = useContext(DrilldownContext);
+  const { query, timerange, streams, streamCategories } = useContext(DrilldownContext);
   const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
@@ -230,6 +230,7 @@ const WidgetActionsMenu = ({
           <ReplaySearchButton queryString={query.query_string}
                               timerange={timerange}
                               streams={streams}
+                              streamCategories={streamCategories}
                               parameterBindings={parameterBindings}
                               parameters={parameters} />
         </IfDashboard>

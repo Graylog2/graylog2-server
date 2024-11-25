@@ -22,8 +22,10 @@ import type { DataTieringConfig } from 'components/indices/data-tiering';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Stream } from 'logic/streams/types';
+import type { ColumnRenderer } from 'components/common/EntityDataTable/types';
+import type { StepType } from 'components/common/Wizard';
+import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 
 interface PluginRoute {
   path: string;
@@ -143,6 +145,16 @@ type DataTiering = {
     config: DataTieringConfig
   }>,
   WarmTierReadinessInfo: React.ComponentType,
+  DeleteFailedSnapshotMenuItem: React.ComponentType<{
+    eventKey: string,
+    indexSetId: string
+  }>,
+}
+
+type InputSetupWizard = {
+  steps: {
+    [key in InputSetupWizardStep]?: StepType
+  }
 }
 
 type License = {
@@ -156,10 +168,16 @@ type License = {
   }>,
 }
 
-type FieldValueProvider = {
+export type FieldValueProvider = {
   type: string,
   displayName: string,
-  formComponent: React.ComponentType,
+  formComponent: React.ComponentType<{
+    fieldName: string,
+    config: EventDefinition['field_spec'][number],
+    onChange: (nextConfig: EventDefinition['field_spec'][number]) => void,
+    validation: any,
+    currentUser: User,
+  }>,
   summaryComponent: React.ComponentType<{
     fieldName: string,
     keys: Array<string>,
@@ -171,27 +189,23 @@ type FieldValueProvider = {
     table_name?: string,
     key_field?: string,
   },
-  requiredFields: {
-    template?: string,
-    table_name?: string,
-    key_field?: string,
-  },
+  requiredFields: string[],
 }
 
 interface PluginDataWarehouse {
+  StreamDataWarehouse: React.ComponentType,
   DataWarehouseStatus: React.ComponentType<{
-    stream: {
-      enabled_status: boolean;
-    }
+    datawareHouseEnabled: boolean;
   }>,
-  StreamDataWarehouse: React.ComponentType<{}>,
+  DataWarehouseJournal: React.ComponentType<{
+    nodeId: string,
+  }>,
   DataWarehouseJobs: React.ComponentType<{
     streamId: string,
   }>,
   StreamIlluminateProcessingSection: React.ComponentType<{
     stream: Stream,
   }>,
-  DataWarehouseJobs: React.ComponentType<{}>,
   StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
   fetchStreamDataWarehouseStatus: (streamId: string) => Promise<{
     id: string,
@@ -213,9 +227,9 @@ interface PluginDataWarehouse {
   getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
-    columnRenderer: ColumnRenderers<Stream>,
-  } | undefined,
-  DataWarehouseStreamDeleteWarning: React.ComponentType<{}>,
+    columnRenderer: { datawarehouse: ColumnRenderer<Stream> },
+  },
+  DataWarehouseStreamDeleteWarning: React.ComponentType,
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -228,6 +242,7 @@ declare module 'graylog-web-plugin/plugin' {
     globalNotifications?: Array<GlobalNotification>;
     fieldValueProviders?:Array<FieldValueProvider>;
     license?: Array<License>,
+    inputSetupWizard?: Array<InputSetupWizard>;
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,

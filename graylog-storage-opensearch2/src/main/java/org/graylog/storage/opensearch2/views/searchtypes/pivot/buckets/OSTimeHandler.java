@@ -37,7 +37,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
@@ -72,11 +71,13 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
         } else {
             for (String timeField : timeSpec.fields()) {
                 final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(interval.toDateInterval(query.effectiveTimeRange(pivot)).toString());
-                final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
+                final var ordering = orderListForPivot(pivot, queryContext, defaultOrder, query);
                 final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
                         .field(timeField)
-                        .order(ordering)
+                        .order(ordering.orders())
                         .format(DATE_TIME_FORMAT);
+
+                ordering.sortingAggregations().forEach(builder::subAggregation);
 
                 setInterval(builder, dateHistogramInterval);
 

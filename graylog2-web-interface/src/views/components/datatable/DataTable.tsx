@@ -124,16 +124,16 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
 };
 
 const DataTable = ({
-  bordered,
-  borderedHeader,
-  condensed,
+  bordered = false,
+  borderedHeader = true,
+  condensed = true,
   config,
   data,
   editing,
   fields,
   setLoadingState,
-  stickyHeader,
-  striped,
+  stickyHeader = true,
+  striped = true,
 }: Props) => {
   const formContext = useContext(FormikContext);
   const onRenderComplete = useContext(RenderCompletionCallback);
@@ -292,14 +292,6 @@ const DataTable = ({
       </div>
     </div>
   );
-};
-
-DataTable.defaultProps = {
-  condensed: true,
-  striped: true,
-  bordered: false,
-  stickyHeader: true,
-  borderedHeader: true,
 };
 
 const ConnectedDataTable = makeVisualization(DataTable, 'table');

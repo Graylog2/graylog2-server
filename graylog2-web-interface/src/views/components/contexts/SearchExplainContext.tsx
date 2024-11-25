@@ -25,7 +25,8 @@ export type WidgetExplain = {
     index_name: string,
     begin: number,
     end: number,
-    is_warm_tiered: boolean
+    is_warm_tiered: boolean,
+    stream_names: Array<string>
   }>
 }
 

@@ -28,13 +28,18 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.apache.commons.io.IOUtils;
+import jakarta.ws.rs.ForbiddenException;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
@@ -48,10 +53,13 @@ import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuild
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.RemoteInfo;
 import org.graylog.shaded.opensearch2.org.opensearch.tasks.Task;
+import org.graylog2.cluster.lock.Lock;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
+import org.graylog2.indexer.datanode.DatanodeMigrationLockWaitConfig;
 import org.graylog2.indexer.datanode.IndexMigrationConfiguration;
 import org.graylog2.indexer.datanode.MigrationConfiguration;
 import org.graylog2.indexer.datanode.RemoteReindexMigrationService;
@@ -66,11 +74,17 @@ import org.graylog2.indexer.migration.RemoteIndex;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.indexer.migration.TaskStatus;
+import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
+import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
+import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -81,6 +95,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -117,6 +133,13 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final DatanodeRestApiProxy datanodeRestApiProxy;
     private final NotificationService notificationService;
 
+    private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
+    private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
+    private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
+    private final SystemJobManager systemJobManager;
+
+    private final DatanodeMigrationLockService migrationLockService;
+
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
                                                final Indices indices,
@@ -125,7 +148,12 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                final ObjectMapper objectMapper,
                                                RemoteReindexMigrationService reindexMigrationService,
                                                DatanodeRestApiProxy datanodeRestApiProxy,
-                                               NotificationService notificationService) {
+                                               NotificationService notificationService,
+                                               IndexRangesCleanupPeriodical indexRangesCleanupPeriodical,
+                                               RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
+                                               CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
+                                               SystemJobManager systemJobManager,
+                                               DatanodeMigrationLockService migrationLockService) {
         this.client = client;
         this.indices = indices;
         this.indexSetRegistry = indexSetRegistry;
@@ -134,6 +162,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.reindexMigrationService = reindexMigrationService;
         this.datanodeRestApiProxy = datanodeRestApiProxy;
         this.notificationService = notificationService;
+        this.indexRangesCleanupPeriodical = indexRangesCleanupPeriodical;
+        this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
+        this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
+        this.systemJobManager = systemJobManager;
+        this.migrationLockService = migrationLockService;
     }
 
     @Override
@@ -171,14 +204,38 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         try {
             new Thread(() -> {
                 prepareCluster(request, migration);
+                final Set<Lock> locks = lockIndexSets(migration);
                 createIndicesInNewCluster(migration);
-                startAsyncTasks(migration, request);
+                startAsyncTasks(migration, request, locks);
+                recaluculateAllIndexRanges();
                 createSystemNotification(Status.RUNNING);
             }).start();
         } catch (Exception e) {
             LOG.error("Failed to start remote reindex migration", e);
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Obtain and hold a lock for each index set that's going to be migrated. These locks will be automatically
+     * extended as long as they are not explicitly released. If this node crashes, locks will expire automatically
+     * @return locks that should be released after the migration.
+     */
+    private Set<Lock> lockIndexSets(MigrationConfiguration migration) {
+        final DatanodeMigrationLockWaitConfig lockWaitConfig = new DatanodeMigrationLockWaitConfig(
+                java.time.Duration.ofSeconds(5),
+                java.time.Duration.ofMinutes(30),
+                (indexSet, caller, attemptNumber) -> logInfo(migration, "Awaiting lock of index set " + indexSet.getConfig().title() + ", attempt #" + attemptNumber)
+        );
+
+        return migration.indices().stream()
+                .map(IndexMigrationConfiguration::indexName)
+                .map(indexSetRegistry::getForIndex)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .distinct()
+                .map(indexSet -> migrationLockService.acquireLock(indexSet, RemoteReindexingMigrationAdapterOS2.class, migration.id(), lockWaitConfig))
+                .collect(Collectors.toSet());
     }
 
     private void createIndicesInNewCluster(MigrationConfiguration migration) {
@@ -384,7 +441,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    private void startAsyncTasks(MigrationConfiguration migration, RemoteReindexRequest request) {
+    private void startAsyncTasks(MigrationConfiguration migration, RemoteReindexRequest request, Set<Lock> locks) {
         final int threadsCount = Math.max(1, Math.min(request.threadsCount(), migration.indices().size()));
 
         final ExecutorService executorService = Executors.newFixedThreadPool(threadsCount, new ThreadFactoryBuilder()
@@ -394,14 +451,42 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 .build());
 
         migration.indices()
-                .forEach(index -> executorService.submit(() -> executeReindexAsync(migration, request.uri(), request.username(), request.password(), index)));
+                .forEach(index -> executorService.submit(() -> executeReindexAsync(
+                        migration,
+                        request.uri(),
+                        request.username(),
+                        request.password(),
+                        index,
+                        locks
+                )));
     }
 
-    private void executeReindexAsync(MigrationConfiguration migration, URI uri, String username, String password, IndexMigrationConfiguration index) {
+    private void executeReindexAsync(MigrationConfiguration migration, URI uri, String username, String password, IndexMigrationConfiguration index, Set<Lock> locks) {
         final String indexName = index.indexName();
-
         try (XContentBuilder builder = JsonXContent.contentBuilder().prettyPrint()) {
-            final boolean closeAfterMigration = openIndexIfNeeded(migration, uri, username, password, indexName);
+
+            List<Runnable> postMigrationActions = new ArrayList<>();
+
+            final boolean remoteClosed = getRemoteIndexState(uri, username, password, indexName) == IndexState.CLOSE;
+            final boolean localClosed = getLocalIndexState(indexName) == IndexState.CLOSE;
+
+            if(remoteClosed) {
+                openRemoteIndex(migration, uri, username, password, indexName);
+                postMigrationActions.add(() -> closeRemoteIndex(migration, uri, username, password, indexName));
+            }
+
+            if(localClosed) {
+                openLocalIndex(migration, indexName);
+            }
+
+            if(remoteClosed || localClosed) {
+                postMigrationActions.add(() -> closeLocalIndex(migration, indexName));
+            }
+
+            retrieveIndexBlock(indexName)
+                    .ifPresent(block -> removeLocalBlock(migration, indexName, block));
+
+
             final BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
             logInfo(migration, "Executing async reindex for " + indexName);
             final TaskSubmissionResponse task = client.execute((c, requestOptions) -> {
@@ -411,52 +496,91 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 return c.submitReindexTask(createReindexRequest(indexName, query, uri, username, password, migration), withHeader);
             });
             reindexMigrationService.assignTask(migration.id(), indexName, task.getTask());
-            waitForTaskCompleted(migration, indexName, task.getTask());
-            if(closeAfterMigration) {
-                closeMigratedIndex(migration, uri, username, password, indexName);
-            }
+            waitForTaskCompleted(migration, indexName, task.getTask(), locks);
+
+            postMigrationActions.forEach(Runnable::run);
+
         } catch (Exception e) {
-            final String message = "Could not reindex index: " + indexName + " - " + e.getMessage();
+            final String message = "Could not reindex index: " + indexName + " - " + formatErrorMessage(e);
             logError(migration, message, e);
         }
     }
 
-    private void closeMigratedIndex(MigrationConfiguration migration, URI uri, String username, String password, String indexName) {
-        closeRemoteIndex(uri, username, password, indexName);
-        client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().close(new CloseIndexRequest(indexName), requestOptions));
-        logInfo(migration, "Restoring original index state, both source and target index " + indexName + " closed after migration");
-    }
-
-    private boolean openIndexIfNeeded(MigrationConfiguration migration, URI uri, String username, String password, String indexName) {
-        final IndexState indexState = getIndexState(uri, username, password, indexName);
-
-        boolean closeAfterMigration = false;
-
-        if(indexState == IndexState.CLOSE) {
-            logInfo(migration, "Source index " + indexName + " is closed, reopening for the migration");
-            closeAfterMigration = true;
-            openRemoteIndex(uri, username, password, indexName);
+    private static String formatErrorMessage(Exception e) {
+        StringBuilder message = new StringBuilder();
+        if (e.getMessage() != null) {
+            message.append(e.getMessage());
         }
-        return closeAfterMigration;
+
+        if (e.getCause() != null && e.getCause().getMessage() != null) {
+            message.append(" ").append(e.getCause().getMessage());
+        }
+        return message.toString();
     }
 
-    private void openRemoteIndex(URI uri, String username, String password, String indexName) {
+    private void removeLocalBlock(MigrationConfiguration migration, String indexName, BlockResponse.IndexBlock block) {
+        logInfo(migration, "Index " + indexName + " is blocked: " + block.description() + ". Removing the block now.");
+        final AcknowledgedResponse acknowledgedResponse = client.execute((restHighLevelClient, requestOptions) -> {
+            final UpdateSettingsRequest settingsRequest = new UpdateSettingsRequest();
+            settingsRequest.indices(indexName);
+            settingsRequest.settings(Map.of(
+                    "index.blocks.write", false,
+                    "index.blocks.read_only_allow_delete", false
+            ));
+            return restHighLevelClient.indices().putSettings(settingsRequest, requestOptions);
+        });
+    }
+
+    private Optional<BlockResponse.IndexBlock> retrieveIndexBlock(String indexName) {
+        return client.execute((restHighLevelClient, requestOptions) -> {
+            final Response blocksResponse = restHighLevelClient.getLowLevelClient().performRequest(new Request("GET", "_cluster/state/blocks/"));
+            try (final InputStream is = blocksResponse.getEntity().getContent()) {
+                final BlockResponse indexBlocks = objectMapper.readValue(is, BlockResponse.class);
+                return indexBlocks.blocks().forIndex(indexName)
+                        .filter(b -> b.levels().contains(BlockResponse.BlockLevel.write));
+            }
+        });
+    }
+
+    private void closeLocalIndex(MigrationConfiguration migration, String indexName) {
+        logInfo(migration, "Target index " + indexName + " is being closed after index migration");
+        client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().close(new CloseIndexRequest(indexName), requestOptions));
+    }
+
+
+    private void openLocalIndex(MigrationConfiguration migration, String indexName) {
+        logInfo(migration, "Target index " + indexName + " is closed, reopening for the migration");
+        client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().open(new OpenIndexRequest(indexName), requestOptions));
+    }
+
+    private void openRemoteIndex(MigrationConfiguration migration, URI uri, String username, String password, String indexName) {
+        logInfo(migration, "Source index " + indexName + " is closed, reopening for the migration");
         datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, datanodeRemoteIndexStateResource -> datanodeRemoteIndexStateResource.changeState(new IndexStateChangeRequest(
                 indexName, IndexState.OPEN, uri.toString(), username, password
         )));
     }
 
-    private void closeRemoteIndex(URI uri, String username, String password, String indexName) {
+    private void closeRemoteIndex(MigrationConfiguration migration, URI uri, String username, String password, String indexName) {
+        logInfo(migration, "Source index " + indexName + " is being closed after index migration");
         datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, datanodeRemoteIndexStateResource -> datanodeRemoteIndexStateResource.changeState(new IndexStateChangeRequest(
                 indexName, IndexState.CLOSE, uri.toString(), username, password
         )));
     }
 
-    private IndexState getIndexState(URI uri, String username, String password, String indexName) {
-        final IndexState indexState = datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, resource -> resource.readState(new IndexStateGetRequest(
+    private IndexState getRemoteIndexState(URI uri, String username, String password, String indexName) {
+        return datanodeRestApiProxy.remoteInterface(DatanodeResolver.ANY_NODE_KEYWORD, DatanodeRemoteIndexStateResource.class, resource -> resource.readState(new IndexStateGetRequest(
                 indexName, uri.toString(), username, password
         ))).values().iterator().next();
-        return indexState;
+    }
+
+    private IndexState getLocalIndexState(String indexName) {
+        return client.execute((restHighLevelClient, requestOptions) -> {
+            final Response statusResponse = restHighLevelClient.getLowLevelClient().performRequest(new Request("GET", "_cat/indices/" + indexName + "/?h=status"));
+            try (final InputStream is = statusResponse.getEntity().getContent()) {
+                String result = IOUtils.toString(is, StandardCharsets.UTF_8);
+                return IndexState.valueOf(result.trim().toUpperCase(Locale.ROOT));
+            }
+        });
     }
 
 
@@ -474,11 +598,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         reindexMigrationService.appendLogEntry(migration.id(), new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.ERROR, message));
     }
 
-    private void waitForTaskCompleted(MigrationConfiguration migration, String indexName, String taskID) {
+    private void waitForTaskCompleted(MigrationConfiguration migration, String indexName, String taskID, Set<Lock> locks) {
         while (taskIsStillRunning(taskID)) {
             sleep();
         }
-        onTaskFinished(migration, indexName, taskID);
+        onTaskFinished(migration, indexName, taskID, locks);
     }
 
     private boolean taskIsStillRunning(String taskID) {
@@ -519,7 +643,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    private void onTaskFinished(MigrationConfiguration migration, String index, String taskID) {
+    private void onTaskFinished(MigrationConfiguration migration, String index, String taskID, Set<Lock> locks) {
         final Optional<GetTaskResponse> task = getTask(taskID);
         task.ifPresent(t -> {
             final Duration duration = getDuration(t);
@@ -530,14 +654,39 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 onTaskSuccess(migration, index, t.task(), duration);
             }
         });
+        recalculateIndexRanges(index);
         Status status = getMigrationStatus(migration);
         if (status == Status.FINISHED || status == Status.ERROR) {
-            onMigrationFinished(status);
+            onMigrationFinished(status, locks);
         }
     }
 
-    private void onMigrationFinished(Status status) {
+    private void recalculateIndexRanges(String index) {
+        indices.refresh(index);
+        try {
+            systemJobManager.submit(singleIndexRangeJobFactory.create(Set.of(), index));
+        } catch (SystemJobConcurrencyException e) {
+            LOG.warn("Unable to trigger index range calculation for index: {}", index, e);
+        }
+    }
+
+    private void onMigrationFinished(Status status, Set<Lock> locks) {
+        LOG.info("Remote reindexing migration finished");
+        recaluculateAllIndexRanges();
         createSystemNotification(status);
+        locks.forEach(migrationLockService::release);
+    }
+
+    private void recaluculateAllIndexRanges() {
+        this.indexRangesCleanupPeriodical.doRun();
+        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSetRegistry.getAll());
+        try {
+            this.systemJobManager.submit(rebuildJob);
+        } catch (SystemJobConcurrencyException e) {
+            final String errorMsg = "Concurrency level of this job reached: " + e.getMessage();
+            LOG.error(errorMsg, e);
+            throw new ForbiddenException(errorMsg);
+        }
     }
 
     private Status getMigrationStatus(MigrationConfiguration migration) {

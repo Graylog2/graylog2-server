@@ -47,7 +47,7 @@ const autoRefreshOptions = {
 describe('RefreshControls', () => {
   useViewsPlugin();
 
-  const SUT = ({ onSubmit, children }: { onSubmit?: () => void, children?: React.ReactNode }) => (
+  const SUT = ({ onSubmit = () => {}, children }: { onSubmit?: () => void, children?: React.ReactNode }) => (
     <TestStoreProvider>
       <Formik initialValues={{}} onSubmit={onSubmit}>
         <Form>
@@ -57,11 +57,6 @@ describe('RefreshControls', () => {
       </Formik>
     </TestStoreProvider>
   );
-
-  SUT.defaultProps = {
-    onSubmit: () => {},
-    children: undefined,
-  };
 
   const TriggerFormChangeButton = () => {
     const { setFieldValue, values } = useFormikContext();
@@ -80,6 +75,8 @@ describe('RefreshControls', () => {
     refreshConfig: null,
     stopAutoRefresh: () => {},
     startAutoRefresh: () => {},
+    restartAutoRefresh: () => {},
+    animationId: 'animation-id',
   };
 
   beforeEach(() => {

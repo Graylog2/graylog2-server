@@ -19,12 +19,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import type { TimeRange, ElasticsearchQueryString, QueryId, FilterType } from 'views/logic/queries/Query';
-import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
+import Query, { createElasticsearchQueryString, newFiltersForQuery } from 'views/logic/queries/Query';
 import generateId from 'logic/generateId';
 import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
 
 export default (
   streamId?: string | string[],
+  streamCategory?: string | string[],
   // eslint-disable-next-line default-param-last
   id: QueryId | undefined = generateId(),
   timeRange?: TimeRange,
@@ -37,7 +38,13 @@ export default (
       ? streamId
       : [streamId]
     : null;
-  const streamFilter = filtersForQuery(streamIds);
+  // eslint-disable-next-line no-nested-ternary
+  const streamCategories = streamCategory
+    ? streamCategory instanceof Array
+      ? streamCategory
+      : [streamCategory]
+    : null;
+  const queryFilter = newFiltersForQuery(streamIds, streamCategories);
   const searchFiltersMap: FilterType = searchFilters
     ? OrderedMap(searchFilters?.map((filter) => [filter.id || uuidv4(), filter]))
     : OrderedMap();
@@ -47,5 +54,5 @@ export default (
     .timerange(timeRange ?? DEFAULT_TIMERANGE)
     .filters(searchFiltersMap.toList());
 
-  return streamFilter ? builder.filter(streamFilter).build() : builder.build();
+  return queryFilter ? builder.filter(queryFilter).build() : builder.build();
 };

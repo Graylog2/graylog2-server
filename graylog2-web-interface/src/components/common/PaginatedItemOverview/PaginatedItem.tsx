@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import IconButton from 'components/common/IconButton';
 
@@ -62,14 +61,6 @@ const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Prop
       {deleteButton}
     </Container>
   );
-};
-
-PaginatedItem.defaultProps = {
-  onDeleteItem: undefined,
-};
-
-PaginatedItem.propTypes = {
-  onDeleteItem: PropTypes.func,
 };
 
 export default PaginatedItem;

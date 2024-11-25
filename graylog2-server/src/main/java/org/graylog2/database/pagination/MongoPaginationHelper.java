@@ -49,6 +49,17 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
     MongoPaginationHelper<T> sort(Bson sort);
 
     /**
+     * Sets the projection BSON to apply to the query.
+     * It will limit the number of fields retrieved from MongoDB for each document.
+     * Keep in mind that you can only exclude fields that are optional in related MongoEntity
+     * and you are responsible for ensuring that excluded fields are not needed in your use case.
+     *
+     * @param projection the projection BSON, which may be null.
+     * @return A new pagination helper with the setting applied
+     */
+    MongoPaginationHelper<T> projection(Bson projection);
+
+    /**
      * Sets the page size.
      *
      * @param perPage the number of documents to put on one page

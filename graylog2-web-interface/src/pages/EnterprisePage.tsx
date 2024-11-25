@@ -59,10 +59,10 @@ const EnterprisePage = () => {
         <HideOnCloud>
           <Row className="content">
             <Col md={6}>
-              <GraylogEnterpriseHeader>Graylog Operations</GraylogEnterpriseHeader>
+              <GraylogEnterpriseHeader>Graylog Enterprise</GraylogEnterpriseHeader>
               <p>
                 Designed to meet the needs of resource-constrained IT Operations and Software Engineering teams,
-                Graylog Operations provides numerous productivity enhancements that will save you thousands of
+                Graylog Enterprise provides numerous productivity enhancements that will save you thousands of
                 hours per year in collecting and analyzing log data to uncover the root cause of performance,
                 outage, and error issues.
               </p>

@@ -220,6 +220,7 @@ type Props = React.PropsWithChildren<{
   onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void),
   rel?: 'noopener noreferrer',
   role?: string,
+  style?: React.ComponentProps<typeof StyledButton>['style'],
   tabIndex?: number,
   target?: '_blank',
   title?: string,
@@ -228,7 +229,7 @@ type Props = React.PropsWithChildren<{
 
 const Button = React.forwardRef<HTMLButtonElement, Props>(
   ({
-    'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
+    'aria-label': ariaLabel, bsStyle = 'default', bsSize, className, 'data-testid': dataTestId, id, onClick, disabled = false, href,
     title, form, target, type, rel, role, name, tabIndex, children, active,
   }, ref) => {
     const theme = useTheme();
@@ -279,26 +280,5 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
       </StyledButton>
     );
   });
-
-Button.defaultProps = {
-  active: undefined,
-  'aria-label': undefined,
-  bsStyle: 'default',
-  bsSize: undefined,
-  className: undefined,
-  'data-testid': undefined,
-  disabled: false,
-  form: undefined,
-  href: undefined,
-  id: undefined,
-  name: undefined,
-  onClick: undefined,
-  rel: undefined,
-  role: undefined,
-  tabIndex: undefined,
-  target: undefined,
-  title: undefined,
-  type: undefined,
-};
 
 export default Button;

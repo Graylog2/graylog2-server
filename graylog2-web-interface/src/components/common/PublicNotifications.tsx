@@ -16,7 +16,6 @@
  */
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import type { PublicNotificationsHooks } from 'theme/types';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -63,7 +62,7 @@ const defaultNotifications: PublicNotificationsHooks = {
   }),
 };
 
-const PublicNotifications = ({ readFromConfig }: Props) => {
+const PublicNotifications = ({ readFromConfig = false }: Props) => {
   const customizationHook = usePluginEntities('customization.publicNotifications');
   const { usePublicNotifications } = customizationHook[0]?.hooks || defaultNotifications;
   const [showReadMore, setShowReadMore] = useState<string>(undefined);
@@ -109,14 +108,6 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
   }
 
   return null;
-};
-
-PublicNotifications.propTypes = {
-  readFromConfig: PropTypes.bool,
-};
-
-PublicNotifications.defaultProps = {
-  readFromConfig: false,
 };
 
 export default PublicNotifications;

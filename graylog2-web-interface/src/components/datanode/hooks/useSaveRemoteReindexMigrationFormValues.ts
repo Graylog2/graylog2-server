@@ -32,7 +32,7 @@ export const DEFAULT_INITIAL_VALUES: RemoteReindexRequest = {
 };
 
 export const saveFormValues = (values: RemoteReindexRequest) => {
-  sessionStorage.setItem('migrateExistingDataForm', JSON.stringify({ ...values, password: '********' }));
+  sessionStorage.setItem('migrateExistingDataForm', JSON.stringify({ ...values, password: '' }));
 };
 
 export const getSavedFormValues = () => JSON.parse(sessionStorage.getItem('migrateExistingDataForm') || '{}');

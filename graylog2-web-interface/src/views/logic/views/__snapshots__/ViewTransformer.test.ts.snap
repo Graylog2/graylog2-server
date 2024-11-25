@@ -130,6 +130,7 @@ exports[`ViewTransformer transform with all attributes should transform a view w
               "query_string": "",
               "type": "elasticsearch",
             },
+            "stream_categories": undefined,
             "streams": [
               "5cdab2293d27467fbe9e8a72",
             ],
@@ -174,6 +175,7 @@ exports[`ViewTransformer transform with all attributes should transform a view w
               "query_string": "",
               "type": "elasticsearch",
             },
+            "stream_categories": undefined,
             "streams": [
               "5cdab2293d27467fbe9e8a72",
             ],

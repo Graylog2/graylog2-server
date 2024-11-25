@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import transform from 'lodash/transform';
 import zipWith from 'lodash/zipWith';
 import sum from 'lodash/sum';
 import flattenDeep from 'lodash/flattenDeep';
@@ -44,6 +43,7 @@ import type {
   PieHoverTemplateSettings,
 } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
+import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
 type DefaultAxisKey = 'withoutUnit';
 
@@ -65,17 +65,20 @@ const getYAxisSide = (axisCount: number) => {
   return 'left';
 };
 
+const getTicklabelPositionSettings = (axisCount: number) => {
+  switch (axisCount) {
+    case 4:
+      return ({ ticklabelposition: 'inside' });
+    default:
+      return ({});
+  }
+};
+
 const getYAxisPositioningSettings = (axisCount: number) => ({
   position: getYAxisPosition(axisCount),
   side: getYAxisSide(axisCount),
   overlaying: axisCount > 1 ? 'y' : undefined,
-  // ticklabelposition: 'outside left',
-  /*
-  standoff: 20,
-  tickson: 'boundaries',
-  tickangle: -45,
-
-   */
+  ...getTicklabelPositionSettings(axisCount),
 });
 
 const defaultSettings = {
@@ -94,7 +97,7 @@ const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: Fiel
   const timeBaseUnit = getBaseUnit(fieldType);
   const prettyValues = tickvals.map((value) => getPrettifiedValue(value, { abbrev: timeBaseUnit.abbrev, unitType: timeBaseUnit.unitType }));
 
-  const ticktext = prettyValues.map((prettified) => `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`);
+  const ticktext = prettyValues.map((prettified) => formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev));
 
   return ({
     tickvals,
@@ -266,7 +269,8 @@ export const generateMappersForYAxis = (
   });
 };
 
-const joinValues = (values: Array<Array<number>>, barmode: BarMode): Array<number> => {
+// eslint-disable-next-line default-param-last
+const joinValues = (values: Array<Array<number>> = [], barmode: BarMode): Array<number> => {
   if (barmode === 'stack' || barmode === 'relative') {
     return zipWith(...values, (...iterateValues) => sum(iterateValues));
   }
@@ -285,7 +289,7 @@ export type GenerateLayoutsParams = {
 
 export const generateLayouts = (
   { unitTypeMapper, chartData, barmode, widgetUnits, config, theme }: GenerateLayoutsParams,
-): Record<string, unknown> => {
+) => {
   const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaultAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
     const traceName = value.fullPath;
     const fieldName = getFieldNameFromTrace({ series: config.series, fullPath: traceName });
@@ -301,10 +305,11 @@ export const generateLayouts = (
     return res;
   }, {});
 
-  return transform(unitTypeMapper, (res, { axisKeyName, axisCount }, unitTypeKey: FieldUnitType | DefaultAxisKey) => {
+  return Object.fromEntries(Object.entries(unitTypeMapper).map(([unitTypeKey, { axisKeyName, axisCount }]) => {
     const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
-    res[axisKeyName] = getUnitLayoutWithData(unitTypeKey, axisCount, unitValues, theme);
-  });
+
+    return [axisKeyName, getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme)];
+  }));
 };
 
 const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>,
@@ -316,32 +321,32 @@ const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>,
 
   if (!prettified) return value;
 
-  return `${Number(prettified?.value).toFixed(DECIMAL_PLACES)} ${prettified.unit.abbrev}`;
+  return formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev);
 });
 
-export const getHoverTemplateSettings = ({ convertedValues, unit, originalName }: {
+export const getHoverTemplateSettings = ({ convertedValues, unit, name }: {
   convertedValues: Array<any>,
   unit: FieldUnit,
-  originalName: string,
+  name: string,
 }): { text: Array<string>, hovertemplate: string, meta: string } | {} => {
   if (unit?.unitType === 'time' || unit?.unitType === 'size') {
     return ({
       text: getHoverTexts({ convertedValues, unit }),
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',
-      meta: originalName,
+      meta: name,
     });
   }
 
   return ({});
 };
 
-export const getPieHoverTemplateSettings = ({ convertedValues, unit, originalName }: {
+export const getPieHoverTemplateSettings = ({ convertedValues, unit, name }: {
   convertedValues: Array<any>,
   unit: FieldUnit,
-  originalName: string,
+  name: string,
 }): PieHoverTemplateSettings | {} => ({
   text: getHoverTexts({ convertedValues, unit }),
   hovertemplate: '<b>%{label}</b><br>%{text}<br>%{percent}',
-  meta: originalName,
+  meta: name,
   textinfo: 'percent',
 });

@@ -54,7 +54,7 @@ const position = (pullRight: boolean, dropup: boolean): 'top' | 'bottom' | 'top-
   return `${orientation}${suffix}`;
 };
 
-const DropdownButton = ({ buttonTitle, children, closeOnItemClick, dropup, title, onMouseDown, onToggle, pullRight, noCaret, keepMounted, ...rest }: Props) => (
+const DropdownButton = ({ buttonTitle, children, closeOnItemClick = true, dropup, title, onMouseDown, onToggle, pullRight, noCaret, keepMounted, ...rest }: Props) => (
   <Menu position={position(pullRight, dropup)} onChange={onToggle} keepMounted={keepMounted} closeOnItemClick={closeOnItemClick}>
     <Menu.Target>
       <Button onClick={onMouseDown} aria-label={buttonTitle} {...rest} title={buttonTitle}>
@@ -64,18 +64,6 @@ const DropdownButton = ({ buttonTitle, children, closeOnItemClick, dropup, title
     <Menu.Dropdown>{children}</Menu.Dropdown>
   </Menu>
 );
-
-DropdownButton.defaultProps = {
-  closeOnItemClick: true,
-  buttonTitle: undefined,
-  dropup: undefined,
-  keepMounted: undefined,
-  noCaret: undefined,
-  onMouseDown: undefined,
-  onToggle: undefined,
-  pullRight: undefined,
-  title: undefined,
-};
 
 /** @component */
 export default DropdownButton;

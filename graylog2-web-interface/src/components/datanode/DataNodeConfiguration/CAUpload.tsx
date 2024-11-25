@@ -28,6 +28,8 @@ import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type FormValues = {
   files?: Array<File>,
@@ -95,6 +97,7 @@ const Explanation = styled.p`
 
 const CAUpload = () => {
   const queryClient = useQueryClient();
+  const sendTelemetry = useSendTelemetry();
   const onRejectUpload = useCallback(() => {
     UserNotification.error('CA upload failed');
   }, []);
@@ -110,7 +113,14 @@ const CAUpload = () => {
     },
   });
 
-  const onSubmit = useCallback((formValues: FormValues) => onProcessUpload(formValues).catch(() => {}), [onProcessUpload]);
+  const onSubmit = useCallback((formValues: FormValues) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_UPLOAD_CA_CLICKED, {
+      app_pathname: 'datanode',
+      app_section: 'migration',
+    });
+
+    return onProcessUpload(formValues).catch(() => {});
+  }, [onProcessUpload, sendTelemetry]);
 
   return (
     <Formik<FormValues> initialValues={{}} onSubmit={onSubmit} validate={validate}>

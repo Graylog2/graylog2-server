@@ -105,6 +105,7 @@ public abstract class MessageList implements SearchType {
                 .offset(0)
                 .filters(Collections.emptyList())
                 .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet())
                 .decorators(Collections.emptyList())
                 .fields(Collections.emptyList());
     }
@@ -129,6 +130,7 @@ public abstract class MessageList implements SearchType {
         public static Builder createDefault() {
             return builder()
                     .filters(Collections.emptyList())
+                    .streamCategories(Collections.emptySet())
                     .streams(Collections.emptySet());
         }
 
@@ -163,6 +165,9 @@ public abstract class MessageList implements SearchType {
 
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty
+        public abstract Builder streamCategories(Set<String> streamCategories);
 
         @JsonProperty
         public abstract Builder limit(int limit);
@@ -261,6 +266,7 @@ public abstract class MessageList implements SearchType {
         return MessageListEntity.builder()
                 .decorators(decorators())
                 .streams(mappedStreams(entityDescriptorIds))
+                .streamCategories(streamCategories())
                 .timerange(timerange().orElse(null))
                 .limit(limit())
                 .offset(offset())

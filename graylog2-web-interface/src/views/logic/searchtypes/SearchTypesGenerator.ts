@@ -47,6 +47,7 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
         timerange: widget.timerange,
         query: widget.query,
         streams: widget.streams,
+        stream_categories: widget.streamCategories,
         ...searchType,
         widgetId: widget.id,
         ...filterForWidget(widget),

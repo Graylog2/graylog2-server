@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
@@ -27,7 +26,6 @@ import { Modal } from 'components/bootstrap';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
-import { ruleBlockPropType, blockDictPropType, outputVariablesPropType } from './types';
 import { getDictForFunction } from './helpers';
 
 const BlockContainer = styled.div(({ theme }) => css`
@@ -267,22 +265,6 @@ const RuleBuilderBlock = ({
       )}
     </BlockContainer>
   );
-};
-
-RuleBuilderBlock.propTypes = {
-  type: PropTypes.oneOf(['action', 'condition']).isRequired,
-  blockDict: PropTypes.arrayOf(blockDictPropType).isRequired,
-  block: ruleBlockPropType,
-  order: PropTypes.number.isRequired,
-  outputVariableList: outputVariablesPropType,
-  addBlock: PropTypes.func.isRequired,
-  updateBlock: PropTypes.func.isRequired,
-  deleteBlock: PropTypes.func.isRequired,
-};
-
-RuleBuilderBlock.defaultProps = {
-  block: undefined,
-  outputVariableList: undefined,
 };
 
 export default RuleBuilderBlock;

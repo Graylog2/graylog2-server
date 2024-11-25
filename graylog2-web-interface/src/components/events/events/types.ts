@@ -20,6 +20,7 @@ export type EventReplayInfo = {
   timerange_end: string,
   query: string,
   streams: string[],
+  stream_categories?: string[],
 };
 
 export type Event = {
@@ -44,3 +45,8 @@ export type EventDefinitionContext = {
   remediation_steps?: string,
   description?: string,
 };
+
+export type EventDefinitionContexts = { [eventDefinitionId: string]: EventDefinitionContext };
+export type EventsAdditionalData = {
+  context: { event_definitions?: EventDefinitionContexts, streams?: EventDefinitionContexts },
+}

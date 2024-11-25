@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -41,11 +40,11 @@ import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 type Props = {
   eventDefinition: Omit<EventDefinition, 'id'>,
   notifications: Array<EventNotification>,
-  validation: {
+  validation?: {
     errors: {
       title?: string,
     }
-  },
+  }
   currentUser: User,
 }
 
@@ -270,17 +269,6 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
       </Col>
     </Row>
   );
-};
-
-EventDefinitionSummary.propTypes = {
-  eventDefinition: PropTypes.object.isRequired,
-  notifications: PropTypes.array.isRequired,
-  validation: PropTypes.object,
-  currentUser: PropTypes.object.isRequired,
-};
-
-EventDefinitionSummary.defaultProps = {
-  validation: undefined,
 };
 
 export default EventDefinitionSummary;

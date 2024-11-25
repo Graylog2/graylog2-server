@@ -84,10 +84,10 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
              name="refresh-interval"
              label="Refresh Interval"
              help="After how many seconds should the dashboard refresh?"
-             onChange={({ target: { value } }) => setRefreshInterval(value ? Number.parseInt(value, 10) : value)}
+             onChange={({ target: { value } }) => setRefreshInterval(Number.parseInt(value, 10))}
              required
              step={1}
-             value={refreshInterval} />
+             value={Number.isNaN(refreshInterval) ? '' : refreshInterval} />
 
       <FormGroup>
         <ControlLabel>Tabs</ControlLabel>
@@ -115,10 +115,10 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
              name="query-cycle-interval"
              label="Tab cycle interval"
              help="After how many seconds should the next tab be shown?"
-             onChange={({ target: { value } }) => setQueryCycleInterval(value ? Number.parseInt(value, 10) : value)}
+             onChange={({ target: { value } }) => setQueryCycleInterval(Number.parseInt(value, 10))}
              required
              step="1"
-             value={queryCycleInterval} />
+             value={Number.isNaN(queryCycleInterval) ? '' : queryCycleInterval} />
     </BootstrapModalForm>
   );
 };
@@ -154,7 +154,7 @@ type Props = {
   view: View,
 };
 
-const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
+const BigDisplayModeConfiguration = ({ disabled = false, show = false, view }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const history = useHistory();
@@ -182,11 +182,6 @@ const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
       </MenuItem>
     </>
   );
-};
-
-BigDisplayModeConfiguration.defaultProps = {
-  disabled: false,
-  show: false,
 };
 
 export default BigDisplayModeConfiguration;

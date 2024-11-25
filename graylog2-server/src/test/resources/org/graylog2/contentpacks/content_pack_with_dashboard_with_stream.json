@@ -1,0 +1,217 @@
+{
+  "v": 1,
+  "id": "72d61b7b-3fb3-44d2-9c6e-48b250a1854e",
+  "rev": 1,
+  "name": "pack with dashboard with stream",
+  "summary": "pack summary",
+  "description": "",
+  "vendor": "pack vendor",
+  "url": "",
+  "parameters": [],
+  "entities": [
+    {
+      "v": "1",
+      "type": {
+        "name": "dashboard",
+        "version": "2"
+      },
+      "id": "d81b7366-40e6-4f39-84d5-cb8f6e59d8db",
+      "data": {
+        "summary": {
+          "@type": "string",
+          "@value": ""
+        },
+        "search": {
+          "queries": [
+            {
+              "id": "7c1cf63c-a94d-427a-bc24-cad9b637fae9",
+              "timerange": {
+                "from": 300,
+                "type": "relative"
+              },
+              "filters": [],
+              "query": {
+                "type": "elasticsearch",
+                "query_string": ""
+              },
+              "search_types": [
+                {
+                  "size": 100,
+                  "query": {
+                    "type": "elasticsearch",
+                    "query_string": ""
+                  },
+                  "name": null,
+                  "timerange": {
+                    "from": 300,
+                    "type": "relative"
+                  },
+                  "streams": [
+                    "06f3a308-cd97-4495-80a0-5dc150adedcf"
+                  ],
+                  "filter": null,
+                  "fields": [
+                    "source",
+                    "message",
+                    "timestamp"
+                  ],
+                  "type": "logs",
+                  "id": "ddd5bff2-d55a-4178-84df-8448c614e715",
+                  "filters": [],
+                  "after": null,
+                  "tie_breaker": null,
+                  "sort": "DESC"
+                }
+              ]
+            }
+          ],
+          "parameters": [],
+          "requires": {},
+          "owner": "admin",
+          "created_at": "2024-08-26T17:14:07.414Z"
+        },
+        "created_at": "2024-08-26T17:13:49.568Z",
+        "requires": {},
+        "state": {
+          "7c1cf63c-a94d-427a-bc24-cad9b637fae9": {
+            "selected_fields": null,
+            "static_message_list_id": null,
+            "titles": {},
+            "widgets": [
+              {
+                "id": "f706f276-0982-4d85-845e-3124825dc8b2",
+                "type": "logs",
+                "filter": null,
+                "filters": [],
+                "timerange": {
+                  "from": 300,
+                  "type": "relative"
+                },
+                "query": {
+                  "type": "elasticsearch",
+                  "query_string": ""
+                },
+                "streams": [
+                  "06f3a308-cd97-4495-80a0-5dc150adedcf"
+                ],
+                "config": {
+                  "fields": [
+                    "timestamp",
+                    "source",
+                    "message"
+                  ],
+                  "units": {},
+                  "size": 100,
+                  "after": null,
+                  "sort": "DESC",
+                  "tie_breaker": null
+                }
+              }
+            ],
+            "widget_mapping": {
+              "f706f276-0982-4d85-845e-3124825dc8b2": [
+                "ddd5bff2-d55a-4178-84df-8448c614e715"
+              ]
+            },
+            "positions": {
+              "f706f276-0982-4d85-845e-3124825dc8b2": {
+                "col": 1,
+                "row": 1,
+                "height": 4,
+                "width": 12
+              }
+            },
+            "formatting": null,
+            "display_mode_settings": {
+              "positions": {}
+            }
+          }
+        },
+        "properties": [],
+        "owner": "admin",
+        "title": {
+          "@type": "string",
+          "@value": "pack title"
+        },
+        "type": "DASHBOARD",
+        "description": {
+          "@type": "string",
+          "@value": ""
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=6.1.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "stream",
+        "version": "1"
+      },
+      "id": "06f3a308-cd97-4495-80a0-5dc150adedcf",
+      "data": {
+        "alarm_callbacks": [],
+        "outputs": [],
+        "remove_matches": {
+          "@type": "boolean",
+          "@value": true
+        },
+        "title": {
+          "@type": "string",
+          "@value": "Stream A"
+        },
+        "stream_rules": [
+          {
+            "type": {
+              "@type": "string",
+              "@value": "EXACT"
+            },
+            "field": {
+              "@type": "string",
+              "@value": "source"
+            },
+            "value": {
+              "@type": "string",
+              "@value": "random-b"
+            },
+            "inverted": {
+              "@type": "boolean",
+              "@value": false
+            },
+            "description": {
+              "@type": "string",
+              "@value": ""
+            }
+          }
+        ],
+        "alert_conditions": [],
+        "matching_type": {
+          "@type": "string",
+          "@value": "AND"
+        },
+        "disabled": {
+          "@type": "boolean",
+          "@value": false
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "default_stream": {
+          "@type": "boolean",
+          "@value": false
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=6.1.0"
+        }
+      ]
+    }
+  ]
+}

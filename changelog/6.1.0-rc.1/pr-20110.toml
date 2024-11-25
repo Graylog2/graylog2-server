@@ -1,0 +1,5 @@
+type = "a"
+message = "Added categories to Streams to allow Illuminate content to be scoped to multiple products."
+
+issues = ["graylog-plugin-enterprise#7945"]
+pulls = ["20110", "20160", "20199", "20371", "20373", "20380", "graylog-plugin-enterprise#8295", "graylog-plugin-enterprise#8418", "graylog-plugin-enterprise#8437", "graylog-plugin-enterprise#8452", "graylog-plugin-enterprise#8454" ]

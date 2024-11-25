@@ -32,13 +32,16 @@ const TABLE_HEADERS = ['Title', 'Status', ''];
 
 export const StyledSectionComponent = styled(SectionComponent)(({ theme }) => css`
   margin-bottom: ${theme.spacings.xs};
+
   &.content {
     background-color: ${theme.colors.table.row.backgroundHover};
     padding: ${theme.spacings.sm} ${theme.spacings.xxs};
   }
+
   &.row {
     margin: 0  ${theme.spacings.xxs} ${theme.spacings.sm};
   }
+
   h2 {
     font-size: ${theme.fonts.size.h3};
   }
@@ -46,13 +49,16 @@ export const StyledSectionComponent = styled(SectionComponent)(({ theme }) => cs
   .table > tbody > tr > td {
     vertical-align: middle;
   }
+
   .table > tbody > tr {
     background-color: transparent;
    }
+
   .table > thead > tr > th {
     border-bottom-color: ${theme.utils.colorLevel(theme.colors.variant.default, -5)};
     border-bottom-width: 1px;
   }
+
   .table.striped > tbody > tr:nth-of-type(even) {
     background-color: ${theme.colors.table.row.backgroundStriped};
   }

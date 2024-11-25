@@ -229,7 +229,17 @@ public class AggregationEventProcessor implements EventProcessor {
      * @return the actual streams
      */
     private Set<String> getStreams(AggregationEventProcessorParameters parameters) {
-        return parameters.streams().isEmpty() ? config.streams() : parameters.streams();
+        if (parameters.streams().isEmpty()) {
+            Set<String> configStreams = new HashSet<>(config.streams());
+            if (!config.streamCategories().isEmpty()) {
+                // TODO: We need to account for permissions of the user who created the event here in place of
+                //      a blanket `true` here.
+                configStreams.addAll(permittedStreams.loadWithCategories(config.streamCategories(), streamId -> true));
+            }
+            return configStreams;
+        } else {
+            return parameters.streams();
+        }
     }
 
     private void filterSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,

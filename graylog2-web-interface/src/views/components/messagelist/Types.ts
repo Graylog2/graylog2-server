@@ -34,7 +34,7 @@ export type Message = {
 
 export type BackendMessage = {
   index: string,
-  message: { _id: string } & {
+  message: { _id: string, timestamp: string } & {
     [key: string]: unknown,
   },
   highlight_ranges?: { [key: string]: any },

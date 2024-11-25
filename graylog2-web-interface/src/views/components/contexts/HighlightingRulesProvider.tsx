@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import useAppSelector from 'stores/useAppSelector';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
@@ -34,10 +33,6 @@ const HighlightingRulesProvider = ({ children }: { children: React.ReactElement 
       </HighlightingRulesContext.Provider>
     )
     : children;
-};
-
-HighlightingRulesProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default HighlightingRulesProvider;

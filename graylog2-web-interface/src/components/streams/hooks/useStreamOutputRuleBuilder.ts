@@ -18,8 +18,8 @@ import { useQuery } from '@tanstack/react-query';
 
 import type { BlockDict, RuleBuilderRule } from 'components/rules/rule-builder/types';
 import { StreamDestinationsFiltersBuilder } from '@graylog/server-api';
-import UserNotification from 'util/UserNotification';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
+import { defaultOnError } from 'util/conditional/onError';
 
 type ConditionsResponse ={conditions: Array<BlockDict>}
 const fetchRuleConditions = async () => StreamDestinationsFiltersBuilder.getConditions().then((resp: ConditionsResponse) => resp.conditions);
@@ -38,12 +38,8 @@ export const fetchValidateRule = async (currentRule: StreamOutputFilterRule): Pr
 const useStreamOutputRuleBuilder = () => {
   const { data: conditions, refetch: refetchConditions, isFetching: isLoadingConditions } = useQuery<Array<BlockDict>>(
     ['stream', 'filter', 'conditions'],
-    fetchRuleConditions,
+    () => defaultOnError(fetchRuleConditions(), 'Loading Stream Output Filter Rule Builder Conditions list failed with status', 'Could not load Stream Output Filter Rule Builder Conditions list.'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Stream Output Filter Rule Builder Conditions list failed with status: ${errorThrown}`,
-          'Could not load Stream Output Filter Rule Builder Conditions list.');
-      },
       keepPreviousData: true,
     },
   );

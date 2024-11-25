@@ -16,15 +16,16 @@
  */
 import React, { useEffect } from 'react';
 
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Link } from 'components/common/router';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { InputsList } from 'components/inputs';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
+import { InputSetupWizardProvider } from 'components/inputs/InputSetupWizard';
 
 import useCurrentUser from '../hooks/useCurrentUser';
 
@@ -58,7 +59,9 @@ const NodeInputsPage = () => {
             You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
           </span>
         </PageHeader>
-        <InputsList permissions={currentUser.permissions} node={node} />
+        <InputSetupWizardProvider>
+          <InputsList permissions={currentUser.permissions} node={node} />
+        </InputSetupWizardProvider>
       </div>
     </DocumentTitle>
   );

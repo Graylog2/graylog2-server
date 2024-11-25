@@ -52,7 +52,7 @@ describe('XYPlot', () => {
   const setChartColor = () => ({});
   const chartData = [{ y: [23, 42], name: 'count()' }];
 
-  const SimpleXYPlot = ({ currentQuery, ...props }: Partial<XYPlotProps> & { currentQuery?: Query }) => {
+  const SimpleXYPlot = ({ currentQuery = defaultCurrentQuery, ...props }: Partial<XYPlotProps> & { currentQuery?: Query }) => {
     const defaultView = createSearch();
     const view = defaultView
       .toBuilder()
@@ -68,13 +68,11 @@ describe('XYPlot', () => {
         <XYPlot chartData={chartData}
                 config={config}
                 setChartColor={setChartColor}
+                height={480}
+                width={640}
                 {...props} />
       </TestStoreProvider>
     );
-  };
-
-  SimpleXYPlot.defaultProps = {
-    currentQuery: defaultCurrentQuery,
   };
 
   useViewsPlugin();
@@ -95,6 +93,7 @@ describe('XYPlot', () => {
       yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: 'linear' },
       xaxis: { fixedrange: true },
       hovermode: 'x',
+      legend: { y: -0.14 },
     });
 
     expect(genericPlot).toHaveProp('chartData', chartData);

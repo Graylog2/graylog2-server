@@ -34,10 +34,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-
-import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntity;
 
 @AutoValue
 @JsonTypeName(EventListEntity.NAME)
@@ -66,7 +63,8 @@ public abstract class EventListEntity implements SearchTypeEntity {
         return new AutoValue_EventListEntity.Builder()
                 .type(NAME)
                 .filters(Collections.emptyList())
-                .streams(Collections.emptySet());
+                .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet());
     }
 
     public abstract EventListEntity.Builder toBuilder();
@@ -82,7 +80,8 @@ public abstract class EventListEntity implements SearchTypeEntity {
         public static Builder createDefault() {
             return builder()
                     .filters(Collections.emptyList())
-                    .streams(Collections.emptySet());
+                    .streams(Collections.emptySet())
+                    .streamCategories(Collections.emptySet());
         }
 
         @JsonProperty
@@ -111,6 +110,10 @@ public abstract class EventListEntity implements SearchTypeEntity {
         public abstract Builder streams(Set<String> streams);
 
         @Override
+        @JsonProperty
+        public abstract Builder streamCategories(Set<String> streamCategories);
+
+        @Override
         public abstract EventListEntity build();
     }
 
@@ -119,6 +122,7 @@ public abstract class EventListEntity implements SearchTypeEntity {
         return EventList.builder()
                 .type(type())
                 .streams(mappedStreams(nativeEntities))
+                .streamCategories(streamCategories())
                 .id(id())
                 .filter(filter())
                 .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())

@@ -24,7 +24,7 @@ type Props = React.PropsWithChildren<{
   hideLabel?: string,
 }>
 
-const Spoiler = ({ maxHeight, children, className, showLabel, hideLabel }: Props) => (
+const Spoiler = ({ maxHeight, children, className, showLabel = 'Show more', hideLabel = 'Hide' }: Props) => (
   <MantineSpoiler maxHeight={maxHeight}
                   showLabel={showLabel}
                   hideLabel={hideLabel}
@@ -32,11 +32,5 @@ const Spoiler = ({ maxHeight, children, className, showLabel, hideLabel }: Props
     {children}
   </MantineSpoiler>
 );
-
-Spoiler.defaultProps = {
-  className: undefined,
-  showLabel: 'Show more',
-  hideLabel: 'Hide',
-};
 
 export default Spoiler;

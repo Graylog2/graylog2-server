@@ -26,6 +26,7 @@ export type ValidationQuery = {
   queryString: ElasticsearchQueryString | string,
   timeRange?: TimeRange | undefined,
   streams?: Array<string>,
+  streamCategories?: Array<string>,
   filter?: ElasticsearchQueryString | string,
   validation_mode?: 'QUERY' | 'SEARCH_FILTER'
 }
@@ -37,6 +38,7 @@ export const validateQuery = (
     queryString,
     timeRange,
     streams,
+    streamCategories,
     filter,
     ...rest
   }: ValidationQuery,
@@ -50,6 +52,7 @@ export const validateQuery = (
     query: queryString,
     timerange: timeRange ? normalizeFromSearchBarForBackend(timeRange, userTimezone) : undefined,
     streams,
+    stream_categories: streamCategories,
     filter,
     ...rest,
   };

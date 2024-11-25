@@ -54,12 +54,14 @@ const buildSearchLink = (
   timerange: TimeRange,
   queryString: string,
   streams: Array<string>,
+  streamCategories: Array<string>,
   parameters?: Immutable.Set<Parameter>,
 ) => {
   let searchLink = SearchLink.builder()
     .query(createElasticsearchQueryString(queryString))
     .timerange(timerange)
     .streams(streams)
+    .streamCategories(streamCategories)
     .build()
     .toURL();
 
@@ -86,14 +88,15 @@ type Props = {
   queryString?: string | undefined,
   timerange?: TimeRange | undefined,
   streams?: string[] | undefined,
+  streamCategories?: string[] | undefined,
   parameters?: Immutable.Set<Parameter>,
   children?: React.ReactNode,
   parameterBindings?: ParameterBindings,
 };
 
-const ReplaySearchButton = ({ queryString, timerange, streams, parameters, children, parameterBindings }: Props) => {
+const ReplaySearchButton = ({ queryString, timerange, streams, streamCategories, parameters, children, parameterBindings }: Props) => {
   const sessionId = useMemo(() => `replay-search-${generateId()}`, []);
-  const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, parameters);
+  const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, streamCategories, parameters);
 
   const onReplaySearch = useCallback(() => {
     if (parameters?.size) {
@@ -106,20 +109,6 @@ const ReplaySearchButton = ({ queryString, timerange, streams, parameters, child
       {children}
     </ReplaySearchButtonComponent>
   );
-};
-
-ReplaySearchButton.defaultProps = {
-  queryString: undefined,
-  timerange: undefined,
-  streams: undefined,
-  parameters: undefined,
-  parameterBindings: undefined,
-  children: undefined,
-};
-
-ReplaySearchButtonComponent.defaultProps = {
-  children: undefined,
-  onClick: undefined,
 };
 
 export default ReplaySearchButton;

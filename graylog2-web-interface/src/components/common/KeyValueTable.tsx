@@ -1,0 +1,202 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React from 'react';
+import styled from 'styled-components';
+
+import { Button, Input, Table } from 'components/bootstrap';
+import ObjectUtils from 'util/ObjectUtils';
+
+const StyledDiv = styled.div`
+  .form-group {
+    margin-left: 0;
+    margin-right: 0;
+  }
+`;
+
+type KeyValueTableProps = {
+  /** Object containing key-values to represent in the table. */
+  pairs: any;
+  /** Table headers. Must be an array with three elements [ key header, value header, actions header]. */
+  headers?: any[];
+  /** Indicates if the user can create, edit or delete key-value pairs. */
+  editable?: boolean;
+  /** Callback when key-value pairs change. It receives the new key-value pairs as argument. */
+  onChange?: (...args: any[]) => void;
+  /** Extra CSS classes for the rendered table. */
+  className?: string;
+  /** Extra CSS classes for the table container. */
+  containerClassName?: string;
+  /** Size of action buttons. */
+  actionsSize?: 'large' | 'medium' | 'small' | 'xsmall';
+};
+
+/**
+ * KeyValueTable displays a table for all key-value pairs in a JS object. If the editable prop is set to true, it also
+ * provides inputs to create, edit and delete key-value pairs.
+ */
+class KeyValueTable extends React.Component<KeyValueTableProps, {
+  [key: string]: any;
+}> {
+  static defaultProps = {
+    headers: ['Name', 'Value', 'Actions'],
+    editable: false,
+    actionsSize: 'xsmall',
+    className: '',
+    containerClassName: '',
+    onChange: () => {},
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      newKey: '',
+      newValue: '',
+    };
+  }
+
+  _onPairsChange = (newPairs) => {
+    if (this.props.onChange) {
+      this.props.onChange(newPairs);
+    }
+  };
+
+  _bindValue = (event) => {
+    const newState = {};
+
+    newState[event.target.name] = event.target.value;
+    this.setState(newState);
+  };
+
+  _addRow = () => {
+    const newPairs = ObjectUtils.clone(this.props.pairs);
+
+    newPairs[this.state.newKey] = this.state.newValue;
+    this._onPairsChange(newPairs);
+
+    this.setState({ newKey: '', newValue: '' });
+  };
+
+  _deleteRow = (key) => () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Are you sure you want to delete property '${key}'?`)) {
+      const newPairs = ObjectUtils.clone(this.props.pairs);
+
+      delete newPairs[key];
+      this._onPairsChange(newPairs);
+    }
+  };
+
+  _formattedHeaders = (headers) => (
+    <tr>
+      {headers.map((header, idx) => {
+        const customStyle: { width?: number } = {};
+
+        // Hide last column or apply width so it sticks to the right
+        if (idx === headers.length - 1) {
+          if (!this.props.editable) {
+            return null;
+          }
+
+          customStyle.width = 75;
+        }
+
+        return <th key={header} style={customStyle}>{header}</th>;
+      })}
+    </tr>
+  );
+
+  _formattedRows = (pairs) => Object.keys(pairs).sort().map((key) => {
+    let actionsColumn;
+
+    if (this.props.editable) {
+      const actions = [];
+
+      actions.push(
+        <Button key={`delete-${key}`} bsStyle="danger" bsSize={this.props.actionsSize} onClick={this._deleteRow(key)}>
+          Delete
+        </Button>,
+      );
+
+      actionsColumn = <td>{actions}</td>;
+    }
+
+    return (
+      <tr key={key}>
+        <td>{key}</td>
+        <td>{pairs[key]}</td>
+        {actionsColumn}
+      </tr>
+    );
+  });
+
+  _newRow = () => {
+    if (!this.props.editable) {
+      return null;
+    }
+
+    const addRowDisabled = !this.state.newKey || !this.state.newValue;
+
+    return (
+      <tr>
+        <td>
+          <StyledDiv>
+            <Input type="text"
+                   name="newKey"
+                   id="newKey"
+                   data-testid="newKey"
+                   placeholder={this.props.headers[0]}
+                   value={this.state.newKey}
+                   onChange={this._bindValue} />
+          </StyledDiv>
+        </td>
+        <td>
+          <StyledDiv>
+            <Input type="text"
+                   name="newValue"
+                   id="newValue"
+                   data-testid="newValue"
+                   placeholder={this.props.headers[1]}
+                   value={this.state.newValue}
+                   onChange={this._bindValue} />
+          </StyledDiv>
+        </td>
+        <td>
+          <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>Add</Button>
+        </td>
+      </tr>
+    );
+  };
+
+  render() {
+    return (
+      <div className="key-value-table-component">
+        <div className={`table-responsive ${this.props.containerClassName}`}>
+          <Table className={`table table-striped ${this.props.className}`}>
+            <thead>{this._formattedHeaders(this.props.headers)}</thead>
+            <tbody>
+              {this._formattedRows(this.props.pairs)}
+              {this._newRow()}
+            </tbody>
+          </Table>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default KeyValueTable;

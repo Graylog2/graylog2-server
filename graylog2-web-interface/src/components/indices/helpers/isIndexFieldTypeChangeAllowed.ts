@@ -18,6 +18,7 @@
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 const TEMPLATE_TYPES = ['failures', 'events', 'illuminate_content'];
-const isIndexFieldTypeChangeAllowed = (indexSet: IndexSet) => !TEMPLATE_TYPES.includes(indexSet?.index_template_type);
+export const isTemplateTypeAllowsFieldTypeChang = (type: string) => !TEMPLATE_TYPES.includes(type);
+const isIndexFieldTypeChangeAllowed = (indexSet: IndexSet) => isTemplateTypeAllowsFieldTypeChang(indexSet?.index_template_type);
 
 export default isIndexFieldTypeChangeAllowed;

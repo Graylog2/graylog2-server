@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { SyntheticEvent } from 'react';
 import { useState, useMemo } from 'react';
 import { Formik, Form } from 'formik';
 import { useQueryClient } from '@tanstack/react-query';
@@ -27,6 +28,8 @@ import { Icon, ModalSubmit } from 'components/common';
 import UserNotification from 'util/UserNotification';
 import { isPermitted } from 'util/PermissionsMixin';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type FormValues = Partial<Pick<Stream, 'index_set_id'>>
 type Props = {
@@ -57,13 +60,19 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
     () => prepareInitialValues(initialValues, indexSets),
     [indexSets, initialValues],
   );
+  const sendTelemetry = useSendTelemetry();
 
-  const openModal = () => {
+  const openModal = (event: SyntheticEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     setShowModal(true);
   };
 
   const onCloseModal = () => {
     setShowModal(false);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_STREAM_INDEXSET_UPDATE_OPENED, {
+      app_pathname: 'streams',
+    });
   };
 
   const onSave = (values: FormValues) => {

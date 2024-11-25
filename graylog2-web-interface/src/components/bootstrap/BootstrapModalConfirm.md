@@ -1,27 +1,27 @@
 ```js
-import createReactClass from 'create-react-class';
 import { Button } from 'components/bootstrap';
 
-const BootstrapModalConfirmExample = createReactClass({
-  getInitialState() {
-    return {
+class BootstrapModalConfirmExample extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       showModal: false,
       confirmed: undefined,
     };
-  },
+  }
 
   openConfirmation() {
     this.setState({ showModal: true });
-  },
+  };
 
   onCancel() {
     this.setState({ confirmed: false, showModal: false });
-  },
+  };
 
   onConfirm(callback) {
     this.setState({ confirmed: true, showModal: false });
     callback();
-  },
+  };
 
   render() {
     const { confirmed, showModal } = this.state;
@@ -40,7 +40,7 @@ const BootstrapModalConfirmExample = createReactClass({
       </div>
     );
   }
-});
+}
 
 <BootstrapModalConfirmExample />
 ```

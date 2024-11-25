@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Input } from 'components/bootstrap';
@@ -40,37 +39,10 @@ type State = {
 }
 
 interface DurationInput {
-  getValue(): string;
+  getValue(): string | boolean;
 }
 
 class ISODurationInput extends React.Component<Props, State> {
-  static propTypes = {
-    /** Input id */
-    id: PropTypes.string.isRequired,
-    /** Value to show in the Input. */
-    duration: PropTypes.string.isRequired,
-    /** Callback that will receive the validated duration when the input changes. */
-    update: PropTypes.func.isRequired,
-    /** Input label. */
-    label: PropTypes.string,
-    /** Input help text. */
-    help: PropTypes.string,
-    /**
-     * Function that validates the duration. It receives the duration in milliseconds and the duration itself as
-     * arguments, and must return `true` if the duration is valid or `false` if not. Only valid durations are propagated
-     * after the input changes.
-     */
-    validator: PropTypes.func,
-    /** Text to display when duration is invalid. */
-    errorText: PropTypes.string,
-    /** Specify that the Input should have input focus when the page loads. */
-    autoFocus: PropTypes.bool,
-    /** Specify that the Input is required to submit the form. */
-    required: PropTypes.bool,
-    /** Specify that the Input is disabled or not */
-    disabled: PropTypes.bool,
-  };
-
   private isoDuration: DurationInput;
 
   static defaultProps = {
@@ -92,7 +64,7 @@ class ISODurationInput extends React.Component<Props, State> {
   }
 
   _onUpdate = () => {
-    let duration = this.isoDuration.getValue().toUpperCase();
+    let duration = this.isoDuration.getValue().toString().toUpperCase();
 
     if (!duration.startsWith('P')) {
       duration = `P${duration}`;
@@ -110,7 +82,7 @@ class ISODurationInput extends React.Component<Props, State> {
     return (
       <Input id={this.props.id}
              type="text"
-             ref={(isoDuration: DurationInput) => { this.isoDuration = isoDuration; }}
+             ref={(isoDuration) => { this.isoDuration = isoDuration; }}
              label={this.props.label}
              onChange={this._onUpdate}
              value={this.state.duration}

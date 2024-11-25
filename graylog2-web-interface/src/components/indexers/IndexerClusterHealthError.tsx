@@ -31,8 +31,4 @@ const IndexerClusterHealthError = ({ error, name }: { error: FetchError, name?: 
   </ESClusterError>
 );
 
-IndexerClusterHealthError.defaultProps = {
-  name: undefined,
-};
-
 export default IndexerClusterHealthError;

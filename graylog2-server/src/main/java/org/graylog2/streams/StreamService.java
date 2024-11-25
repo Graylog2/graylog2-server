@@ -26,6 +26,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,9 @@ public interface StreamService extends PersistedService {
     }
 
     Map<String, String> loadStreamTitles(Collection<String> streamIds);
+
+    @Nullable
+    public String streamTitleFromCache(String streamId);
 
     /**
      * @return the total number of streams

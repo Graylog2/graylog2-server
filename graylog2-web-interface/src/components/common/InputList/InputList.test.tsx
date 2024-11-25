@@ -28,7 +28,7 @@ const renderComponent = (onChange: (e: React.BaseSyntheticEvent) => void, values
     <components.MultiValueRemove {...props}>value remover</components.MultiValueRemove>
   );
 
-  const CustomClearText: React.FC = () => <>clear all</>;
+  const CustomClearText = () => <>clear all</>;
 
   const ClearIndicator = (props: ClearIndicatorProps) => {
     const {

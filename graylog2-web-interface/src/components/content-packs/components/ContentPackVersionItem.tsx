@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import { useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -32,22 +31,23 @@ import {
   MenuItem,
   Modal,
 } from 'components/bootstrap';
-import type { ContentPackVersionsType, ContentPackInstallation } from 'components/content-packs/Types';
+import type { ContentPackInstallation } from 'components/content-packs/Types';
+import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 
 type Props = {
   pack: ContentPackInstallation
-  contentPackRevisions: ContentPackVersionsType,
-  onDeletePack: (id: string, rev: number) => void,
-  onChange: (id: string) => void,
-  onInstall: (id: string, contentPackRev: string, parameters: unknown) => void,
+  contentPackRevisions: ContentPackRevisions,
+  onDeletePack?: (id: string, rev: number) => void
+  onChange?: (id: string) => void
+  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void
 };
 
 const ContentPackVersionItem = ({
   pack,
   contentPackRevisions,
-  onChange: onChangeProp,
-  onDeletePack,
-  onInstall: onInstallProp,
+  onChange: onChangeProp = () => {},
+  onDeletePack = () => {},
+  onInstall: onInstallProp = () => {},
 }: Props) => {
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -130,20 +130,6 @@ const ContentPackVersionItem = ({
 
     </tr>
   );
-};
-
-ContentPackVersionItem.propTypes = {
-  pack: PropTypes.object.isRequired,
-  contentPackRevisions: PropTypes.object.isRequired,
-  onChange: PropTypes.func,
-  onDeletePack: PropTypes.func,
-  onInstall: PropTypes.func,
-};
-
-ContentPackVersionItem.defaultProps = {
-  onChange: () => {},
-  onDeletePack: () => {},
-  onInstall: () => {},
 };
 
 export default ContentPackVersionItem;

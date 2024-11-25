@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -114,17 +113,17 @@ const fieldType = (fieldName, { decoration_stats: decorationStats }: {
 
 const Strong = ({ children, strong = false }: React.PropsWithChildren<{ strong: boolean }>) => (strong
   ? <strong>{children}</strong>
-  // eslint-disable-next-line react/jsx-no-useless-fragment
+
   : <>{children}</>);
 
 const MessageTableEntry = ({
   config,
-  disableSurroundingSearch,
+  disableSurroundingSearch = false,
   expandAllRenderAsync,
   expanded,
   fields,
   message,
-  showMessageRow,
+  showMessageRow = false,
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
@@ -202,34 +201,6 @@ const MessageTableEntry = ({
       </TableBody>
     </AdditionalContext.Provider>
   );
-};
-
-MessageTableEntry.propTypes = {
-  disableSurroundingSearch: PropTypes.bool,
-  expandAllRenderAsync: PropTypes.bool.isRequired,
-  expanded: PropTypes.bool.isRequired,
-  fields: PropTypes.object.isRequired,
-  message: PropTypes.shape({
-    fields: PropTypes.object.isRequired,
-    highlight_ranges: PropTypes.object,
-    id: PropTypes.string.isRequired,
-    index: PropTypes.string.isRequired,
-    decoration_stats: PropTypes.shape({
-      added_fields: PropTypes.object,
-      changed_fields: PropTypes.object,
-      removed_fields: PropTypes.object,
-    }),
-  }).isRequired,
-  // @ts-ignore
-  selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
-  showMessageRow: PropTypes.bool,
-  toggleDetail: PropTypes.func.isRequired,
-};
-
-MessageTableEntry.defaultProps = {
-  disableSurroundingSearch: false,
-  selectedFields: Immutable.OrderedSet(),
-  showMessageRow: false,
 };
 
 export default MessageTableEntry;

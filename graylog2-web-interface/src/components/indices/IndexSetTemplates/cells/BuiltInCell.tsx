@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Icon } from 'components/common';
@@ -30,7 +29,3 @@ const BuiltInCell = ({ builtIn }: Props) => {
 };
 
 export default BuiltInCell;
-
-BuiltInCell.propTypes = {
-  builtIn: PropTypes.bool.isRequired,
-};

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import numeral from 'numeral';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -81,16 +80,6 @@ type State = {
 };
 
 class IndexSetPage extends React.Component<Props, State> {
-  static propTypes = {
-    params: PropTypes.shape({
-      indexSetId: PropTypes.string,
-    }).isRequired,
-    indexSet: PropTypes.object,
-    indexerOverview: PropTypes.object,
-    indexerOverviewError: PropTypes.object,
-    indexDetails: PropTypes.object,
-  };
-
   static defaultProps = {
     indexerOverview: undefined,
     indexerOverviewError: undefined,

@@ -16,10 +16,10 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { SystemIndexSetsTypes } from '@graylog/server-api';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -78,12 +78,8 @@ const useFieldTypeUsages = ({ streams, field }: { streams: Array<string>, field:
 } => {
   const { data, refetch, isInitialLoading, isLoading } = useQuery(
     ['fieldTypeUsages', field, searchParams],
-    () => fetchFieldTypeUsages({ streams, field }, searchParams),
+    () => defaultOnError(fetchFieldTypeUsages({ streams, field }, searchParams), `Loading ${field} types failed with status`, 'Could not load field types'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading ${field} types failed with status: ${errorThrown}`,
-          'Could not load field types');
-      },
       keepPreviousData: true,
       enabled,
     },

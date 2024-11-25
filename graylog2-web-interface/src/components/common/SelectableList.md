@@ -1,9 +1,7 @@
 ```js
-import createReactClass from 'create-react-class';
-
-const SelectableListExample = createReactClass({
-  getInitialState() {
-    return {
+class SelectableListExample extends React.Component {
+  constructor() {
+    this.state = {
       options: [
         { label: 'Uno', value: 'one' },
         { label: 'Dos', value: 'two' },
@@ -16,11 +14,12 @@ const SelectableListExample = createReactClass({
         { label: 'Cuatro', value: 'four' },
       ],
     };
-  },
+    this.onChange = this.onChange.bind(this);
+  }
 
   onChange(nextSelectedOptions) {
     this.setState({ selectedOptions: nextSelectedOptions });
-  },
+  };
 
   render() {
     const { options, selectedOptions } = this.state;
@@ -30,8 +29,8 @@ const SelectableListExample = createReactClass({
                       onChange={this.onChange}
                       selectedOptions={selectedOptions} />
     );
-  },
-});
+  }
+}
 
 <SelectableListExample />
 ```

@@ -66,7 +66,7 @@ describe('useChartDataSettingsWithCustomUnits', () => {
 
     act(() => {
       chartDataSettingsWithCustomUnits = result.current(
-        { originalName: 'Name1', fullPath: 'Name1', values: [1000, 2000, 3000] },
+        { name: 'Name1', fullPath: 'Name1', values: [1000, 2000, 3000] },
       );
     });
 
@@ -89,7 +89,7 @@ describe('useChartDataSettingsWithCustomUnits', () => {
 
     act(() => {
       chartDataSettingsWithCustomUnits = result.current(
-        { originalName: 'Name2', fullPath: 'Name2', values: [1000, 2000, 3000] },
+        { name: 'Name2', fullPath: 'Name2', values: [1000, 2000, 3000] },
       );
     });
 
@@ -97,7 +97,7 @@ describe('useChartDataSettingsWithCustomUnits', () => {
       fullPath: 'Name2',
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',
       meta: 'Name2',
-      text: ['1.0 Mb', '2.0 Mb', '3.0 Mb'],
+      text: ['1.0 MB', '2.0 MB', '3.0 MB'],
       y: [1000000, 2000000, 3000000],
       yaxis: 'y2',
     });
@@ -112,7 +112,7 @@ describe('useChartDataSettingsWithCustomUnits', () => {
 
     act(() => {
       chartDataSettingsWithCustomUnits = result.current(
-        { originalName: 'Name3', fullPath: 'Name3', values: [100, 200, 300] },
+        { name: 'Name3', fullPath: 'Name3', values: [100, 200, 300] },
       );
     });
 
@@ -132,7 +132,7 @@ describe('useChartDataSettingsWithCustomUnits', () => {
 
     act(() => {
       chartDataSettingsWithCustomUnits = result.current(
-        { originalName: 'count()', fullPath: 'count()', values: [100, 200, 300] },
+        { name: 'count()', fullPath: 'count()', values: [100, 200, 300] },
       );
     });
 

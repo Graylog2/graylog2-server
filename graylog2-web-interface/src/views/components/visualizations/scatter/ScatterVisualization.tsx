@@ -16,10 +16,8 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type { Layout } from 'plotly.js';
 
-import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import useChartData from 'views/components/visualizations/useChartData';
@@ -38,6 +36,7 @@ const ScatterVisualization = makeVisualization(({
   data,
   effectiveTimerange,
   height,
+  width,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
   const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
@@ -56,7 +55,7 @@ const ScatterVisualization = makeVisualization(({
     y: values,
     mode: 'markers',
     originalName,
-    ...getChartDataSettingsWithCustomUnits({ originalName, fullPath: fullPath, values }),
+    ...getChartDataSettingsWithCustomUnits({ name, fullPath: fullPath, values }),
   }), [_mapKeys, getChartDataSettingsWithCustomUnits]);
   const _chartDataResult = useChartData(rows, {
     widgetConfig: config,
@@ -78,14 +77,9 @@ const ScatterVisualization = makeVisualization(({
             chartData={chartDataResult}
             plotLayout={layout}
             height={height}
+            width={width}
             effectiveTimerange={effectiveTimerange} />
   );
 }, 'scatter');
-
-ScatterVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-  height: PropTypes.number,
-};
 
 export default ScatterVisualization;

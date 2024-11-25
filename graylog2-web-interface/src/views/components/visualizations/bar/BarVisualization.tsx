@@ -16,10 +16,8 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type { Layout } from 'plotly.js';
 
-import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
@@ -81,6 +79,7 @@ const BarVisualization = makeVisualization(({
   data,
   effectiveTimerange,
   height,
+  width,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
 
@@ -108,7 +107,7 @@ const BarVisualization = makeVisualization(({
       opacity,
       originalName,
       ...getBarChartDataSettingsWithCustomUnits({ originalName, name, fullPath, values, idx, total, xAxisItemsLength: mappedKeys.length }),
-    }) as ChartDefinition;
+    });
   },
   [visualizationConfig?.opacity, _mapKeys, getBarChartDataSettingsWithCustomUnits]);
 
@@ -149,14 +148,9 @@ const BarVisualization = makeVisualization(({
             effectiveTimerange={effectiveTimerange}
             setChartColor={setChartColor}
             height={height}
+            width={width}
             plotLayout={layout} />
   );
 }, 'bar');
-
-BarVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-  height: PropTypes.number,
-};
 
 export default BarVisualization;

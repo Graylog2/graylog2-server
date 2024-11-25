@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Field, useField } from 'formik';
 import { useQuery } from '@tanstack/react-query';
@@ -55,7 +54,6 @@ const debouncedTestNaturalDate = debounceWithPromise((
 
 const TimePreview = ({ dateTime, isLoading }: { dateTime: string, isLoading: boolean }) => {
   if (!dateTime || isLoading) {
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{EMPTY_RANGE}</>;
   }
 
@@ -97,10 +95,10 @@ const KeywordTimeRangePreview = () => {
 };
 
 type Props = {
-  disabled: boolean,
+  disabled?: boolean
 };
 
-const TabKeywordTimeRange = ({ disabled }: Props) => (
+const TabKeywordTimeRange = ({ disabled = false }: Props) => (
   <Row className="no-bm">
     <Col sm={5}>
       <Headline>Time range:</Headline>
@@ -148,13 +146,5 @@ const TabKeywordTimeRange = ({ disabled }: Props) => (
     </Col>
   </Row>
 );
-
-TabKeywordTimeRange.propTypes = {
-  disabled: PropTypes.bool,
-};
-
-TabKeywordTimeRange.defaultProps = {
-  disabled: false,
-};
 
 export default TabKeywordTimeRange;

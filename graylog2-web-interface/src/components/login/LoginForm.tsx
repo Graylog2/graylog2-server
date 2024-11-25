@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { ModalSubmit } from 'components/common';
@@ -74,10 +73,6 @@ const LoginForm = ({ onErrorChange }: Props) => {
                     submitButtonText="Sign in" />
     </form>
   );
-};
-
-LoginForm.propTypes = {
-  onErrorChange: PropTypes.func.isRequired,
 };
 
 export default LoginForm;

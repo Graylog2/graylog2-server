@@ -43,7 +43,6 @@ const chartData = [
 const columnPivots = [Pivot.create(['field1'], 'unknown')];
 const config = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).columnPivots(columnPivots).build();
 
-// eslint-disable-next-line react/require-default-props
 const SUT = ({ chartDataProp = chartData, plotConfig = config, neverHide = false }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig, neverHide?: boolean }) => (
   <WidgetFocusContext.Provider value={{
     focusedWidget: undefined,
@@ -54,7 +53,11 @@ const SUT = ({ chartDataProp = chartData, plotConfig = config, neverHide = false
   }}>
 
     <ChartColorContext.Provider value={{ colors, setColor }}>
-      <PlotLegend config={plotConfig} chartData={chartDataProp} neverHide={neverHide}>
+      <PlotLegend config={plotConfig}
+                  chartData={chartDataProp}
+                  height={480}
+                  width={640}
+                  neverHide={neverHide}>
         <div>Plot</div>
       </PlotLegend>
     </ChartColorContext.Provider>

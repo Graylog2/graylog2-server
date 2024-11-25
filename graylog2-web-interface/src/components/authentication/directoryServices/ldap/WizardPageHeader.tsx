@@ -62,9 +62,4 @@ const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) 
   );
 };
 
-WizardPageHeader.defaultProps = {
-  authenticationBackend: undefined,
-  title: undefined,
-};
-
 export default WizardPageHeader;

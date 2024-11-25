@@ -16,7 +16,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -48,12 +47,12 @@ type Props = {
     rules: { [id: string]: false },
   },
   stream: Stream,
-  onDelete: (ruleId: string) => void,
-  onSubmit: (ruleId: string, data: unknown) => void,
+  onDelete?: (ruleId: string) => void
+  onSubmit?: (ruleId: string, data: unknown) => void
   streamRule: StreamRuleTypeDefinition
 }
 
-const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) => {
+const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
   const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -109,7 +108,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
 
   return (
     <tr key={streamRule.id}>
-      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+      {}
       <td>
         <HumanReadableStreamRule streamRule={streamRule} inputs={inputs} />
         {description}
@@ -134,23 +133,6 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit, onDelete }: Props) =>
       )}
     </tr>
   );
-};
-
-DetailsStreamRule.propTypes = {
-  matchData: PropTypes.shape({
-    matches: PropTypes.bool,
-    rules: PropTypes.object,
-  }),
-  onDelete: PropTypes.func,
-  onSubmit: PropTypes.func,
-  stream: PropTypes.object.isRequired,
-  streamRule: PropTypes.object.isRequired,
-};
-
-DetailsStreamRule.defaultProps = {
-  matchData: {},
-  onSubmit: () => {},
-  onDelete: () => {},
 };
 
 export default DetailsStreamRule;

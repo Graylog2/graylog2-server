@@ -75,7 +75,7 @@ const usePluggableDashboardActions = (dashboard: View) => {
   return ({ actions, actionModals });
 };
 
-const DashboardDeleteAction = ({ dashboard, refetchDashboards, isEvidenceModal }: { dashboard: View, refetchDashboards: () => void, isEvidenceModal?: boolean }) => {
+const DashboardDeleteAction = ({ dashboard, refetchDashboards, isEvidenceModal = false }: { dashboard: View, refetchDashboards: () => void, isEvidenceModal?: boolean }) => {
   const { deselectEntity } = useSelectedEntities();
   const paginationQueryParameter = usePaginationQueryParameter();
 
@@ -103,11 +103,7 @@ const DashboardDeleteAction = ({ dashboard, refetchDashboards, isEvidenceModal }
   );
 };
 
-DashboardDeleteAction.defaultProps = {
-  isEvidenceModal: false,
-};
-
-const DashboardActions = ({ dashboard, isEvidenceModal }: Props) => {
+const DashboardActions = ({ dashboard, isEvidenceModal = false }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(dashboard);
   const currentUser = useCurrentUser();
@@ -146,10 +142,6 @@ const DashboardActions = ({ dashboard, isEvidenceModal }: Props) => {
       {pluggableActionModals}
     </>
   );
-};
-
-DashboardActions.defaultProps = {
-  isEvidenceModal: false,
 };
 
 export default DashboardActions;

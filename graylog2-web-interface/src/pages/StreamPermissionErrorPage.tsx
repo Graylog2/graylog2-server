@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import type FetchError from 'logic/errors/FetchError';
 
@@ -23,7 +22,7 @@ import UnauthorizedErrorPage from './UnauthorizedErrorPage';
 
 type Props = {
   error: FetchError | undefined | null,
-  missingStreamIds: string[],
+  missingStreamIds?: string[]
 };
 
 const StreamPermissionErrorPage = ({ error, missingStreamIds = [] }: Props) => {
@@ -41,22 +40,6 @@ const StreamPermissionErrorPage = ({ error, missingStreamIds = [] }: Props) => {
   return (
     <UnauthorizedErrorPage error={error} description={description} title="Missing Stream Permissions" errorDetails={errorDetails} />
   );
-};
-
-StreamPermissionErrorPage.propTypes = {
-  error: PropTypes.shape({
-    message: PropTypes.string.isRequired,
-    additional: PropTypes.shape({
-      body: PropTypes.shape({
-        streams: PropTypes.arrayOf(PropTypes.string),
-      }),
-    }),
-  }).isRequired,
-  missingStreamIds: PropTypes.arrayOf(PropTypes.string),
-};
-
-StreamPermissionErrorPage.defaultProps = {
-  missingStreamIds: [],
 };
 
 export default StreamPermissionErrorPage;

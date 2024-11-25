@@ -17,7 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import selectEvent from 'react-select-event';
 
 import asMock from 'helpers/mocking/AsMock';

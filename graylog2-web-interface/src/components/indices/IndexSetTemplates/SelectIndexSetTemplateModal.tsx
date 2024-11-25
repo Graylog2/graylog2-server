@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -58,7 +57,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   const [showBuiltInWarmTier, setShowBuiltInWarmTier] = useState<boolean>(!!dataTieringPlugin);
 
   const templateCategorySegments: Array<{value: TemplateCategorySegment, label: string}> = [
-    { value: 'built_in', label: 'Default Templates' },
+    { value: 'built_in', label: 'Built-in Templates' },
     { value: 'custom', label: 'Custom Templates' },
   ];
 
@@ -131,11 +130,11 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
 
   return (
     <Modal show={show}
-           title="Index Set Strategy"
+           title="Index Set Templates"
            bsSize="large"
            onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Index Set Strategy</Modal.Title>
+        <Modal.Title>Index Set Templates</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <FlexWrapper>
@@ -204,11 +203,6 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
       </Modal.Footer>
     </Modal>
   );
-};
-
-SelectIndexSetTemplateModal.propTypes = {
-  hideModal: PropTypes.func.isRequired,
-  show: PropTypes.bool.isRequired,
 };
 
 export default SelectIndexSetTemplateModal;

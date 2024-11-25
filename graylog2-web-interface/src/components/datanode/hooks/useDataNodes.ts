@@ -23,10 +23,13 @@ import fetch from 'logic/rest/FetchProvider';
 import type { Attribute, SearchParams, PaginatedResponseType } from 'stores/PaginationTypes';
 import type FetchError from 'logic/errors/FetchError';
 import type { DataNodes } from 'components/datanode/Types';
+import { defaultOnError } from 'util/conditional/onError';
 
 export const bulkRemoveDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
   try {
     const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_remove'), { entity_ids });
+
+    selectBackFailedEntities([]);
 
     if (failures?.length) {
       selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
@@ -48,6 +51,8 @@ export const bulkStartDataNode = async (entity_ids: string[], selectBackFailedEn
   try {
     const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_start'), { entity_ids });
 
+    selectBackFailedEntities([]);
+
     if (failures?.length) {
       selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
     }
@@ -67,6 +72,8 @@ export const bulkStartDataNode = async (entity_ids: string[], selectBackFailedEn
 export const bulkStopDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
   try {
     const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_stop'), { entity_ids });
+
+    selectBackFailedEntities([]);
 
     if (failures?.length) {
       selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
@@ -167,12 +174,8 @@ const useDataNodes = (searchParams: SearchParams = {
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery<DataNodeResponse, FetchError>(
     keyFn(searchParams),
-    () => fetchDataNodes(searchParams),
+    () => defaultOnError(fetchDataNodes(searchParams), 'Loading Data Nodes failed with status', 'Could not load Data Nodes.'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Data Nodes failed with status: ${errorThrown}`,
-          'Could not load Data Nodes.');
-      },
       notifyOnChangeProps: ['data', 'error'],
       refetchInterval,
       enabled,

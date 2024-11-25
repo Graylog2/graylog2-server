@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Set;
 
 public interface SearchTypeBuilder {
     SearchType build();
@@ -33,4 +34,6 @@ public interface SearchTypeBuilder {
     SearchTypeBuilder query(@Nullable BackendQuery query);
 
     SearchTypeBuilder filter(@Nullable Filter filter);
+
+    SearchTypeBuilder streams(Set<String> streams);
 }

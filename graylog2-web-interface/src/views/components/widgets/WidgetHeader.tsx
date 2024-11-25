@@ -15,14 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Spinner, Icon } from 'components/common';
 import EditableTitle from 'views/components/common/EditableTitle';
 import { Input } from 'components/bootstrap';
-
-import CustomPropTypes from '../CustomPropTypes';
 
 const LoadingSpinner = styled(Spinner)`
   margin-left: 10px;
@@ -79,15 +76,24 @@ const TitleInput = styled(Input)(({ theme }) => css`
 `);
 
 type Props = {
-  children: React.ReactNode,
-  onRename: (newTitle: string) => unknown,
-  hideDragHandle: boolean,
+  children?: React.ReactNode
+  onRename?: (newTitle: string) => unknown
+  hideDragHandle?: boolean
   title: string,
-  loading: boolean,
+  loading?: boolean
   editing: boolean,
+  titleIcon?: React.ReactNode,
 };
 
-const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading, editing }: Props) => (
+const WidgetHeader = ({
+  title,
+  editing,
+  hideDragHandle = false,
+  loading = false,
+  children = null,
+  titleIcon = null,
+  onRename = null,
+}: Props) => (
   <Container>
     <Col>
       {hideDragHandle || <DragHandleContainer className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="drag_indicator" /></DragHandleContainer>}
@@ -95,15 +101,18 @@ const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading, edit
         <TitleInputWrapper>
           <TitleInput type="text"
                       id="widget-title"
-                      onChange={(e) => onRename(e.target.value)}
+                      onChange={(e) => onRename && onRename(e.target.value)}
                       value={title}
                       required />
         </TitleInputWrapper>
       ) : (
-        <EditableTitle key={title}
-                       disabled={!onRename}
-                       value={title}
-                       onChange={onRename} />
+        <>
+          <EditableTitle key={title}
+                         disabled={!onRename}
+                         value={title}
+                         onChange={onRename} />
+          {titleIcon}
+        </>
       )}
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>
@@ -112,20 +121,5 @@ const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading, edit
     </WidgetActionDropdown>
   </Container>
 );
-
-WidgetHeader.propTypes = {
-  children: CustomPropTypes.OneOrMoreChildren,
-  onRename: PropTypes.func,
-  hideDragHandle: PropTypes.bool,
-  title: PropTypes.node.isRequired,
-  loading: PropTypes.bool,
-};
-
-WidgetHeader.defaultProps = {
-  children: null,
-  onRename: undefined,
-  hideDragHandle: false,
-  loading: false,
-};
 
 export default WidgetHeader;

@@ -1,5 +1,0 @@
-type = "a"
-message = "Added categories to Streams to allow Illuminate content to be scoped to multiple products."
-
-issues = ["graylog-plugin-enterprise#7945"]
-pulls = ["20110"]

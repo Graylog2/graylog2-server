@@ -40,6 +40,7 @@ public abstract class AggregationWidget implements ViewWidget {
     private static final String FIELD_TIMERANGE = "timerange";
     private static final String FIELD_QUERY = "query";
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_STREAM_CATEGORIES = "stream_categories";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -60,13 +61,17 @@ public abstract class AggregationWidget implements ViewWidget {
     @JsonProperty(FIELD_STREAMS)
     abstract Set<String> streams();
 
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    abstract Set<String> streamCategories();
+
     @JsonProperty(FIELD_CONFIG)
     public abstract AggregationConfig config();
 
     public static Builder builder() {
         return new AutoValue_AggregationWidget.Builder()
                 .type(TYPE_AGGREGATION)
-                .streams(Collections.emptySet());
+                .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet());
     }
 
     public Set<SearchType> toSearchTypes(RandomUUIDProvider randomUUIDProvider) {
@@ -75,6 +80,7 @@ public abstract class AggregationWidget implements ViewWidget {
                 .name("chart")
                 .query(query())
                 .streams(streams())
+                .streamCategories(streamCategories())
                 .timerange(timerange())
                 .rollup(config().rollup())
                 .rowGroups(config().rowPivots().stream().map(pivot -> pivot.toBucketSpec()).collect(Collectors.toList()))
@@ -121,6 +127,9 @@ public abstract class AggregationWidget implements ViewWidget {
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty(FIELD_STREAM_CATEGORIES)
+        public abstract Builder streamCategories(Set<String> streamCategories);
 
         @JsonProperty(FIELD_CONFIG)
         public abstract Builder config(AggregationConfig config);

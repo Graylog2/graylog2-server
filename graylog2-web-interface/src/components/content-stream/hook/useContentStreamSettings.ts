@@ -20,6 +20,7 @@ import { ContentStream } from '@graylog/server-api';
 import UserNotification from 'preflight/util/UserNotification';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { CONTENT_STREAM_CONTENT_KEY } from 'components/content-stream/hook/useContentStream';
+import { defaultOnError } from 'util/conditional/onError';
 
 export const CONTENT_STREAM_SETTINGS_KEY = ['content-stream', 'settings'];
 export const CONTENT_STREAM_TAGS_KEY = ['content-stream', 'tags'];
@@ -63,23 +64,19 @@ const useContentStreamSettings = (): {
     data,
     isLoading,
     refetch: refetchContentStream,
-  } = useQuery<ContentStreamSettingsApi, Error>([CONTENT_STREAM_SETTINGS_KEY], () => getContentStreamUserSettings(currentUser.username), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading content stream config failed with status: ${errorThrown}`,
-        'Could not load content stream.');
-    },
-  });
+  } = useQuery<ContentStreamSettingsApi, Error>(
+    [CONTENT_STREAM_SETTINGS_KEY],
+    () => defaultOnError(getContentStreamUserSettings(currentUser.username), 'Loading content stream config failed with status', 'Could not load content stream.'),
+  );
   const {
     data: tags,
     isLoading: isLoadingTags,
     refetch: refetchContentStreamTag,
     error: contentStreamTagError,
-  } = useQuery<Array<string>, Error>([CONTENT_STREAM_TAGS_KEY], () => getContentStreamTags(), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading content stream tag failed with status: ${errorThrown}`,
-        'Could not load content stream tags.');
-    },
-  });
+  } = useQuery<Array<string>, Error>(
+    [CONTENT_STREAM_TAGS_KEY],
+    () => defaultOnError(getContentStreamTags(), 'Loading content stream tag failed with status', 'Could not load content stream tags.'),
+  );
   const { mutateAsync: onSaveContentStreamSetting } = useMutation(saveSettings, {
     onSuccess: () => {
       queryClient.invalidateQueries(CONTENT_STREAM_SETTINGS_KEY);

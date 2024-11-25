@@ -1,0 +1,5 @@
+type="a"
+message="Added new Palo Alto Networks TCP (PAN-OS v11+) input."
+
+issues=["20223"]
+pulls=["20236"]

@@ -126,7 +126,7 @@ type Props = {
   showUnit?: boolean
 };
 
-const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, displayOverlayInPortal, showUnit }: Props) => {
+const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, displayOverlayInPortal = false, showUnit = false }: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
@@ -169,13 +169,6 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, 
                                                customListItemRender={SortableListItem}
                                                displayOverlayInPortal={displayOverlayInPortal} />
   );
-};
-
-SelectedFieldsList.defaultProps = {
-  displayOverlayInPortal: false,
-  testPrefix: undefined,
-  selectSize: undefined,
-  showUnit: false,
 };
 
 export default SelectedFieldsList;

@@ -16,16 +16,14 @@
  */
 import * as React from 'react';
 import { useContext, useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
@@ -179,15 +177,6 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
       </TableWrapper>
     </MessageTableProviders>
   );
-};
-
-MessageTable.propTypes = {
-  activeQueryId: PropTypes.string.isRequired,
-  config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-  fields: CustomPropTypes.FieldListType.isRequired,
-  messages: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onSortChange: PropTypes.func.isRequired,
-  setLoadingState: PropTypes.func.isRequired,
 };
 
 export default React.memo(MessageTable);

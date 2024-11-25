@@ -174,6 +174,12 @@ describe('Chart Layout Generators', () => {
 
       expect(result).toEqual(layoutsFor4axis);
     });
+
+    it('does not throw exception when chart data is `undefined` in stack mode', () => {
+      const result = generateLayouts({ ...params, chartData: [], barmode: 'stack' });
+
+      expect(result).toBeDefined();
+    });
   });
 
   describe('getHoverTemplateSettings', () => {
@@ -181,7 +187,7 @@ describe('Chart Layout Generators', () => {
       const result = getHoverTemplateSettings({
         convertedValues: [10, 20, 30],
         unit: FieldUnit.fromJSON({ abbrev: 'ms', unit_type: 'time' }),
-        originalName: 'Name1',
+        name: 'Name1',
       });
 
       expect(result).toEqual({
@@ -199,16 +205,16 @@ describe('Chart Layout Generators', () => {
       const result = getHoverTemplateSettings({
         convertedValues: [10, 20, 30],
         unit: FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'size' }),
-        originalName: 'Name2',
+        name: 'Name2',
       });
 
       expect(result).toEqual({
         hovertemplate: '%{text}<br><extra>%{meta}</extra>',
         meta: 'Name2',
         text: [
-          '10.0 b',
-          '20.0 b',
-          '30.0 b',
+          '10.0 B',
+          '20.0 B',
+          '30.0 B',
         ],
       });
     });
@@ -217,7 +223,7 @@ describe('Chart Layout Generators', () => {
       const result = getHoverTemplateSettings({
         convertedValues: [10, 20, 30],
         unit: FieldUnit.fromJSON({ abbrev: '%', unit_type: 'percent' }),
-        originalName: 'Name3',
+        name: 'Name3',
       });
 
       expect(result).toEqual({});
@@ -227,7 +233,7 @@ describe('Chart Layout Generators', () => {
       const result = getHoverTemplateSettings({
         convertedValues: [10, 20, 30],
         unit: null,
-        originalName: 'Name4',
+        name: 'Name4',
       });
 
       expect(result).toEqual({});
@@ -239,7 +245,7 @@ describe('Chart Layout Generators', () => {
       const result = getPieHoverTemplateSettings({
         convertedValues: [10, 20, 30],
         unit: FieldUnit.fromJSON({ abbrev: 'ms', unit_type: 'time' }),
-        originalName: 'Name1',
+        name: 'Name1',
       });
 
       expect(result).toEqual({
@@ -258,7 +264,7 @@ describe('Chart Layout Generators', () => {
       const result = getPieHoverTemplateSettings({
         convertedValues: [10, 20, 30],
         unit: FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'size' }),
-        originalName: 'Name2',
+        name: 'Name2',
       });
 
       expect(result).toEqual({
@@ -266,9 +272,9 @@ describe('Chart Layout Generators', () => {
         textinfo: 'percent',
         meta: 'Name2',
         text: [
-          '10.0 b',
-          '20.0 b',
-          '30.0 b',
+          '10.0 B',
+          '20.0 B',
+          '30.0 B',
         ],
       });
     });
@@ -277,7 +283,7 @@ describe('Chart Layout Generators', () => {
       const result = getPieHoverTemplateSettings({
         convertedValues: [10, 20, 30],
         unit: FieldUnit.fromJSON({ abbrev: '%', unit_type: 'percent' }),
-        originalName: 'Name3',
+        name: 'Name3',
       });
 
       expect(result).toEqual({
@@ -296,7 +302,7 @@ describe('Chart Layout Generators', () => {
       const result = getPieHoverTemplateSettings({
         convertedValues: [10, 20, 30],
         unit: null,
-        originalName: 'Name4',
+        name: 'Name4',
       });
 
       expect(result).toEqual({

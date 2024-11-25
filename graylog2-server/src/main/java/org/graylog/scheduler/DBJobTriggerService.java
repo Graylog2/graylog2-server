@@ -227,6 +227,18 @@ public class DBJobTriggerService {
     }
 
     /**
+     * Creates the given {@link JobTriggerDto} as new entry or returns an existing one. The ID of the given trigger
+     * must not be null!
+     *
+     * @param trigger the trigger to get or create
+     * @return the trigger from the database
+     * @throws NullPointerException when the trigger or trigger ID is null
+     */
+    public JobTriggerDto getOrCreate(JobTriggerDto trigger) {
+        return mongoUtils.getOrCreate(requireNonNull(trigger, "trigger cannot be null"));
+    }
+
+    /**
      * Creates a new record in the database. The given {@link JobTriggerDto} object <b>must not</b> have an ID to make
      * sure a new record is created.
      *
@@ -418,6 +430,8 @@ public class DBJobTriggerService {
 
         final List<Bson> updates = new ArrayList<>();
         updates.add(unset(FIELD_LOCK_OWNER));
+        // Reset the cancellation status on release to make sure we start uncancelled on the next trigger execution
+        updates.add(set(FIELD_IS_CANCELLED, false));
 
         if (triggerUpdate.concurrencyReschedule()) {
             updates.add(inc(FIELD_CONCURRENCY_RESCHEDULE_COUNT, 1));
@@ -466,6 +480,8 @@ public class DBJobTriggerService {
         );
         final var update = combine(
                 unset(FIELD_LOCK_OWNER),
+                // Reset the cancellation status on force-release to make sure we start uncancelled on the next trigger execution
+                set(FIELD_IS_CANCELLED, false),
                 set(FIELD_STATUS, JobTriggerStatus.RUNNABLE));
 
         return Ints.saturatedCast(collection.updateMany(filter, update).getModifiedCount());

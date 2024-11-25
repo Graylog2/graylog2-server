@@ -56,8 +56,4 @@ const StartStreamsActions = ({ handleFailures, refetchStreams, descriptor, onSel
   );
 };
 
-StartStreamsActions.defaultProps = {
-  onSelect: undefined,
-};
-
 export default StartStreamsActions;

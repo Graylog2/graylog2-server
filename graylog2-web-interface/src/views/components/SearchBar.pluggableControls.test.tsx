@@ -149,6 +149,7 @@ describe('SearchBar pluggable controls', () => {
         pluggableControl: 'Initial Value2',
         queryString: '*',
         streams: [],
+        streamCategories: [],
         timerange: { from: 300, type: 'relative' },
       },
       expect.any(Function),
@@ -164,6 +165,7 @@ describe('SearchBar pluggable controls', () => {
         pluggableControl: 'Initial Value',
         queryString: '*',
         streams: [],
+        streamCategories: [],
         timerange: { from: 300, type: 'relative' },
       },
       {
@@ -180,6 +182,7 @@ describe('SearchBar pluggable controls', () => {
       customKey: 'Initial Value',
       queryString: '*',
       streams: [],
+      streamCategories: [],
       timeRange: { from: 300, type: 'relative' },
     }, 'Europe/Berlin'));
   });

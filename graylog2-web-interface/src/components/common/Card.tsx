@@ -51,11 +51,4 @@ const Card = ({ children, className, padding, id, tabIndex }: Props) => (
   </Container>
 );
 
-Card.defaultProps = {
-  className: undefined,
-  id: undefined,
-  padding: undefined,
-  tabIndex: undefined,
-};
-
 export default Card;

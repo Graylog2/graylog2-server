@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.bson.types.ObjectId;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestJobTriggerData;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
@@ -31,6 +32,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -275,6 +277,28 @@ public class DBJobTriggerServiceTest {
         assertThatCode(() -> dbJobTriggerService.getForJobs(Collections.singleton("54e3deadbeefdeadbeefaff3")))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("54e3deadbeefdeadbeefaff3");
+    }
+
+    @Test
+    public void getOrCreateTrigger() {
+        final String id = new ObjectId().toHexString();
+        final JobTriggerDto trigger = dbJobTriggerService.getOrCreate(JobTriggerDto.Builder.create(clock)
+                .id(id)
+                .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
+                .build());
+
+        assertThat(trigger.id()).isEqualTo(id);
+        assertThat(trigger.status()).isEqualTo(JobTriggerStatus.RUNNABLE);
+        assertThat(trigger.lock()).isEqualTo(JobTriggerLock.empty());
+
+        assertThatCode(() -> dbJobTriggerService.create(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("trigger cannot be null");
     }
 
     @Test
@@ -745,6 +769,50 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
+    public void releaseCancelledTrigger() {
+        final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
+                .concurrencyRescheduleCount(42)
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
+                .build());
+        final JobTriggerData newData = TestJobTriggerData.create(Collections.singletonMap("hello", "world"));
+        final JobTriggerUpdate update = JobTriggerUpdate.withNextTimeAndData(clock.nowUTC().plusSeconds(20), newData);
+
+        // Lock the trigger
+        final Optional<JobTriggerDto> runnableTrigger = dbJobTriggerService.nextRunnableTrigger();
+        assertThat(runnableTrigger).isNotEmpty();
+
+        clock.plus(15, TimeUnit.SECONDS);
+
+        // Cancel the trigger
+        dbJobTriggerService.cancelTriggerByQuery(MongoUtils.idEq(requireNonNull(trigger1.id())));
+
+        // Check that the "is_cancelled" field is set to true
+        assertThat(dbJobTriggerService.get(trigger1.id()))
+                .map(JobTriggerDto::isCancelled)
+                .get()
+                .isEqualTo(true);
+
+        // Release the trigger
+        assertThat(dbJobTriggerService.releaseTrigger(runnableTrigger.get(), update)).isTrue();
+
+        assertThat(dbJobTriggerService.get(trigger1.id()))
+                .isPresent()
+                .get()
+                .satisfies(trigger -> {
+                    // Make sure the lock is gone
+                    assertThat(trigger.lock().owner()).isNull();
+                    assertThat(trigger.status()).isEqualTo(JobTriggerStatus.RUNNABLE);
+                    // Releasing the lock should reset the "is_cancelled" flag to false
+                    assertThat(trigger.isCancelled()).isFalse();
+                });
+    }
+
+    @Test
     public void setTriggerError() {
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
@@ -827,6 +895,27 @@ public class DBJobTriggerServiceTest {
 
         // Running triggers not owned by this node should not be released
         assertThat(newTriggerIds).containsOnly("54e3deadbeefdeadbeef0002");
+    }
+
+    @Test
+    @MongoDBFixtures("stale-job-triggers.json")
+    public void forceReleaseOwnedCancelledTriggers() {
+        final Set<String> cancelledTriggerIds = dbJobTriggerService.all().stream()
+                .filter(JobTriggerDto::isCancelled)
+                .map(JobTriggerDto::id)
+                .collect(Collectors.toSet());
+
+        assertThat(cancelledTriggerIds).containsOnly("54e3deadbeefdeadbeef0001");
+
+        assertThat(dbJobTriggerService.forceReleaseOwnedTriggers()).isEqualTo(2);
+
+        final Set<String> newCancelledTriggerIds = dbJobTriggerService.all().stream()
+                .filter(JobTriggerDto::isCancelled)
+                .map(JobTriggerDto::id)
+                .collect(Collectors.toSet());
+
+        // Force releasing triggers should reset the "is_cancelled" flag to false
+        assertThat(newCancelledTriggerIds).isEmpty();
     }
 
     @Test

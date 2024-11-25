@@ -144,7 +144,7 @@ public final class Streams implements GraylogRestApi {
             RetryerBuilder.<String>newBuilder()
                     .withWaitStrategy(WaitStrategies.fixedWait(100, TimeUnit.MILLISECONDS))
                     .withStopStrategy(StopStrategies.stopAfterDelay(10, TimeUnit.SECONDS))
-                    .retryIfResult(r -> r.equals(existingEngineFingerprint))
+                    .retryIfResult(r -> r != null && r.equals(existingEngineFingerprint))
                     .build()
                     .call(this::getStreamRouterEngineFingerprint);
         } catch (ExecutionException | RetryException e) {

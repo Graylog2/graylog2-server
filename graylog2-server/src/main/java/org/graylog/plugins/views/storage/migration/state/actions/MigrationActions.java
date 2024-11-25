@@ -51,7 +51,9 @@ public interface MigrationActions {
 
     void startDataNodes();
 
-    boolean dataNodeStartupFinished();
+    boolean allDatanodesAvailable();
+
+    void setPreflightFinished();
 
     void startRemoteReindex();
 
@@ -68,4 +70,6 @@ public interface MigrationActions {
     void stopDatanodes();
 
     void finishRemoteReindexMigration();
+
+    boolean isRemoteReindexMigrationEnabled();
 }

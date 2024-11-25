@@ -27,11 +27,13 @@ import type { Unit } from 'views/components/visualizations/utils/unitConverters'
 import { mappedUnitsFromJSON as units } from 'views/components/visualizations/utils/unitConverters';
 import type { FieldUnitsFormValues } from 'views/types';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: stretch;
+
   & .control-label {
     font-weight: normal;
   }
@@ -53,6 +55,7 @@ export const StyledButton = styled(Button)(({ theme }) => css`
   min-width: 20px;
   border-radius: 3px;
   color: ${theme.colors.variant.lightest.default};
+
   &:hover {
     background-color: ${theme.colors.gray[80]};
     color: ${theme.colors.variant.lightest.default};
@@ -74,7 +77,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
   const badgeLabel = useMemo(() => {
     const curUnit = values?.units?.[field]?.abbrev;
 
-    return curUnit || '...';
+    return getUnitTextLabel(curUnit) || '...';
   }, [field, values?.units]);
 
   const predefinedInfo = useMemo(() => {
@@ -86,7 +89,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
   }, [field, predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType]);
 
   const onClear = useCallback(() => {
-    setFieldValue(`units.${field}`, { unitType: undefined, abbrev: undefined });
+    setFieldValue(`units.${field}`, undefined);
     toggleShow();
   }, [field, setFieldValue]);
 

@@ -23,8 +23,10 @@ import type {
 } from 'views/logic/queries/Query';
 import {
   filtersForQuery,
+  categoryFiltersForQuery,
   createElasticsearchQueryString,
   filtersToStreamSet,
+  filtersToStreamCategorySet,
 } from 'views/logic/queries/Query';
 import type { TimeRangeQueryParameter } from 'views/logic/TimeRange';
 import { timeRangeFromQueryParameter } from 'views/logic/TimeRange';
@@ -35,7 +37,11 @@ type StreamsQuery = {
   streams?: string,
 };
 
-export type RawQuery = (TimeRangeQueryParameter | { relative?: string }) & StreamsQuery & { q?: string };
+type StreamCategoryQuery = {
+  stream_categories?: string,
+};
+
+export type RawQuery = (TimeRangeQueryParameter | { relative?: string }) & StreamsQuery & StreamCategoryQuery & { q?: string };
 
 // eslint-disable-next-line no-nested-ternary
 const normalizeTimeRange = (query: {} | TimeRangeQueryParameter): TimeRange | undefined => (query && 'rangetype' in query
@@ -56,9 +62,22 @@ const normalizeStreams = (query: StreamsQuery = {}): Array<string> => {
     .filter((stream) => stream !== '');
 };
 
+const normalizeStreamCategories = (query: StreamCategoryQuery = {}): Array<string> => {
+  const rawCategories = query.stream_categories;
+
+  if (rawCategories === undefined || rawCategories === null) {
+    return [];
+  }
+
+  return String(rawCategories).split(',')
+    .map((category) => category.trim())
+    .filter((category) => category !== '');
+};
+
 type NormalizedSearchURLQueryParams = {
   timeRange: TimeRange | undefined,
   streamsFilter: FilterType | undefined,
+  streamCategoriesFilter: FilterType | undefined,
   queryString: ElasticsearchQueryString | undefined
 }
 
@@ -66,10 +85,12 @@ const normalizeSearchURLQueryParams = (query: RawQuery): NormalizedSearchURLQuer
   const { q: queryString } = query ?? {};
   const timeRange = normalizeTimeRange(query);
   const streamsFilter = filtersForQuery(normalizeStreams(query));
+  const streamCategoriesFilter = categoryFiltersForQuery(normalizeStreamCategories(query));
 
   return {
     timeRange,
     streamsFilter,
+    streamCategoriesFilter,
     queryString: queryString ? createElasticsearchQueryString(queryString) : undefined,
   };
 };
@@ -78,9 +99,14 @@ export const useSearchURLQueryParams = () => {
   const query = useQuery();
 
   return useMemo(() => {
-    const { timeRange, queryString, streamsFilter } = normalizeSearchURLQueryParams(query);
+    const { timeRange, queryString, streamsFilter, streamCategoriesFilter } = normalizeSearchURLQueryParams(query);
 
-    return { timeRange, queryString, streams: filtersToStreamSet(streamsFilter).toArray() };
+    return {
+      timeRange,
+      queryString,
+      streams: filtersToStreamSet(streamsFilter).toArray(),
+      streamCategories: filtersToStreamCategorySet(streamCategoriesFilter).toArray(),
+    };
   }, [query]);
 };
 

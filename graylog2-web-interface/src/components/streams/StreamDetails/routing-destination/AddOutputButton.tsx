@@ -67,8 +67,6 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
     setShowAddOutput(false);
   };
 
-  const { id: streamId } = stream;
-
   const handleCreateOutput = (data) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_CREATED, {
       app_pathname: 'stream',
@@ -78,6 +76,7 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
       addStreamOutput({ streamId: stream.id, outputs: { outputs: [result.id] } })
         .then(() => {
           queryClient.invalidateQueries(['outputs', 'overview']);
+
           onCancel();
         });
 
@@ -93,13 +92,21 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
       });
   };
 
+  const onShowAddOutput = () => {
+    setShowAddOutput(true);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_DESTINATIONS_OUTPUT_ASSIGN_OPENED, {
+      app_pathname: 'stream',
+    });
+  };
+
   return (
     <>
       <Button bsStyle="default"
               bsSize="sm"
-              onClick={() => setShowAddOutput(true)}
+              onClick={onShowAddOutput}
               title="Edit Output">
-        <Icon name="add" size="sm" /> Add Output
+        <Icon name="add" size="sm" /> Add output
       </Button>
       {showAddOutput && (
       <BootstrapModalWrapper showModal
@@ -116,12 +123,10 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
             {currentSegment === CREATE_SEGMENT && (
             <CreateOutputDropdown types={availableOutputTypes}
                                   onSubmit={handleCreateOutput}
-                                  getTypeDefinition={getTypeDefinition}
-                                  streamId={streamId} />
+                                  getTypeDefinition={getTypeDefinition} />
             )}
             {currentSegment === ASSIGN_SEGMENT && (
-            <AssignOutputDropdown streamId={streamId}
-                                  outputs={assignableOutputs}
+            <AssignOutputDropdown outputs={assignableOutputs}
                                   onSubmit={handleAssignOutput} />
             )}
           </SegmentedContainer>

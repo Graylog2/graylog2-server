@@ -14,7 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const noUnusedVarsOptions = { argsIgnorePattern: '^_' };
+const ignorePattern = '^(_|ignored)';
+const noUnusedVarsOptions = {
+  argsIgnorePattern: ignorePattern,
+  caughtErrorsIgnorePattern: ignorePattern,
+};
 
 module.exports = {
   parser: '@babel/eslint-parser',
@@ -131,11 +135,14 @@ module.exports = {
     'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
     'react/jsx-first-prop-new-line': ['warn', 'never'],
     'react/jsx-indent-props': ['error', 'first'],
+    'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }],
     'react/jsx-one-expression-per-line': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
+    'react/prop-types': ['off'],
     'react/static-property-placement': 'off',
+    'react/require-default-props': ['warn', { functions: 'defaultArguments' }],
 
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',

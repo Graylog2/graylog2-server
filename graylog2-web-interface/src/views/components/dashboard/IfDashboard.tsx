@@ -26,7 +26,6 @@ type Props = {
 const IfDashboard = ({ children }: Props) => {
   const viewType = useViewType();
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return viewType === View.Type.Dashboard ? <>{children}</> : null;
 };
 

@@ -45,7 +45,8 @@
             "query": null,
             "filter": null,
             "timerange": null,
-            "streams": []
+            "streams": [],
+            "stream_categories": [ ]
           },
           {
             "id": "0000016e-b690-4270-0000-016eb690426f",
@@ -59,7 +60,8 @@
             "type": "messages",
             "query": null,
             "timerange": null,
-            "streams": []
+            "streams": [],
+            "stream_categories": [ ]
           }
         ],
         "widget_mapping": {

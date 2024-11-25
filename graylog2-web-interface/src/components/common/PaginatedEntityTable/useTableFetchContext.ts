@@ -17,9 +17,12 @@
 import { useContext } from 'react';
 
 import TableFetchContext from './TableFetchContext';
+import type { ContextValue } from './TableFetchContext';
 
-const useTableFetchContext = () => {
+const useTableFetchContext = (skip: boolean = false) => {
   const tableFetchContext = useContext(TableFetchContext);
+
+  if (skip) return {} as ContextValue;
 
   if (!tableFetchContext) {
     throw new Error('useTableFetchContext hook needs to be used inside TableFetchContext.Provider');

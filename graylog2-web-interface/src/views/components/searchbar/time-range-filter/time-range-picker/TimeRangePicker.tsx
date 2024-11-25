@@ -134,7 +134,7 @@ type Props = React.PropsWithChildren<{
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
   limitDuration: number,
   noOverride?: boolean,
-  position: 'bottom' | 'right',
+  position: 'bottom' | 'bottom-start' | 'right',
   setCurrentTimeRange: (timeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
   validTypes?: Array<SupportedTimeRangeType>,
@@ -144,14 +144,14 @@ type Props = React.PropsWithChildren<{
 const TimeRangePicker = ({
   children,
   show,
-  noOverride,
+  noOverride = false,
   toggleDropdownShow,
   currentTimeRange,
   setCurrentTimeRange,
   validTypes = allTimeRangeTypes,
   position,
   limitDuration: configLimitDuration,
-  withinPortal,
+  withinPortal = true,
 }: Props) => {
   const { ignoreLimitDurationInTimeRangeDropdown } = useContext(TimeRangeInputSettingsContext);
   const limitDuration = useMemo(() => (ignoreLimitDurationInTimeRangeDropdown ? 0 : configLimitDuration), [configLimitDuration, ignoreLimitDurationInTimeRangeDropdown]);
@@ -218,6 +218,7 @@ const TimeRangePicker = ({
     <Popover id="timerange-type"
              data-testid="timerange-type"
              opened={show}
+             onChange={toggleDropdownShow}
              position={position}
              withinPortal={withinPortal}
              withArrow
@@ -263,12 +264,6 @@ const TimeRangePicker = ({
       </Popover.Dropdown>
     </Popover>
   );
-};
-
-TimeRangePicker.defaultProps = {
-  noOverride: false,
-  validTypes: allTimeRangeTypes,
-  withinPortal: true,
 };
 
 export default TimeRangePicker;

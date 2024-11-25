@@ -99,7 +99,7 @@ type IndicesActionsType = {
   close: (indexName: string) => Promise<unknown>,
   delete: (indexName: string) => Promise<unknown>,
   multiple: () => Promise<unknown>,
-  reopen: () => Promise<unknown>,
+  reopen: (indexName: string) => Promise<unknown>,
   subscribe: (indexName: string) => Promise<unknown>,
   unsubscribe: (indexName: string) => Promise<unknown>,
 }

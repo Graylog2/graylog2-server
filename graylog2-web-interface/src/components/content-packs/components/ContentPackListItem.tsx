@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import { useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import {
   Button,
@@ -136,14 +135,5 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
 
   );
 };
-
-ContentPackListItem.propTypes = {
-  pack: PropTypes.object.isRequired,
-  contentPackMetadata: PropTypes.object.isRequired,
-  onDeletePack: PropTypes.func.isRequired,
-  onInstall: PropTypes.func.isRequired,
-};
-
-ContentPackListItem.defaultProps = {};
 
 export default ContentPackListItem;

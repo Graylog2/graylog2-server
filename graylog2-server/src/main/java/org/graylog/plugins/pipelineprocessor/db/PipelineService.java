@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.db;
 
 import org.graylog2.database.NotFoundException;
-import org.mongojack.DBQuery;
 
 import java.util.Collection;
 
@@ -31,6 +30,4 @@ public interface PipelineService {
     Collection<PipelineDao> loadAll();
 
     void delete(String id);
-
-    long count(DBQuery.Query query);
 }

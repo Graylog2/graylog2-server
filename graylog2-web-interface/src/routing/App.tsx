@@ -28,12 +28,12 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
-import 'stylesheets/typeahead.less';
 import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import PageContextProviders from 'components/page/contexts/PageContextProviders';
+import { singleton } from 'logic/singleton';
 
 const AppLayout = styled.div`
   display: flex;
@@ -106,4 +106,4 @@ const App = () => (
   </QueryParamProvider>
 );
 
-export default App;
+export default singleton('components.App', () => App);

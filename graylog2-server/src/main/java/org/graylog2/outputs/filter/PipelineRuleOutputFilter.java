@@ -82,14 +82,14 @@ public class PipelineRuleOutputFilter implements OutputFilter {
     @SuppressWarnings("unused")
     @Subscribe
     private void handleFilterUpdate(StreamDestinationFilterUpdatedEvent event) {
-        LOG.info("Handling filter update: {}", event);
+        LOG.debug("Handling filter update: {}", event);
         scheduler.execute(() -> stateUpdater.reloadForUpdate(activeState, event.ids()));
     }
 
     @SuppressWarnings("unused")
     @Subscribe
     private void handleFilterDelete(StreamDestinationFilterDeletedEvent event) {
-        LOG.info("Handling filter deletion: {}", event);
+        LOG.debug("Handling filter deletion: {}", event);
         scheduler.execute(() -> stateUpdater.reloadForDelete(activeState, event.ids()));
     }
 

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useContext } from 'react';
-import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
 import isFunction from 'lodash/isFunction';
 import type { FormikProps } from 'formik';
@@ -87,15 +86,6 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
       )}
     </Formik>
   );
-};
-
-DashboardSearchForm.propTypes = {
-  initialValues: PropTypes.shape({
-    timerange: PropTypes.object,
-    queryString: PropTypes.string,
-  }).isRequired,
-  limitDuration: PropTypes.number.isRequired,
-  onSubmit: PropTypes.func.isRequired,
 };
 
 export default DashboardSearchForm;

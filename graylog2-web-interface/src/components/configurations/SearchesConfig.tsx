@@ -138,7 +138,7 @@ const SearchesConfig = () => {
     setFormConfig({ ...formConfig, query_time_range_limit: queryTimeRangeLimit });
   };
 
-  const onCancelAfterSecondsChanged = ({ target: { value } }: { target: { value: number | null }}) => {
+  const onCancelAfterSecondsChanged = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
     setFormConfig({ ...formConfig, cancel_after_seconds: value });
   };
 
@@ -345,7 +345,7 @@ const SearchesConfig = () => {
                                 duration={formConfig.query_time_range_limit}
                                 update={onUpdate('query_time_range_limit')}
                                 label="Query time range limit (ISO8601 Duration)"
-                                help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
+                                help='The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'
                                 validator={queryTimeRangeLimitValidator}
                                 required />
             )}

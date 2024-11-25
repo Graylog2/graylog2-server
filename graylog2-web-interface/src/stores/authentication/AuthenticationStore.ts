@@ -98,7 +98,7 @@ export type LoadActiveResponse = LoadResponse & {
 };
 
 export type ActionsType = {
-  create: (AuthenticationBackendCreate) => Promise<LoadResponse>,
+  create: (request: AuthenticationBackendCreate) => Promise<LoadResponse>,
   delete: (authBackendId: AuthenticationBackend['id'] | undefined | null, authBackendTitle: AuthenticationBackend['title']) => Promise<void>,
   load: (id: string) => Promise<LoadResponse>,
   loadActive: () => Promise<LoadActiveResponse>,
@@ -108,7 +108,7 @@ export type ActionsType = {
   setActiveBackend: (authBackendId: AuthenticationBackend['id'] | undefined | null, authBackendTitle: AuthenticationBackend['title']) => Promise<void>,
   testConnection: (payload: ConnectionTestPayload) => Promise<ConnectionTestResult>,
   testLogin: (payload: LoginTestPayload) => Promise<LoginTestResult>,
-  update: (id: string, AuthenticationBackendUpdate) => Promise<LoadResponse>,
+  update: (id: string, request: AuthenticationBackendUpdate) => Promise<LoadResponse>,
 };
 
 export const AuthenticationActions = singletonActions(

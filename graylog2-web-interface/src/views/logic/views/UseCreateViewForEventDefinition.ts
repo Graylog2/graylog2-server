@@ -29,6 +29,7 @@ const useCreateViewForEventDefinition = (
   }: { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
 ) => {
   const streams = eventDefinition?.config?.streams ?? [];
+  const streamCategories = eventDefinition?.config?.stream_categories ?? [];
   const timeRange: RelativeTimeRangeStartOnly = {
     type: 'relative',
     range: (eventDefinition?.config?.search_within_ms ?? 0) / 1000,
@@ -45,7 +46,7 @@ const useCreateViewForEventDefinition = (
   const searchFilters = eventDefinition?.config?.filters ?? [];
 
   return useMemo(
-    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy, queryParameters, searchFilters }),
+    () => ViewGenerator({ streams, streamCategories, timeRange, queryString, aggregations, groupBy, queryParameters, searchFilters }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );

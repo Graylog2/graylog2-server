@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
 import isNil from 'lodash/isNil';
@@ -211,15 +210,6 @@ const HighlightForm = ({ onClose, rule }: Props) => {
 
     </Formik>
   );
-};
-
-HighlightForm.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  rule: PropTypes.object,
-};
-
-HighlightForm.defaultProps = {
-  rule: undefined,
 };
 
 export default HighlightForm;

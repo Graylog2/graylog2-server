@@ -124,7 +124,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   get isEmpty(): boolean {
-    const empty = (arr) => !arr.length;
+    const empty = (arr: Array<unknown>) => !arr.length;
 
     return empty(this.rowPivots) && empty(this.columnPivots) && empty(this.series);
   }

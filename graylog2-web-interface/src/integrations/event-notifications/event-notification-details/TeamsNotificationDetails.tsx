@@ -30,7 +30,7 @@ const NewExampleWell = styled(Well)(({ theme }) => css`
   word-wrap: break-word;
 `);
 
-const TeamsNotificationDetails: React.FC<TeamsNotificationSummaryType> = ({ notification }) => (
+const TeamsNotificationDetails = ({ notification }: TeamsNotificationSummaryType) => (
   <>
     <ReadOnlyFormGroup label="Webhook URL" value={notification.config.webhook_url} />
     <ReadOnlyFormGroup label="Custom Message Template "
@@ -38,7 +38,7 @@ const TeamsNotificationDetails: React.FC<TeamsNotificationSummaryType> = ({ noti
                          <NewExampleWell bsSize="small">
                            {notification.config.custom_message || <em>Empty body</em>}
                          </NewExampleWell>
-                       )} />
+                     )} />
     <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
     <ReadOnlyFormGroup label="Icon URL" value={notification.config.icon_url} />
     <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />

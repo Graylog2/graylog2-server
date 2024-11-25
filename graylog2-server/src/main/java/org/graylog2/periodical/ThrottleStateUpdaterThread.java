@@ -21,6 +21,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.RatioGauge;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.eventbus.EventBus;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.GlobalMetricNames;
@@ -32,9 +34,6 @@ import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
 
@@ -236,7 +235,7 @@ public class ThrottleStateUpdaterThread extends Periodical {
         eventBus.post(throttleState);
 
         // Abusing the current thread to send notifications from KafkaJournal in the graylog2-shared module
-        final double journalUtilizationPercentage = throttleState.journalSizeLimit > 0 ? (throttleState.journalSize * 100) / throttleState.journalSizeLimit : 0.0;
+        final double journalUtilizationPercentage = journal.getJournalUtilization().orElse(0.0);
 
         if (journalUtilizationPercentage > LocalKafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
             Notification notification = notificationService.buildNow()

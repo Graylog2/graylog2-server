@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -54,11 +53,11 @@ const getListClassName = (matchData) => (matchData.matches ? 'success' : 'danger
 
 type Props = {
   streamId: string,
-  messageId: string | undefined,
-  index: string,
+  messageId?: string | undefined
+  index?: string
 }
 
-const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
+const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [message, setMessage] = useState<{ [fieldName: string]: unknown } | undefined>();
   const [matchData, setMatchData] = useState<MatchData | undefined>();
@@ -167,17 +166,6 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
       </Col>
     </Row>
   );
-};
-
-StreamRulesEditor.propTypes = {
-  streamId: PropTypes.string.isRequired,
-  messageId: PropTypes.string,
-  index: PropTypes.string,
-};
-
-StreamRulesEditor.defaultProps = {
-  messageId: '',
-  index: '',
 };
 
 export default StreamRulesEditor;

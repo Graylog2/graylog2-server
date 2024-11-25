@@ -46,4 +46,10 @@ describe('PaginationUR', () => {
 
     expect(url).toEqual('https://foo/?page=1&per_page=10&bool=false&scope=scope-1&scope=scope-2&query=bar');
   });
+
+  it('should not URL-encode query parameter twice', () => {
+    const url = PaginationURL('https://foo', 1, 10, 'my search query');
+
+    expect(url).toEqual('https://foo/?page=1&per_page=10&query=my+search+query');
+  });
 });

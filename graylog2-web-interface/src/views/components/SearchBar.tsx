@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useRef } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
@@ -28,7 +27,7 @@ import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
 import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
-import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
+import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
@@ -36,7 +35,12 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
-import { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
+import {
+  createElasticsearchQueryString,
+  filtersToStreamSet,
+  filtersToStreamCategorySet,
+  newFiltersForQuery,
+} from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -69,6 +73,9 @@ import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import { defaultCompare } from 'logic/DefaultCompare';
+import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -84,14 +91,14 @@ const StreamsAndRefresh = styled.div`
   flex: 1.5;
 `;
 
-const defaultOnSubmit = async (dispatch: AppDispatch, values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query) => {
-  const { timerange, streams, queryString } = values;
-
+const defaultOnSubmit = async (dispatch: AppDispatch, values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query, restartAutoRefresh: () => void) => {
+  const { timerange, streams, streamCategories, queryString } = values;
+  restartAutoRefresh();
   const queryWithPluginData = await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls, currentQuery);
 
   const newQuery = queryWithPluginData.toBuilder()
     .timerange(timerange)
-    .filter(filtersForQuery(streams))
+    .filter(newFiltersForQuery(streams, streamCategories))
     .query(createElasticsearchQueryString(queryString))
     .build();
 
@@ -116,14 +123,16 @@ const useInitialFormValues = ({ currentQuery, queryFilters }: {
   const { query_string: queryString } = query ?? {};
   const initialValuesFromPlugins = usePluggableInitialValues(currentQuery);
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
+  const streamCategories = filtersToStreamCategorySet(queryFilters.get(id, Immutable.Map())).toJS();
 
-  return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
+  return ({ timerange, streams, queryString, streamCategories, ...initialValuesFromPlugins });
 };
 
 const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string, context: HandlerContext) => {
   const request = {
     timeRange: values?.timerange,
     streams: values?.streams,
+    streamCategories: values?.streamCategories,
     queryString: values?.queryString,
     ...pluggableValidationPayload(values, context, pluggableSearchBarControls),
   };
@@ -132,7 +141,13 @@ const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarCon
 };
 
 type Props = {
-  onSubmit?: (dispatch: AppDispatch, update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
+  onSubmit?: (
+    dispatch: AppDispatch,
+    update: SearchBarFormValues,
+    pluggableSearchBarControls: Array<() => SearchBarControl>,
+    query: Query,
+    restartAutoRefresh: () => void
+  ) => Promise<any>
 };
 
 const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
@@ -142,6 +157,14 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
     key: stream.title,
     value: stream.id,
   })));
+  const availableStreamCategories = useStore(StreamsStore, ({ streams }) => streams.flatMap((stream) => {
+    if (stream.categories) {
+      return stream.categories.map((s) => ({ key: s, value: s }));
+    }
+
+    return [];
+  }).filter((element, index, self) => index === self.findIndex((e) => e.value === element.value),
+  ).sort((a, b) => defaultCompare(a.value, b.value)));
   const { config } = useSearchConfiguration();
   const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
@@ -150,8 +173,9 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const dispatch = useAppDispatch();
-  const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery),
-    [currentQuery, dispatch, onSubmit, pluggableSearchBarControls]);
+  const { restartAutoRefresh } = useAutoRefresh();
+  const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery, restartAutoRefresh),
+    [currentQuery, dispatch, onSubmit, pluggableSearchBarControls, restartAutoRefresh]);
   const handlerContext = useHandlerContext();
   const isLoadingExecution = useIsLoading();
 
@@ -206,6 +230,18 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                                              })} />
                             )}
                           </Field>
+                          <Field name="streamCategories">
+                            {({ field: { name, value, onChange } }) => (
+                              <StreamCategoryFilter value={value}
+                                                    streamCategories={availableStreamCategories}
+                                                    onChange={(newCategories) => onChange({
+                                                      target: {
+                                                        value: newCategories,
+                                                        name,
+                                                      },
+                                                    })} />
+                            )}
+                          </Field>
 
                           <RefreshControls disable={!isValid} />
                         </StreamsAndRefresh>
@@ -222,21 +258,21 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                                   {({ warnings }) => (
                                     <PluggableCommands usage="search_query">
                                       {(customCommands) => (
-                                        <QueryInput value={value}
-                                                    ref={editorRef}
-                                                    view={view}
-                                                    timeRange={values.timerange}
-                                                    streams={values.streams}
-                                                    name={name}
-                                                    onChange={onChange}
-                                                    placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                                    error={error}
-                                                    isValidating={isValidating}
-                                                    warning={warnings.queryString}
-                                                    disableExecution={disableSearchSubmit}
-                                                    validate={validateForm}
-                                                    onExecute={handleSubmit as () => void}
-                                                    commands={customCommands} />
+                                        <ViewsQueryInput value={value}
+                                                         ref={editorRef}
+                                                         view={view}
+                                                         timeRange={values.timerange}
+                                                         streams={values.streams}
+                                                         name={name}
+                                                         onChange={onChange}
+                                                         placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                                         error={error}
+                                                         isValidating={isValidating}
+                                                         warning={warnings.queryString}
+                                                         disableExecution={disableSearchSubmit}
+                                                         validate={validateForm}
+                                                         onExecute={handleSubmit as () => void}
+                                                         commands={customCommands} />
                                       )}
                                     </PluggableCommands>
                                   )}
@@ -262,11 +298,5 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
     </WidgetFocusContext.Consumer>
   );
 };
-
-SearchBar.propTypes = {
-  onSubmit: PropTypes.func,
-};
-
-SearchBar.defaultProps = defaultProps;
 
 export default SearchBar;

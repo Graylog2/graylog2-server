@@ -55,7 +55,7 @@ type Props = {
   displaySubmitActions?: boolean,
 };
 
-const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions }: Props) => {
+const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = true }: Props) => {
   const widget = useContext(WidgetContext);
   const viewType = useViewType();
   const isDashboard = viewType === View.Type.Dashboard;
@@ -89,10 +89,6 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions }:
       </DisableSubmissionStateProvider>
     </WidgetEditApplyAllChangesProvider>
   );
-};
-
-EditWidgetFrame.defaultProps = {
-  displaySubmitActions: true,
 };
 
 export default EditWidgetFrame;

@@ -680,7 +680,8 @@ public class StreamResource extends RestResource {
                 stream.getContentPack(),
                 stream.isDefaultStream(),
                 stream.getRemoveMatchesFromDefaultStream(),
-                stream.getIndexSetId()
+                stream.getIndexSetId(),
+                stream.getCategories()
         );
     }
 

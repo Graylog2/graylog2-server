@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -25,13 +24,12 @@ import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/ho
 import AppConfig from 'util/AppConfig';
 import { FormikInput, FormSubmit, Section, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col, Row, SegmentedControl } from 'components/bootstrap';
+import { Alert, Col, Row, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
 import { DataTieringConfiguration, DataTieringVisualisation, prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
 import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
-import { IndexSetPropType } from 'stores/indices/IndexSetsStore';
 import type {
   RotationStrategyConfig,
   RetentionStrategyConfig,
@@ -186,7 +184,7 @@ const IndexSetConfigurationForm = ({
   rotationStrategies,
   retentionStrategies,
   retentionStrategiesContext,
-  create,
+  create = false,
   onUpdate,
   cancelLink,
   submitButtonText,
@@ -302,34 +300,34 @@ const IndexSetConfigurationForm = ({
                     <HideOnCloud>
                       <FormikInput type="number"
                                    id="shards"
-                                   label="Index shards"
+                                   label="Index Shards"
                                    name="shards"
-                                   help="Number of Elasticsearch shards used per index in this index set."
+                                   help="Number of search cluster Shards used per index in this Index Set. Increasing the Index Shards improves the search cluster write speed of data stored to this Index Set by distributing the active write Index over multiple search nodes. Increasing the Index Shards can degrade search performance and increases the memory footprint of the Index. This value should not be set higher than the number of search nodes."
                                    required />
                       <FormikInput type="number"
                                    id="replicas"
-                                   label="Index replicas"
+                                   label="Index Replica"
                                    name="replicas"
-                                   help="Number of Elasticsearch replicas used per index in this index set."
+                                   help="Number of search cluster Replica Shards used per Index in this Index Set. Adding Replica Shards improves search performance during parallel reads of the index, such as occurs on dashboards, and is a component of HA and backup strategy. Each Replica Shard set multiplies the storage requirement and memory footprint of the index. This value should not be set higher than the number of search nodes, and typically not higher than 1.                                   "
                                    required />
                       <FormikInput type="number"
                                    id="max-number-segments"
-                                   label="Max. number of segments"
+                                   label="Maximum Number of Segments"
                                    name="index_optimization_max_num_segments"
                                    minLength={1}
-                                   help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
+                                   help={<><em>Advanced Option.</em> Maximum number of segments per Search Cluster Index after optimization (force merge). Setting higher values decreases the compression ratio of Index Optimization.</>}
                                    required />
                       <FormikInput type="checkbox"
                                    id="index-optimization-disabled"
-                                   label="Disable index optimization after rotation"
+                                   label="Disable Index Optimization after Rotation"
                                    name="index_optimization_disabled"
-                                   help="Disable Elasticsearch index optimization (force merge) after rotation." />
+                                   help={<><em>Advanced Option.</em> Index Optimization is a compression process that occurs after an active Index has been rotated and reduces the size of an Index on disk. It manifests as a CPU intensive maintenance task performed by the search cluster after Index rotation. Compressing Indexes improves search performance and decreases the storage footprint of Index Sets.</>} />
                       <Field name="field_type_refresh_interval">
                         {({ field: { name, value, onChange } }) => (
                           <TimeUnitInput id="field-type-refresh-interval"
-                                         label="Field type refresh interval"
+                                         label="Field Type Refresh Interval"
                                          type="number"
-                                         help="How often the field type information for the active write index will be updated."
+                                         help={<><em>Advanced Option.</em> How often the Field Type Information for the active write Index will be updated. Setting this value higher can marginally reduce search cluster overhead and improve performance, but will result in new data messages longer to be searchable in Graylog.</>}
                                          value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
                                          unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
                                          units={['SECONDS', 'MINUTES']}
@@ -387,6 +385,12 @@ const IndexSetConfigurationForm = ({
                     </Field>
                   </Section>
                   )}
+                  <Section title="Important Note">
+                    <Alert bsStyle="info">
+                      These changes do not apply to any existing indices. They only apply to newly created indices.
+                      To apply this to the current index set immediately, rotate the index.
+                    </Alert>
+                  </Section>
                   <SubmitWrapper>
                     <FormSubmit disabledSubmit={!isValid}
                                 submitButtonText={submitButtonText}
@@ -404,25 +408,6 @@ const IndexSetConfigurationForm = ({
       </Col>
     </Row>
   );
-};
-
-IndexSetConfigurationForm.propTypes = {
-  indexSet: IndexSetPropType,
-  rotationStrategies: PropTypes.array.isRequired,
-  retentionStrategies: PropTypes.array.isRequired,
-  retentionStrategiesContext: PropTypes.shape({
-    max_index_retention_period: PropTypes.string,
-  }).isRequired,
-  create: PropTypes.bool,
-  onUpdate: PropTypes.func.isRequired,
-  cancelLink: PropTypes.string.isRequired,
-  submitButtonText: PropTypes.string.isRequired,
-  submitLoadingText: PropTypes.string.isRequired,
-};
-
-IndexSetConfigurationForm.defaultProps = {
-  create: false,
-  indexSet: undefined,
 };
 
 export default IndexSetConfigurationForm;

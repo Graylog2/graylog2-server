@@ -16,10 +16,10 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
+import { defaultOnError } from 'util/conditional/onError';
 
 type Options = {
   enabled: boolean,
@@ -38,23 +38,21 @@ export const fetchEventDefinitions = (searchParams: SearchParams) => EventDefini
 
 export const keyFn = (searchParams: SearchParams) => ['eventDefinition', 'overview', searchParams];
 
+type EventDefinitionResult = {
+  list: Array<EventDefinition>,
+  pagination: { total: number }
+  attributes: Array<{ id: string, title: string, sortable: boolean }>
+};
+
 const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
-  data: {
-    list: Array<EventDefinition>,
-    pagination: { total: number }
-    attributes: Array<{ id: string, title: string, sortable: boolean }>
-  } | undefined,
+  data: EventDefinitionResult | undefined,
   refetch: () => void,
   isInitialLoading: boolean,
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery<EventDefinitionResult>(
     keyFn(searchParams),
-    () => fetchEventDefinitions(searchParams),
+    () => defaultOnError(fetchEventDefinitions(searchParams), 'Loading Event Definitions failed with status', 'Could not load Event definition'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Event Definitions failed with status: ${errorThrown}`,
-          'Could not load Event definition');
-      },
       keepPreviousData: true,
       enabled,
     },

@@ -36,7 +36,7 @@ type Props = {
   streams: Array<Stream>,
   decorators: Array<Decorator>,
   types: { [key: string]: any },
-  // eslint-disable-next-line react/require-default-props
+
   show?: boolean,
   onCancel: () => void,
   onSave: (newDecorators: Array<Decorator>) => unknown,

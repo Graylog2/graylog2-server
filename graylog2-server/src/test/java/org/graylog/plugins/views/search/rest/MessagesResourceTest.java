@@ -70,7 +70,7 @@ public class MessagesResourceTest {
         when(commandFactory.buildFromRequest(any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithSearchOnly(any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithMessageList(any(), any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
-        final PermittedStreams permittedStreams = new PermittedStreams(() -> Stream.of("a-default-stream"));
+        final PermittedStreams permittedStreams = new PermittedStreams(() -> Stream.of("a-default-stream"), (categories) -> Stream.of());
         executionGuard = mock(SearchExecutionGuard.class);
         SearchDomain searchDomain = mock(SearchDomain.class);
 

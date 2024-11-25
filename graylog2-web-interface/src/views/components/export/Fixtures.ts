@@ -31,6 +31,7 @@ const searchType = {
   id: 'search-type-id-1',
   type: 'messages',
   streams: [],
+  stream_categories: [],
   sort: [],
   filters: [],
   filter: '',

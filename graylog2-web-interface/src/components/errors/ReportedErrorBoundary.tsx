@@ -82,7 +82,6 @@ const ReportedErrorBoundary = ({ children }: Props) => {
     return <ReportedErrorPage reportedError={reportedError} />;
   }
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 };
 

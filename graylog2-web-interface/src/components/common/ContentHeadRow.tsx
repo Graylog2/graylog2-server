@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import classNames from 'classnames';
 
@@ -43,7 +42,7 @@ const StyledRow = styled(Row)(({ theme }) => css`
 
 type Props = {
   children: React.ReactNode,
-  className: string,
+  className?: string
 };
 
 const ContentHeadRow = ({ children, className, ...props }: Props) => (
@@ -51,14 +50,5 @@ const ContentHeadRow = ({ children, className, ...props }: Props) => (
     {children}
   </StyledRow>
 );
-
-ContentHeadRow.propTypes = {
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-};
-
-ContentHeadRow.defaultProps = {
-  className: undefined,
-};
 
 export default ContentHeadRow;

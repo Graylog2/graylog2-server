@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as PropTypes from 'prop-types';
 
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import type Role from 'logic/roles/Role';
@@ -35,11 +34,11 @@ const rolesList = (defaultRolesIds: Immutable.List<string>, roles: Immutable.Lis
 
 type Props = {
   authenticationBackend: DirectoryServiceBackend,
-  excludedFields: {[ inputName: string ]: boolean },
+  excludedFields?: {[ inputName: string ]: boolean }
   roles: Immutable.List<Role>,
 };
 
-const UserSyncSection = ({ authenticationBackend, roles, excludedFields }: Props) => {
+const UserSyncSection = ({ authenticationBackend, roles, excludedFields = {} }: Props) => {
   const {
     userSearchBase,
     userSearchPattern,
@@ -65,14 +64,6 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields }: Props
       <ReadOnlyFormGroup label="Default Roles" value={rolesList(defaultRoles, roles)} />
     </SectionComponent>
   );
-};
-
-UserSyncSection.defaultProps = {
-  excludedFields: {},
-};
-
-UserSyncSection.propTypes = {
-  excludedFields: PropTypes.object,
 };
 
 export default UserSyncSection;

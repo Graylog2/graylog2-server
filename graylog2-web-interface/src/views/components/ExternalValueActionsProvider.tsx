@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -36,7 +35,13 @@ const usePluginExternalActions = () => {
   return useMemo(() => ({ isLoading, isError, externalValueActions }), [externalValueActions, isError, isLoading]);
 };
 
-const ExternalValueActionsProvider = ({ children }) => {
+type ExternalValueActionsProviderProps = {
+  children: React.ReactNode;
+};
+
+const ExternalValueActionsProvider = ({
+  children,
+}: ExternalValueActionsProviderProps) => {
   const contextValue = usePluginExternalActions();
 
   return (
@@ -44,10 +49,6 @@ const ExternalValueActionsProvider = ({ children }) => {
       {children}
     </ExternalValueActionsContext.Provider>
   );
-};
-
-ExternalValueActionsProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default ExternalValueActionsProvider;

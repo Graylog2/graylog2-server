@@ -72,7 +72,7 @@ public class PivotAggregationSearchTest {
     @Mock
     private NotificationService notificationService;
 
-    private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of);
+    private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of, (categories) -> Stream.of());
 
     @Test
     public void testExtractValuesWithGroupBy() throws Exception {
@@ -489,7 +489,7 @@ public class PivotAggregationSearchTest {
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
-                new PermittedStreams(() -> Stream.of("00001")),
+                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
                 notificationService,
                 new QueryStringDecorators(Optional.of((queryString, parameterProvider, query) -> {
                     if (queryString.equals("source:$secret$") && parameterProvider.getParameter("secret").isPresent()) {
@@ -540,7 +540,7 @@ public class PivotAggregationSearchTest {
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
-                new PermittedStreams(() -> Stream.of("00001")),
+                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
                 notificationService,
                 new QueryStringDecorators(Optional.empty())
         );

@@ -75,4 +75,8 @@ public class PaginatedResponse<T> {
     public static <T> PaginatedResponse<T> create(String listKey, PaginatedList<T> paginatedList, String query, Map<String, Object> context) {
         return new PaginatedResponse<>(listKey, paginatedList, query, context);
     }
+
+    public PaginatedList<T> paginatedList() {
+        return paginatedList;
+    }
 }

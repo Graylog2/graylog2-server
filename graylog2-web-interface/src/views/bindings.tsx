@@ -161,15 +161,14 @@ const exports: PluginExports = {
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
     { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
     { path: showViewsPath, component: ShowViewPage, parentComponent: App },
-    { path: Routes.ALERTS.replay_search(':alertId'), component: EventReplaySearchPage, parentComponent: App },
-    { path: Routes.ALERTS.DEFINITIONS.replay_search(':definitionId'), component: EventDefinitionReplaySearchPage, parentComponent: App },
+    { path: Routes.unqualified.ALERTS.replay_search(':alertId'), component: EventReplaySearchPage, parentComponent: App },
+    { path: Routes.unqualified.ALERTS.DEFINITIONS.replay_search(':definitionId'), component: EventDefinitionReplaySearchPage, parentComponent: App },
   ],
   enterpriseWidgets: [
     {
       type: 'MESSAGES',
       displayName: 'Message List',
       defaultHeight: 5,
-      reportStyle: () => ({ width: 800 }),
       defaultWidth: 6,
       // TODO: Subtyping needs to be taken into account
       visualizationComponent: MessageList as unknown as React.ComponentType<WidgetComponentProps>,
@@ -185,7 +184,6 @@ const exports: PluginExports = {
       displayName: 'Results',
       defaultHeight: 4,
       defaultWidth: 4,
-      reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
       editComponent: AggregationWizard,
       hasEditSubmitButton: true,

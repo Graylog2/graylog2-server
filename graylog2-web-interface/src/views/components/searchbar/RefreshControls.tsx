@@ -30,8 +30,6 @@ import useLocation from 'routing/useLocation';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import ReadableDuration from 'components/common/ReadableDuration';
-import useAppSelector from 'stores/useAppSelector';
-import { selectJobIds } from 'views/logic/slices/searchExecutionSelectors';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
@@ -91,22 +89,21 @@ const useDefaultInterval = () => {
 };
 
 type Props = {
-  disable: boolean
+  disable?: boolean
 }
 
 const RefreshControls = ({ disable }: Props) => {
   const { dirty, submitForm } = useFormikContext();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions } } = useSearchConfiguration();
+  const { config } = useSearchConfiguration();
+  const autoRefreshTimerangeOptions = config?.auto_refresh_timerange_options;
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
-  const intervalOptions = Object.entries(autoRefreshTimerangeOptions);
-  const { refreshConfig, startAutoRefresh, stopAutoRefresh } = useAutoRefresh();
+  const { refreshConfig, startAutoRefresh, stopAutoRefresh, animationId } = useAutoRefresh();
+
   const defaultInterval = useDefaultInterval();
-  const jobIds = useAppSelector(selectJobIds);
 
   useDisableOnFormChange();
-
   const selectInterval = useCallback((interval: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
       app_pathname: getPathnameWithoutId(location.pathname),
@@ -145,10 +142,16 @@ const RefreshControls = ({ disable }: Props) => {
     }
   }, [defaultInterval, dirty, refreshConfig?.enabled, refreshConfig?.interval, sendTelemetry, startAutoRefresh, stopAutoRefresh, submitForm]);
 
+  if (!config) {
+    return null;
+  }
+
+  const intervalOptions = Object.entries(autoRefreshTimerangeOptions);
+
   return (
     <FlexibleButtonGroup aria-label="Refresh Search Controls">
-      {(refreshConfig?.enabled && !jobIds) && (
-        <ProgressAnimation key={`${refreshConfig.interval}`}
+      {(refreshConfig?.enabled && animationId) && (
+        <ProgressAnimation key={`${refreshConfig.interval}-${animationId}`}
                            $animationDuration={refreshConfig.interval}
                            $increase={false} />
       )}
@@ -180,6 +183,10 @@ const RefreshControls = ({ disable }: Props) => {
       </DropdownButton>
     </FlexibleButtonGroup>
   );
+};
+
+RefreshControls.defaultProps = {
+  disable: false,
 };
 
 export default RefreshControls;

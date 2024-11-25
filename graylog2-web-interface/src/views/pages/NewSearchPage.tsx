@@ -56,8 +56,14 @@ const useParametersFromStore = () => {
 
 const NewSearchPage = () => {
   const { parameters, parameterBindings } = useParametersFromStore();
-  const { timeRange, queryString, streams } = useSearchURLQueryParams();
-  const viewPromise = useCreateSavedSearch({ streamId: streams, timeRange, queryString, parameters });
+  const { timeRange, queryString, streams, streamCategories } = useSearchURLQueryParams();
+  const viewPromise = useCreateSavedSearch({
+    streamId: streams,
+    streamCategory: streamCategories,
+    timeRange,
+    queryString,
+    parameters,
+  });
   const view = useCreateSearch(viewPromise);
 
   return <SearchPage view={view} executionState={SearchExecutionState.create(parameterBindings)} isNew />;

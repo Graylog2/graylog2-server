@@ -1,7 +1,7 @@
 [
   {
     "title": "7 Days Hot, 90 Days Total",
-    "description": "Use case: rare historical searches. This configuration is good choice for minimising database overhead and Hot Tier storage provision, and suitable for data that is normally only relavent for a few days.",
+    "description": "Use case: minimal need for historical searches. This configuration has low memory and storage usage. Logs will be searchable for a minimum of 90 days.",
     "built_in": true,
     "index_set_config": {
       "index_analyzer": "standard",
@@ -24,7 +24,7 @@
   },
   {
     "title": "14 Days Hot, 90 Days Total.",
-    "description": "Use Case: Infrequent historical Searches. This configuration offers faster deep historical searches, balanced against higher Hot Tier storage requirement and resource overhead.",
+    "description": "Use case: regular need for historical searches. Logs will be searchable for a minimum of 90 days.",
     "built_in": true,
     "index_set_config": {
       "index_analyzer": "standard",
@@ -47,7 +47,8 @@
   },
   {
     "title": "30 days Hot, 90 Days Total",
-    "description": "Use case: Frequent Historical Searches. This configuration maximizes deep historical search performance, but the 30 day Hot Tier requires a significant Hot Tier storage provision and resource overhead.",  "built_in": true,
+    "description": "Use case: need for frequent and deep historical searches. This configuration has high memory and storage usage. Logs will be searchable for a minimum of 90 days.",
+    "built_in": true,
     "index_set_config": {
       "index_analyzer": "standard",
       "shards": 1,
@@ -69,7 +70,7 @@
   },
   {
     "title": "7 Days Hot",
-    "description": "This configuration maintains a minimum of 7 days of logs in the Hot Tier. Logs will be searchable for a maximum of 9 days.",
+    "description": "Use case: rare historical searches. This configuration maintains a minimum of 7 days of logs in the Hot Tier.",
     "built_in": true,
     "index_set_config": {
       "index_analyzer": "standard",
@@ -88,7 +89,7 @@
   },
   {
     "title": "14 Days Hot",
-    "description": "This configuration maintains a minimum of 14 days of logs in the Hot Tier. Logs will be searchable for a maximum of 18 days.",
+    "description": "Use case: some historical searches. This configuration maintains a minimum of 14 days of logs in the Hot Tier.",
     "built_in": true,
     "index_set_config": {
       "index_analyzer": "standard",
@@ -107,7 +108,7 @@
   },
   {
     "title": "30 Days Hot",
-    "description": "This configuration maintains a minimum of 30 days of logs in the Hot Tier. Logs will be searchable for a maximum of 40 days.",
+    "description": "Use case: frequent historical searches. This configuration maintains a minimum of 30 days of logs in the Hot Tier.",
     "built_in": true,
     "index_set_config": {
       "index_analyzer": "standard",

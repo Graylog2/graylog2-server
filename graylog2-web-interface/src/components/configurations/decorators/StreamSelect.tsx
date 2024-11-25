@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Select from 'components/common/Select';
@@ -50,12 +49,6 @@ const StreamSelect = ({ onChange, value, streams }: Props) => {
               value={value} />
     </SelectContainer>
   );
-};
-
-StreamSelect.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
-  streams: PropTypes.array.isRequired,
 };
 
 export default StreamSelect;

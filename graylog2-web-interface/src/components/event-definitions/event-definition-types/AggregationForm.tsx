@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import defaultTo from 'lodash/defaultTo';
 
 import { MultiSelect } from 'components/common';
@@ -37,6 +36,7 @@ import commonStyles from '../common/commonStyles.css';
 type EventDefinitionConfig = {
   group_by: Array<string>,
   streams: Array<string>,
+  stream_categories?: Array<string>,
 };
 
 type EventDefinition = {
@@ -121,13 +121,6 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
                                  onChange={propagateConfigChange} />
     </fieldset>
   );
-};
-
-AggregationForm.propTypes = {
-  eventDefinition: PropTypes.object.isRequired,
-  validation: PropTypes.object.isRequired,
-  aggregationFunctions: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
 };
 
 export default AggregationForm;

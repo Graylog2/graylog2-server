@@ -78,6 +78,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     public static final String FIELD_TIMERANGE = "timerange";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -100,6 +101,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
 
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
+
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    public abstract Set<String> streamCategories();
 
     @JsonProperty(FIELD_CONFIG)
     public abstract WidgetConfigDTO config();
@@ -131,6 +135,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
 
+        @JsonProperty(FIELD_STREAM_CATEGORIES)
+        public abstract Builder streamCategories(Set<String> streamCategories);
+
         @JsonProperty(FIELD_CONFIG)
         @JsonTypeInfo(
                 use = JsonTypeInfo.Id.NAME,
@@ -145,6 +152,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         static Builder builder() {
             return new AutoValue_WidgetEntity.Builder()
                     .streams(Collections.emptySet())
+                    .streamCategories(Collections.emptySet())
                     .filters(Collections.emptyList());
         }
     }
@@ -168,6 +176,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                                         "Invalid type for stream Stream for event definition: " + object.getClass());
                             }
                         }).collect(Collectors.toSet()))
+                .streamCategories(this.streamCategories())
                 .type(this.type());
         if (this.query().isPresent()) {
             widgetBuilder.query(this.query().get());
@@ -194,6 +203,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         final PivotEntity.Builder pivotBuilder = PivotEntity.builder()
                 .name("chart")
                 .streams(streams())
+                .streamCategories(streamCategories())
                 .rollup(true)
                 .sort(toSortSpec(config))
                 .rowGroups(toRowGroups(config))

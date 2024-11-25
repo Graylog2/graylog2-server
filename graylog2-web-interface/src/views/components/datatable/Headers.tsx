@@ -128,16 +128,6 @@ const HeaderField = ({
   );
 };
 
-HeaderField.defaultProps = {
-  prefix: undefined,
-  span: undefined,
-  title: undefined,
-  sortType: undefined,
-  onSetColumnsWidth: undefined,
-  isPinned: undefined,
-  showPinIcon: undefined,
-};
-
 type HeaderFieldForValueProps = {
   borderedHeader: boolean,
   field: string,
@@ -153,11 +143,6 @@ const HeaderFieldForValue = ({ field, value, span = 1, prefix = '', type, border
     <Value field={field} value={value} type={type} />
   </CenteredTh>
 );
-
-HeaderFieldForValue.defaultProps = {
-  span: 1,
-  prefix: '',
-};
 
 const Spacer = ({ span }: { span: number }) => <th aria-label="spacer" colSpan={span} />;
 
@@ -206,12 +191,7 @@ const ColumnPivotFieldsHeaders = ({ fields, pivots, values, series, offset = 1, 
     );
   });
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{headerRows}</>;
-};
-
-ColumnPivotFieldsHeaders.defaultProps = {
-  offset: 1,
 };
 
 type Props = {
@@ -224,7 +204,7 @@ type Props = {
   fields: FieldTypeMappingsList,
   onSortChange: (sortConfig: Array<SortConfig>) => Promise<unknown>;
   sortConfigMap: OrderedMap<string, SortConfig>;
-  onSetColumnsWidth: (props: { field: string, offsetWidth: number }) => void,
+  onSetColumnsWidth?: (props: { field: string, offsetWidth: number }) => void
   pinnedColumns?: Immutable.Set<string>
   togglePin: (field: string) => void,
   setLoadingState: (loading: boolean) => void,
@@ -241,7 +221,7 @@ const Headers = ({
   onSortChange,
   sortConfigMap,
   onSetColumnsWidth,
-  pinnedColumns,
+  pinnedColumns = Immutable.Set(),
   togglePin,
   setLoadingState,
 }: Props) => {
@@ -290,10 +270,6 @@ const Headers = ({
       </tr>
     </>
   );
-};
-
-Headers.defaultProps = {
-  pinnedColumns: Immutable.Set(),
 };
 
 export default Headers;

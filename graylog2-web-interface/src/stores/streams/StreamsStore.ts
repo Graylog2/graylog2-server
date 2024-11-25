@@ -79,6 +79,7 @@ export type StreamResponse = {
   is_editable: boolean,
   remove_matches_from_default_stream: boolean,
   index_set_id: string,
+  categories: string[],
 }
 
 type TestMatchResponse = {

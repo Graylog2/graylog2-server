@@ -16,13 +16,14 @@
  */
 import React, { useEffect } from 'react';
 
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { InputsList } from 'components/inputs';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import { InputSetupWizardProvider } from 'components/inputs/InputSetupWizard';
 
 const isCloud = AppConfig.isCloud();
 
@@ -55,7 +56,9 @@ const InputsPage = () => {
             )
             : <span>Graylog nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>}
         </PageHeader>
-        <InputsList permissions={currentUser.permissions} />
+        <InputSetupWizardProvider>
+          <InputsList permissions={currentUser.permissions} />
+        </InputSetupWizardProvider>
       </div>
     </DocumentTitle>
   );

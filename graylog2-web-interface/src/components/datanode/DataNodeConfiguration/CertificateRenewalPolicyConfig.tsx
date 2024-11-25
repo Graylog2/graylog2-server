@@ -31,17 +31,16 @@ import { ConfigurationType } from 'components/configurations/ConfigurationTypes'
 import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import Select from 'components/common/Select';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
+
+import { TIME_UNITS_UPPER } from '../Constants';
+import type { TIME_UNITS } from '../Constants';
 
 type RenewalPolicy = {
   mode: 'AUTOMATIC' | 'MANUAL',
   certificate_lifetime: string,
 }
-const TIME_UNITS = ['hours', 'days', 'months', 'years'] as const;
-const TIME_UNITS_UPPER = TIME_UNITS.map((unit) => unit.toLocaleUpperCase());
 
 type FormConfig = {
   mode: RenewalPolicy['mode'],
@@ -116,12 +115,11 @@ type Props = {
   className?: string
 }
 
-const CertificateRenewalPolicyConfig = ({ className }: Props) => {
+const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const { data: currentConfig, isLoading } = useQuery(queryKey, fetchCurrentConfig);
 
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
   const queryClient = useQueryClient();
 
   const { mutateAsync: updateConfig } = useMutation(handleSaveConfig, {
@@ -166,10 +164,9 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
   };
 
   const saveConfig = (values: FormConfig) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.CERTIFICATE_RENEWAL_POLICY_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'certificate-renewal-policy',
-      app_action_value: 'configuration-save',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CR_UPDATE_CONFIGURATION_CLICKED, {
+      app_pathname: 'datanode',
+      app_section: 'migration',
     });
 
     const newConfig = {
@@ -202,6 +199,11 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
               <Button bsStyle="primary"
                       bsSize="small"
                       onClick={() => {
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CR_EDIT_CONFIGURATION_CLICKED, {
+                          app_pathname: 'datanode',
+                          app_section: 'migration',
+                        });
+
                         setShowModal(true);
                       }}>Edit configuration
               </Button>
@@ -270,10 +272,6 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
       </Modal>
     </div>
   );
-};
-
-CertificateRenewalPolicyConfig.defaultProps = {
-  className: undefined,
 };
 
 export default CertificateRenewalPolicyConfig;

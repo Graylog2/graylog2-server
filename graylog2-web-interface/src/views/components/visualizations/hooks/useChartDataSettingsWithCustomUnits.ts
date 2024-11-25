@@ -37,7 +37,7 @@ const useChartDataSettingsWithCustomUnits = ({ config }: {
   const widgetUnits = useWidgetUnits(config);
   const { fieldNameToAxisNameMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
 
-  return useCallback(({ originalName, values, fullPath }: { originalName: string, values: Array<any>, fullPath: string }): Partial<ChartDefinition> => {
+  return useCallback(({ name, values, fullPath }: { name: string, values: Array<any>, fullPath: string }): Partial<ChartDefinition> => {
     if (!unitFeatureEnabled) return ({});
     const fieldNameKey = getFieldNameFromTrace({ fullPath, series: config.series }) ?? NO_FIELD_NAME_SERIES;
     const yaxis = fieldNameToAxisNameMapper[fieldNameKey];
@@ -51,7 +51,7 @@ const useChartDataSettingsWithCustomUnits = ({ config }: {
       yaxis,
       y: convertedValues,
       fullPath,
-      ...getHoverTemplateSettings({ unit, convertedValues, originalName }),
+      ...getHoverTemplateSettings({ unit, convertedValues, name }),
     });
   }, [config.series, fieldNameToAxisNameMapper, unitFeatureEnabled, widgetUnits]);
 };

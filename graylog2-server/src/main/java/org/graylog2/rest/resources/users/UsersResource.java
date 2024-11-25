@@ -34,6 +34,7 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.UserContext;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
@@ -44,6 +45,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.PermissionEditRequest;
@@ -233,17 +235,23 @@ public class UsersResource extends RestResource {
      */
     @GET
     @Deprecated
-    @RequiresPermissions(RestPermissions.USERS_LIST)
     @ApiOperation(value = "List all users", notes = "Permissions and session data included by default")
     public UserList listUsers(
             @ApiParam(name = "include_permissions") @QueryParam("include_permissions") @DefaultValue("true") boolean includePermissions,
-            @ApiParam(name = "include_sessions") @QueryParam("include_sessions") @DefaultValue("true") boolean includeSessions) {
-        return listUsersSelective(includePermissions, includeSessions);
+            @ApiParam(name = "include_sessions") @QueryParam("include_sessions") @DefaultValue("true") boolean includeSessions,
+            @Context SearchUser searchUser) {
+        final Optional<AllUserSessions> optSessions = includeSessions ? Optional.of(AllUserSessions.create(sessionService)) : Optional.empty();
+        return searchUser.isPermitted(RestPermissions.USERS_LIST) ?
+                listUsersSelective(includePermissions, optSessions) :
+                listForLoggedInUser(searchUser, includePermissions, optSessions);
     }
 
-    private UserList listUsersSelective(boolean includePermissions, boolean includeSessions) {
+    private UserList listForLoggedInUser(final SearchUser searchUser, final boolean includePermissions, Optional<AllUserSessions> optSessions) {
+        return UserList.create(List.of(toUserResponse(searchUser.getUser(), includePermissions, optSessions)));
+    }
+
+    private UserList listUsersSelective(final boolean includePermissions, final Optional<AllUserSessions> optSessions) {
         final List<User> users = userManagementService.loadAll();
-        final Optional<AllUserSessions> optSessions = includeSessions ? Optional.of(AllUserSessions.create(sessionService)) : Optional.empty();
 
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
         userManagementService.getRootUser().ifPresent(adminUser ->
@@ -272,7 +280,7 @@ public class UsersResource extends RestResource {
                                                                 allowableValues = "title,description")
                                                       @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
                                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                      @DefaultValue("asc") @QueryParam("order") String order) {
+                                                      @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
         final AllUserSessions sessions = AllUserSessions.create(sessionService);

@@ -30,6 +30,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -151,7 +152,7 @@ public class AuthzRolesResource extends RestResource {
                       allowableValues = "username,full_name,email")
             @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-            @DefaultValue("asc") @QueryParam("order") String order) {
+            @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
         try {
@@ -283,7 +284,7 @@ public class AuthzRolesResource extends RestResource {
 
     private Map<String, Set<Map<String, String>>> userRoleContext(PaginatedList<AuthzRoleDTO> roles) {
         final PaginatedList<UserOverviewDTO> users = paginatedUserService.findPaginatedByRole(new SearchQuery(""),
-                1, 0, UserOverviewDTO.FIELD_USERNAME, "asc",
+                1, 0, UserOverviewDTO.FIELD_USERNAME, SortOrder.ASCENDING,
                 roles.stream().map(AuthzRoleDTO::id).collect(Collectors.toSet()));
         final Map<String, Set<Map<String, String>>> userRoleMap = new HashMap<>(roles.size());
         roles.forEach(authzRoleDTO -> {

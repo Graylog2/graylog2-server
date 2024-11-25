@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import capitalize from 'lodash/capitalize';
 import uniq from 'lodash/uniq';
 
@@ -136,11 +135,6 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
       {renderProcessActionSummary()}
     </span>
   );
-};
-
-CollectorProcessControl.propTypes = {
-  selectedSidecarCollectorPairs: PropTypes.array.isRequired,
-  onProcessAction: PropTypes.func.isRequired,
 };
 
 export default CollectorProcessControl;

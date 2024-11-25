@@ -36,6 +36,7 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.system.indices.DataTieringStatusService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
@@ -156,32 +157,13 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void get() {
-        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
-        when(indexSetService.get("id")).thenReturn(Optional.of(indexSetConfig));
-
-        final IndexSetSummary summary = indexSetsResource.get("id");
-
-        verify(indexSetService, times(1)).get("id");
-        verify(indexSetService, times(1)).getDefault();
-        verifyNoMoreInteractions(indexSetService);
-        assertThat(summary).isEqualTo(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
-    }
-
-    @Test
     public void get0() {
         when(indexSetService.get("id")).thenReturn(Optional.empty());
 
         expectedException.expect(NotFoundException.class);
-        expectedException.expectMessage("Couldn't load index set with ID <id>");
+        expectedException.expectMessage("Couldn't find index set with ID <id>");
 
-        try {
-            indexSetsResource.get("id");
-        } finally {
-            verify(indexSetService, times(1)).get("id");
-            verify(indexSetService, times(1)).getDefault();
-            verifyNoMoreInteractions(indexSetService);
-        }
+        indexSetsResource.get("id");
     }
 
     @Test
@@ -681,7 +663,7 @@ public class IndexSetsResourceTest {
         private final Provider<Boolean> permitted;
 
         TestResource(Indices indices, IndexSetService indexSetService, IndexSetRegistry indexSetRegistry, IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory, IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService, SystemJobManager systemJobManager, Provider<Boolean> permitted) {
-            super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager);
+            super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class));
             this.permitted = permitted;
         }
 

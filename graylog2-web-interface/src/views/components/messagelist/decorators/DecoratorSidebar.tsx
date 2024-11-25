@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { DecoratorsActions, DecoratorsStore } from 'stores/decorators/DecoratorsStore';
@@ -35,12 +34,6 @@ type Props = {
 };
 
 class DecoratorSidebar extends React.Component<Props> {
-  static propTypes = {
-    decorators: PropTypes.array.isRequired,
-    decoratorTypes: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-  };
-
   componentDidMount() {
     DecoratorsActions.available();
   }

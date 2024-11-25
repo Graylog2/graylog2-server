@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { DateUtils } from 'react-day-picker';
 
 import { DatePicker } from 'components/common';
@@ -28,7 +27,7 @@ type Props = {
   startDate?: Date,
 }
 
-const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
+const AbsoluteDatePicker = ({ dateTime, onChange = () => {}, startDate }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
   const initialDateTime = toUTCFromTz(dateTime, userTimezone);
   const initialDate = formatTime(initialDateTime, 'date');
@@ -54,17 +53,6 @@ const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
                 onChange={_onDatePicked}
                 fromDate={startDate} />
   );
-};
-
-AbsoluteDatePicker.propTypes = {
-  dateTime: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-  startDate: PropTypes.instanceOf(Date),
-};
-
-AbsoluteDatePicker.defaultProps = {
-  onChange: () => {},
-  startDate: undefined,
 };
 
 export default AbsoluteDatePicker;

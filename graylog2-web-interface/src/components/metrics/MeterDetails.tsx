@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 
@@ -37,9 +36,5 @@ const MeterDetails = ({ metric: { metric: meter } }: Props) => (
     <dd><span className="number-format">{numeral(meter.rate.fifteen_minute).format('0,0.[00]')}</span> {meter.rate_unit}</dd>
   </dl>
 );
-
-MeterDetails.propTypes = {
-  metric: PropTypes.object.isRequired,
-};
 
 export default MeterDetails;

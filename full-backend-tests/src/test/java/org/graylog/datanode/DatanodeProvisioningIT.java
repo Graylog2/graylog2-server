@@ -46,6 +46,7 @@ import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.graylog2.security.JwtSecret;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -130,7 +131,7 @@ public class DatanodeProvisioningIT {
             new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(getOpensearchPort())
                     .truststore(truststore)
-                    .jwtTokenProvider(new IndexerJwtAuthTokenProvider(ContainerizedGraylogBackend.PASSWORD_SECRET, Duration.seconds(120), Duration.seconds(60)))
+                    .jwtTokenProvider(new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60)))
                     .build())
                     .waitForNodesCount(1);
         } catch (Exception e) {

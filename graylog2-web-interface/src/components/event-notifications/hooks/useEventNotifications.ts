@@ -16,10 +16,10 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { defaultOnError } from 'util/conditional/onError';
 
 type Options = {
   enabled: boolean,
@@ -38,23 +38,21 @@ export const fetchEventNotifications = (searchParams: SearchParams) => EventNoti
 
 export const keyFn = (searchParams?: SearchParams | undefined) => (['eventNotifications', 'overview', ...(searchParams ? [searchParams] : [])]);
 
+type EventNotificationsResult = {
+  list: Array<EventNotification>,
+  pagination: { total: number }
+  attributes: Array<{ id: string, title: string, sortable: boolean }>
+};
+
 const useEventNotifications = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
-  data: {
-    list: Array<EventNotification>,
-    pagination: { total: number }
-    attributes: Array<{ id: string, title: string, sortable: boolean }>
-  } | undefined,
+  data: EventNotificationsResult | undefined,
   refetch: () => void,
   isInitialLoading: boolean,
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery<EventNotificationsResult>(
     keyFn(searchParams),
-    () => fetchEventNotifications(searchParams),
+    () => defaultOnError(fetchEventNotifications(searchParams), 'Loading event notifications failed with status', 'Could not load event notifications'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading event notifications failed with status: ${errorThrown}`,
-          'Could not load event notifications');
-      },
       keepPreviousData: true,
       enabled,
     },

@@ -423,10 +423,10 @@ export const layoutsFor4axis = {
       size: 16,
     },
     ticktext: [
-      '130.3 b',
-      '260.5 b',
-      '390.8 b',
-      '521.0 b',
+      '130.3 B',
+      '260.5 B',
+      '390.8 B',
+      '521.0 B',
     ],
     tickvals: [
       130.25,
@@ -480,6 +480,7 @@ export const layoutsFor4axis = {
       size: 16,
     },
     tickformat: ',~r',
+    ticklabelposition: 'inside',
     title: {
       font: {
         color: '#fff',

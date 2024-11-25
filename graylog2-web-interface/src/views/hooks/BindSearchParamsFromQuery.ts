@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as Immutable from 'immutable';
+
 import isDeepEqual from 'stores/isDeepEqual';
 import type { ViewHook, ViewHookArguments } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
@@ -25,9 +27,9 @@ const bindSearchParamsFromQuery: ViewHook = async ({ query, view, executionState
     return [view, executionState];
   }
 
-  const { queryString, timeRange, streamsFilter } = normalizeSearchURLQueryParams(query);
+  const { queryString, timeRange, streamsFilter, streamCategoriesFilter } = normalizeSearchURLQueryParams(query);
 
-  if (!queryString && !timeRange && !streamsFilter) {
+  if (!queryString && !timeRange && !streamsFilter && !streamCategoriesFilter) {
     return [view, executionState];
   }
 
@@ -48,8 +50,15 @@ const bindSearchParamsFromQuery: ViewHook = async ({ query, view, executionState
     queryBuilder = queryBuilder.timerange(timeRange);
   }
 
-  if (streamsFilter) {
-    queryBuilder = queryBuilder.filter(streamsFilter);
+  const combinedFilters = streamsFilter && streamCategoriesFilter
+    ? Immutable.Map({
+      type: 'or',
+      filters: Immutable.List.of(streamsFilter, streamCategoriesFilter),
+    })
+    : streamsFilter || streamCategoriesFilter;
+
+  if (combinedFilters) {
+    queryBuilder = queryBuilder.filter(combinedFilters);
   }
 
   const newQuery = queryBuilder.build();

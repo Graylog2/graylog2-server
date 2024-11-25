@@ -59,6 +59,7 @@ import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +77,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
@@ -88,6 +88,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
     private final StatsCollector<QueryExecutionStats> executionStatsCollector;
+    private final StreamService streamService;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -96,6 +97,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
                                 StatsCollector<QueryExecutionStats> executionStatsCollector,
+                                StreamService streamService,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
@@ -104,6 +106,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
         this.executionStatsCollector = executionStatsCollector;
+        this.streamService = streamService;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -224,6 +227,11 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     @Override
     public Set<IndexRange> indexRangesForStreamsInTimeRange(Set<String> streamIds, TimeRange timeRange) {
         return indexLookup.indexRangesForStreamsInTimeRange(streamIds, timeRange);
+    }
+
+    @Override
+    public Optional<String> streamTitle(String streamId) {
+        return Optional.ofNullable(streamService.streamTitleFromCache(streamId));
     }
 
     @WithSpan

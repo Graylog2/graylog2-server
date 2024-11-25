@@ -25,11 +25,11 @@ import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import Routes from 'routing/Routes';
-import AppConfig from 'util/AppConfig';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Stream } from 'views/stores/StreamsStore';
 import type { Input } from 'components/messageloaders/Types';
+import NodeName from 'views/components/messagelist/NodeName';
 
 const Span = styled.span`
   word-break: break-word;
@@ -47,32 +47,6 @@ const InputName = ({ inputs, inputId }: { inputs: Immutable.Map<string, Input> |
   const input = inputs?.get(inputId);
 
   return input ? <Span>{input.title}</Span> : <>deleted input</>;
-};
-
-const NodeName = ({ nodes, nodeId }: { nodes: Immutable.Map<string, { short_node_id: string, hostname: string }> | undefined, nodeId: string }) => {
-  const node = nodes?.get(nodeId);
-  let nodeInformation;
-
-  if (node) {
-    const nodeURL = Routes.node(nodeId);
-
-    const nodeContent = (
-      <>
-        <Icon name="fork_right" />
-        &nbsp;
-        <Span>{node.short_node_id}</Span>&nbsp;/&nbsp;
-        <Span>{node.hostname}</Span>
-      </>
-    );
-
-    nodeInformation = AppConfig.isCloud()
-      ? nodeContent
-      : <a href={nodeURL}>{nodeContent}</a>;
-  } else {
-    nodeInformation = <Span>stopped node</Span>;
-  }
-
-  return nodeInformation;
 };
 
 const StreamLinks = ({ messageStreams, streamIds, streams }: {
@@ -100,13 +74,12 @@ const StreamLinks = ({ messageStreams, streamIds, streams }: {
 type Props = {
   message: Message & { streams?: Array<Stream> },
   inputs?: Immutable.Map<string, Input>,
-  nodes?: Immutable.Map<string, { short_node_id: string, hostname: string }>,
   streams?: Immutable.Map<string, Stream>,
   renderForDisplay: (fieldName: string) => React.ReactNode,
   customFieldActions?: React.ReactNode
 }
 
-const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, customFieldActions }: Props) => {
+const MessageDetail = ({ renderForDisplay, inputs, streams, message, customFieldActions }: Props) => {
   const streamIds = Immutable.Set(message.stream_ids);
   const rawTimestamp = message.fields.timestamp;
   const timestamp = [
@@ -136,12 +109,12 @@ const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, cust
         <Col md={3}>
           <MessageDetailsDefinitionList>
             {timestamp}
-            {(message.source_input_id && message.source_node_id && nodes) && (
+            {(message.source_input_id && message.source_node_id) && (
               <div>
                 <dt>Received by</dt>
                 <dd>
                   <em><InputName inputs={inputs} inputId={message.source_input_id} /></em>{' '}
-                  on <NodeName nodes={nodes} nodeId={message.source_node_id} />
+                  on <NodeName nodeId={message.source_node_id} />
 
                   {/* Legacy */}
                   {message.source_radio_id && (
@@ -149,7 +122,7 @@ const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, cust
                       <br />
                       <span>
                         via <em><InputName inputs={inputs} inputId={message.source_radio_input_id} /></em> on
-                        radio <NodeName nodes={nodes} nodeId={message.source_radio_id} />
+                        radio <NodeName nodeId={message.source_radio_id} />
                       </span>
                     </>
                   )}
@@ -182,13 +155,6 @@ const MessageDetail = ({ renderForDisplay, inputs, nodes, streams, message, cust
       </Row>
     </div>
   );
-};
-
-MessageDetail.defaultProps = {
-  inputs: undefined,
-  nodes: undefined,
-  streams: undefined,
-  customFieldActions: undefined,
 };
 
 export default MessageDetail;

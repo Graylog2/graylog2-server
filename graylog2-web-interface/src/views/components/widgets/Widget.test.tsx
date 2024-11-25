@@ -42,6 +42,7 @@ import FieldTypesContext from '../contexts/FieldTypesContext';
 jest.mock('../searchbar/queryinput/QueryInput');
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 const searchExplainContext = (searchedIndexRanges = [
   {
@@ -49,12 +50,14 @@ const searchExplainContext = (searchedIndexRanges = [
     begin: 1709716042283,
     end: 1709716342274,
     is_warm_tiered: false,
+    stream_names: ['foo', 'bar'],
   },
   {
     index_name: 'aloho_1018',
     begin: 0,
     end: 0,
     is_warm_tiered: false,
+    stream_names: ['bar'],
   },
 ],
 ) => ({
@@ -123,7 +126,8 @@ describe('<Widget />', () => {
       index_name: string,
       begin: number,
       end: number,
-      is_warm_tiered: boolean
+      is_warm_tiered: boolean,
+      stream_names: Array<string>
     }>,
   }
 
@@ -140,7 +144,6 @@ describe('<Widget />', () => {
     <TestStoreProvider>
       <SearchExplainContext.Provider value={searchExplainContext(searchedIndices)}>
         <FieldTypesContext.Provider value={fieldTypes}>
-          {}
           <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
             <WidgetContext.Provider value={propsWidget}>
               <Widget widget={propsWidget}
@@ -262,8 +265,8 @@ describe('<Widget />', () => {
       .config({})
       .build();
     const UnknownWidget = (props: Partial<React.ComponentProps<typeof Widget>>) => (
-      <FieldTypesContext.Provider value={fieldTypes}>
-        <TestStoreProvider>
+      <TestStoreProvider>
+        <FieldTypesContext.Provider value={fieldTypes}>
           <WidgetContext.Provider value={unknownWidget}>
             <Widget widget={unknownWidget}
                     editing
@@ -273,8 +276,8 @@ describe('<Widget />', () => {
                     position={new WidgetPosition(1, 1, 1, 1)}
                     {...props} />
           </WidgetContext.Provider>
-        </TestStoreProvider>
-      </FieldTypesContext.Provider>
+        </FieldTypesContext.Provider>
+      </TestStoreProvider>
     );
 
     render(
@@ -373,31 +376,5 @@ describe('<Widget />', () => {
     await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 
     expect(updateWidget).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
-  });
-
-  it('shows an info when the widget accesses the Warm Tier', async () => {
-    render(<DummyWidget searchedIndices={
-[
-  {
-    index_name: 'aloho_warm_1016',
-    begin: 1709715731270,
-    end: 1709716042255,
-    is_warm_tiered: true,
-  },
-  {
-    index_name: 'aloho_1017',
-    begin: 1709716042283,
-    end: 1709716342274,
-    is_warm_tiered: false,
-  },
-  {
-    index_name: 'aloho_1018',
-    begin: 0,
-    end: 0,
-    is_warm_tiered: false,
-  }]
-    } />);
-
-    await screen.findByText('This widget is retrieving data from the Warm Tier and may take longer to load.');
   });
 });

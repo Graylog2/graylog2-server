@@ -133,6 +133,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId }: Props) 
     query,
     query_parameters: queryParameters,
     streams: configStreams,
+    stream_categories: streamCategories,
     search_within_ms: searchWithinMs,
     execute_every_ms: executeEveryMs,
     use_cron_scheduling: useCronScheduling,
@@ -163,6 +164,19 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId }: Props) 
     return 'Error: no cron expression specified!';
   };
 
+  const renderStreamCategories = () => {
+    if (!streamCategories || streamCategories.length === 0) return null;
+
+    const renderedCategories = streamCategories.map((s) => <StreamOrId streamOrId={s} />);
+
+    return (
+      <>
+        <dt>Stream Categories</dt>
+        <dd className={styles.streamList}>{renderedCategories}</dd>
+      </>
+    );
+  };
+
   return (
     <dl>
       <dt>Type</dt>
@@ -174,6 +188,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId }: Props) 
       <SearchFilters filters={config.filters} />
       <dt>Streams</dt>
       <dd className={styles.streamList}><Streams streams={streams} streamIds={effectiveStreamIds} streamIdsWithMissingPermission={streamIdsWithMissingPermission} /></dd>
+      {renderStreamCategories()}
       <dt>Search within</dt>
       <dd>{searchWithin.duration} {searchWithin.unit.toLowerCase()}</dd>
       <dt>Use Cron Scheduling</dt>
@@ -225,10 +240,6 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId }: Props) 
       </dd>
     </dl>
   );
-};
-
-FilterAggregationSummary.defaultProps = {
-  definitionId: undefined,
 };
 
 export default FilterAggregationSummary;

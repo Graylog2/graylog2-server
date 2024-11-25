@@ -17,11 +17,11 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { ConfigurationField } from 'components/configurationforms';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { defaultOnError } from 'util/conditional/onError';
 
 export const KEY_PREFIX = ['outputs', 'types'];
 export const keyFn = () => [...KEY_PREFIX];
@@ -59,12 +59,8 @@ const useAvailableOutputTypes = ({ enabled }: Options = { enabled: true }): {
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     keyFn(),
-    () => fetchOutputsTypes(),
+    () => defaultOnError(fetchOutputsTypes(), 'Loading stream outputs failed with status', 'Could not load stream outputs'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading stream outputs failed with status: ${errorThrown}`,
-          'Could not load stream outputs');
-      },
       keepPreviousData: true,
       enabled,
     },

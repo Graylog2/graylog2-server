@@ -50,6 +50,7 @@ type SearchTypeBase = {
   timerange: TimeRange | undefined | null,
   type: string,
   streams: Array<string>,
+  stream_categories: Array<string>,
 };
 
 export type AggregationSearchType = SearchTypeBase & {

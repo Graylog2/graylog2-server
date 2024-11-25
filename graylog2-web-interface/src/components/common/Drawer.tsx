@@ -22,6 +22,7 @@ const StyledDrawer = styled(MantineDrawer)(({ theme }) => css`
   .mantine-Drawer-content, .mantine-Drawer-header {
     background-color: ${theme.colors.global.contentBackground};
   }
+
   .mantine-Drawer-content {
     display: flex;
     flex-direction: column;

@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { DeflectorActions } from 'stores/indices/DeflectorStore';
 import { IndexRangesActions } from 'stores/indices/IndexRangesStore';
@@ -45,6 +46,8 @@ type Props = {
 };
 
 const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
+
   const onCycleDeflector = useCallback(() => _onCycleDeflector(indexSetId), [indexSetId]);
   const onRecalculateIndexRange = useCallback(() => _onRecalculateIndexRange(indexSetId), [indexSetId]);
   const cycleButton = useMemo(() => (indexSet?.writable ? <MenuItem eventKey="2" onClick={onCycleDeflector}>Rotate active write index</MenuItem> : null), [indexSet?.writable, onCycleDeflector]);
@@ -54,14 +57,12 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
       <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
         <MenuItem eventKey="1" onClick={onRecalculateIndexRange}>Recalculate index ranges</MenuItem>
         {cycleButton}
+        {indexSet?.data_tiering_status?.has_failed_snapshot && dataTieringPlugin && (
+          <dataTieringPlugin.DeleteFailedSnapshotMenuItem eventKey="3" indexSetId={indexSetId} />
+        )}
       </DropdownButton>
     </ButtonGroup>
   );
-};
-
-IndicesMaintenanceDropdown.propTypes = {
-  indexSetId: PropTypes.string.isRequired,
-  indexSet: PropTypes.object.isRequired,
 };
 
 export default IndicesMaintenanceDropdown;

@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
@@ -28,6 +27,10 @@ import useIsLoading from 'views/hooks/useIsLoading';
 jest.mock('views/hooks/useIsLoading');
 jest.mock('views/components/Query', () => () => <span>Query Results</span>);
 
+type SimpleSearchResultProps = {
+  fieldTypes?: any;
+};
+
 describe('SearchResult', () => {
   beforeAll(() => {
     jest.useFakeTimers();
@@ -38,19 +41,13 @@ describe('SearchResult', () => {
   });
 
   const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
-  const SimpleSearchResult = ({ fieldTypes }) => (
+  const SimpleSearchResult = ({
+    fieldTypes = initialFieldTypes,
+  }: SimpleSearchResultProps) => (
     <FieldTypesContext.Provider value={fieldTypes}>
       <SearchResult />
     </FieldTypesContext.Provider>
   );
-
-  SimpleSearchResult.propTypes = {
-    fieldTypes: PropTypes.object,
-  };
-
-  SimpleSearchResult.defaultProps = {
-    fieldTypes: initialFieldTypes,
-  };
 
   it('should show spinner with undefined fields', () => {
     const { getByText } = render(

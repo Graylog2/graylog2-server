@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 
-import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
@@ -69,15 +68,17 @@ const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUn
   fullPath,
 }): ChartDefinition => {
   const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
-  const extendedSettings = getPieChartDataSettingsWithCustomUnits({ values, originalName, fullPath });
+  const extendedSettings = getPieChartDataSettingsWithCustomUnits({ values, name, fullPath });
 
-  const definition = {
+  return {
     type,
     name,
     hole: 0.4,
     labels: labels.map((label) => label.split(keySeparator).map((l, i) => mapKeys(l, rowPivots[i])).join(humanSeparator)),
     originalLabels: labels,
     values,
+    automargin: true,
+    textposition: 'inside',
     domain: {
       x: _horizontalDimensions(idx, total),
       y: _verticalDimensions(idx, total),
@@ -85,8 +86,6 @@ const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUn
     originalName,
     ...extendedSettings,
   };
-
-  return definition;
 };
 
 const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
@@ -101,24 +100,19 @@ const labelMapper = (data: Array<{ labels: Array<string>, originalLabels?: Array
 
 const rowPivotsToFields = (config: AggregationWidgetConfig) => config?.rowPivots?.flatMap((pivot) => pivot.fields);
 
-const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+const PieVisualization = makeVisualization(({ config, data, height, width }: VisualizationComponentProps) => {
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const mapKeys = useMapKeys();
   const getPieChartDataSettingsWithCustomUnits = usePieChartDataSettingsWithCustomUnits({ config });
   const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries(mapKeys, getPieChartDataSettingsWithCustomUnits) });
 
   return (
-    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} labelFields={rowPivotsToFields} neverHide>
+    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} labelFields={rowPivotsToFields} neverHide height={height} width={width}>
       <GenericPlot chartData={transformedData}
                    setChartColor={setChartColor} />
     </PlotLegend>
   );
 }, 'pie');
-
-PieVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-};
 
 PieVisualization.displayName = 'PieVisualization';
 

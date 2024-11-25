@@ -16,13 +16,12 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
-import WidgetModel from 'views/logic/widgets/Widget';
+import type WidgetModel from 'views/logic/widgets/Widget';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
@@ -45,6 +44,7 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
+import FullSizeContainer from 'views/components/aggregationbuilder/FullSizeContainer';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -61,7 +61,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 export type Props = {
   id: string,
   widget: WidgetModel,
-  editing: boolean,
+  editing?: boolean
   title: string,
   position: WidgetPosition,
   onPositionsChange: (position: BackendWidgetPosition) => void,
@@ -122,18 +122,24 @@ const Visualization = ({
     const { config, filter } = widget;
 
     return (
-      <VisComponent config={config}
-                    data={data as WidgetResults}
-                    editing={editing}
-                    fields={fields}
-                    filter={filter}
-                    queryId={queryId}
-                    onConfigChange={onWidgetConfigChange}
-                    setLoadingState={setLoadingState}
-                    title={title}
-                    toggleEdit={onToggleEdit}
-                    type={widget.type}
-                    id={id} />
+      <FullSizeContainer>
+        {({ height, width }) => (
+          <VisComponent config={config}
+                        data={data as WidgetResults}
+                        editing={editing}
+                        fields={fields}
+                        filter={filter}
+                        queryId={queryId}
+                        onConfigChange={onWidgetConfigChange}
+                        setLoadingState={setLoadingState}
+                        title={title}
+                        toggleEdit={onToggleEdit}
+                        type={widget.type}
+                        id={id}
+                        height={height}
+                        width={width} />
+        )}
+      </FullSizeContainer>
     );
   }
 
@@ -188,7 +194,7 @@ const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: 
   return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
 };
 
-const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Props) => {
+const Widget = ({ id, editing = false, widget, title, position, onPositionsChange }: Props) => {
   const viewType = useViewType();
   const fields = useQueryFieldTypes();
   const { stopAutoRefresh } = useAutoRefresh();
@@ -245,18 +251,21 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
 
   const { config } = widget;
   const isFocused = focusedWidget?.id === id;
+  const titleIcon = (
+    <IfDashboard>
+      {!editing && (
+        <WidgetWarmTierAlert widgetId={id} activeQuery={activeQuery} />
+      )}
+    </IfDashboard>
+  );
 
   return (
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
-        <IfDashboard>
-          {!editing && (
-            <WidgetWarmTierAlert widgetId={id} activeQuery={activeQuery} />
-          )}
-        </IfDashboard>
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader title={title}
+                          titleIcon={titleIcon}
                           hideDragHandle={!interactive || isFocused}
                           loading={loading}
                           editing={editing}
@@ -299,18 +308,6 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
       </WidgetFrame>
     </WidgetColorContext>
   );
-};
-
-Widget.propTypes = {
-  editing: PropTypes.bool,
-  id: PropTypes.string.isRequired,
-  onPositionsChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  widget: PropTypes.instanceOf(WidgetModel).isRequired,
-};
-
-Widget.defaultProps = {
-  editing: false,
 };
 
 export default Widget;

@@ -28,7 +28,6 @@ import type { OnVisualizationConfigChange } from 'views/components/aggregationwi
 import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
-import FullSizeContainer from './FullSizeContainer';
 
 const defaultVisualizationType = 'table';
 
@@ -94,6 +93,8 @@ const AggregationBuilder = ({
   fields,
   toggleEdit,
   setLoadingState,
+  height,
+  width,
 }: WidgetComponentProps<AggregationWidgetConfig>) => {
   const onVisualizationConfigChange = useContext(OnVisualizationConfigChangeContext);
 
@@ -113,20 +114,16 @@ const AggregationBuilder = ({
   ) as VisualizationResult;
 
   return (
-    <FullSizeContainer>
-      {({ height, width }) => (
-        <VisComponent config={config}
-                      data={rows}
-                      setLoadingState={setLoadingState}
-                      effectiveTimerange={effectiveTimerange}
-                      editing={editing}
-                      fields={fields}
-                      height={height}
-                      width={width}
-                      toggleEdit={toggleEdit}
-                      onChange={onVisualizationConfigChange} />
-      )}
-    </FullSizeContainer>
+    <VisComponent config={config}
+                  data={rows}
+                  setLoadingState={setLoadingState}
+                  effectiveTimerange={effectiveTimerange}
+                  editing={editing}
+                  fields={fields}
+                  height={height}
+                  width={width}
+                  toggleEdit={toggleEdit}
+                  onChange={onVisualizationConfigChange} />
   );
 };
 

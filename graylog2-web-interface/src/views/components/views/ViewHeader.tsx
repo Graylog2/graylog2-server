@@ -117,10 +117,6 @@ const CrumbLink = ({ label, link, dataTestId }: { label: string, link: string | 
   link ? <Link target="_blank" to={link} data-testid={dataTestId}>{label}</Link> : <span data-testid={dataTestId}>{label}</span>
 );
 
-CrumbLink.defaultProps = {
-  dataTestId: undefined,
-};
-
 const ViewHeader = () => {
   const view = useView();
   const isNew = useIsNew();

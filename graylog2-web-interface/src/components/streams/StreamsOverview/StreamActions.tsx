@@ -35,10 +35,8 @@ import { MoreActions } from 'components/common/EntityDataTable';
 import { LinkContainer } from 'components/common/router';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import UserNotification from 'util/UserNotification';
-
-import StreamDeleteModal from './StreamDeleteModal';
-
-import StreamModal from '../StreamModal';
+import StreamDeleteModal from 'components/streams/StreamsOverview/StreamDeleteModal';
+import StreamModal from 'components/streams/StreamModal';
 
 const DefaultStreamHelp = () => (
   <HoverForHelp displayLeftMargin>Action not available for the default
@@ -161,9 +159,19 @@ const StreamActions = ({
 
   return (
     <ButtonToolbar>
-      <LinkContainer to={Routes.stream_view(stream.id)}>
-        <Button disabled={isNotEditable} bsStyle="primary" bsSize="xsmall">View details</Button>
-      </LinkContainer>
+      <IfPermitted permissions={`streams:edit:${stream.id}`}>
+        <LinkContainer to={Routes.stream_view(stream.id)}>
+          <Button disabled={isNotEditable}
+                  bsStyle="primary"
+                  bsSize="xsmall"
+                  onClick={() => {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_CLICKED, {
+                      app_pathname: 'stream',
+                    });
+                  }}>Data Routing
+          </Button>
+        </LinkContainer>
+      </IfPermitted>
       <ShareButton entityId={stream.id}
                    entityType="stream"
                    onClick={toggleEntityShareModal}

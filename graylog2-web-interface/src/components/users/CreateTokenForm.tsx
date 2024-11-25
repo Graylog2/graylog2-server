@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
@@ -34,12 +33,12 @@ const StyledForm = styled.form`
 `;
 
 type Props = {
-  creatingToken: boolean,
-  disableForm: boolean,
+  creatingToken?: boolean
+  disableForm?: boolean
   onCreate: (tokenName: string) => void,
 };
 
-const CreateTokenForm = ({ creatingToken, disableForm, onCreate }: Props) => {
+const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate }: Props) => {
   const [tokenName, setTokenName] = useState('');
 
   const createToken = (event: React.SyntheticEvent) => {
@@ -66,17 +65,6 @@ const CreateTokenForm = ({ creatingToken, disableForm, onCreate }: Props) => {
       </Button>
     </StyledForm>
   );
-};
-
-CreateTokenForm.propTypes = {
-  creatingToken: PropTypes.bool,
-  disableForm: PropTypes.bool,
-  onCreate: PropTypes.func.isRequired,
-};
-
-CreateTokenForm.defaultProps = {
-  creatingToken: false,
-  disableForm: false,
 };
 
 export default CreateTokenForm;

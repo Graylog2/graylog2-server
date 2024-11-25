@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -52,7 +51,7 @@ type Props = {
   onCancel?: () => void,
 };
 
-const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
+const PipelineDetails = ({ pipeline, create = false, onChange, onCancel = () => {} }: Props) => {
   if (create) {
     return <PipelineForm create save={onChange} onCancel={onCancel} modal={false} />;
   }
@@ -86,19 +85,6 @@ const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
       <hr />
     </div>
   );
-};
-
-PipelineDetails.propTypes = {
-  pipeline: PropTypes.object,
-  create: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  onCancel: PropTypes.func,
-};
-
-PipelineDetails.defaultProps = {
-  pipeline: undefined,
-  create: false,
-  onCancel: () => {},
 };
 
 export default PipelineDetails;

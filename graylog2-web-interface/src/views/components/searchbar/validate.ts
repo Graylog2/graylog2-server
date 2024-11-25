@@ -61,7 +61,7 @@ const validate = async <T extends FormValues>(
     return errors;
   }
 
-  if (queryValidation?.status === 'WARNING') {
+  if (queryValidation?.status === 'WARNING' || queryValidation?.status === 'INFO') {
     setFieldWarning('queryString', queryValidation);
 
     return errors;

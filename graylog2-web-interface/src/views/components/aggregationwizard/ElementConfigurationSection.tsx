@@ -110,7 +110,7 @@ const ElementConfigurationSection = ({
   allowCreate,
   children,
   elementTitle,
-  isEmpty,
+  isEmpty = false,
   onCreate,
   sectionTitle,
 }: Props) => {
@@ -133,11 +133,6 @@ const ElementConfigurationSection = ({
       </div>
     </Wrapper>
   );
-};
-
-ElementConfigurationSection.defaultProps = {
-  sectionTitle: undefined,
-  isEmpty: false,
 };
 
 export default ElementConfigurationSection;
