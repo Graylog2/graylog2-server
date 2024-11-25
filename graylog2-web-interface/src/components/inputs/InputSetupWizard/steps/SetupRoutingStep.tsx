@@ -155,6 +155,7 @@ const SetupRoutingStep = () => {
               <Select inputId="streams"
                       onChange={handleStreamSelect}
                       options={options}
+                      aria-label="All messages (Default)"
                       clearable
                       placeholder="All messages (Default)"
                       value={selectedStreamId} />

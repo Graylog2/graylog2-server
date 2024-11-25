@@ -23,48 +23,51 @@ import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'stores/streams/StreamsStore';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import { useInputSetupWizard, InputSetupWizardProvider } from 'components/inputs/InputSetupWizard';
+import type { WizardData } from 'components/inputs/InputSetupWizard';
 
 import InputSetupWizard from './InputSetupWizard';
 
-const OpenWizardButton = ({ wizardData }) => {
+const OpenWizardTestButton = ({ wizardData } : { wizardData: WizardData}) => {
   const { openWizard } = useInputSetupWizard();
 
   return (<Button onClick={() => openWizard(wizardData)}>Open Wizard!</Button>);
 };
 
-const CloseWizardButton = () => {
+const CloseWizardTestButton = () => {
   const { closeWizard } = useInputSetupWizard();
 
   return (<Button onClick={closeWizard}>Close Wizard!</Button>);
 };
 
-const renderWizard = (wizardData = {}) => (
+const renderWizard = (wizardData: WizardData = {}) => (
   render(
     <InputSetupWizardProvider>
-      <OpenWizardButton wizardData={wizardData} />
-      <CloseWizardButton />
+      <OpenWizardTestButton wizardData={wizardData} />
+      <CloseWizardTestButton />
       <InputSetupWizard />
     </InputSetupWizardProvider>,
   )
 );
 
-// jest.mock('views/stores/StreamsStore');
+jest.mock('views/stores/StreamsStore');
 
-// jest.mock('hooks/usePipelinesConnectedStream');
+jest.mock('hooks/usePipelinesConnectedStream');
 
-// const pipelinesConnectedMock = (response = []) => ({
-//   data: response,
-//   refetch: jest.fn(),
-//   isInitialLoading: false,
-//   error: undefined,
-//   isError: false,
-// });
+const pipelinesConnectedMock = (response = []) => ({
+  data: response,
+  refetch: jest.fn(),
+  isInitialLoading: false,
+  error: undefined,
+  isError: false,
+});
 
-//  asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
-//     StreamsActions.listStreams = mockAction(jest.fn(() => Promise.resolve([])));
+beforeEach(() => {
+  asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
+  StreamsActions.listStreams = mockAction(jest.fn(() => Promise.resolve([])));
+});
 
 describe('InputSetupWizard', () => {
-  it('renders the wizard and show the first step', async () => {
+  it('renders the wizard and shows routing step as first step', async () => {
     renderWizard();
 
     const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
