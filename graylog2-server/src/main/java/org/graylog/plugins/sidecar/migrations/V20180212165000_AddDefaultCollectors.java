@@ -131,13 +131,15 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 BEATS_PREAMBEL));
 
         String apacheConfigType = """
+
                 - type: filestream
                   id: apache-filestream
                   enabled: true
                   %s
                   fields_under_root: true
                   fields:
-                      event_source_product: apache_httpd""";
+                      event_source_product: apache_httpd
+                """;
 
         ensureCollector(
                 "filebeat",
@@ -183,8 +185,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                   - /var/log/apache2/access.log
                                   - /var/log/apache2/error.log
                                   - /var/log/httpd/access_log
-                                  - /var/log/httpd/error_log
-                                """))
+                                  - /var/log/httpd/error_log"""
+                        ))
                         .toString()
         ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-linux-default", collector));
 
@@ -199,8 +201,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         .append(f(apacheConfigType, """
                                 paths:
                                   - /var/log/httpd-access.log
-                                  - /var/log/httpd-error.log
-                                """))
+                                  - /var/log/httpd-error.log"""
+                        ))
                         .toString()
         ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-freebsd-default", collector));
 
@@ -215,8 +217,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         .append(f(apacheConfigType, """
                                 paths:
                                   - /etc/httpd/log/access_log
-                                  - /etc/httpd/log/error_log
-                                """))
+                                  - /etc/httpd/log/error_log"""
+                        ))
                         .toString()
         ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-darwin-default", collector));
 
