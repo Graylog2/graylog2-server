@@ -64,7 +64,7 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = 
   }
 
   return (
-    <WidgetEditApplyAllChangesProvider widget={widget} onChange={onChange}>
+    <WidgetEditApplyAllChangesProvider widget={widget}>
       <DisableSubmissionStateProvider>
         <Container>
           {(showQueryControls && !widget.returnsAllRecords) && (

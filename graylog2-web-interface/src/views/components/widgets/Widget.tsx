@@ -45,6 +45,7 @@ import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import FullSizeContainer from 'views/components/aggregationbuilder/FullSizeContainer';
+import type WidgetType from 'views/logic/widgets/Widget';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -173,11 +174,16 @@ export const EditWrapper = ({
 }: EditWrapperProps) => {
   const EditComponent = useMemo(() => _editComponentForType(type), [type]);
   const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
+  const _onWidgetConfigChange = useCallback((_widgetId: string, widget: WidgetType) => {
+    onWidgetConfigChange(widget.config);
+
+    return Promise.resolve();
+  }, [onWidgetConfigChange]);
 
   return editing ? (
     <EditWidgetFrame onSubmit={onToggleEdit}
                      onCancel={onCancelEdit}
-                     onChange={onWidgetConfigChange}
+                     onChange={_onWidgetConfigChange}
                      displaySubmitActions={!hasOwnSubmitButton}
                      showQueryControls={showQueryControls}>
       <EditComponent config={config}
