@@ -131,7 +131,7 @@ public class DBAuthServiceBackendService {
                 .filter(dbQuery)
                 .sort(sort)
                 .perPage(params.getPerPage())
-                .page(params.getPerPage(), filter);
+                .page(params.getPage(), filter);
     }
 
     @MustBeClosed
