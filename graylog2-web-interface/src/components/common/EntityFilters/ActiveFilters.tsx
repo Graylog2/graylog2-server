@@ -42,11 +42,11 @@ type Props = {
   onDeleteFilter: (attributeId: string, filterValue: string) => void,
 }
 
-const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
+const ActiveFilters = ({ attributes, filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
   <>
     {filters.entrySeq()
       .map(([attributeId, filterValues]) => {
-        const attribute = attributes.find(({ id }) => id === attributeId);
+        const attribute = attributes?.find(({ id }) => id === attributeId);
 
         return (
           <FilterGroup key={attributeId}>

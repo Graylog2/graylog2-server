@@ -80,7 +80,7 @@ type Props = {
   customFieldActions?: React.ReactNode
 }
 
-const MessageDetail = ({ renderForDisplay, inputs, streams, message, customFieldActions }: Props) => {
+const MessageDetail = ({ renderForDisplay, inputs = undefined, streams = undefined, message, customFieldActions = undefined }: Props) => {
   const streamIds = Immutable.Set(message.stream_ids);
   const rawTimestamp = message.fields.timestamp;
   const timestamp = [
