@@ -22,17 +22,32 @@ import BulkActions from 'components/events/events/BulkActions';
 import { asMock } from 'helpers/mocking';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { events } from 'fixtures/events';
 import type { EventAction } from 'views/types';
 import type { Event } from 'components/events/events/types';
 
 jest.mock('hooks/usePluginEntities');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
+const getEvent = (id: string): Event => ({
+  id,
+  event_definition_id: 'event_definition_id_1',
+  event_definition_type: 'event_definition_type',
+  priority: 1,
+  timestamp: '2024-01-01',
+  timerange_start: '2024-01-01',
+  timerange_end: '2024-01-02',
+  key: 'key-1',
+  fields: {},
+  group_by_fields: {},
+  source_streams: ['000000000000000000000001'],
+  replay_info: undefined,
+  alert: undefined,
+});
+
 const mockedSelectedEntitiesData = {
-  '01HV0YS4GHDMT30E3EMWQVQNK9': events[0],
-  '01HV0YS4GH0VC7DV6A2VGN1VJ0': events[1],
-} as { [id: string]: Event};
+  '01HV0YS4GHDMT30E3EMWQVQNK9': getEvent('01HV0YS4GHDMT30E3EMWQVQNK9'),
+  '01HV0YS4GH0VC7DV6A2VGN1VJ0': getEvent('01HV0YS4GH0VC7DV6A2VGN1VJ0'),
+};
 
 const mockedEventActions: Array<EventAction> = [
   {
