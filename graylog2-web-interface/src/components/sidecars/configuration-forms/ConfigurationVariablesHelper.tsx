@@ -123,7 +123,7 @@ class ConfigurationVariablesHelper extends React.Component<ConfigurationVariable
           <td><code>{escapedName}</code></td>
           <td>{configVar.description}</td>
           <td>
-            <Button bsStyle="primary" bsSize="xsmall" onClick={this._handleDeleteCheck(configVar)}>
+            <Button bsStyle="danger" bsSize="xsmall" onClick={this._handleDeleteCheck(configVar)}>
               Delete
             </Button>
             &nbsp;
