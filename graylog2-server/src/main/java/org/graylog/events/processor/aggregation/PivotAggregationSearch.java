@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
@@ -102,6 +103,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final PermittedStreams permittedStreams;
     private final NotificationService notificationService;
     private final QueryStringDecorators queryStringDecorators;
+    private final boolean isCloud;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
@@ -115,7 +117,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   MoreSearch moreSearch,
                                   PermittedStreams permittedStreams,
                                   NotificationService notificationService,
-                                  QueryStringDecorators queryStringDecorators) {
+                                  QueryStringDecorators queryStringDecorators,
+                                  @Named("is_cloud") boolean isCloud) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
@@ -128,6 +131,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.permittedStreams = permittedStreams;
         this.notificationService = notificationService;
         this.queryStringDecorators = queryStringDecorators;
+        this.isCloud = isCloud;
     }
 
     private String metricName(SeriesSpec series) {
@@ -170,17 +174,19 @@ public class PivotAggregationSearch implements AggregationSearch {
                 return AggregationResult.empty();
             }
 
-            final String description = f("Event definition %s (%s) failed: %s",
-                    eventDefinition.title(), eventDefinition.id(),
-                    errors.stream().map(SearchError::description).collect(Collectors.joining("\n")));
-            Notification systemNotification = notificationService.buildNow()
-                    .addType(Notification.Type.SEARCH_ERROR)
-                    .addSeverity(Notification.Severity.NORMAL)
-                    .addTimestamp(DateTime.now(DateTimeZone.UTC))
-                    .addKey(eventDefinition.id())
-                    .addDetail("title", "Aggregation search failed")
-                    .addDetail("description", description);
-            notificationService.publishIfFirst(systemNotification);
+            if (!suppressInCloud(errors)) {
+                final String description = f("Event definition %s (%s) failed: %s",
+                        eventDefinition.title(), eventDefinition.id(),
+                        errors.stream().map(SearchError::description).collect(Collectors.joining("\n")));
+                Notification systemNotification = notificationService.buildNow()
+                        .addType(Notification.Type.SEARCH_ERROR)
+                        .addSeverity(Notification.Severity.NORMAL)
+                        .addTimestamp(DateTime.now(DateTimeZone.UTC))
+                        .addKey(eventDefinition.id())
+                        .addDetail("title", "Aggregation search failed")
+                        .addDetail("description", description);
+                notificationService.publishIfFirst(systemNotification);
+            }
 
             if (errors.size() > 1) {
                 throw new EventProcessorException("Pivot search failed with multiple errors.", false, eventDefinition);
@@ -199,6 +205,22 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .sourceStreams(extractSourceStreams(streamsResult))
                 .additionalResults(additionalResults)
                 .build();
+    }
+
+    // Suppress notification when error likely due to Cloud maintenance work
+    private boolean suppressInCloud(Set<SearchError> errors) {
+        if (!isCloud) {
+            return false;
+        }
+        if (errors.stream()
+                .map(SearchError::description)
+                .filter(s -> s.contains("node_not_connected"))
+                .findFirst()
+                .isEmpty()) {
+            return false;
+        }
+        LOG.debug("Suppressed node_not_connected notification in Cloud");
+        return true;
     }
 
     private ImmutableSet<String> extractSourceStreams(PivotResult pivotResult) {
@@ -349,7 +371,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                             values.add(seriesValue);
                         } else {
                             // Should not happen
-                            throw new IllegalStateException("Got unexpected non-number value for " + series.toString() + " " + row.toString() + " " + value.toString());
+                            throw new IllegalStateException("Got unexpected non-number value for " + series + " " + row + " " + value);
                         }
                     }
                 }
