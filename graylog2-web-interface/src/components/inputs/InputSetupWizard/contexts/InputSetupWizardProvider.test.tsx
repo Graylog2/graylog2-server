@@ -26,7 +26,7 @@ const contextData = {
   wizardData: {},
   orderedSteps: [],
   show: false,
-}
+};
 
 const renderSUT = () => {
   const consume = jest.fn();
