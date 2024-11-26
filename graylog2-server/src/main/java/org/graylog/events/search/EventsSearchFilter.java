@@ -51,13 +51,13 @@ public abstract class EventsSearchFilter {
     public abstract Set<String> eventDefinitions();
 
     @JsonProperty(FIELD_PRIORITY)
-    public abstract Optional<String> priority();
+    public abstract Set<String> priority();
 
     @JsonProperty(FIELD_AGGREGATION_TIMERANGE)
     public abstract Optional<AbsoluteRange> aggregationTimerange();
 
     @JsonProperty(FIELD_KEY)
-    public abstract Optional<String> key();
+    public abstract Set<String> key();
 
     public static EventsSearchFilter empty() {
         return builder().build();
@@ -75,7 +75,9 @@ public abstract class EventsSearchFilter {
         public static Builder create() {
             return new AutoValue_EventsSearchFilter.Builder()
                     .alerts(Alerts.INCLUDE)
-                    .eventDefinitions(Collections.emptySet());
+                    .eventDefinitions(Collections.emptySet())
+                    .priority(Collections.emptySet())
+                    .key(Collections.emptySet());
         }
 
         @JsonProperty(FIELD_ALERTS)
@@ -85,13 +87,13 @@ public abstract class EventsSearchFilter {
         public abstract Builder eventDefinitions(Set<String> eventDefinitions);
 
         @JsonProperty(FIELD_PRIORITY)
-        public abstract Builder priority(String priority);
+        public abstract Builder priority(Set<String> priority);
 
         @JsonProperty(FIELD_AGGREGATION_TIMERANGE)
         public abstract Builder aggregationTimerange(AbsoluteRange aggregationTimerange);
 
         @JsonProperty(FIELD_KEY)
-        public abstract Builder key(String key);
+        public abstract Builder key(Set<String> key);
 
         public abstract EventsSearchFilter build();
     }

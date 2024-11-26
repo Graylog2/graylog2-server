@@ -33,9 +33,9 @@ type FiltersResult = {
   filter: {
     alerts?: string,
     event_definitions?: Array<string>,
-    priority?: string,
+    priority?: Array<string>,
     aggregation_timerange?: { from?: string, to?: string, type: string, range?: number },
-    key?: string,
+    key?: Array<string>,
   },
   timerange?: { from?: string, to?: string, type: string, range?: number },
 };
@@ -61,19 +61,16 @@ const parseFilters = (filters: UrlQueryFilters) => {
       : { type: 'relative', range: 0 };
   }
 
-  if (filters.get('key')?.[0]) {
-    const keyFilter = filters.get('key')?.[0];
-    result.filter.key = keyFilter;
+  if (filters.get('key')?.length > 0) {
+    result.filter.key = filters.get('key');
   }
 
-  if (filters.get('event_definition_id')?.[0]) {
-    const eventDefinitionId = filters.get('event_definition_id')[0];
-    result.filter.event_definitions = [eventDefinitionId];
+  if (filters.get('event_definition_id')?.length > 0) {
+    result.filter.event_definitions = filters.get('event_definition_id');
   }
 
-  if (filters.get('priority')?.[0]) {
-    const priority = filters.get('priority')[0];
-    result.filter.priority = priority;
+  if (filters.get('priority')?.length > 0) {
+    result.filter.priority = filters.get('priority');
   }
 
   switch (filters?.get('alert')?.[0]) {

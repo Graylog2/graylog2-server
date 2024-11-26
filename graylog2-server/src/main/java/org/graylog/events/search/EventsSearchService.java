@@ -30,6 +30,7 @@ import org.graylog2.plugin.database.Persisted;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +38,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
@@ -44,6 +46,8 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
 public class EventsSearchService {
+    private static final Collector<CharSequence, ?, String> joiningQueriesWithAND = Collectors.joining(" AND ");
+    private static final Collector<CharSequence, ?, String> joiningQueriesWithOR = Collectors.joining(" OR ");
     private final MoreSearch moreSearch;
     private final StreamService streamService;
     private final DBEventDefinitionService eventDefinitionService;
@@ -65,20 +69,26 @@ public class EventsSearchService {
     }
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
-        final ImmutableSet.Builder<String> filterBuilder = ImmutableSet.<String>builder()
-                // Make sure we only filter for actual events and ignore anything else that might be in the event
-                // indices. (fixes an issue when users store non-event messages in event indices)
-                .add("_exists_:" + EventDto.FIELD_EVENT_DEFINITION_ID);
+        final var filterBuilder = new ArrayList<String>();
+        // Make sure we only filter for actual events and ignore anything else that might be in the event
+        // indices. (fixes an issue when users store non-event messages in event indices)
+        filterBuilder.add("_exists_:" + EventDto.FIELD_EVENT_DEFINITION_ID);
 
         if (!parameters.filter().eventDefinitions().isEmpty()) {
             final String eventDefinitionFilter = parameters.filter().eventDefinitions().stream()
                     .map(this::eventDefinitionFilter)
-                    .collect(Collectors.joining(" OR "));
+                    .collect(joiningQueriesWithOR);
 
-            filterBuilder.addAll(Collections.singleton("(" + eventDefinitionFilter + ")"));
+            filterBuilder.add(eventDefinitionFilter);
         }
 
-        parameters.filter().priority().ifPresent(priorityFilter -> filterBuilder.add(EventDto.FIELD_PRIORITY + ":" + mapPriority(priorityFilter)));
+        if (!parameters.filter().priority().isEmpty()) {
+            filterBuilder.add(parameters.filter().priority().stream()
+                    .map(this::mapPriority)
+                    .map(priority -> EventDto.FIELD_PRIORITY + ":" + priority)
+                    .collect(joiningQueriesWithOR));
+        }
+
         parameters.filter().aggregationTimerange().ifPresent(aggregationTimerange -> {
             filterBuilder.add(
                     TermRangeQuery.newStringRange(
@@ -98,7 +108,11 @@ public class EventsSearchService {
             );
         });
 
-        parameters.filter().key().ifPresent(keyFilter -> filterBuilder.add(EventDto.FIELD_KEY + ":" + keyFilter));
+        if (!parameters.filter().key().isEmpty()) {
+            filterBuilder.add(parameters.filter().key().stream()
+                    .map(keyFilter -> EventDto.FIELD_KEY + ":" + keyFilter)
+                    .collect(joiningQueriesWithOR));
+        }
 
         switch (parameters.filter().alerts()) {
             case INCLUDE:
@@ -112,7 +126,9 @@ public class EventsSearchService {
                 break;
         }
 
-        final String filter = String.join(" AND ", filterBuilder.build());
+        final String filter = filterBuilder.stream()
+                .map(query -> "(" + query + ")")
+                .collect(joiningQueriesWithAND);
         final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
         final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
