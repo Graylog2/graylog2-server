@@ -93,16 +93,16 @@ public class EventsSearchService {
             filterBuilder.add(
                     TermRangeQuery.newStringRange(
                             EventDto.FIELD_TIMERANGE_START,
-                            "\"1970-01-01 00:00:00.000\"",
-                            "\"" + aggregationTimerange.from().toString(ES_DATE_FORMAT_FORMATTER) + "\"",
+                            quote("1970-01-01 00:00:00.000"),
+                            quote(aggregationTimerange.from().toString(ES_DATE_FORMAT_FORMATTER)),
                             true,
                             true).toString()
             );
             filterBuilder.add(
                     TermRangeQuery.newStringRange(
                             EventDto.FIELD_TIMERANGE_END,
-                            "\"" + aggregationTimerange.to().toString(ES_DATE_FORMAT_FORMATTER) + "\"",
-                            "\"2038-01-01 00:00:00.000\"",
+                            quote(aggregationTimerange.to().toString(ES_DATE_FORMAT_FORMATTER)),
+                            quote("2038-01-01 00:00:00.000"),
                             true,
                             true).toString()
             );
@@ -110,7 +110,7 @@ public class EventsSearchService {
 
         if (!parameters.filter().key().isEmpty()) {
             filterBuilder.add(parameters.filter().key().stream()
-                    .map(keyFilter -> EventDto.FIELD_KEY + ":" + keyFilter)
+                    .map(keyFilter -> EventDto.FIELD_KEY_TUPLE + ":" + quote(keyFilter))
                     .collect(joiningQueriesWithOR));
         }
 
@@ -158,6 +158,10 @@ public class EventsSearchService {
                 .usedIndices(result.usedIndexNames())
                 .context(context)
                 .build();
+    }
+
+    private String quote(String s) {
+        return "\"" + s + "\"";
     }
 
     private long mapPriority(String priorityFilter) {
