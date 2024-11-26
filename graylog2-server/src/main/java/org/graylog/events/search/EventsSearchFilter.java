@@ -33,6 +33,7 @@ public abstract class EventsSearchFilter {
     private static final String FIELD_EVENT_DEFINITIONS = "event_definitions";
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_AGGREGATION_TIMERANGE = "aggregation_timerange";
+    private static final String FIELD_KEY = "key";
 
     public enum Alerts {
         @JsonProperty("include")
@@ -54,6 +55,9 @@ public abstract class EventsSearchFilter {
 
     @JsonProperty(FIELD_AGGREGATION_TIMERANGE)
     public abstract Optional<AbsoluteRange> aggregationTimerange();
+
+    @JsonProperty(FIELD_KEY)
+    public abstract Optional<String> key();
 
     public static EventsSearchFilter empty() {
         return builder().build();
@@ -85,6 +89,9 @@ public abstract class EventsSearchFilter {
 
         @JsonProperty(FIELD_AGGREGATION_TIMERANGE)
         public abstract Builder aggregationTimerange(AbsoluteRange aggregationTimerange);
+
+        @JsonProperty(FIELD_KEY)
+        public abstract Builder key(String key);
 
         public abstract EventsSearchFilter build();
     }

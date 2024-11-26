@@ -75,7 +75,8 @@ export const detailsAttributes: Array<Attribute> = [
     title: 'Key',
     type: 'STRING',
     sortable: true,
-    searchable: false,
+    searchable: true,
+    filterable: true,
   },
   {
     id: 'fields',

@@ -98,6 +98,8 @@ public class EventsSearchService {
             );
         });
 
+        parameters.filter().key().ifPresent(keyFilter -> filterBuilder.add(EventDto.FIELD_KEY + ":" + keyFilter));
+
         switch (parameters.filter().alerts()) {
             case INCLUDE:
                 // Nothing to do
