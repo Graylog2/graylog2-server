@@ -19,7 +19,7 @@ package org.graylog2.commands;
 import com.google.common.collect.Lists;
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import org.graylog2.CommonNodeConfiguration;
+import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.GraylogNodeModule;
 import org.graylog2.bootstrap.CmdLineTool;
 import org.graylog2.featureflag.FeatureFlags;
@@ -31,15 +31,15 @@ import java.util.List;
 /**
  * Inherit from this command to create new standalone node types.
  */
-public abstract class AbstractNodeCommand extends CmdLineTool<CommonNodeConfiguration> {
+public abstract class AbstractNodeCommand extends CmdLineTool<GraylogNodeConfiguration> {
 
     private final GraylogNodeModule nodeModule;
 
-    public AbstractNodeCommand(final CommonNodeConfiguration configuration) {
+    public AbstractNodeCommand(final GraylogNodeConfiguration configuration) {
         this(null, configuration);
     }
 
-    public AbstractNodeCommand(final String commandName, final CommonNodeConfiguration configuration) {
+    public AbstractNodeCommand(final String commandName, final GraylogNodeConfiguration configuration) {
         super(commandName, configuration);
         this.nodeModule = new GraylogNodeModule(configuration);
     }

@@ -110,5 +110,10 @@ module.exports = {
     module: webpackConfig.module,
     resolve: merge.smart({ modules: ['node_modules'] }, webpackConfig.resolve),
     resolveLoader: webpackConfig.resolveLoader,
+    devServer: {
+      client: {
+        overlay: false,
+      },
+    },
   },
 };

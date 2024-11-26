@@ -100,7 +100,7 @@ public abstract class DatanodeBootstrap extends DatanodeCmdLineTool {
 
         final OS os = OS.getOs();
 
-        LOG.info("Graylog DataNode {} {} starting up", commandName, version);
+        LOG.info("Graylog Data Node {} {} starting up", commandName, version);
         LOG.info("JRE: {}", systemInformation);
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());

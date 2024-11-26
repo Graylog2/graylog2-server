@@ -62,14 +62,14 @@ const SidecarListContainer = ({ paginationQueryParameter }: Props) => {
     options.page = effectivePage;
 
     return SidecarsActions.listPaginated(options);
-  }, [paginationQueryParameter?.page, paginationQueryParameter?.pageSize]);
+  }, [paginationQueryParameter.page, paginationQueryParameter.pageSize, sidecars.onlyActive, sidecars.query, sidecars.sort]);
 
   useEffect(() => {
     _reloadSidecars();
     const interval = setInterval(() => _reloadSidecars({}), SIDECAR_DATA_REFRESH);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [_reloadSidecars]);
 
   const handleSortChange = useCallback((field) => () => {
     _reloadSidecars({
@@ -77,11 +77,11 @@ const SidecarListContainer = ({ paginationQueryParameter }: Props) => {
       // eslint-disable-next-line no-nested-ternary
       order: (sidecars.sort.field === field ? (sidecars.sort.order === 'asc' ? 'desc' : 'asc') : 'asc'),
     });
-  }, []);
+  }, [_reloadSidecars, sidecars.sort.field, sidecars.sort.order]);
 
   const handlePageChange = useCallback((page, pageSize) => {
     _reloadSidecars({ page: page, pageSize: pageSize });
-  }, []);
+  }, [_reloadSidecars]);
 
   const handleQueryChange = useCallback((query = '', callback = () => {}) => {
     const { resetPage } = paginationQueryParameter;
@@ -89,7 +89,7 @@ const SidecarListContainer = ({ paginationQueryParameter }: Props) => {
     resetPage();
 
     _reloadSidecars({ query: query }).finally(callback);
-  }, []);
+  }, [_reloadSidecars, paginationQueryParameter]);
 
   const toggleShowInactive = useCallback(() => {
     const { resetPage } = paginationQueryParameter;
@@ -97,11 +97,11 @@ const SidecarListContainer = ({ paginationQueryParameter }: Props) => {
     resetPage();
 
     _reloadSidecars({ onlyActive: !sidecars.onlyActive });
-  }, []);
+  }, [_reloadSidecars, paginationQueryParameter, sidecars.onlyActive]);
 
   const { sidecars: sidecarsList, onlyActive, pagination, query, sort } = sidecars;
 
-  const isLoading = !sidecars;
+  const isLoading = !sidecarsList;
 
   if (isLoading) {
     return <Spinner />;

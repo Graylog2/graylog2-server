@@ -248,18 +248,18 @@ const ConfigurationForm = ({
       const collector = _collectors ? _collectors.find((c) => c.id === collectorId) : undefined;
 
       return (
-        <span>
+        <>
           <FormControl.Static>{_formatCollector(collector)}</FormControl.Static>
           <HelpBlock bsClass="warning">
             <b>Note:</b> Log Collector cannot change while the Configuration is in use. Clone the Configuration
             to test it using another Collector.
           </HelpBlock>
-        </span>
+        </>
       );
     }
 
     return (
-      <span>
+      <>
         <Select inputId="collector_id"
                 options={_formatCollectorOptions()}
                 value={collectorId}
@@ -267,7 +267,7 @@ const ConfigurationForm = ({
                 placeholder="Collector"
                 required />
         <HelpBlock>Choose the log collector this configuration is meant for.</HelpBlock>
-      </span>
+      </>
     );
   };
 

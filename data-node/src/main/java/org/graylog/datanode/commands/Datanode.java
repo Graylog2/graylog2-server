@@ -56,7 +56,7 @@ import java.util.Collection;
 import java.util.List;
 
 
-@Command(name = "datanode", description = "Start the Graylog DataNode")
+@Command(name = "datanode", description = "Start Graylog Data Node")
 public class Datanode extends DatanodeBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Datanode.class);
 

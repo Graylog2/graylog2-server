@@ -22,10 +22,10 @@ import org.graylog2.bootstrap.CmdLineTool;
 
 public abstract class DatanodeCmdLineTool extends CmdLineTool<Configuration> {
 
-    @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog DataNode", override = true)
+    @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog Data Node", override = true)
     protected String configFile = "/etc/graylog/datanode/datanode.conf";
 
-    @Option(name = {"-ff", "--featureflagfile"}, description = "Configuration file for Graylog DataNode feature flags", override = true)
+    @Option(name = {"-ff", "--featureflagfile"}, description = "Configuration file for Graylog Data Node feature flags", override = true)
     protected String customFeatureFlagFile = "/etc/graylog/datanode/feature-flag.conf";
 
     protected String commandName = "command";

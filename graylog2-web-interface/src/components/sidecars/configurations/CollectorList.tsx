@@ -34,21 +34,21 @@ type CollectorListProps = {
   },
   query: string,
   total: number,
-  onClone: (...args: any[]) => void,
-  onDelete: (...args: any[]) => void,
-  onPageChange: (...args: any[]) => void,
-  onQueryChange: (...args: any[]) => void,
+  onClone: (collector: string, name: string, callback: () => void) => void,
+  onDelete: (collector: Collector) => void,
+  onPageChange: (page: number, pageSize: number) => void,
+  onQueryChange: () => void,
   validateCollector: (collector: Collector) => Promise<{ errors: { name: string[] } }>,
 }
 
+const headerCellFormatter = (header: React.ReactNode) => {
+  const className = (header === 'Actions' ? style.actionsColumn : '');
+
+  return <th className={className}>{header}</th>;
+};
+
 class CollectorList extends React.Component<CollectorListProps> {
-  headerCellFormatter(header) {
-    const className = (header === 'Actions' ? style.actionsColumn : '');
-
-    return <th className={className}>{header}</th>;
-  }
-
-  collectorFormatter(collector) {
+  collectorFormatter = (collector: Collector) => {
     const { onClone, onDelete, validateCollector } = this.props;
 
     return (
@@ -57,7 +57,7 @@ class CollectorList extends React.Component<CollectorListProps> {
                     onDelete={onDelete}
                     validateCollector={validateCollector} />
     );
-  }
+  };
 
   render() {
     const { collectors, pagination, query, total, onPageChange, onQueryChange } = this.props;
@@ -100,7 +100,7 @@ class CollectorList extends React.Component<CollectorListProps> {
                 <DataTable id="collector-list"
                            className="table-hover"
                            headers={headers}
-                           headerCellFormatter={this.headerCellFormatter}
+                           headerCellFormatter={headerCellFormatter}
                            rows={collectors}
                            dataRowFormatter={this.collectorFormatter}
                            noDataText="There are no log collectors to display, why don't you create one?"

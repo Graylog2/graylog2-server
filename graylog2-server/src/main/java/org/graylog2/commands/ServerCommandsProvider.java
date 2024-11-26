@@ -31,7 +31,6 @@ public class ServerCommandsProvider implements CliCommandsProvider {
 
         builder.withCommand(Server.class);
         builder.withCommand(MigrateCmd.class);
-        builder.withCommand(ExampleCommand.class);
 
         builder.withGroup("journal")
                 .withDescription("Manage the persisted message journal")

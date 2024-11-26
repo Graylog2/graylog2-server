@@ -16,6 +16,10 @@
  */
 package org.graylog2;
 
+import org.graylog2.plugin.ServerStatus;
+
+import java.util.Set;
+
 import org.graylog2.shared.plugins.PluginLoader;
 
 /**
@@ -40,6 +44,21 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
 
     @Override
     default boolean withPlugins() {
+        return false;
+    }
+
+    @Override
+    default boolean withNodeIdFile() {
+        return true;
+    }
+
+    @Override
+    default Set<ServerStatus.Capability> withCapabilities() {
+        return Set.of(ServerStatus.Capability.SERVER);
+    }
+
+    @Override
+    default boolean isMessageRecordingsEnabled() {
         return false;
     }
 

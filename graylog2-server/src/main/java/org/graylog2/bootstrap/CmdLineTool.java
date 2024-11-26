@@ -32,6 +32,7 @@ import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
 import com.github.luben.zstd.util.Native;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -597,10 +598,9 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         for (Message message : messages) {
             //noinspection ThrowableResultOfMethodCallIgnored
             final Throwable rootCause = ExceptionUtils.getRootCause(message.getCause());
-            if (rootCause instanceof NodeIdPersistenceException) {
-                //TODO: Check configuration
-//                LOG.error(UI.wallString(
-//                        "Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
+            if (configuration.withNodeIdFile() && rootCause instanceof NodeIdPersistenceException) {
+                LOG.error(UI.wallString(
+                        "Unable to read or persist your NodeId file. This means your node id file is not readable or writable by the current user. The following exception might give more information: " + message));
                 System.exit(-1);
             } else if (rootCause instanceof AccessDeniedException) {
                 LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));
@@ -625,5 +625,10 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
     protected Set<ServerStatus.Capability> capabilities() {
         return Collections.emptySet();
+    }
+
+    @VisibleForTesting
+    protected void setConfigFile(String configFile) {
+        this.configFile = configFile;
     }
 }

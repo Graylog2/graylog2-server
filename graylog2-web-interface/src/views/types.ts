@@ -14,11 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
 import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 
+import type { ExportPayload } from 'util/MessagesExportUtils';
 import type { IconName } from 'components/common/Icon';
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
@@ -59,7 +61,6 @@ import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
-import type { ExportPayload } from 'util/MessagesExportUtils';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -310,6 +311,13 @@ type DashboardAction<T> = {
   useCondition?: () => boolean,
 }
 
+type EventAction = {
+  useCondition: () => boolean,
+  modal?: React.ComponentType<EventActionModalProps<unknown>>,
+  component: React.ComponentType<EventActionComponentProps>,
+  key: string,
+}
+
 type EventWidgetAction<T> = {
   key: string,
   component: React.ComponentType<EventWidgetActionComponentProps<T>>,
@@ -322,8 +330,9 @@ type AssetInformation = {
   key: string,
 }
 
-type EventActionComponentProps = {
+export type EventActionComponentProps = {
   eventId: string,
+  modalRef: () => unknown,
 }
 
 type MessageActionComponentProps = {
@@ -474,12 +483,8 @@ declare module 'graylog-web-plugin/plugin' {
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
-    'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
-    'views.components.eventActions'?: Array<{
-      useCondition: () => boolean,
-      component: React.ComponentType<EventActionComponentProps>,
-      key: string,
-    }>;
+    'views.components.dashboardActions'?: Array<DashboardAction<unknown>>
+    'views.components.eventActions'?: Array<EventAction>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<MessageDetailContextProviderProps>>>;

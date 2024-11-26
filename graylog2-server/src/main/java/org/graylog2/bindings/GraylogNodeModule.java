@@ -28,9 +28,11 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.SchedulerBindings;
+import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
 
 import java.util.Set;
@@ -53,7 +55,7 @@ public class GraylogNodeModule extends Graylog2Module {
 
     @Override
     protected void configure() {
-        // install(new ServerStatusBindings(nodeSettings.capabilities())); TODO: Create MinimalServerStatus without processing/message stuff
+        bind(GraylogNodeConfiguration.class).toInstance(configuration);
         if (configuration.withMongoDb()) {
             install(new MongoDbConnectionModule());
             install(new ObjectMapperModule());
@@ -68,7 +70,16 @@ public class GraylogNodeModule extends Graylog2Module {
         }
         // ensure we always create a new LocalMetricRegistry, they are meant to be separate from each other
         bind(LocalMetricRegistry.class).in(Scopes.NO_SCOPE);
-        bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
+
+        if (configuration.withNodeIdFile()) {
+            bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
+        } else {
+            bind(NodeId.class).toInstance(new SimpleNodeId("dummy-nodeid"));
+        }
+
+        if (!configuration.withCapabilities().isEmpty()) {
+            install(new ServerStatusBindings(configuration.withCapabilities()));
+        }
 
         bind(EncryptedValueService.class).asEagerSingleton();
         bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
@@ -77,7 +88,6 @@ public class GraylogNodeModule extends Graylog2Module {
     public Set<Object> getConfigurationBeans() {
         Set<Object> configurationBeans = Sets.newHashSet();
         configurationBeans.add(configuration);
-        //todo: if possible, these ifs should be removed and necessary configurations resolved somehow
         if (configuration.withMongoDb()) {
             configurationBeans.add(new MongoDbConfiguration());
         }

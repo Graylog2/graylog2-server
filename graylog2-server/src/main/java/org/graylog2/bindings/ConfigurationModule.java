@@ -19,6 +19,7 @@ package org.graylog2.bindings;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.graylog2.Configuration;
+import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.plugin.BaseConfiguration;
 
 import static java.util.Objects.requireNonNull;
@@ -34,5 +35,6 @@ public class ConfigurationModule implements Module {
     public void configure(Binder binder) {
         binder.bind(Configuration.class).toInstance(configuration);
         binder.bind(BaseConfiguration.class).toInstance(configuration);
+        binder.bind(GraylogNodeConfiguration.class).toInstance(configuration);
     }
 }

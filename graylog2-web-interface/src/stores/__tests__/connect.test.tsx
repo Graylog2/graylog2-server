@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { act, render, screen } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import Reflux from 'reflux';
 import { Map, List } from 'immutable';
 
@@ -248,6 +248,11 @@ describe('connect()', () => {
   });
 });
 
+type StoreType<State> = {
+  getInitialState: () => State;
+  listen: (cb: (state: State) => unknown) => () => void;
+};
+
 describe('useStore', () => {
   const SimpleComponent = () => {
     const { value } = useStore(SimpleStore) || {};
@@ -350,5 +355,25 @@ describe('useStore', () => {
     await screen.findByText('Value is: 84');
 
     expect(listenSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('store without `getInitialState` function does not throw error', async () => {
+    const Store = {
+      listen: jest.fn(),
+    } as unknown as StoreType<number>;
+
+    const mapper = jest.fn((v: number) => v);
+
+    const ComponentWithStore = () => {
+      const value = useStore(Store, mapper);
+
+      return <span>{value}</span>;
+    };
+
+    render(<ComponentWithStore />);
+
+    await waitFor(() => {
+      expect(mapper).toHaveBeenCalledWith(undefined);
+    });
   });
 });
