@@ -20,15 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-
-import javax.annotation.Nullable;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.users.ValidPassword;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @JsonAutoDetect
@@ -40,6 +39,7 @@ public abstract class CreateUserRequest {
     public abstract String username();
 
     @JsonProperty
+    @ValidPassword
     public abstract String password();
 
     @JsonProperty
