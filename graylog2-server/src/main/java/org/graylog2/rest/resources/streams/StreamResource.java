@@ -625,6 +625,7 @@ public class StreamResource extends RestResource {
     @POST
     @Path("/pipelines")
     @ApiOperation(value = "Get pipelines associated with specified streams")
+    @NoAuditEvent("No data is changed.")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, List<PipelineCompactSource>> getConnectedPipelinesForStreams(@ApiParam(name = "streamIds", required = true) GetConnectedPipelinesRequest request) {
         return request.streamIds().stream()
