@@ -92,9 +92,7 @@ const DashboardDeleteAction = ({ dashboard, refetchDashboards, isEvidenceModal =
   }, [dashboard, deselectEntity, refetchDashboards, paginationQueryParameter]);
 
   return isEvidenceModal ? null : (
-    <DeleteMenuItem onClick={onDashboardDelete}>
-      Delete
-    </DeleteMenuItem>
+    <DeleteMenuItem onClick={onDashboardDelete} />
   );
 };
 

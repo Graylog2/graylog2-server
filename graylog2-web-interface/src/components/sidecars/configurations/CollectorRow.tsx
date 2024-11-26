@@ -60,7 +60,7 @@ const CollectorRow = ({ collector, onClone, onDelete, validateCollector }: Props
                                 validateCollector={validateCollector}
                                 copyCollector={onClone} />
             <MenuItem divider />
-            <DeleteMenuItem onSelect={handleDelete}>Delete</DeleteMenuItem>
+            <DeleteMenuItem onSelect={handleDelete} />
           </MoreActions>
         </ButtonToolbar>
       </td>

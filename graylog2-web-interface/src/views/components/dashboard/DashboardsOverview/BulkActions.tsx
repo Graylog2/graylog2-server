@@ -60,7 +60,7 @@ const BulkActions = () => {
 
   return (
     <BulkActionsDropdown>
-      <DeleteMenuItem onSelect={onDelete}>Delete</DeleteMenuItem>
+      <DeleteMenuItem onSelect={onDelete} />
     </BulkActionsDropdown>
   );
 };

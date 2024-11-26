@@ -139,7 +139,7 @@ const EventDefinitionEntry = ({
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
-              <DeleteMenuItem onClick={handleDelete}>Delete</DeleteMenuItem>
+              <DeleteMenuItem onClick={handleDelete} />
             </IfPermitted>
           )}
         </DropdownButton>

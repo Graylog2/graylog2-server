@@ -147,7 +147,7 @@ class EventNotifications extends React.Component<EventNotificationsProps, {
             </IfPermitted>
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
-              <DeleteMenuItem onClick={onDelete(notification)}>Delete</DeleteMenuItem>
+              <DeleteMenuItem onClick={onDelete(notification)} />
             </IfPermitted>
           </DropdownButton>
         </IfPermitted>

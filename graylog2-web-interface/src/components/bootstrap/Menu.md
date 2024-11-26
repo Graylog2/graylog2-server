@@ -9,7 +9,7 @@ import { Menu, MenuItem, DeleteMenuItem, Button } from 'components/bootstrap';
   <Menu.Dropdown>
     <MenuItem onClick={() => console.log('on click menu item')}>Edit</MenuItem>
     <Menu.Divider />
-    <DeleteMenuItem onClick={() => console.log('on click menu item')}>Delete</DeleteMenuItem>
+    <DeleteMenuItem onClick={() => console.log('on click menu item')} />
   </Menu.Dropdown>
 </Menu>
 ```

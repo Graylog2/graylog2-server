@@ -84,9 +84,7 @@ const TemplateActions = ({ id, title, built_in, isDefault, isEnabled } : Props) 
           <MenuItem onSelect={onSetAsDefault}>
             Set as default
           </MenuItem>
-          <DeleteMenuItem onSelect={onDelete}>
-            Delete
-          </DeleteMenuItem>
+          <DeleteMenuItem onSelect={onDelete} />
         </MoreActions>
         )}
       </ButtonToolbar>

@@ -44,9 +44,7 @@ const ProfileActions = ({ profileId, profileName }: { profileId: string, profile
         </Button>
       </LinkContainer>
       <MoreActions>
-        <DeleteMenuItem onSelect={onDelete}>
-          Delete
-        </DeleteMenuItem>
+        <DeleteMenuItem onSelect={onDelete} />
       </MoreActions>
     </ButtonToolbar>
   );

@@ -105,7 +105,7 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
             </IfPermitted>
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
-              <DeleteMenuItem onClick={onDelete}>Delete</DeleteMenuItem>
+              <DeleteMenuItem onClick={onDelete} />
             </IfPermitted>
           </IfPermitted>
         </MoreActions>

@@ -194,7 +194,7 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
               <MenuItem onClick={onInsertAbove}>Insert above</MenuItem>
               <MenuItem onClick={onInsertBelow}>Insert below</MenuItem>
               <MenuItem divider />
-              <DeleteMenuItem onClick={onDelete}>Delete</DeleteMenuItem>
+              <DeleteMenuItem onClick={onDelete} />
             </OverlayDropdownButton>
           </ActionsContainer>
         )}

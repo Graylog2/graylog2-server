@@ -273,9 +273,7 @@ const WidgetActionsMenu = ({
           </IfDashboard>
           <ExtraDropdownWidgetActions widget={widget} />
           <MenuItem divider />
-          <DeleteMenuItem onSelect={onDelete}>
-            Delete
-          </DeleteMenuItem>
+          <DeleteMenuItem onSelect={onDelete} />
         </WidgetActionDropdown>
 
         {showCopyToDashboard && (

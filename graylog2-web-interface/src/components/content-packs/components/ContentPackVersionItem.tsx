@@ -98,9 +98,7 @@ const ContentPackVersionItem = ({
               <MenuItem>Create New From Revision</MenuItem>
             </LinkContainer>
             <MenuItem divider />
-            <DeleteMenuItem onClick={() => { onDeletePack(pack.id, pack.rev); }}>
-              Delete
-            </DeleteMenuItem>
+            <DeleteMenuItem onClick={() => { onDeletePack(pack.id, pack.rev); }} />
           </DropdownButton>
         </ButtonToolbar>
       </td>

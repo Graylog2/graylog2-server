@@ -97,7 +97,7 @@ const BulkActions = ({ indexSets }: Props) => {
                            refetchStreams={refetchStreams}
                            descriptor={descriptor} />
 
-        <DeleteMenuItem onSelect={onDelete}>Delete</DeleteMenuItem>
+        <DeleteMenuItem onSelect={onDelete} />
       </BulkActionsDropdown>
     </>
   );

@@ -275,9 +275,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               <DeleteMenuItem disabled={isSystemEventDefinition() || isSigmaEventDefinition()}
                               title={getDeleteActionTitle()}
                               onClick={isSystemEventDefinition() || isSigmaEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
-                              data-testid="delete-button">
-                Delete
-              </DeleteMenuItem>
+                              data-testid="delete-button" />
             </IfPermitted>
           )}
           {

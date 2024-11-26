@@ -137,9 +137,7 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
           )}
           <DeleteMenuItem id={`delete-user-${id}`}
                           title={`Delete user ${fullName}`}
-                          onClick={_deleteUser}>
-            Delete
-          </DeleteMenuItem>
+                          onClick={_deleteUser} />
         </IfPermitted>
       </MoreActions>
     </>

@@ -96,7 +96,7 @@ class ConfigurationRow extends React.Component<ConfigurationRowProps, {
               <MenuItem onSelect={() => this.openModal()}>Clone</MenuItem>
 
               <MenuItem divider />
-              <DeleteMenuItem onSelect={this._handleDelete}>Delete</DeleteMenuItem>
+              <DeleteMenuItem onSelect={this._handleDelete} />
             </MoreActions>
             {showModal && (
             <CopyConfigurationModal configuration={configuration}

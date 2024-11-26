@@ -144,7 +144,7 @@ const BulkActions = () => {
       <BulkActionsDropdown>
         <MenuItem onSelect={() => handleAction(ACTION_TYPES.ENABLE)}>Enable</MenuItem>
         <MenuItem onSelect={() => handleAction(ACTION_TYPES.DISABLE)}>Disable</MenuItem>
-        <DeleteMenuItem onSelect={() => handleAction(ACTION_TYPES.DELETE)}>Delete</DeleteMenuItem>
+        <DeleteMenuItem onSelect={() => handleAction(ACTION_TYPES.DELETE)} />
       </BulkActionsDropdown>
       {showDialog && (
         <ConfirmDialog title={ACTION_TEXT[actionType]?.dialogTitle}

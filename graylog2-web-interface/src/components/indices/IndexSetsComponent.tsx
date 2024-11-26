@@ -157,7 +157,7 @@ const IndexSetsComponent = () => {
                     disabled={!indexSet.can_be_default || indexSet.default}>Set as default
           </MenuItem>
           <MenuItem divider />
-          <DeleteMenuItem onSelect={onDelete(indexSet)}>Delete</DeleteMenuItem>
+          <DeleteMenuItem onSelect={onDelete(indexSet)} />
         </DropdownButton>
       </ButtonToolbar>
     );

@@ -26,6 +26,6 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => css`
 
 type Props = React.ComponentProps<typeof MenuItem>
 
-const DeleteMenuItem = (props: Props) => <StyledMenuItem {...props} />;
+const DeleteMenuItem = ({ children = 'Delete', ...props }: Props) => <StyledMenuItem {...props}>{children}</StyledMenuItem>;
 
 export default DeleteMenuItem;
