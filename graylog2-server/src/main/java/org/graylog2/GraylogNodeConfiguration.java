@@ -16,6 +16,10 @@
  */
 package org.graylog2;
 
+import org.graylog2.plugin.ServerStatus;
+
+import java.util.Set;
+
 /**
  * Helper class to hold configuration shared by all Graylog node types
  */
@@ -31,8 +35,11 @@ public interface GraylogNodeConfiguration {
 
     boolean withNodeIdFile();
 
+    Set<ServerStatus.Capability> withCapabilities();
+
     String getEnvironmentVariablePrefix();
 
     String getSystemPropertyPrefix();
 
+    boolean isMessageRecordingsEnabled();
 }

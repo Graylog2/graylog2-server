@@ -32,6 +32,7 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.SchedulerBindings;
+import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
 
 import java.util.Set;
@@ -54,7 +55,7 @@ public class GraylogNodeModule extends Graylog2Module {
 
     @Override
     protected void configure() {
-        // install(new ServerStatusBindings(nodeSettings.capabilities())); TODO: Create MinimalServerStatus without processing/message stuff
+        bind(GraylogNodeConfiguration.class).toInstance(configuration);
         if (configuration.withMongoDb()) {
             install(new MongoDbConnectionModule());
             install(new ObjectMapperModule());
@@ -74,6 +75,10 @@ public class GraylogNodeModule extends Graylog2Module {
             bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         } else {
             bind(NodeId.class).toInstance(new SimpleNodeId("dummy-nodeid"));
+        }
+
+        if (!configuration.withCapabilities().isEmpty()) {
+            install(new ServerStatusBindings(configuration.withCapabilities()));
         }
 
         bind(EncryptedValueService.class).asEagerSingleton();
