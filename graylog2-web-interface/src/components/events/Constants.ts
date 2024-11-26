@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import capitalize from 'lodash/capitalize';
-
 import type { Sort, Attribute } from 'stores/PaginationTypes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
@@ -35,8 +33,8 @@ export const detailsAttributes: Array<Attribute> = [
     sortable: true,
     searchable: false,
     filterable: true,
-    filter_options: Object.entries(EventDefinitionPriorityEnum.properties)
-      .map(([num, def]) => ({ value: def.name, title: `${num} - ${capitalize(def.name)}` })),
+    filter_options: Object.keys(EventDefinitionPriorityEnum.properties)
+      .map((num) => ({ value: num, title: num })),
   },
   {
     id: 'timestamp',
