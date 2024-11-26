@@ -34,6 +34,7 @@ type FiltersResult = {
     alerts?: string,
     event_definitions?: Array<string>,
     priority?: string,
+    aggregation_timerange?: { from?: string, to?: string, type: string, range?: number },
   },
   timerange?: { from?: string, to?: string, type: string, range?: number },
 };
@@ -49,6 +50,14 @@ const parseFilters = (filters: UrlQueryFilters) => {
       : { type: 'relative', range: 0 };
   } else {
     result.timerange = { type: 'relative', range: 0 };
+  }
+
+  if (filters.get('timerange_start')?.[0]) {
+    const [from, to] = extractRangeFromString(filters.get('timerange_start')[0]);
+
+    result.filter.aggregation_timerange = from
+      ? { from, to: to || adjustFormat(moment().utc(), 'internal'), type: 'absolute' }
+      : { type: 'relative', range: 0 };
   }
 
   if (filters.get('event_definition_id')?.[0]) {

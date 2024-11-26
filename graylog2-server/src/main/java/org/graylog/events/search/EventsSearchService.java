@@ -19,6 +19,7 @@ package org.graylog.events.search;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
+import org.apache.lucene.search.TermRangeQuery;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
@@ -38,6 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
@@ -76,7 +78,25 @@ public class EventsSearchService {
             filterBuilder.addAll(Collections.singleton("(" + eventDefinitionFilter + ")"));
         }
 
-        parameters.filter().priority().ifPresent(priorityFilter -> filterBuilder.add("priority:" + mapPriority(priorityFilter)));
+        parameters.filter().priority().ifPresent(priorityFilter -> filterBuilder.add(EventDto.FIELD_PRIORITY + ":" + mapPriority(priorityFilter)));
+        parameters.filter().aggregationTimerange().ifPresent(aggregationTimerange -> {
+            filterBuilder.add(
+                    TermRangeQuery.newStringRange(
+                            EventDto.FIELD_TIMERANGE_START,
+                            "\"1970-01-01 00:00:00.000\"",
+                            "\"" + aggregationTimerange.from().toString(ES_DATE_FORMAT_FORMATTER) + "\"",
+                            true,
+                            true).toString()
+            );
+            filterBuilder.add(
+                    TermRangeQuery.newStringRange(
+                            EventDto.FIELD_TIMERANGE_END,
+                            "\"" + aggregationTimerange.to().toString(ES_DATE_FORMAT_FORMATTER) + "\"",
+                            "\"2038-01-01 00:00:00.000\"",
+                            true,
+                            true).toString()
+            );
+        });
 
         switch (parameters.filter().alerts()) {
             case INCLUDE:

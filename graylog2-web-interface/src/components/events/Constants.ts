@@ -67,6 +67,8 @@ export const detailsAttributes: Array<Attribute> = [
     id: 'timerange_start',
     title: 'Aggregation time range',
     sortable: true,
+    type: 'DATE',
+    filterable: true,
   },
   {
     id: 'key',
