@@ -70,7 +70,7 @@ describe('EditWidgetFrame', () => {
     const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) => render((
       <TestStoreProvider>
         <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} onChange={() => Promise.resolve()} {...props}>
+          <EditWidgetFrame onCancel={() => {}} onSubmit={() => Promise.resolve()} {...props}>
             Hello World!
             These are some buttons!
           </EditWidgetFrame>
@@ -114,7 +114,7 @@ describe('EditWidgetFrame', () => {
     });
 
     it('calls onSubmit', async () => {
-      const onSubmit = jest.fn();
+      const onSubmit = jest.fn(() => Promise.resolve());
       renderSUT({ onSubmit });
 
       fireEvent.click(await screen.findByRole('button', { name: /update widget/i }));

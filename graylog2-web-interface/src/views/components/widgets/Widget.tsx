@@ -175,14 +175,19 @@ export const EditWrapper = ({
   const EditComponent = useMemo(() => _editComponentForType(type), [type]);
   const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
   const dispatch = useAppDispatch();
-  const onChangeWidget = useCallback((newWidget: WidgetType) => (
-    dispatch(updateWidget(newWidget.id, newWidget)).then(() => {})
-  ), [dispatch]);
+  const onSubmitEdit = useCallback((newWidget: WidgetType, hasChanges: boolean) => {
+    if (hasChanges) {
+      return dispatch(updateWidget(newWidget.id, newWidget)).then(() => onToggleEdit());
+    }
+
+    onToggleEdit();
+
+    return Promise.resolve();
+  }, [dispatch, onToggleEdit]);
 
   return editing ? (
-    <EditWidgetFrame onSubmit={onToggleEdit}
+    <EditWidgetFrame onSubmit={onSubmitEdit}
                      onCancel={onCancelEdit}
-                     onChange={onChangeWidget}
                      displaySubmitActions={!hasOwnSubmitButton}
                      showQueryControls={showQueryControls}>
       <EditComponent config={config}
@@ -190,7 +195,6 @@ export const EditWrapper = ({
                      editing={editing}
                      id={id}
                      type={type}
-                     onSubmit={onToggleEdit}
                      onCancel={onCancelEdit}
                      onChange={onWidgetConfigChange}>
         {children}

@@ -38,7 +38,7 @@ const useApplyAllWidgetChanges = (
   widget: Widget,
   applySearchControlsChanges: React.RefObject<(widget: Widget) => Widget>,
   applyElementConfigurationChanges: React.RefObject<(widgetConfig: WidgetConfig) => WidgetConfig>,
-  onChange: (newWidget: Widget) => Promise<void>,
+  onSubmit: (newWidget: Widget, hasChanges: boolean) => Promise<void>,
 ) => {
   const { setDisabled } = useContext(DisableSubmissionStateContext);
   const setDisableWidgetEditSubmit = useCallback(
@@ -67,31 +67,27 @@ const useApplyAllWidgetChanges = (
       }
     }
 
-    if (hasChanges) {
-      setDisableWidgetEditSubmit(true);
+    setDisableWidgetEditSubmit(true);
 
-      return onChange(newWidget)
-        .catch((error) => {
-          UserNotification.error(`Applying widget changes failed with status: ${error}`);
+    return onSubmit(newWidget, hasChanges)
+      .catch((error) => {
+        UserNotification.error(`Applying widget changes failed with status: ${error}`);
 
-          return error;
-        }).finally(() => setDisableWidgetEditSubmit(false));
-    }
-
-    return Promise.resolve();
-  }, [widget, applySearchControlsChanges, applyElementConfigurationChanges, setDisableWidgetEditSubmit, onChange]);
+        return error;
+      }).finally(() => setDisableWidgetEditSubmit(false));
+  }, [widget, applySearchControlsChanges, applyElementConfigurationChanges, setDisableWidgetEditSubmit, onSubmit]);
 };
 
 type Props = {
-  widget: Widget,
   children: React.ReactNode,
-  onChange: (newWidget: Widget) => Promise<void>,
+  onSubmit: (newWidget: Widget, hasChanges: boolean) => Promise<void>,
+  widget: Widget,
 }
 
-const WidgetEditApplyAllChangesProvider = ({ children, widget, onChange }: Props) => {
+const WidgetEditApplyAllChangesProvider = ({ children, widget, onSubmit }: Props) => {
   const { applyChangesRef: applySearchControlsChanges, bindApplyChanges: bindApplySearchControlsChanges } = useBindApplyChanges();
   const { applyChangesRef: applyElementConfigurationChanges, bindApplyChanges: bindApplyElementConfigurationChanges } = useBindApplyChanges();
-  const applyAllWidgetChanges = useApplyAllWidgetChanges(widget, applySearchControlsChanges, applyElementConfigurationChanges, onChange);
+  const applyAllWidgetChanges = useApplyAllWidgetChanges(widget, applySearchControlsChanges, applyElementConfigurationChanges, onSubmit);
 
   const contextValue = useMemo(() => ({
     applyAllWidgetChanges,

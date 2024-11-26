@@ -51,13 +51,12 @@ type Props = {
   children: React.ReactNode,
   displaySubmitActions?: boolean,
   onCancel: () => void,
-  onSubmit: () => void,
   showQueryControls?: boolean,
-  onChange: (newWidget: Widget) => Promise<void>,
+  onSubmit: (newWidget: Widget, hasChanges: boolean) => Promise<void>,
   containerComponent?: React.ComponentType<React.PropsWithChildren>
 };
 
-const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = true, showQueryControls = true, onChange, containerComponent: ContainerComponent = WidgetOverrideElements }: Props) => {
+const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = true, showQueryControls = true, containerComponent: ContainerComponent = WidgetOverrideElements }: Props) => {
   const widget = useContext(WidgetContext);
 
   if (!widget) {
@@ -65,7 +64,7 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = 
   }
 
   return (
-    <WidgetEditApplyAllChangesProvider widget={widget} onChange={onChange}>
+    <WidgetEditApplyAllChangesProvider widget={widget} onSubmit={onSubmit}>
       <DisableSubmissionStateProvider>
         <Container>
           {(showQueryControls && !widget.returnsAllRecords) && (
@@ -82,7 +81,7 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = 
           </Visualization>
           {displaySubmitActions && (
             <div>
-              <SaveOrCancelButtons onSubmit={onSubmit} onCancel={onCancel} />
+              <SaveOrCancelButtons onCancel={onCancel} />
             </div>
           )}
         </Container>

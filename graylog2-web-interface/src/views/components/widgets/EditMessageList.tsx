@@ -69,7 +69,7 @@ const _onSortDirectionChange = (direction: SortConfig['direction'], config, onCh
   return onChange(newConfig);
 };
 
-const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmit }: EditWidgetComponentProps<MessagesWidgetConfig>) => {
+const EditMessageList = ({ children, config, fields, onChange, onCancel }: EditWidgetComponentProps<MessagesWidgetConfig>) => {
   const { sort } = config;
   const [sortDirection] = (sort || []).map((s) => s.direction);
   const onDecoratorsChange = (newDecorators) => onChange(config.toBuilder().decorators(newDecorators).build());
@@ -79,7 +79,7 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
   return (
     <FullHeightRow>
       <FullHeightCol md={3}>
-        <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
+        <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} />}
                              alignActionsAtBottom>
           <DescriptionBox description="Fields">
             <FieldsConfiguration onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
