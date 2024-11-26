@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useQuery } from '@tanstack/react-query';
-import { create, windowScheduler } from '@yornaath/batshit';
+import { create, windowScheduler, indexedResolver } from '@yornaath/batshit';
 
 import { Streams } from '@graylog/server-api';
 import type FetchError from 'logic/errors/FetchError';
@@ -25,7 +25,7 @@ export type StreamConnectedPipelines = Array<Pick<PipelineType, 'id' | 'title'>>
 
 const pipelines = create({
   fetcher: async (streamIds: Array<string>) => Streams.getConnectedPipelinesForStreams({ stream_ids: streamIds }),
-  resolver: (items, query) => items[query],
+  resolver: indexedResolver(),
   scheduler: windowScheduler(10),
 });
 
