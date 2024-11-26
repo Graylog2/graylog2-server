@@ -31,7 +31,18 @@ type Props = {
   operatingSystem?: string
 };
 
-const matchIcon = (os: string) => {
+const defaultIcon = {
+  iconName: 'help',
+  iconType: 'default',
+} as const;
+
+const matchIcon = (_os: string) => {
+  if (!_os) {
+    return defaultIcon;
+  }
+
+  const os = _os.trim().toLowerCase();
+
   if (os.includes('darwin') || os.includes('mac os')) {
     return {
       iconName: 'apple',
@@ -60,14 +71,11 @@ const matchIcon = (os: string) => {
     } as const;
   }
 
-  return {
-    iconName: 'help',
-    iconType: 'default',
-  } as const;
+  return defaultIcon;
 };
 
-const OperatingSystemIcon = ({ operatingSystem }: Props) => {
-  const { iconName, iconType } = matchIcon(operatingSystem.trim().toLowerCase());
+const OperatingSystemIcon = ({ operatingSystem = undefined }: Props) => {
+  const { iconName, iconType } = matchIcon(operatingSystem);
 
   return (
     <Container>

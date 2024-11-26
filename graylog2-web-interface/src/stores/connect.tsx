@@ -42,7 +42,7 @@ export function useStore<U> (store: StoreType<U>): U;
 export function useStore<U, M extends (props: U) => any> (store: StoreType<U>, propsMapper: M): ReturnType<M>;
 
 export function useStore(store, propsMapper = id) {
-  const [storeState, setStoreState] = useState(() => store.getInitialState());
+  const [storeState, setStoreState] = useState(() => store.getInitialState?.());
   const storeStateRef = useRef(storeState);
 
   const mappedStoreState = useMemo(() => propsMapper(storeState), [propsMapper, storeState]);
@@ -54,7 +54,7 @@ export function useStore(store, propsMapper = id) {
         storeStateRef.current = newState;
       }
     });
-    setStoreState(store.getInitialState());
+    setStoreState(store.getInitialState?.());
 
     return unsub;
   }, [store]);
