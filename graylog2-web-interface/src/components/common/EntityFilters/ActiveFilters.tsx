@@ -42,28 +42,30 @@ type Props = {
   onDeleteFilter: (attributeId: string, filterValue: string) => void,
 }
 
-const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
+const ActiveFilters = ({ attributes, filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
   <>
-    {filters.entrySeq().map(([attributeId, filterValues]) => {
-      const attribute = attributes.find(({ id }) => id === attributeId);
+    {filters.entrySeq()
+      .map(([attributeId, filterValues]) => {
+        const attribute = attributes?.find(({ id }) => id === attributeId);
 
-      return (
-        <FilterGroup key={attributeId}>
-          <FilterGroupTitle>
-            {attribute.title}:
-          </FilterGroupTitle>
-          {filterValues.map((filter) => (
-            <ActiveFilter filter={filter}
-                          allActiveFilters={filters}
-                          key={`${attribute.id}-${filter.value}`}
-                          attribute={attribute}
-                          filterValueRenderer={filterValueRenderers?.[attributeId]}
-                          onChangeFilter={onChangeFilter}
-                          onDeleteFilter={onDeleteFilter} />
-          ))}
-        </FilterGroup>
-      );
-    })}
+        return (
+          <FilterGroup key={attributeId}>
+            <FilterGroupTitle>
+              {attribute.title}:
+            </FilterGroupTitle>
+            {filterValues.map((filter) => (
+              <ActiveFilter filter={filter}
+                            allActiveFilters={filters}
+                            key={`${attribute.id}-${filter.value}`}
+                            attribute={attribute}
+                            filterValueRenderer={filterValueRenderers?.[attributeId]}
+                            onChangeFilter={onChangeFilter}
+                            onDeleteFilter={onDeleteFilter} />
+            ))}
+          </FilterGroup>
+        );
+      })
+      .toArray()}
   </>
 );
 
