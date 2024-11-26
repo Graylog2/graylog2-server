@@ -25,7 +25,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
-import CommonRefreshControls from 'components/common/CommonRefreshControls';
+import RefreshControls from 'components/common/RefreshControls';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 
 const useDisableOnFormChange = () => {
@@ -43,7 +43,7 @@ type Props = {
   disable?: boolean
 }
 
-const RefreshControls = ({ disable = false }: Props) => {
+const ViewsRefreshControls = ({ disable = false }: Props) => {
   const { dirty, submitForm } = useFormikContext();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -83,16 +83,16 @@ const RefreshControls = ({ disable = false }: Props) => {
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions);
 
   return (
-    <CommonRefreshControls disable={disable}
-                           intervalOptions={intervalOptions}
-                           isLoadingMinimumInterval={isLoadingMinimumInterval}
-                           minimumRefreshInterval={minimumRefreshInterval}
-                           defaultInterval={defaultInterval}
-                           humanName="Search"
-                           onToggle={onToggle}
-                           onEnable={submitForm}
-                           onSelectInterval={onSelectInterval} />
+    <RefreshControls disable={disable}
+                     intervalOptions={intervalOptions}
+                     isLoadingMinimumInterval={isLoadingMinimumInterval}
+                     minimumRefreshInterval={minimumRefreshInterval}
+                     defaultInterval={defaultInterval}
+                     humanName="Search"
+                     onToggle={onToggle}
+                     onEnable={submitForm}
+                     onSelectInterval={onSelectInterval} />
   );
 };
 
-export default RefreshControls;
+export default ViewsRefreshControls;

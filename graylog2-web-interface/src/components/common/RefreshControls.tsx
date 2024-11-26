@@ -21,7 +21,7 @@ import { ProgressAnimation, Icon, Spinner, HoverForHelp } from 'components/commo
 import { Button, DropdownButton, MenuItem, ButtonGroup } from 'components/bootstrap';
 import ReadableDuration from 'components/common/ReadableDuration';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
-import { durationToMS } from 'views/hooks/useDefaultIntervalForRefresh';
+import { durationToMS } from 'util/DateTime';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
@@ -62,7 +62,7 @@ type Props = {
   humanName: string,
 }
 
-const CommonRefreshControls = ({ humanName, disable, onToggle = null, onEnable = null, onDisable = null, intervalOptions, onSelectInterval = null, isLoadingMinimumInterval, minimumRefreshInterval, defaultInterval }: Props) => {
+const RefreshControls = ({ humanName, disable, onToggle = null, onEnable = null, onDisable = null, intervalOptions, onSelectInterval = null, isLoadingMinimumInterval, minimumRefreshInterval, defaultInterval }: Props) => {
   const { refreshConfig, startAutoRefresh, stopAutoRefresh, animationId } = useAutoRefresh();
 
   const selectInterval = useCallback((interval: string) => {
@@ -137,4 +137,4 @@ const CommonRefreshControls = ({ humanName, disable, onToggle = null, onEnable =
   );
 };
 
-export default CommonRefreshControls;
+export default RefreshControls;

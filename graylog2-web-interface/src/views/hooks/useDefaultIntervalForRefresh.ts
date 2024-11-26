@@ -15,12 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import moment from 'moment/moment';
-
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
-
-export const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
+import { durationToMS } from 'util/DateTime';
 
 const useDefaultIntervalForRefresh = () => {
   const { config } = useSearchConfiguration();

@@ -23,7 +23,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
-import CommonRefreshControls from 'components/common/CommonRefreshControls';
+import RefreshControls from 'components/common/RefreshControls';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
@@ -64,14 +64,14 @@ const EventsRefreshControls = () => {
 
   return (
     <AutoRefreshProvider onRefresh={refetch}>
-      <CommonRefreshControls disable={false}
-                             intervalOptions={intervalOptions}
-                             isLoadingMinimumInterval={isLoadingMinimumInterval}
-                             minimumRefreshInterval={minimumRefreshInterval}
-                             defaultInterval={defaultInterval}
-                             humanName="Evets"
-                             onToggle={onToggle}
-                             onSelectInterval={onSelectInterval} />
+      <RefreshControls disable={false}
+                       intervalOptions={intervalOptions}
+                       isLoadingMinimumInterval={isLoadingMinimumInterval}
+                       minimumRefreshInterval={minimumRefreshInterval}
+                       defaultInterval={defaultInterval}
+                       humanName="Evets"
+                       onToggle={onToggle}
+                       onSelectInterval={onSelectInterval} />
     </AutoRefreshProvider>
   );
 };
