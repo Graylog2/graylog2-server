@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 
-import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { ConfirmDialog } from 'components/common';
 import { LinkContainer } from 'components/common/router';
@@ -85,22 +84,12 @@ const TemplateActions = ({ id, title, built_in, isDefault, isEnabled } : Props) 
           <MenuItem onSelect={onSetAsDefault}>
             Set as default
           </MenuItem>
-          <MenuItem onSelect={onDelete}>
-            Delete
-          </MenuItem>
+          <DeleteMenuItem onSelect={onDelete} />
         </MoreActions>
         )}
       </ButtonToolbar>
     </>
   );
-};
-
-TemplateActions.propTypes = {
-  id: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  built_in: PropTypes.bool.isRequired,
-  isDefault: PropTypes.bool.isRequired,
-  isEnabled: PropTypes.bool.isRequired,
 };
 
 export default TemplateActions;

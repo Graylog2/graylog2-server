@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import isFinite from 'lodash/isFinite';
-import PropTypes from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
 import styled, { css } from 'styled-components';
@@ -133,48 +132,6 @@ type State = {
 }
 
 class SourceCodeEditor extends React.Component<Props, State> {
-  static propTypes = {
-    /**
-     * Annotations to show in the editor's gutter. The format should be:
-     * `[{ row: 0, column: 2, type: 'error', text: 'Some error.'}]`
-     * The type value must be one of `error`, `warning`, or `info`.
-     */
-    annotations: PropTypes.array,
-    /** Specifies if the source code editor should have the input focus or not. */
-    focus: PropTypes.bool,
-    /** Specifies the font size in pixels to use in the text editor. */
-    fontSize: PropTypes.number,
-    /** Editor height in pixels. */
-    height: PropTypes.number,
-    /** Specifies a unique ID for the source code editor. */
-    id: PropTypes.string.isRequired,
-    /** Provides a ref associated to AceEditor component */
-    innerRef: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.shape({ current: PropTypes.any }),
-    ]),
-    /** Specifies the mode to use in the editor. This is used for highlighting and auto-completion. */
-    mode: PropTypes.oneOf(availableModes),
-    /** Function called on editor load. The first argument is the instance of the editor. */
-    onLoad: PropTypes.func,
-    /** Function called when the value of the text changes. It receives the new value and an event as arguments. */
-    onChange: PropTypes.func,
-    /** Function called when the editor loses focus. */
-    onBlur: PropTypes.func,
-    /** Specifies if the editor should be in read-only mode. */
-    readOnly: PropTypes.bool,
-    /** Specifies if the editor should be resizable by the user. */
-    resizable: PropTypes.bool,
-    /** Specifies if the editor should also include a toolbar. */
-    toolbar: PropTypes.bool,
-    /** Text to use in the editor. */
-    value: PropTypes.string,
-    /** Editor width in pixels. Use `Infinity` to indicate the editor should use 100% of its container's width. */
-    width: PropTypes.number,
-    /** Specifies if the editor should wrap text or use horizontal scrolling. */
-    wrapEnabled: PropTypes.bool,
-  };
-
   static defaultProps = {
     annotations: [],
     focus: false,

@@ -15,26 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 type Props = {
-  children: React.ReactNode,
+  children?: React.ReactNode
 }
 
-const EnterpriseProductLink = ({ children }: Props) => (
+const EnterpriseProductLink = ({ children = null }: Props) => (
   <a href="https://www.graylog.org/products/enterprise"
      rel="noopener noreferrer"
      target="_blank">
     {children}
   </a>
 );
-
-EnterpriseProductLink.propTypes = {
-  children: PropTypes.node,
-};
-
-EnterpriseProductLink.defaultProps = {
-  children: null,
-};
 
 export default EnterpriseProductLink;

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -64,11 +63,6 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
       </DropdownButton>
     </ButtonGroup>
   );
-};
-
-IndicesMaintenanceDropdown.propTypes = {
-  indexSetId: PropTypes.string.isRequired,
-  indexSet: PropTypes.object.isRequired,
 };
 
 export default IndicesMaintenanceDropdown;

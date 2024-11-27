@@ -19,6 +19,8 @@ package org.graylog2.database.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.ErrorCategory;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Filters;
@@ -168,6 +170,16 @@ public class MongoUtils<T extends MongoEntity> {
     public static <T> Stream<T> stream(@Nonnull MongoIterable<T> mongoIterable) {
         final var cursor = mongoIterable.cursor();
         return Streams.stream(cursor).onClose(cursor::close);
+    }
+
+    /**
+     * Checks if the given {@link MongoException} represents a duplicate key error by checking its error code.
+     *
+     * @param e Exception that has been thrown by a MongoDB operation
+     * @return true if the exception represents a duplicate key error, false otherwise
+     */
+    public static boolean isDuplicateKeyError(MongoException e) {
+        return ErrorCategory.fromErrorCode(e.getCode()) == ErrorCategory.DUPLICATE_KEY;
     }
 
     /**

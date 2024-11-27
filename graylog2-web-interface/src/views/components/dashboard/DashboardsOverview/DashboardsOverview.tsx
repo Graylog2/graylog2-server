@@ -30,7 +30,7 @@ type Props = {
   isEvidenceModal?: boolean,
 };
 
-const DashboardsOverview = ({ isEvidenceModal }: Props) => {
+const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
   const customColumnRenderers = useColumnRenderers();
 
   const renderDashboardActions = useCallback((dashboard: View) => (
@@ -49,10 +49,6 @@ const DashboardsOverview = ({ isEvidenceModal }: Props) => {
                                 bulkSelection={{ actions: <BulkActions /> }}
                                 columnRenderers={customColumnRenderers} />
   );
-};
-
-DashboardsOverview.defaultProps = {
-  isEvidenceModal: false,
 };
 
 export default DashboardsOverview;

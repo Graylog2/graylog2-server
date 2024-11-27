@@ -16,10 +16,10 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { defaultOnError } from 'util/conditional/onError';
 
 const DEFAULT_DATA = {
   pagination: {
@@ -62,14 +62,13 @@ const useFilterValueSuggestions = (
     throw Error(`Attribute meta data for attribute "${attributeId}" is missing related collection.`);
   }
 
-  const { data, isInitialLoading } = useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(collection, searchParams, collectionProperty), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading suggestions for filter failed with status: ${errorThrown}`,
-        'Could not load filter suggestions');
-    },
-    retry: 0,
-    keepPreviousData: true,
-  });
+  const { data, isInitialLoading } = useQuery(
+    ['filters', 'suggestions', searchParams],
+    () => defaultOnError(fetchFilterValueSuggestions(collection, searchParams, collectionProperty), 'Loading suggestions for filter failed with status', 'Could not load filter suggestions'),
+    {
+      retry: 0,
+      keepPreviousData: true,
+    });
 
   return {
     data: data ?? DEFAULT_DATA,

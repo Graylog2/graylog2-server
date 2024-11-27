@@ -21,7 +21,7 @@ import HighlightingRulesContext from 'views/components/contexts/HighlightingRule
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import { StaticColor, GradientColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import CustomHighlighting from './CustomHighlighting';
 
@@ -115,5 +115,21 @@ describe('CustomHighlighting', () => {
     const elem = await findByText('42');
 
     expect(elem).not.toHaveStyleRule('background-color');
+  });
+
+  describe('gradiant highlight', () => {
+    it('renders highlighted value if rule for value exists', async () => {
+      const rule = HighlightingRule.builder()
+        .field(field)
+        .value(String(value))
+        .color(GradientColor.create('Picnic', 0, 100))
+        .build();
+
+      const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
+
+      const elem = await findByText('42');
+
+      expect(elem).toHaveStyle('background-color: rgb(214, 214, 255)');
+    });
   });
 });

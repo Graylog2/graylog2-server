@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 const StyledDescriptionBox = styled.div(({ theme }) => css`
@@ -43,10 +42,5 @@ const DescriptionBox = ({ description, children }: Props) => (
     {children}
   </StyledDescriptionBox>
 );
-
-DescriptionBox.propTypes = {
-  children: PropTypes.node.isRequired,
-  description: PropTypes.string.isRequired,
-};
 
 export default DescriptionBox;

@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useState } from 'react';
 import type { List } from 'immutable';
 import { OrderedSet } from 'immutable';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Field, Formik, Form } from 'formik';
 
@@ -50,7 +49,7 @@ const Content = styled.div`
 `;
 
 export type Props = {
-  closeModal: () => void,
+  closeModal?: () => void
   directExportWidgetId?: string,
   view: View,
 };
@@ -77,7 +76,10 @@ type FormState = {
   format: string,
 };
 
-const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
+const ExportModal = ({
+  closeModal = () => {
+  }, view, directExportWidgetId = null,
+}: Props) => {
   const executionState = useSearchExecutionState();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -185,17 +187,6 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
       }}
     </Formik>
   );
-};
-
-ExportModal.propTypes = {
-  closeModal: PropTypes.func,
-  directExportWidgetId: PropTypes.string,
-};
-
-ExportModal.defaultProps = {
-  closeModal: () => {
-  },
-  directExportWidgetId: null,
 };
 
 export default ExportModal;

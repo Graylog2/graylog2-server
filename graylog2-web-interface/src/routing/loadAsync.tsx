@@ -37,9 +37,9 @@ type ComponentSupplier<TProps> = () => Promise<{ default: React.ComponentType<TP
 const emptyPlaceholder = <></>;
 
 const loadAsync = <TProps, >(factory: ComponentSupplier<TProps>) => {
-  const Component = React.lazy(factory) as React.ForwardRefExoticComponent<TProps>;
+  const Component = React.lazy(factory);
 
-  return React.forwardRef((props: TProps, ref) => (
+  return React.forwardRef((props: React.PropsWithoutRef<TProps>, ref) => (
     <ErrorBoundary FallbackComponent={ErrorComponent}>
       <React.Suspense fallback={emptyPlaceholder}>
         <Component {...props} ref={ref} />

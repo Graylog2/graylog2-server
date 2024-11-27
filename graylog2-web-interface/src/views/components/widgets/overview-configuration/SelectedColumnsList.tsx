@@ -79,7 +79,7 @@ type Props = {
   testPrefix?: string,
 };
 
-const SelectedColumnsList = ({ testPrefix, selectedColumns, onChange, displayOverlayInPortal, columnTitle }: Props) => {
+const SelectedColumnsList = ({ testPrefix, selectedColumns, onChange, displayOverlayInPortal = false, columnTitle }: Props) => {
   const columnsForList = useMemo(() => selectedColumns?.map((column) => ({ id: column, title: columnTitle(column) })), [columnTitle, selectedColumns]);
 
   const onChangeColumn = useCallback((columnIndex: number, newFieldName: string) => {
@@ -120,11 +120,6 @@ const SelectedColumnsList = ({ testPrefix, selectedColumns, onChange, displayOve
                   customListItemRender={SortableListItem}
                   displayOverlayInPortal={displayOverlayInPortal} />
   );
-};
-
-SelectedColumnsList.defaultProps = {
-  displayOverlayInPortal: false,
-  testPrefix: undefined,
 };
 
 export default SelectedColumnsList;

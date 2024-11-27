@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
 
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
 

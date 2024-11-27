@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -23,15 +22,17 @@ import Spinner from 'components/common/Spinner';
 import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
 import EntityList from 'components/common/EntityList';
 import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
-import type { ExtractorType, InputSummary, NodeSummary } from 'stores/extractors/ExtractorsStore';
+import type { ExtractorType } from 'stores/extractors/ExtractorsStore';
 import { useStore } from 'stores/connect';
+import type { NodeInfo } from 'stores/nodes/NodesStore';
+import type { Input } from 'components/messageloaders/Types';
 
 import ExtractorsListItem from './ExtractorsListItem';
 import ExtractorsSortModal from './ExtractorSortModal';
 
 type Props = {
-  input: InputSummary,
-  node: NodeSummary,
+  input: Input,
+  node: NodeInfo,
 };
 
 const fetchExtractors = (inputId: string) => {
@@ -103,11 +104,6 @@ const ExtractorsList = ({ input, node }: Props) => {
       )}
     </div>
   );
-};
-
-ExtractorsList.propTypes = {
-  input: PropTypes.object.isRequired,
-  node: PropTypes.object.isRequired,
 };
 
 export default ExtractorsList;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { createContext, useEffect, useRef, useCallback, useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
 
 import type { RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
@@ -60,11 +59,11 @@ const savePipelineRule = (nextRule: RuleType, callback: (rule: RuleType) => void
 
 type Props = {
   children: React.ReactNode,
-  usedInPipelines: Array<string>,
-  rule: RuleType,
+  usedInPipelines?: Array<string>
+  rule?: RuleType
 }
 
-export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props) => {
+export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: Props) => {
   const ruleSourceRef = useRef(undefined);
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule?.source);
@@ -182,25 +181,4 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       {children}
     </PipelineRulesContext.Provider>
   );
-};
-
-PipelineRulesProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  usedInPipelines: PropTypes.array,
-  rule: PropTypes.shape({
-    id: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    source: PropTypes.string,
-    simulator_message: PropTypes.string,
-  }),
-};
-
-PipelineRulesProvider.defaultProps = {
-  usedInPipelines: [],
-  rule: {
-    description: '',
-    source: '',
-    simulator_message: '',
-  },
 };

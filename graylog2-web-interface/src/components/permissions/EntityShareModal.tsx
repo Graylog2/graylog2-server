@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useRef, useEffect, useState } from 'react';
 import type { FormikProps } from 'formik';
-import PropTypes from 'prop-types';
 import upperCase from 'lodash/upperCase';
 
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
@@ -39,7 +38,7 @@ type Props = {
   entityId: SharedEntity['id'],
   entityTitle: SharedEntity['title'],
   entityType: SharedEntity['type'],
-  entityTypeTitle: string | null | undefined,
+  entityTypeTitle?: string | null | undefined
   onClose: () => void,
   showShareableEntityURL?: boolean
 };
@@ -51,7 +50,7 @@ const EntityShareModal = ({
   entityTitle,
   entityTypeTitle,
   onClose,
-  showShareableEntityURL,
+  showShareableEntityURL = true,
 }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
@@ -113,21 +112,6 @@ const EntityShareModal = ({
       )}
     </BootstrapModalConfirm>
   );
-};
-
-EntityShareModal.propTypes = {
-  description: PropTypes.string.isRequired,
-  entityId: PropTypes.string.isRequired,
-  entityTitle: PropTypes.string.isRequired,
-  entityType: PropTypes.string.isRequired,
-  entityTypeTitle: PropTypes.string,
-  onClose: PropTypes.func.isRequired,
-  showShareableEntityURL: PropTypes.bool,
-};
-
-EntityShareModal.defaultProps = {
-  entityTypeTitle: undefined,
-  showShareableEntityURL: true,
 };
 
 export default EntityShareModal;

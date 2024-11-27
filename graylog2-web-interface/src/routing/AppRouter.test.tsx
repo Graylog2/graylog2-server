@@ -74,10 +74,6 @@ const AppRouterWithContext = () => (
   </HotkeysProvider>
 );
 
-AppRouterWithContext.defaultProps = {
-  path: '/',
-};
-
 const setInitialPath = (path: string) => {
   asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes, {
     initialEntries: [path],

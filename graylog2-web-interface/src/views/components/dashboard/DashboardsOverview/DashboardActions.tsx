@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useRef } from 'react';
-import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import UserNotification from 'util/UserNotification';
 import { ShareButton } from 'components/common';
-import { MenuItem } from 'components/bootstrap';
+import { MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -48,10 +47,6 @@ type Props = {
   isEvidenceModal?: boolean,
 }
 
-const DeleteItem = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.danger};
-`);
-
 const usePluggableDashboardActions = (dashboard: View) => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.dashboardActions');
@@ -75,7 +70,7 @@ const usePluggableDashboardActions = (dashboard: View) => {
   return ({ actions, actionModals });
 };
 
-const DashboardDeleteAction = ({ dashboard, refetchDashboards, isEvidenceModal }: { dashboard: View, refetchDashboards: () => void, isEvidenceModal?: boolean }) => {
+const DashboardDeleteAction = ({ dashboard, refetchDashboards, isEvidenceModal = false }: { dashboard: View, refetchDashboards: () => void, isEvidenceModal?: boolean }) => {
   const { deselectEntity } = useSelectedEntities();
   const paginationQueryParameter = usePaginationQueryParameter();
 
@@ -97,17 +92,11 @@ const DashboardDeleteAction = ({ dashboard, refetchDashboards, isEvidenceModal }
   }, [dashboard, deselectEntity, refetchDashboards, paginationQueryParameter]);
 
   return isEvidenceModal ? null : (
-    <MenuItem onClick={onDashboardDelete}>
-      <DeleteItem role="button">Delete</DeleteItem>
-    </MenuItem>
+    <DeleteMenuItem onClick={onDashboardDelete} />
   );
 };
 
-DashboardDeleteAction.defaultProps = {
-  isEvidenceModal: false,
-};
-
-const DashboardActions = ({ dashboard, isEvidenceModal }: Props) => {
+const DashboardActions = ({ dashboard, isEvidenceModal = false }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(dashboard);
   const currentUser = useCurrentUser();
@@ -146,10 +135,6 @@ const DashboardActions = ({ dashboard, isEvidenceModal }: Props) => {
       {pluggableActionModals}
     </>
   );
-};
-
-DashboardActions.defaultProps = {
-  isEvidenceModal: false,
 };
 
 export default DashboardActions;

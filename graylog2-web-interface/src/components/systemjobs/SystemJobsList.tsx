@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -44,7 +43,13 @@ const StyledAlert = styled(Alert)`
   margin-top: 10px;
 `;
 
-const SystemJobsList = ({ jobs }): React.ReactElement => {
+type SystemJobsListProps = {
+  jobs: any[];
+};
+
+const SystemJobsList = ({
+  jobs,
+}: SystemJobsListProps): React.ReactElement => {
   const formatSystemJob = (job) => (
     <SystemJobWrap key={`job-${job.id}`}>
       <SystemJob job={job} />
@@ -66,10 +71,6 @@ const SystemJobsList = ({ jobs }): React.ReactElement => {
         </span>
       )
   );
-};
-
-SystemJobsList.propTypes = {
-  jobs: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default SystemJobsList;

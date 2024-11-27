@@ -130,7 +130,7 @@ type Props = {
   forceSideBarPinned?: boolean,
 };
 
-const Search = ({ forceSideBarPinned }: Props) => {
+const Search = ({ forceSideBarPinned = false }: Props) => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
   const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar } = useSearchPageLayout();
@@ -216,10 +216,6 @@ const Search = ({ forceSideBarPinned }: Props) => {
       </ExternalValueActionsProvider>
     </>
   );
-};
-
-Search.defaultProps = {
-  forceSideBarPinned: false,
 };
 
 export default Search;

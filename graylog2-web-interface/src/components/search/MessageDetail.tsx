@@ -66,7 +66,8 @@ const StreamLinks = ({ messageStreams, streamIds, streams }: {
     <>
       {streamIds.map((id) => streams.get(id))
         .filter((stream) => !!stream)
-        .map((stream) => <li key={stream.id}><StreamLink stream={stream} /></li>)}
+        .map((stream) => <li key={stream.id}><StreamLink stream={stream} /></li>)
+        .toArray()}
     </>
   );
 };
@@ -79,7 +80,7 @@ type Props = {
   customFieldActions?: React.ReactNode
 }
 
-const MessageDetail = ({ renderForDisplay, inputs, streams, message, customFieldActions }: Props) => {
+const MessageDetail = ({ renderForDisplay, inputs = undefined, streams = undefined, message, customFieldActions = undefined }: Props) => {
   const streamIds = Immutable.Set(message.stream_ids);
   const rawTimestamp = message.fields.timestamp;
   const timestamp = [
@@ -155,12 +156,6 @@ const MessageDetail = ({ renderForDisplay, inputs, streams, message, customField
       </Row>
     </div>
   );
-};
-
-MessageDetail.defaultProps = {
-  inputs: undefined,
-  streams: undefined,
-  customFieldActions: undefined,
 };
 
 export default MessageDetail;

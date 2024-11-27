@@ -174,7 +174,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
   }, [colors, interactive, layout, theme]);
 };
 
-const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfig, color: ColorMapper) => ChartColor) => {
+const usePlotChartData = (chartData: Array<any>, setChartColor: (data: ChartConfig, color: ColorMapper) => ChartColor) => {
   const theme = useTheme();
   const { colors } = useContext(ChartColorContext);
 
@@ -182,9 +182,7 @@ const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfi
     if (setChartColor && colors) {
       const conf = setChartColor(chart, colors);
 
-      if (chart.type === 'pie') {
-        conf.outsidetextfont = { color: theme.colors.global.textDefault };
-      }
+      conf.outsidetextfont = { color: theme.colors.global.textDefault };
 
       if (chart?.name === eventsDisplayName) {
         const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
@@ -203,10 +201,10 @@ const usePlotChatData = (chartData: Array<any>, setChartColor: (data: ChartConfi
   }), [chartData, colors, setChartColor, theme.colors.global.textDefault]);
 };
 
-const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverMarker, onUnhoverMarker, onZoom, onAfterPlot }: Props) => {
+const GenericPlot = ({ chartData, layout = {}, setChartColor, onClickMarker = () => {}, onHoverMarker = () => {}, onUnhoverMarker = () => {}, onZoom = () => {}, onAfterPlot = () => {} }: Props) => {
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);
-  const plotChartData = usePlotChatData(chartData, setChartColor);
+  const plotChartData = usePlotChartData(chartData, setChartColor);
   const onRenderComplete = useContext(RenderCompletionCallback);
 
   const _onRelayout = useCallback((axis: Axis) => {
@@ -253,16 +251,6 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
                 onRelayout={interactive ? _onRelayout : () => {}}
                 config={config} />
   );
-};
-
-GenericPlot.defaultProps = {
-  layout: {},
-  onZoom: () => {},
-  setChartColor: undefined,
-  onClickMarker: () => {},
-  onHoverMarker: () => {},
-  onUnhoverMarker: () => {},
-  onAfterPlot: () => {},
 };
 
 export default GenericPlot;

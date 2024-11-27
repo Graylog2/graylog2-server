@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useContext, useMemo } from 'react';
-import PropTypes from 'prop-types';
 
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
 import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
@@ -50,17 +49,6 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: P
   })), [fieldName, fieldValue, highlightingRules]);
 
   return matchingRule ? <Highlight color={matchingRule.color.colorFor(fieldValue)}>{children}</Highlight> : children;
-};
-
-CustomHighlighting.propTypes = {
-  children: PropTypes.element,
-  field: PropTypes.string.isRequired,
-  value: PropTypes.any,
-};
-
-CustomHighlighting.defaultProps = {
-  children: undefined,
-  value: undefined,
 };
 
 export default CustomHighlighting;

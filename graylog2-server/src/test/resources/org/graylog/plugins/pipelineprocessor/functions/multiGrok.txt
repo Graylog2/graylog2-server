@@ -1,0 +1,40 @@
+rule "multi_grok"
+when true
+then
+    set_fields(
+        fields: multi_grok(
+            patterns: [
+                "^ABC %{IPV4:abc_ip}: %{GREEDY:abc_message}",
+                "^123 %{IPV4:123_ip}: %{GREEDY:123_message}",
+                "^ABC %{IPV4:abc2_ip}: %{GREEDY:abc2_message}"
+            ],
+            value: "ABC 192.168.0.1: ABC message1",
+            only_named_captures: true
+        )
+    );
+
+    set_fields(
+        fields: multi_grok(
+            patterns: [
+                "^ABC %{IPV4:abc_ip}: %{GREEDY:abc_message}",
+                "^123 %{IPV4:123_ip}: %{GREEDY:123_message}",
+                "^ABC %{IPV4:abc2_ip}: %{GREEDY:abc2_message}"
+            ],
+            value: "123 192.168.0.2: 123 message",
+            only_named_captures: true
+        )
+    );
+
+    set_fields(
+        fields: multi_grok(
+            patterns: [
+                "^ABC %{IPV4:abc_ip}: %{GREEDY:abc_message}",
+                "^123 %{IPV4:123_ip}: %{GREEDY:123_message}",
+                "^ABC %{IPV4:abc2_ip}: %{GREEDY:abc2_message}"
+            ],
+            value: "XYZ 192.168.0.3: XYZ message",
+            only_named_captures: true
+        )
+    );
+
+end

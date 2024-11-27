@@ -22,7 +22,7 @@ import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
+import { defaultOnError } from 'util/conditional/onError';
 
 export const FAVORITE_ITEMS_QUERY_KEY = 'favorite_items_query_key';
 
@@ -32,16 +32,15 @@ const fetchFavoriteItems = async ({ page }: RequestQuery): Promise<PaginatedFavo
   return fetch('GET', qualifyUrl(url));
 };
 
-const useFavoriteItems = (pagination: RequestQuery): { data: PaginatedFavoriteItems, isFetching: boolean } => useQuery([FAVORITE_ITEMS_QUERY_KEY, pagination], () => fetchFavoriteItems(pagination), {
-  onError: (errorThrown) => {
-    UserNotification.error(`Loading favorite items failed with status: ${errorThrown}`,
-      'Could not load favorite items');
-  },
-  retry: 0,
-  initialData: {
-    favorites: [],
-    ...DEFAULT_PAGINATION,
-  },
-});
+const useFavoriteItems = (pagination: RequestQuery): { data: PaginatedFavoriteItems, isFetching: boolean } => useQuery(
+  [FAVORITE_ITEMS_QUERY_KEY, pagination],
+  () => defaultOnError(fetchFavoriteItems(pagination), 'Loading favorite items failed with status', 'Could not load favorite items'),
+  {
+    retry: 0,
+    initialData: {
+      favorites: [],
+      ...DEFAULT_PAGINATION,
+    },
+  });
 
 export default useFavoriteItems;

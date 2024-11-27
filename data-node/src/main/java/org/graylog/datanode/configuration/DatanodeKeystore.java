@@ -16,9 +16,9 @@
  */
 package org.graylog.datanode.configuration;
 
-import com.google.common.base.Suppliers;
 import com.google.common.eventbus.EventBus;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -48,10 +48,8 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
@@ -69,10 +67,6 @@ public class DatanodeKeystore {
     public static final Path DATANODE_KEYSTORE_FILE = Path.of("keystore.jks");
     public static String DATANODE_KEY_ALIAS = CertConstants.DATANODE_KEY_ALIAS;
     private final EventBus eventBus;
-
-    // TODO: we could be smarter here, caching the results as long as there is no keystore change event. This requires some
-    // additional code, but would perform better.
-    private final Supplier<Date> certValidUntil = Suppliers.memoizeWithExpiration(this::doGetCertificateExpiration, Duration.ofMinutes(1));
 
     @Inject
     public DatanodeKeystore(DatanodeConfiguration configuration, final @Named("password_secret") String passwordSecret, EventBus eventBus) {
@@ -178,11 +172,8 @@ public class DatanodeKeystore {
         return CsrGenerator.generateCSR(keystore, DATANODE_KEY_ALIAS, hostname, altNames);
     }
 
+    @Nullable
     public Date getCertificateExpiration() {
-        return doGetCertificateExpiration();
-    }
-
-    private Date doGetCertificateExpiration() {
         try {
             final KeyStore keystore = loadKeystore();
             if (isSignedCertificateChain(keystore)) {

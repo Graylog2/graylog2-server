@@ -84,9 +84,4 @@ const PluggableStoreProvider = ({ initialQuery, children, isNew, view, execution
   );
 };
 
-PluggableStoreProvider.defaultProps = {
-  undoRedoState: undefined,
-  result: undefined,
-};
-
 export default PluggableStoreProvider;

@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { Formik, Form } from 'formik';
-import PropTypes from 'prop-types';
 import _omit from 'lodash/omit';
 import type { LookupTable } from 'src/logic/lookup-tables/types';
 
@@ -53,11 +52,11 @@ const INIT_TABLE_VALUES: LookupTableType = {
 
 type Props = {
   saved: () => void,
-  create: boolean,
-  table: LookupTableType,
+  create?: boolean
+  table?: LookupTableType
 };
 
-const LookupTableForm = ({ saved, create, table }: Props) => {
+const LookupTableForm = ({ saved, create = true, table = INIT_TABLE_VALUES }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
@@ -254,17 +253,6 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
       )}
     </Formik>
   );
-};
-
-LookupTableForm.propTypes = {
-  saved: PropTypes.func.isRequired,
-  create: PropTypes.bool,
-  table: PropTypes.object,
-};
-
-LookupTableForm.defaultProps = {
-  create: true,
-  table: INIT_TABLE_VALUES,
 };
 
 export default LookupTableForm;

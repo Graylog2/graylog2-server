@@ -156,7 +156,7 @@ export class GradientColor extends HighlightingColor {
     const spread = this.upper - this.lower;
     const normalizedValue = Math.max(this.lower, Math.min(this.upper, parsedValue));
 
-    return this._scale((normalizedValue - this.lower) / spread);
+    return this._scale((normalizedValue - this.lower) / spread).hex();
   }
 
   static fromJSON({ gradient, lower, upper }: GradientColorJson) {

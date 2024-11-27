@@ -58,7 +58,7 @@ describe('ChangeFieldType', () => {
   useViewsPlugin();
 
   beforeAll(() => {
-    asMock(useInitialSelection).mockReturnValue(['id-1', 'id-2']);
+    asMock(useInitialSelection).mockReturnValue({ list: ['id-1', 'id-2'], isLoading: false });
     asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
   });
 

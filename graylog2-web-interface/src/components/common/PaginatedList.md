@@ -1,25 +1,25 @@
 ```js
-import createReactClass from 'create-react-class';
-
-const PaginatedListExample = createReactClass({
-  getInitialState() {
+class PaginatedListExample extends React.Component {
+  constructor(props) {
+    super(props);
     const items = [];
     for(let i = 1; i <= 12; i++)
       items.push(i);
 
-    return {
+    this.state = {
       currentPage: 0,
       items: items,
       pageSize: 5,
     };
-  },
+    this.onPageChange = this.onPageChange.bind(this);
+  };
 
   onPageChange(currentPage, pageSize) {
     this.setState({
       currentPage: currentPage - 1,
       pageSize: pageSize,
     });
-  },
+  };
 
   render() {
     const { currentPage, items, pageSize } = this.state;
@@ -43,8 +43,8 @@ const PaginatedListExample = createReactClass({
         </table>
       </PaginatedList>
     );
-  },
-});
+  };
+}
 
 <PaginatedListExample />
 ```

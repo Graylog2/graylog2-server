@@ -21,7 +21,7 @@ const useEventAttributes = () => {
 
   return eventAttributes.filter(({ useCondition }) => (
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    typeof useCondition === 'function' ? useCondition() : true),
+    (typeof useCondition === 'function' ? useCondition() : true)),
   );
 };
 

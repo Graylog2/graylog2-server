@@ -45,6 +45,9 @@ const ToolsStore = {
     pattern: string,
     string: string,
     named_captures_only: string,
+    error_message: string,
+    matched: boolean,
+    matches: Array<{ name: string, match: string }>,
   }> {
     const { url } = ApiRoutes.ToolsApiController.grokTest();
     const promise = fetch('POST', qualifyUrl(url), {
@@ -76,6 +79,7 @@ const ToolsStore = {
     key_whitespace_replacement: string,
     key_prefix: string,
     string: string,
+    matches: { [key: string]: string }
   }> {
     const { url } = ApiRoutes.ToolsApiController.jsonTest();
     const payload = {
@@ -147,6 +151,10 @@ const ToolsStore = {
   testRegex(regex: string, string: string): Promise<{
     regex: string,
     string: string,
+    matched: boolean,
+    match: {
+      match: string,
+    }
   }> {
     const { url } = ApiRoutes.ToolsApiController.regexTest();
     const promise = fetch('POST', qualifyUrl(url), {
@@ -166,6 +174,10 @@ const ToolsStore = {
     replacement: string,
     replace_all: boolean,
     string: string,
+    matched: boolean,
+    match: {
+      match: string,
+    }
   }> {
     const { url } = ApiRoutes.ToolsApiController.regexReplaceTest();
     const payload = {
@@ -210,6 +222,8 @@ const ToolsStore = {
     start: number,
     end: number,
     string: string,
+    successful: boolean,
+    cut: string,
   }> {
     const { url } = ApiRoutes.ToolsApiController.substringTest();
     const payload = {
@@ -248,6 +262,11 @@ const ToolsStore = {
   testLookupTable(lookupTableName: string, string: string): Promise<{
     lookup_table_name: string,
     string: string,
+    error: string,
+    empty: boolean,
+    error_message: string,
+    key: string,
+    value: string,
   }> {
     const { url } = ApiRoutes.ToolsApiController.lookupTableTest();
     const promise = fetch('POST', qualifyUrl(url), {

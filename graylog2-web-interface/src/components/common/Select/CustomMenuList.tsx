@@ -101,11 +101,6 @@ export const WindowList = ({ children, listRef, ...rest }: WindowListProps) => {
   );
 };
 
-WindowList.defaultProps = {
-  listRef: undefined,
-  onItemsRendered: undefined,
-};
-
 const CustomMenuList = ({ children, innerProps, ...rest }: Partial<MenuListProps> & { children: Array<React.ReactNode> }) => {
   if (!children?.length || (children.length < REACT_SELECT_MAX_OPTIONS_LENGTH)) {
     return (

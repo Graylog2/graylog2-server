@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
@@ -53,10 +52,6 @@ const NewPipeline = ({ onChange }: Props) => {
       </Col>
     </Row>
   );
-};
-
-NewPipeline.propTypes = {
-  onChange: PropTypes.func.isRequired,
 };
 
 export default NewPipeline;

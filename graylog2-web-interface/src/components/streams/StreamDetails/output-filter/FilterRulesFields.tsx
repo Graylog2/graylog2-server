@@ -42,7 +42,7 @@ const StyledPanel = styled(Panel)(({ theme }) => css`
 const StyledPanelHeading = styled(Panel.Heading)(({ theme }) => css`
   display: flex;
   justify-content: space-between;
-  background-color: ${theme.colors.table.row.backgroundAlt} !important;
+  background-color: ${theme.colors.table.row.backgroundStriped} !important;
   border: 0;
 `);
 

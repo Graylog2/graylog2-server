@@ -15,28 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { Alert } from 'components/bootstrap';
 
 type Props = {
-  children: React.ReactNode,
+  children?: React.ReactNode
 };
 
 /**
  * Component used to display a simple alert message for an empty entity in Graylog. For more complex messages that
  * explain what that entity is and a link to create a new one please use the EmptyEntity component.
 */
-const NoEntitiesExist = ({ children }: Props) => (
+const NoEntitiesExist = ({ children = 'No entities exist.' }: Props) => (
   <Alert className="no-bm">{children}</Alert>
 );
-
-NoEntitiesExist.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.node]),
-};
-
-NoEntitiesExist.defaultProps = {
-  children: 'No entities exist.',
-};
 
 export default NoEntitiesExist;

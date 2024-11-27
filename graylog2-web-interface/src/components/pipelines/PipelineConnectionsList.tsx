@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -30,7 +29,7 @@ type Props = {
   noConnectionsMessage?: React.ReactNode,
 }
 
-const PipelineConnectionsList = ({ pipeline, connections, streams, streamsFormatter, noConnectionsMessage }: Props) => {
+const PipelineConnectionsList = ({ pipeline, connections, streams, streamsFormatter, noConnectionsMessage = 'Pipeline not connected to any streams' }: Props) => {
   const streamsUsingPipeline = connections
     .filter((c) => c.pipeline_ids && c.pipeline_ids.includes(pipeline.id)) // Get connections for this pipeline
     .filter((c) => streams.some((s) => s.id === c.stream_id)) // Filter out deleted streams
@@ -42,18 +41,6 @@ const PipelineConnectionsList = ({ pipeline, connections, streams, streamsFormat
       {streamsUsingPipeline.length === 0 ? noConnectionsMessage : streamsFormatter(streamsUsingPipeline)}
     </span>
   );
-};
-
-PipelineConnectionsList.propTypes = {
-  pipeline: PropTypes.object.isRequired,
-  connections: PropTypes.array.isRequired,
-  streams: PropTypes.array.isRequired,
-  streamsFormatter: PropTypes.func.isRequired,
-  noConnectionsMessage: PropTypes.node,
-};
-
-PipelineConnectionsList.defaultProps = {
-  noConnectionsMessage: 'Pipeline not connected to any streams',
 };
 
 export default PipelineConnectionsList;

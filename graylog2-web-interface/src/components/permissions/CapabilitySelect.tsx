@@ -35,7 +35,7 @@ type Props = {
   title?: string,
 };
 
-const CapabilitySelect = ({ capabilities, onChange, title, ...rest }: Props) => {
+const CapabilitySelect = ({ capabilities, onChange, title = 'Select a capability', ...rest }: Props) => {
   const capabilitiesOptions = _capabilitiesOptions(capabilities);
 
   const handleChange = useCallback((name, capabilityId, onFieldChange) => {
@@ -59,11 +59,6 @@ const CapabilitySelect = ({ capabilities, onChange, title, ...rest }: Props) => 
       )}
     </Field>
   );
-};
-
-CapabilitySelect.defaultProps = {
-  onChange: undefined,
-  title: 'Select a capability',
 };
 
 export default CapabilitySelect;

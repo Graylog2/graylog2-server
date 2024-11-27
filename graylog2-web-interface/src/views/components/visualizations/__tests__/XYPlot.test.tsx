@@ -52,7 +52,7 @@ describe('XYPlot', () => {
   const setChartColor = () => ({});
   const chartData = [{ y: [23, 42], name: 'count()' }];
 
-  const SimpleXYPlot = ({ currentQuery, ...props }: Partial<XYPlotProps> & { currentQuery?: Query }) => {
+  const SimpleXYPlot = ({ currentQuery = defaultCurrentQuery, ...props }: Partial<XYPlotProps> & { currentQuery?: Query }) => {
     const defaultView = createSearch();
     const view = defaultView
       .toBuilder()
@@ -73,10 +73,6 @@ describe('XYPlot', () => {
                 {...props} />
       </TestStoreProvider>
     );
-  };
-
-  SimpleXYPlot.defaultProps = {
-    currentQuery: defaultCurrentQuery,
   };
 
   useViewsPlugin();

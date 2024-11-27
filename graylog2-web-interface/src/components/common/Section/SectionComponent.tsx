@@ -61,7 +61,7 @@ const FlexWrapper = styled.div(({ theme }) => css`
   align-items: center;
 `);
 
-const SectionComponent = ({ children, title, showLoading = false, headerActions, className, collapsible, defaultClosed, disableCollapseButton }: Props) => {
+const SectionComponent = ({ children, title, showLoading = false, headerActions, className = '', collapsible = false, defaultClosed = false, disableCollapseButton = false }: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
 
   return (
@@ -94,15 +94,6 @@ const SectionComponent = ({ children, title, showLoading = false, headerActions,
       </Col>
     </Row>
   );
-};
-
-SectionComponent.defaultProps = {
-  className: '',
-  showLoading: false,
-  headerActions: undefined,
-  collapsible: false,
-  defaultClosed: false,
-  disableCollapseButton: false,
 };
 
 export default SectionComponent;

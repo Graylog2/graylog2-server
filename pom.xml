@@ -89,7 +89,7 @@
         <!-- Dependencies -->
         <opensearch.shaded.version>2.15.0-1</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
-        <amqp-client.version>5.22.0</amqp-client.version>
+        <amqp-client.version>5.23.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -99,14 +99,14 @@
         <auto-value.version>1.11.0</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.28.6</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.29.3</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
-        <bouncycastle.version>1.78.1</bouncycastle.version>
-        <byte-buddy.version>1.15.3</byte-buddy.version>
+        <bouncycastle.version>1.79</bouncycastle.version>
+        <byte-buddy.version>1.15.10</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.177</classgraph.version>
+        <classgraph.version>4.8.179</classgraph.version>
         <commons-codec.version>1.17.1</commons-codec.version>
         <commons-csv.version>1.12.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -114,14 +114,14 @@
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <commons-net.version>3.11.1</commons-net.version>
         <commons-validator.version>1.9.0</commons-validator.version>
-        <commons-io.version>2.17.0</commons-io.version>
+        <commons-io.version>2.18.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.33.0</error-prone.version>
+        <error-prone.version>2.36.0</error-prone.version>
         <freemarker.version>2.3.33</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.66.0</grpc.version>
+        <grpc.version>1.68.1</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.3.1-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -146,16 +146,16 @@
         <jool.version>0.9.15</jool.version>
         <json-org.version>20240303</json-org.version>
         <json-path.version>2.9.0</json-path.version>
-        <kafka.version>3.8.0</kafka.version>
+        <kafka.version>3.9.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.24.1</log4j.version>
+        <log4j.version>2.24.2</log4j.version>
         <lucene.version>9.12.0</lucene.version>
         <metrics.version>4.2.28</metrics.version>
-        <mongodb-driver.version>5.2.0</mongodb-driver.version>
+        <mongodb-driver.version>5.2.1</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.114.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.66.Final</netty-tcnative-boringssl-static.version>
+        <netty.version>4.1.115.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.69.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.32.0</opentelemetry.version>
@@ -166,7 +166,7 @@
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.11.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>2.0.1</shiro.version>
+        <shiro.version>2.0.2</shiro.version>
         <snakeyaml.version>2.3</snakeyaml.version>
         <snappy-java.version>1.1.10.7</snappy-java.version>
         <oshi.version>6.6.5</oshi.version>
@@ -179,7 +179,7 @@
         <unboundid-ldap.version>7.0.1</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.0</validation-api.version>
-        <zstd.version>1.5.6-6</zstd.version>
+        <zstd.version>1.5.6-8</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.6</jjwt.version>
@@ -191,14 +191,14 @@
         <assertj-core.version>3.26.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.2</awaitility.version>
-        <equalsverifier.version>3.17.1</equalsverifier.version>
+        <equalsverifier.version>3.17.3</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
-        <junit-jupiter.version>5.11.2</junit-jupiter.version>
-        <mockito.version>5.14.1</mockito.version>
+        <junit-jupiter.version>5.11.3</junit-jupiter.version>
+        <mockito.version>5.14.2</mockito.version>
         <restassured.version>5.5.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.20.2</testcontainers.version>
+        <testcontainers.version>1.20.4</testcontainers.version>
         <testcontainers.opensearch.version>2.1.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -559,7 +559,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.10.1</version>
+                    <version>3.11.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -589,7 +589,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.25.0</version>
+                    <version>3.26.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -599,22 +599,22 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.17.1</version>
+                    <version>2.18.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.6.4</version>
+                    <version>4.8.6.6</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -923,6 +923,7 @@
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <compilerArgs>
                         <arg>-XDcompilePolicy=simple</arg>
+                        <arg>--should-stop=ifError=FLOW</arg>
                         <!--
                           We disabled checks that don't apply to us because we either don't use the platform or
                           library. (e.g., Android, Flogger) Disabling those checks improves compile times.
@@ -965,6 +966,7 @@
                             -Xep:RobolectricShadowDirectlyOn:OFF
                             -Xep:StringCaseLocaleUsage:OFF
                             -Xep:SwigMemoryLeak:OFF
+                            -Xep:ArrayRecordComponent:ERROR
                             -Xep:DefaultCharset:ERROR
                             -Xep:DoubleCheckedLocking:ERROR
                             -Xep:InconsistentHashCode:ERROR
@@ -972,6 +974,7 @@
                             -Xep:NonAtomicVolatileUpdate:ERROR
                             -Xep:PrimitiveAtomicReference:ERROR
                             -Xep:WildcardImport:ERROR
+                            -Xep:JavaDurationGetSecondsToToSeconds:ERROR
                             -Xep:StreamResourceLeak:ERROR
                         </arg>
                     </compilerArgs>

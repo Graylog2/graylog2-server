@@ -108,8 +108,4 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => (
   </TimeRangeWrapper>
 );
 
-TimeRangeDisplay.defaultProps = {
-  toggleDropdownShow: undefined,
-};
-
 export default TimeRangeDisplay;

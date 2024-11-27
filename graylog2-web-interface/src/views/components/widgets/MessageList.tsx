@@ -17,7 +17,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useContext, useState, useEffect, useCallback, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import type { WidgetComponentProps, MessageResult } from 'views/types';
 import { Messages } from 'views/Constants';
@@ -99,8 +98,8 @@ const MessageList = ({
   config,
   data: { id: searchTypeId, messages, total: totalMessages },
   fields,
-  onConfigChange,
-  pageSize,
+  onConfigChange = () => Promise.resolve(),
+  pageSize = Messages.DEFAULT_LIMIT,
   setLoadingState,
 }: Props) => {
   const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
@@ -170,16 +169,6 @@ const MessageList = ({
       </Wrapper>
     </WindowDimensionsContextProvider>
   );
-};
-
-MessageList.propTypes = {
-  onConfigChange: PropTypes.func,
-  pageSize: PropTypes.number,
-};
-
-MessageList.defaultProps = {
-  onConfigChange: () => Promise.resolve(),
-  pageSize: Messages.DEFAULT_LIMIT,
 };
 
 export default MessageList;

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -76,10 +75,6 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                   filterValueRenderers={FilterValueRenderers}
                                   columnRenderers={columnRenderers} />
   );
-};
-
-StreamsOverview.propTypes = {
-  indexSets: PropTypes.array.isRequired,
 };
 
 export default StreamsOverview;

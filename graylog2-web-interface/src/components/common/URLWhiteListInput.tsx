@@ -16,7 +16,6 @@
  */
 import type { SyntheticEvent } from 'react';
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';
 import { isValidURL } from 'util/URLUtils';
@@ -24,21 +23,22 @@ import { isValidURL } from 'util/URLUtils';
 import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { triggerInput } from 'util/FormsUtils';
+import type { ValidationState } from 'components/common/types';
 
 type Props = {
   label: string,
   onChange: (event: SyntheticEvent<EventTarget>) => void,
-  validationMessage: string,
-  validationState: string,
-  url: string,
+  validationMessage?: string
+  validationState?: ValidationState
+  url?: string
   onValidationChange?: (validationState: string) => void,
-  labelClassName: string,
-  wrapperClassName: string,
-  urlType: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'],
-  autofocus: boolean,
+  labelClassName?: string
+  wrapperClassName?: string
+  urlType?: React.ComponentProps<typeof URLWhiteListFormModal>['urlType']
+  autofocus?: boolean
 };
 
-const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, onValidationChange, labelClassName, wrapperClassName, urlType, autofocus }: Props) => {
+const URLWhiteListInput = ({ label, onChange, validationMessage = '', validationState, url = '', onValidationChange = () => {}, labelClassName = '', wrapperClassName = '', urlType = 'literal', autofocus = true }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
@@ -109,7 +109,6 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
 
   const addButton = isWhitelistError() && !isWhitelisted ? <URLWhiteListFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} /> : '';
   const helpMessage = <>{validationState === null ? ownValidationMessage : validationMessage} {addButton}</>;
-  const bsStyle = currentValidationState === '' ? null : currentValidationState;
 
   return (
     <Input type="text"
@@ -121,38 +120,11 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
            required
            onChange={onChange}
            help={helpMessage}
-           bsStyle={bsStyle}
+           bsStyle={currentValidationState}
            value={url}
            labelClassName={labelClassName}
            wrapperClassName={wrapperClassName} />
   );
-};
-
-URLWhiteListInput.propTypes = {
-  autofocus: PropTypes.bool,
-  label: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  validationState: PropTypes.string,
-  validationMessage: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.string,
-  ]),
-  url: PropTypes.string,
-  onValidationChange: PropTypes.func,
-  labelClassName: PropTypes.string,
-  wrapperClassName: PropTypes.string,
-  urlType: PropTypes.oneOf(['regex', 'literal']),
-};
-
-URLWhiteListInput.defaultProps = {
-  autofocus: true,
-  url: '',
-  validationState: '',
-  validationMessage: '',
-  labelClassName: '',
-  wrapperClassName: '',
-  urlType: 'literal',
-  onValidationChange: () => {},
 };
 
 export default URLWhiteListInput;

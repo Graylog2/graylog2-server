@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 
@@ -43,9 +42,5 @@ const HistogramDetails = ({ metric: { metric: histogram } }: Props) => (
     <dd><span className="number-format">{numeral(histogram.count).format('0,0')}</span></dd>
   </dl>
 );
-
-HistogramDetails.propTypes = {
-  metric: PropTypes.object.isRequired,
-};
 
 export default HistogramDetails;

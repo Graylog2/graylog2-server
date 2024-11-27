@@ -31,7 +31,7 @@ type Props = {
   compact?: boolean,
 }
 
-const ResumeStartupButton = ({ setIsWaitingForStartup, children, variant, compact }: Props) => {
+const ResumeStartupButton = ({ setIsWaitingForStartup, children = 'Resume startup', variant, compact = false }: Props) => {
   const { data: dataNodes } = useDataNodes();
 
   const onResumeStartup = useCallback(() => {
@@ -59,12 +59,6 @@ const ResumeStartupButton = ({ setIsWaitingForStartup, children, variant, compac
       {children}
     </Button>
   );
-};
-
-ResumeStartupButton.defaultProps = {
-  variant: undefined,
-  compact: false,
-  children: 'Resume startup',
 };
 
 export default ResumeStartupButton;

@@ -69,6 +69,6 @@ describe('useUserSearchFilterQuery hook', () => {
       await waitFor(() => !result.current.isInitialLoading);
     });
 
-    expect(UserNotification.error).toHaveBeenCalledWith('Loading layout preferences for "streams" overview failed with Error: Error!');
+    expect(UserNotification.error).toHaveBeenCalledWith('Loading layout preferences for "streams" overview failed with: Error: Error!', undefined);
   });
 });

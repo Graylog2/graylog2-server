@@ -35,6 +35,7 @@ import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.security.JwtSecret;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -54,7 +55,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     private final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration;
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
-    private final byte[] signingKey;
+    private final JwtSecret signingKey;
     private final NodeService<DataNodeDto> nodeService;
     private final S3RepositoryConfiguration s3RepositoryConfiguration;
 
@@ -73,7 +74,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
                                           final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration,
                                           final InSecureConfiguration inSecureConfiguration,
                                           final NodeService<DataNodeDto> nodeService,
-                                          final @Named("password_secret") String passwordSecret,
+                                          JwtSecret jwtSecret,
                                           final S3RepositoryConfiguration s3RepositoryConfiguration,
                                           final EventBus eventBus) {
         this.localConfiguration = localConfiguration;
@@ -81,7 +82,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
         this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
         this.localKeystoreSecureConfiguration = localKeystoreSecureConfiguration;
         this.inSecureConfiguration = inSecureConfiguration;
-        this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
+        this.signingKey = jwtSecret;
         this.nodeService = nodeService;
         this.s3RepositoryConfiguration = s3RepositoryConfiguration;
         this.eventBus = eventBus;

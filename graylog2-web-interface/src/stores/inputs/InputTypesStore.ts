@@ -64,9 +64,15 @@ export type InputDescriptions = {
   [type: string]: InputDescription,
 };
 
+type InputTypesStoreState = {
+  sourceUrl: string,
+  inputTypes?: InputTypes,
+  inputDescriptions?: InputDescriptions,
+}
+
 export const InputTypesStore = singletonStore(
   'core.InputTypes',
-  () => Reflux.createStore({
+  () => Reflux.createStore<InputTypesStoreState>({
     listenables: [InputTypesActions],
     sourceUrl: '/system/inputs/types',
     inputTypes: undefined,

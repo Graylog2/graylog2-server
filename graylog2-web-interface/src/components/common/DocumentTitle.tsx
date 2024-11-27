@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 type Props = {
   title: React.ReactNode,
@@ -45,16 +44,6 @@ const DocumentTitle = ({ children, title }: Props) => {
   }, [title]);
 
   return <>{children}</>;
-};
-
-DocumentTitle.propTypes = {
-  /** Title to prepend to the page `document.title`. */
-  title: PropTypes.string.isRequired,
-  /** Children to be rendered. */
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
 };
 
 export default DocumentTitle;

@@ -14,11 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
 import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 
+import type { ExportPayload } from 'util/MessagesExportUtils';
+import type { IconName } from 'components/common/Icon';
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import type { VisualizationComponent } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -58,7 +61,6 @@ import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
-import type { ExportPayload } from 'util/MessagesExportUtils';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -194,9 +196,9 @@ export interface ExportFormat {
   formatSpecificFileDownloader?: (format: string, widget: Widget, view: View, executionState: SearchExecutionState, currentUser: User, currentQuery: Query, exportPayload: ExportPayload,) => Promise<void>
 }
 
-export interface SystemConfigurationComponentProps {
-  config: any,
-  updateConfig: (newConfig: any) => any,
+export interface SystemConfigurationComponentProps<T = unknown> {
+  config: T,
+  updateConfig: (newConfig: T) => any,
 }
 
 export interface SystemConfiguration {
@@ -262,29 +264,32 @@ type MessageDetailContextProviderProps = {
   message: Message,
 }
 
-type DashboardActionComponentProps = {
+type DashboardActionComponentProps<T> = {
   dashboard: View,
-  modalRef: () => unknown,
+  modalRef: () => T,
 }
 
-type EventWidgetActionComponentProps = {
+type EventWidgetActionComponentProps<T> = {
   eventId: string,
-  modalRef: () => unknown,
+  modalRef: () => T,
 }
 
-type DashboardActionModalProps = {
+type DashboardActionModalProps<T> = React.PropsWithRef<{
   dashboard: View,
-  ref: React.Ref<unknown>,
-}
+}> & {
+  ref: React.LegacyRef<T>
+};
 
-type EventActionModalProps = {
+type EventActionModalProps<T> = React.PropsWithRef<{
   eventId: string,
-  ref: React.Ref<unknown>,
+}> & {
+  ref: React.LegacyRef<T>,
 }
 
-type SearchActionModalProps = {
+type SearchActionModalProps = React.PropsWithRef<{
   search: View,
-  ref: React.Ref<unknown>,
+}> & {
+  ref: React.LegacyRef<unknown>,
 }
 
 type AssetInformationComponentProps = {
@@ -299,26 +304,35 @@ type SearchAction = {
   useCondition: () => boolean,
 };
 
-type DashboardAction = {
+type DashboardAction<T> = {
   key: string,
-  component: React.ComponentType<DashboardActionComponentProps>,
-  modal?: React.ComponentType<DashboardActionModalProps>,
+  component: React.ComponentType<DashboardActionComponentProps<T>>,
+  modal?: React.ComponentType<DashboardActionModalProps<T>>,
   useCondition?: () => boolean,
 }
 
-type EventWidgetAction = {
+type EventAction = {
+  useCondition: () => boolean,
+  modal?: React.ComponentType<EventActionModalProps<unknown>>,
+  component: React.ComponentType<EventActionComponentProps>,
   key: string,
-  component: React.ComponentType<EventWidgetActionComponentProps>,
-  modal?: React.ComponentType<EventActionModalProps>,
+}
+
+type EventWidgetAction<T> = {
+  key: string,
+  component: React.ComponentType<EventWidgetActionComponentProps<T>>,
+  modal?: React.ComponentType<EventActionModalProps<T>>,
   useCondition?: () => boolean,
 }
 
 type AssetInformation = {
   component: React.ComponentType<AssetInformationComponentProps>,
+  key: string,
 }
 
-type EventActionComponentProps = {
+export type EventActionComponentProps = {
   eventId: string,
+  modalRef: () => unknown,
 }
 
 type MessageActionComponentProps = {
@@ -449,6 +463,14 @@ export type FieldUnitType = 'size' | 'time' | 'percent';
 
 export type FieldUnitsFormValues = Record<string, {abbrev: string; unitType: FieldUnitType}>;
 
+export type SearchDataSource = {
+  key: string,
+  title: string,
+  icon: IconName,
+  link: string,
+  useCondition: () => boolean,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -461,12 +483,8 @@ declare module 'graylog-web-plugin/plugin' {
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
-    'views.components.dashboardActions'?: Array<DashboardAction>;
-    'views.components.eventActions'?: Array<{
-      useCondition: () => boolean,
-      component: React.ComponentType<EventActionComponentProps>,
-      key: string,
-    }>;
+    'views.components.dashboardActions'?: Array<DashboardAction<unknown>>
+    'views.components.eventActions'?: Array<EventAction>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<MessageDetailContextProviderProps>>>;
@@ -483,7 +501,7 @@ declare module 'graylog-web-plugin/plugin' {
       useCondition: () => boolean,
       key: string,
     }>;
-    'views.components.widgets.events.actions'?: Array<EventWidgetAction>;
+    'views.components.widgets.events.actions'?: Array<EventWidgetAction<unknown>>;
     'views.components.searchActions'?: Array<SearchAction>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
@@ -500,6 +518,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.copyPageToDashboard'?: Array<CopyParamsToView>;
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
+    'views.searchDataSources'?: Array<SearchDataSource>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.widgets.exportAction'?: Array<{ action: WidgetActionType, useCondition: () => boolean }>;
     'views.reducers'?: Array<ViewsReducer>;

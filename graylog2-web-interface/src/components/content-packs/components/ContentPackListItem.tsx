@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import { useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import {
   Button,
@@ -26,7 +25,7 @@ import {
   MenuItem,
   Modal,
   Row,
-  ButtonToolbar,
+  ButtonToolbar, DeleteMenuItem,
 } from 'components/bootstrap';
 import { ModalSubmit } from 'components/common';
 import ControlledTableListItem from 'components/common/ControlledTableListItem';
@@ -97,9 +96,9 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
                 Download
               </MenuItem>
               <MenuItem divider />
-              <MenuItem onSelect={handleDeleteAllVersions}>
+              <DeleteMenuItem onSelect={handleDeleteAllVersions}>
                 Delete All Versions
-              </MenuItem>
+              </DeleteMenuItem>
             </DropdownButton>
           </ButtonToolbar>
         </Col>
@@ -136,14 +135,5 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
 
   );
 };
-
-ContentPackListItem.propTypes = {
-  pack: PropTypes.object.isRequired,
-  contentPackMetadata: PropTypes.object.isRequired,
-  onDeletePack: PropTypes.func.isRequired,
-  onInstall: PropTypes.func.isRequired,
-};
-
-ContentPackListItem.defaultProps = {};
 
 export default ContentPackListItem;

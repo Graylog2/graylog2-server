@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
-import MenuItem from 'components/bootstrap/MenuItem';
+import { MenuItem } from 'components/bootstrap';
 import {
   isAttributeWithFilterOptions,
   isAttributeWithRelatedCollection, isDateAttribute,
@@ -64,9 +64,5 @@ export const FilterConfiguration = ({
     )}
   </>
 );
-
-FilterConfiguration.defaultProps = {
-  filter: undefined,
-};
 
 export default FilterConfiguration;

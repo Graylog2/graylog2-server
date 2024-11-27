@@ -76,7 +76,13 @@ const StreamRuleModal = ({
   submitButtonText,
   submitLoadingText,
   onSubmit,
-  initialValues,
+  initialValues = {
+    field: '',
+    type: 1,
+    value: '',
+    inverted: false,
+    description: '',
+  },
 }: Props) => {
   const { inputs } = useStore(StreamRulesInputsStore);
   const { data: streamRuleTypes } = useStreamRuleTypes();
@@ -228,16 +234,6 @@ const StreamRuleModal = ({
       </Formik>
     </Modal>
   );
-};
-
-StreamRuleModal.defaultProps = {
-  initialValues: {
-    field: '',
-    type: 1,
-    value: '',
-    inverted: false,
-    description: '',
-  },
 };
 
 export default StreamRuleModal;

@@ -35,7 +35,7 @@ const locationHasChanged = (currentLocation: Location, newLocation: Location, qu
     ? !window.confirm(question)
     : false);
 
-const ConfirmLeaveDialog = ({ question, ignoredRoutes }: Props) => {
+const ConfirmLeaveDialog = ({ question = 'Are you sure?', ignoredRoutes = [] }: Props) => {
   const handleLeavePage = useCallback((e) => {
     if (AppConfig.gl2DevMode()) {
       return null;
@@ -57,11 +57,6 @@ const ConfirmLeaveDialog = ({ question, ignoredRoutes }: Props) => {
   useBlocker((history) => !AppConfig.gl2DevMode() && locationHasChanged(history.currentLocation, history.nextLocation, question, ignoredRoutes));
 
   return null;
-};
-
-ConfirmLeaveDialog.defaultProps = {
-  question: 'Are you sure?',
-  ignoredRoutes: [],
 };
 
 /** @component */

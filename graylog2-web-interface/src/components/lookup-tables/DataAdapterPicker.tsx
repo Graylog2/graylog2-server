@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { useField } from 'formik';
-import PropTypes from 'prop-types';
 import type { LookupTableAdapter } from 'src/logic/lookup-tables/types';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -24,11 +23,11 @@ import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 type Props = {
-  dataAdapters: LookupTableAdapter[],
+  dataAdapters?: LookupTableAdapter[]
 }
 
 const DataAdapterPicker = ({
-  dataAdapters,
+  dataAdapters = [],
 }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField('data_adapter_id');
   const sortedAdapters = dataAdapters.map((adapter: LookupTableAdapter) => ({ value: adapter.id, label: `${adapter.title} (${adapter.name})` })).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
@@ -55,14 +54,6 @@ const DataAdapterPicker = ({
       </Input>
     </fieldset>
   );
-};
-
-DataAdapterPicker.propTypes = {
-  dataAdapters: PropTypes.array,
-};
-
-DataAdapterPicker.defaultProps = {
-  dataAdapters: [],
 };
 
 export default DataAdapterPicker;

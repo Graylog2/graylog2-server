@@ -32,7 +32,6 @@ const Index = ({ index, indexDetails, indexSetId }: { index: IndexSummaryType, i
       <Col md={12}>
         <IndexSummary index={index}
                       name={index.index_name}
-                      count={index.size}
                       indexRange={indexRange}
                       isDeflector={index.is_deflector}>
           <span>

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 
 import * as FormsUtils from 'util/FormsUtils';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -101,15 +100,6 @@ const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTit
       </>
     </BootstrapModalForm>
   );
-};
-
-DashboardPropertiesModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-  show: PropTypes.bool.isRequired,
-  submitButtonText: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  view: PropTypes.object.isRequired,
 };
 
 export default DashboardPropertiesModal;

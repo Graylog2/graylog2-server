@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableSet;
 
 public class GRNTypes {
     public static final GRNType BUILTIN_TEAM = GRNType.create("builtin-team", "XXX-NOT-A-REAL-TYPE-XXX:");
-    public static final GRNType COLLECTION = GRNType.create("collection", "collections:");
     public static final GRNType DASHBOARD = GRNType.create("dashboard", "dashboards:");
     public static final GRNType EVENT_DEFINITION = GRNType.create("event_definition", "eventdefinitions:");
     public static final GRNType EVENT_NOTIFICATION = GRNType.create("notification", "eventnotifications:");
@@ -40,7 +39,6 @@ public class GRNTypes {
     // TODO find a way to unify these
     private static final ImmutableSet<GRNType> BUILTIN_TYPES = ImmutableSet.<GRNType>builder()
             .add(BUILTIN_TEAM)
-            .add(COLLECTION)
             .add(DASHBOARD)
             .add(EVENT_DEFINITION)
             .add(EVENT_NOTIFICATION)
