@@ -75,6 +75,7 @@ public class DBEventProcessorServiceTest {
 
     @Test
     @MongoDBFixtures("event-processors.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void loadPersisted() {
         final List<EventDefinitionDto> dtos = dbService.streamAll().collect(Collectors.toList());
 

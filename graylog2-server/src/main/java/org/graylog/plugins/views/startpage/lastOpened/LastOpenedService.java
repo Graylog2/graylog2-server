@@ -33,6 +33,7 @@ import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.users.events.UserDeletedEvent;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class LastOpenedService {
     public static final String COLLECTION_NAME = "last_opened";
@@ -53,7 +54,9 @@ public class LastOpenedService {
     }
 
     Optional<LastOpenedForUserDTO> findForUser(final String userId) {
-        return MongoUtils.stream(this.db.find(Filters.eq(LastOpenedForUserDTO.FIELD_USER_ID, userId))).findAny();
+        try (var stream = MongoUtils.stream(this.db.find(Filters.eq(LastOpenedForUserDTO.FIELD_USER_ID, userId)))) {
+            return stream.findAny();
+        }
     }
 
     public void create(final LastOpenedForUserDTO lastOpenedItems) {

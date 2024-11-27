@@ -274,9 +274,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         if (!config.tags().isEmpty()) {
             final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
                     .map(Collector::nodeOperatingSystem).orElse("");
-            sidecarService.findByTagsAndOS(config.tags(), os)
-                    .map(Sidecar::nodeId)
-                    .forEach(etagService::invalidateRegistration);
+            try (var stream = sidecarService.findByTagsAndOS(config.tags(), os)) {
+                stream.map(Sidecar::nodeId).forEach(etagService::invalidateRegistration);
+            }
         }
 
         return Response.ok().entity(config).build();
@@ -332,9 +332,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             final Set<String> tags = Sets.symmetricDifference(previousConfiguration.tags(), updatedConfiguration.tags());
             final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
                     .map(Collector::nodeOperatingSystem).orElse("");
-            sidecarService.findByTagsAndOS(tags, os)
-                    .map(Sidecar::nodeId)
-                    .forEach(etagService::invalidateRegistration);
+            try (var stream = sidecarService.findByTagsAndOS(tags, os)) {
+                stream.map(Sidecar::nodeId).forEach(etagService::invalidateRegistration);
+            }
         }
 
         return Response.ok().entity(configurationService.save(updatedConfiguration)).build();

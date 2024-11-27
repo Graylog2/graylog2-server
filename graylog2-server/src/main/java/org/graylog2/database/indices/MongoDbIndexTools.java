@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 public class MongoDbIndexTools<T> {
 
@@ -114,11 +115,13 @@ public class MongoDbIndexTools<T> {
         if (existingIndices == null) {
             return Optional.empty();
         }
-        return MongoUtils.stream(existingIndices)
-                .filter(info ->
-                        info.get(INDEX_DOCUMENT_KEY, Document.class).containsKey(sortField)
-                )
-                .findFirst();
+        try (var stream = MongoUtils.stream(existingIndices)) {
+            return stream
+                    .filter(info ->
+                            info.get(INDEX_DOCUMENT_KEY, Document.class).containsKey(sortField)
+                    )
+                    .findFirst();
+        }
     }
 
     public void createUniqueIndex(final String field) {

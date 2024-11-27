@@ -18,6 +18,7 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
 import one.util.streamex.StreamEx;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -69,6 +70,7 @@ public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto>
      * @param value       the value of the config field
      * @return a stream of job definitions with the given config field.
      */
+    @MustBeClosed
     public Stream<JobDefinitionDto> streamByConfigField(String configField, Object value) {
         return streamQuery(buildConfigFieldQuery(configField, value));
     }

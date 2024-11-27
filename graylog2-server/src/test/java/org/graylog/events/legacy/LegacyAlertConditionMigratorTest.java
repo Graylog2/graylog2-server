@@ -146,6 +146,7 @@ public class LegacyAlertConditionMigratorTest {
 
     @Test
     @MongoDBFixtures("legacy-alert-conditions.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void run() {
         final int migratedConditions = 10;
         final int migratedCallbacks = 4;
@@ -621,6 +622,7 @@ public class LegacyAlertConditionMigratorTest {
 
     @Test
     @MongoDBFixtures("legacy-alert-conditions.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void runWithMigrationStatus() {
         final int migratedConditions = 9; // Only 8 because we pass one migrated condition in
         final int migratedCallbacks = 3;  // Only 2 because we pass one migrated callback in

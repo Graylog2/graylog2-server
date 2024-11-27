@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SearchDomain {
     private final SearchDbService dbService;
@@ -66,9 +67,11 @@ public class SearchDomain {
     }
 
     public List<Search> getAllForUser(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission) {
-        return dbService.streamAll()
-                .filter(s -> hasReadPermissionFor(searchPermissions, viewReadPermission, s))
-                .collect(Collectors.toList());
+        try (var stream = dbService.streamAll()) {
+            return stream
+                    .filter(s -> hasReadPermissionFor(searchPermissions, viewReadPermission, s))
+                    .collect(Collectors.toList());
+        }
     }
 
     public Search saveForUser(Search search, SearchUser searchUser) {
