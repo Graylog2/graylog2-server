@@ -89,7 +89,7 @@
         <!-- Dependencies -->
         <opensearch.shaded.version>2.15.0-1</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
-        <amqp-client.version>5.22.0</amqp-client.version>
+        <amqp-client.version>5.23.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -114,9 +114,9 @@
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <commons-net.version>3.11.1</commons-net.version>
         <commons-validator.version>1.9.0</commons-validator.version>
-        <commons-io.version>2.17.0</commons-io.version>
+        <commons-io.version>2.18.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.35.1</error-prone.version>
+        <error-prone.version>2.36.0</error-prone.version>
         <freemarker.version>2.3.33</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.1</geoip2.version>
@@ -148,7 +148,7 @@
         <json-path.version>2.9.0</json-path.version>
         <kafka.version>3.9.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.24.1</log4j.version>
+        <log4j.version>2.24.2</log4j.version>
         <lucene.version>9.12.0</lucene.version>
         <metrics.version>4.2.28</metrics.version>
         <mongodb-driver.version>5.2.1</mongodb-driver.version>
@@ -179,7 +179,7 @@
         <unboundid-ldap.version>7.0.1</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.0</validation-api.version>
-        <zstd.version>1.5.6-7</zstd.version>
+        <zstd.version>1.5.6-8</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.6</jjwt.version>
@@ -198,7 +198,7 @@
         <mockito.version>5.14.2</mockito.version>
         <restassured.version>5.5.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.20.3</testcontainers.version>
+        <testcontainers.version>1.20.4</testcontainers.version>
         <testcontainers.opensearch.version>2.1.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -923,6 +923,7 @@
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <compilerArgs>
                         <arg>-XDcompilePolicy=simple</arg>
+                        <arg>--should-stop=ifError=FLOW</arg>
                         <!--
                           We disabled checks that don't apply to us because we either don't use the platform or
                           library. (e.g., Android, Flogger) Disabling those checks improves compile times.

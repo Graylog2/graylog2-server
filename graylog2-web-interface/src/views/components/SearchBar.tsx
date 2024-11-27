@@ -29,7 +29,7 @@ import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchAct
 import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
-import RefreshControls from 'views/components/searchbar/RefreshControls';
+import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
@@ -243,7 +243,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                             )}
                           </Field>
 
-                          <RefreshControls disable={!isValid} />
+                          <ViewsRefreshControls disable={!isValid} />
                         </StreamsAndRefresh>
                       </TimeRangeRow>
                       <SearchQueryRow>
