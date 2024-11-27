@@ -40,7 +40,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -89,8 +88,8 @@ public class OpensearchSecurityConfiguration implements KeystoreContributor {
             final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
             this.truststore = TruststoreCreator.newDefaultJvm()
-                    .addRootCert("datanode-transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
-                    .addRootCert("datanode-http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addFromKeystore("datanode-transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addFromKeystore("datanode-http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
                     .addCertificates(trustedCertificates)
                     .persist(trustStorePath, truststorePassword.toCharArray());
 

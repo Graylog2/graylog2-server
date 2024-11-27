@@ -19,10 +19,8 @@ package org.graylog.datanode.configuration;
 import jakarta.annotation.Nonnull;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,6 +33,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TruststoreCreator {
 
@@ -60,10 +59,29 @@ public class TruststoreCreator {
         }
     }
 
-    public TruststoreCreator addRootCert(final String name, FilesystemKeystoreInformation keystoreInformation,
-                                         final String alias) throws IOException, GeneralSecurityException {
-        final X509Certificate rootCert = findRootCert(keystoreInformation.location(), keystoreInformation.password(), alias);
-        this.truststore.setCertificateEntry(name, rootCert);
+    /**
+     * Originally we added only the root(=selfsigned) certificate to the truststore. But this causes problems with
+     * usage of intermediate CAs. There is nothing wrong adding the whole cert chain to the truststore.
+     *
+     * @param newAliasPrefix      new alias prefix used for the truststore. We'll append _i, where i is the index of the cert in the chain
+     * @param keystoreInformation access to the keystore, to obtain certificate chains by the given alias
+     * @param alias               which certificate chain should we extract from the provided keystore
+     */
+    public TruststoreCreator addFromKeystore(final String newAliasPrefix, KeystoreInformation keystoreInformation,
+                                             final String alias) throws IOException, GeneralSecurityException {
+        final KeyStore keystore = keystoreInformation.loadKeystore();
+        final Certificate[] certs = keystore.getCertificateChain(alias);
+
+        AtomicInteger certCounter = new AtomicInteger(0);
+        Arrays.stream(certs)
+                .forEach(cert -> {
+                    try {
+                        this.truststore.setCertificateEntry(newAliasPrefix + "_" + certCounter.getAndIncrement(), cert);
+                    } catch (KeyStoreException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
         return this;
     }
 
@@ -89,33 +107,5 @@ public class TruststoreCreator {
     @Nonnull
     public KeyStore getTruststore() {
         return this.truststore;
-    }
-
-
-    private static X509Certificate findRootCert(Path keystorePath,
-                                                char[] password,
-                                                final String alias) throws IOException, GeneralSecurityException {
-        final KeyStore keystore = loadKeystore(keystorePath, password);
-        final Certificate[] certs = keystore.getCertificateChain(alias);
-
-        return Arrays.stream(certs)
-                .filter(cert -> cert instanceof X509Certificate)
-                .map(cert -> (X509Certificate) cert)
-                .filter(cert -> isRootCaCertificate(cert) || certs.length == 1)
-                .findFirst()
-                .orElseThrow(() -> new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!"));
-    }
-
-    private static boolean isRootCaCertificate(X509Certificate cert) {
-        return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-    }
-
-    private static KeyStore loadKeystore(final Path keystorePath,
-                                         final char[] password) throws IOException, GeneralSecurityException {
-        KeyStore nodeKeystore = KeyStore.getInstance(CertConstants.PKCS12);
-        try (final FileInputStream is = new FileInputStream(keystorePath.toFile())) {
-            nodeKeystore.load(is, password);
-        }
-        return nodeKeystore;
     }
 }

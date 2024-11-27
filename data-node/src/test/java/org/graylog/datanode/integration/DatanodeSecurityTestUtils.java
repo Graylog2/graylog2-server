@@ -17,41 +17,29 @@
 package org.graylog.datanode.integration;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 public class DatanodeSecurityTestUtils {
-    public static KeyStore buildTruststore(FilesystemKeystoreInformation ca) throws IOException, GeneralSecurityException {
-        try (FileInputStream fis = new FileInputStream(ca.location().toFile())) {
-
-            KeyStore caKeystore = KeyStore.getInstance("PKCS12");
-            caKeystore.load(fis, ca.password());
-
-            KeyStore trustStore = KeyStore.getInstance("PKCS12");
-            trustStore.load(null, null);
-
-            final Enumeration<String> aliases = caKeystore.aliases();
-            while (aliases.hasMoreElements()) {
-                final String alias = aliases.nextElement();
-                final Certificate cert = caKeystore.getCertificate(alias);
-                if (cert instanceof final X509Certificate x509Certificate) {
-                    trustStore.setCertificateEntry(alias, x509Certificate);
-                }
-            }
-            return trustStore;
+    public static KeyStore buildTruststore(KeystoreInformation ca) throws IOException, GeneralSecurityException {
+        final TruststoreCreator truststoreCreator = TruststoreCreator.newEmpty();
+        final Enumeration<String> aliases = ca.loadKeystore().aliases();
+        while (aliases.hasMoreElements()) {
+            final String alias = aliases.nextElement();
+            truststoreCreator.addFromKeystore(alias, ca, alias);
         }
+        return truststoreCreator.getTruststore();
     }
 
     public static FilesystemKeystoreInformation generateCa(Path dir) {
