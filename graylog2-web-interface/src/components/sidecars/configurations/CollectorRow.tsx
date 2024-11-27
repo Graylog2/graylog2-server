@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 import upperFirst from 'lodash/upperFirst';
 
 import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, MenuItem, Button } from 'components/bootstrap';
+import { ButtonToolbar, MenuItem, Button, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import { MoreActions } from 'components/common/EntityDataTable';
@@ -29,7 +29,7 @@ import CopyCollectorModal from './CopyCollectorModal';
 
 type Props = {
   collector: Collector,
-  onClone: () => void,
+  onClone: (collector: string, name: string, callback: () => void) => void,
   onDelete: (collector: Collector) => void,
   validateCollector: (collector: Collector) => Promise<{ errors: { name: string[] } }>,
 }
@@ -60,7 +60,7 @@ const CollectorRow = ({ collector, onClone, onDelete, validateCollector }: Props
                                 validateCollector={validateCollector}
                                 copyCollector={onClone} />
             <MenuItem divider />
-            <MenuItem onSelect={handleDelete} variant="danger">Delete</MenuItem>
+            <DeleteMenuItem onSelect={handleDelete} />
           </MoreActions>
         </ButtonToolbar>
       </td>

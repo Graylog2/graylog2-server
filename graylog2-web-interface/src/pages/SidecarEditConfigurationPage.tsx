@@ -30,9 +30,7 @@ type SidecarEditConfigurationPageProps = {
   params: any;
 };
 
-const SidecarEditConfigurationPage = ({
-  params,
-}: SidecarEditConfigurationPageProps) => {
+const SidecarEditConfigurationPage = ({ params }: SidecarEditConfigurationPageProps) => {
   const [configuration, setConfiguration] = useState<Configuration>(null);
   const [configurationSidecars, setConfigurationSidecars] = useState<ConfigurationSidecarsResponse>(null);
   const history = useHistory();
