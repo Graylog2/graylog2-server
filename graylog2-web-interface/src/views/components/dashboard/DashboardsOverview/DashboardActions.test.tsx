@@ -66,7 +66,7 @@ describe('DashboardActions', () => {
 
   const clickDashboardAction = async (action: string) => {
     userEvent.click(await screen.findByRole('button', { name: /more/i }));
-    userEvent.click(await screen.findByRole('button', { name: action }));
+    userEvent.click(await screen.findByRole('menuitem', { name: action }));
     await waitFor(() => menuIsHidden());
   };
 
