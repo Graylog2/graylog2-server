@@ -57,6 +57,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -76,8 +77,8 @@ public class TruststoreCreatorTest {
         final KeystoreInformation boot = createKeystore(tempDir.resolve("boot.p12"), "boot", "CN=BOOT", BigInteger.TWO);
 
         final FilesystemKeystoreInformation truststore = TruststoreCreator.newEmpty()
-                .addFromKeystore("root", root, "root")
-                .addFromKeystore("boot", boot, "boot")
+                .addFromKeystore(root, "root")
+                .addFromKeystore(boot, "boot")
 
                 .persist(tempDir.resolve("truststore.sec"), "caramba! caramba!".toCharArray());
 
@@ -90,11 +91,11 @@ public class TruststoreCreatorTest {
 
         final KeyStore keyStore = keyStoreOptional.get();
         assertThat(ImmutableList.copyOf(keyStore.aliases().asIterator()))
-                .containsOnly("root_0", "boot_0");
+                .containsOnly("cn=root", "cn=boot");
 
-        final Certificate rootCert = keyStore.getCertificate("root_0");
+        final Certificate rootCert = keyStore.getCertificate("cn=root");
         verifyCertificate(rootCert, "CN=ROOT", BigInteger.ONE);
-        final Certificate bootCert = keyStore.getCertificate("boot_0");
+        final Certificate bootCert = keyStore.getCertificate("cn=boot");
         verifyCertificate(bootCert, "CN=BOOT", BigInteger.TWO);
     }
 
@@ -134,7 +135,7 @@ public class TruststoreCreatorTest {
         final InMemoryKeystoreInformation keystoreInformation = createInMemoryKeystore(nodeKeys, intermediateCa);
 
         final KeyStore truststore = TruststoreCreator.newEmpty()
-                .addFromKeystore("my-node", keystoreInformation, "my-node")
+                .addFromKeystore(keystoreInformation, "my-node")
                 .getTruststore();
 
         final X509TrustManager defaultTrustManager = createTrustManager(truststore);
@@ -144,6 +145,25 @@ public class TruststoreCreatorTest {
         final KeyPair fakeNodeKeys = CertificateGenerator.generate(CertRequest.selfSigned("my-fake-node").isCA(false).validity(Duration.ofDays(100)));
         Assertions.assertThatThrownBy(() -> defaultTrustManager.checkServerTrusted(new X509Certificate[]{fakeNodeKeys.certificate()}, "RSA"))
                 .isInstanceOf(CertificateException.class);
+    }
+
+    @Test
+    void testDuplicateCname() throws Exception {
+        final KeyPair ca1 = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyPair ca2 = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyPair ca3 = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+
+        final KeyStore truststore = TruststoreCreator.newEmpty()
+                .addCertificates(List.of(ca1.certificate()))
+                .addCertificates(List.of(ca2.certificate()))
+                .addCertificates(List.of(ca3.certificate()))
+                .getTruststore();
+
+        Assertions.assertThat(Collections.list(truststore.aliases()))
+                .hasSize(3)
+                .contains("cn=my-ca")
+                .contains("cn=my-ca_1")
+                .contains("cn=my-ca_2");
     }
 
     private static X509TrustManager createTrustManager(KeyStore caTruststore) throws NoSuchAlgorithmException, KeyStoreException {

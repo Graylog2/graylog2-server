@@ -63,32 +63,29 @@ public class TruststoreCreator {
      * Originally we added only the root(=selfsigned) certificate to the truststore. But this causes problems with
      * usage of intermediate CAs. There is nothing wrong adding the whole cert chain to the truststore.
      *
-     * @param newAliasPrefix      new alias prefix used for the truststore. We'll append _i, where i is the index of the cert in the chain
      * @param keystoreInformation access to the keystore, to obtain certificate chains by the given alias
      * @param alias               which certificate chain should we extract from the provided keystore
      */
-    public TruststoreCreator addFromKeystore(final String newAliasPrefix, KeystoreInformation keystoreInformation,
+    public TruststoreCreator addFromKeystore(KeystoreInformation keystoreInformation,
                                              final String alias) throws IOException, GeneralSecurityException {
         final KeyStore keystore = keystoreInformation.loadKeystore();
-        final Certificate[] certs = keystore.getCertificateChain(alias);
+        final Certificate[] chain = keystore.getCertificateChain(alias);
+        final List<X509Certificate> x509Certs = toX509Certs(chain);
+        return addCertificates(x509Certs);
+    }
 
-        AtomicInteger certCounter = new AtomicInteger(0);
-        Arrays.stream(certs)
-                .forEach(cert -> {
-                    try {
-                        this.truststore.setCertificateEntry(newAliasPrefix + "_" + certCounter.getAndIncrement(), cert);
-                    } catch (KeyStoreException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-
-        return this;
+    @Nonnull
+    private static List<X509Certificate> toX509Certs(Certificate[] certs) {
+        return Arrays.stream(certs)
+                .filter(c -> c instanceof X509Certificate)
+                .map(c -> (X509Certificate) c)
+                .toList();
     }
 
     public TruststoreCreator addCertificates(List<X509Certificate> trustedCertificates) {
         trustedCertificates.forEach(cert -> {
             try {
-                this.truststore.setCertificateEntry(cert.getSubjectX500Principal().getName(), cert);
+                this.truststore.setCertificateEntry(generateAlias(this.truststore, cert), cert);
             } catch (KeyStoreException e) {
                 throw new RuntimeException(e);
             }
@@ -96,8 +93,25 @@ public class TruststoreCreator {
         return this;
     }
 
-    public FilesystemKeystoreInformation persist(final Path truststorePath, final char[] truststorePassword) throws IOException, GeneralSecurityException {
+    /**
+     * Alias has no meaning for the trust and validation purposes in the truststore. It's there only for managing
+     * the truststore content. We just need to make sure that we are using unique aliases, otherwise the
+     * truststore would override already present certificates.
+     *
+     * If there is no collision, we use the cname as given in the cert. In case of collisions, we'll append _i,
+     * where is index an incremented till it's unique in the truststore.
+     */
+    private static String generateAlias(KeyStore truststore, X509Certificate cert) throws KeyStoreException {
+        AtomicInteger counter = new AtomicInteger(1);
+        final String cname = cert.getSubjectX500Principal().getName();
+        String alias = cname;
+        while (truststore.containsAlias(alias)) {
+            alias = cname + "_" + counter.getAndIncrement();
+        }
+        return alias;
+    }
 
+    public FilesystemKeystoreInformation persist(final Path truststorePath, final char[] truststorePassword) throws IOException, GeneralSecurityException {
         try (final FileOutputStream fileOutputStream = new FileOutputStream(truststorePath.toFile())) {
             this.truststore.store(fileOutputStream, truststorePassword);
         }

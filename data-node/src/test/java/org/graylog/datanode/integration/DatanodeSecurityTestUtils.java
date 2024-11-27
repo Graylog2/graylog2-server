@@ -37,7 +37,7 @@ public class DatanodeSecurityTestUtils {
         final Enumeration<String> aliases = ca.loadKeystore().aliases();
         while (aliases.hasMoreElements()) {
             final String alias = aliases.nextElement();
-            truststoreCreator.addFromKeystore(alias, ca, alias);
+            truststoreCreator.addFromKeystore(ca, alias);
         }
         return truststoreCreator.getTruststore();
     }

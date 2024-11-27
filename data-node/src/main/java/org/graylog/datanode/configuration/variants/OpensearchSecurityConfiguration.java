@@ -88,8 +88,8 @@ public class OpensearchSecurityConfiguration implements KeystoreContributor {
             final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
             this.truststore = TruststoreCreator.newDefaultJvm()
-                    .addFromKeystore("datanode-transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
-                    .addFromKeystore("datanode-http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addFromKeystore(transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addFromKeystore(httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
                     .addCertificates(trustedCertificates)
                     .persist(trustStorePath, truststorePassword.toCharArray());
 
