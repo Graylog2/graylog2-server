@@ -17,11 +17,13 @@
 import React, { useState } from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import { SegmentedControl } from 'components/bootstrap';
+import { Col, Row, SegmentedControl, Table } from 'components/bootstrap';
 import { NodesList } from 'components/nodes';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 import DataNodeList from 'components/datanode/DataNodeList/DataNodeList';
+import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
+import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 const VIEW_TYPES_SEGMENTS = [
   {
@@ -39,6 +41,7 @@ type ViewTypesSegments = 'list' | 'icons';
 const ClusterConfigurationPage = () => {
   const { nodes } = useStore(NodesStore);
   const [viewType, setViewType] = useState<ViewTypesSegments>('list');
+  const { graylogNodes, dataNodes } = useClusterNodes();
 
   return (
     <DocumentTitle title="Cluster Configuration">
@@ -51,10 +54,47 @@ const ClusterConfigurationPage = () => {
             will be persisted to disk, even when processing is disabled.
           </span>
         </PageHeader>
-        <SegmentedControl data={VIEW_TYPES_SEGMENTS}
-                          radius="sm"
-                          value={viewType}
-                          onChange={(newViewType) => setViewType(newViewType)} />
+        <Row className="content">
+          <Col md={12}>
+            <h2>Nodes</h2>
+            <br/>
+            <SegmentedControl data={VIEW_TYPES_SEGMENTS}
+                              radius="sm"
+                              value={viewType}
+                              onChange={(newViewType) => setViewType(newViewType)} />
+            <Table>
+              <thead>
+                <tr>
+                  <th>Node</th>
+                  <th>Type</th>
+                  <th>Role</th>
+                  <th>State</th>
+                  <th className="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {graylogNodes.map((graylogNode) => (
+                  <tr>
+                    <td>{graylogNode.nodeName}</td>
+                    <td>{graylogNode.type}</td>
+                    <td>{graylogNode.role}</td>
+                    <td>{graylogNode.state}</td>
+                    <td><MoreActions /></td>
+                  </tr>
+                ))}
+                {dataNodes.map((dataNode) => (
+                  <tr>
+                    <td>{dataNode.nodeName}</td>
+                    <td>{dataNode.type}</td>
+                    <td>{dataNode.role}</td>
+                    <td>{dataNode.state}</td>
+                    <td><MoreActions /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
         <NodesList nodes={nodes} />
         <DataNodeList />
       </div>
