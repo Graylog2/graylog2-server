@@ -448,6 +448,6 @@ public class Indices {
     }
 
     public Map<String, Object> indexSettings(String index) {
-        return IndexSettingsHelper.unflatten(indicesAdapter.getFlattenIndexSettings(index));
+        return IndexSettingsHelper.getAsStructuredMap(indicesAdapter.getFlattenIndexSettings(index));
     }
 }

@@ -22,7 +22,7 @@ import jakarta.annotation.Nullable;
 import java.util.Map;
 
 public class IndexSettings {
-    public Map<String, Object> settings;
+    private final Map<String, Object> settings;
 
     public IndexSettings(Map<String, Object> settings) {
         this.settings = settings;
@@ -35,8 +35,7 @@ public class IndexSettings {
         if (analysis != null) {
             fields.put("analysis", analysis);
         }
-        return new IndexSettings(fields
-                .build());
+        return new IndexSettings(fields.build());
     }
 
     public Map<String, Object> map() {

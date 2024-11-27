@@ -22,14 +22,10 @@ import java.util.Map;
 
 public class IndexSettingsHelper {
 
-    public static Map<String, Object> unflatten(Map<String, Object> settings) {
-        return getAsStructuredMap(settings);
-    }
-
     /**
      * This method is copied from {@link org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings} and adapted.
      */
-    private static Map<String, Object> getAsStructuredMap(Map<String, Object> settings) {
+    public static Map<String, Object> getAsStructuredMap(Map<String, Object> settings) {
         Map<String, Object> map = new HashMap<>(2);
         for (Map.Entry<String, Object> entry : settings.entrySet()) {
             processSetting(map, "", entry.getKey(), entry.getValue());
