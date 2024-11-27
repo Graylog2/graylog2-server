@@ -95,13 +95,23 @@ public final class Streams implements GraylogRestApi {
     }
 
     public void deleteStream(String streamId) {
-        waitForStreamRouterRefresh(() -> given()
+        final var streamRules = api.streams().getStream(streamId)
+                .extract().body().jsonPath().getList("rules");
+        if (streamRules.isEmpty()) {
+            doDeleteStream(streamId);
+        } else {
+            waitForStreamRouterRefresh(() -> doDeleteStream(streamId));
+        }
+    }
+
+    private ValidatableResponse doDeleteStream(String streamId) {
+        return given()
                 .spec(api.requestSpecification())
                 .when()
                 .delete("/streams/" + streamId)
                 .then()
                 .log().ifError()
-                .statusCode(204));
+                .statusCode(204);
     }
 
     public ValidatableResponse getStream(String streamId) {
