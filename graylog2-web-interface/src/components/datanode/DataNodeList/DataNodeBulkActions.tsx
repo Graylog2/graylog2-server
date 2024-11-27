@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 
-import MenuItem from 'components/bootstrap/MenuItem';
+import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import ConfirmDialog from 'components/common/ConfirmDialog';

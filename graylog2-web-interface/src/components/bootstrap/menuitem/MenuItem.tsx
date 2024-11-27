@@ -16,16 +16,12 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
 import Icon from 'components/common/Icon';
 
-import Menu from './Menu';
-
-const StyledMenuItem = styled(Menu.Item)<{ $variant: 'danger' | undefined }>(({ $variant, theme }) => css`
-  ${$variant ? `color: ${theme.colors.variant.danger};` : ''}
-`);
+import Menu from '../Menu';
 
 const IconWrapper = styled.div`
   display: inline-flex;
@@ -54,11 +50,10 @@ type Props<T = undefined> = React.PropsWithChildren<{
   rel?: 'noopener noreferrer',
   target?: '_blank',
   title?: string,
-  variant?: 'danger'
   closeMenuOnClick?: boolean,
 }>;
 
-const CustomMenuItem = <T, >({ children, className, disabled = false, divider = false, eventKey, header = false, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component, variant, closeMenuOnClick }: Props<T>) => {
+const CustomMenuItem = <T, >({ children, className, disabled = false, divider = false, eventKey, header = false, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component, closeMenuOnClick }: Props<T>) => {
   const callback = onClick ?? onSelect;
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
 
@@ -71,7 +66,6 @@ const CustomMenuItem = <T, >({ children, className, disabled = false, divider = 
   }
 
   const sharedProps = {
-    $variant: variant,
     className,
     'data-tab-id': dataTabId,
     disabled,
@@ -84,16 +78,16 @@ const CustomMenuItem = <T, >({ children, className, disabled = false, divider = 
 
   if (href) {
     return (
-      <StyledMenuItem component={Link} to={href} rel={rel} target={target} {...sharedProps}>
+      <Menu.Item component={Link} to={href} rel={rel} target={target} {...sharedProps}>
         {children}
-      </StyledMenuItem>
+      </Menu.Item>
     );
   }
 
   return (
-    <StyledMenuItem component={component} {...sharedProps}>
+    <Menu.Item component={component} {...sharedProps}>
       {children}
-    </StyledMenuItem>
+    </Menu.Item>
   );
 };
 
