@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import type { PropsWithChildren } from 'react';
 
-import MenuItem from 'components/bootstrap/MenuItem';
-import { DropdownButton } from 'components/bootstrap';
+import { MenuItem, DropdownButton } from 'components/bootstrap';
 
 import useSelectedEntities from './hooks/useSelectedEntities';
 

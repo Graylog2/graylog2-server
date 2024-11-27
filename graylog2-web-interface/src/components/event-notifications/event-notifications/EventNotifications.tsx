@@ -32,7 +32,7 @@ import {
   Icon,
   QueryHelper,
 } from 'components/common';
-import { Col, DropdownButton, MenuItem, Row, Button } from 'components/bootstrap';
+import { Col, DropdownButton, MenuItem, Row, Button, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 
 import styles from './EventNotifications.css';
@@ -147,7 +147,7 @@ class EventNotifications extends React.Component<EventNotificationsProps, {
             </IfPermitted>
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
-              <MenuItem onClick={onDelete(notification)} variant="danger">Delete</MenuItem>
+              <DeleteMenuItem onClick={onDelete(notification)} />
             </IfPermitted>
           </DropdownButton>
         </IfPermitted>
