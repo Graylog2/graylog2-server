@@ -19,8 +19,7 @@ import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 
 import { Button } from 'components/bootstrap';
 import { asMock } from 'helpers/mocking';
-import mockAction from 'helpers/mocking/MockAction';
-import { StreamsActions } from 'stores/streams/StreamsStore';
+import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import { useInputSetupWizard, InputSetupWizardProvider } from 'components/inputs/InputSetupWizard';
 import type { WizardData } from 'components/inputs/InputSetupWizard';
@@ -49,9 +48,16 @@ const renderWizard = (wizardData: WizardData = {}) => (
   )
 );
 
-jest.mock('views/stores/StreamsStore');
-
+jest.mock('components/streams/hooks/useStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
+
+const useStreamsResult = (list = []) => ({
+  data: { list: list, pagination: { total: 1 }, attributes: [] },
+  isInitialLoading: false,
+  isFetching: false,
+  error: undefined,
+  refetch: () => {},
+});
 
 const pipelinesConnectedMock = (response = []) => ({
   data: response,
@@ -62,12 +68,12 @@ const pipelinesConnectedMock = (response = []) => ({
 });
 
 beforeEach(() => {
+  asMock(useStreams).mockReturnValue(useStreamsResult());
   asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
-  StreamsActions.listStreams = mockAction(jest.fn(() => Promise.resolve([])));
 });
 
 describe('InputSetupWizard', () => {
-  it('renders the wizard and shows routing step as first step', async () => {
+  it('should render the wizard and shows routing step as first step', async () => {
     renderWizard();
 
     const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
@@ -79,7 +85,7 @@ describe('InputSetupWizard', () => {
     expect(wizard).toBeInTheDocument();
   });
 
-  it('closes the wizard', async () => {
+  it('should close the wizard', async () => {
     renderWizard();
     const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
     const closeButton = await screen.findByRole('button', { name: /Close Wizard!/ });

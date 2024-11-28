@@ -20,11 +20,10 @@ import selectEvent from 'react-select-event';
 
 import { Button } from 'components/bootstrap';
 import { asMock } from 'helpers/mocking';
-import mockAction from 'helpers/mocking/MockAction';
-import { StreamsActions } from 'stores/streams/StreamsStore';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import { useInputSetupWizard, InputSetupWizardProvider, INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard';
 import type { WizardData } from 'components/inputs/InputSetupWizard';
+import useStreams from 'components/streams/hooks/useStreams';
 
 import InputSetupWizard from './InputSetupWizard';
 
@@ -48,9 +47,16 @@ const renderWizard = (wizardData: WizardData = {}) => (
   )
 );
 
-jest.mock('views/stores/StreamsStore');
-
+jest.mock('components/streams/hooks/useStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
+
+const useStreamsResult = (list = []) => ({
+  data: { list: list, pagination: { total: 1 }, attributes: [] },
+  isInitialLoading: false,
+  isFetching: false,
+  error: undefined,
+  refetch: () => {},
+});
 
 const pipelinesConnectedMock = (response = []) => ({
   data: response,
@@ -61,8 +67,8 @@ const pipelinesConnectedMock = (response = []) => ({
 });
 
 beforeEach(() => {
+  asMock(useStreams).mockReturnValue(useStreamsResult());
   asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
-  StreamsActions.listStreams = mockAction(jest.fn(() => Promise.resolve([])));
 });
 
 describe('InputSetupWizard Setup Routing', () => {
@@ -79,10 +85,12 @@ describe('InputSetupWizard Setup Routing', () => {
   });
 
   it('should only show editable existing streams', async () => {
-    StreamsActions.listStreams = mockAction(jest.fn(() => Promise.resolve([
-      { id: 'alohoid', title: 'Aloho', is_editable: true },
-      { id: 'moraid', title: 'Mora', is_editable: false },
-    ])));
+    asMock(useStreams).mockReturnValue(useStreamsResult(
+      [
+        { id: 'alohoid', title: 'Aloho', is_editable: true },
+        { id: 'moraid', title: 'Mora', is_editable: false },
+      ],
+    ));
 
     renderWizard();
 
@@ -102,10 +110,12 @@ describe('InputSetupWizard Setup Routing', () => {
   });
 
   it('should not show existing default stream in select', async () => {
-    StreamsActions.listStreams = mockAction(jest.fn(() => Promise.resolve([
-      { id: 'alohoid', title: 'Aloho', is_editable: true, is_default: true },
-      { id: 'moraid', title: 'Mora', is_editable: true },
-    ])));
+    asMock(useStreams).mockReturnValue(useStreamsResult(
+      [
+        { id: 'alohoid', title: 'Aloho', is_editable: true, is_default: true },
+        { id: 'moraid', title: 'Mora', is_editable: true },
+      ],
+    ));
 
     renderWizard();
 
@@ -125,10 +135,12 @@ describe('InputSetupWizard Setup Routing', () => {
   });
 
   it('should allow the user to select a stream', async () => {
-    StreamsActions.listStreams = mockAction(jest.fn(() => Promise.resolve([
-      { id: 'alohoid', title: 'Aloho', is_editable: true },
-      { id: 'moraid', title: 'Mora', is_editable: true },
-    ])));
+    asMock(useStreams).mockReturnValue(useStreamsResult(
+      [
+        { id: 'alohoid', title: 'Aloho', is_editable: true },
+        { id: 'moraid', title: 'Mora', is_editable: true },
+      ],
+    ));
 
     renderWizard();
 
@@ -144,10 +156,12 @@ describe('InputSetupWizard Setup Routing', () => {
   });
 
   it('should show a warning if the selected stream has connected pipelines', async () => {
-    StreamsActions.listStreams = mockAction(jest.fn(() => Promise.resolve([
-      { id: 'alohoid', title: 'Aloho', is_editable: true },
-      { id: 'moraid', title: 'Mora', is_editable: true },
-    ])));
+    asMock(useStreams).mockReturnValue(useStreamsResult(
+      [
+        { id: 'alohoid', title: 'Aloho', is_editable: true },
+        { id: 'moraid', title: 'Mora', is_editable: true },
+      ],
+    ));
 
     asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock([
       { id: 'pipeline1', title: 'Pipeline1' },
@@ -175,7 +189,7 @@ describe('InputSetupWizard Setup Routing', () => {
     expect(warningPipeline2).toBeInTheDocument();
   });
 
-  it('should the user to create a new stream', async () => {
+  it('should allow the user to create a new stream', async () => {
     renderWizard();
 
     const openButton = await screen.findByRole('button', { name: /Open Wizard!/i });
