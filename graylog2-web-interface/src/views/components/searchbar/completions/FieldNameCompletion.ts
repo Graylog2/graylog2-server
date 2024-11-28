@@ -23,10 +23,10 @@ import {
   isTypeTerm,
   isExistsOperator,
 } from 'views/components/searchbar/completions/token-helper';
+import { escapeField } from 'views/logic/queries/QueryHelper';
 
 import type { CompletionResult, Token } from '../queryinput/ace-types';
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
-import {escapeField} from 'views/logic/queries/QueryHelper';
 
 export type Suggestion = Readonly<{
   name: string,
