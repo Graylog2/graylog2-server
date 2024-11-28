@@ -47,14 +47,14 @@ const useMappedData = ({ contexts, field, queryId, value }: HookProps) => useMem
   const searchFilterQuery = transformSearchFiltersToQuery(curQuery.filters);
   const queryWithReplacedParams = replaceParametersInQueryString({ query: curQuery.query.query_string, restParameterValues });
   const streams = getStreams(curQuery.filter);
-  const { ...aggregationVales } = aggregationHandler({ valuePath: contexts.valuePath, widget: contexts.widget, value: value, field: field });
+  const { ...aggregationValues } = aggregationHandler({ valuePath: contexts.valuePath, widget: contexts.widget, value: value, field: field });
   const data: MappedData = {
     searchWithinMs,
     lutParameters,
     searchFilterQuery,
     queryWithReplacedParams,
     streams,
-    ...aggregationVales,
+    ...aggregationValues,
   };
 
   return pickBy(data, (v) => {
