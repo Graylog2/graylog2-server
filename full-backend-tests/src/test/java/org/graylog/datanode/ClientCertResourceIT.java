@@ -53,6 +53,8 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collections;
 
 @ContainerMatrixTestsConfiguration(searchVersions = SearchServer.DATANODE_DEV,
@@ -86,14 +88,14 @@ public class ClientCertResourceIT {
         final PrivateKey privateKey = decodePrivateKey(parsedResponse.properJSONPath().read("private_key"));
         final X509Certificate certificate = decodeCert(parsedResponse.properJSONPath().read("certificate"));
 
-        assertThat(certificate.getIssuerX500Principal().getName()).isEqualTo("CN=Graylog CA");
-        assertThat(certificate.getSubjectX500Principal().getName()).isEqualTo("CN=admin");
+        Assertions.assertThat(certificate.getIssuerX500Principal().getName()).isEqualTo("CN=Graylog CA");
+        Assertions.assertThat(certificate.getSubjectX500Principal().getName()).isEqualTo("CN=admin");
         LocalDate expires = certificate.getNotAfter()
                 .toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
-        assertThat(expires).isBefore(LocalDate.now().plusMonths(6).plusDays(2));
-        assertThat(expires).isAfter(LocalDate.now().plusMonths(6).minusDays(2));
+        Assertions.assertThat(expires).isBefore(LocalDate.now().plusMonths(6).plusDays(2));
+        Assertions.assertThat(expires).isAfter(LocalDate.now().plusMonths(6).minusDays(2));
 
         final SSLContext sslContext = createSslContext(
                 createKeystore(privateKey, certificate, caCertificate),
@@ -103,7 +105,7 @@ public class ClientCertResourceIT {
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         if (connection instanceof HttpsURLConnection) {
-            ((HttpsURLConnection)connection).setSSLSocketFactory(sslContext.getSocketFactory());
+            ((HttpsURLConnection) connection).setSSLSocketFactory(sslContext.getSocketFactory());
 
             Assertions.assertThat(connection.getResponseCode()).isEqualTo(200);
 
