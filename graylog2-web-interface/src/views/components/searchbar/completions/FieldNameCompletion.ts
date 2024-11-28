@@ -115,7 +115,8 @@ class FieldNameCompletion implements Completer {
       ? [...currentQueryFields.toArray()]
       : [...this.staticSuggestions, ...currentQueryFields.toArray()];
     const currentQuery = fieldsToMatchIn.filter((field) => (matchesFieldName(field) > 0))
-      .map((field) => _fieldResult(field, 10 + matchesFieldName(field), valuePosition));
+      .map((field) => _fieldResult(field, 10 + matchesFieldName(field), valuePosition))
+      .map((field) => ({ ...field, value: field.value.replaceAll(/(.*)(\s|\/)(.*)/g, '$1\\$2$3') }));
     const allFields = allButInCurrent.filter((field) => (matchesFieldName(field) > 0))
       .map((field) => _fieldResult(field, 1 + matchesFieldName(field), valuePosition))
       .map((result) => ({ ...result, meta: `${result.meta} (not in streams)` }));
