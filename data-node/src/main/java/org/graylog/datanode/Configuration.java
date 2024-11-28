@@ -257,7 +257,11 @@ public class Configuration {
     /**
      * @see <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/searchable_snapshot/#configuring-a-node-to-use-searchable-snapshots}">Searchable snapshots</a>
      */
-    @Documentation(value = "Cache size for searchable snaphots. ")
+    @Documentation(value = """
+            Cache size for searchable snapshots. This space will be automatically reserved
+            if you have either S3 or shared filesystem repositories enabled and configured.
+            See s3_client_* configuration options and path_repo.
+            """)
     @Parameter(value = "node_search_cache_size")
     private String searchCacheSize = "10gb";
 
