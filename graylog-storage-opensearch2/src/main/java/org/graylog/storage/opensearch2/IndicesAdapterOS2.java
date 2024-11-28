@@ -43,7 +43,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRe
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
@@ -168,12 +167,9 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     private CreateIndexRequest createIndexRequest(String index,
-                                                   IndexSettings indexSettings,
-                                                   @Nullable Map<String, Object> mapping) {
-        final Map<String, Object> settings = new HashMap<>();
-        settings.put("number_of_shards", indexSettings.shards());
-        settings.put("number_of_replicas", indexSettings.replicas());
-        CreateIndexRequest request = new CreateIndexRequest(index).settings(settings);
+                                                  IndexSettings indexSettings,
+                                                  @Nullable Map<String, Object> mapping) {
+        CreateIndexRequest request = new CreateIndexRequest(index).settings(indexSettings.map());
         if (mapping != null) {
             request = request.mapping(mapping);
         }
@@ -203,11 +199,26 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
                 .indices(index)
                 .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
-        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+        return client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions).mappings().get(index).sourceAsMap(),
                 "Couldn't read mapping of index " + index);
-
-        return result.mappings().get(index).sourceAsMap();
     }
+
+    @Override
+    public Map<String, Object> getFlattenIndexSettings(@Nonnull String index) {
+
+        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
+                .indices(index)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+
+        return client.execute((c, requestOptions) -> {
+            final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
+            Settings settings = settingsResponse.getIndexToSettings().get(index);
+            ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+            settings.keySet().forEach(k -> Optional.ofNullable(settings.get(k)).ifPresent(v -> builder.put(k, v)));
+            return builder.build();
+        }, "Couldn't read settings of index " + index);
+    }
+
 
     @Override
     public void updateIndexMetaData(@Nonnull String index, @Nonnull Map<String, Object> metadata, boolean mergeExisting) {

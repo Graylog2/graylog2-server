@@ -28,7 +28,7 @@ import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 
-import RefreshControls from './RefreshControls';
+import ViewsRefreshControls from './ViewsRefreshControls';
 
 jest.useFakeTimers();
 
@@ -51,7 +51,7 @@ describe('RefreshControls', () => {
     <TestStoreProvider>
       <Formik initialValues={{}} onSubmit={onSubmit}>
         <Form>
-          <RefreshControls disable={false} />
+          <ViewsRefreshControls disable={false} />
           {children}
         </Form>
       </Formik>

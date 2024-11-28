@@ -152,3 +152,7 @@ export const durationInSeconds = (duration: string | number) => moment.duration(
  * Takes a duration (e.g. in milliseconds or seconds, or as a ISO8601 duration) and returns it in minutes.
  */
 export const durationInMinutes = (duration: string | number) => moment.duration(duration).asMinutes();
+/**
+ * Takes a duration (e.g. in minutes or seconds, or as a ISO8601 duration) and returns it in milliseconds.
+ */
+export const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();

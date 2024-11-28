@@ -24,7 +24,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import MenuItem from 'components/bootstrap/MenuItem';
+import { MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import StopStreamsAction from 'components/streams/StreamsOverview/BulkActions/StopStreamsAction';
 import SearchStreamsAction from 'components/streams/StreamsOverview/BulkActions/SearchStreamsAction';
@@ -97,7 +97,7 @@ const BulkActions = ({ indexSets }: Props) => {
                            refetchStreams={refetchStreams}
                            descriptor={descriptor} />
 
-        <MenuItem onSelect={onDelete}>Delete</MenuItem>
+        <DeleteMenuItem onSelect={onDelete} />
       </BulkActionsDropdown>
     </>
   );
