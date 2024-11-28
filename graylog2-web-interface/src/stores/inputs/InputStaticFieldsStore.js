@@ -21,7 +21,7 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 
-export const InputStaticFieldsStore = singletonStore(
+const InputStaticFieldsStore = singletonStore(
   'core.InputStaticFields',
   () => Reflux.createStore({
     listenables: [],
@@ -70,3 +70,5 @@ export const InputStaticFieldsStore = singletonStore(
     },
   }),
 );
+
+export default InputStaticFieldsStore;
