@@ -177,7 +177,6 @@ public class OpensearchConfigurationService extends AbstractIdleService {
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
                     configurationParts,
-                    localConfiguration.getNodeSearchCacheSize(),
                     opensearchProperties.build()
             );
         } catch (GeneralSecurityException | KeyStoreStorageException | IOException e) {

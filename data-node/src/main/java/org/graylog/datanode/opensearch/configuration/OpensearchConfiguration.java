@@ -50,7 +50,6 @@ public record OpensearchConfiguration(
         OpensearchSecurityConfiguration opensearchSecurityConfiguration,
         Set<OpensearchConfigurationPart> configurationParts,
 
-        String nodeSearchCacheSize,
         Map<String, Object> additionalConfiguration
 ) {
     public Map<String, Object> asMap() {
@@ -82,8 +81,6 @@ public record OpensearchConfiguration(
         }
 
         config.put("discovery.seed_providers", "file");
-
-        config.put("node.search.cache.size", nodeSearchCacheSize);
 
         configurationParts.stream()
                 .map(OpensearchConfigurationPart::properties)
