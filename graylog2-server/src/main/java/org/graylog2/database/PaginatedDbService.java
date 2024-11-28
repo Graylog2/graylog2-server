@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Sorts;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -55,7 +56,11 @@ import java.util.stream.Stream;
  * </p>
  *
  * @param <DTO>
+ * @deprecated Do not implement services based on this class anymore. Instead, use
+ * {@link MongoCollections#collection(String, Class)}, {@link MongoCollections#paginationHelper(MongoCollection)}, and
+ * {@link MongoCollections#utils(MongoCollection)} to implement common data access patterns.
  */
+@Deprecated(since = "6.2.0", forRemoval = true)
 public abstract class PaginatedDbService<DTO> {
     protected final JacksonDBCollection<DTO, ObjectId> db;
 

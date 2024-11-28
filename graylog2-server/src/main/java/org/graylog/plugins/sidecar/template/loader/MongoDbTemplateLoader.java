@@ -19,33 +19,33 @@ package org.graylog.plugins.sidecar.template.loader;
 import freemarker.cache.TemplateLoader;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
-import org.mongojack.DBQuery;
-import org.mongojack.JacksonDBCollection;
+import org.graylog2.database.utils.MongoUtils;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
 public class MongoDbTemplateLoader implements TemplateLoader {
-    private final JacksonDBCollection<Configuration, ObjectId> dbCollection;
+    private final MongoUtils<Configuration> mongoUtils;
 
-    public MongoDbTemplateLoader(JacksonDBCollection<Configuration, ObjectId> dbCollection) {
-        this.dbCollection = dbCollection;
+    public MongoDbTemplateLoader(MongoUtils<Configuration> mongoUtils) {
+        this.mongoUtils = mongoUtils;
     }
 
     @Override
     public Object findTemplateSource(String id) throws IOException {
-        Configuration configuration;
+
+        final ObjectId objectId;
         try {
-            configuration = dbCollection.findOne(DBQuery.is("_id", unlocalize(id)));
+            objectId = new ObjectId(unlocalize(id));
         } catch (IllegalArgumentException e) {
             // no ObjectID so skip MongoDB loader and try with next one
             return null;
         }
-        if (configuration == null) {
-            throw new IOException("Can't find template: " + unlocalize(id));
-        }
-        return configuration.template();
+
+        return mongoUtils.getById(objectId)
+                .map(Configuration::template)
+                .orElseThrow(() -> new IOException("Can't find template: " + unlocalize(id)));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class MongoDbTemplateLoader implements TemplateLoader {
 
     @Override
     public Reader getReader(Object snippet, String encoding) {
-        return new StringReader((String)snippet);
+        return new StringReader((String) snippet);
     }
 
     @Override

@@ -30,6 +30,7 @@ import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationSystemEventPublisher;
@@ -86,7 +87,9 @@ public class SidecarServiceTest {
     @Before
     public void setUp(MongoJackObjectMapperProvider mapperProvider,
                       Validator validator) throws Exception {
-        this.sidecarService = new SidecarService(collectorService, configurationService, mongodb.mongoConnection(), mapperProvider, notificationService, publisher, validator);
+        this.sidecarService = new SidecarService(collectorService, configurationService,
+                new MongoCollections(mapperProvider, mongodb.mongoConnection()), notificationService, publisher,
+                validator);
     }
 
     @Test
