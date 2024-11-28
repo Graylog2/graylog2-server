@@ -610,6 +610,10 @@ public class StreamResource extends RestResource {
     @ApiOperation(value = "Get pipelines associated with a stream")
     @Produces(MediaType.APPLICATION_JSON)
     public List<PipelineCompactSource> getConnectedPipelines(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
+        if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+            throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
+        }
+
         PipelineConnections pipelineConnections = pipelineStreamConnectionsService.load(streamId);
         List<PipelineCompactSource> list = new ArrayList<>();
 
