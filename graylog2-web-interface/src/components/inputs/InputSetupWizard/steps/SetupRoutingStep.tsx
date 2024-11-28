@@ -17,18 +17,16 @@
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useQuery } from '@tanstack/react-query';
 
 import { Alert, Button, Row, Col } from 'components/bootstrap';
 import { Select } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
-import { StreamsActions } from 'stores/streams/StreamsStore';
-import type { Stream } from 'stores/streams/StreamsStore';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { StepData } from 'components/inputs/InputSetupWizard/types';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStream from 'components/inputs/InputSetupWizard/steps/components/CreateStream';
 import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
+import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
 const StepCol = styled(Col)(({ theme }) => css`
@@ -74,13 +72,15 @@ interface RoutingStepData extends StepData {
 
 const SetupRoutingStep = () => {
   const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsData, setStepsData } = useInputSetupWizard();
-  const { data: streams, isLoading: isStreamsLoading } = useQuery<Array<Stream>>(['streamsMap'], StreamsActions.listStreams);
   const [selectedStreamId, setSelectedStreamId] = useState(undefined);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
   const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsData);
   const currentStepName = INPUT_WIZARD_STEPS.SETUP_ROUTING;
+  const { data: streamsData, isInitialLoading: isLoadingStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } });
+  const streams = streamsData?.list;
+  const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
 
   useEffect(() => {
     if (orderedSteps && activeStep && stepsData) {
@@ -88,8 +88,6 @@ const SetupRoutingStep = () => {
       setStepsData(withNextStepEnabled);
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
 
   const options = useMemo(() => {
     if (!streams) return [];
@@ -151,7 +149,7 @@ const SetupRoutingStep = () => {
           <Row>
             <ExistingStreamCol md={6}>
               <StyledHeading>Choose an existing Stream</StyledHeading>
-              {!isStreamsLoading && (
+              {!isLoadingStreams && (
               <Select inputId="streams"
                       onChange={handleStreamSelect}
                       options={options}
