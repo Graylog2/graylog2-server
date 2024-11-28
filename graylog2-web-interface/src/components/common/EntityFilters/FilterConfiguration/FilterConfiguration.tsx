@@ -70,7 +70,7 @@ const FilterComponent = ({ allActiveFilters, attribute, filter, filterValueRende
 export const FilterConfiguration = ({
   allActiveFilters,
   attribute,
-  filter,
+  filter = undefined,
   filterValueRenderer,
   onSubmit,
 }: Props) => (
