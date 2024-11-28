@@ -35,6 +35,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -617,6 +618,39 @@ public class StreamResource extends RestResource {
             list.add(PipelineCompactSource.create(pipelineDao.id(), pipelineDao.title()));
         }
         return list;
+    }
+
+    public record GetConnectedPipelinesRequest(List<String> streamIds) {}
+
+    @POST
+    @Path("/pipelines")
+    @ApiOperation(value = "Get pipelines associated with specified streams")
+    @NoAuditEvent("No data is changed.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, List<PipelineCompactSource>> getConnectedPipelinesForStreams(@ApiParam(name = "streamIds", required = true) GetConnectedPipelinesRequest request) {
+        return request.streamIds().stream()
+                .collect(Collectors.toMap(streamId -> streamId, streamId -> {
+                    if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+                        throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
+                    }
+                    final PipelineConnections pipelineConnections;
+                    try {
+                        pipelineConnections = pipelineStreamConnectionsService.load(streamId);
+                    } catch (NotFoundException ignored) {
+                        return List.of();
+                    }
+                    final List<PipelineCompactSource> list = new ArrayList<>();
+
+                    for (String id : pipelineConnections.pipelineIds()) {
+                        try {
+                            PipelineDao pipelineDao = pipelineService.load(id);
+                            list.add(PipelineCompactSource.create(pipelineDao.id(), pipelineDao.title()));
+                        } catch (NotFoundException ignored) {
+                        }
+                    }
+                    return list;
+                }));
+
     }
 
     @PUT
