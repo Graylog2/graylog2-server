@@ -29,11 +29,7 @@ public abstract class DatanodeCmdLineTool extends CmdLineTool<Configuration> {
     protected String customFeatureFlagFile = "/etc/graylog/datanode/feature-flag.conf";
 
     protected String commandName = "command";
-
-    protected DatanodeCmdLineTool() {
-        super(new Configuration());
-    }
-
+    
     protected DatanodeCmdLineTool(String commandName) {
         super(commandName, new Configuration());
     }
