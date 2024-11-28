@@ -185,7 +185,7 @@ public class GraylogApis implements GraylogRestApi {
         return post(url, Users.LOCAL_ADMIN, "", expectedResult);
     }
 
-    public ValidatableResponse post(final String url, final Map<?, ?> body, final int expectedResult) throws JsonProcessingException {
+    public ValidatableResponse post(final String url, final Object body, final int expectedResult) throws JsonProcessingException {
         final var objectMapper = OBJECT_MAPPER_PROVIDER.get();
         return post(url, Users.LOCAL_ADMIN, objectMapper.writeValueAsString(body), expectedResult);
     }
