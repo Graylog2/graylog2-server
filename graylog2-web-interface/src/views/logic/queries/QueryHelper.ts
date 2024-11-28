@@ -37,6 +37,8 @@ const escape = (searchTerm: string | number | undefined | null) => {
   return escapedTerm;
 };
 
+const escapeField = (field: string | number | undefined | null) => String(field).replaceAll(/(\s|\/)/g, '\\$&');
+
 const addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND') => {
   if (trim(oldQuery) === '*' || trim(oldQuery) === '') {
     return newTerm;
@@ -56,4 +58,4 @@ const concatQueryStrings = (queryStrings: Array<string>, { operator = 'AND', wit
   return withRemovedEmpty.map((s) => (showBracketsForChild ? `(${s})` : s)).join(` ${operator} `);
 };
 
-export { isPhrase, escape, addToQuery, concatQueryStrings };
+export { isPhrase, escape, escapeField, addToQuery, concatQueryStrings };
