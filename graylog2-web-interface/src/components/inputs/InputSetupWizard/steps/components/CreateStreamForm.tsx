@@ -83,37 +83,40 @@ const CreateStreamForm = ({ submitForm } : Props) => {
     <Formik<FormValues> initialValues={initialValues}
                         onSubmit={submitForm}
                         validate={validate}>
-      <Form>
-        <FormikInput label="Title"
-                     name="title"
-                     id="title"
-                     help="A descriptive name of the new stream" />
-        <FormikInput label={<>Description <InputOptionalInfo /></>}
-                     name="description"
-                     id="description"
-                     help="What kind of messages are routed into this stream?" />
+      {({ isValid, isValidating, dirty }) => (
 
-        <IndexSetSelect indexSets={indexSets} />
-        <NewIndexSetButton bsSize="xs" onClick={handleNewIndexSetClick}>Create a new Index Set</NewIndexSetButton>
-        <FormikInput label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
-                     help={
-                       <span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>
+        <Form>
+          <FormikInput label="Title"
+                       name="title"
+                       id="title"
+                       help="A descriptive name of the new stream" />
+          <FormikInput label={<>Description <InputOptionalInfo /></>}
+                       name="description"
+                       id="description"
+                       help="What kind of messages are routed into this stream?" />
+
+          <IndexSetSelect indexSets={indexSets} />
+          <NewIndexSetButton bsSize="xs" onClick={handleNewIndexSetClick}>Create a new Index Set</NewIndexSetButton>
+          <FormikInput label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
+                       help={
+                         <span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>
 }
-                     name="remove_matches_from_default_stream"
-                     id="remove_matches_from_default_stream"
-                     type="checkbox" />
+                       name="remove_matches_from_default_stream"
+                       id="remove_matches_from_default_stream"
+                       type="checkbox" />
 
-        <FormikInput label={<>Create a new pipeline for this stream</>}
-                     name="create_new_pipeline"
-                     id="create_new_pipeline"
-                     type="checkbox" />
+          <FormikInput label={<>Create a new pipeline for this stream</>}
+                       name="create_new_pipeline"
+                       id="create_new_pipeline"
+                       type="checkbox" />
 
-        <Row>
-          <SubmitCol md={12}>
-            <Button bsStyle="primary" type="submit">Create</Button>
-          </SubmitCol>
-        </Row>
-      </Form>
+          <Row>
+            <SubmitCol md={12}>
+              <Button bsStyle="primary" type="submit" disabled={isValidating || !isValid || !dirty}>Create</Button>
+            </SubmitCol>
+          </Row>
+        </Form>
+      )}
     </Formik>
   );
 };
