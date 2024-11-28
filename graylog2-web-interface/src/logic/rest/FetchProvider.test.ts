@@ -104,7 +104,7 @@ const setUpServer = () => {
     res.send(req.fields).end();
   });
 
-  app.post('/errorWithMessage', (_req, res) => res.status(500).send({ message: 'The dungeon collapses. You die!' }));
+  app.post('/errorWithMessage', (_req, res) => { res.status(500).send({ message: 'The dungeon collapses. You die!' }); });
 
   return app.listen(PORT, () => {});
 };
