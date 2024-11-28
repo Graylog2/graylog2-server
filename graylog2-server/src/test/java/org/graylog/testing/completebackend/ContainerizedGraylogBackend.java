@@ -124,6 +124,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         if (!licenses.isEmpty()) {
             ServiceLoader<TestLicenseImporter> loader = ServiceLoader.load(TestLicenseImporter.class);
             loader.forEach(importer -> importer.importLicenses(mongoDBInstance, licenses));
+        } else {
+            throw new IllegalStateException("Missing required environment variables " + String.join(", ", licenseStrs));
         }
     }
 
