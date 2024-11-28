@@ -1,4 +1,4 @@
 type = "a"
-message = "Added data node preflight check for usable disk space and node search cache size"
+message = "Unified snapshot configuration, role and cache management in datanode"
 
 pulls = ["21031"]
