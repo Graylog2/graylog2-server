@@ -33,6 +33,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
@@ -155,6 +156,10 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             } else {
                 message = codec.decode(raw);
             }
+        } catch (InputProcessingException e) {
+            LOG.error(e.getMessage(), e.getCause());
+            metricRegistry.meter(name(baseMetricName, "failures")).mark();
+            throw e;
         } catch (RuntimeException e) {
             LOG.error("Unable to decode raw message {} on input <{}>.", raw, inputIdOnCurrentNode);
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
