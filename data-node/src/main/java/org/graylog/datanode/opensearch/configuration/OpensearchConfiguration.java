@@ -16,12 +16,15 @@
  */
 package org.graylog.datanode.opensearch.configuration;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nonnull;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
-import org.graylog.datanode.configuration.variants.KeystoreContributor;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
+import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
 import org.graylog.datanode.process.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
@@ -29,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,11 +48,11 @@ public record OpensearchConfiguration(
         List<String> nodeRoles,
         List<String> discoverySeedHosts,
         OpensearchSecurityConfiguration opensearchSecurityConfiguration,
-        S3RepositoryConfiguration s3RepositoryConfiguration,
+        Set<OpensearchConfigurationPart> configurationParts,
 
         String nodeSearchCacheSize,
         Map<String, Object> additionalConfiguration
-) implements KeystoreContributor {
+) {
     public Map<String, Object> asMap() {
 
         Map<String, Object> config = new LinkedHashMap<>();
@@ -71,10 +75,8 @@ public record OpensearchConfiguration(
         }
 
         config.put("node.name", nodeName);
+        config.put("node.roles", buildRolesList());
 
-        if (nodeRoles != null && !nodeRoles.isEmpty()) {
-            config.put("node.roles", toValuesList(nodeRoles));
-        }
         if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
             config.put("discovery.seed_hosts", toValuesList(discoverySeedHosts));
         }
@@ -82,12 +84,26 @@ public record OpensearchConfiguration(
         config.put("discovery.seed_providers", "file");
 
         config.put("node.search.cache.size", nodeSearchCacheSize);
-        if (s3RepositoryConfiguration.isRepositoryEnabled()) {
-            config.putAll(s3RepositoryConfiguration.toOpensearchProperties());
-        }
+
+        configurationParts.stream()
+                .map(OpensearchConfigurationPart::properties)
+                .forEach(config::putAll);
 
         config.putAll(additionalConfiguration);
         return config;
+    }
+
+    @Nonnull
+    private String buildRolesList() {
+        final ImmutableList.Builder<String> roles = ImmutableList.builder();
+        if (nodeRoles != null) {
+            roles.addAll(nodeRoles);
+        }
+        configurationParts.stream()
+                .map(OpensearchConfigurationPart::nodeRoles)
+                .forEach(roles::addAll);
+
+        return toValuesList(roles.build());
     }
 
     private String toValuesList(List<String> values) {
@@ -128,10 +144,15 @@ public record OpensearchConfiguration(
     }
 
 
-    @Override
     public Map<String, String> getKeystoreItems() {
-        Stream<KeystoreContributor> keystoreContributorStream = Stream.of(opensearchSecurityConfiguration, s3RepositoryConfiguration);
-                return keystoreContributorStream.flatMap(config -> config.getKeystoreItems().entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        builder.putAll(opensearchSecurityConfiguration.getKeystoreItems());
+
+        configurationParts.stream()
+                .map(OpensearchConfigurationPart::keystoreItems)
+                .forEach(builder::putAll);
+
+        return builder.build();
     }
 }

@@ -25,7 +25,6 @@ import org.graylog.datanode.bootstrap.preflight.OpenSearchPreconditionsCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchBinPreflightCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync;
 import org.graylog.datanode.bootstrap.preflight.OpensearchDataDirCompatibilityCheck;
-import org.graylog.datanode.bootstrap.preflight.OpensearchCacheSizePreflightCheck;
 import org.graylog.datanode.opensearch.CsrRequester;
 import org.graylog.datanode.opensearch.CsrRequesterImpl;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
@@ -48,7 +47,6 @@ public class PreflightChecksBindings extends AbstractModule {
         addPreflightCheck(DatanodeDirectoriesLockfileCheck.class);
         addPreflightCheck(OpenSearchPreconditionsCheck.class);
         addPreflightCheck(OpensearchDataDirCompatibilityCheck.class);
-        addPreflightCheck(OpensearchCacheSizePreflightCheck.class);
 
         // Mongodb is needed for legacy datanode storage, where we want to extract the certificate chain from
         // mongodb and store it in local keystore
