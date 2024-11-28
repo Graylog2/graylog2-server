@@ -29,7 +29,7 @@ const pipelines = create({
   scheduler: windowScheduler(10),
 });
 
-const usePipelinesConnectedStream = (streamId: string): {
+const usePipelinesConnectedStream = (streamId: string, enabled: boolean = true): {
   data: StreamConnectedPipelines,
   refetch: () => void,
   isInitialLoading: boolean,
@@ -41,6 +41,7 @@ const usePipelinesConnectedStream = (streamId: string): {
     () => pipelines.fetch(streamId),
     {
       notifyOnChangeProps: ['data', 'error'],
+      enabled: enabled,
     },
   );
 
