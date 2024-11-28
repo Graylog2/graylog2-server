@@ -63,10 +63,10 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
     @Override
     default String getEnvironmentVariablePrefix() {
         return "GRAYLOG_";
-    };
+    }
 
     @Override
     default String getSystemPropertyPrefix() {
         return "graylog.";
-    };
+    }
 }
