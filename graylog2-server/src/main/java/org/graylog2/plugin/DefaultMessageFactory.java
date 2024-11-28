@@ -29,7 +29,7 @@ class DefaultMessageFactory implements MessageFactory {
     private final boolean cleanKeyKeepsSpaceAndSlash;
 
     @Inject
-    public DefaultMessageFactory(@Named("clean_key_keeps_space_and_slash") final boolean cleanKeyKeepsSpaceAndSlash) {
+    public DefaultMessageFactory(@Named("pipeline_rules_clean_key_keeps_space_and_slash") final boolean cleanKeyKeepsSpaceAndSlash) {
         this.cleanKeyKeepsSpaceAndSlash = cleanKeyKeepsSpaceAndSlash;
     }
 
