@@ -182,7 +182,6 @@ const RuleBlockForm = ({
                   <Select id={`existingBlock-select-${type}`}
                           name={`existingBlock-select-${type}`}
                           placeholder={`Add ${type}`}
-                          aria-label={`Add ${type}`}
                           options={options}
                           optionRenderer={optionRenderer}
                           clearable={false}

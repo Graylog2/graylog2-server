@@ -80,7 +80,7 @@ const MultiSelectField = ({ name, field, title, error, value, onChange, values }
               multi
               menuPortalTarget={document.body}
               onChange={onSelect}
-              inputProps={{ 'aria-label': `Select ${field.title}` }}
+              aria-label={`Select ${field.title}`}
               displayKey="key"
               inputId="multi-select-visualization" />
     </Input>

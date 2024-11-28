@@ -510,6 +510,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       onChange: onReactSelectChange || this._onChange,
       onInputChange,
       'aria-label': ariaLabel ?? placeholder,
+      placeholder,
       async,
       isMulti,
       isDisabled,
