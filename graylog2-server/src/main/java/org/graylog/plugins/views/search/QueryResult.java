@@ -63,7 +63,11 @@ public abstract class QueryResult {
     public abstract Builder toBuilder();
 
     public static QueryResult emptyResult() {
-        return builder().searchTypes(Collections.emptyMap()).query(Query.emptyRoot()).build();
+        return emptyResultForQuery(Query.emptyRoot());
+    }
+
+    public static QueryResult emptyResultForQuery(Query query) {
+        return builder().searchTypes(Collections.emptyMap()).query(query).build();
     }
 
     public static QueryResult failedQueryWithError(Query query, SearchError error) {
