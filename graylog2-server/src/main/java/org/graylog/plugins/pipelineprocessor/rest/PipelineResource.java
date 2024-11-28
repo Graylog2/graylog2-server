@@ -31,7 +31,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -74,7 +73,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -96,7 +94,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
             .put(PipelineDao.FIELD_TITLE, SearchQueryField.create(PipelineDao.FIELD_TITLE))
             .put(PipelineDao.FIELD_DESCRIPTION, SearchQueryField.create(PipelineDao.FIELD_DESCRIPTION))
             .build();
-    public static final String GL_INPUT_ROUTING_PIPELINE = "gl_input_routing_pipeline";
+    public static final String GL_INPUT_ROUTING_PIPELINE = "All Messages Routing";
 
     private final SearchQueryParser searchQueryParser;
     private final PaginatedPipelineService paginatedPipelineService;
@@ -272,7 +270,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
         return PipelineSource.fromDao(pipelineRuleParser, savedPipeline);
     }
 
-    public static record RoutingRequest(
+    public record RoutingRequest(
             @JsonProperty(value = "input_id", required = true) String inputId,
             @JsonProperty(value = "stream_id", required = true) String streamId,
             @JsonProperty(value = "remove_from_default", required = true) boolean removeFromDefault
@@ -291,13 +289,14 @@ public class PipelineResource extends RestResource implements PluginRestResource
             final Stream stream = streamService.load(request.streamId());
             streamName = stream.getTitle();
         } catch (NotFoundException e) {
-            throw new InternalServerErrorException(f("Unable to load stream %s", request.streamId()), e);
+            throw new NotFoundException(f("Unable to load stream %s", request.streamId()), e);
         }
 
         RuleDao ruleDao = createRoutingRule(request, streamName);
         PipelineDao pipelineDao;
         try {
             pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
+            ensurePipelineConnection(pipelineDao.id(), DEFAULT_STREAM_ID);
         } catch (NotFoundException e) {
             // Create pipeline with first rule
             return createRoutingPipeline(ruleDao);
@@ -308,10 +307,10 @@ public class PipelineResource extends RestResource implements PluginRestResource
         final List<String> rules0 = pipelineSource.stages().get(0).rules();
         if (rules0.stream().filter(ruleRef -> ruleRef.equals(ruleDao.title())).findFirst().isEmpty()) {
             rules0.add(ruleDao.title());
-            PipelineSource updated = pipelineSource.toBuilder()
+            pipelineSource = pipelineSource.toBuilder()
                     .source(createPipelineString(pipelineSource))
                     .build();
-            update(pipelineDao.id(), updated);
+            update(pipelineDao.id(), pipelineSource);
         } else {
             log.info(f("Routing for input <%s> already exists - skipping", request.inputId()));
         }
@@ -329,13 +328,23 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .stages(stages)
                 .build();
         final PipelineSource parsedSource = createFromParser(pipelineSource);
-
-        Set<String> pipelineIds = new HashSet<>();
-        pipelineIds.add(parsedSource.id());
-        final PipelineConnections pipelineConnections = PipelineConnections.create(null, DEFAULT_STREAM_ID, pipelineIds);
-        connectionsService.save(pipelineConnections);
-
+        ensurePipelineConnection(parsedSource.id(), DEFAULT_STREAM_ID);
         return parsedSource;
+    }
+
+    private void ensurePipelineConnection(String pipelineId, String streamId) {
+        PipelineConnections pipelineConnections;
+        try {
+            pipelineConnections = connectionsService.load(streamId);
+            if (pipelineConnections.pipelineIds().stream()
+                    .anyMatch(id -> id.equals(pipelineId))) {
+                return;
+            }
+        } catch (NotFoundException e) {
+            pipelineConnections = PipelineConnections.create(null, streamId, new HashSet<>());
+        }
+        pipelineConnections.pipelineIds().add(pipelineId);
+        connectionsService.save(pipelineConnections);
     }
 
     private RuleDao createRoutingRule(RoutingRequest request, String streamName) {
@@ -356,6 +365,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
         RuleDao ruleDao = RuleDao.builder()
                 .title(ruleName)
+                .description("Input setup wizard routing rule")
                 .source(ruleSource)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .build();
