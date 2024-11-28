@@ -18,10 +18,6 @@ import React, { useState } from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Col, Row, SegmentedControl, Table } from 'components/bootstrap';
-import { NodesList } from 'components/nodes';
-import { NodesStore } from 'stores/nodes/NodesStore';
-import { useStore } from 'stores/connect';
-import DataNodeList from 'components/datanode/DataNodeList/DataNodeList';
 import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
@@ -39,7 +35,6 @@ const VIEW_TYPES_SEGMENTS = [
 type ViewTypesSegments = 'list' | 'icons';
 
 const ClusterConfigurationPage = () => {
-  const { nodes } = useStore(NodesStore);
   const [viewType, setViewType] = useState<ViewTypesSegments>('list');
   const { graylogNodes, dataNodes } = useClusterNodes();
 
@@ -62,41 +57,58 @@ const ClusterConfigurationPage = () => {
                               radius="sm"
                               value={viewType}
                               onChange={(newViewType) => setViewType(newViewType)} />
-            <Table>
-              <thead>
-                <tr>
-                  <th>Node</th>
-                  <th>Type</th>
-                  <th>Role</th>
-                  <th>State</th>
-                  <th className="text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {graylogNodes.map((graylogNode) => (
+            
+            {viewType == 'list' && (
+              <Table>
+                <thead>
                   <tr>
-                    <td>{graylogNode.nodeName}</td>
-                    <td>{graylogNode.type}</td>
-                    <td>{graylogNode.role}</td>
-                    <td>{graylogNode.state}</td>
-                    <td><MoreActions /></td>
+                    <th>Node</th>
+                    <th>Type</th>
+                    <th>Role</th>
+                    <th>State</th>
+                    <th className="text-right">Actions</th>
                   </tr>
-                ))}
-                {dataNodes.map((dataNode) => (
-                  <tr>
-                    <td>{dataNode.nodeName}</td>
-                    <td>{dataNode.type}</td>
-                    <td>{dataNode.role}</td>
-                    <td>{dataNode.state}</td>
-                    <td><MoreActions /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+                </thead>
+                <tbody>
+                  {graylogNodes.map((graylogNode) => (
+                    <tr>
+                      <td>{graylogNode.nodeName}</td>
+                      <td>{graylogNode.type}</td>
+                      <td>{graylogNode.role}</td>
+                      <td>{graylogNode.state}</td>
+                      <td align='right'><MoreActions /></td>
+                    </tr>
+                  ))}
+                  {dataNodes.map((dataNode) => (
+                    <tr>
+                      <td>{dataNode.nodeName}</td>
+                      <td>{dataNode.type}</td>
+                      <td>{dataNode.role}</td>
+                      <td>{dataNode.state}</td>
+                      <td align='right'><MoreActions /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            )}
+            {viewType == 'icons' && (
+              <Row style={{ marginTop: 10 }}>
+                <Col md={6}>
+                  <h6><b>Graylog</b></h6>
+                  {graylogNodes.map((graylogNode) => (
+                    <div style={{ margin: 10, padding: 10, border: '1px solid', borderRadius: '10px' }}>{graylogNode.nodeName}</div>
+                  ))}
+                </Col>
+                <Col md={6}>
+                  <h6><b>Data Node</b></h6>
+                  {dataNodes.map((dataNode) => (
+                    <div style={{ margin: 10, padding: 10, border: '1px solid', borderRadius: '10px' }}>{dataNode.nodeName}</div>
+                  ))}
+                </Col>
+              </Row>
+            )}
           </Col>
         </Row>
-        <NodesList nodes={nodes} />
-        <DataNodeList />
       </div>
     </DocumentTitle>
   );
