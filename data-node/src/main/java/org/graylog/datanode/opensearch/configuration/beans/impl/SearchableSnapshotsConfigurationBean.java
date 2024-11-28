@@ -32,9 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -69,7 +67,7 @@ public class SearchableSnapshotsConfigurationBean implements OpensearchConfigura
             return OpensearchConfigurationPart.builder()
                     .properties(properties())
                     .keystoreItems(keystoreItems())
-                    .nodeRoles(roles())
+                    .addNodeRole(SEARCH_NODE_ROLE)
                     .build();
         } else {
             LOG.info("Opensearch snapshots not configured, skipping search role and cache configuration.");
@@ -129,12 +127,9 @@ public class SearchableSnapshotsConfigurationBean implements OpensearchConfigura
 
     private Map<String, String> properties() {
         final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        builder.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
 
-        if (snapshotsAreEnabled()) {
-            builder.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
-        }
-
-        if (isShardFileSystemRepo()) {
+        if (isSharedFileSystemRepo()) {
             // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
             if (localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
                 builder.put("path.repo", String.join(",", localConfiguration.getPathRepo()));
@@ -156,18 +151,11 @@ public class SearchableSnapshotsConfigurationBean implements OpensearchConfigura
         return builder.build();
     }
 
-    private List<String> roles() {
-        if (snapshotsAreEnabled()) {
-            return List.of(SEARCH_NODE_ROLE);
-        }
-        return Collections.emptyList();
-    }
-
     private boolean snapshotsAreEnabled() {
-        return s3RepositoryConfiguration.isRepositoryEnabled() || isShardFileSystemRepo();
+        return s3RepositoryConfiguration.isRepositoryEnabled() || isSharedFileSystemRepo();
     }
 
-    private boolean isShardFileSystemRepo() {
+    private boolean isSharedFileSystemRepo() {
         return localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty();
     }
 }
