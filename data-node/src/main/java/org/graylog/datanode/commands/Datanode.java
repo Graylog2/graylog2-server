@@ -60,7 +60,6 @@ import java.util.List;
 public class Datanode extends DatanodeBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Datanode.class);
 
-    private final Configuration configuration = new Configuration();
     private final S3RepositoryConfiguration s3RepositoryConfiguration = new S3RepositoryConfiguration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
