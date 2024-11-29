@@ -39,10 +39,10 @@ import static org.graylog.datanode.Configuration.TRANSPORT_CERTIFICATE_PASSWORD_
 
 public final class LocalConfigurationCertificatesProvider implements OpensearchCertificatesProvider {
 
-    private final String uploadedTransportKeystoreFileName;
-    private final String uploadedHttpKeystoreFileName;
-    private final String datanodeTransportCertificatePassword;
-    private final String datanodeHttpCertificatePassword;
+    private final String tranportCertificateFile;
+    private final String httpCertificateFile;
+    private final String transportCertificatePassword;
+    private final String httpCertificatePassword;
     private final DatanodeConfiguration datanodeConfiguration;
 
     @Inject
@@ -50,11 +50,11 @@ public final class LocalConfigurationCertificatesProvider implements OpensearchC
                                                   final DatanodeConfiguration datanodeConfiguration) {
         this.datanodeConfiguration = datanodeConfiguration;
 
-        this.uploadedTransportKeystoreFileName = localConfiguration.getDatanodeTransportCertificate();
-        this.uploadedHttpKeystoreFileName = localConfiguration.getDatanodeHttpCertificate();
+        this.tranportCertificateFile = localConfiguration.getDatanodeTransportCertificate();
+        this.transportCertificatePassword = localConfiguration.getDatanodeTransportCertificatePassword();
 
-        this.datanodeTransportCertificatePassword = localConfiguration.getDatanodeTransportCertificatePassword();
-        this.datanodeHttpCertificatePassword = localConfiguration.getDatanodeHttpCertificatePassword();
+        this.httpCertificateFile = localConfiguration.getDatanodeHttpCertificate();
+        this.httpCertificatePassword = localConfiguration.getDatanodeHttpCertificatePassword();
     }
 
     @Override
@@ -66,19 +66,19 @@ public final class LocalConfigurationCertificatesProvider implements OpensearchC
 
         List<String> errors = new LinkedList<>();
 
-        if (isBlank(datanodeTransportCertificatePassword)) {
+        if (isBlank(transportCertificatePassword)) {
             errors.add(TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY + " required. Please configure password to your transport certificates keystore.");
         }
 
-        if (!fileExists(uploadedTransportKeystoreFileName)) {
+        if (!fileExists(tranportCertificateFile)) {
             errors.add("transport_certificate required. Please provide a path to a certificate file in your configuration.");
         }
 
-        if (isBlank(datanodeHttpCertificatePassword)) {
+        if (isBlank(httpCertificatePassword)) {
             errors.add(HTTP_CERTIFICATE_PASSWORD_PROPERTY + " required. Please configure password to your http certificates keystore.");
         }
 
-        if (!fileExists(uploadedHttpKeystoreFileName)) {
+        if (!fileExists(httpCertificateFile)) {
             errors.add("http_certificate required. Please provide a path to a certificate file in your configuration.");
         }
 
@@ -105,20 +105,20 @@ public final class LocalConfigurationCertificatesProvider implements OpensearchC
      * lead to an exception, it's a mismatched configuration and would cause problems in the future.
      */
     private boolean noneOfRequiredConfigOptionsProvided() {
-        return isBlank(datanodeTransportCertificatePassword) &&
-                isBlank(datanodeHttpCertificatePassword) &&
-                isBlank(uploadedHttpKeystoreFileName) &&
-                isBlank(uploadedTransportKeystoreFileName);
+        return isBlank(transportCertificatePassword) &&
+                isBlank(httpCertificatePassword) &&
+                isBlank(httpCertificateFile) &&
+                isBlank(tranportCertificateFile);
     }
 
     @Override
     public OpensearchCertificates build() {
 
-        final Path transportCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(uploadedTransportKeystoreFileName).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
-        final InMemoryKeystoreInformation transportKeystore = reencrypt(new FilesystemKeystoreInformation(transportCertPath, datanodeTransportCertificatePassword.toCharArray()));
+        final Path transportCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(tranportCertificateFile).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
+        final InMemoryKeystoreInformation transportKeystore = reencrypt(new FilesystemKeystoreInformation(transportCertPath, transportCertificatePassword.toCharArray()));
 
-        final Path httpCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(uploadedHttpKeystoreFileName).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
-        final InMemoryKeystoreInformation httpKeystore = reencrypt(new FilesystemKeystoreInformation(httpCertPath, datanodeHttpCertificatePassword.toCharArray()));
+        final Path httpCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(httpCertificateFile).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
+        final InMemoryKeystoreInformation httpKeystore = reencrypt(new FilesystemKeystoreInformation(httpCertPath, httpCertificatePassword.toCharArray()));
 
         return new OpensearchCertificates(transportKeystore, httpKeystore);
     }

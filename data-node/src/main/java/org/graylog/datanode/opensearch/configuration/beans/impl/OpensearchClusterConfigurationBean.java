@@ -25,11 +25,24 @@ import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurati
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class OpensearchClusterConfigurationBean implements OpensearchConfigurationBean {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchClusterConfigurationBean.class);
+
+    public static final Path UNICAST_HOSTS_FILE = Path.of("unicast_hosts.txt");
 
     private final Configuration localConfiguration;
     private final NodeService<DataNodeDto> nodeService;
@@ -47,7 +60,7 @@ public class OpensearchClusterConfigurationBean implements OpensearchConfigurati
         properties.put("network.bind_host", localConfiguration.getBindAddress());
         properties.put("network.publish_host", localConfiguration.getHostname());
 
-        if (localConfiguration.getClustername() != null && localConfiguration.getClustername().isBlank()) {
+        if (localConfiguration.getClustername() != null && !localConfiguration.getClustername().isBlank()) {
             properties.put("cluster.name", localConfiguration.getClustername());
         }
 
@@ -78,6 +91,18 @@ public class OpensearchClusterConfigurationBean implements OpensearchConfigurati
 
         return OpensearchConfigurationPart.builder()
                 .properties(properties.build())
+                .addConfigurationDirModifier(this::writeSeedHostsFile)
                 .build();
+    }
+
+    private void writeSeedHostsFile(Path configPath) {
+            try {
+                final Path hostsfile = configPath.resolve(UNICAST_HOSTS_FILE); // TODO: restrict file permissions!
+                final Set<String> current = nodeService.allActive().values().stream().map(DataNodeDto::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
+                Files.write(hostsfile, current, Charset.defaultCharset(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+            } catch (IOException iox) {
+                LOG.error("Could not write to file: {} - {}", UNICAST_HOSTS_FILE, iox.getMessage());
+            }
+
     }
 }
