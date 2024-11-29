@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans;
+package org.graylog.datanode.opensearch.configuration;
 
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
-public interface OpensearchConfigurationBean {
-    OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams trustedCertificates);
+public record ConfigurationBuildParams(List<X509Certificate> trustedCertificates,
+                                       java.util.Map<String, String> transientConfiguration) {
 }

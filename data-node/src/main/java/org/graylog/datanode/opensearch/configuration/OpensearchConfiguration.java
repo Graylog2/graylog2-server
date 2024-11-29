@@ -16,10 +16,8 @@
  */
 package org.graylog.datanode.opensearch.configuration;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
-import org.apache.commons.exec.OS;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationDirModifier;
@@ -41,65 +39,26 @@ import java.util.stream.Collectors;
 public record OpensearchConfiguration(
         OpensearchDistribution opensearchDistribution,
         DatanodeDirectories datanodeDirectories,
-        String bindAddress,
         String hostname,
         int httpPort,
-        int transportPort,
-        String clusterName,
-        String nodeName,
-        List<String> nodeRoles,
-        Set<OpensearchConfigurationPart> configurationParts,
-
-        Map<String, Object> additionalConfiguration
+        Set<OpensearchConfigurationPart> configurationParts
 ) {
     public Map<String, Object> asMap() {
-
         Map<String, Object> config = new LinkedHashMap<>();
 
-        config.put("action.auto_create_index", "false");
-
-        // currently, startup fails on macOS without disabling this filter.
-        // for a description of the filter (although it's for ES), see https://www.elastic.co/guide/en/elasticsearch/reference/7.17/_system_call_filter_check.html
-        if (OS.isFamilyMac()) {
-            config.put("bootstrap.system_call_filter", "false");
-        }
-
-        if (bindAddress != null && !bindAddress.isBlank()) {
-            config.put("network.host", bindAddress);
-        }
-        config.put("http.port", String.valueOf(httpPort));
-        config.put("transport.port", String.valueOf(transportPort));
-        if (clusterName != null && !clusterName.isBlank()) {
-            config.put("cluster.name", clusterName);
-        }
-
-        config.put("node.name", nodeName);
-        config.put("node.roles", buildRolesList());
-
+        config.put("node.roles", buildRolesList()); // this needs special treatment as it's as an aggregation of other configuration parts
 
         configurationParts.stream()
                 .map(OpensearchConfigurationPart::properties)
                 .forEach(config::putAll);
-
-        config.putAll(additionalConfiguration);
         return config;
     }
 
     @Nonnull
     private String buildRolesList() {
-        final ImmutableList.Builder<String> roles = ImmutableList.builder();
-        if (nodeRoles != null) {
-            roles.addAll(nodeRoles);
-        }
-        configurationParts.stream()
-                .map(OpensearchConfigurationPart::nodeRoles)
-                .forEach(roles::addAll);
-
-        return toValuesList(roles.build());
-    }
-
-    private String toValuesList(List<String> values) {
-        return String.join(",", values);
+        return configurationParts.stream()
+                .flatMap(cfg -> cfg.nodeRoles().stream())
+                .collect(Collectors.joining(","));
     }
 
     public Environment getEnv() {
@@ -110,16 +69,13 @@ public record OpensearchConfiguration(
         configurationParts.stream().map(OpensearchConfigurationPart::javaOpts)
                 .forEach(javaOpts::addAll);
 
-        javaOpts.add("-Dopensearch.transport.cname_in_publish_address=true");
-
         env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
         env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
         return env;
     }
 
     public HttpHost getRestBaseUrl() {
-        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false").toString());
-        return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
+        return new HttpHost(hostname(), httpPort(), securityConfigured() ? "https" : "http");
     }
 
     public boolean securityConfigured() {
@@ -139,6 +95,7 @@ public record OpensearchConfiguration(
     public KeyStore trustStore() {
         return configurationParts.stream()
                 .map(OpensearchConfigurationPart::trustStore)
+                .filter(Objects::nonNull)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("This should not happen, truststore should always be present"));
     }

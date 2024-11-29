@@ -19,13 +19,13 @@ package org.graylog.datanode.opensearch.configuration.beans.impl;
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 
-import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,8 +41,23 @@ public class OpensearchClusterConfigurationBean implements OpensearchConfigurati
     }
 
     @Override
-    public OpensearchConfigurationPart buildConfigurationPart(List<X509Certificate> trustedCertificates) {
+    public OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams trustedCertificates) {
         ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();
+
+        properties.put("network.bind_host", localConfiguration.getBindAddress());
+        properties.put("network.publish_host", localConfiguration.getHostname());
+
+        if (localConfiguration.getClustername() != null && localConfiguration.getClustername().isBlank()) {
+            properties.put("cluster.name", localConfiguration.getClustername());
+        }
+
+        if (localConfiguration.getBindAddress() != null && !localConfiguration.getBindAddress().isBlank()) {
+            properties.put("network.host", localConfiguration.getBindAddress());
+        }
+        properties.put("http.port", String.valueOf(localConfiguration.getOpensearchHttpPort()));
+        properties.put("transport.port", String.valueOf(localConfiguration.getOpensearchTransportPort()));
+
+        properties.put("node.name", localConfiguration.getDatanodeNodeName());
 
         if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
             properties.put("cluster.initial_cluster_manager_nodes", localConfiguration.getInitialClusterManagerNodes());

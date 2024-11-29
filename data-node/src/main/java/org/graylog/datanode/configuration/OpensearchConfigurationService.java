@@ -24,6 +24,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
+import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
@@ -45,7 +46,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     /**
      * This configuration won't survive datanode restart. But it can be repeatedly provided to the managed opensearch
      */
-    private final Map<String, Object> transientConfiguration = new ConcurrentHashMap<>();
+    private final Map<String, String> transientConfiguration = new ConcurrentHashMap<>();
 
     private final List<X509Certificate> trustedCertificates = new ArrayList<>();
     private final EventBus eventBus;
@@ -82,14 +83,14 @@ public class OpensearchConfigurationService extends AbstractIdleService {
 
     public void setAllowlist(List<String> allowlist, List<X509Certificate> trustedCertificates) {
         this.trustedCertificates.addAll(trustedCertificates);
-        setTransientConfiguration("reindex.remote.allowlist", allowlist);
+        setTransientConfiguration("reindex.remote.allowlist", String.join(", ", allowlist));
     }
 
     public void removeAllowlist() {
         removeTransientConfiguration("reindex.remote.allowlist");
     }
 
-    public void setTransientConfiguration(String key, Object value) {
+    public void setTransientConfiguration(String key, String value) {
         this.transientConfiguration.put(key, value);
         triggerConfigurationChangedEvent();
     }
@@ -103,49 +104,17 @@ public class OpensearchConfigurationService extends AbstractIdleService {
 
     private OpensearchConfiguration get() {
 
-        ImmutableMap.Builder<String, Object> opensearchProperties = ImmutableMap.builder();
-        opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
         final Set<OpensearchConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
-                .map(bean -> bean.buildConfigurationPart(trustedCertificates))
+                .map(bean -> bean.buildConfigurationPart(new ConfigurationBuildParams(trustedCertificates, transientConfiguration)))
                 .collect(Collectors.toSet());
 
         return new OpensearchConfiguration(
                 datanodeConfiguration.opensearchDistributionProvider().get(),
                 datanodeConfiguration.datanodeDirectories(),
-                localConfiguration.getBindAddress(),
                 localConfiguration.getHostname(),
                 localConfiguration.getOpensearchHttpPort(),
-                localConfiguration.getOpensearchTransportPort(),
-                localConfiguration.getClustername(),
-                localConfiguration.getDatanodeNodeName(),
-                localConfiguration.getNodeRoles(),
-                configurationParts,
-                opensearchProperties.build()
+                configurationParts
         );
-    }
-
-    private ImmutableMap<String, Object> commonOpensearchConfig(final Configuration localConfiguration) {
-        final ImmutableMap.Builder<String, Object> config = ImmutableMap.builder();
-        localConfiguration.getOpensearchNetworkHost().ifPresent(
-                networkHost -> config.put("network.host", networkHost));
-        config.put("path.data", datanodeConfiguration.datanodeDirectories().getDataTargetDir().toString());
-        config.put("path.logs", datanodeConfiguration.datanodeDirectories().getLogsTargetDir().toString());
-
-        config.put("network.bind_host", localConfiguration.getBindAddress());
-
-        config.put("network.publish_host", localConfiguration.getHostname());
-
-        if (localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
-            config.put("logger.org.opensearch", localConfiguration.getOpensearchDebug());
-        }
-
-        // common OpenSearch config parameters from our docs
-        config.put("indices.query.bool.max_clause_count", localConfiguration.getIndicesQueryBoolMaxClauseCount().toString());
-
-
-        config.putAll(transientConfiguration);
-
-        return config.build();
     }
 
     private void triggerConfigurationChangedEvent() {

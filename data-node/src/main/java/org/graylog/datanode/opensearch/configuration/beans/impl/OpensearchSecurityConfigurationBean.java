@@ -28,6 +28,7 @@ import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.configuration.variants.OpensearchCertificatesProvider;
+import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
 import org.graylog.security.certutil.CertConstants;
@@ -91,7 +92,7 @@ public class OpensearchSecurityConfigurationBean implements OpensearchConfigurat
     }
 
     @Override
-    public OpensearchConfigurationPart buildConfigurationPart(List<X509Certificate> trustedCertificates) {
+    public OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams configurationBuildParams) {
 
         final OpensearchConfigurationPart.Builder configurationBuilder = OpensearchConfigurationPart.builder();
 
@@ -105,7 +106,7 @@ public class OpensearchSecurityConfigurationBean implements OpensearchConfigurat
         final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
         final TruststoreCreator truststoreCreator = TruststoreCreator.newDefaultJvm()
-                .addCertificates(trustedCertificates);
+                .addCertificates(configurationBuildParams.trustedCertificates());
 
         final Optional<KeystoreInformation> httpCert = securityVariant
                 .map(OpensearchCertificates::getHttpCertificate)

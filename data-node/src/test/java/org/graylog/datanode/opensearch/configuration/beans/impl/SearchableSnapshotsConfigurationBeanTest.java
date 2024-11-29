@@ -24,6 +24,7 @@ import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
+import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(Collections.emptyList());
+        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
@@ -62,6 +63,10 @@ class SearchableSnapshotsConfigurationBeanTest {
 
         Assertions.assertThat(configurationPart.properties())
                 .containsKeys("s3.client.default.endpoint", "node.search.cache.size");
+    }
+
+    private ConfigurationBuildParams emptyBuildParams() {
+        return new ConfigurationBuildParams(Collections.emptyList(), Collections.emptyMap());
     }
 
     @Test
@@ -78,7 +83,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(Collections.emptyList());
+        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
@@ -104,7 +109,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(Collections.emptyList());
+        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .isEmpty(); // no search role should be provided
@@ -133,7 +138,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
 
         // 10GB cache requested on 8GB of free space, needs to throw an exception!
-        Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(Collections.emptyList()))
+        Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(emptyBuildParams()))
                 .isInstanceOf(OpensearchConfigurationException.class)
                 .hasMessageContaining("There is not enough usable space for the node search cache. Your system has only 8gb available");
 
