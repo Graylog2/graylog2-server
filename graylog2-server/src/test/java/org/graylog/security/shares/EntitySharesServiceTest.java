@@ -36,6 +36,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -80,7 +81,7 @@ class EntitySharesServiceTest {
                GRNRegistry grnRegistry) {
         this.grnRegistry = grnRegistry;
 
-        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, this.grnRegistry);
+        this.dbGrantService = new DBGrantService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
 
         lenient().when(entityDependencyResolver.resolve(any())).thenReturn(ImmutableSet.of());
         lenient().when(entityDependencyPermissionChecker.check(any(), any(), any())).thenReturn(ImmutableMultimap.of());
