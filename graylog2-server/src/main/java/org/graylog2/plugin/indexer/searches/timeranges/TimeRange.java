@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.joda.time.DateTime;
+import org.threeten.extra.Interval;
+
+import java.time.Instant;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes({
@@ -42,4 +45,8 @@ public abstract class TimeRange {
     public abstract DateTime getTo();
 
     public abstract TimeRange withReferenceDate(DateTime now);
+
+    public Interval asInterval() {
+        return Interval.of(Instant.ofEpochMilli(getFrom().toInstant().getMillis()), Instant.ofEpochMilli(getTo().toInstant().getMillis()));
+    }
 }
