@@ -19,10 +19,10 @@ package org.graylog2.streams;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.ArrayList;
@@ -38,10 +38,12 @@ public class StreamsIT {
 
     private final GraylogApis api;
     private final List<String> createdStreamsIds;
+    private final List<String> createdIndexSetIds;
 
     public StreamsIT(GraylogApis api) {
         this.api = api;
         this.createdStreamsIds = new ArrayList<>();
+        this.createdIndexSetIds = new ArrayList<>();
     }
 
     @BeforeAll
@@ -49,6 +51,8 @@ public class StreamsIT {
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         final String newIndexSetId = api.indices().createIndexSet("Test Indices", "Some test indices", "streamstest");
         final String newIndexSetId2 = api.indices().createIndexSet("More Test Indices", "Some more test indices", "moretest");
+        this.createdIndexSetIds.add(newIndexSetId);
+        this.createdIndexSetIds.add(newIndexSetId2);
         createdStreamsIds.add(api.streams().createStream("New Stream", newIndexSetId));
         createdStreamsIds.add(api.streams().createStream("New Stream 2", defaultIndexSetId));
         createdStreamsIds.add(api.streams().createStream("New Stream 3", newIndexSetId2));
@@ -56,6 +60,12 @@ public class StreamsIT {
         createdStreamsIds.add(api.streams().createStream("sorttest: aaaaa", defaultIndexSetId));
         createdStreamsIds.add(api.streams().createStream("sorttest: ZZZZZZ", defaultIndexSetId, false));
         createdStreamsIds.add(api.streams().createStream("sorttest: 12345", defaultIndexSetId, false));
+    }
+
+    @AfterAll
+    void afterAll() {
+        createdStreamsIds.forEach(streamId -> api.streams().deleteStream(streamId));
+        createdIndexSetIds.forEach(indexSetId -> api.indices().deleteIndexSet(indexSetId, true));
     }
 
     @ContainerMatrixTest

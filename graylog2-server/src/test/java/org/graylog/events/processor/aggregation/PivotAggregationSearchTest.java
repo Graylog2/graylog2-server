@@ -107,7 +107,8 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 permittedStreams,
                 notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new QueryStringDecorators(Optional.empty()),
+                false
         );
 
         final String toString = timerange.getTo().toString();
@@ -208,7 +209,8 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 permittedStreams,
                 notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new QueryStringDecorators(Optional.empty()),
+                false
         );
 
         final PivotResult pivotResult = PivotResult.builder()
@@ -287,7 +289,8 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 permittedStreams,
                 notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new QueryStringDecorators(Optional.empty()),
+                false
         );
 
         final PivotResult pivotResult = PivotResult.builder()
@@ -353,7 +356,8 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 permittedStreams,
                 notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new QueryStringDecorators(Optional.empty()),
+                false
         );
 
         final PivotResult pivotResult = PivotResult.builder()
@@ -497,7 +501,8 @@ public class PivotAggregationSearchTest {
                     } else {
                         throw new IllegalArgumentException("Unexpected query decoration request!");
                     }
-                }))
+                })),
+                false
         );
         final Query query = pivotAggregationSearch.getAggregationQuery(parameters, WINDOW_LENGTH, WINDOW_LENGTH);
         Assertions.assertThat(query.query().queryString()).isEqualTo("source:example.org");
@@ -542,7 +547,8 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
                 notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new QueryStringDecorators(Optional.empty()),
+                false
         );
         final Query query = pivotAggregationSearch.getAggregationQuery(parameters, WINDOW_LENGTH, WINDOW_LENGTH);
         Assertions.assertThatCollection(query.searchTypes()).contains(
