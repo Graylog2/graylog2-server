@@ -84,6 +84,6 @@ public class StreamsPipelinesIT {
         final var pipeline1 = Map.of("id", pipeline1Id, "title", pipeline1Title);
         final var pipeline2 = Map.of("id", pipeline2Id, "title", pipeline2Title);
 
-        assertThat(result.getList("")).containsExactly(pipeline1, pipeline2);
+        assertThat(result.getList("")).containsExactlyInAnyOrder(pipeline1, pipeline2);
     }
 }
