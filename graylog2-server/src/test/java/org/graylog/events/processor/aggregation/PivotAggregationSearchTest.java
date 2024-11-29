@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.Assertions;
 import org.graylog.events.EventsConfigurationTestProvider;
 import org.graylog.events.processor.EventDefinition;
-import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.SearchJobService;
@@ -68,8 +67,6 @@ public class PivotAggregationSearchTest {
     @Mock
     private EventDefinition eventDefinition;
     @Mock
-    private MoreSearch moreSearch;
-    @Mock
     private NotificationService notificationService;
 
     private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of, (categories) -> Stream.of());
@@ -104,7 +101,6 @@ public class PivotAggregationSearchTest {
                 searchJobService,
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
-                moreSearch,
                 permittedStreams,
                 notificationService,
                 new QueryStringDecorators(Optional.empty()),
@@ -206,7 +202,6 @@ public class PivotAggregationSearchTest {
                 searchJobService,
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
-                moreSearch,
                 permittedStreams,
                 notificationService,
                 new QueryStringDecorators(Optional.empty()),
@@ -286,7 +281,6 @@ public class PivotAggregationSearchTest {
                 searchJobService,
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
-                moreSearch,
                 permittedStreams,
                 notificationService,
                 new QueryStringDecorators(Optional.empty()),
@@ -353,7 +347,6 @@ public class PivotAggregationSearchTest {
                 searchJobService,
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
-                moreSearch,
                 permittedStreams,
                 notificationService,
                 new QueryStringDecorators(Optional.empty()),
@@ -492,7 +485,6 @@ public class PivotAggregationSearchTest {
                 searchJobService,
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
-                moreSearch,
                 new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
                 notificationService,
                 new QueryStringDecorators(Optional.of((queryString, parameterProvider, query) -> {
@@ -544,7 +536,6 @@ public class PivotAggregationSearchTest {
                 searchJobService,
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
-                moreSearch,
                 new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
                 notificationService,
                 new QueryStringDecorators(Optional.empty()),
