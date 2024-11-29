@@ -15,66 +15,69 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useCallback, useMemo, useState } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Modal } from 'components/bootstrap';
 import { Wizard } from 'components/common';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
+import { getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 
-import { TestInputStep } from './steps';
+import { InputDiagnosisStep, SetupRoutingStep, StartInputStep } from './steps';
 
 const InputSetupWizard = () => {
-  const { activeStep, setActiveStep, show, closeWizard, wizardData } = useInputSetupWizard();
-  const [orderedSteps, setOrderedSteps] = useState([]);
-  const { category, subcategory } = wizardData;
+  const { activeStep, setActiveStep, show, orderedSteps, setOrderedSteps, stepsData, closeWizard } = useInputSetupWizard();
   const enterpriseSteps = PluginStore.exports('inputSetupWizard').find((plugin) => (!!plugin.steps))?.steps;
 
   const steps = useMemo(() => {
     const defaultSteps = {
-      [INPUT_WIZARD_STEPS.TEST_INPUT]: {
-        key: INPUT_WIZARD_STEPS.TEST_INPUT,
+      [INPUT_WIZARD_STEPS.SETUP_ROUTING]: {
+        key: INPUT_WIZARD_STEPS.SETUP_ROUTING,
         title: (
           <>
-            Test Input
+            Setup Routing
           </>
         ),
         component: (
-          <TestInputStep />
+          <SetupRoutingStep />
         ),
+        disabled: false,
+      },
+      [INPUT_WIZARD_STEPS.START_INPUT]: {
+        key: INPUT_WIZARD_STEPS.START_INPUT,
+        title: (
+          <>
+            Start Input
+          </>
+        ),
+        component: (
+          <StartInputStep />
+        ),
+        disabled: !getStepData(stepsData, INPUT_WIZARD_STEPS.START_INPUT, 'enabled'),
+      },
+      [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
+        key: INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
+        title: (
+          <>
+            Input Diagnosis
+          </>
+        ),
+        component: (
+          <InputDiagnosisStep />
+        ),
+        disabled: !getStepData(stepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, 'enabled'),
       },
     };
     if (enterpriseSteps) return { ...defaultSteps, ...enterpriseSteps };
 
     return defaultSteps;
-  }, [enterpriseSteps]);
+  }, [enterpriseSteps, stepsData]);
 
   const determineFirstStep = useCallback(() => {
-    if (!category || !subcategory) {
-      if (steps[INPUT_WIZARD_STEPS.SELECT_CATEGORY]) {
-        setActiveStep(INPUT_WIZARD_STEPS.SELECT_CATEGORY);
-        setOrderedSteps([INPUT_WIZARD_STEPS.SELECT_CATEGORY]);
-
-        return;
-      }
-
-      setActiveStep(INPUT_WIZARD_STEPS.TEST_INPUT);
-      setOrderedSteps([INPUT_WIZARD_STEPS.TEST_INPUT]);
-
-      return;
-    }
-
-    if (steps[INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]) {
-      setActiveStep(INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE);
-      setOrderedSteps([INPUT_WIZARD_STEPS.ACTIVATE_ILLUMINATE]);
-
-      return;
-    }
-
-    setActiveStep(INPUT_WIZARD_STEPS.TEST_INPUT);
-    setOrderedSteps([INPUT_WIZARD_STEPS.TEST_INPUT]);
-  }, [setActiveStep, category, subcategory, steps]);
+    setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);
+    setOrderedSteps([INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.START_INPUT, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]);
+  }, [setActiveStep, setOrderedSteps]);
 
   useEffect(() => {
     if (!activeStep) {
@@ -84,7 +87,7 @@ const InputSetupWizard = () => {
     if (activeStep && orderedSteps.length < 1) {
       setOrderedSteps([activeStep]);
     }
-  }, [activeStep, determineFirstStep, orderedSteps]);
+  }, [activeStep, determineFirstStep, orderedSteps, setOrderedSteps]);
 
   if (!show || orderedSteps.length < 1) return null;
 

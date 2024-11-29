@@ -14,7 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export { default as InputDiagnosisStep } from './InputDiagnosisStep';
-export { default as SetupRoutingStep } from './SetupRoutingStep';
-export { default as StartInputStep } from './StartInputStep';
+const StartInputStep = () => (
+  <div>
+    Start Input
+  </div>
+);
+
+export default StartInputStep;

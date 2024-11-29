@@ -16,8 +16,10 @@
  */
 import * as React from 'react';
 
-const TestInputStep = () => (
-  <div>Test Input Step</div>
+const InputDiagnosisStep = () => (
+  <div>
+    Input Diagnosis
+  </div>
 );
 
-export default TestInputStep;
+export default InputDiagnosisStep;

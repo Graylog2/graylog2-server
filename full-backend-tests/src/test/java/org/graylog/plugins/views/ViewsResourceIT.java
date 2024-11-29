@@ -32,7 +32,7 @@ public class ViewsResourceIT {
 
     @ContainerMatrixTest
     void testEmptyBody() {
-        api.post("/views", null, 400)
+        api.post("/views", 400)
                  .assertThat().body("message[0]", equalTo("View is mandatory"));
     }
 
