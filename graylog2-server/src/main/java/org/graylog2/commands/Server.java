@@ -26,6 +26,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
@@ -76,7 +77,6 @@ import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
@@ -102,7 +102,6 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.ClusterConfigValidatorModule;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.MessageInputBindings;
-import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.system.activities.Activity;
@@ -135,7 +134,6 @@ public class Server extends ServerBootstrap {
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
     private final ElasticsearchClientConfiguration elasticsearchClientConfiguration = new ElasticsearchClientConfiguration();
     private final EmailConfiguration emailConfiguration = new EmailConfiguration();
-    private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
     private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
     private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration();
@@ -167,7 +165,7 @@ public class Server extends ServerBootstrap {
     }
 
     @Override
-    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
+    protected @Nonnull List<Module> getNodeCommandBindings(FeatureFlags featureFlags) {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
                 new VersionAwareStorageModule(configuration),
@@ -185,7 +183,6 @@ public class Server extends ServerBootstrap {
                 new RotationStrategyBindings(elasticsearchConfiguration),
                 new RetentionStrategyBindings(elasticsearchConfiguration),
                 new PeriodicalBindings(),
-                new ObjectMapperModule(chainingClassLoader),
                 new RestApiBindings(configuration),
                 new PasswordAlgorithmBindings(),
                 new DecoratorBindings(),
@@ -224,13 +221,12 @@ public class Server extends ServerBootstrap {
     }
 
     @Override
-    protected List<Object> getCommandConfigurationBeans() {
+    protected @Nonnull List<Object> getNodeCommandConfigurationBeans() {
         return Arrays.asList(configuration,
                 httpConfiguration,
                 elasticsearchConfiguration,
                 elasticsearchClientConfiguration,
                 emailConfiguration,
-                mongoDbConfiguration,
                 versionCheckConfiguration,
                 kafkaJournalConfiguration,
                 nettyTransportConfiguration,

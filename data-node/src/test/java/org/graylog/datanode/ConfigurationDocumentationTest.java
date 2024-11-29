@@ -38,7 +38,7 @@ class ConfigurationDocumentationTest {
 
     @Test
     void testAllFieldsAreDocumented() {
-        final List<Object> datanodeConfiguration = new Datanode().getCommandConfigurationBeans();
+        final List<Object> datanodeConfiguration = new Datanode().getNodeCommandConfigurationBeans();
         final List<Field> undocumentedFields = datanodeConfiguration.stream().flatMap(configurationBean -> {
             return Arrays.stream(configurationBean.getClass().getDeclaredFields())
                     .filter(f -> f.isAnnotationPresent(Parameter.class))
@@ -63,7 +63,7 @@ class ConfigurationDocumentationTest {
 
             printer.printRecord("Parameter", "Type", "Required", "Default value", "Description");
 
-            final List<Object> datanodeConfiguration = new Datanode().getCommandConfigurationBeans();
+            final List<Object> datanodeConfiguration = new Datanode().getNodeCommandConfigurationBeans();
 
             datanodeConfiguration.forEach(configurationBean -> {
                 Arrays.stream(configurationBean.getClass().getDeclaredFields())
