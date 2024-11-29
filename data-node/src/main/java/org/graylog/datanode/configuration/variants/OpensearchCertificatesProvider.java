@@ -17,22 +17,11 @@
 package org.graylog.datanode.configuration.variants;
 
 import org.graylog.datanode.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog.datanode.configuration.OpensearchConfigurationException;
 
-@Deprecated
-public class InSecureConfiguration implements SecurityConfigurationVariant {
+public interface OpensearchCertificatesProvider {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InSecureConfiguration.class);
+    boolean isConfigured(final Configuration localConfiguration) throws OpensearchConfigurationException;
 
-    @Override
-    public boolean isConfigured(final Configuration localConfiguration) {
-        return localConfiguration.isInsecureStartup();
-    }
-
-    @Override
-    public OpensearchSecurityConfiguration build() {
-        LOG.warn("Insecure configuration is deprecated. Please use selfsigned_setup to create fully encrypted setups.");
-        return OpensearchSecurityConfiguration.disabled();
-    }
+    OpensearchCertificates build();
 }

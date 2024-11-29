@@ -21,6 +21,10 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
+import org.graylog.datanode.configuration.variants.LocalConfigurationCertificatesProvider;
+import org.graylog.datanode.configuration.variants.DatanodeKeystoreOpensearchCertificatesProvider;
+import org.graylog.datanode.configuration.variants.NoOpensearchCertificatesProvider;
+import org.graylog.datanode.configuration.variants.OpensearchCertificatesProvider;
 import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.OpensearchProcessImpl;
@@ -51,6 +55,13 @@ public class OpensearchProcessBindings extends AbstractModule {
         bind(OpensearchStateMachine.class).toProvider(OpensearchStateMachineProvider.class).asEagerSingleton();
 
         bind(OpensearchUsableSpace.class).toProvider(OpensearchUsableSpaceProvider.class).asEagerSingleton();
+
+        //opensearch certificate providers
+        Multibinder<OpensearchCertificatesProvider> opensearchCertificatesProviders = Multibinder.newSetBinder(binder(), OpensearchCertificatesProvider.class);
+        opensearchCertificatesProviders.addBinding().to(LocalConfigurationCertificatesProvider.class).asEagerSingleton();
+        opensearchCertificatesProviders.addBinding().to(DatanodeKeystoreOpensearchCertificatesProvider.class).asEagerSingleton();
+        opensearchCertificatesProviders.addBinding().to(NoOpensearchCertificatesProvider.class).asEagerSingleton();
+
 
         //opensearch configuration beans
         Multibinder<OpensearchConfigurationBean> opensearchConfigurationBeanMultibinder = Multibinder.newSetBinder(binder(), OpensearchConfigurationBean.class);

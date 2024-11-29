@@ -37,7 +37,7 @@ import java.util.Optional;
 import static org.graylog.datanode.Configuration.HTTP_CERTIFICATE_PASSWORD_PROPERTY;
 import static org.graylog.datanode.Configuration.TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY;
 
-public final class UploadedCertFilesSecureConfiguration implements SecurityConfigurationVariant {
+public final class LocalConfigurationCertificatesProvider implements OpensearchCertificatesProvider {
 
     private final String uploadedTransportKeystoreFileName;
     private final String uploadedHttpKeystoreFileName;
@@ -46,8 +46,8 @@ public final class UploadedCertFilesSecureConfiguration implements SecurityConfi
     private final DatanodeConfiguration datanodeConfiguration;
 
     @Inject
-    public UploadedCertFilesSecureConfiguration(final Configuration localConfiguration,
-                                                final DatanodeConfiguration datanodeConfiguration) {
+    public LocalConfigurationCertificatesProvider(final Configuration localConfiguration,
+                                                  final DatanodeConfiguration datanodeConfiguration) {
         this.datanodeConfiguration = datanodeConfiguration;
 
         this.uploadedTransportKeystoreFileName = localConfiguration.getDatanodeTransportCertificate();
@@ -112,7 +112,7 @@ public final class UploadedCertFilesSecureConfiguration implements SecurityConfi
     }
 
     @Override
-    public OpensearchSecurityConfiguration build() {
+    public OpensearchCertificates build() {
 
         final Path transportCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(uploadedTransportKeystoreFileName).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
         final InMemoryKeystoreInformation transportKeystore = reencrypt(new FilesystemKeystoreInformation(transportCertPath, datanodeTransportCertificatePassword.toCharArray()));
@@ -120,7 +120,7 @@ public final class UploadedCertFilesSecureConfiguration implements SecurityConfi
         final Path httpCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(uploadedHttpKeystoreFileName).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
         final InMemoryKeystoreInformation httpKeystore = reencrypt(new FilesystemKeystoreInformation(httpCertPath, datanodeHttpCertificatePassword.toCharArray()));
 
-        return new OpensearchSecurityConfiguration(transportKeystore, httpKeystore);
+        return new OpensearchCertificates(transportKeystore, httpKeystore);
     }
 
     @Nonnull

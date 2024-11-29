@@ -19,18 +19,18 @@ package org.graylog.datanode.configuration.variants;
 import jakarta.annotation.Nullable;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 
-public class OpensearchSecurityConfiguration {
+public class OpensearchCertificates {
 
     private final KeystoreInformation transportCertificate;
     private final KeystoreInformation httpCertificate;
 
-    public OpensearchSecurityConfiguration(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
+    public OpensearchCertificates(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
         this.transportCertificate = transportCertificate;
         this.httpCertificate = httpCertificate;
     }
 
-    public static OpensearchSecurityConfiguration disabled() {
-        return new OpensearchSecurityConfiguration(null, null);
+    public static OpensearchCertificates none() {
+        return new OpensearchCertificates(null, null);
     }
 
     @Nullable

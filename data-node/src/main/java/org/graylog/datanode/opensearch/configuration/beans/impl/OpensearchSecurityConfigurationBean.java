@@ -24,14 +24,10 @@ import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.TruststoreCreator;
-import org.graylog.datanode.configuration.variants.InSecureConfiguration;
-import org.graylog.datanode.configuration.variants.LocalKeystoreSecureConfiguration;
-import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
-import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
-import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
+import org.graylog.datanode.configuration.variants.OpensearchCertificates;
+import org.graylog.datanode.configuration.variants.OpensearchCertificatesProvider;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
 import org.graylog.security.certutil.CertConstants;
@@ -54,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class OpensearchSecurityConfigurationBean implements OpensearchConfigurationBean {
@@ -80,24 +77,17 @@ public class OpensearchSecurityConfigurationBean implements OpensearchConfigurat
 
     private static final Path TRUSTSTORE_FILE = Path.of("datanode-truststore.p12");
 
-    private final List<SecurityConfigurationVariant> securityConfigurationTypes;
+    private final Set<OpensearchCertificatesProvider> opensearchCertificatesProviders;
     private final Configuration localConfiguration;
     private final JwtSecret jwtSecret;
 
     @Inject
-    public OpensearchSecurityConfigurationBean(final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
-                                               final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration,
-                                               final InSecureConfiguration inSecureConfiguration,
+    public OpensearchSecurityConfigurationBean(Set<OpensearchCertificatesProvider> opensearchCertificatesProviders,
                                                final Configuration localConfiguration,
                                                final JwtSecret jwtSecret) {
+        this.opensearchCertificatesProviders = opensearchCertificatesProviders;
         this.localConfiguration = localConfiguration;
         this.jwtSecret = jwtSecret;
-
-        this.securityConfigurationTypes = List.of(
-                inSecureConfiguration,
-                uploadedCertFilesSecureConfiguration,
-                localKeystoreSecureConfiguration
-        );
     }
 
     @Override
@@ -105,23 +95,24 @@ public class OpensearchSecurityConfigurationBean implements OpensearchConfigurat
 
         final OpensearchConfigurationPart.Builder configurationBuilder = OpensearchConfigurationPart.builder();
 
-        Optional<OpensearchSecurityConfiguration> securityVariant = securityConfigurationTypes.stream()
+        Optional<OpensearchCertificates> securityVariant = opensearchCertificatesProviders.stream()
                 .filter(s -> s.isConfigured(localConfiguration))
                 .findFirst()
-                .map(SecurityConfigurationVariant::build);
+                .map(OpensearchCertificatesProvider::build);
 
         configurationBuilder.securityConfigured(securityVariant.isPresent());
 
         final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
+
         final TruststoreCreator truststoreCreator = TruststoreCreator.newDefaultJvm()
                 .addCertificates(trustedCertificates);
 
         final Optional<KeystoreInformation> httpCert = securityVariant
-                .map(OpensearchSecurityConfiguration::getHttpCertificate)
+                .map(OpensearchCertificates::getHttpCertificate)
                 .filter(Objects::nonNull);
 
         final Optional<KeystoreInformation> transportCert = securityVariant
-                .map(OpensearchSecurityConfiguration::getTransportCertificate)
+                .map(OpensearchCertificates::getTransportCertificate)
                 .filter(Objects::nonNull);
 
         httpCert.ifPresent(cert -> {

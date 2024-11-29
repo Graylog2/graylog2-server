@@ -23,11 +23,11 @@ import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 
-public final class LocalKeystoreSecureConfiguration implements SecurityConfigurationVariant {
+public final class DatanodeKeystoreOpensearchCertificatesProvider implements OpensearchCertificatesProvider {
     private final DatanodeKeystore datanodeKeystore;
 
     @Inject
-    public LocalKeystoreSecureConfiguration(final DatanodeKeystore datanodeKeystore) {
+    public DatanodeKeystoreOpensearchCertificatesProvider(final DatanodeKeystore datanodeKeystore) {
         this.datanodeKeystore = datanodeKeystore;
     }
 
@@ -41,10 +41,10 @@ public final class LocalKeystoreSecureConfiguration implements SecurityConfigura
     }
 
     @Override
-    public OpensearchSecurityConfiguration build() {
+    public OpensearchCertificates build() {
         try {
-            final InMemoryKeystoreInformation reencryptedCopy = this.datanodeKeystore.getSafeCopy();
-            return new OpensearchSecurityConfiguration(reencryptedCopy, reencryptedCopy);
+            final InMemoryKeystoreInformation safeCopy = this.datanodeKeystore.getSafeCopy();
+            return new OpensearchCertificates(safeCopy, safeCopy);
         } catch (DatanodeKeystoreException e) {
             throw new OpensearchConfigurationException(e);
         }
