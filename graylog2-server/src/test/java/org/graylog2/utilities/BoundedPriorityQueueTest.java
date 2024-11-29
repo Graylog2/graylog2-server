@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
 
-class FixedSizePriorityQueueTest {
+class BoundedPriorityQueueTest {
 
     @Test
     void add() {
         // the queue behaves like a standard PriorityQueue, but should never grow past the bound we specify, so this is what we test here
         // not the rest of the behavior
-        final FixedSizePriorityQueue<Integer> queue = new FixedSizePriorityQueue<Integer>(10, Comparator.naturalOrder());
+        final BoundedPriorityQueue<Integer> queue = new BoundedPriorityQueue<Integer>(10, Comparator.naturalOrder());
 
         for (int i = 0; i < 42; i++) {
             queue.add(i);

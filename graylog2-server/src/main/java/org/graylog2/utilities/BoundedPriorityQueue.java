@@ -8,11 +8,11 @@ import java.util.PriorityQueue;
  *
  * @param <E> entry type
  */
-public class FixedSizePriorityQueue<E> extends PriorityQueue<E> {
+public class BoundedPriorityQueue<E> extends PriorityQueue<E> {
 
     private final int maxSize;
 
-    public FixedSizePriorityQueue(int maxSize, Comparator<E> comparator) {
+    public BoundedPriorityQueue(int maxSize, Comparator<E> comparator) {
         super(comparator);
         this.maxSize = maxSize;
     }
