@@ -7181,7 +7181,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.9"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-4f87cb38-baf2-40df-bedb-46b703d23284-1732623121151/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-228b800d-38f9-4ad2-a41f-334358e57ba9-1732840168679/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "28.9.0"
     eslint-plugin-jest-dom "5.5.0"
@@ -8667,12 +8667,12 @@ graphemer@^1.4.0:
     "@tanstack/react-query" "4.36.1"
     "@types/jquery" "3.5.32"
     "@types/react" "18.3.12"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.2.0-SNAPSHOT-f6058cb2-fa2d-40b1-8f0d-d39b0c2b657c-1732623120986/node_modules/babel-preset-graylog"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.2.0-SNAPSHOT-f6058cb2-fa2d-40b1-8f0d-d39b0c2b657c-1732623120986/node_modules/eslint-config-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.2.0-SNAPSHOT-6d8848a5-f9ff-45e3-89e6-00fbc1d446c7-1732840168419/node_modules/babel-preset-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.2.0-SNAPSHOT-6d8848a5-f9ff-45e3-89e6-00fbc1d446c7-1732840168419/node_modules/eslint-config-graylog"
     formik "2.4.6"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.2.0-SNAPSHOT-f6058cb2-fa2d-40b1-8f0d-d39b0c2b657c-1732623120986/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.2.0-SNAPSHOT-6d8848a5-f9ff-45e3-89e6-00fbc1d446c7-1732840168419/node_modules/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.46"
@@ -8683,7 +8683,7 @@ graphemer@^1.4.0:
     react-router-dom "6.27.0"
     reflux "0.2.13"
     styled-components "6.1.1"
-    typescript "5.6.3"
+    typescript "5.7.2"
     use-query-params "^2.2.0"
     webpack "5.96.1"
     webpack-cli "5.1.4"
@@ -15698,10 +15698,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@5.6.3, typescript@^5.6.3:
-  version "5.6.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.6.3.tgz#5f3449e31c9d94febb17de03cc081dd56d81db5b"
-  integrity sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==
+typescript@5.7.2, typescript@^5.6.3:
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.7.2.tgz#3169cf8c4c8a828cde53ba9ecb3d2b1d5dd67be6"
+  integrity sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==
 
 typewise-core@^1.2, typewise-core@^1.2.0:
   version "1.2.0"
