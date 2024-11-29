@@ -21,9 +21,10 @@ import styled, { css } from 'styled-components';
 
 import { IfPermitted } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
-import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import DestinationOutputs from 'components/streams/StreamDetails/routing-destination/DestinationOutputs';
 import DestinationIndexSetSection from 'components/streams/StreamDetails/routing-destination/DestinationIndexSetSection';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
 type Props = {
   stream: Stream;
@@ -36,14 +37,13 @@ const Container = styled.div(({ theme }) => css`
 `);
 
 const StreamDataRoutingDestinations = ({ stream }: Props) => {
-  const { index_set_id: indexSetId } = stream;
-  const { data: indexSet, isSuccess } = useSingleIndexSet(indexSetId);
+  const currentUser = useCurrentUser();
   const StreamDataWarehouseComponent = PluginStore.exports('dataWarehouse')?.[0]?.StreamDataWarehouse;
 
   return (
     <Container>
-      {isSuccess && <DestinationIndexSetSection indexSet={indexSet} stream={stream} />}
-      {StreamDataWarehouseComponent && <StreamDataWarehouseComponent />}
+      {isPermitted(currentUser.permissions, ['indexsets:read']) && <DestinationIndexSetSection stream={stream} />}
+      {StreamDataWarehouseComponent && <StreamDataWarehouseComponent permissions={currentUser.permissions} />}
       <IfPermitted permissions="outputs:edit">
         <DestinationOutputs stream={stream} />
       </IfPermitted>
