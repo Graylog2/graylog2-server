@@ -85,7 +85,7 @@ class ViewSharingToGrantsMigrationTest {
         this.dbCollection = mongodb.mongoCollection("view_sharings");
         this.userService = userService;
         this.roleService = roleService;
-        this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry);
+        this.grantService = new DBGrantService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
 
         when(userService.load(anyString())).thenAnswer(a -> {
             final String argument = a.getArgument(0);

@@ -17,26 +17,24 @@
 package org.graylog2.indexer.indexset.profile;
 
 import com.google.common.primitives.Ints;
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
-import org.mongojack.WriteResult;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -47,6 +45,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.database.utils.MongoUtils.idEq;
+import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.CUSTOM_MAPPINGS_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.DESCRIPTION_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.ID_FIELD_NAME;
@@ -54,7 +54,7 @@ import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.NAME_F
 import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
 
 
-public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldTypeProfile> {
+public class IndexFieldTypeProfileService {
 
     static final String INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME = "index_field_type_profiles";
 
@@ -77,31 +77,31 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
             .sort(Sorting.create(IndexFieldTypeProfile.NAME_FIELD_NAME, Sorting.Direction.valueOf("asc".toUpperCase(Locale.ROOT))))
             .build();
 
-    private final MongoCollection<IndexFieldTypeProfile> profileCollection;
+    private final MongoCollection<IndexFieldTypeProfile> collection;
     private final DbQueryCreator dbQueryCreator;
     private final IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService;
     private final IndexSetService indexSetService;
+    private final MongoUtils<IndexFieldTypeProfile> mongoUtils;
 
     @Inject
-    public IndexFieldTypeProfileService(final MongoConnection mongoConnection,
-                                        final MongoJackObjectMapperProvider mapper,
-                                        final MongoCollections mongoCollections,
+    public IndexFieldTypeProfileService(final MongoCollections mongoCollections,
                                         final IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService,
                                         final IndexSetService indexSetService) {
-        super(mongoConnection, mapper, IndexFieldTypeProfile.class, INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME);
-        this.db.createIndex(new BasicDBObject(IndexFieldTypeProfile.NAME_FIELD_NAME, 1), new BasicDBObject("unique", false));
-        this.profileCollection = mongoCollections.collection(INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME, IndexFieldTypeProfile.class);
         this.indexSetService = indexSetService;
         this.dbQueryCreator = new DbQueryCreator(IndexFieldTypeProfile.NAME_FIELD_NAME, ATTRIBUTES);
         this.indexFieldTypeProfileUsagesService = indexFieldTypeProfileUsagesService;
+
+        collection = mongoCollections.collection(INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME, IndexFieldTypeProfile.class);
+        mongoUtils = mongoCollections.utils(collection);
+
+        collection.createIndex(Indexes.ascending(IndexFieldTypeProfile.NAME_FIELD_NAME));
     }
 
-    @Override
     public Optional<IndexFieldTypeProfile> get(final String profileId) {
         if (!ObjectId.isValid(profileId)) {
             return Optional.empty();
         }
-        return super.get(profileId);
+        return mongoUtils.getById(profileId);
     }
 
     public Optional<IndexFieldTypeProfileWithUsages> getWithUsages(final String profileId) {
@@ -118,18 +118,25 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
         );
     }
 
-    @Override
-    public IndexFieldTypeProfile save(final IndexFieldTypeProfile indexFieldTypeProfile) {
-        indexFieldTypeProfile.customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
-        return super.save(indexFieldTypeProfile);
+    public IndexFieldTypeProfile save(final IndexFieldTypeProfile profile) {
+        profile.customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
+
+        final var id = profile.id();
+        if (id == null) {
+            final var insertedId = insertedIdAsString(collection.insertOne(profile));
+            return new IndexFieldTypeProfile(insertedId, profile.name(), profile.description(),
+                    profile.customFieldMappings());
+        } else {
+            collection.replaceOne(idEq(id), profile, new ReplaceOptions().upsert(true));
+            return profile;
+        }
     }
 
-    @Override
     public int delete(final String id) {
         if (!ObjectId.isValid(id)) {
             return 0;
         }
-        int numRemoved = super.delete(id);
+        int numRemoved = mongoUtils.deleteById(id) ? 1 : 0;
         indexSetService.removeReferencesToProfile(id);
         return numRemoved;
     }
@@ -139,8 +146,7 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
             return false;
         }
         updatedProfile.customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
-        final WriteResult<IndexFieldTypeProfile, ObjectId> writeResult = db.updateById(new ObjectId(profileId), updatedProfile);
-        return writeResult.getN() > 0;
+        return collection.replaceOne(idEq(profileId), updatedProfile).getMatchedCount() > 0;
     }
 
     public PageListResponse<IndexFieldTypeProfileWithUsages> getPaginated(final String query,
@@ -153,9 +159,9 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final Bson dbSort = "desc".equalsIgnoreCase(order) ? Sorts.descending(sortField) : Sorts.ascending(sortField);
 
-        final long total = profileCollection.countDocuments(dbQuery);
+        final long total = collection.countDocuments(dbQuery);
         List<IndexFieldTypeProfile> singlePageOfProfiles = new ArrayList<>(perPage);
-        profileCollection.find(dbQuery)
+        collection.find(dbQuery)
                 .sort(dbSort)
                 .limit(perPage)
                 .skip(perPage * Math.max(0, page - 1))
@@ -182,7 +188,7 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
     @Deprecated
     //This method has been introduced only because of technical debt in FE. Do not use it elsewhere! Paginated access is the proper way to go.
     public List<IndexFieldTypeProfileIdAndName> getAll() {
-        return profileCollection.find()
+        return collection.find()
                 .projection(Projections.include(ID_FIELD_NAME, NAME_FIELD_NAME))
                 .sort(Sorts.ascending(NAME_FIELD_NAME))
                 .map(profile -> new IndexFieldTypeProfileIdAndName(profile.id(), profile.name()))

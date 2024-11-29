@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.MongoDbSession;
 import org.mongojack.Id;
@@ -35,7 +36,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = UserOverviewDTO.Builder.class)
-public abstract class UserOverviewDTO {
+public abstract class UserOverviewDTO implements MongoEntity {
 
     public static final String FIELD_ID = "id";
     private static final String FIELD_AUTH_SERVICE_ID = "auth_service_id";

@@ -51,8 +51,8 @@ import static org.hamcrest.CoreMatchers.not;
 
 public class GraylogApis implements GraylogRestApi {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogApis.class);
+    private static final ObjectMapperProvider OBJECT_MAPPER_PROVIDER = new ObjectMapperProvider();
 
-    ObjectMapperProvider OBJECT_MAPPER_PROVIDER = new ObjectMapperProvider();
     private final GraylogBackend backend;
     private final Users users;
     private final Streams streams;
@@ -66,6 +66,7 @@ public class GraylogApis implements GraylogRestApi {
     private final EventNotifications eventNotifications;
     private final EventDefinitions eventDefinitions;
     private final Dashboards dashboards;
+    private final Pipelines pipelines;
 
     public GraylogApis(GraylogBackend backend) {
         this.backend = backend;
@@ -81,6 +82,7 @@ public class GraylogApis implements GraylogRestApi {
         this.eventNotifications = new EventNotifications(this);
         this.eventDefinitions = new EventDefinitions(this);
         this.dashboards = new Dashboards(this);
+        this.pipelines = new Pipelines(this);
     }
 
     public RequestSpecification requestSpecification() {
@@ -150,6 +152,10 @@ public class GraylogApis implements GraylogRestApi {
         return dashboards;
     }
 
+    public Pipelines pipelines() {
+        return pipelines;
+    }
+
     protected RequestSpecification prefix(final Users.User user) {
         return given()
                 .config(withGraylogBackendFailureConfig())
@@ -173,6 +179,15 @@ public class GraylogApis implements GraylogRestApi {
 
     public ValidatableResponse post(final String url, final String body, final int expectedResult) {
         return post(url, Users.LOCAL_ADMIN, body, expectedResult);
+    }
+
+    public ValidatableResponse post(final String url, final int expectedResult) {
+        return post(url, Users.LOCAL_ADMIN, "", expectedResult);
+    }
+
+    public ValidatableResponse post(final String url, final Object body, final int expectedResult) throws JsonProcessingException {
+        final var objectMapper = OBJECT_MAPPER_PROVIDER.get();
+        return post(url, Users.LOCAL_ADMIN, objectMapper.writeValueAsString(body), expectedResult);
     }
 
     public ValidatableResponse post(final String url, final Users.User user, final String body, final int expectedResult) {
