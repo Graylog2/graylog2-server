@@ -55,7 +55,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -100,6 +102,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final PermittedStreams permittedStreams;
     private final NotificationService notificationService;
     private final QueryStringDecorators queryStringDecorators;
+    private final StreamService streamService;
     private final boolean isCloud;
 
     @Inject
@@ -114,6 +117,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   PermittedStreams permittedStreams,
                                   NotificationService notificationService,
                                   QueryStringDecorators queryStringDecorators,
+                                  StreamService streamService,
                                   @Named("is_cloud") boolean isCloud) {
         this.config = config;
         this.parameters = parameters;
@@ -126,6 +130,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.permittedStreams = permittedStreams;
         this.notificationService = notificationService;
         this.queryStringDecorators = queryStringDecorators;
+        this.streamService = streamService;
         this.isCloud = isCloud;
     }
 
@@ -548,7 +553,10 @@ public class PivotAggregationSearch implements AggregationSearch {
             // TODO: How to take into consideration StreamPermissions here???
             streamIds.addAll(permittedStreams.loadWithCategories(config.streamCategories(), (streamId) -> true));
         }
-        final Set<String> existingStreams = loadAllStreams();
+        final Set<String> existingStreams = streamService.loadByIds(streamIds)
+                .stream()
+                .map(Persisted::getId)
+                .collect(toSet());
         final Set<String> nonExistingStreams = streamIds.stream()
                 .filter(stream -> !existingStreams.contains(stream))
                 .collect(toSet());

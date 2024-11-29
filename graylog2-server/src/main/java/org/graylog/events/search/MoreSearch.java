@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ResultMessage;
@@ -37,7 +36,6 @@ import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -112,7 +110,7 @@ public class MoreSearch {
                     .map(IndexRange::indexName)
                     .collect(Collectors.toSet());
         } else {
-            final Set<Stream> streams = loadStreams(streamIds);
+            final Set<Stream> streams = streamService.loadByIds(streamIds);
             final IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams = new IndexRangeContainsOneOfStreams();
             return indexRanges.stream()
                     .filter(ir -> indexRangeContainsOneOfStreams.test(ir, streams))
@@ -155,21 +153,6 @@ public class MoreSearch {
         }
 
         moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, filters, batchSize, resultCallback::call);
-    }
-
-    private Set<Stream> loadStreams(Set<String> streamIds) {
-        // TODO: Use method from `StreamService` which loads a collection of ids (when implemented) to prevent n+1.
-        // Track https://github.com/Graylog2/graylog2-server/issues/4897 for progress.
-        Set<Stream> streams = new HashSet<>();
-        for (String streamId : streamIds) {
-            try {
-                Stream load = streamService.load(streamId);
-                streams.add(load);
-            } catch (NotFoundException e) {
-                LOG.debug("Failed to load stream <{}>", streamId);
-            }
-        }
-        return streams;
     }
 
     /**
