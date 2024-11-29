@@ -57,12 +57,16 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                                     final CustomFieldMappings customFieldMappings) {
         var settings = new Template.Settings(Map.of(
                 "index", Map.of(
-                        "analysis", Map.of("analyzer", analyzerKeyword())
+                        "analysis", analysisSettings()
                 )
         ));
         var mappings = mapping(analyzer, customFieldMappings);
 
         return createTemplate(indexPattern, order, settings, mappings);
+    }
+
+    public Map<String, Object> analysisSettings() {
+        return Map.of("analyzer", analyzerKeyword());
     }
 
     Template createTemplate(String indexPattern, Long order, Template.Settings settings, Template.Mappings mappings) {

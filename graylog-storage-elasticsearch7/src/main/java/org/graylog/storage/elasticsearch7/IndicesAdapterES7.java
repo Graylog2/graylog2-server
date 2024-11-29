@@ -43,9 +43,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseI
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.BulkByScrollResponse;
@@ -169,10 +169,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     private CreateIndexRequest createIndexRequest(String index,
                                                   IndexSettings indexSettings,
                                                   @Nullable Map<String, Object> mapping) {
-        final Map<String, Object> settings = new HashMap<>();
-        settings.put("number_of_shards", indexSettings.shards());
-        settings.put("number_of_replicas", indexSettings.replicas());
-        CreateIndexRequest request = new CreateIndexRequest(index).settings(settings);
+        CreateIndexRequest request = new CreateIndexRequest(index).settings(indexSettings.map());
         if (mapping != null) {
             request = request.mapping(mapping);
         }
@@ -202,10 +199,24 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 .indices(index)
                 .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
-        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+        return client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions).mappings().get(index).sourceAsMap(),
                 "Couldn't read mapping of index " + index);
+    }
 
-        return result.mappings().get(index).sourceAsMap();
+    @Override
+    public Map<String, Object> getFlattenIndexSettings(@Nonnull String index) {
+
+        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
+                .indices(index)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+
+        return client.execute((c, requestOptions) -> {
+            final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
+            Settings settings = settingsResponse.getIndexToSettings().get(index);
+            ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+            settings.keySet().forEach(k -> Optional.ofNullable(settings.get(k)).ifPresent(v -> builder.put(k, v)));
+            return builder.build();
+        }, "Couldn't read settings of index " + index);
     }
 
     @Override
