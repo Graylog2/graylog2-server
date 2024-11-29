@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useRef } from 'react';
-import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import UserNotification from 'util/UserNotification';
 import { ShareButton } from 'components/common';
-import { MenuItem } from 'components/bootstrap';
+import { MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -47,10 +46,6 @@ type Props = {
   dashboard: View,
   isEvidenceModal?: boolean,
 }
-
-const DeleteItem = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.danger};
-`);
 
 const usePluggableDashboardActions = (dashboard: View) => {
   const modalRefs = useRef({});
@@ -97,9 +92,7 @@ const DashboardDeleteAction = ({ dashboard, refetchDashboards, isEvidenceModal =
   }, [dashboard, deselectEntity, refetchDashboards, paginationQueryParameter]);
 
   return isEvidenceModal ? null : (
-    <MenuItem onClick={onDashboardDelete}>
-      <DeleteItem role="button">Delete</DeleteItem>
-    </MenuItem>
+    <DeleteMenuItem onClick={onDashboardDelete} />
   );
 };
 

@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
+import { Button, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
 import { MoreActions } from 'components/common/EntityDataTable';
@@ -44,9 +44,7 @@ const ProfileActions = ({ profileId, profileName }: { profileId: string, profile
         </Button>
       </LinkContainer>
       <MoreActions>
-        <MenuItem onSelect={onDelete}>
-          Delete
-        </MenuItem>
+        <DeleteMenuItem onSelect={onDelete} />
       </MoreActions>
     </ButtonToolbar>
   );

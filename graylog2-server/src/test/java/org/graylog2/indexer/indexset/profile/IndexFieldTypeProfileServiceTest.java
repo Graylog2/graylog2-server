@@ -72,8 +72,7 @@ public class IndexFieldTypeProfileServiceTest {
                 mock(ClusterEventBus.class)
         );
         indexFieldTypeProfileUsagesService = new IndexFieldTypeProfileUsagesService(mongoConnection);
-        toTest = new IndexFieldTypeProfileService(mongoConnection,
-                objectMapperProvider,
+        toTest = new IndexFieldTypeProfileService(
                 new MongoCollections(new CommonMongoJackObjectMapperProvider(objectMapperProvider), mongoConnection),
                 indexFieldTypeProfileUsagesService,
                 mongoIndexSetService);
