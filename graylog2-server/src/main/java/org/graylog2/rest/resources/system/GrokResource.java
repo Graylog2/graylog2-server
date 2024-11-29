@@ -120,7 +120,7 @@ public class GrokResource extends RestResource {
                                                   @ApiParam(name = "sort",
                                                             value = "The field to sort the result on",
                                                             required = true,
-                                                            allowableValues = "title,description,id")
+                                                            allowableValues = "name,pattern")
                                                   @DefaultValue(GrokPattern.FIELD_NAME) @QueryParam("sort") String sort,
                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                       @DefaultValue("asc") @QueryParam("order") SortOrder order) {
