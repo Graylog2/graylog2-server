@@ -33,7 +33,7 @@ public class BoundedPriorityQueue<E> extends PriorityQueue<E> {
         this.maxSize = maxSize;
     }
 
-    public boolean add(final E e) {
+    public boolean offer(final E e) {
         if (e == null) {
             throw new NullPointerException();
         }
@@ -45,6 +45,6 @@ public class BoundedPriorityQueue<E> extends PriorityQueue<E> {
                 poll();
             }
         }
-        return offer(e);
+        return super.offer(e);
     }
 }
