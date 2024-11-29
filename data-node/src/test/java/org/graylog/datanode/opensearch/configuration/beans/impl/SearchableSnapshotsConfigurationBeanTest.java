@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +52,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart();
+        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(Collections.emptyList());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
@@ -77,7 +78,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart();
+        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(Collections.emptyList());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
@@ -103,7 +104,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart();
+        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(Collections.emptyList());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .isEmpty(); // no search role should be provided
@@ -132,7 +133,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
 
         // 10GB cache requested on 8GB of free space, needs to throw an exception!
-        Assertions.assertThatThrownBy(bean::buildConfigurationPart)
+        Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(Collections.emptyList()))
                 .isInstanceOf(OpensearchConfigurationException.class)
                 .hasMessageContaining("There is not enough usable space for the node search cache. Your system has only 8gb available");
 

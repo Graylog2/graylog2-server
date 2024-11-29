@@ -22,19 +22,21 @@ import jakarta.annotation.Nonnull;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
-import org.graylog.datanode.configuration.S3RepositoryConfiguration;
-import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
+import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationDirModifier;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
 import org.graylog.datanode.process.Environment;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
+import java.security.KeyStore;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public record OpensearchConfiguration(
         OpensearchDistribution opensearchDistribution,
@@ -46,8 +48,6 @@ public record OpensearchConfiguration(
         String clusterName,
         String nodeName,
         List<String> nodeRoles,
-        List<String> discoverySeedHosts,
-        OpensearchSecurityConfiguration opensearchSecurityConfiguration,
         Set<OpensearchConfigurationPart> configurationParts,
 
         Map<String, Object> additionalConfiguration
@@ -76,11 +76,6 @@ public record OpensearchConfiguration(
         config.put("node.name", nodeName);
         config.put("node.roles", buildRolesList());
 
-        if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
-            config.put("discovery.seed_hosts", toValuesList(discoverySeedHosts));
-        }
-
-        config.put("discovery.seed_providers", "file");
 
         configurationParts.stream()
                 .map(OpensearchConfigurationPart::properties)
@@ -111,15 +106,11 @@ public record OpensearchConfiguration(
         final Environment env = new Environment(System.getenv());
 
         List<String> javaOpts = new LinkedList<>();
-        javaOpts.add("-Xms%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
-        javaOpts.add("-Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
-        javaOpts.add("-Dopensearch.transport.cname_in_publish_address=true");
 
-        opensearchSecurityConfiguration.getTruststore().ifPresent(truststore -> {
-            javaOpts.add("-Djavax.net.ssl.trustStore=" + truststore.location().toAbsolutePath());
-            javaOpts.add("-Djavax.net.ssl.trustStorePassword=" + new String(truststore.password()));
-            javaOpts.add("-Djavax.net.ssl.trustStoreType=pkcs12");
-        });
+        configurationParts.stream().map(OpensearchConfigurationPart::javaOpts)
+                .forEach(javaOpts::addAll);
+
+        javaOpts.add("-Dopensearch.transport.cname_in_publish_address=true");
 
         env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
         env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
@@ -131,25 +122,44 @@ public record OpensearchConfiguration(
         return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
     }
 
-    public HttpHost getClusterBaseUrl() {
-        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false").toString());
-        return new HttpHost(hostname(), transportPort(), sslEnabled ? "https" : "http");
-    }
-
     public boolean securityConfigured() {
-        return opensearchSecurityConfiguration() != null;
+        return configurationParts.stream().anyMatch(OpensearchConfigurationPart::securityConfigured);
     }
 
 
     public Map<String, String> getKeystoreItems() {
-
         final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        builder.putAll(opensearchSecurityConfiguration.getKeystoreItems());
-
         configurationParts.stream()
                 .map(OpensearchConfigurationPart::keystoreItems)
                 .forEach(builder::putAll);
 
         return builder.build();
+    }
+
+    public KeyStore trustStore() {
+        return configurationParts.stream()
+                .map(OpensearchConfigurationPart::trustStore)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("This should not happen, truststore should always be present"));
+    }
+
+    public Optional<KeystoreInformation> httpCertificate() {
+        return configurationParts.stream()
+                .map(OpensearchConfigurationPart::httpCertificate)
+                .filter(Objects::nonNull)
+                .findFirst();
+    }
+
+    public Optional<KeystoreInformation> transportCertificate() {
+        return configurationParts.stream()
+                .map(OpensearchConfigurationPart::transportCertificate)
+                .filter(Objects::nonNull)
+                .findFirst();
+    }
+
+    public Set<OpensearchConfigurationDirModifier> configDirModifiers() {
+        return configurationParts.stream()
+                .flatMap(c -> c.configurationDirModifiers().stream())
+                .collect(Collectors.toSet());
     }
 }

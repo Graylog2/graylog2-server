@@ -93,6 +93,10 @@ public class OpensearchCommandLineProcess implements Closeable {
         try {
             final Path configFile = config.datanodeDirectories().createOpensearchProcessConfigurationFile(CONFIG);
             mapper.writeValue(configFile.toFile(), getOpensearchConfigurationArguments(config));
+            final Path opensearchProcessConfigurationDir = config.datanodeDirectories().getOpensearchProcessConfigurationDir();
+            config.configDirModifiers().forEach(modifier -> {
+                modifier.modifyConfigDir(opensearchProcessConfigurationDir);
+            });
         } catch (IOException e) {
             throw new RuntimeException("Could not generate OpenSearch config: " + e.getMessage(), e);
         }

@@ -17,7 +17,6 @@
 package org.graylog.datanode.configuration.variants;
 
 import org.graylog.datanode.Configuration;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,7 @@ public class InSecureConfiguration implements SecurityConfigurationVariant {
     }
 
     @Override
-    public OpensearchSecurityConfiguration build() throws KeyStoreStorageException {
+    public OpensearchSecurityConfiguration build() {
         LOG.warn("Insecure configuration is deprecated. Please use selfsigned_setup to create fully encrypted setups.");
         return OpensearchSecurityConfiguration.disabled();
     }

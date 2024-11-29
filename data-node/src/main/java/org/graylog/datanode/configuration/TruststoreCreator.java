@@ -19,8 +19,7 @@ package org.graylog.datanode.configuration;
 import jakarta.annotation.Nonnull;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -60,9 +59,14 @@ public class TruststoreCreator {
         }
     }
 
-    public TruststoreCreator addRootCert(final String name, FilesystemKeystoreInformation keystoreInformation,
-                                         final String alias) throws IOException, GeneralSecurityException {
-        final X509Certificate rootCert = findRootCert(keystoreInformation.location(), keystoreInformation.password(), alias);
+    public TruststoreCreator addRootCert(final String name, KeystoreInformation keystoreInformation,
+                                         final String alias) throws GeneralSecurityException {
+        final X509Certificate rootCert;
+        try {
+            rootCert = findRootCert(keystoreInformation, alias);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         this.truststore.setCertificateEntry(name, rootCert);
         return this;
     }
@@ -92,10 +96,9 @@ public class TruststoreCreator {
     }
 
 
-    private static X509Certificate findRootCert(Path keystorePath,
-                                                char[] password,
-                                                final String alias) throws IOException, GeneralSecurityException {
-        final KeyStore keystore = loadKeystore(keystorePath, password);
+    private static X509Certificate findRootCert(KeystoreInformation keystoreInformation,
+                                                final String alias) throws Exception {
+        final KeyStore keystore = keystoreInformation.loadKeystore();
         final Certificate[] certs = keystore.getCertificateChain(alias);
 
         return Arrays.stream(certs)

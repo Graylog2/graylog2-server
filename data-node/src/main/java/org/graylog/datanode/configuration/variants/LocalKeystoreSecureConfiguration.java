@@ -17,35 +17,18 @@
 package org.graylog.datanode.configuration.variants;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
+import org.graylog.datanode.configuration.OpensearchConfigurationException;
+import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-
-public final class LocalKeystoreSecureConfiguration extends SecureConfiguration {
+public final class LocalKeystoreSecureConfiguration implements SecurityConfigurationVariant {
     private final DatanodeKeystore datanodeKeystore;
-    private final char[] secret;
 
     @Inject
-    public LocalKeystoreSecureConfiguration(final DatanodeKeystore datanodeKeystore,
-                                            final DatanodeConfiguration datanodeConfiguration,
-                                            final @Named("password_secret") String passwordSecret
-    ) {
-        super(datanodeConfiguration);
+    public LocalKeystoreSecureConfiguration(final DatanodeKeystore datanodeKeystore) {
         this.datanodeKeystore = datanodeKeystore;
-        this.secret = passwordSecret.toCharArray();
     }
 
     @Override
@@ -53,35 +36,17 @@ public final class LocalKeystoreSecureConfiguration extends SecureConfiguration 
         try {
             return datanodeKeystore.exists() && datanodeKeystore.hasSignedCertificate();
         } catch (DatanodeKeystoreException e) {
-            throw new RuntimeException(e);
+            throw new OpensearchConfigurationException(e);
         }
     }
 
     @Override
-    public OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException {
-
-        final Path targetTransportKeystoreLocation = getTransportKeystoreLocation();
-        final Path targetHttpKeystoreLocation = getHttpKeystoreLocation();
-
+    public OpensearchSecurityConfiguration build() {
         try {
-            final KeyStore datanodeKeystore = this.datanodeKeystore.loadKeystore();
-            copy(datanodeKeystore, targetTransportKeystoreLocation, secret);
-            copy(datanodeKeystore, targetHttpKeystoreLocation, secret);
-
-            return new OpensearchSecurityConfiguration(
-                    new FilesystemKeystoreInformation(targetTransportKeystoreLocation.toAbsolutePath(), secret),
-                    new FilesystemKeystoreInformation(targetHttpKeystoreLocation.toAbsolutePath(), secret)
-            );
+            final InMemoryKeystoreInformation reencryptedCopy = this.datanodeKeystore.getSafeCopy();
+            return new OpensearchSecurityConfiguration(reencryptedCopy, reencryptedCopy);
         } catch (DatanodeKeystoreException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void copy(final KeyStore originalKeystore, final Path targetLocation, final char[] password) {
-        try (FileOutputStream fos = new FileOutputStream(targetLocation.toFile())) {
-            originalKeystore.store(fos, password);
-        } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new OpensearchConfigurationException(e);
         }
     }
 }

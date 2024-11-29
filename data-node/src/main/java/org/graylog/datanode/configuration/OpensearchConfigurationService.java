@@ -23,28 +23,15 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.variants.InSecureConfiguration;
-import org.graylog.datanode.configuration.variants.LocalKeystoreSecureConfiguration;
-import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
-import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
-import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.security.JwtSecret;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -52,12 +39,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class OpensearchConfigurationService extends AbstractIdleService {
     private final Configuration localConfiguration;
-    private final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration;
-    private final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration;
-    private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
-    private final JwtSecret signingKey;
-    private final NodeService<DataNodeDto> nodeService;
     private final Set<OpensearchConfigurationBean> opensearchConfigurationBeans;
 
     /**
@@ -71,20 +53,10 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     @Inject
     public OpensearchConfigurationService(final Configuration localConfiguration,
                                           final DatanodeConfiguration datanodeConfiguration,
-                                          final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
-                                          final LocalKeystoreSecureConfiguration localKeystoreSecureConfiguration,
-                                          final InSecureConfiguration inSecureConfiguration,
-                                          final NodeService<DataNodeDto> nodeService,
-                                          JwtSecret jwtSecret,
                                           final Set<OpensearchConfigurationBean> opensearchConfigurationBeans,
                                           final EventBus eventBus) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
-        this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
-        this.localKeystoreSecureConfiguration = localKeystoreSecureConfiguration;
-        this.inSecureConfiguration = inSecureConfiguration;
-        this.signingKey = jwtSecret;
-        this.nodeService = nodeService;
         this.opensearchConfigurationBeans = opensearchConfigurationBeans;
         this.eventBus = eventBus;
         eventBus.register(this);
@@ -130,58 +102,26 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     }
 
     private OpensearchConfiguration get() {
-        //TODO: at some point bind the whole list, for now there is too much experiments with order and prerequisites
-        List<SecurityConfigurationVariant> securityConfigurationTypes = List.of(
-                inSecureConfiguration,
-                uploadedCertFilesSecureConfiguration,
-                localKeystoreSecureConfiguration
+
+        ImmutableMap.Builder<String, Object> opensearchProperties = ImmutableMap.builder();
+        opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
+        final Set<OpensearchConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
+                .map(bean -> bean.buildConfigurationPart(trustedCertificates))
+                .collect(Collectors.toSet());
+
+        return new OpensearchConfiguration(
+                datanodeConfiguration.opensearchDistributionProvider().get(),
+                datanodeConfiguration.datanodeDirectories(),
+                localConfiguration.getBindAddress(),
+                localConfiguration.getHostname(),
+                localConfiguration.getOpensearchHttpPort(),
+                localConfiguration.getOpensearchTransportPort(),
+                localConfiguration.getClustername(),
+                localConfiguration.getDatanodeNodeName(),
+                localConfiguration.getNodeRoles(),
+                configurationParts,
+                opensearchProperties.build()
         );
-
-        Optional<SecurityConfigurationVariant> chosenSecurityConfigurationVariant = securityConfigurationTypes.stream()
-                .filter(s -> s.isConfigured(localConfiguration))
-                .findFirst();
-
-        try {
-            ImmutableMap.Builder<String, Object> opensearchProperties = ImmutableMap.builder();
-
-            if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
-                opensearchProperties.put("cluster.initial_cluster_manager_nodes", localConfiguration.getInitialClusterManagerNodes());
-            } else {
-                final var nodeList = String.join(",", nodeService.allActive().values().stream().map(Node::getHostname).collect(Collectors.toSet()));
-                opensearchProperties.put("cluster.initial_cluster_manager_nodes", nodeList);
-            }
-            opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
-
-            OpensearchSecurityConfiguration securityConfiguration = null;
-            if (chosenSecurityConfigurationVariant.isPresent()) {
-                securityConfiguration = chosenSecurityConfigurationVariant.get()
-                        .build()
-                        .configure(datanodeConfiguration, trustedCertificates, signingKey);
-                opensearchProperties.putAll(securityConfiguration.getProperties());
-            }
-
-            final Set<OpensearchConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
-                    .map(OpensearchConfigurationBean::buildConfigurationPart)
-                    .collect(Collectors.toSet());
-
-            return new OpensearchConfiguration(
-                    datanodeConfiguration.opensearchDistributionProvider().get(),
-                    datanodeConfiguration.datanodeDirectories(),
-                    localConfiguration.getBindAddress(),
-                    localConfiguration.getHostname(),
-                    localConfiguration.getOpensearchHttpPort(),
-                    localConfiguration.getOpensearchTransportPort(),
-                    localConfiguration.getClustername(),
-                    localConfiguration.getDatanodeNodeName(),
-                    localConfiguration.getNodeRoles(),
-                    localConfiguration.getOpensearchDiscoverySeedHosts(),
-                    securityConfiguration,
-                    configurationParts,
-                    opensearchProperties.build()
-            );
-        } catch (GeneralSecurityException | KeyStoreStorageException | IOException e) {
-            throw new OpensearchConfigurationException(e);
-        }
     }
 
     private ImmutableMap<String, Object> commonOpensearchConfig(final Configuration localConfiguration) {
@@ -199,15 +139,9 @@ public class OpensearchConfigurationService extends AbstractIdleService {
             config.put("logger.org.opensearch", localConfiguration.getOpensearchDebug());
         }
 
-        if (localConfiguration.getOpensearchAuditLog() != null && !localConfiguration.getOpensearchAuditLog().isBlank()) {
-            config.put("plugins.security.audit.type", localConfiguration.getOpensearchAuditLog());
-        }
-
         // common OpenSearch config parameters from our docs
         config.put("indices.query.bool.max_clause_count", localConfiguration.getIndicesQueryBoolMaxClauseCount().toString());
 
-        // enable admin access via the REST API
-        config.put("plugins.security.restapi.admin.enabled", "true");
 
         config.putAll(transientConfiguration);
 

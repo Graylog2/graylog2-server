@@ -28,6 +28,9 @@ import org.graylog.datanode.opensearch.OpensearchProcessService;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpaceProvider;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchClusterConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchJvmConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchSecurityConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.SearchableSnapshotsConfigurationBean;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachineProvider;
@@ -51,7 +54,10 @@ public class OpensearchProcessBindings extends AbstractModule {
 
         //opensearch configuration beans
         Multibinder<OpensearchConfigurationBean> opensearchConfigurationBeanMultibinder = Multibinder.newSetBinder(binder(), OpensearchConfigurationBean.class);
+        opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchJvmConfigurationBean.class).asEagerSingleton();
+        opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchClusterConfigurationBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(SearchableSnapshotsConfigurationBean.class).asEagerSingleton();
+        opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchSecurityConfigurationBean.class).asEagerSingleton();
 
         // this service both starts and provides the opensearch process
         serviceBinder.addBinding().to(OpensearchConfigurationService.class).asEagerSingleton();

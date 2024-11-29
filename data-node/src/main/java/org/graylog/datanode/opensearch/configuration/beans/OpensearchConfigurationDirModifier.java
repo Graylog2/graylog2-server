@@ -16,9 +16,9 @@
  */
 package org.graylog.datanode.opensearch.configuration.beans;
 
-import java.security.cert.X509Certificate;
-import java.util.List;
+import java.nio.file.Path;
 
-public interface OpensearchConfigurationBean {
-    OpensearchConfigurationPart buildConfigurationPart(List<X509Certificate> trustedCertificates);
+public interface OpensearchConfigurationDirModifier {
+
+    void modifyConfigDir(final Path opensearchConfigDir);
 }

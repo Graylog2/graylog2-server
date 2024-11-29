@@ -25,7 +25,6 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.cli.OpensearchCommandLineProcess;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.rest.OpensearchRestClient;
@@ -35,7 +34,6 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.periodicals.ClusterStateResponse;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
-import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -69,9 +67,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
+import java.security.KeyStore;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -134,9 +130,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
 
-        final TrustManager trustManager = configuration.opensearchSecurityConfiguration().getTruststore()
-                .map(this::createAggregatedTrustManager)
-                .orElse(this.trustManager);
+        final TrustManager trustManager = createAggregatedTrustManager(configuration.trustStore());
 
         return OpensearchRestClient.build(configuration, datanodeConfiguration, trustManager);
     }
@@ -148,12 +142,8 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
      * @return combined trust manager
      */
     @Nonnull
-    private X509TrustManager createAggregatedTrustManager(FilesystemKeystoreInformation truststore) {
-        try {
-            return new TrustManagerAggregator(List.of(this.trustManager, TrustManagerAggregator.trustManagerFromKeystore(truststore.loadKeystore())));
-        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+    private X509TrustManager createAggregatedTrustManager(KeyStore truststore) {
+        return new TrustManagerAggregator(List.of(this.trustManager, TrustManagerAggregator.trustManagerFromKeystore(truststore)));
     }
 
     @Override
@@ -196,9 +186,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public String getDatanodeRestApiUrl() {
-        final boolean secured = opensearchConfiguration.map(OpensearchConfiguration::opensearchSecurityConfiguration)
-                .map(OpensearchSecurityConfiguration::securityEnabled)
-                .orElse(false);
+        final boolean secured = opensearchConfiguration.map(OpensearchConfiguration::securityConfigured).orElse(false);
         String protocol = secured ? "https" : "http";
         String host = configuration.getHostname();
         final int port = configuration.getDatanodeHttpPort();

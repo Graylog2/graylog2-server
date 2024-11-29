@@ -17,21 +17,21 @@
 package org.graylog.datanode.configuration;
 
 
-import com.google.common.base.Suppliers;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import io.jsonwebtoken.lang.Collections;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
-import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.security.certutil.KeyStoreDto;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class OpensearchKeystoreProvider implements Provider<Map<OpensearchKeystoreProvider.Store, KeyStoreDto>> {
@@ -40,7 +40,7 @@ public class OpensearchKeystoreProvider implements Provider<Map<OpensearchKeysto
 
     private static final Logger log = LoggerFactory.getLogger(OpensearchKeystoreProvider.class);
 
-    private Supplier<OpensearchSecurityConfiguration> opensearchSecurityConfiguration;
+    private final Map<Store, KeyStoreDto> keystores = new ConcurrentHashMap<>();
 
     @Inject
     public OpensearchKeystoreProvider(EventBus eventBus) {
@@ -50,44 +50,34 @@ public class OpensearchKeystoreProvider implements Provider<Map<OpensearchKeysto
     @Subscribe
     @SuppressWarnings("unused")
     public void onConfigurationChangeEvent(OpensearchConfigurationChangeEvent event) {
-        this.opensearchSecurityConfiguration = Suppliers.memoize(() -> event.config().opensearchSecurityConfiguration());
+        try {
+            keystores.put(Store.TRUSTSTORE, KeyStoreDto.fromKeyStore(event.config().trustStore()));
+
+            event.config().httpCertificate()
+                    .map(OpensearchKeystoreProvider::toDto)
+                    .ifPresent(dto -> keystores.put(Store.HTTP, dto));
+
+            event.config().transportCertificate()
+                    .map(OpensearchKeystoreProvider::toDto)
+                    .ifPresent(dto -> keystores.put(Store.TRANSPORT, dto));
+
+        } catch (Exception e) {
+            log.error("Error reading truststore", e);
+        }
+    }
+
+    @Nonnull
+    private static KeyStoreDto toDto(KeystoreInformation cert) {
+        try {
+            return KeyStoreDto.fromKeyStore(cert.loadKeystore());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Map<Store, KeyStoreDto> get() {
-        if (opensearchSecurityConfiguration == null) {
-            return Map.of();
-        }
-        OpensearchSecurityConfiguration config = opensearchSecurityConfiguration.get();
-
-        Map<Store, KeyStoreDto> certificates = new HashMap<>();
-
-        certificates.put(Store.TRUSTSTORE, config.getTruststore().map(t -> {
-            try {
-                return KeyStoreDto.fromKeyStore(t.loadKeystore());
-            } catch (Exception e) {
-                log.error("Error reading truststore", e);
-                return KeyStoreDto.empty();
-            }
-        }).orElse(KeyStoreDto.empty()));
-
-        KeyStoreDto http = KeyStoreDto.empty();
-        try {
-            http = KeyStoreDto.fromKeyStore(config.getHttpCertificate().loadKeystore());
-        } catch (Exception e) {
-            log.error("Error reading http certificate", e);
-
-        }
-        certificates.put(Store.HTTP, http);
-
-        KeyStoreDto transport = KeyStoreDto.empty();
-        try {
-            transport = KeyStoreDto.fromKeyStore(config.getTransportCertificate().loadKeystore());
-        } catch (Exception e) {
-            log.error("Error reading transport certificate", e);
-        }
-        certificates.put(Store.TRANSPORT, transport);
-        return certificates;
+        return Collections.immutable(keystores);
     }
 
 }

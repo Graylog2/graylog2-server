@@ -16,19 +16,19 @@
  */
 package org.graylog.datanode.configuration.variants;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
+import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
+import org.graylog.security.certutil.csr.KeystoreInformation;
+import org.graylog.security.certutil.keystore.storage.KeystoreUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,22 +37,18 @@ import java.util.Optional;
 import static org.graylog.datanode.Configuration.HTTP_CERTIFICATE_PASSWORD_PROPERTY;
 import static org.graylog.datanode.Configuration.TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY;
 
-public final class UploadedCertFilesSecureConfiguration extends SecureConfiguration {
+public final class UploadedCertFilesSecureConfiguration implements SecurityConfigurationVariant {
 
     private final String uploadedTransportKeystoreFileName;
     private final String uploadedHttpKeystoreFileName;
     private final String datanodeTransportCertificatePassword;
     private final String datanodeHttpCertificatePassword;
-    private final KeystoreFileStorage keystoreFileStorage;
     private final DatanodeConfiguration datanodeConfiguration;
 
     @Inject
     public UploadedCertFilesSecureConfiguration(final Configuration localConfiguration,
-                                                final DatanodeConfiguration datanodeConfiguration,
-                                                KeystoreFileStorage keystoreFileStorage) {
-        super(datanodeConfiguration);
+                                                final DatanodeConfiguration datanodeConfiguration) {
         this.datanodeConfiguration = datanodeConfiguration;
-        this.keystoreFileStorage = keystoreFileStorage;
 
         this.uploadedTransportKeystoreFileName = localConfiguration.getDatanodeTransportCertificate();
         this.uploadedHttpKeystoreFileName = localConfiguration.getDatanodeHttpCertificate();
@@ -116,47 +112,25 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
     }
 
     @Override
-    public OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException {
+    public OpensearchSecurityConfiguration build() {
 
-        final Path targetTransportKeystoreLocation = getTransportKeystoreLocation();
-        final Path targetHttpKeystoreLocation = getHttpKeystoreLocation();
+        final Path transportCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(uploadedTransportKeystoreFileName).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
+        final InMemoryKeystoreInformation transportKeystore = reencrypt(new FilesystemKeystoreInformation(transportCertPath, datanodeTransportCertificatePassword.toCharArray()));
 
-        final char[] transportOTP = reEncyptWithOtp(datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(uploadedTransportKeystoreFileName).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected")),
-                datanodeTransportCertificatePassword.toCharArray(),
-                targetTransportKeystoreLocation);
+        final Path httpCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(uploadedHttpKeystoreFileName).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
+        final InMemoryKeystoreInformation httpKeystore = reencrypt(new FilesystemKeystoreInformation(httpCertPath, datanodeHttpCertificatePassword.toCharArray()));
 
-        final char[] httpOTP = reEncyptWithOtp(datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(uploadedHttpKeystoreFileName).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected")),
-                datanodeHttpCertificatePassword.toCharArray(),
-                targetHttpKeystoreLocation);
-
-        return new OpensearchSecurityConfiguration(
-                new FilesystemKeystoreInformation(targetTransportKeystoreLocation.toAbsolutePath(), transportOTP),
-                new FilesystemKeystoreInformation(targetHttpKeystoreLocation.toAbsolutePath(), httpOTP)
-        );
+        return new OpensearchSecurityConfiguration(transportKeystore, httpKeystore);
     }
 
-    public char[] reEncyptWithOtp(final Path originalLocation,
-                                  final char[] originalPassword,
-                                  final Path targetLocation
-    ) throws KeyStoreStorageException {
-        // caution! This password changes during each configuration request!!!
-        final char[] oneTimePassword = RandomStringUtils.randomAlphabetic(256).toCharArray();
-        reEncypt(originalLocation, originalPassword, targetLocation, oneTimePassword);
-        return oneTimePassword;
-    }
-
-    private void reEncypt(final Path originalLocation,
-                          final char[] originalPassword,
-                          final Path targetLocation,
-                          final char[] newPassword
-    ) throws KeyStoreStorageException {
-
-        final Optional<KeyStore> keyStore = keystoreFileStorage.readKeyStore(originalLocation, originalPassword);
-        if (keyStore.isPresent()) {
-            final KeyStore originalKeystore = keyStore.get();
-            keystoreFileStorage.writeKeyStore(targetLocation, originalKeystore, originalPassword, newPassword);
-        } else {
-            throw new KeyStoreStorageException("No keystore present in : " + originalLocation);
+    @Nonnull
+    private static InMemoryKeystoreInformation reencrypt(KeystoreInformation keystoreInformation) {
+        try {
+            final char[] oneTimePassword = RandomStringUtils.randomAlphabetic(256).toCharArray();
+            final KeyStore reencrypted = KeystoreUtils.newStoreCopyContent(keystoreInformation.loadKeystore(), keystoreInformation.password(), oneTimePassword);
+            return new InMemoryKeystoreInformation(reencrypted, oneTimePassword);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

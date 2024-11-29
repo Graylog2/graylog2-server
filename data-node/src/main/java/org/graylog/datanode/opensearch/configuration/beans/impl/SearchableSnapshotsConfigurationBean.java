@@ -32,7 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -61,7 +63,7 @@ public class SearchableSnapshotsConfigurationBean implements OpensearchConfigura
     }
 
     @Override
-    public OpensearchConfigurationPart buildConfigurationPart() {
+    public OpensearchConfigurationPart buildConfigurationPart(List<X509Certificate> trustedCertificates) {
         if (snapshotsAreEnabled()) {
             validateUsableSpace();
             return OpensearchConfigurationPart.builder()
