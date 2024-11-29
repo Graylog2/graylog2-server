@@ -150,7 +150,8 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
                      label="Event Limit"
                      type="number"
                      bsStyle={validation.errors.event_limit ? 'error' : null}
-                     help={get(validation, 'errors.event_limit',
+                     help={get(validation,
+                       'errors.event_limit',
                        'Maximum number of events to be created per execution of this event definition. Excess events will be suppressed.') as string}
                      value={eventDefinition.config.event_limit}
                      onChange={handleConfigChange}
