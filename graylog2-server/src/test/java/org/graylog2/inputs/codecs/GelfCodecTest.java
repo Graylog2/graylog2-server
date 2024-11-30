@@ -101,6 +101,34 @@ public class GelfCodecTest {
     }
 
     @Test
+    public void decodeSupportsAllDataTypes() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": \"example.org\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\","
+                + "\"_boolean\": true,"
+                + "\"_long\": 42,"
+                + "\"_double\": 3.14,"
+                + "\"_string\": \"Foobar\","
+                + "\"_map\": {\"key\":\"value\"},"
+                + "\"_array\": [\"val1\",\"val2\"]"
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        final Message message = codec.decode(rawMessage);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("boolean")).isEqualTo(true);
+        assertThat(message.getField("long")).isEqualTo(42L);
+        assertThat(message.getField("double")).isEqualTo(3.14D);
+        assertThat(message.getField("string")).isEqualTo("Foobar");
+
+        // Container nodes are converted into their JSON string equivalent
+        assertThat(message.getField("map")).isEqualTo("{\"key\":\"value\"}");
+        assertThat(message.getField("array")).isEqualTo("[\"val1\",\"val2\"]");
+    }
+
+    @Test
     public void decodeBuildsValidMessageObject() throws Exception {
         final String json = "{"
                 + "\"version\": \"1.1\","
