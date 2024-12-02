@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
@@ -31,6 +32,7 @@ import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
+import org.graylog2.indexer.IndexMappingTemplate;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
@@ -225,18 +227,26 @@ public class Indices {
     }
 
     public boolean create(String indexName, IndexSet indexSet) {
-        return create(indexName, indexSet, null );
+        return create(indexName, indexSet, null, null );
     }
 
-    public boolean create(String indexName, IndexSet indexSet, Map<String, Object> indexMapping) {
-        IndexSettings indexSettings = IndexSettings.create(
-                indexSet.getConfig().shards(),
-                indexSet.getConfig().replicas()
-        );
+    public boolean create(String indexName,
+                          IndexSet indexSet,
+                          @Nullable Map<String, Object> indexMapping,
+                          @Nullable Map<String, Object> indexSettings) {
         try {
             // Make sure our index template exists before creating an index!
             ensureIndexTemplate(indexSet);
-            indicesAdapter.create(indexName, indexSettings, indexMapping);
+            Optional<IndexMappingTemplate> indexMappingTemplate = indexMapping(indexSet);
+            IndexSettings settings = indexMappingTemplate
+                    .map(t -> t.indexSettings(indexSet.getConfig(), indexSettings))
+                    .orElse(IndexMappingTemplate.createIndexSettings(indexSet.getConfig()));
+
+            Map<String, Object> mappings = indexMappingTemplate
+                    .map(t -> t.indexMappings(indexSet.getConfig(), indexMapping))
+                    .orElse(null);
+
+            indicesAdapter.create(indexName, settings, mappings);
         } catch (Exception e) {
             LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage(), e);
             auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
@@ -244,6 +254,14 @@ public class Indices {
         }
         auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         return true;
+    }
+
+    private Optional<IndexMappingTemplate> indexMapping(IndexSet indexSet) {
+        try {
+            return Optional.of(indexMappingFactory.createIndexMapping(indexSet.getConfig()));
+        }catch (IgnoreIndexTemplate e){
+            return Optional.empty();
+        }
     }
 
     public IndexSetMappingTemplate getTemplateIndexSetConfig(
@@ -427,5 +445,9 @@ public class Indices {
 
     public Map<String, Object> indexMapping(String index) {
         return indicesAdapter.getIndexMapping(index);
+    }
+
+    public Map<String, Object> indexSettings(String index) {
+        return IndexSettingsHelper.getAsStructuredMap(indicesAdapter.getFlattenIndexSettings(index));
     }
 }

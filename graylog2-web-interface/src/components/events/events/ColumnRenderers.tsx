@@ -98,6 +98,7 @@ const RemediationStepRenderer = ({ eventDefinitionId, meta }: { eventDefinitionI
 
 const StyledDiv = styled.div`
   cursor: pointer;
+
   &:hover {
     text-decoration: underline;
   }
@@ -125,7 +126,7 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
   attributes: {
     message: {
       minWidth: 300,
-      width: 0.7,
+      width: 0.5,
       renderCell: (_message: string, event) => <MessageRenderer message={_message} eventId={event.id} />,
     },
     key: {

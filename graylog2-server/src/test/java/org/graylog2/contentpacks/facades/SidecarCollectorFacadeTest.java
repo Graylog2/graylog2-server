@@ -35,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
@@ -56,7 +57,7 @@ public class SidecarCollectorFacadeTest {
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        collectorService = new CollectorService(mongodb.mongoConnection(), mapperProvider);
+        collectorService = new CollectorService(new MongoCollections(mapperProvider, mongodb.mongoConnection()));
         facade = new SidecarCollectorFacade(objectMapper, collectorService);
     }
 

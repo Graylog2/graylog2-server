@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix custom highlighting of field values in the message details of the message table widget"
+
+issues = ["18388"]
+pulls = ["20921"]

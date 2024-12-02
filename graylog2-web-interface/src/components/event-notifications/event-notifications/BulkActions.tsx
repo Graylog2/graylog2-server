@@ -24,7 +24,7 @@ import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
 import { getPathnameWithoutId, qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import { MenuItem } from 'components/bootstrap';
+import { DeleteMenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -87,7 +87,7 @@ const BulkActions = () => {
 
   return (
     <BulkActionsDropdown>
-      <MenuItem onSelect={() => onDelete()} variant="danger">Delete</MenuItem>
+      <DeleteMenuItem onSelect={() => onDelete()} />
     </BulkActionsDropdown>
   );
 };

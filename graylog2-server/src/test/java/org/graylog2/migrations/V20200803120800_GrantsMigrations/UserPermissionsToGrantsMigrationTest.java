@@ -31,6 +31,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
@@ -73,9 +74,8 @@ class UserPermissionsToGrantsMigrationTest {
 
         this.userSelfEditPermissionCount = new Permissions(ImmutableSet.of()).userSelfEditPermissions("dummy").size();
 
-        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
+        this.dbGrantService = new DBGrantService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
         this.userService = userService;
-        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         migration = new UserPermissionsToGrantsMigration(userService, dbGrantService, grnRegistry, viewService, "admin");
     }
 
