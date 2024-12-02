@@ -75,4 +75,15 @@ public class StreamsPipelinesIT {
         assertThat(result.getList(stream2Id)).containsExactlyInAnyOrder(pipeline1);
         assertThat(result.getList(stream3Id)).containsExactlyInAnyOrder(pipeline2);
     }
+
+    @ContainerMatrixTest
+    void retrievePipelineConnectionsForASingleStream() {
+        var result = api.get("/streams/" + stream1Id + "/pipelines", 200)
+                .extract().body().jsonPath();
+
+        final var pipeline1 = Map.of("id", pipeline1Id, "title", pipeline1Title);
+        final var pipeline2 = Map.of("id", pipeline2Id, "title", pipeline2Title);
+
+        assertThat(result.getList("")).containsExactlyInAnyOrder(pipeline1, pipeline2);
+    }
 }
