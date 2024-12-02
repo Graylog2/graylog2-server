@@ -19,7 +19,7 @@ import type { Sort, Attribute } from 'stores/PaginationTypes';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
-export const detailsAttributes: Array<Attribute> = [
+export const commonEventAttributes: Array<Attribute> = [
   {
     id: 'id',
     title: 'ID',
@@ -41,26 +41,10 @@ export const detailsAttributes: Array<Attribute> = [
     filterable: true,
   },
   {
-    id: 'event_definition_id',
-    title: 'Event Definition',
-    type: 'STRING',
-    sortable: false,
-    searchable: false,
-  },
-  {
     id: 'event_definition_type',
     title: 'Event Definition Type',
     type: 'STRING',
     sortable: true,
-  },
-  {
-    id: 'remediation_steps',
-    title: 'Remediation Steps',
-    sortable: false,
-  },
-  {
-    id: 'timerange_start',
-    title: 'Aggregation time range',
   },
   {
     id: 'key',
@@ -70,9 +54,8 @@ export const detailsAttributes: Array<Attribute> = [
     searchable: false,
   },
   {
-    id: 'fields',
-    title: 'Additional Fields',
-    type: 'STRING',
+    id: 'remediation_steps',
+    title: 'Remediation Steps',
     sortable: false,
   },
   {
@@ -81,7 +64,28 @@ export const detailsAttributes: Array<Attribute> = [
     sortable: false,
   },
 ];
-export const additionalAttributes: Array<Attribute> = [
+export const detailsAttributes: Array<Attribute> = [
+  ...commonEventAttributes,
+  {
+    id: 'event_definition_id',
+    title: 'Event Definition',
+    type: 'STRING',
+    sortable: false,
+    searchable: false,
+  },
+
+  {
+    id: 'timerange_start',
+    title: 'Aggregation time range',
+  },
+  {
+    id: 'fields',
+    title: 'Additional Fields',
+    type: 'STRING',
+    sortable: false,
+  },
+];
+export const eventsTableSpecificAttributes: Array<Attribute> = [
   {
     id: 'message',
     title: 'Description',
@@ -97,6 +101,9 @@ export const additionalAttributes: Array<Attribute> = [
     filterable: true,
     filter_options: [{ value: 'false', title: 'Event' }, { value: 'true', title: 'Alert' }],
   },
+];
+export const additionalAttributes: Array<Attribute> = [
+  ...eventsTableSpecificAttributes,
   ...detailsAttributes,
 ];
 

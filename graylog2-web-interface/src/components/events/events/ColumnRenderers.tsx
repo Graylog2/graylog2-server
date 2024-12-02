@@ -33,6 +33,7 @@ import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { Timestamp } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
+import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 
 const EventDefinitionRenderer = ({ eventDefinitionId, meta }: { eventDefinitionId: string, meta: EventsAdditionalData }) => {
   const { permissions } = useCurrentUser();
@@ -122,43 +123,46 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => (eventData.tim
   <em>No time range</em>
 ));
 
+export const getGeneralEventAttributeRenderers = <T, M = unknown>(): ColumnRenderersByAttribute<T, M> => ({
+  message: {
+    minWidth: 300,
+    width: 0.7,
+    renderCell: (_message: string, event) => <MessageRenderer message={_message} eventId={event.id} />,
+  },
+  key: {
+    renderCell: (_key: string) => <span>{_key || <em>No Key set for this Event.</em>}</span>,
+    staticWidth: 200,
+  },
+  id: {
+    staticWidth: 300,
+  },
+  alert: {
+    renderCell: (_alert: boolean) => <EventTypeLabel isAlert={_alert} />,
+    staticWidth: 100,
+  },
+  priority: {
+    renderCell: (_priority: number) => <PriorityName priority={_priority} />,
+    staticWidth: 100,
+  },
+  event_definition_type: {
+    renderCell: (_type: string) => <EventDefinitionTypeRenderer type={_type} />,
+    staticWidth: 200,
+  },
+  group_by_fields: {
+    renderCell: (groupByFields: Record<string, string>) => <GroupByFieldsRenderer groupByFields={groupByFields} />,
+    staticWidth: 400,
+  },
+});
 const customColumnRenderers = (): ColumnRenderers<Event> => ({
   attributes: {
-    message: {
-      minWidth: 300,
-      width: 0.7,
-      renderCell: (_message: string, event) => <MessageRenderer message={_message} eventId={event.id} />,
-    },
-    key: {
-      renderCell: (_key: string) => <span>{_key || <em>No Key set for this Event.</em>}</span>,
-      staticWidth: 200,
-    },
-    id: {
-      staticWidth: 300,
-    },
-    alert: {
-      renderCell: (_alert: boolean) => <EventTypeLabel isAlert={_alert} />,
-      staticWidth: 100,
-    },
+    ...getGeneralEventAttributeRenderers<Event>(),
     event_definition_id: {
       minWidth: 300,
       width: 0.3,
       renderCell: (_eventDefinitionId: string, _, __, meta: EventsAdditionalData) => <EventDefinitionRenderer meta={meta} eventDefinitionId={_eventDefinitionId} />,
     },
-    priority: {
-      renderCell: (_priority: number) => <PriorityName priority={_priority} />,
-      staticWidth: 100,
-    },
-    event_definition_type: {
-      renderCell: (_type: string) => <EventDefinitionTypeRenderer type={_type} />,
-      staticWidth: 200,
-    },
     fields: {
       renderCell: (_fields: Record<string, string>) => <FieldsRenderer fields={_fields} />,
-      staticWidth: 400,
-    },
-    group_by_fields: {
-      renderCell: (groupByFields: Record<string, string>) => <GroupByFieldsRenderer groupByFields={groupByFields} />,
       staticWidth: 400,
     },
     remediation_steps: {
