@@ -96,25 +96,23 @@ public class OpensearchSecurityConfigurationBean implements OpensearchConfigurat
 
         final OpensearchConfigurationPart.Builder configurationBuilder = OpensearchConfigurationPart.builder();
 
-        Optional<OpensearchCertificates> securityVariant = opensearchCertificatesProviders.stream()
+        Optional<OpensearchCertificates> opensearchCertificates = opensearchCertificatesProviders.stream()
                 .filter(s -> s.isConfigured(localConfiguration))
                 .findFirst()
                 .map(OpensearchCertificatesProvider::build);
 
-        configurationBuilder.securityConfigured(securityVariant.isPresent());
+        configurationBuilder.securityConfigured(opensearchCertificates.isPresent()); // Caution, this may include insecure_startup config with no certs!
 
         final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
         final TruststoreCreator truststoreCreator = TruststoreCreator.newDefaultJvm()
                 .addCertificates(configurationBuildParams.trustedCertificates());
 
-        final Optional<KeystoreInformation> httpCert = securityVariant
-                .map(OpensearchCertificates::getHttpCertificate)
-                .filter(Objects::nonNull);
+        final Optional<KeystoreInformation> httpCert = opensearchCertificates
+                .map(OpensearchCertificates::getHttpCertificate);
 
-        final Optional<KeystoreInformation> transportCert = securityVariant
-                .map(OpensearchCertificates::getTransportCertificate)
-                .filter(Objects::nonNull);
+        final Optional<KeystoreInformation> transportCert = opensearchCertificates
+                .map(OpensearchCertificates::getTransportCertificate);
 
         httpCert.ifPresent(cert -> {
             try {

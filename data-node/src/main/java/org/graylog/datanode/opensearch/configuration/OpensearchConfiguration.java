@@ -75,9 +75,16 @@ public record OpensearchConfiguration(
     }
 
     public HttpHost getRestBaseUrl() {
-        return new HttpHost(hostname(), httpPort(), securityConfigured() ? "https" : "http");
+        return new HttpHost(hostname(), httpPort(), isHttpsEnabled() ? "https" : "http");
     }
 
+    public boolean isHttpsEnabled() {
+        return httpCertificate().isPresent();
+    }
+
+    /**
+     * Are there any {@link  org.graylog.datanode.configuration.variants.OpensearchCertificatesProvider} configured?
+     */
     public boolean securityConfigured() {
         return configurationParts.stream().anyMatch(OpensearchConfigurationPart::securityConfigured);
     }

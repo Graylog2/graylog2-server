@@ -55,11 +55,11 @@ public class OpensearchKeystoreProvider implements Provider<Map<OpensearchKeysto
 
             event.config().httpCertificate()
                     .map(OpensearchKeystoreProvider::toDto)
-                    .ifPresent(dto -> keystores.put(Store.HTTP, dto));
+                    .ifPresentOrElse(dto -> keystores.put(Store.HTTP, dto), () -> keystores.remove(Store.HTTP));
 
             event.config().transportCertificate()
                     .map(OpensearchKeystoreProvider::toDto)
-                    .ifPresent(dto -> keystores.put(Store.TRANSPORT, dto));
+                    .ifPresentOrElse(dto -> keystores.put(Store.TRANSPORT, dto), () -> keystores.remove(Store.TRANSPORT));
 
         } catch (Exception e) {
             log.error("Error reading truststore", e);

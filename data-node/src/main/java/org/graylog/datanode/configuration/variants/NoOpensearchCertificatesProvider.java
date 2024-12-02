@@ -32,7 +32,7 @@ public class NoOpensearchCertificatesProvider implements OpensearchCertificatesP
 
     @Override
     public OpensearchCertificates build() {
-        LOG.warn("Insecure configuration is deprecated. Please use selfsigned_setup to create fully encrypted setups.");
+         LOG.warn("Insecure configuration is deprecated. Please use selfsigned_startup to create fully encrypted setups.");
         return OpensearchCertificates.none();
     }
 }
