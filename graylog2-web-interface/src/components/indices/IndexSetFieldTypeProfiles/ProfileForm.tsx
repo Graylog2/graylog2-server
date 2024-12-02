@@ -116,7 +116,7 @@ const ProfileFormSelect = ({ onChange, options, error, name, value, placeholder,
               onChange={(newVal) => {
                 onChange({ target: { value: newVal, name } });
               }}
-              inputProps={{ 'aria-label': `Select ${name}` }}
+              aria-label={`Select ${name}`}
               placeholder={placeholder}
               allowCreate={allowCreate} />
     </Input>
