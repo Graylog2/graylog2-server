@@ -51,7 +51,6 @@ const CapabilitySelect = ({ capabilities, onChange, title = 'Select a capability
       {({ field: { name, value, onChange: onFieldChange } }) => (
         <Select {...rest}
                 clearable={false}
-                inputProps={{ 'aria-label': title }}
                 onChange={(capabilityId) => handleChange(name, capabilityId, onFieldChange)}
                 options={capabilitiesOptions}
                 placeholder={title}

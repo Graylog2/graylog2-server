@@ -15,16 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useQuery } from '@tanstack/react-query';
+import { create, windowScheduler, indexedResolver } from '@yornaath/batshit';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
+import { Streams } from '@graylog/server-api';
 import type FetchError from 'logic/errors/FetchError';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 
 export type StreamConnectedPipelines = Array<Pick<PipelineType, 'id' | 'title'>>
 
-const fetchPipelinesConnectedStream = (streamId: string) => fetch('GET', qualifyUrl(ApiRoutes.StreamsApiController.stream_connected_pipelines(streamId).url));
+const pipelines = create({
+  fetcher: async (streamIds: Array<string>) => Streams.getConnectedPipelinesForStreams({ stream_ids: streamIds }),
+  resolver: indexedResolver(),
+  scheduler: windowScheduler(10),
+});
 
 const usePipelinesConnectedStream = (streamId: string, enabled: boolean = true): {
   data: StreamConnectedPipelines,
@@ -35,7 +38,7 @@ const usePipelinesConnectedStream = (streamId: string, enabled: boolean = true):
 } => {
   const { data, refetch, isInitialLoading, error, isError } = useQuery<StreamConnectedPipelines, FetchError>(
     ['stream', 'pipelines', streamId],
-    () => fetchPipelinesConnectedStream(streamId),
+    () => pipelines.fetch(streamId),
     {
       notifyOnChangeProps: ['data', 'error'],
       enabled: enabled,
