@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -29,7 +30,7 @@ import javax.annotation.Nullable;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class GrokPattern {
+public abstract class GrokPattern implements MongoEntity {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_NAME = "name";

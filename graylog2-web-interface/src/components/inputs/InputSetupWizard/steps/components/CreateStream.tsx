@@ -14,7 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export { default as InputDiagnosisStep } from './InputDiagnosisStep';
-export { default as SetupRoutingStep } from './SetupRoutingStep';
-export { default as StartInputStep } from './StartInputStep';
+import { Row, Col } from 'components/bootstrap';
+
+const CreateStream = () => (
+  <Row>
+    <Col md={12}>
+      <h3>
+        Create new stream
+      </h3>
+    </Col>
+  </Row>
+);
+
+export default CreateStream;

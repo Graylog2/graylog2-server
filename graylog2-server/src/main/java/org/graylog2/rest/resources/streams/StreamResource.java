@@ -82,6 +82,7 @@ import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -244,7 +245,7 @@ public class StreamResource extends RestResource {
                                                          allowableValues = "title,description,created_at,updated_at,status")
                                                @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                               @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+                                               @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
         final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
         final PaginatedList<StreamDTO> result = paginatedStreamService
@@ -610,6 +611,10 @@ public class StreamResource extends RestResource {
     @ApiOperation(value = "Get pipelines associated with a stream")
     @Produces(MediaType.APPLICATION_JSON)
     public List<PipelineCompactSource> getConnectedPipelines(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
+        if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+            throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
+        }
+
         PipelineConnections pipelineConnections = pipelineStreamConnectionsService.load(streamId);
         List<PipelineCompactSource> list = new ArrayList<>();
 
