@@ -41,6 +41,13 @@ export const commonEventAttributes: Array<Attribute> = [
     filterable: true,
   },
   {
+    id: 'event_definition_id',
+    title: 'Event Definition',
+    type: 'STRING',
+    sortable: false,
+    searchable: false,
+  },
+  {
     id: 'event_definition_type',
     title: 'Event Definition Type',
     type: 'STRING',
@@ -66,14 +73,6 @@ export const commonEventAttributes: Array<Attribute> = [
 ];
 export const detailsAttributes: Array<Attribute> = [
   ...commonEventAttributes,
-  {
-    id: 'event_definition_id',
-    title: 'Event Definition',
-    type: 'STRING',
-    sortable: false,
-    searchable: false,
-  },
-
   {
     id: 'timerange_start',
     title: 'Aggregation time range',

@@ -34,25 +34,14 @@ import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpa
 import { Timestamp } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 
 const EventDefinitionRenderer = ({ eventDefinitionId, meta }: { eventDefinitionId: string, meta: EventsAdditionalData }) => {
   const { permissions } = useCurrentUser();
   const { context: eventsContext } = meta;
-  const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
+  const title = eventsContext?.event_definitions?.[eventDefinitionId]?.title;
 
-  if (!eventDefinitionContext) {
-    return <em>{eventDefinitionId}</em>;
-  }
-
-  if (isPermitted(permissions, `eventdefinitions:edit:${eventDefinitionContext.id}`)) {
-    return (
-      <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
-        {eventDefinitionContext.title}
-      </Link>
-    );
-  }
-
-  return <>{eventDefinitionContext.title}</>;
+  return <EventDefinitionLink id={eventDefinitionId} title={title}/>
 };
 
 const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
