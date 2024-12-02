@@ -121,6 +121,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -651,7 +652,9 @@ public class StreamResource extends RestResource {
                 .collect(Collectors.toMap(MongoEntity::id, pipeline -> pipeline));
         return request.streamIds().stream()
                 .collect(Collectors.toMap(streamId -> streamId, streamId -> {
-                    final var pipelinesForStream = pipelineConnections.get(streamId).pipelineIds();
+                    final var pipelinesForStream = Optional.ofNullable(pipelineConnections.get(streamId))
+                            .map(PipelineConnections::pipelineIds)
+                            .orElse(Set.of());
                     return pipelinesForStream.stream()
                             .map(pipelines::get)
                             .map(pipeline -> PipelineCompactSource.create(pipeline.id(), pipeline.title()))
