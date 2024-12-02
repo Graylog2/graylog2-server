@@ -117,8 +117,7 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier = (role) => role
   return (
     <div>
       <FormElements>
-        <StyledSelect inputProps={{ 'aria-label': 'Search for roles' }}
-                      onChange={onChange}
+        <StyledSelect onChange={onChange}
                       optionRenderer={_renderRoleOption}
                       options={options}
                       placeholder="Search for roles"
