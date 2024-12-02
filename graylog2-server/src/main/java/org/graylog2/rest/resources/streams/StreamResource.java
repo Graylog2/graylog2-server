@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.streams;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -283,18 +282,19 @@ public class StreamResource extends RestResource {
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
 
-    public record IndexIdListResponse(
-            @JsonProperty(value = "index_set_ids", required = true) Collection<String> indexSetIds) {}
-
     @GET
-    @Path("/indexSets/{streamId}")
+    @Path("/byIndex/{indexSetId}")
     @Timed
-    @ApiOperation(value = "Get a list of all index sets connected to a given stream")
+    @ApiOperation(value = "Get a list of all streams connected to a given index set")
     @Produces(MediaType.APPLICATION_JSON)
-    public IndexIdListResponse getIndexSetIdsById(@ApiParam(name = "streamId", required = true)
-                                                  @PathParam("streamId") @NotEmpty String streamId) {
-        final Set<String> indexSetIds = streamService.indexSetIdsByIds(List.of(streamId));
-        return new IndexIdListResponse(indexSetIds);
+    public StreamListResponse getByIndexSet(@ApiParam(name = "indexSetId", required = true)
+                                            @PathParam("indexSetId") @NotEmpty String indexSetId) {
+        checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
+        final List<Stream> streams = streamService.loadAll().stream()
+                .filter(stream -> stream.getIndexSetId().equals(indexSetId))
+                .toList();
+
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
 
     @GET
