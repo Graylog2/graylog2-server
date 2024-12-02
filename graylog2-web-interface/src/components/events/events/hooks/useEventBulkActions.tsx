@@ -14,28 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import styled from 'styled-components';
+import { useMemo } from 'react';
 
-import { Select } from 'components/common';
+import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
+import type { Event } from 'components/events/events/types';
 
-import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
+const useEventBulkAction = (events: Array<Event>) => {
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(events, true);
 
-const TimeoutSelect = styled(Select)`
-  width: 150px;
-`;
+  const actions = useMemo(() => [
+    pluggableActions,
+  ].filter(Boolean), [pluggableActions]);
 
-const OPTIONS = [
-  { value: `${MS_SECOND}`, label: 'Seconds' },
-  { value: `${MS_MINUTE}`, label: 'Minutes' },
-  { value: `${MS_HOUR}`, label: 'Hours' },
-  { value: `${MS_DAY}`, label: 'Days' },
-];
+  return { actions, pluggableActionModals };
+};
 
-const TimeoutUnitSelect = (props) => (
-  <TimeoutSelect {...props}
-                 aria-label="Timeout unit"
-                 options={OPTIONS} />
-);
-
-export default TimeoutUnitSelect;
+export default useEventBulkAction;
