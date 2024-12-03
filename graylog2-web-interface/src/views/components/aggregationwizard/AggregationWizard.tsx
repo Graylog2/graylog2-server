@@ -100,7 +100,7 @@ const validateForm = (formValues: WidgetConfigFormValues) => {
   return elementValidationResults.reduce((prev, cur) => ({ ...prev, ...cur }), {});
 };
 
-const AggregationWizard = ({ onChange, config, children, onSubmit, onCancel }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
+const AggregationWizard = ({ onChange, config, children, onCancel }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
   const initialFormValues = _initialFormValues(config);
 
   return (
@@ -114,7 +114,6 @@ const AggregationWizard = ({ onChange, config, children, onSubmit, onCancel }: E
             <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
                                    config={config}
                                    onCreate={onCreateElement}
-                                   onSubmit={onSubmit}
                                    onCancel={onCancel}
                                    onConfigChange={onChange} />
           </Section>

@@ -84,7 +84,6 @@ export interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetCo
   type: string;
   fields: Immutable.List<FieldTypeMapping>,
   onChange: (newConfig: Config) => void,
-  onSubmit: () => void,
   onCancel: () => void,
 }
 
