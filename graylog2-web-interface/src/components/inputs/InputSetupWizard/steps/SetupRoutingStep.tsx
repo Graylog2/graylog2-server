@@ -25,7 +25,7 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import type { StepData } from 'components/inputs/InputSetupWizard/types';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStreamForm from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
-import type { FormValues as CreateStreamFormValues } from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
+import type { StreamFormValues } from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
 import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData, getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
@@ -67,15 +67,18 @@ const ConntectedPipelinesList = styled.ul`
   padding-left: 20px;
 `;
 
-interface RoutingStepData extends StepData {
+export interface RoutingStepData extends StepData {
   streamId?: string,
-  newStream?: CreateStreamFormValues
+  defaultStreamId?: string,
+  newStream?: StreamFormValues,
+  shouldCreateNewPipeline?: boolean,
+  streamType: 'NEW' | 'EXISTING' | 'DEFAULT'
 }
 
 const SetupRoutingStep = () => {
   const currentStepName = INPUT_WIZARD_STEPS.SETUP_ROUTING;
   const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsData, setStepsData } = useInputSetupWizard();
-  const newStream: CreateStreamFormValues = getStepData(stepsData, currentStepName, 'newStream');
+  const newStream: StreamFormValues = getStepData(stepsData, currentStepName, 'newStream');
   const [selectedStreamId, setSelectedStreamId] = useState(undefined);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
@@ -85,12 +88,54 @@ const SetupRoutingStep = () => {
   const streams = streamsData?.list;
   const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
 
+  const defaultStepData: RoutingStepData = { streamType: 'DEFAULT' };
+
+  const isStepValid = () => {
+    const { streamType, streamId, defaultStreamId } = getStepData(stepsData, currentStepName);
+
+    if (showCreateStream && !newStream) return false;
+
+    switch (streamType) {
+      case 'NEW':
+        if (!newStream) return false;
+
+        return true;
+      case 'EXISTING':
+        if (!streamId) return false;
+
+        return true;
+      case 'DEFAULT':
+        if (!defaultStreamId) return false;
+
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const defaultStream = useMemo(() => {
+    if (!streams) return undefined;
+
+    return streams
+      .filter(({ is_default }) => is_default)[0];
+  }, [streams]);
+
   useEffect(() => {
     if (orderedSteps && activeStep && stepsData) {
-      const withNextStepEnabled = enableNextStep(orderedSteps, activeStep, stepsData);
+      const withInitialStepsData = updateStepData(stepsData, currentStepName, defaultStepData);
+      const withNextStepEnabled = enableNextStep(orderedSteps, activeStep, withInitialStepsData);
+
+      // TODO enable next step on validation (maybe split contexts??)
+
       setStepsData(withNextStepEnabled);
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (defaultStream) {
+      setStepsData(updateStepData(stepsData, currentStepName, { defaultStreamId: defaultStream.id } as RoutingStepData));
+    }
+  }, [defaultStream, currentStepName, stepsData, setStepsData]);
 
   const options = useMemo(() => {
     if (!streams) return [];
@@ -102,20 +147,22 @@ const SetupRoutingStep = () => {
   }, [streams]);
 
   const handleStreamSelect = (streamId: string) => {
+    if (!streamId) return;
+
     setSelectedStreamId(streamId);
+
+    setStepsData(
+      updateStepData(stepsData, currentStepName, { streamId, streamType: 'EXISTING' } as RoutingStepData),
+    );
   };
 
   const onNextStep = () => {
-    setStepsData(
-      updateStepData(stepsData, currentStepName, { streamId: selectedStreamId } as RoutingStepData),
-    );
-
     goToNextStep();
   };
 
   const handleBackClick = () => {
     setStepsData(
-      updateStepData(stepsData, currentStepName, {} as RoutingStepData, true),
+      updateStepData(stepsData, currentStepName, defaultStepData, true),
     );
 
     setShowCreateStream(false);
@@ -125,14 +172,20 @@ const SetupRoutingStep = () => {
 
   const streamHasConnectedPipelines = streamPipelinesData && streamPipelinesData?.length > 0;
 
-  const submitStreamCreation = (values: CreateStreamFormValues) => {
+  const submitStreamCreation = ({ create_new_pipeline, ...stream }: StreamFormValues & { create_new_pipeline?: boolean }) => {
     setStepsData(
-      updateStepData(stepsData, currentStepName, { newStream: values } as RoutingStepData),
+      updateStepData(stepsData, currentStepName, {
+        newStream: stream,
+        shouldCreateNewPipeline: create_new_pipeline ?? false,
+        streamType: 'NEW',
+      } as RoutingStepData),
     );
   };
 
   const backButtonText = newStream ? 'Reset' : 'Back';
   const showNewStreamSection = newStream || showCreateStream;
+
+  // todo validate step
 
   return (
     <Row>
@@ -167,7 +220,7 @@ const SetupRoutingStep = () => {
                 <>
                   <p>This input will use a new stream: &quot;{newStream.title}&quot;.</p>
                   <p>Matches will {!newStream.remove_matches_from_default_stream && ('not ')}be removed from the Default stream.</p>
-                  {newStream.create_new_pipeline && (<p>A new pipeline will be created.</p>)}
+                  {getStepData(stepsData, currentStepName, 'shouldCreateNewPipeline') && (<p>A new pipeline will be created.</p>)}
                 </>
               ) : (
                 <CreateStreamForm submitForm={submitStreamCreation} />
@@ -198,7 +251,7 @@ const SetupRoutingStep = () => {
         <Row>
           <ButtonCol md={12}>
             {(hasPreviousStep || showNewStreamSection) && (<Button onClick={handleBackClick}>{backButtonText}</Button>)}
-            {hasNextStep && (<Button disabled={isNextStepDisabled || (showCreateStream && !newStream)} onClick={onNextStep} bsStyle="primary">Finish & Start Input</Button>)}
+            {hasNextStep && (<Button disabled={isNextStepDisabled || !isStepValid()} onClick={onNextStep} bsStyle="primary">Finish & Start Input</Button>)}
           </ButtonCol>
         </Row>
         )}

@@ -25,9 +25,11 @@ import IndexSetSelect from 'components/streams/IndexSetSelect';
 import type { Stream } from 'stores/streams/StreamsStore';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 
+export type StreamFormValues = Partial<Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream'>>
+
 export type FormValues = {
     create_new_pipeline?: boolean
-  } & Partial<Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream'>>
+} & StreamFormValues
 
 type Props = {
     submitForm: (values: FormValues) => void

@@ -14,6 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+import type { Input } from 'components/messageloaders/Types';
+
 export const INPUT_WIZARD_STEPS = {
   SELECT_CATEGORY: 'SELECT_CATEGORY',
   INPUT_DIAGNOSIS: 'INPUT_DIAGNOSIS',
@@ -41,6 +44,6 @@ export type StepsData = {
 }
 
 export type WizardData = {
-  inputId?: string,
+  input?: Input,
   category?: InputSetupWizardCategory
 }

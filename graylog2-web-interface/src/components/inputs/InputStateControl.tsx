@@ -76,7 +76,7 @@ const InputStateControl = ({ input } : Props) => {
       app_action_value: 'setup-input',
     });
 
-    openWizard({ inputId: input.id });
+    openWizard({ input });
   };
 
   if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {

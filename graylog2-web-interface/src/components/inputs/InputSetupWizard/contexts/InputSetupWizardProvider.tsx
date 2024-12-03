@@ -51,7 +51,7 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
     setShow(false);
   }, [clearWizard]);
 
-  const openWizard = useCallback((data: WizardData = {}) => {
+  const openWizard = useCallback((data: WizardData = DEFAULT_WIZARD_DATA) => {
     setWizardData({ ...wizardData, ...data });
     setShow(true);
   }, [wizardData]);
