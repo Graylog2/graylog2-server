@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
-import type { FormValues as CreateStreamFormValues } from 'src/components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
 
 import { Alert, Button, Row, Col } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -26,6 +25,7 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import type { StepData } from 'components/inputs/InputSetupWizard/types';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStreamForm from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
+import type { FormValues as CreateStreamFormValues } from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
 import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData, getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
