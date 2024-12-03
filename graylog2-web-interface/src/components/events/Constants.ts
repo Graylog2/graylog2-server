@@ -21,12 +21,6 @@ export const EVENTS_ENTITY_TABLE_ID = 'events';
 
 export const commonEventAttributes: Array<Attribute> = [
   {
-    id: 'id',
-    title: 'ID',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
     id: 'priority',
     title: 'Priority',
     type: 'STRING',
@@ -61,11 +55,6 @@ export const commonEventAttributes: Array<Attribute> = [
     searchable: false,
   },
   {
-    id: 'remediation_steps',
-    title: 'Remediation Steps',
-    sortable: false,
-  },
-  {
     id: 'group_by_fields',
     title: 'Group-By Fields',
     sortable: false,
@@ -73,6 +62,17 @@ export const commonEventAttributes: Array<Attribute> = [
 ];
 export const detailsAttributes: Array<Attribute> = [
   ...commonEventAttributes,
+  {
+    id: 'remediation_steps',
+    title: 'Remediation Steps',
+    sortable: false,
+  },
+  {
+    id: 'id',
+    title: 'ID',
+    type: 'STRING',
+    sortable: true,
+  },
   {
     id: 'timerange_start',
     title: 'Aggregation time range',

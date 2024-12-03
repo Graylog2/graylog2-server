@@ -165,6 +165,6 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
   },
 });
 
-const useColumnRenderers = () => useMemo(customColumnRenderers, []);
+const useColumnRenderers = () => useMemo<ColumnRenderers<Event>>(customColumnRenderers, []);
 
 export default useColumnRenderers;
