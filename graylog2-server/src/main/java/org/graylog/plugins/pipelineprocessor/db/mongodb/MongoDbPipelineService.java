@@ -35,11 +35,14 @@ import org.graylog2.events.ClusterEventBus;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 
 public class MongoDbPipelineService implements PipelineService {
     private static final RateLimitedLog log = getRateLimitedLog(MongoDbPipelineService.class);
@@ -107,6 +110,11 @@ public class MongoDbPipelineService implements PipelineService {
     public void delete(String id) {
         collection.deleteOne(idEq(id));
         clusterBus.post(PipelinesChangedEvent.deletedPipelineId(id));
+    }
+
+    @Override
+    public Set<PipelineDao> loadByIds(Set<String> pipelineIds) {
+        return MongoUtils.stream(collection.find(stringIdsIn(pipelineIds))).collect(Collectors.toSet());
     }
 
     public long count(Bson filter) {
