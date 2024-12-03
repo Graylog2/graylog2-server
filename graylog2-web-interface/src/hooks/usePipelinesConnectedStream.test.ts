@@ -18,6 +18,7 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { waitFor } from 'wrappedTestingLibrary';
 
 import { Streams } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 
 import usePipelinesConnectedStream from './usePipelinesConnectedStream';
