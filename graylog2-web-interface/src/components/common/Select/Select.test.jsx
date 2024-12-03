@@ -25,7 +25,7 @@ import Select from './index';
 const createOption = (x) => ({ label: x, value: x });
 
 describe('Select', () => {
-  const SimpleSelect = (props) => <Select inputProps={{ 'aria-label': 'Select value' }} {...props} />;
+  const SimpleSelect = (props) => <Select placeholder="Select value" {...props} />;
 
   it('calls `onChange` upon selecting option', async () => {
     const options = ['foo', 'bar'].map(createOption);

@@ -158,7 +158,6 @@ const StreamRuleModal = ({
                                   options={streamRuleTypesOptions}
                                   inputId={name}
                                   placeholder="Select a type"
-                                  inputProps={{ 'aria-label': 'Select a type' }}
                                   value={value} />
                         </Input>
                       )}
@@ -179,7 +178,7 @@ const StreamRuleModal = ({
                                         options={inputOptions}
                                         inputId={name}
                                         placeholder="Select an input"
-                                        inputProps={{ 'aria-label': 'Select an input' }}
+                                        aria-label="Select an input"
                                         value={value} />
                               </Input>
                             )}
