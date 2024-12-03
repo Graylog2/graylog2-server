@@ -48,7 +48,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class OpensearchSecurityConfiguration implements KeystoreContributor {
+public class OpensearchSecurityConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchSecurityConfiguration.class);
 
@@ -129,7 +129,6 @@ public class OpensearchSecurityConfiguration implements KeystoreContributor {
         return config.build();
     }
 
-    @Override
     public Map<String, String> getKeystoreItems() {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         if (securityEnabled()) {

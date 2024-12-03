@@ -14,13 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration.variants;
+import { useMemo } from 'react';
 
-import java.util.Map;
+import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
+import type { Event } from 'components/events/events/types';
 
-public interface KeystoreContributor {
-    /**
-     * @return collection of key-value pairs that should be added to the opensearch keystore (holding secrets)
-     */
-    Map<String, String> getKeystoreItems();
-}
+const useEventBulkAction = (events: Array<Event>) => {
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(events, true);
+
+  const actions = useMemo(() => [
+    pluggableActions,
+  ].filter(Boolean), [pluggableActions]);
+
+  return { actions, pluggableActionModals };
+};
+
+export default useEventBulkAction;
