@@ -16,11 +16,14 @@
  */
 package org.graylog.datanode.opensearch.configuration;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nonnull;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
-import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
+import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
 import org.graylog.datanode.process.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
@@ -28,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public record OpensearchConfiguration(
         OpensearchDistribution opensearchDistribution,
@@ -41,9 +45,8 @@ public record OpensearchConfiguration(
         List<String> nodeRoles,
         List<String> discoverySeedHosts,
         OpensearchSecurityConfiguration opensearchSecurityConfiguration,
-        S3RepositoryConfiguration s3RepositoryConfiguration,
+        Set<OpensearchConfigurationPart> configurationParts,
 
-        String nodeSearchCacheSize,
         Map<String, Object> additionalConfiguration
 ) {
     public Map<String, Object> asMap() {
@@ -68,23 +71,33 @@ public record OpensearchConfiguration(
         }
 
         config.put("node.name", nodeName);
+        config.put("node.roles", buildRolesList());
 
-        if (nodeRoles != null && !nodeRoles.isEmpty()) {
-            config.put("node.roles", toValuesList(nodeRoles));
-        }
         if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
             config.put("discovery.seed_hosts", toValuesList(discoverySeedHosts));
         }
 
         config.put("discovery.seed_providers", "file");
 
-        config.put("node.search.cache.size", nodeSearchCacheSize);
-        if (s3RepositoryConfiguration.isRepositoryEnabled()) {
-            config.putAll(s3RepositoryConfiguration.toOpensearchProperties());
-        }
+        configurationParts.stream()
+                .map(OpensearchConfigurationPart::properties)
+                .forEach(config::putAll);
 
         config.putAll(additionalConfiguration);
         return config;
+    }
+
+    @Nonnull
+    private String buildRolesList() {
+        final ImmutableList.Builder<String> roles = ImmutableList.builder();
+        if (nodeRoles != null) {
+            roles.addAll(nodeRoles);
+        }
+        configurationParts.stream()
+                .map(OpensearchConfigurationPart::nodeRoles)
+                .forEach(roles::addAll);
+
+        return toValuesList(roles.build());
     }
 
     private String toValuesList(List<String> values) {
@@ -97,10 +110,11 @@ public record OpensearchConfiguration(
         List<String> javaOpts = new LinkedList<>();
         javaOpts.add("-Xms%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
         javaOpts.add("-Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
+        javaOpts.add("-Dopensearch.transport.cname_in_publish_address=true");
 
         opensearchSecurityConfiguration.getTruststore().ifPresent(truststore -> {
             javaOpts.add("-Djavax.net.ssl.trustStore=" + truststore.location().toAbsolutePath());
-            javaOpts.add("-Djavax.net.ssl.trustStorePassword=" + truststore.passwordAsString());
+            javaOpts.add("-Djavax.net.ssl.trustStorePassword=" + new String(truststore.password()));
             javaOpts.add("-Djavax.net.ssl.trustStoreType=pkcs12");
         });
 
@@ -121,5 +135,18 @@ public record OpensearchConfiguration(
 
     public boolean securityConfigured() {
         return opensearchSecurityConfiguration() != null;
+    }
+
+
+    public Map<String, String> getKeystoreItems() {
+
+        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        builder.putAll(opensearchSecurityConfiguration.getKeystoreItems());
+
+        configurationParts.stream()
+                .map(OpensearchConfigurationPart::keystoreItems)
+                .forEach(builder::putAll);
+
+        return builder.build();
     }
 }
