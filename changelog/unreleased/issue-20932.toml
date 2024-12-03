@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix error when ticking or unticking show event annotations"
+
+issues = ["20932"]
+pulls = ["21028"]
