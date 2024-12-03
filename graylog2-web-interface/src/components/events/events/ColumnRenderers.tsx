@@ -32,14 +32,11 @@ import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { Timestamp } from 'components/common';
-import useCurrentUser from 'hooks/useCurrentUser';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 
 const EventDefinitionRenderer = ({ eventDefinitionId, meta }: { eventDefinitionId: string, meta: EventsAdditionalData }) => {
-  const { permissions } = useCurrentUser();
-  const { context: eventsContext } = meta;
-  const title = eventsContext?.event_definitions?.[eventDefinitionId]?.title;
+  const title = meta?.context?.event_definitions?.[eventDefinitionId]?.title;
 
   return <EventDefinitionLink id={eventDefinitionId} title={title}/>
 };
