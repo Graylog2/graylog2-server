@@ -14,13 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration.variants;
+package org.graylog.datanode.opensearch.configuration;
 
-import java.util.Map;
+import java.nio.file.Path;
 
-public interface KeystoreContributor {
-    /**
-     * @return collection of key-value pairs that should be added to the opensearch keystore (holding secrets)
-     */
-    Map<String, String> getKeystoreItems();
+public record OpensearchUsableSpace(Path dataDir, long usableSpace) {
 }
