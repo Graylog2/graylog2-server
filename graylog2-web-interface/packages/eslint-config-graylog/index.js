@@ -99,6 +99,11 @@ module.exports = {
     'import/no-unresolved': 'off',
     'import/order': ['error', {
       groups: ['builtin', 'external', 'internal', ['sibling', 'index'], 'parent'],
+      pathGroups: [{
+        pattern: '@graylog/*-api',
+        group: 'external',
+        position: 'after',
+      }],
       'newlines-between': 'always',
     }],
     'sort-imports': 'off', // disabled in favor of 'import/order'
