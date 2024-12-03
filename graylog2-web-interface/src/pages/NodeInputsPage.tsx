@@ -25,7 +25,6 @@ import withParams from 'routing/withParams';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
-import { InputSetupWizardProvider } from 'components/inputs/InputSetupWizard';
 
 import useCurrentUser from '../hooks/useCurrentUser';
 
@@ -59,9 +58,7 @@ const NodeInputsPage = () => {
             You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
           </span>
         </PageHeader>
-        <InputSetupWizardProvider>
-          <InputsList permissions={currentUser.permissions} node={node} />
-        </InputSetupWizardProvider>
+        <InputsList permissions={currentUser.permissions} node={node} />
       </div>
     </DocumentTitle>
   );

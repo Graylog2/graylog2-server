@@ -47,7 +47,6 @@ const StreamCategoryFilter = ({ disabled = false, value = [], streamCategories, 
     <Container data-testid="stream-category-filter" title={placeholder}>
       <Select placeholder={placeholder}
               disabled={disabled}
-              inputProps={{ 'aria-label': placeholder }}
               displayKey="key"
               inputId="stream-categories-filter"
               onChange={handleChange}
