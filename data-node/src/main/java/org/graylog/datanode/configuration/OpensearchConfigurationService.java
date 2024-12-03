@@ -21,7 +21,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.InSecureConfiguration;
@@ -31,6 +30,8 @@ import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -38,13 +39,13 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.security.JwtSecret;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -57,7 +58,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     private final DatanodeConfiguration datanodeConfiguration;
     private final JwtSecret signingKey;
     private final NodeService<DataNodeDto> nodeService;
-    private final S3RepositoryConfiguration s3RepositoryConfiguration;
+    private final Set<OpensearchConfigurationBean> opensearchConfigurationBeans;
 
     /**
      * This configuration won't survive datanode restart. But it can be repeatedly provided to the managed opensearch
@@ -75,7 +76,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
                                           final InSecureConfiguration inSecureConfiguration,
                                           final NodeService<DataNodeDto> nodeService,
                                           JwtSecret jwtSecret,
-                                          final S3RepositoryConfiguration s3RepositoryConfiguration,
+                                          final Set<OpensearchConfigurationBean> opensearchConfigurationBeans,
                                           final EventBus eventBus) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
@@ -84,7 +85,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
         this.inSecureConfiguration = inSecureConfiguration;
         this.signingKey = jwtSecret;
         this.nodeService = nodeService;
-        this.s3RepositoryConfiguration = s3RepositoryConfiguration;
+        this.opensearchConfigurationBeans = opensearchConfigurationBeans;
         this.eventBus = eventBus;
         eventBus.register(this);
     }
@@ -159,6 +160,10 @@ public class OpensearchConfigurationService extends AbstractIdleService {
                 opensearchProperties.putAll(securityConfiguration.getProperties());
             }
 
+            final Set<OpensearchConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
+                    .map(OpensearchConfigurationBean::buildConfigurationPart)
+                    .collect(Collectors.toSet());
+
             return new OpensearchConfiguration(
                     datanodeConfiguration.opensearchDistributionProvider().get(),
                     datanodeConfiguration.datanodeDirectories(),
@@ -171,8 +176,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
                     localConfiguration.getNodeRoles(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
-                    s3RepositoryConfiguration,
-                    localConfiguration.getNodeSearchCacheSize(),
+                    configurationParts,
                     opensearchProperties.build()
             );
         } catch (GeneralSecurityException | KeyStoreStorageException | IOException e) {
@@ -188,11 +192,6 @@ public class OpensearchConfigurationService extends AbstractIdleService {
         config.put("path.logs", datanodeConfiguration.datanodeDirectories().getLogsTargetDir().toString());
 
         config.put("network.bind_host", localConfiguration.getBindAddress());
-
-        // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
-        if (localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
-            config.put("path.repo", localConfiguration.getPathRepo());
-        }
 
         config.put("network.publish_host", localConfiguration.getHostname());
 
