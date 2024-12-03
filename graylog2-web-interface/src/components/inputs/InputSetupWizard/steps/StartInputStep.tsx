@@ -95,7 +95,6 @@ const StartInputStep = () => {
     InputStatesStore.start(input)
       .finally(() => {
         setStartInputStatus('SUCCESS');
-        updateWizardData('completed', true);
         addMessage('Input started');
       });
   };
