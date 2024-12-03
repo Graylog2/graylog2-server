@@ -21,13 +21,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
-import org.graylog2.database.MongoEntity;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
+import org.graylog2.database.entities.ScopedEntity;
 
 @AutoValue
 @JsonDeserialize(builder = EventProcedureStep.Builder.class)
-public abstract class EventProcedureStep implements MongoEntity {
+public abstract class EventProcedureStep extends ScopedEntity {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_ACTION = "action";
@@ -51,11 +49,7 @@ public abstract class EventProcedureStep implements MongoEntity {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder {
-        @Id
-        @ObjectId
-        @JsonProperty("id")
-        public abstract Builder id(String id);
+    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
 
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);

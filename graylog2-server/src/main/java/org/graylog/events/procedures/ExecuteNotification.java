@@ -54,6 +54,10 @@ public class ExecuteNotification extends Action {
         @JsonProperty(FIELD_NOTIFICATION_ID)
         public abstract String notificationId();
 
+        public static Builder builder() {
+            return Builder.create();
+        }
+
         @AutoValue.Builder
         public abstract static class Builder {
             @JsonProperty(TYPE_FIELD)
