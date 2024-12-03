@@ -20,7 +20,7 @@ import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
-import RefreshControls from 'views/components/searchbar/RefreshControls';
+import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
 import { Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
@@ -156,7 +156,7 @@ const DashboardSearchBar = () => {
                                              limitDuration={limitDuration}
                                              hasErrorOnMount={!!errors.timerange}
                                              noOverride />
-                      <RefreshControls disable={!isValid} />
+                      <ViewsRefreshControls disable={!isValid} />
                     </TimeRangeRow>
 
                     <SearchQueryRow>

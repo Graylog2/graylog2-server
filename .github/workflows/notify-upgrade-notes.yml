@@ -25,7 +25,7 @@ jobs:
         with:
           channel-id: "${{ vars.SLACK_UPGRADE_NOTIFY_CHANNELS }}"
           slack-message: |
-            The Graylog ${{ github.ref_name || "test" }}/UPGRADING.md file was updated:
+            The Graylog ${{ github.ref_name || 'test' }}/UPGRADING.md file was updated:
 
-            Content: https://github.com/Graylog2/graylog2-server/blob/${{ github.sha || "test" }}/UPGRADING.md
-            Commit: https://github.com/Graylog2/graylog2-server/commit/${{ github.sha || "test" }}
+            Content: https://github.com/Graylog2/graylog2-server/blob/${{ github.sha || 'test' }}/UPGRADING.md
+            Commit: https://github.com/Graylog2/graylog2-server/commit/${{ github.sha || 'test' }}

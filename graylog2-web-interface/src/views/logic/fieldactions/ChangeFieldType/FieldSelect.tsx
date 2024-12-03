@@ -56,7 +56,7 @@ const FieldSelect = ({ indexSetId, onFieldChange, field }: Props) => {
                       onChange={_onFieldChange}
                       placeholder="Select or type the field"
                       disabled={isLoading}
-                      inputProps={{ 'aria-label': 'Select Field' }}
+                      aria-label="Select Field"
                       required
                       allowCreate />
       </Input>

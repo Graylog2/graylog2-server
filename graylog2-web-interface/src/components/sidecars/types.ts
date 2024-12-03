@@ -27,10 +27,10 @@ export type Collector = {
   service_type: string;
   node_operating_system: string;
   name: string;
-  validation_parameters: string;
-  executable_path: string;
-  execute_parameters: string;
-  default_template: string;
+  validation_parameters?: string;
+  executable_path?: string;
+  execute_parameters?: string;
+  default_template?: string;
   id: string;
 }
 
