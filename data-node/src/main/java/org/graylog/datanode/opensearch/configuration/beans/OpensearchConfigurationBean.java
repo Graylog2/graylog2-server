@@ -14,28 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import styled from 'styled-components';
+package org.graylog.datanode.opensearch.configuration.beans;
 
-import { Select } from 'components/common';
-
-import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
-
-const TimeoutSelect = styled(Select)`
-  width: 150px;
-`;
-
-const OPTIONS = [
-  { value: `${MS_SECOND}`, label: 'Seconds' },
-  { value: `${MS_MINUTE}`, label: 'Minutes' },
-  { value: `${MS_HOUR}`, label: 'Hours' },
-  { value: `${MS_DAY}`, label: 'Days' },
-];
-
-const TimeoutUnitSelect = (props) => (
-  <TimeoutSelect {...props}
-                 aria-label="Timeout unit"
-                 options={OPTIONS} />
-);
-
-export default TimeoutUnitSelect;
+public interface OpensearchConfigurationBean {
+    OpensearchConfigurationPart buildConfigurationPart();
+}

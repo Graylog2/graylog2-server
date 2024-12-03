@@ -53,7 +53,8 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
@@ -95,8 +96,8 @@ public class ClientCertResourceIT {
                 .toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
-        Assertions.assertThat(expires).isBefore(LocalDate.now(Clock.systemDefaultZone()).plusMonths(6).plusDays(2));
-        Assertions.assertThat(expires).isAfter(LocalDate.now(Clock.systemDefaultZone()).plusMonths(6).minusDays(2));
+        LocalDate shouldExpire = Instant.now().plus(Duration.ofDays(180)).atZone(ZoneId.systemDefault()).toLocalDate();
+        Assertions.assertThat(expires).isBetween(shouldExpire.minusDays(2), shouldExpire.plusDays(2));
 
         final SSLContext sslContext = createSslContext(
                 createKeystore(privateKey, certificate, caCertificate),
