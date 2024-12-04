@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+
 import useCurrentUser from 'hooks/useCurrentUser';
-import {isPermitted} from 'util/PermissionsMixin';
-import {Link} from 'components/common/router';
+import { isPermitted } from 'util/PermissionsMixin';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
 const EventDefinitionLink = ({ title, id }: { title: string | undefined, id: string }) => {

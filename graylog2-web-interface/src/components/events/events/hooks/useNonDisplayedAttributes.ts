@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import {useTableFetchContext} from 'components/common/PaginatedEntityTable';
-import {useMemo} from 'react';
-import type {Attribute} from 'stores/PaginationTypes';
+import { useMemo } from 'react';
+
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import type { Attribute } from 'stores/PaginationTypes';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 
 const useNonDisplayedAttributes = (defaultLayout) => {
