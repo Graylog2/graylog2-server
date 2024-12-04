@@ -114,9 +114,9 @@ const MessageRenderer = ({ message, eventId }: { message: string, eventId: strin
 
 const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => (eventData.timerange_start && eventData.timerange_end ? (
   <div>
-    <Timestamp dateTime={new Date()} />
+    <Timestamp dateTime={new Date(eventData.timerange_start)} />
       &ensp;&mdash;&ensp;
-    <Timestamp dateTime={new Date()} />
+    <Timestamp dateTime={new Date(eventData.timerange_end)} />
   </div>
 ) : (
   <em>No time range</em>
