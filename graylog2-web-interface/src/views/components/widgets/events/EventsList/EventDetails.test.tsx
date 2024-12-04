@@ -22,7 +22,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser, alice } from 'fixtures/users';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useEventById from 'hooks/useEventById';
-import { mockEventData } from 'helpers/mocking/EventAndEventDefinitions_mock';
+import { mockEventData, mockEventDefinitionTwoAggregations } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
 
 import EventDetails from './EventDetails';
@@ -61,6 +61,7 @@ describe('EventDetails', () => {
   });
 
   it('should render default event details', async () => {
+    asMock(useEventDefinition).mockReturnValue({ data: mockEventDefinitionTwoAggregations, isFetching: false, isInitialLoading: false });
     render(<EventDetails eventId="event-id" />);
 
     await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith('event-definition-id-1', true));

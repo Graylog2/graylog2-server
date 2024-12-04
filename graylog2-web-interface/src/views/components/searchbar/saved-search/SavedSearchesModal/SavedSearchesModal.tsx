@@ -23,7 +23,7 @@ import SavedSearchesOverview from './SavedSearchesOverview';
 
 type Props = {
   toggleModal: () => void,
-  deleteSavedSearch: (view: View) => Promise<View>,
+  deleteSavedSearch: (view: View) => Promise<void>,
   activeSavedSearchId: string,
 };
 

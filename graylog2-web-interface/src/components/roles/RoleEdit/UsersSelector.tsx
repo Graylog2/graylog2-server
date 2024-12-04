@@ -133,10 +133,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
             <FormElements>
               <Field name="user" validate={_isRequired('user')}>
                 {({ field: { name, value, onChange } }) => (
-                  <StyledSelect inputProps={{ 'aria-label': 'Search for users' }}
-                                onChange={(user) => {
-                                  onChange({ target: { value: user, name } });
-                                }}
+                  <StyledSelect onChange={(user) => { onChange({ target: { value: user, name } }); }}
                                 optionRenderer={_renderOption}
                                 multi
                                 options={options}

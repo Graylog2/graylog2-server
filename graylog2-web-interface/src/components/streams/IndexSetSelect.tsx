@@ -52,7 +52,6 @@ const IndexSetSelect = ({ indexSets, help = 'Messages that match this stream wil
                   options={indexSetOptions}
                   inputId={name}
                   placeholder="Select an index set"
-                  inputProps={{ 'aria-label': 'Select an index set' }}
                   value={value} />
         </Input>
       )}

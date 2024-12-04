@@ -62,7 +62,7 @@ const NotificationBadge = () => {
       <StyledNav navbar>
         <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
           <StyledInactiveNavItem>
-            <Badge bsStyle="danger" data-testid="notification-badge" title="Notifications">{total}</Badge>
+            <Badge bsStyle="danger" data-testid="notification-badge" title="System Notifications">{total}</Badge>
           </StyledInactiveNavItem>
         </LinkContainer>
       </StyledNav>

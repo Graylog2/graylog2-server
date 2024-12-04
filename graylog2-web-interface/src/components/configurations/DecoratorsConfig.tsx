@@ -49,7 +49,7 @@ const DecoratorsConfig = () => {
       () => UserNotification.success('Updated decorators configuration.', 'Success!'),
       (error) => UserNotification.error(`Unable to save new decorators: ${error}`, 'Saving decorators failed'),
     )
-    .then(refetchDecorators)
+    .then(() => refetchDecorators())
     .then(closeModal), [closeModal, decorators, refetchDecorators]);
 
   const decoratorMap = useMemo(() => {

@@ -179,8 +179,7 @@ const UserSyncStep = ({
                      label="Default Roles"
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9">
-                <Select inputProps={{ 'aria-label': 'Search for roles' }}
-                        multi
+                <Select multi
                         onBlur={onBlur}
                         onChange={(selectedRoles) => onChange({ target: { value: selectedRoles, name } })}
                         options={rolesOptions}

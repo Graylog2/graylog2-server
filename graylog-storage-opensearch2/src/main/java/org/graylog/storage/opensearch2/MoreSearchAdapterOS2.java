@@ -106,17 +106,13 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
             filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
         }
 
-        final SortOrder order = sortOrderMapper.fromSorting(sorting);
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
                 .from((page - 1) * perPage)
                 .size(perPage)
                 .trackTotalHits(true);
-        final FieldSortBuilder sortBuilder = new FieldSortBuilder(sorting.getField()).order(order);
-        sorting.getUnmappedType().ifPresent(unmappedType -> sortBuilder
-                        .unmappedType(unmappedType)
-                        .missing(order.equals(SortOrder.ASC) ? "_first" : "_last"));
-        searchSourceBuilder.sort(sortBuilder);
+        final var sortBuilders = createSorting(sorting);
+        sortBuilders.forEach(searchSourceBuilder::sort);
 
         final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
         final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
@@ -143,6 +139,27 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                 .usedIndexNames(affectedIndices)
                 .executedQuery(searchSourceBuilder.toString())
                 .build();
+    }
+
+    private List<FieldSortBuilder> createSorting(Sorting sorting) {
+        final SortOrder order = sortOrderMapper.fromSorting(sorting);
+        final List<FieldSortBuilder> sortBuilders;
+        if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
+            sortBuilders = List.of(
+                    new FieldSortBuilder(EventDto.FIELD_TIMERANGE_START),
+                    new FieldSortBuilder(EventDto.FIELD_TIMERANGE_END)
+            );
+        } else {
+            sortBuilders = List.of(new FieldSortBuilder(sorting.getField()));
+        }
+        return sortBuilders.stream()
+                .map(sortBuilder -> {
+                    sorting.getUnmappedType().ifPresent(unmappedType -> sortBuilder
+                            .unmappedType(unmappedType)
+                            .missing(order.equals(SortOrder.ASC) ? "_first" : "_last"));
+                    return sortBuilder.order(order);
+                })
+                .toList();
     }
 
     @Override

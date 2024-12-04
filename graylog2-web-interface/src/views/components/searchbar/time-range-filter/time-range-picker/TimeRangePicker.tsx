@@ -218,6 +218,7 @@ const TimeRangePicker = ({
     <Popover id="timerange-type"
              data-testid="timerange-type"
              opened={show}
+             onChange={toggleDropdownShow}
              position={position}
              withinPortal={withinPortal}
              withArrow

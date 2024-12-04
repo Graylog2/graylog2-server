@@ -94,7 +94,6 @@ const renderSUT = (props = {}) => render((
   <TestStoreProvider>
     <FieldTypesContext.Provider value={fieldTypes}>
       <AggregationWizard onChange={() => {}}
-                         onSubmit={() => {}}
                          onCancel={() => {}}
                          config={widgetConfig}
                          editing

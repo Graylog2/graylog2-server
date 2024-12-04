@@ -120,7 +120,7 @@ const GradientColorPicker = () => (
                    error={meta?.error}
                    label="Gradient Name">
               <Select options={GRADIENTS}
-                      inputProps={{ 'aria-label': 'Select gradient colors' }}
+                      placeholder="Select gradient colors"
                       value={value}
                       onChange={(newGradient) => onChange({ target: { name, value: newGradient } })} />
             </Input>
@@ -129,7 +129,7 @@ const GradientColorPicker = () => (
         <Field name="color.lower">
           {({ field: { name, value, onChange }, meta }) => (
             <Input id={name}
-                   aria-label="Specify lowest value"
+                   placeholder="Specify lowest value"
                    label="Lowest Value"
                    type="number"
                    value={value}

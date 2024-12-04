@@ -23,7 +23,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl, getPathnameWithoutId } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import { MenuItem } from 'components/bootstrap';
+import { MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -144,7 +144,7 @@ const BulkActions = () => {
       <BulkActionsDropdown>
         <MenuItem onSelect={() => handleAction(ACTION_TYPES.ENABLE)}>Enable</MenuItem>
         <MenuItem onSelect={() => handleAction(ACTION_TYPES.DISABLE)}>Disable</MenuItem>
-        <MenuItem onSelect={() => handleAction(ACTION_TYPES.DELETE)} variant="danger">Delete</MenuItem>
+        <DeleteMenuItem onSelect={() => handleAction(ACTION_TYPES.DELETE)} />
       </BulkActionsDropdown>
       {showDialog && (
         <ConfirmDialog title={ACTION_TEXT[actionType]?.dialogTitle}
