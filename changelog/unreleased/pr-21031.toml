@@ -1,0 +1,4 @@
+type = "a"
+message = "Unified snapshot configuration, role and cache management in datanode. This prevents allocating a big search cache when no searchable snapshots have been configured, leading to potential low watermark issues."
+
+pulls = ["21031"]
