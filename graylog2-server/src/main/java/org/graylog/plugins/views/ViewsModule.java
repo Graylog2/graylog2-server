@@ -85,15 +85,22 @@ public abstract class ViewsModule extends VersionAwareModule {
         seriesSpecBinder().addBinding(name).toInstance(SeriesDescription.create(name, description));
     }
 
-    protected MapBinder<String, QueryBackend<? extends GeneratedQueryContext>> queryBackendBinder(SearchVersion version) {
+    protected MapBinder<String, QueryBackend<? extends GeneratedQueryContext>> queryBackendBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
-                new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {});
+                new TypeLiteral<>() {});
 
     }
 
-    protected ScopedBindingBuilder registerQueryBackend(SearchVersion version, String name, Class<? extends QueryBackend<? extends GeneratedQueryContext>> implementation) {
-        return queryBackendBinder(version).addBinding(name).to(implementation);
+    /**
+     * Use this binder for versioned backends, it also registers the backend in the overall MapBinder in
+     * @param version
+     * @param name
+     * @param implementation
+     */
+    protected void registerVersionedQueryBackend(SearchVersion version, String name, Class<? extends QueryBackend<? extends GeneratedQueryContext>> implementation) {
+        bindForVersion(version, new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {}).to(implementation);
+        queryBackendBinder().addBinding(name).to(implementation);
     }
 
     protected void registerESQueryDecorator(Class<? extends QueryStringDecorator> esQueryDecorator) {
