@@ -81,10 +81,6 @@ export const detailsAttributes: Array<Attribute> = [
     sortable: true,
   },
   {
-    id: 'timerange_start',
-    title: 'Aggregation time range',
-  },
-  {
     id: 'fields',
     title: 'Additional Fields',
     type: 'STRING',
