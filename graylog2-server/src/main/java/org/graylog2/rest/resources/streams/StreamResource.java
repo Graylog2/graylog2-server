@@ -656,7 +656,7 @@ public class StreamResource extends RestResource {
                             .map(PipelineConnections::pipelineIds)
                             .orElse(Set.of());
                     return pipelinesForStream.stream()
-                            .map(pipelines::get)
+                            .flatMap(pipeline -> Optional.ofNullable(pipelines.get(pipeline)).stream())
                             .map(pipeline -> PipelineCompactSource.create(pipeline.id(), pipeline.title()))
                             .toList();
                 }));
