@@ -18,6 +18,7 @@ const EventDefinitionPriorityEnum = {
   LOW: 1,
   MEDIUM: 2,
   HIGH: 3,
+  CRITICAL: 4,
   properties: {
     1: { name: 'low' },
     2: { name: 'medium' },
