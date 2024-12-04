@@ -131,7 +131,7 @@ const useElementsWidths = <Entity extends EntityBase, Meta>({
   return { tableRef, actionsRef, columnsWidths, actionsColWidth };
 };
 
-export const mergeColumnsRenderers = <Entity extends EntityBase, Meta = unknown>(columns: Array<Column>, customColumnRenderers: ColumnRenderers<Entity, Meta>) => {
+const mergeColumnsRenderers = <Entity extends EntityBase, Meta = unknown>(columns: Array<Column>, customColumnRenderers: ColumnRenderers<Entity, Meta>) => {
   const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
 
   return Object.fromEntries(columns.map(({ id, type }) => {

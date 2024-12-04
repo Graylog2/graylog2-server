@@ -29,13 +29,13 @@ import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { Timestamp } from 'components/common';
-import type {ColumnRenderersByAttribute, EntityBase} from 'components/common/EntityDataTable/types';
+import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 
 const EventDefinitionRenderer = ({ eventDefinitionId, meta }: { eventDefinitionId: string, meta: EventsAdditionalData }) => {
   const title = meta?.context?.event_definitions?.[eventDefinitionId]?.title;
 
-  return <EventDefinitionLink id={eventDefinitionId} title={title}/>
+  return <EventDefinitionLink id={eventDefinitionId} title={title} />;
 };
 
 const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
