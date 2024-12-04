@@ -17,6 +17,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { ContentStream } from '@graylog/server-api';
+
 import UserNotification from 'preflight/util/UserNotification';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { CONTENT_STREAM_CONTENT_KEY } from 'components/content-stream/hook/useContentStream';

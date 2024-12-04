@@ -267,6 +267,29 @@ describe('stepHelper', () => {
       });
     });
 
+    it('returns updated steps data with overriden data when override=true', () => {
+      const testStepsData = {
+        [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
+          enabled: false,
+          foo: 'foo',
+        },
+        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+          enabled: true,
+          foo: 'foo',
+        },
+      };
+
+      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' } as StepData, true)).toEqual({
+        [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
+          enabled: false,
+          foo: 'foo',
+        },
+        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+          foo: 'bar',
+        },
+      });
+    });
+
     it('returns the original steps data when no data was given', () => {
       const testStepsData = {
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {

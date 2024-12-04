@@ -18,11 +18,12 @@
 import * as React from 'react';
 import { Formik, Form } from 'formik';
 
+import { Streams } from '@graylog/server-api';
+
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import type FetchError from 'logic/errors/FetchError';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
 import UserNotification from 'util/UserNotification';
-import { Streams } from '@graylog/server-api';
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';

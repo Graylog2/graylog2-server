@@ -70,6 +70,11 @@ export const detailsAttributes: Array<Attribute> = [
     sortable: false,
   },
   {
+    id: 'timerange_start',
+    title: 'Aggregation time range',
+    sortable: true,
+  },
+  {
     id: 'id',
     title: 'ID',
     type: 'STRING',

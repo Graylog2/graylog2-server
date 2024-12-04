@@ -191,7 +191,7 @@
         <assertj-core.version>3.26.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.2</awaitility.version>
-        <equalsverifier.version>3.17.3</equalsverifier.version>
+        <equalsverifier.version>3.17.4</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.11.3</junit-jupiter.version>
@@ -199,7 +199,7 @@
         <restassured.version>5.5.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.20.4</testcontainers.version>
-        <testcontainers.opensearch.version>2.1.1</testcontainers.opensearch.version>
+        <testcontainers.opensearch.version>2.1.2</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v20.17.0</nodejs.version>

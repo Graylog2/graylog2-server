@@ -71,10 +71,14 @@ export const addStepAfter = (orderedSteps: Array<InputSetupWizardStep>, step: In
   return newOrderedSteps;
 };
 
-export const updateStepData = (stepsData: StepsData, stepName: InputSetupWizardStep, data: StepData = {}) : StepsData => {
+export const updateStepData = (stepsData: StepsData, stepName: InputSetupWizardStep, data: StepData = {}, override: boolean = false) : StepsData => {
   if (!stepName) return {};
 
   if (!stepsData) return { [stepName]: data };
+
+  if (override) {
+    return { ...stepsData, [stepName]: data };
+  }
 
   return { ...stepsData, [stepName]: { ...stepsData[stepName], ...data } };
 };
