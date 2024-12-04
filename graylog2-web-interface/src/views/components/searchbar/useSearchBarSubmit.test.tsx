@@ -18,8 +18,9 @@ import * as React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import type { SearchBarFormValues } from 'views/Constants';
 import { SearchQueryStrings } from '@graylog/server-api';
+
+import type { SearchBarFormValues } from 'views/Constants';
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
 

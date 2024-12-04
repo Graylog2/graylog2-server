@@ -16,8 +16,9 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import type { Message } from 'views/components/messagelist/Types';
 import { Messages } from '@graylog/server-api';
+
+import type { Message } from 'views/components/messagelist/Types';
 import MessageFormatter from 'logic/message/MessageFormatter';
 import { defaultOnError } from 'util/conditional/onError';
 

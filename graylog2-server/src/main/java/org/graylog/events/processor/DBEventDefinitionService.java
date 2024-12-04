@@ -211,4 +211,10 @@ public class DBEventDefinitionService {
     public Stream<EventDefinitionDto> streamAll() {
         return stream(collection.find());
     }
+
+    public List<EventDefinitionDto> getByIds(List<String> ids) {
+        return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(ids)))
+                .map(this::getEventDefinitionWithRefetchedFilters)
+                .toList();
+    }
 }
