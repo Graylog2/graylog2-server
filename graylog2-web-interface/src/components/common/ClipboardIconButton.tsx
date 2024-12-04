@@ -16,43 +16,38 @@
  */
 import * as React from 'react';
 
-import { Button } from 'components/bootstrap';
-import type { BsSize } from 'components/bootstrap/types';
-import type { StyleProps } from 'components/bootstrap/Button';
 import ClipboardContainer from 'components/common/ClipboardContainer';
+import { IconButton } from 'components/common';
+
+import type { IconName } from './Icon';
 
 /**
- * Component that renders a button to copy some text in the clipboard when pressed.
+ * Component that renders an icon button to copy some text in the clipboard when pressed.
  * The text to be copied can be given in the `text` prop, or in an external element through a CSS selector in the `target` prop.
  */
 
 type Props = {
-  bsSize?: BsSize,
-  bsStyle?: StyleProps,
   buttonTitle?: string,
   className?: string,
   disabled?: boolean,
   onSuccess?: () => void,
   text: string,
-  title: React.ReactNode,
+  name: IconName,
 }
 
-const ClipboardButton = ({ bsSize, bsStyle, buttonTitle, className, disabled, onSuccess, text, title }: Props) => (
+const ClipboardIconButton = ({ buttonTitle, className, disabled, onSuccess, text, name }: Props) => (
   <ClipboardContainer text={text}>
     {({ copy }) => (
-      <Button bsSize={bsSize}
-              bsStyle={bsStyle}
-              className={className}
-              disabled={disabled}
-              title={buttonTitle}
-              onClick={() => {
-                copy();
-                onSuccess?.();
-              }}>
-        {title}
-      </Button>
+      <IconButton className={className}
+                  name={name}
+                  disabled={disabled}
+                  title={buttonTitle}
+                  onClick={() => {
+                    copy();
+                    onSuccess?.();
+                  }} />
     )}
   </ClipboardContainer>
 );
 
-export default ClipboardButton;
+export default ClipboardIconButton;
