@@ -41,7 +41,7 @@ export const commonEventAttributes: Array<Attribute> = [
     sortable: false,
     searchable: false,
     filterable: true,
-    related_collection: 'event_definitions'
+    related_collection: 'event_definitions',
   },
   {
     id: 'event_definition_type',

@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import type useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
