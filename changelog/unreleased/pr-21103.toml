@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix disable cross_subdomain_cookie for telemetry (backport)."
+
+issues = ["15675", "17745"]
+pulls = ["21103"]
