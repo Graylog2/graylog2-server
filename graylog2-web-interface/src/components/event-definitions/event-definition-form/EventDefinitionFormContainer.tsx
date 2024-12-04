@@ -64,7 +64,7 @@ const EventDefinitionFormContainer = ({
   eventDefinition: eventDefinitionInitial = {
     title: '',
     description: '',
-    priority: EventDefinitionPriorityEnum.NORMAL,
+    priority: EventDefinitionPriorityEnum.MEDIUM,
     // @ts-ignore
     config: {},
     field_spec: {},

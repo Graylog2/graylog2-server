@@ -34,7 +34,8 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
-const priorityOptions = map(EventDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: upperFirst(value.name) }));
+const priorityOptions = map(EventDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: upperFirst(value.name) }))
+  .sort((a, b) =>  Number(b.value) - Number(a.value));
 
 type Props = {
   eventDefinition: EventDefinition,
