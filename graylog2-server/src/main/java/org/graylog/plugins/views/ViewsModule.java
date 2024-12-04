@@ -18,7 +18,6 @@ package org.graylog.plugins.views;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
-import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
@@ -92,15 +91,8 @@ public abstract class ViewsModule extends VersionAwareModule {
 
     }
 
-    /**
-     * Use this binder for versioned backends, it also registers the backend in the overall MapBinder in
-     * @param version
-     * @param name
-     * @param implementation
-     */
-    protected void registerVersionedQueryBackend(SearchVersion version, String name, Class<? extends QueryBackend<? extends GeneratedQueryContext>> implementation) {
+    protected void registerVersionedQueryBackend(SearchVersion version, Class<? extends QueryBackend<? extends GeneratedQueryContext>> implementation) {
         bindForVersion(version, new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {}).to(implementation);
-        queryBackendBinder().addBinding(name).to(implementation);
     }
 
     protected void registerESQueryDecorator(Class<? extends QueryStringDecorator> esQueryDecorator) {
@@ -142,4 +134,6 @@ public abstract class ViewsModule extends VersionAwareModule {
     protected Multibinder<SearchValidator> searchValidatorBinder() {
         return Multibinder.newSetBinder(binder(), SearchValidator.class);
     }
+
+
 }

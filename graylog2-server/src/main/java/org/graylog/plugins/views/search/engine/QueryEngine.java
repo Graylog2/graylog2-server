@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.engine;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Query;
@@ -27,9 +28,12 @@ import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog2.storage.DetectedSearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,13 +56,19 @@ public class QueryEngine {
 
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
-    private final Map<String, QueryBackend<? extends GeneratedQueryContext>> backends;
+    private final SearchVersion detectedVersion;
+    private final Map<SearchVersion, Provider<QueryBackend<? extends GeneratedQueryContext>>> versionedBackends;
+    private final Map<String, QueryBackend<? extends GeneratedQueryContext>> unversionedBackends;
 
     @Inject
-    public QueryEngine(Map<String, QueryBackend<? extends GeneratedQueryContext>> backends,
+    public QueryEngine(@DetectedSearchVersion SearchVersion detectedVersion,
+                       Map<SearchVersion, Provider<QueryBackend<? extends GeneratedQueryContext>>> versionedBackends,
+                       Map<String, QueryBackend<? extends GeneratedQueryContext>> unversionedBackends,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
                        QueryParser queryParser) {
-        this.backends = backends;
+        this.detectedVersion = detectedVersion;
+        this.versionedBackends = versionedBackends;
+        this.unversionedBackends = unversionedBackends;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
     }
@@ -75,7 +85,7 @@ public class QueryEngine {
     public ExplainResults explain(SearchJob searchJob, Set<SearchError> validationErrors, DateTimeZone timezone) {
         final Map<String, ExplainResults.QueryExplainResult> queries = searchJob.getSearch().queries().stream()
                 .collect(Collectors.toMap(Query::id, q -> {
-                    var backend = backends.get(q.query().type());
+                    var backend = getBackendForQuery(q);
                     final GeneratedQueryContext generatedQueryContext = backend.generate(q, Set.of(), timezone);
 
                     return backend.explain(searchJob, q, generatedQueryContext);
@@ -117,7 +127,7 @@ public class QueryEngine {
     }
 
     private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors, DateTimeZone timezone) {
-        final var backend = backends.get(query.query().type());
+        final var backend = getBackendForQuery(query);
         LOG.debug("[{}] Using {} to generate query", query.id(), backend);
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
@@ -138,5 +148,16 @@ public class QueryEngine {
                 .map(q -> (QueryError) q)
                 .map(QueryError::queryId)
                 .anyMatch(id -> Objects.equals(id, query.id()));
+    }
+
+    private QueryBackend<? extends GeneratedQueryContext> getBackendForQuery(Query query) {
+        var backendQuery = query.query();
+        if (backendQuery.type().equals(ElasticsearchQueryString.NAME)) {
+            return versionedBackends.get(detectedVersion).get();
+        }
+        if (unversionedBackends.containsKey(backendQuery.type())) {
+            return unversionedBackends.get(backendQuery.type());
+        }
+        throw new IllegalArgumentException("Unknown backend type: " + backendQuery.type());
     }
 }
