@@ -14,10 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
-const TestInputStep = () => (
-  <div>Test Input Step</div>
-);
+import MenuItem from './MenuItem';
 
-export default TestInputStep;
+const StyledMenuItem = styled(MenuItem)(({ theme }) => css`
+  color: ${theme.colors.variant.danger};
+`);
+
+type Props = React.ComponentProps<typeof MenuItem>
+
+const DeleteMenuItem = ({ children = 'Delete', ...props }: Props) => <StyledMenuItem {...props}>{children}</StyledMenuItem>;
+
+export default DeleteMenuItem;

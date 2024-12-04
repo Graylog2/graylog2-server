@@ -257,7 +257,8 @@ const UserCreate = () => {
                       <PaginatedItem item={role}
                                      onDeleteItem={(data) => _onUnassignRole(data)}
                                      key={role.id} />
-                    ))}
+                    ))
+                      .toArray()}
                     {!hasValidRole && (
                       <Alert bsStyle="danger">
                         You need to select at least one of

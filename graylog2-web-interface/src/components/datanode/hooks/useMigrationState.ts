@@ -17,8 +17,9 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import { Migration } from '@graylog/server-api';
+
+import UserNotification from 'util/UserNotification';
 import type { MigrationState } from 'components/datanode/Types';
 import { onError } from 'util/conditional/onError';
 

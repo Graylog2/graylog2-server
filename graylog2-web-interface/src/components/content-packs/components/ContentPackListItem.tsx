@@ -25,7 +25,7 @@ import {
   MenuItem,
   Modal,
   Row,
-  ButtonToolbar,
+  ButtonToolbar, DeleteMenuItem,
 } from 'components/bootstrap';
 import { ModalSubmit } from 'components/common';
 import ControlledTableListItem from 'components/common/ControlledTableListItem';
@@ -96,9 +96,9 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
                 Download
               </MenuItem>
               <MenuItem divider />
-              <MenuItem onSelect={handleDeleteAllVersions}>
+              <DeleteMenuItem onSelect={handleDeleteAllVersions}>
                 Delete All Versions
-              </MenuItem>
+              </DeleteMenuItem>
             </DropdownButton>
           </ButtonToolbar>
         </Col>

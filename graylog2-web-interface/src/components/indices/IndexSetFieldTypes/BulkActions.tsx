@@ -20,7 +20,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { styled } from 'styled-components';
 
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
-import MenuItem from 'components/bootstrap/MenuItem';
+import { MenuItem } from 'components/bootstrap';
 import IndexSetCustomFieldTypeRemoveModal
   from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import Routes from 'routing/Routes';

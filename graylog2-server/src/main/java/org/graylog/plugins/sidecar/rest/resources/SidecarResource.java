@@ -51,6 +51,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -159,7 +160,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                                                   allowableValues = "title,description,name,id")
                                         @DefaultValue(Sidecar.FIELD_NODE_NAME) @QueryParam("sort") String sort,
                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                        @DefaultValue("asc") @QueryParam("order") String order,
+                                        @DefaultValue("asc") @QueryParam("order") SortOrder order,
                                         @ApiParam(name = "only_active") @QueryParam("only_active") @DefaultValue("false") boolean onlyActive) {
         final String mappedQuery = sidecarStatusMapper.replaceStringStatusSearchQuery(query);
         SearchQuery searchQuery;
