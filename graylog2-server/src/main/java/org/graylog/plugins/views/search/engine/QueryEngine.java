@@ -52,13 +52,13 @@ public class QueryEngine {
 
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
-    private final QueryBackend<? extends GeneratedQueryContext> backend;
+    private final Map<String, QueryBackend<? extends GeneratedQueryContext>> backends;
 
     @Inject
-    public QueryEngine(QueryBackend<? extends GeneratedQueryContext> backend,
+    public QueryEngine(Map<String, QueryBackend<? extends GeneratedQueryContext>> backends,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
                        QueryParser queryParser) {
-        this.backend = backend;
+        this.backends = backends;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
     }
@@ -75,6 +75,7 @@ public class QueryEngine {
     public ExplainResults explain(SearchJob searchJob, Set<SearchError> validationErrors, DateTimeZone timezone) {
         final Map<String, ExplainResults.QueryExplainResult> queries = searchJob.getSearch().queries().stream()
                 .collect(Collectors.toMap(Query::id, q -> {
+                    final QueryBackend<? extends GeneratedQueryContext> backend = backends.get(q.query().type());
                     final GeneratedQueryContext generatedQueryContext = backend.generate(q, Set.of(), timezone);
 
                     return backend.explain(searchJob, q, generatedQueryContext);
@@ -116,6 +117,7 @@ public class QueryEngine {
     }
 
     private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors, DateTimeZone timezone) {
+        final QueryBackend<? extends GeneratedQueryContext> backend = backends.get(query.query().type());
         LOG.debug("[{}] Using {} to generate query", query.id(), backend);
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead

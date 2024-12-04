@@ -89,7 +89,6 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
         try {
             final Stopwatch stopwatch = Stopwatch.createStarted();
             final QueryExecutionStats.Builder statsBuilder = QueryExecutionStats.builderWithCurrentTime();
-            // https://www.ibm.com/developerworks/java/library/j-jtp04298/index.html#3.0
             //noinspection unchecked
             final QueryResult result = doRun(job, query, (T) generatedQueryContext);
             stopwatch.stop();
@@ -116,7 +115,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job          currently executing job
      * @param query        the individual query to run from the current job
-     * @param queryContext the generated query by {@link #generate(Query, Set)}
+     * @param queryContext the generated query by {@link #generate(Query, Set, DateTimeZone)}
      * @return the result for the query
      * @throws RuntimeException if the query could not be executed for some reason
      */
@@ -132,7 +131,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job          currently executing job
      * @param query        the individual query to explain from the current job
-     * @param queryContext the generated query by {@link #generate(Query, Set)}
+     * @param queryContext the generated query by {@link #generate(Query, Set, DateTimeZone)}
      * @return the explain result for the query
      */
     default ExplainResults.QueryExplainResult doExplain(SearchJob job, Query query, T queryContext) {
