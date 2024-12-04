@@ -22,7 +22,6 @@ import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
-import org.graylog.events.procedures.EventProcedure;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.joda.time.DateTime;
 
@@ -74,7 +73,7 @@ public interface EventDefinition {
         return config().requiredPermissions();
     }
 
-    default EventProcedure eventProcedure() {
+    default String eventProcedureId() {
         return null;
     }
 }

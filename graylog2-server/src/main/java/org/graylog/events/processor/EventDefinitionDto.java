@@ -34,7 +34,6 @@ import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
-import org.graylog.events.procedures.EventProcedure;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog2.contentpacks.ContentPackable;
@@ -153,7 +152,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @Nullable
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(FIELD_EVENT_PROCEDURE)
-    public abstract EventProcedure eventProcedure();
+    public abstract String eventProcedureId();
 
     public static Builder builder() {
         return Builder.create();
@@ -258,7 +257,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         public abstract Builder schedulerCtx(EventDefinitionContextService.SchedulerCtx schedulerCtx);
 
         @JsonProperty(FIELD_EVENT_PROCEDURE)
-        public abstract Builder eventProcedure(EventProcedure eventProcedure);
+        public abstract Builder eventProcedureId(String eventProcedureId);
 
         abstract EventDefinitionDto autoBuild();
 
@@ -297,6 +296,11 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
                         .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
                         .collect(Collectors.toList()));
 
+        String procedureDescriptorId = null;
+        if (eventProcedureId() != null) {
+            procedureDescriptorId = entityDescriptorIds.get(eventProcedureId(), ModelTypes.EVENT_PROCEDURE_V1).orElse(null);
+        }
+
         return EventDefinitionEntity.builder()
                 .scope(ValueReference.of(scope()))
                 .updatedAt(updatedAt())
@@ -312,6 +316,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
                 .fieldSpec(fieldSpec())
                 .keySpec(keySpec())
                 .storage(storage())
+                .eventProcedureId(ValueReference.ofNullable(procedureDescriptorId))
                 .build();
     }
 
@@ -325,6 +330,13 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
                             .build();
                     mutableGraph.putEdge(entityDescriptor, depNotification);
                 });
+        if (eventProcedureId() != null && !eventProcedureId().isEmpty()) {
+            final EntityDescriptor depProcedure = EntityDescriptor.builder()
+                    .id(ModelId.of(eventProcedureId()))
+                    .type(ModelTypes.EVENT_PROCEDURE_V1)
+                    .build();
+            mutableGraph.putEdge(entityDescriptor, depProcedure);
+        }
         config().resolveNativeEntity(entityDescriptor, mutableGraph);
     }
 }
