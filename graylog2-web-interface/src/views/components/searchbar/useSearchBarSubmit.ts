@@ -17,6 +17,7 @@
 import { useCallback, useState } from 'react';
 
 import { SearchQueryStrings } from '@graylog/server-api';
+
 import type { SearchBarFormValues } from 'views/Constants';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
