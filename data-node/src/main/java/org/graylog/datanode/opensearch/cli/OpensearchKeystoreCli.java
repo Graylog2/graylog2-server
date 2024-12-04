@@ -19,6 +19,7 @@ package org.graylog.datanode.opensearch.cli;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 
 import java.util.Collections;
+import java.util.List;
 
 public class OpensearchKeystoreCli extends AbstractOpensearchCli {
 
@@ -40,6 +41,6 @@ public class OpensearchKeystoreCli extends AbstractOpensearchCli {
      * in the command line history). So we have to work around that and provide the value in STDIN.
      */
     public void add(String key, String secretValue) {
-        runWithStdin(Collections.singletonList(secretValue), "add", key);
+        runWithStdin(List.of(secretValue), "add", "-x", key); // -x allows input from stdin, bypassing the prompt
     }
 }
