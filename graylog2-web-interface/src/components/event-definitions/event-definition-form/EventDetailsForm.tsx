@@ -35,7 +35,7 @@ import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
 const priorityOptions = map(EventDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: upperFirst(value.name) }))
-  .sort((a, b) =>  Number(b.value) - Number(a.value));
+  .sort((a, b) => Number(b.value) - Number(a.value));
 
 type Props = {
   eventDefinition: EventDefinition,
