@@ -24,8 +24,9 @@ import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInp
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { StepData } from 'components/inputs/InputSetupWizard/types';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
-import CreateStream from 'components/inputs/InputSetupWizard/steps/components/CreateStream';
-import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
+import CreateStreamForm from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
+import type { FormValues as CreateStreamFormValues } from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
+import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData, getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
@@ -67,17 +68,19 @@ const ConntectedPipelinesList = styled.ul`
 `;
 
 interface RoutingStepData extends StepData {
-  streamId: string
+  streamId?: string,
+  newStream?: CreateStreamFormValues
 }
 
 const SetupRoutingStep = () => {
+  const currentStepName = INPUT_WIZARD_STEPS.SETUP_ROUTING;
   const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsData, setStepsData } = useInputSetupWizard();
+  const newStream: CreateStreamFormValues = getStepData(stepsData, currentStepName, 'newStream');
   const [selectedStreamId, setSelectedStreamId] = useState(undefined);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
   const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsData);
-  const currentStepName = INPUT_WIZARD_STEPS.SETUP_ROUTING;
   const { data: streamsData, isInitialLoading: isLoadingStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } });
   const streams = streamsData?.list;
   const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
@@ -111,16 +114,25 @@ const SetupRoutingStep = () => {
   };
 
   const handleBackClick = () => {
-    if (showCreateStream) {
-      setShowCreateStream(false);
+    setStepsData(
+      updateStepData(stepsData, currentStepName, {} as RoutingStepData, true),
+    );
 
-      return;
-    }
+    setShowCreateStream(false);
 
     goToPreviousStep();
   };
 
   const streamHasConnectedPipelines = streamPipelinesData && streamPipelinesData?.length > 0;
+
+  const submitStreamCreation = (values: CreateStreamFormValues) => {
+    setStepsData(
+      updateStepData(stepsData, currentStepName, { newStream: values } as RoutingStepData),
+    );
+  };
+
+  const backButtonText = newStream ? 'Reset' : 'Back';
+  const showNewStreamSection = newStream || showCreateStream;
 
   return (
     <Row>
@@ -145,7 +157,24 @@ const SetupRoutingStep = () => {
             </Col>
           </Row>
         )}
-        {showCreateStream ? (<CreateStream />) : (
+        {showNewStreamSection ? (
+          <Row>
+            <Col md={12}>
+              <StyledHeading>
+                Create new stream
+              </StyledHeading>
+              {newStream ? (
+                <>
+                  <p>This input will use a new stream: &quot;{newStream.title}&quot;.</p>
+                  <p>Matches will {!newStream.remove_matches_from_default_stream && ('not ')}be removed from the Default stream.</p>
+                  {newStream.create_new_pipeline && (<p>A new pipeline will be created.</p>)}
+                </>
+              ) : (
+                <CreateStreamForm submitForm={submitStreamCreation} />
+              )}
+            </Col>
+          </Row>
+        ) : (
           <Row>
             <ExistingStreamCol md={6}>
               <StyledHeading>Choose an existing Stream</StyledHeading>
@@ -165,11 +194,11 @@ const SetupRoutingStep = () => {
             </CreateStreamCol>
           </Row>
         )}
-        {(hasPreviousStep || hasNextStep || showCreateStream) && (
+        {(hasPreviousStep || hasNextStep || showNewStreamSection) && (
         <Row>
           <ButtonCol md={12}>
-            {(hasPreviousStep || showCreateStream) && (<Button onClick={handleBackClick}>Back</Button>)}
-            {hasNextStep && (<Button disabled={isNextStepDisabled} onClick={onNextStep} bsStyle="primary">Finish & Start Input</Button>)}
+            {(hasPreviousStep || showNewStreamSection) && (<Button onClick={handleBackClick}>{backButtonText}</Button>)}
+            {hasNextStep && (<Button disabled={isNextStepDisabled || (showCreateStream && !newStream)} onClick={onNextStep} bsStyle="primary">Finish & Start Input</Button>)}
           </ButtonCol>
         </Row>
         )}

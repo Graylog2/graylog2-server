@@ -36,7 +36,7 @@ const fetchIndexSetsList = (stats:boolean): Promise<State> => fetch('GET', getUr
 
 const initialData: State = { indexSets: [], indexSetsCount: null, indexSetStats: null };
 
-const useIndexSetsList = (stats: boolean = false) : {
+const useIndexSetsList = (stats: boolean = false, refetchInterval: number | false = false) : {
   data: State,
   refetch: () => void,
   isSuccess: boolean,
@@ -47,6 +47,7 @@ const useIndexSetsList = (stats: boolean = false) : {
     () => defaultOnError(fetchIndexSetsList(stats), 'Loading index sets with list failed with status', 'Could not load index sets list'),
     {
       keepPreviousData: true,
+      refetchInterval,
     },
   );
 
