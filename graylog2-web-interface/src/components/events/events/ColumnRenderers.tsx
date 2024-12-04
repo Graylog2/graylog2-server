@@ -20,11 +20,8 @@ import { useMemo } from 'react';
 import styled from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
 
-import { isPermitted } from 'util/PermissionsMixin';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import PriorityName from 'components/events/events/PriorityName';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -32,7 +29,7 @@ import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { Timestamp } from 'components/common';
-import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import type {ColumnRenderersByAttribute, EntityBase} from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 
 const EventDefinitionRenderer = ({ eventDefinitionId, meta }: { eventDefinitionId: string, meta: EventsAdditionalData }) => {
@@ -109,7 +106,7 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => (eventData.tim
   <em>No time range</em>
 ));
 
-export const getGeneralEventAttributeRenderers = <T, M = unknown>(): ColumnRenderersByAttribute<T, M> => ({
+export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<T, M> => ({
   message: {
     minWidth: 300,
     width: 0.5,

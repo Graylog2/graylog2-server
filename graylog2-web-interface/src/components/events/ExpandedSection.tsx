@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
-import type { Attribute } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';

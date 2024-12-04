@@ -19,24 +19,22 @@ import { styled } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
-import useColumnRenderers from 'components/events/events/ColumnRenderers';
-import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import {ColumnRenderersByAttribute} from 'components/common/EntityDataTable/types';
+import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
-import {Attribute} from 'stores/PaginationTypes';
+import type { Attribute } from 'stores/PaginationTypes';
 
 const TD = styled.td`
   white-space: nowrap;
 `;
 
-type Props<T, M = EventsAdditionalData> = {
+type Props<T extends EntityBase, M = EventsAdditionalData> = {
   attributesList: Array<{ id: string, title: string}>,
   event: T,
-  meta?: M,
+  meta?: M | {},
   attributesRenderers: ColumnRenderersByAttribute<T, M>
 }
 
-const EventDetailsTable = <E = Event>({ event, attributesList, meta = {}, attributesRenderers }: Props<E>) => (
+const EventDetailsTable = <E extends EntityBase = Event>({ event, attributesList, meta = {}, attributesRenderers }: Props<E>) => (
   <Table condensed striped>
     <tbody>
       {attributesList.map((attribute: Attribute) => {
@@ -44,10 +42,11 @@ const EventDetailsTable = <E = Event>({ event, attributesList, meta = {}, attrib
         const typeRenderer = attributesRenderers?.types?.[attribute?.type]?.renderCell;
         const renderCell = attributesRenderers[attribute.id]?.renderCell ?? typeRenderer ?? defaultTypeRenderer;
         const value = event[attribute.id];
+
         console.log({
           attribute,
           renderCell,
-        })
+        });
 
         return (
           <tr key={attribute.id}>
