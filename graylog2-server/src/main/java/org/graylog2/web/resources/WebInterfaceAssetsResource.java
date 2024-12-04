@@ -138,6 +138,7 @@ public class WebInterfaceAssetsResource {
         } catch (IOException | URISyntaxException e) {
             return generateIndexHtml(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
         }
+
     }
 
     private String trimBasePath(String filename, HttpHeaders headers) {
