@@ -31,12 +31,11 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractJournalCommand extends AbstractNodeCommand {
-    protected static final Configuration configuration = new JournalCommandConfiguration();
     protected final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
     protected LocalKafkaJournal journal;
 
     public AbstractJournalCommand(String commandName) {
-        super(commandName, configuration);
+        super(commandName, new JournalCommandConfiguration());
     }
 
     @Override
