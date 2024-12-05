@@ -27,7 +27,6 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.database.Persisted;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
@@ -91,7 +90,7 @@ public class EventsSearchService {
         }
 
         parameters.filter().aggregationTimerange()
-                .filter(TimeRange::isAllMessages)
+                .filter(range -> !range.isAllMessages())
                 .ifPresent(aggregationTimerange -> {
                     filterBuilder.add(
                             TermRangeQuery.newStringRange(
