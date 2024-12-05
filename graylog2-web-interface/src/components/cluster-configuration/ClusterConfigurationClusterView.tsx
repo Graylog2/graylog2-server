@@ -17,6 +17,7 @@
 import React from 'react';
 
 import { Col, Row } from 'components/bootstrap';
+import ClusterConfigurationStatusLabel from './ClusterConfigurationStatusLabel';
 
 type Props = {
   graylogNodes: any,
@@ -26,16 +27,24 @@ type Props = {
 const ClusterConfigurationClusterView = ({ graylogNodes, dataNodes }: Props) => {
   return (
     <Row style={{ marginTop: 10 }}>
-      <Col md={6}>
+      <Col md={3} sm={4} xs={6}>
         <h6><b>Graylog</b></h6>
         {graylogNodes.map((graylogNode) => (
-          <div style={{ margin: 10, padding: 10, border: '1px solid', borderRadius: '10px' }}>{graylogNode.nodeName}</div>
+          <div style={{ marginTop: 10, padding: 10, border: '1px solid', borderRadius: '10px' }}>
+            <div>{graylogNode.nodeName}</div>
+            <div><small>{graylogNode.role}</small></div>
+            <ClusterConfigurationStatusLabel status={graylogNode.state} />
+          </div>
         ))}
       </Col>
-      <Col md={6}>
+      <Col md={3} sm={4} xs={6}>
         <h6><b>Data Node</b></h6>
         {dataNodes.map((dataNode) => (
-          <div style={{ margin: 10, padding: 10, border: '1px solid', borderRadius: '10px' }}>{dataNode.nodeName}</div>
+          <div style={{ marginTop: 10, padding: 10, border: '1px solid', borderRadius: '10px', width: '100%' }}>
+            <div>{dataNode.nodeName}</div>
+            <div><small>{dataNode.role}</small></div>
+            <ClusterConfigurationStatusLabel status={dataNode.state} />
+          </div>
         ))}
       </Col>
     </Row>

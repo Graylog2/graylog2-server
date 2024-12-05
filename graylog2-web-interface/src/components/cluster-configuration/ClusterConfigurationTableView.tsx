@@ -19,6 +19,8 @@ import React from 'react';
 import { Table } from 'components/bootstrap';
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
+import ClusterConfigurationStatusLabel from './ClusterConfigurationStatusLabel';
+
 type Props = {
   graylogNodes: any,
   dataNodes: any,
@@ -42,7 +44,7 @@ const ClusterConfigurationTableView = ({ graylogNodes, dataNodes }: Props) => {
             <td>{graylogNode.nodeName}</td>
             <td>{graylogNode.type}</td>
             <td>{graylogNode.role}</td>
-            <td>{graylogNode.state}</td>
+            <td><ClusterConfigurationStatusLabel status={graylogNode.state} /></td>
             <td align='right'><MoreActions /></td>
           </tr>
         ))}
@@ -51,7 +53,7 @@ const ClusterConfigurationTableView = ({ graylogNodes, dataNodes }: Props) => {
             <td>{dataNode.nodeName}</td>
             <td>{dataNode.type}</td>
             <td>{dataNode.role}</td>
-            <td>{dataNode.state}</td>
+            <td><ClusterConfigurationStatusLabel status={dataNode.state} /></td>
             <td align='right'><MoreActions /></td>
           </tr>
         ))}
