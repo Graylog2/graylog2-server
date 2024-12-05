@@ -107,7 +107,7 @@ const SubmitOnChange = () => {
   return <></>;
 };
 
-const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: EditWidgetComponentProps<EventsWidgetConfig>) => {
+const EventsWidgetEdit = ({ children, onCancel, config, onChange }: EditWidgetComponentProps<EventsWidgetConfig>) => {
   const filterComponents = usePluginEntities('views.components.widgets.events.filterComponents');
   const eventAttributes = useEventAttributes();
 
@@ -172,7 +172,7 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
             <FullHeightRow>
               <FullHeightCol md={4} lg={3}>
                 <Container>
-                  <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
+                  <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} />}
                                        alignActionsAtBottom>
                     <DescriptionBox description="Visualization">
                       <WidgetModeConfiguration name="mode" onChange={onChangeType} options={WIDGET_MODE_OPTIONS} />

@@ -42,7 +42,6 @@ describe('AggregationWizard', () => {
     <TestStoreProvider>
       <FieldTypesContext.Provider value={fieldTypes}>
         <AggregationWizard onChange={() => {}}
-                           onSubmit={() => {}}
                            onCancel={() => {}}
                            config={widgetConfig}
                            editing
@@ -96,14 +95,6 @@ describe('AggregationWizard', () => {
 
     await waitFor(() => within(metricsSection).findByText('Function'));
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
-  });
-
-  it('should call onSubmit', async () => {
-    const onSubmit = jest.fn();
-    renderSUT({ onSubmit });
-    userEvent.click(await screen.findByRole('button', { name: /update widget/i }));
-
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
   });
 
   it('should call onCancel', async () => {

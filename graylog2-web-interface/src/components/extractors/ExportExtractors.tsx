@@ -17,10 +17,11 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import * as API from '@graylog/server-api';
+
 import { ClipboardButton, Spinner } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import Version from 'util/Version';
-import * as API from '@graylog/server-api';
 
 const useExtractors = (inputId: string) => useQuery(['extractors', inputId], () => API.Extractors.list(inputId));
 
