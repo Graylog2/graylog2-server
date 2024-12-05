@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import type FetchError from 'logic/errors/FetchError';
-import { Spinner } from 'components/common';
+import { Spinner, Icon } from 'components/common';
 import type { ProcessingSteps } from 'components/inputs/InputSetupWizard/steps/StartInputStep';
 
 type Props = {
@@ -29,15 +28,6 @@ type Props = {
   errorMessage?: FetchError,
 }
 
-// const NewIndexSetButton = styled(Button)(({ theme }) => css`
-//   margin-bottom: ${theme.spacings.xs};
-// `);
-
-// const SubmitCol = styled(Col)`
-//   display: flex;
-//   justify-content: flex-end;
-// `;
-// todo typing
 const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, errorMessage = undefined } : Props) => {
   const loadingText: {[key in ProcessingSteps]: string} = {
     createStream: 'Creating stream...',
@@ -70,7 +60,7 @@ const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, errorMessage
   if (isError) {
     return (
       <>
-        <p>{errorText[stepName]}</p>
+        <p><Icon name="check" title={errorText[stepName]} /></p>
         {errorMessage && (<p><strong>Details:</strong> {errorMessage.message}</p>)}
       </>
     );
@@ -78,7 +68,7 @@ const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, errorMessage
 
   if (isSuccess) {
     return (
-      <p>{successText[stepName]}</p>
+      <p><Icon name="close" title={successText[stepName]} /></p>
     );
   }
 
