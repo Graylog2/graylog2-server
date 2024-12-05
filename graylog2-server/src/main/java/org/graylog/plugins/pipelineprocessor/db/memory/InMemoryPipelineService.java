@@ -26,8 +26,10 @@ import org.graylog2.events.ClusterEventBus;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * A PipelineService that does not persist any data, but simply keeps it in memory.
@@ -101,6 +103,13 @@ public class InMemoryPipelineService implements PipelineService {
         }
 
         clusterBus.post(PipelinesChangedEvent.deletedPipelineId(id));
+    }
+
+    @Override
+    public Set<PipelineDao> loadByIds(Set<String> pipelineIds) {
+        return pipelineIds.stream()
+                .map(store::get)
+                .collect(Collectors.toSet());
     }
 
     private String createId() {
