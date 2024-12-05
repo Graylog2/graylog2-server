@@ -41,8 +41,8 @@ class ImmutableFeatureFlagsCollector {
 
     private static final Logger LOG = LoggerFactory.getLogger(ImmutableFeatureFlagsCollector.class);
 
-    private final String feature_flag_env_prefix;
-    private final String feature_flag_system_prop_prefix;
+    private final String featureFlagEnvPrefix;
+    private final String featureFlagSystemPropPrefix;
 
     private Map<String, FeatureFlagValue> existingFlags = new HashMap<>();
     private final FeatureFlagsResources resources;
@@ -54,8 +54,8 @@ class ImmutableFeatureFlagsCollector {
         this.resources = resources;
         this.defaultPropertiesFile = defaultPropertiesFile;
         this.customPropertiesFile = customPropertiesFile;
-        this.feature_flag_env_prefix = configuration.getEnvironmentVariablePrefix() + "FEATURE_";
-        this.feature_flag_system_prop_prefix = configuration.getSystemPropertyPrefix() + "feature.";
+        this.featureFlagEnvPrefix = configuration.getEnvironmentVariablePrefix() + "FEATURE_";
+        this.featureFlagSystemPropPrefix = configuration.getSystemPropertyPrefix() + "feature.";
     }
 
     public Map<String, String> toMap() {
@@ -102,11 +102,11 @@ class ImmutableFeatureFlagsCollector {
     }
 
     private void addSystemPropertiesFlags() {
-        addFlagsWithPrefix(feature_flag_system_prop_prefix, resources.systemProperties(), "system properties");
+        addFlagsWithPrefix(featureFlagSystemPropPrefix, resources.systemProperties(), "system properties");
     }
 
     private void addEnvironmentVariableFlags() {
-        addFlagsWithPrefix(feature_flag_env_prefix, resources.environmentVariables(), "environment variables");
+        addFlagsWithPrefix(featureFlagEnvPrefix, resources.environmentVariables(), "environment variables");
     }
 
     private void addFlagsWithPrefix(String prefix, Map<String, String> newFlags, String resourceType) {
