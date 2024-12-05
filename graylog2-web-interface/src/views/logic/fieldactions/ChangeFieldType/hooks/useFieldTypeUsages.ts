@@ -16,9 +16,10 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { SystemIndexSetsTypes } from '@graylog/server-api';
+
 import type { Attribute } from 'stores/PaginationTypes';
 import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
-import { SystemIndexSetsTypes } from '@graylog/server-api';
 import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
