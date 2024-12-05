@@ -724,7 +724,7 @@
                                 </banDynamicVersions>
                                 <requireMavenVersion>
                                     <!-- Enforce the same version we define in the maven wrapper -->
-                                    <version>[3.9.6]</version>
+                                    <version>[3.9.9]</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <version>[17.0,17.99]</version>
