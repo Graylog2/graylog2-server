@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 public abstract class AbstractKinesisCodec extends AbstractCodec {
 
@@ -58,11 +57,11 @@ public abstract class AbstractKinesisCodec extends AbstractCodec {
                 return decodeLogData(entry);
             } catch (Exception e) {
                 throw InputProcessingException.create("Couldn't decode log event <%s>".formatted(entry),
-                        e, rawMessage, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
+                        e, rawMessage, new String(rawMessage.getPayload(), charset));
             }
         } catch (IOException e) {
             throw InputProcessingException.create("Couldn't deserialize log data",
-                    e, rawMessage, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
+                    e, rawMessage, new String(rawMessage.getPayload(), charset));
         }
     }
 

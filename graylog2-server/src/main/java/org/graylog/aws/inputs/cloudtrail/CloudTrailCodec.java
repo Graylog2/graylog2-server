@@ -35,7 +35,6 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.charset.StandardCharsets;
 
 public class CloudTrailCodec extends AbstractCodec {
     public static final String NAME = "AWSCloudTrail";
@@ -66,7 +65,7 @@ public class CloudTrailCodec extends AbstractCodec {
             return message;
         } catch (Exception e) {
             throw InputProcessingException.create("Could not deserialize CloudTrail record.",
-                    e, rawMessage, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
+                    e, rawMessage, new String(rawMessage.getPayload(), charset));
         }
     }
 

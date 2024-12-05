@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -80,7 +79,7 @@ public class Beats2Codec extends AbstractCodec {
             }
         } catch (IOException e) {
             throw InputProcessingException.create("Couldn't decode beats 2 message",
-                    e, rawMessage, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
+                    e, rawMessage, new String(rawMessage.getPayload(), charset));
         }
 
         return parseEvent(event);

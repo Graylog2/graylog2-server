@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState;
 
@@ -61,7 +60,7 @@ public class RandomHttpMessageCodec extends AbstractCodec {
         if (!rawMessage.getCodecName().equals(getName())) {
             throw InputProcessingException.create(
                     "Cannot decode payload type %s, skipping message %s".formatted(rawMessage.getCodecName(), rawMessage.getId()),
-                    rawMessage, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
+                    rawMessage, new String(rawMessage.getPayload(), charset));
         }
         try {
             final GeneratorState state = objectMapper.readValue(rawMessage.getPayload(), GeneratorState.class);
@@ -69,7 +68,7 @@ public class RandomHttpMessageCodec extends AbstractCodec {
         } catch (IOException e) {
             throw InputProcessingException.create(
                     "Cannot decode message to class FakeHttpRawMessageGenerator.GeneratorState",
-                    rawMessage, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
+                    rawMessage, new String(rawMessage.getPayload(), charset));
         }
     }
 

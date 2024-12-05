@@ -37,7 +37,6 @@ import software.amazon.awssdk.regions.Region;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -73,7 +72,7 @@ public class AWSCodec extends AbstractCodec {
         final Codec.Factory<? extends Codec> codecFactory = this.availableCodecs.get(awsMessageType.getCodecName());
         if (codecFactory == null) {
             throw InputProcessingException.create("A codec with name [%s] could not be found.".formatted(awsMessageType.getCodecName()),
-                    rawMessage, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
+                    rawMessage, new String(rawMessage.getPayload(), charset));
         }
 
         final Codec codec = codecFactory.create(configuration);
