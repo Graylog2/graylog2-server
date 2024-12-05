@@ -22,9 +22,9 @@ import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/use
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Button, Row, Col } from 'components/bootstrap';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
-import type { StepData } from 'components/inputs/InputSetupWizard/types';
+import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/useInputSetupWizardSteps';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
-import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData, getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
+import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, getStepConfigOrData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import type { RoutingStepData } from 'components/inputs/InputSetupWizard/steps/SetupRoutingStep';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
@@ -51,15 +51,11 @@ const ButtonCol = styled(Col)(({ theme }) => css`
   margin-top: ${theme.spacings.lg};
 `);
 
-interface StartInputStepData extends StepData {
-
-}
-
 export type ProcessingSteps = 'createStream' | 'startStream' | 'createPipeline' | 'setupRouting' | 'startInput'
 
 const StartInputStep = () => {
-  const currentStepName = INPUT_WIZARD_STEPS.START_INPUT;
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsData, setStepsData, wizardData } = useInputSetupWizard();
+  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData, stepsConfig, setStepsConfig } = useInputSetupWizard();
+  const { stepsData } = useInputSetupWizardSteps();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
   const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsData);
@@ -83,9 +79,9 @@ const StartInputStep = () => {
   }), [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation]);
 
   useEffect(() => {
-    if (orderedSteps && activeStep && stepsData) {
-      const withNextStepEnabled = enableNextStep(orderedSteps, activeStep, stepsData);
-      setStepsData(withNextStepEnabled);
+    if (orderedSteps && activeStep && stepsConfig) {
+      const withNextStepEnabled = enableNextStep(orderedSteps, activeStep, stepsConfig);
+      setStepsConfig(withNextStepEnabled);
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -115,7 +111,7 @@ const StartInputStep = () => {
   };
 
   const setupInput = async () => {
-    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+    const routingStepData = getStepConfigOrData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
     const { input } = wizardData;
     const inputId = input?.id;
 
@@ -164,10 +160,6 @@ const StartInputStep = () => {
   };
 
   const handleBackClick = () => {
-    setStepsData(
-      updateStepData(stepsData, currentStepName, {} as StartInputStepData, true),
-    );
-
     goToPreviousStep();
   };
 

@@ -14,22 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext } from 'react';
 
-import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
-import Wizard from './Wizard';
-import type { WizardData } from './types';
+import InputSetupWizardStepsContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardStepsContext';
 
-type Props = {
-  show: boolean,
-  input: WizardData['input'],
-  onClose: () => void,
-}
+const useInputSetupWizardSteps = () => {
+  const inputSetupWizardSteps = useContext(InputSetupWizardStepsContext);
 
-const InputSetupWizard = ({ show, input, onClose }: Props) => (
-  <InputSetupWizardProvider>
-    <Wizard show={show} input={input} onClose={onClose} />
-  </InputSetupWizardProvider>
-);
+  if (!inputSetupWizardSteps) {
+    throw new Error('useInputSetupWizardSteps hook needs to be used inside InputSetupWizardContextSteps.Provider');
+  }
 
-export default InputSetupWizard;
+  return inputSetupWizardSteps;
+};
+
+export default useInputSetupWizardSteps;

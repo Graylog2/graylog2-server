@@ -15,18 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button, Row, Col } from 'components/bootstrap';
 import { Select } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
+import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/useInputSetupWizardSteps';
 import { defaultCompare } from 'logic/DefaultCompare';
-import type { StepData } from 'components/inputs/InputSetupWizard/types';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStreamForm from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
 import type { StreamFormValues } from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
-import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData, getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
+import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, disableNextStep, updateStepConfigOrData, getStepConfigOrData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
@@ -67,7 +67,7 @@ const ConntectedPipelinesList = styled.ul`
   padding-left: 20px;
 `;
 
-export interface RoutingStepData extends StepData {
+export type RoutingStepData = {
   streamId?: string,
   newStream?: StreamFormValues,
   shouldCreateNewPipeline?: boolean,
@@ -75,22 +75,25 @@ export interface RoutingStepData extends StepData {
 }
 
 const SetupRoutingStep = () => {
-  const currentStepName = INPUT_WIZARD_STEPS.SETUP_ROUTING;
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsData, setStepsData } = useInputSetupWizard();
-  const newStream: StreamFormValues = getStepData(stepsData, currentStepName, 'newStream');
+  const currentStepName = useMemo(() => INPUT_WIZARD_STEPS.SETUP_ROUTING, []);
+  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsConfig, setStepsConfig } = useInputSetupWizard();
+  const { stepsData, setStepsData } = useInputSetupWizardSteps();
+  const newStream: StreamFormValues = getStepConfigOrData(stepsData, currentStepName, 'newStream');
   const [selectedStreamId, setSelectedStreamId] = useState(undefined);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
-  const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsData);
+  const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsConfig);
   const { data: streamsData, isInitialLoading: isLoadingStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } });
   const streams = streamsData?.list;
   const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
 
   const defaultStepData: RoutingStepData = { streamType: 'DEFAULT' };
 
-  const isStepValid = () => {
-    const { streamType, streamId } = getStepData(stepsData, currentStepName);
+  const isStepValid = useCallback(() => {
+    const stepData = getStepConfigOrData(stepsData, currentStepName);
+    if (!stepData) return false;
+    const { streamType, streamId } = stepData;
 
     if (showCreateStream && !newStream) return false;
 
@@ -108,16 +111,23 @@ const SetupRoutingStep = () => {
       default:
         return false;
     }
-  };
+  }, [currentStepName, newStream, showCreateStream, stepsData]);
+
+  useEffect(() => {
+    if (isStepValid()) {
+      const withNextStepEnabled = enableNextStep(orderedSteps, activeStep, stepsData);
+      setStepsConfig(withNextStepEnabled);
+    } else {
+      const withNextStepDisabled = disableNextStep(orderedSteps, activeStep, stepsData);
+      setStepsConfig(withNextStepDisabled);
+    }
+  }, [isStepValid, stepsData, activeStep, orderedSteps, setStepsConfig]);
 
   useEffect(() => {
     if (orderedSteps && activeStep && stepsData) {
-      const withInitialStepsData = updateStepData(stepsData, currentStepName, defaultStepData);
-      const withNextStepEnabled = enableNextStep(orderedSteps, activeStep, withInitialStepsData);
+      const withInitialStepsData = updateStepConfigOrData(stepsData, currentStepName, defaultStepData);
 
-      // TODO enable next step on validation (maybe split contexts??)
-
-      setStepsData(withNextStepEnabled);
+      setStepsData(withInitialStepsData);
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -136,12 +146,12 @@ const SetupRoutingStep = () => {
     setSelectedStreamId(streamId);
 
     setStepsData(
-      updateStepData(stepsData, currentStepName, { streamId, streamType: 'EXISTING' } as RoutingStepData),
+      updateStepConfigOrData(stepsData, currentStepName, { streamId, streamType: 'EXISTING' } as RoutingStepData),
     );
   };
 
   const handleCreateStream = () => {
-    updateStepData(stepsData, currentStepName, defaultStepData);
+    updateStepConfigOrData(stepsData, currentStepName, defaultStepData);
     setShowCreateStream(true);
   };
 
@@ -151,7 +161,7 @@ const SetupRoutingStep = () => {
 
   const handleBackClick = () => {
     setStepsData(
-      updateStepData(stepsData, currentStepName, defaultStepData, true),
+      updateStepConfigOrData(stepsData, currentStepName, defaultStepData, true),
     );
 
     setShowCreateStream(false);
@@ -163,7 +173,7 @@ const SetupRoutingStep = () => {
 
   const submitStreamCreation = ({ create_new_pipeline, ...stream }: StreamFormValues & { create_new_pipeline?: boolean }) => {
     setStepsData(
-      updateStepData(stepsData, currentStepName, {
+      updateStepConfigOrData(stepsData, currentStepName, {
         newStream: stream,
         shouldCreateNewPipeline: create_new_pipeline ?? false,
         streamType: 'NEW',
@@ -207,7 +217,7 @@ const SetupRoutingStep = () => {
                 <>
                   <p>This input will use a new stream: &quot;{newStream.title}&quot;.</p>
                   <p>Matches will {!newStream.remove_matches_from_default_stream && ('not ')}be removed from the Default stream.</p>
-                  {getStepData(stepsData, currentStepName, 'shouldCreateNewPipeline') && (<p>A new pipeline will be created.</p>)}
+                  {getStepConfigOrData(stepsData, currentStepName, 'shouldCreateNewPipeline') && (<p>A new pipeline will be created.</p>)}
                 </>
               ) : (
                 <CreateStreamForm submitForm={submitStreamCreation} />

@@ -28,18 +28,18 @@ import type { Input } from 'components/messageloaders/Types';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
-import { INPUT_SETUP_MODE_FEATURE_FLAG, useInputSetupWizard } from 'components/inputs/InputSetupWizard';
+import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
 
 type Props = {
-  input: Input
+  input: Input,
+  openWizard: () => void,
 }
 
-const InputStateControl = ({ input } : Props) => {
+const InputStateControl = ({ input, openWizard } : Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
-  const { openWizard } = useInputSetupWizard();
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
 
   const startInput = () => {
@@ -76,7 +76,7 @@ const InputStateControl = ({ input } : Props) => {
       app_action_value: 'setup-input',
     });
 
-    openWizard({ input });
+    openWizard();
   };
 
   if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
