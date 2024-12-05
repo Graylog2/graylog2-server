@@ -176,7 +176,7 @@
         <swagger.version>1.6.14</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>7.0.1</unboundid-ldap.version>
+        <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.0</validation-api.version>
         <zstd.version>1.5.6-8</zstd.version>
@@ -724,7 +724,7 @@
                                 </banDynamicVersions>
                                 <requireMavenVersion>
                                     <!-- Enforce the same version we define in the maven wrapper -->
-                                    <version>[3.9.6]</version>
+                                    <version>[3.9.9]</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <version>[17.0,17.99]</version>
