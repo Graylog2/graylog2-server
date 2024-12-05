@@ -16,8 +16,25 @@
  */
 import * as React from 'react';
 
-const TestInputStep = () => (
-  <div>Test Input Step</div>
-);
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
+import type { Event } from 'components/events/events/types';
+import useEventBulkActions from 'components/events/events/hooks/useEventBulkActions';
 
-export default TestInputStep;
+type Props = {
+  selectedEntitiesData: {[eventId: string]: Event}
+}
+
+const BulkActions = ({ selectedEntitiesData }: Props) => {
+  const { actions, pluggableActionModals } = useEventBulkActions(Object.values(selectedEntitiesData));
+
+  return (
+    <>
+      <BulkActionsDropdown>
+        {actions}
+      </BulkActionsDropdown>
+      {pluggableActionModals}
+    </>
+  );
+};
+
+export default BulkActions;

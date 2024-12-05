@@ -143,7 +143,7 @@ const singleValueAndPlaceholder = ({ theme }) => (base) => ({
   fontWeight: 400,
 });
 
-const placeholder = ({ theme }) => (base) => ({
+const placeholderStyling = ({ theme }) => (base) => ({
   ...base,
   color: theme.colors.input.placeholder,
   lineHeight: '28px',
@@ -202,7 +202,7 @@ const _styles = ({ size, theme }) => ({
   menu,
   menuPortal,
   singleValue: singleValueAndPlaceholder({ theme }),
-  placeholder: placeholder({ theme }),
+  placeholder: placeholderStyling({ theme }),
   control: controlFocus({ size, theme }),
   valueContainer: valueContainer({ size }),
 });
@@ -213,6 +213,8 @@ type ComponentsProp = {
 };
 
 export type Props<OptionValue> = {
+  // The placeholder will be used by default for the aria label.
+  'aria-label'?: string,
   addLabelText?: string,
   allowCreate?: boolean,
   autoFocus?: boolean,
@@ -484,6 +486,8 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       total,
       onInputChange,
       loadOptions,
+      'aria-label': ariaLabel,
+      placeholder,
       ...rest
     } = this.props;
 
@@ -500,10 +504,13 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       async: boolean,
       loadOptions: () => void,
       total: number,
+
     } = {
       ...rest,
       onChange: onReactSelectChange || this._onChange,
       onInputChange,
+      'aria-label': ariaLabel ?? placeholder,
+      placeholder,
       async,
       isMulti,
       isDisabled,

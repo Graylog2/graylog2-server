@@ -21,6 +21,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
@@ -34,10 +35,11 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import jakarta.inject.Inject;
-
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
@@ -122,5 +124,11 @@ public class MongoDbPipelineStreamConnectionsService implements PipelineStreamCo
         } catch (NotFoundException e) {
             log.debug("No connections found for stream " + streamId);
         }
+    }
+
+    @Override
+    public Map<String, PipelineConnections> loadByStreamIds(Collection<String> streamIds) {
+        return dbCollection.find(DBQuery.in("stream_id", streamIds)).toArray().stream()
+                .collect(Collectors.toMap(PipelineConnections::streamId, conn -> conn));
     }
 }
