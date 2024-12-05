@@ -54,7 +54,6 @@ import org.graylog.tracing.TracingModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
 import org.graylog2.audit.AuditActor;
-import org.graylog2.audit.AuditBindings;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.ConfigurationModule;
@@ -186,7 +185,6 @@ public class Server extends ServerBootstrap {
                 new RestApiBindings(configuration),
                 new PasswordAlgorithmBindings(),
                 new DecoratorBindings(),
-                new AuditBindings(),
                 new AlertConditionBindings(),
                 new IndexerBindings(),
                 new MigrationsModule(),

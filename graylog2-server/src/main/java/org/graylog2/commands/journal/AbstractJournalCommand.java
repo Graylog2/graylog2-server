@@ -16,58 +16,39 @@
  */
 package org.graylog2.commands.journal;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import jakarta.annotation.Nonnull;
 import org.graylog2.Configuration;
-import org.graylog2.audit.AuditBindings;
-import org.graylog2.bindings.ConfigurationModule;
-import org.graylog2.bootstrap.CmdLineTool;
+import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.SimpleNodeId;
-import org.graylog2.shared.bindings.SchedulerBindings;
-import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.graylog2.shared.journal.LocalKafkaJournalModule;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractJournalCommand extends CmdLineTool {
-    protected static final Configuration configuration = new Configuration();
+public abstract class AbstractJournalCommand extends AbstractNodeCommand {
+    protected static final Configuration configuration = new JournalCommandConfiguration();
     protected final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
     protected LocalKafkaJournal journal;
 
-    public AbstractJournalCommand() {
-        this(null);
-    }
     public AbstractJournalCommand(String commandName) {
         super(commandName, configuration);
     }
 
     @Override
-    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
-        return Arrays.asList(
-                new ConfigurationModule(configuration),
-                new AbstractModule() {
-                    @Override
-                    public void configure() {
-                        bind(NodeId.class).toInstance(new SimpleNodeId("dummy-nodeid"));
-                    }
-                },
-        new ServerStatusBindings(capabilities()),
-                new SchedulerBindings(),
-                new LocalKafkaJournalModule(),
-                new AuditBindings());
+    protected @Nonnull List<Module> getNodeCommandBindings(FeatureFlags featureFlags) {
+        return List.of(
+                new LocalKafkaJournalModule()
+        );
     }
 
     @Override
-    protected List<Object> getCommandConfigurationBeans() {
-        return Arrays.asList(configuration, kafkaJournalConfiguration);
+    protected @Nonnull List<Object> getNodeCommandConfigurationBeans() {
+        return List.of(kafkaJournalConfiguration);
     }
 
     @Override
@@ -98,4 +79,31 @@ public abstract class AbstractJournalCommand extends CmdLineTool {
     }
 
     protected abstract void runCommand();
+
+    static class JournalCommandConfiguration extends Configuration {
+        @Override
+        public boolean withNodeIdFile() {
+            return false;
+        }
+
+        @Override
+        public boolean withScheduler() {
+            return true;
+        }
+
+        @Override
+        public boolean withEventBus() {
+            return false;
+        }
+
+        @Override
+        public boolean withPlugins() {
+            return false;
+        }
+
+        @Override
+        public boolean withMongoDb() {
+            return false;
+        }
+    }
 }

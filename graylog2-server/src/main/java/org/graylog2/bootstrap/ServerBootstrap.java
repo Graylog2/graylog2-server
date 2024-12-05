@@ -448,7 +448,6 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
         result.add(new GenericBindings(isMigrationCommand()));
         result.add(new MessageBindings());
         result.add(new SecurityBindings());
-        result.add(new ServerStatusBindings(capabilities()));
         result.add(new ValidatorModule());
         result.add(new SharedPeriodicalBindings());
         result.add(new GenericInitializerBindings());
