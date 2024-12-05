@@ -33,7 +33,7 @@ const EventsEntityTable = () => {
 
   const columnRenderers = useColumnRenderers();
   const _fetchEvents = useCallback((searchParams: SearchParams) => fetchEvents(searchParams, streamId as string), [streamId]);
-  const { entityActions, expandedSections } = useTableElements({ defaultLayout: eventsTableElements.defaultLayout });
+  const { entityActions, expandedSections, bulkSelection } = useTableElements({ defaultLayout: eventsTableElements.defaultLayout });
 
   return (
     <PaginatedEntityTable<Event, EventsAdditionalData> humanName="events"
@@ -48,6 +48,7 @@ const EventsEntityTable = () => {
                                                        entityAttributesAreCamelCase={false}
                                                        filterValueRenderers={FilterValueRenderers}
                                                        columnRenderers={columnRenderers}
+                                                       bulkSelection={bulkSelection}
                                                        topRightCol={<EventsRefreshControls />} />
   );
 };

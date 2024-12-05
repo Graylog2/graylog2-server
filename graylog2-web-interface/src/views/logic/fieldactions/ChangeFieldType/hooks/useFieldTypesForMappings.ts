@@ -16,8 +16,9 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { SystemFieldTypes } from '@graylog/server-api';
+
+import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {

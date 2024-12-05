@@ -19,20 +19,21 @@ package org.graylog.security.authzroles;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
+import jakarta.inject.Inject;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.shared.users.UserService;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 
-import jakarta.inject.Inject;
-
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -40,28 +41,33 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
-public class PaginatedAuthzRolesService extends PaginatedDbService<AuthzRoleDTO> {
+public class PaginatedAuthzRolesService {
     private static final String COLLECTION_NAME = "roles";
 
-    private final MongoCollection<Document> dbCollection;
+    private final MongoCollection<AuthzRoleDTO> collection;
+    private final MongoCollection<Document> documentCollection;
     private final UserService userService;
 
+    private final MongoUtils<AuthzRoleDTO> mongoUtils;
+    private final MongoPaginationHelper<AuthzRoleDTO> paginationHelper;
+
     @Inject
-    public PaginatedAuthzRolesService(MongoConnection mongoConnection,
-                                      UserService userService,
-                                      MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, AuthzRoleDTO.class, COLLECTION_NAME);
-        this.dbCollection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+    public PaginatedAuthzRolesService(MongoCollections mongoCollections, UserService userService) {
         this.userService = userService;
+
+        collection = mongoCollections.collection(COLLECTION_NAME, AuthzRoleDTO.class);
+        mongoUtils = mongoCollections.utils(collection);
+        paginationHelper = mongoCollections.paginationHelper(collection);
+        documentCollection = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class);
     }
 
     public long count() {
-        return dbCollection.countDocuments();
+        return collection.countDocuments();
     }
 
     public ImmutableSet<String> getAllRoleIds() {
-        // Use a MongoCollection query here to avoid the mongojack deserializing and object creation overhead
-        final FindIterable<Document> docs = dbCollection.find().projection(Projections.include("_id"));
+        // Use a projection here to avoid the mongojack deserializing and object creation overhead
+        final FindIterable<Document> docs = documentCollection.find().projection(Projections.include("_id"));
 
         return StreamSupport.stream(docs.spliterator(), false)
                 .map(doc -> doc.get("_id", ObjectId.class).toHexString())
@@ -69,28 +75,59 @@ public class PaginatedAuthzRolesService extends PaginatedDbService<AuthzRoleDTO>
     }
 
     public List<AuthzRoleDTO> findByIds(Collection<String> ids) {
-        return asImmutableList(db.find(DBQuery.in("_id", ids)));
+        return collection.find(MongoUtils.stringIdsIn(ids)).into(new ArrayList<>());
+    }
+
+    /**
+     * @deprecated Use {@link #findPaginated(SearchQuery, int, int, String, SortOrder)}
+     */
+    @Deprecated
+    public PaginatedList<AuthzRoleDTO> findPaginated(SearchQuery searchQuery, int page,
+                                                     int perPage, String sortField, String order) {
+        return findPaginated(searchQuery, page, perPage, sortField, SortOrder.fromString(order));
     }
 
     public PaginatedList<AuthzRoleDTO> findPaginated(SearchQuery searchQuery, int page,
-                                                     int perPage, String sortField, String order) {
-        final DBQuery.Query dbQuery = searchQuery.toDBQuery();
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
-        return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+                                                     int perPage, String sortField, SortOrder order) {
+        return paginationHelper
+                .filter(searchQuery.toBson())
+                .sort(order.toBsonSort(sortField))
+                .perPage(perPage)
+                .includeGrandTotal(true)
+                .page(page);
     }
 
+    /**
+     * @deprecated use {@link #findPaginatedByIds(SearchQuery, int, int, String, SortOrder, Set)}
+     */
+    @Deprecated
     public PaginatedList<AuthzRoleDTO> findPaginatedByIds(SearchQuery searchQuery,
                                                           int page,
                                                           int perPage,
                                                           String sortField,
                                                           String order,
                                                           Set<String> roleIds) {
-        final DBQuery.Query dbQuery = buildRoleIdsQuery(searchQuery, roleIds);
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
-
-        return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+        return findPaginatedByIds(searchQuery, page, perPage, sortField, SortOrder.fromString(order), roleIds);
     }
 
+    public PaginatedList<AuthzRoleDTO> findPaginatedByIds(SearchQuery searchQuery,
+                                                          int page,
+                                                          int perPage,
+                                                          String sortField,
+                                                          SortOrder order,
+                                                          Set<String> roleIds) {
+        return paginationHelper
+                .filter(buildRoleIdsQuery(searchQuery, roleIds))
+                .sort(order.toBsonSort(sortField))
+                .perPage(perPage)
+                .includeGrandTotal(true)
+                .page(page);
+    }
+
+    /**
+     * @deprecated use {@link #findPaginatedByIdsWithFilter(SearchQuery, Predicate, int, int, String, SortOrder, Set)}
+     */
+    @Deprecated
     public PaginatedList<AuthzRoleDTO> findPaginatedByIdsWithFilter(SearchQuery searchQuery,
                                                                     Predicate<AuthzRoleDTO> filter,
                                                                     int page,
@@ -98,23 +135,40 @@ public class PaginatedAuthzRolesService extends PaginatedDbService<AuthzRoleDTO>
                                                                     String sortField,
                                                                     String order,
                                                                     Set<String> roleIds) {
-        final DBQuery.Query dbQuery = buildRoleIdsQuery(searchQuery, roleIds);
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
+        return findPaginatedByIdsWithFilter(searchQuery, filter, page, perPage, sortField, SortOrder.fromString(order),
+                roleIds);
 
-        return findPaginatedWithQueryFilterAndSort(dbQuery, filter, sortBuilder, page, perPage);
     }
 
-    @Override
+    public PaginatedList<AuthzRoleDTO> findPaginatedByIdsWithFilter(SearchQuery searchQuery,
+                                                                    Predicate<AuthzRoleDTO> filter,
+                                                                    int page,
+                                                                    int perPage,
+                                                                    String sortField,
+                                                                    SortOrder order,
+                                                                    Set<String> roleIds) {
+        return paginationHelper
+                .filter(buildRoleIdsQuery(searchQuery, roleIds))
+                .sort(order.toBsonSort(sortField))
+                .perPage(perPage)
+                .includeGrandTotal(true)
+                .page(page, filter);
+    }
+
     public int delete(String id) {
-        final Optional<AuthzRoleDTO> role = get(id);
-        final int delete = super.delete(id);
+        final Optional<AuthzRoleDTO> role = mongoUtils.getById(id);
+        final int delete = mongoUtils.deleteById(id) ? 1 : 0;
         if (delete > 0) {
             role.ifPresent(r -> userService.dissociateAllUsersFromRole(r.toLegacyRole()));
         }
         return delete;
     }
 
-    private DBQuery.Query buildRoleIdsQuery(SearchQuery searchQuery, Set<String> roleIds) {
-        return DBQuery.and(DBQuery.in("_id", roleIds), searchQuery.toDBQuery());
+    private Bson buildRoleIdsQuery(SearchQuery searchQuery, Set<String> roleIds) {
+        return Filters.and(MongoUtils.stringIdsIn(roleIds), searchQuery.toBson());
+    }
+
+    public Optional<AuthzRoleDTO> get(String roleId) {
+        return mongoUtils.getById(roleId);
     }
 }

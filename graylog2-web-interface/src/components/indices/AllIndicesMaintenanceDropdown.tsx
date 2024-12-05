@@ -17,6 +17,7 @@
 import * as React from 'react';
 
 import { SystemIndexRanges } from '@graylog/server-api';
+
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 
 const _onRecalculateAllIndexRange = () => {

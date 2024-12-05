@@ -17,6 +17,7 @@
 import isEqual from 'lodash/isEqual';
 
 import { SearchSuggestions } from '@graylog/server-api';
+
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';

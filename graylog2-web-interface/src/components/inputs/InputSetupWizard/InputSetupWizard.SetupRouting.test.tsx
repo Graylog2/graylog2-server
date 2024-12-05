@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
 import { Button } from 'components/bootstrap';
@@ -24,6 +24,7 @@ import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import { useInputSetupWizard, InputSetupWizardProvider, INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard';
 import type { WizardData } from 'components/inputs/InputSetupWizard';
 import useStreams from 'components/streams/hooks/useStreams';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 
 import InputSetupWizard from './InputSetupWizard';
 
@@ -49,6 +50,7 @@ const renderWizard = (wizardData: WizardData = {}) => (
 
 jest.mock('components/streams/hooks/useStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
+jest.mock('components/indices/hooks/useIndexSetsList');
 
 const useStreamsResult = (list = []) => ({
   data: { list: list, pagination: { total: 1 }, attributes: [] },
@@ -66,18 +68,124 @@ const pipelinesConnectedMock = (response = []) => ({
   isError: false,
 });
 
+const useIndexSetsListResult = {
+  data: {
+    indexSets:
+     [
+       {
+         id: 'default_id',
+         title: 'Default',
+         description: 'default index set',
+         index_prefix: 'default',
+         shards: 1,
+         replicas: 1,
+         rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+         rotation_strategy: {
+           type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+           max_docs_per_index: 20000000,
+         },
+         retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+         retention_strategy: {
+           type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
+           max_number_of_indices: 2147483647,
+         },
+         index_analyzer: '',
+         index_optimization_max_num_segments: 0,
+         index_optimization_disabled: false,
+         field_type_refresh_interval: 1,
+         writable: true,
+         default: true,
+         can_be_default: true,
+       },
+       {
+         id: 'nox_id',
+         title: 'Nox',
+         description: 'nox index set',
+         index_prefix: 'nox',
+         shards: 1,
+         replicas: 1,
+         rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+         rotation_strategy: {
+           type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+           max_docs_per_index: 20000000,
+         },
+         retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+         retention_strategy: {
+           type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
+           max_number_of_indices: 2147483647,
+         },
+         index_analyzer: '',
+         index_optimization_max_num_segments: 0,
+         index_optimization_disabled: false,
+         field_type_refresh_interval: 1,
+         writable: true,
+         default: false,
+         can_be_default: true,
+       },
+     ],
+    indexSetsCount: 2,
+    indexSetStats: null,
+  },
+  isInitialLoading: false,
+  isSuccess: true,
+  error: undefined,
+  refetch: () => {},
+};
+
+const getStreamCreateFormFields = async () => {
+  const titleInput = await screen.findByRole('textbox', {
+    name: /Title/i,
+    hidden: true,
+  });
+
+  const descriptionInput = await screen.findByRole('textbox', {
+    name: /Description/i,
+    hidden: true,
+  });
+
+  const indexSetSelect = await screen.findByLabelText(/Index Set/i);
+
+  const removeMatchesCheckbox = await screen.findByRole('checkbox', {
+    name: /Remove matches from/i,
+    hidden: true,
+  });
+
+  const newPipelineCheckbox = await screen.findByRole('checkbox', {
+    name: /Create a new pipeline for this stream/i,
+    hidden: true,
+  });
+
+  const submitButton = await screen.findByRole('button', {
+    name: 'Create',
+    hidden: true,
+  });
+
+  return {
+    titleInput,
+    descriptionInput,
+    indexSetSelect,
+    removeMatchesCheckbox,
+    newPipelineCheckbox,
+    submitButton,
+  };
+};
+
+const openWizard = async () => {
+  const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
+
+  fireEvent.click(openButton);
+};
+
 beforeEach(() => {
   asMock(useStreams).mockReturnValue(useStreamsResult());
   asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
+  asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
 });
 
 describe('InputSetupWizard Setup Routing', () => {
   it('should render the Setup Routing step', async () => {
     renderWizard();
-
-    const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
-
-    fireEvent.click(openButton);
+    openWizard();
 
     const wizard = await screen.findByText('Setup Routing');
 
@@ -93,10 +201,7 @@ describe('InputSetupWizard Setup Routing', () => {
     ));
 
     renderWizard();
-
-    const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
-
-    fireEvent.click(openButton);
+    openWizard();
 
     const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
@@ -118,10 +223,7 @@ describe('InputSetupWizard Setup Routing', () => {
     ));
 
     renderWizard();
-
-    const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
-
-    fireEvent.click(openButton);
+    openWizard();
 
     const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
@@ -143,10 +245,7 @@ describe('InputSetupWizard Setup Routing', () => {
     ));
 
     renderWizard();
-
-    const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
-
-    fireEvent.click(openButton);
+    openWizard();
 
     const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
@@ -169,10 +268,7 @@ describe('InputSetupWizard Setup Routing', () => {
     ]));
 
     renderWizard();
-
-    const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
-
-    fireEvent.click(openButton);
+    openWizard();
 
     const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
@@ -189,21 +285,124 @@ describe('InputSetupWizard Setup Routing', () => {
     expect(warningPipeline2).toBeInTheDocument();
   });
 
-  it('should allow the user to create a new stream', async () => {
-    renderWizard();
+  describe('Stream creation', () => {
+    it('should allow the user to create a new stream', async () => {
+      asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
 
-    const openButton = await screen.findByRole('button', { name: /Open Wizard!/i });
+      renderWizard();
+      openWizard();
 
-    fireEvent.click(openButton);
+      const createStreamButton = await screen.findByRole('button', {
+        name: /Create Stream/i,
+        hidden: true,
+      });
 
-    const createStreamButton = await screen.findByRole('button', {
-      name: /Create Stream/i,
-      hidden: true,
+      fireEvent.click(createStreamButton);
+
+      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+
+      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } = await getStreamCreateFormFields();
+
+      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await selectEvent.openMenu(indexSetSelect);
+      await selectEvent.select(indexSetSelect, 'Nox');
+      fireEvent.click(removeMatchesCheckbox);
+      fireEvent.click(newPipelineCheckbox);
+
+      await waitFor(() => expect(submitButton).toBeEnabled());
+      fireEvent.click(submitButton);
+
+      expect(await screen.findByText(/This input will use a new stream: "Wingardium"./i)).toBeInTheDocument();
+      expect(await screen.findByText(/Matches will be removed from the Default stream./i)).toBeInTheDocument();
+      expect(await screen.findByText(/A new pipeline will be created./i)).toBeInTheDocument();
+
+      expect(await screen.findByRole('button', {
+        name: /Reset/i,
+        hidden: true,
+      }),
+      ).toBeInTheDocument();
     });
-    fireEvent.click(createStreamButton);
 
-    const createStreamHeadline = await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+    it('should disable and enable the next step button', async () => {
+      asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
 
-    expect(createStreamHeadline).toBeInTheDocument();
+      renderWizard();
+      openWizard();
+
+      const createStreamButton = await screen.findByRole('button', {
+        name: /Create Stream/i,
+        hidden: true,
+      });
+
+      const nextStepButton = await screen.findByRole('button', {
+        name: /Finish & Start Input/i,
+        hidden: true,
+      });
+
+      expect(nextStepButton).toBeEnabled();
+
+      fireEvent.click(createStreamButton);
+
+      expect(nextStepButton).toBeDisabled();
+
+      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+
+      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } = await getStreamCreateFormFields();
+
+      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await selectEvent.openMenu(indexSetSelect);
+      await selectEvent.select(indexSetSelect, 'Nox');
+      fireEvent.click(removeMatchesCheckbox);
+      fireEvent.click(newPipelineCheckbox);
+
+      await waitFor(() => expect(submitButton).toBeEnabled());
+      fireEvent.click(submitButton);
+
+      expect(await screen.findByText(/This input will use a new stream: "Wingardium"./i)).toBeInTheDocument();
+
+      expect(nextStepButton).toBeEnabled();
+    });
+
+    it('should allow the user to reset the new stream', async () => {
+      asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
+
+      renderWizard();
+      openWizard();
+
+      const createStreamButton = await screen.findByRole('button', {
+        name: /Create Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(createStreamButton);
+
+      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+
+      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } = await getStreamCreateFormFields();
+
+      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await selectEvent.openMenu(indexSetSelect);
+      await selectEvent.select(indexSetSelect, 'Nox');
+      fireEvent.click(removeMatchesCheckbox);
+      fireEvent.click(newPipelineCheckbox);
+
+      await waitFor(() => expect(submitButton).toBeEnabled());
+      fireEvent.click(submitButton);
+
+      expect(await screen.findByText(/This input will use a new stream: "Wingardium"./i)).toBeInTheDocument();
+
+      const resetButton = await screen.findByRole('button', {
+        name: /Reset/i,
+        hidden: true,
+      });
+
+      fireEvent.click(resetButton);
+
+      expect(screen.queryByRole('heading', { name: /Create new stream/i, hidden: true })).not.toBeInTheDocument();
+      expect(await screen.findByRole('heading', { name: /Route to a new Stream/i, hidden: true })).toBeInTheDocument();
+    });
   });
 });

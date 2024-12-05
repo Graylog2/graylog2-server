@@ -63,6 +63,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.DefaultFailureContextCreator;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.audit.jersey.SuccessContextCreator;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
@@ -120,6 +121,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -611,6 +613,10 @@ public class StreamResource extends RestResource {
     @ApiOperation(value = "Get pipelines associated with a stream")
     @Produces(MediaType.APPLICATION_JSON)
     public List<PipelineCompactSource> getConnectedPipelines(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
+        if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+            throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
+        }
+
         PipelineConnections pipelineConnections = pipelineStreamConnectionsService.load(streamId);
         List<PipelineCompactSource> list = new ArrayList<>();
 
@@ -629,29 +635,31 @@ public class StreamResource extends RestResource {
     @NoAuditEvent("No data is changed.")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, List<PipelineCompactSource>> getConnectedPipelinesForStreams(@ApiParam(name = "streamIds", required = true) GetConnectedPipelinesRequest request) {
-        return request.streamIds().stream()
-                .collect(Collectors.toMap(streamId -> streamId, streamId -> {
+        final var streamIds = request.streamIds.stream()
+                .filter((streamId) -> {
                     if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
                         throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
                     }
-                    final PipelineConnections pipelineConnections;
-                    try {
-                        pipelineConnections = pipelineStreamConnectionsService.load(streamId);
-                    } catch (NotFoundException ignored) {
-                        return List.of();
-                    }
-                    final List<PipelineCompactSource> list = new ArrayList<>();
+                    return true;
+                })
+                .collect(Collectors.toSet());
 
-                    for (String id : pipelineConnections.pipelineIds()) {
-                        try {
-                            PipelineDao pipelineDao = pipelineService.load(id);
-                            list.add(PipelineCompactSource.create(pipelineDao.id(), pipelineDao.title()));
-                        } catch (NotFoundException ignored) {
-                        }
-                    }
-                    return list;
+        final var pipelineConnections = pipelineStreamConnectionsService.loadByStreamIds(streamIds);
+        final var pipelineIds = pipelineConnections.values().stream()
+                .flatMap(connection -> connection.pipelineIds().stream())
+                .collect(Collectors.toSet());
+        final var pipelines = pipelineService.loadByIds(pipelineIds).stream()
+                .collect(Collectors.toMap(MongoEntity::id, pipeline -> pipeline));
+        return request.streamIds().stream()
+                .collect(Collectors.toMap(streamId -> streamId, streamId -> {
+                    final var pipelinesForStream = Optional.ofNullable(pipelineConnections.get(streamId))
+                            .map(PipelineConnections::pipelineIds)
+                            .orElse(Set.of());
+                    return pipelinesForStream.stream()
+                            .map(pipelines::get)
+                            .map(pipeline -> PipelineCompactSource.create(pipeline.id(), pipeline.title()))
+                            .toList();
                 }));
-
     }
 
     @PUT
