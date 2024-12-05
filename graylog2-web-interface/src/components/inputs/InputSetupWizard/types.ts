@@ -16,12 +16,9 @@
  */
 export const INPUT_WIZARD_STEPS = {
   SELECT_CATEGORY: 'SELECT_CATEGORY',
-  PREFLIGHT: 'PREFLIGHT',
-  ACTIVATE_ILLUMINATE: 'ACTIVATE_ILLUMINATE',
-  TEST_INPUT: 'TEST_INPUT',
+  INPUT_DIAGNOSIS: 'INPUT_DIAGNOSIS',
   SETUP_ROUTING: 'SETUP_ROUTING',
-  CREATE_STREAM: 'CREATE_STREAM',
-  COMPLETE: 'COMPLETE',
+  START_INPUT: 'START_INPUT',
 } as const;
 
 export const INPUT_WIZARD_CATEGORIES = {
@@ -34,14 +31,16 @@ export const INPUT_WIZARD_SUBCATEGORIES = {
 
 export type InputSetupWizardStep = typeof INPUT_WIZARD_STEPS[keyof typeof INPUT_WIZARD_STEPS]
 export type InputSetupWizardCategory = typeof INPUT_WIZARD_CATEGORIES[keyof typeof INPUT_WIZARD_CATEGORIES]
-export type InputSetupWizardSubcategory = typeof INPUT_WIZARD_SUBCATEGORIES[keyof typeof INPUT_WIZARD_SUBCATEGORIES]
+
+export interface StepData {
+  enabled?: boolean
+}
 
 export type StepsData = {
-  [key in InputSetupWizardStep]?: any
+  [key in InputSetupWizardStep]?: StepData
 }
 
 export type WizardData = {
   inputId?: string,
   category?: InputSetupWizardCategory
-  subcategory?: InputSetupWizardSubcategory
 }

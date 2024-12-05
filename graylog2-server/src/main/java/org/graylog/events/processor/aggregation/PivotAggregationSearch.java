@@ -23,10 +23,10 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
-import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
@@ -55,8 +55,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -98,10 +99,11 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final QueryEngine queryEngine;
     private final EventsConfigurationProvider configurationProvider;
     private final EventDefinition eventDefinition;
-    private final MoreSearch moreSearch;
     private final PermittedStreams permittedStreams;
     private final NotificationService notificationService;
     private final QueryStringDecorators queryStringDecorators;
+    private final StreamService streamService;
+    private final boolean isCloud;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
@@ -112,10 +114,11 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   SearchJobService searchJobService,
                                   QueryEngine queryEngine,
                                   EventsConfigurationProvider configProvider,
-                                  MoreSearch moreSearch,
                                   PermittedStreams permittedStreams,
                                   NotificationService notificationService,
-                                  QueryStringDecorators queryStringDecorators) {
+                                  QueryStringDecorators queryStringDecorators,
+                                  StreamService streamService,
+                                  @Named("is_cloud") boolean isCloud) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
@@ -124,10 +127,11 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
         this.configurationProvider = configProvider;
-        this.moreSearch = moreSearch;
         this.permittedStreams = permittedStreams;
         this.notificationService = notificationService;
         this.queryStringDecorators = queryStringDecorators;
+        this.streamService = streamService;
+        this.isCloud = isCloud;
     }
 
     private String metricName(SeriesSpec series) {
@@ -170,17 +174,19 @@ public class PivotAggregationSearch implements AggregationSearch {
                 return AggregationResult.empty();
             }
 
-            final String description = f("Event definition %s (%s) failed: %s",
-                    eventDefinition.title(), eventDefinition.id(),
-                    errors.stream().map(SearchError::description).collect(Collectors.joining("\n")));
-            Notification systemNotification = notificationService.buildNow()
-                    .addType(Notification.Type.SEARCH_ERROR)
-                    .addSeverity(Notification.Severity.NORMAL)
-                    .addTimestamp(DateTime.now(DateTimeZone.UTC))
-                    .addKey(eventDefinition.id())
-                    .addDetail("title", "Aggregation search failed")
-                    .addDetail("description", description);
-            notificationService.publishIfFirst(systemNotification);
+            if (!suppressInCloud(errors)) {
+                final String description = f("Event definition %s (%s) failed: %s",
+                        eventDefinition.title(), eventDefinition.id(),
+                        errors.stream().map(SearchError::description).collect(Collectors.joining("\n")));
+                Notification systemNotification = notificationService.buildNow()
+                        .addType(Notification.Type.SEARCH_ERROR)
+                        .addSeverity(Notification.Severity.NORMAL)
+                        .addTimestamp(DateTime.now(DateTimeZone.UTC))
+                        .addKey(eventDefinition.id())
+                        .addDetail("title", "Aggregation search failed")
+                        .addDetail("description", description);
+                notificationService.publishIfFirst(systemNotification);
+            }
 
             if (errors.size() > 1) {
                 throw new EventProcessorException("Pivot search failed with multiple errors.", false, eventDefinition);
@@ -199,6 +205,22 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .sourceStreams(extractSourceStreams(streamsResult))
                 .additionalResults(additionalResults)
                 .build();
+    }
+
+    // Suppress notification when error likely due to Cloud maintenance work
+    private boolean suppressInCloud(Set<SearchError> errors) {
+        if (!isCloud) {
+            return false;
+        }
+        if (errors.stream()
+                .map(SearchError::description)
+                .filter(s -> s.contains("node_not_connected"))
+                .findFirst()
+                .isEmpty()) {
+            return false;
+        }
+        LOG.debug("Suppressed node_not_connected notification in Cloud");
+        return true;
     }
 
     private ImmutableSet<String> extractSourceStreams(PivotResult pivotResult) {
@@ -307,7 +329,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             }
 
             // Safety guard against programming errors
-            if (row.key().size() == 0 || isNullOrEmpty(row.key().get(0))) {
+            if (row.key().isEmpty() || isNullOrEmpty(row.key().get(0))) {
                 throw new EventProcessorException("Invalid row key! Expected at least the date range timestamp value: " + row.key().toString(), true, eventDefinition);
             }
 
@@ -349,7 +371,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                             values.add(seriesValue);
                         } else {
                             // Should not happen
-                            throw new IllegalStateException("Got unexpected non-number value for " + series.toString() + " " + row.toString() + " " + value.toString());
+                            throw new IllegalStateException("Got unexpected non-number value for " + series + " " + row + " " + value);
                         }
                     }
                 }
@@ -371,6 +393,10 @@ public class PivotAggregationSearch implements AggregationSearch {
         return results.build();
     }
 
+    private ImmutableSet<String> loadAllStreams() {
+        return permittedStreams.loadAllMessageStreams((streamId) -> true);
+    }
+
     private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, User user,
                                    long searchWithinMs, long executeEveryMs) throws EventProcessorException {
         final var username = user.name();
@@ -381,7 +407,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         // This adds all streams if none were provided
         // TODO: Once we introduce "EventProcessor owners" this should only load the permitted streams of the
         //       user who created this EventProcessor.
-        search = search.addStreamsToQueriesWithoutStreams(() -> permittedStreams.loadAllMessageStreams((streamId) -> true));
+        search = search.addStreamsToQueriesWithoutStreams(this::loadAllStreams);
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username, NO_CANCELLATION), Collections.emptySet(), user.timezone());
         try {
             Uninterruptibles.getUninterruptibly(
@@ -527,13 +553,14 @@ public class PivotAggregationSearch implements AggregationSearch {
             // TODO: How to take into consideration StreamPermissions here???
             streamIds.addAll(permittedStreams.loadWithCategories(config.streamCategories(), (streamId) -> true));
         }
-        final Set<String> existingStreams = moreSearch.loadStreams(streamIds).stream()
-                .map(Stream::getId)
+        final Set<String> existingStreams = streamService.loadByIds(streamIds)
+                .stream()
+                .map(Persisted::getId)
                 .collect(toSet());
         final Set<String> nonExistingStreams = streamIds.stream()
                 .filter(stream -> !existingStreams.contains(stream))
                 .collect(toSet());
-        if (nonExistingStreams.size() != 0) {
+        if (!nonExistingStreams.isEmpty()) {
             LOG.warn("Removing non-existing streams <{}> from event definition <{}>/<{}>",
                     nonExistingStreams,
                     eventDefinition.id(),

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.shared.users.Role;
 import org.graylog2.users.RoleImpl;
 import org.mongojack.Id;
@@ -31,7 +32,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = AuthzRoleDTO.Builder.class)
-public abstract class AuthzRoleDTO {
+public abstract class AuthzRoleDTO implements MongoEntity {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_NAME = "name";

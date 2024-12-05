@@ -17,7 +17,7 @@
 import React from 'react';
 
 import type { Attribute } from 'stores/PaginationTypes';
-import MenuItem from 'components/bootstrap/MenuItem';
+import { MenuItem } from 'components/bootstrap';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { Filters } from 'components/common/EntityFilters/types';
 
