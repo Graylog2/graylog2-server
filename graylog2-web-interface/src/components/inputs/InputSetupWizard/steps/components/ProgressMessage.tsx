@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import type FetchError from 'logic/errors/FetchError';
 import { Spinner, Icon } from 'components/common';
@@ -27,6 +28,14 @@ type Props = {
   isError: boolean,
   errorMessage?: FetchError,
 }
+
+const SuccessIcon = styled(Icon)(({ theme }) => css`
+  color: ${theme.colors.variant.success}
+`);
+
+const ErrorIcon = styled(Icon)(({ theme }) => css`
+  color: ${theme.colors.variant.danger}
+`);
 
 const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, errorMessage = undefined } : Props) => {
   const loadingText: {[key in ProcessingSteps]: string} = {
@@ -60,7 +69,7 @@ const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, errorMessage
   if (isError) {
     return (
       <>
-        <p><Icon name="check" title={errorText[stepName]} /></p>
+        <p><ErrorIcon name="close" title={errorText[stepName]} /> {errorText[stepName]}</p>
         {errorMessage && (<p><strong>Details:</strong> {errorMessage.message}</p>)}
       </>
     );
@@ -68,7 +77,7 @@ const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, errorMessage
 
   if (isSuccess) {
     return (
-      <p><Icon name="close" title={successText[stepName]} /></p>
+      <p><SuccessIcon name="check" title={successText[stepName]} /> {successText[stepName]}</p>
     );
   }
 
