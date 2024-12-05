@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search.engine;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Query;
@@ -32,8 +31,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
-import org.graylog2.storage.DetectedSearchVersion;
-import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.providers.ElasticsearchBackendProvider;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,18 +54,15 @@ public class QueryEngine {
 
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
-    private final SearchVersion detectedVersion;
-    private final Map<SearchVersion, Provider<QueryBackend<? extends GeneratedQueryContext>>> versionedBackends;
+    private final ElasticsearchBackendProvider elasticsearchBackendProvider;
     private final Map<String, QueryBackend<? extends GeneratedQueryContext>> unversionedBackends;
 
     @Inject
-    public QueryEngine(@DetectedSearchVersion SearchVersion detectedVersion,
-                       Map<SearchVersion, Provider<QueryBackend<? extends GeneratedQueryContext>>> versionedBackends,
+    public QueryEngine(ElasticsearchBackendProvider elasticsearchBackendProvider,
                        Map<String, QueryBackend<? extends GeneratedQueryContext>> unversionedBackends,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
                        QueryParser queryParser) {
-        this.detectedVersion = detectedVersion;
-        this.versionedBackends = versionedBackends;
+        this.elasticsearchBackendProvider = elasticsearchBackendProvider;
         this.unversionedBackends = unversionedBackends;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
@@ -153,7 +148,7 @@ public class QueryEngine {
     private QueryBackend<? extends GeneratedQueryContext> getBackendForQuery(Query query) {
         var backendQuery = query.query();
         if (backendQuery.type().equals(ElasticsearchQueryString.NAME)) {
-            return versionedBackends.get(detectedVersion).get();
+            return elasticsearchBackendProvider.get();
         }
         if (unversionedBackends.containsKey(backendQuery.type())) {
             return unversionedBackends.get(backendQuery.type());
