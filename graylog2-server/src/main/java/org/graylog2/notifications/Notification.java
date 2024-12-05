@@ -94,7 +94,6 @@ public interface Notification extends Persisted {
         SEARCH_ERROR,
         SIDECAR_STATUS_UNKNOWN,
         CERTIFICATE_NEEDS_RENEWAL,
-        EVENT_LIMIT_REACHED,
         DRAWDOWN_LICENSE_ERROR,
         REMOTE_REINDEX_RUNNING,
         REMOTE_REINDEX_FINISHED,
