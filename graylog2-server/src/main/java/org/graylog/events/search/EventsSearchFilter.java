@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -54,7 +54,7 @@ public abstract class EventsSearchFilter {
     public abstract Set<String> priority();
 
     @JsonProperty(FIELD_AGGREGATION_TIMERANGE)
-    public abstract Optional<AbsoluteRange> aggregationTimerange();
+    public abstract Optional<TimeRange> aggregationTimerange();
 
     @JsonProperty(FIELD_KEY)
     public abstract Set<String> key();
@@ -90,7 +90,7 @@ public abstract class EventsSearchFilter {
         public abstract Builder priority(Set<String> priority);
 
         @JsonProperty(FIELD_AGGREGATION_TIMERANGE)
-        public abstract Builder aggregationTimerange(AbsoluteRange aggregationTimerange);
+        public abstract Builder aggregationTimerange(TimeRange aggregationTimerange);
 
         @JsonProperty(FIELD_KEY)
         public abstract Builder key(Set<String> key);

@@ -27,6 +27,7 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.database.Persisted;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
@@ -89,23 +90,25 @@ public class EventsSearchService {
                     .collect(joiningQueriesWithOR));
         }
 
-        parameters.filter().aggregationTimerange().ifPresent(aggregationTimerange -> {
-            filterBuilder.add(
-                    TermRangeQuery.newStringRange(
-                            EventDto.FIELD_TIMERANGE_START,
-                            quote("1970-01-01 00:00:00.000"),
-                            quote(aggregationTimerange.from().toString(ES_DATE_FORMAT_FORMATTER)),
-                            true,
-                            true).toString()
-            );
-            filterBuilder.add(
-                    TermRangeQuery.newStringRange(
-                            EventDto.FIELD_TIMERANGE_END,
-                            quote(aggregationTimerange.to().toString(ES_DATE_FORMAT_FORMATTER)),
-                            quote("2038-01-01 00:00:00.000"),
-                            true,
-                            true).toString()
-            );
+        parameters.filter().aggregationTimerange()
+                .filter(TimeRange::isAllMessages)
+                .ifPresent(aggregationTimerange -> {
+                    filterBuilder.add(
+                            TermRangeQuery.newStringRange(
+                                    EventDto.FIELD_TIMERANGE_START,
+                                    quote("1970-01-01 00:00:00.000"),
+                                    quote(aggregationTimerange.getFrom().toString(ES_DATE_FORMAT_FORMATTER)),
+                                    true,
+                                    true).toString()
+                    );
+                    filterBuilder.add(
+                            TermRangeQuery.newStringRange(
+                                    EventDto.FIELD_TIMERANGE_END,
+                                    quote(aggregationTimerange.getTo().toString(ES_DATE_FORMAT_FORMATTER)),
+                                    quote("2038-01-01 00:00:00.000"),
+                                    true,
+                                    true).toString()
+                    );
         });
 
         if (!parameters.filter().key().isEmpty()) {
