@@ -58,7 +58,7 @@ type AlertConditionSummary = {
   title: string | null | undefined,
 };
 
-type StreamConfiguration = Pick<Stream,
+export type StreamConfiguration = Pick<Stream,
 'index_set_id' |
 'title' |
 'matching_type' |

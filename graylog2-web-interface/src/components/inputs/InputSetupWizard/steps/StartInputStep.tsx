@@ -15,18 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
+import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Button, Row, Col } from 'components/bootstrap';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import type { StepData } from 'components/inputs/InputSetupWizard/types';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData, getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
-import usePipelineRoutingMutation from 'components/inputs/InputSetupWizard/hooks/usePipelineRoutingMutation';
 import type { RoutingStepData } from 'components/inputs/InputSetupWizard/steps/SetupRoutingStep';
-import { StreamsActions } from 'stores/streams/StreamsStore';
+import SourceGenerator from 'logic/pipelines/SourceGenerator';
+import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
+import ProgressMessage from 'components/inputs/InputSetupWizard/steps/components/ProgressMessage';
 
 const StepCol = styled(Col)(({ theme }) => css`
   padding-left: ${theme.spacings.lg};
@@ -53,9 +55,11 @@ interface StartInputStepData extends StepData {
 
 }
 
+export type ProcessingSteps = 'createStream' | 'startStream' | 'createPipeline' | 'setupRouting' | 'startInput'
+
 const StartInputStep = () => {
   const currentStepName = INPUT_WIZARD_STEPS.START_INPUT;
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsData, setStepsData, wizardData, updateWizardData } = useInputSetupWizard();
+  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsData, setStepsData, wizardData } = useInputSetupWizard();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
   const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsData);
@@ -63,8 +67,20 @@ const StartInputStep = () => {
   const isRunningOrDone = startInputStatus === 'RUNNING' || startInputStatus === 'SUCCESS';
   const notStartedOrFailed = startInputStatus === 'NOT_STARTED' || startInputStatus === 'FAILED';
   const hasBeenStarted = startInputStatus !== 'NOT_STARTED';
-  const { updateRouting } = usePipelineRoutingMutation();
-  const [processMessages, setProcessMessages] = useState<Array<string>>([]);
+
+  const {
+    createStreamMutation,
+    startStreamMutation,
+    createPipelineMutation,
+    updateRoutingMutation,
+  } = useSetupInputMutations();
+
+  const stepMutations = useMemo<{[key in ProcessingSteps]?}>(() => ({
+    createStream: createStreamMutation,
+    startStream: startStreamMutation,
+    createPipeline: createPipelineMutation,
+    setupRouting: updateRoutingMutation,
+  }), [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation]);
 
   useEffect(() => {
     if (orderedSteps && activeStep && stepsData) {
@@ -73,33 +89,32 @@ const StartInputStep = () => {
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const addMessage = (msg: string) => {
-    setProcessMessages([...processMessages, msg]);
+  const createPipeline = async (stream: StreamConfiguration) => {
+    const pipeline = {
+      title: stream.title,
+      description: `Pipeline for Stream: ${stream.title} created by the Input Setup Wizard.`,
+    };
+
+    const requestPipeline = {
+      ...pipeline,
+      source: SourceGenerator.generatePipeline({ ...pipeline, stages: [{ stage: 0, rules: [], match: '' }] }),
+    };
+
+    return createPipelineMutation.mutateAsync(requestPipeline);
   };
 
-  const createStream = (stream: any, newPipeline?: boolean = false) => {
-    addMessage('Creating stream...');
-
-    // newPipeline
-
-    return StreamsActions.save(stream);
-  };
-
-  const startInput = () => {
+  const startInput = async () => {
     const { input } = wizardData;
 
     if (!input) return;
 
-    addMessage('Starting input...');
-
     InputStatesStore.start(input)
       .finally(() => {
         setStartInputStatus('SUCCESS');
-        addMessage('Input started');
       });
   };
 
-  const setupInput = () => {
+  const setupInput = async () => {
     const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
     const { input } = wizardData;
     const inputId = input?.id;
@@ -108,34 +123,30 @@ const StartInputStep = () => {
 
     switch (routingStepData.streamType) {
       case 'NEW':
-        createStream(routingStepData.newStream, routingStepData.shouldCreateNewPipeline).then((stream) => {
-          addMessage('Stream created');
-          addMessage('Setting up routing...');
 
-          updateRouting({ input_id: inputId, stream_id: stream.id }).then(() => {
-            addMessage('Routing to new stream set up.');
-            startInput();
-          });
+        if (routingStepData.shouldCreateNewPipeline) {
+          createPipeline(routingStepData.newStream);
+        }
+
+        createStreamMutation.mutateAsync(routingStepData.newStream, {
+          onSuccess: (response) => {
+            startStreamMutation.mutateAsync(response.stream_id);
+
+            updateRoutingMutation.mutateAsync({ input_id: inputId, stream_id: response.stream_id }).finally(() => {
+              startInput();
+            });
+          },
         });
 
         break;
       case 'EXISTING':
-        addMessage('Setting up routing...');
-
-        updateRouting({ input_id: inputId, stream_id: routingStepData.streamId }).then(() => {
-          addMessage('Routing to existing stream set up.');
+        updateRoutingMutation.mutateAsync({ input_id: inputId, stream_id: routingStepData.streamId }).finally(() => {
           startInput();
         });
 
         break;
       case 'DEFAULT':
-        addMessage('Setting up routing...');
-
-        updateRouting({ input_id: inputId, stream_id: routingStepData.defaultStreamId }).then(() => {
-          addMessage('Routing to default stream set up.');
-          startInput();
-        });
-
+        startInput();
         break;
 
       default:
@@ -175,10 +186,24 @@ const StartInputStep = () => {
             {startInputStatus !== 'NOT_STARTED' && (
               <>
                 <StyledHeading>Setting up input</StyledHeading>
-                {processMessages.length > 0 && (
-                  processMessages.map((message) => <p key={message}>{message}</p>,
-                  )
-                )}
+                  {Object.keys(stepMutations).map((stepName) => {
+                    const mutation = stepMutations[stepName];
+                    if (mutation.isIdle) return null;
+
+                    return (
+                      <ProgressMessage stepName={stepName as ProcessingSteps}
+                                       isLoading={mutation.isLoading}
+                                       isSuccess={mutation.isSuccess}
+                                       isError={mutation.isError}
+                                       errorMessage={mutation.error} /> // todo handle error format
+                    );
+                  })}
+                  {startInputStatus && (
+                  <ProgressMessage stepName="startInput"
+                                   isLoading={false}
+                                   isSuccess={startInputStatus === 'SUCCESS'}
+                                   isError={startInputStatus === 'FAILED'} />
+                  )}
               </>
             )}
             {(notStartedOrFailed) && (

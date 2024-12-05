@@ -69,7 +69,6 @@ const ConntectedPipelinesList = styled.ul`
 
 export interface RoutingStepData extends StepData {
   streamId?: string,
-  defaultStreamId?: string,
   newStream?: StreamFormValues,
   shouldCreateNewPipeline?: boolean,
   streamType: 'NEW' | 'EXISTING' | 'DEFAULT'
@@ -91,7 +90,7 @@ const SetupRoutingStep = () => {
   const defaultStepData: RoutingStepData = { streamType: 'DEFAULT' };
 
   const isStepValid = () => {
-    const { streamType, streamId, defaultStreamId } = getStepData(stepsData, currentStepName);
+    const { streamType, streamId } = getStepData(stepsData, currentStepName);
 
     if (showCreateStream && !newStream) return false;
 
@@ -105,20 +104,11 @@ const SetupRoutingStep = () => {
 
         return true;
       case 'DEFAULT':
-        if (!defaultStreamId) return false;
-
         return true;
       default:
         return false;
     }
   };
-
-  const defaultStream = useMemo(() => {
-    if (!streams) return undefined;
-
-    return streams
-      .filter(({ is_default }) => is_default)[0];
-  }, [streams]);
 
   useEffect(() => {
     if (orderedSteps && activeStep && stepsData) {
@@ -130,12 +120,6 @@ const SetupRoutingStep = () => {
       setStepsData(withNextStepEnabled);
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (defaultStream) {
-      setStepsData(updateStepData(stepsData, currentStepName, { defaultStreamId: defaultStream.id } as RoutingStepData));
-    }
-  }, [defaultStream, currentStepName, stepsData, setStepsData]);
 
   const options = useMemo(() => {
     if (!streams) return [];
@@ -154,6 +138,11 @@ const SetupRoutingStep = () => {
     setStepsData(
       updateStepData(stepsData, currentStepName, { streamId, streamType: 'EXISTING' } as RoutingStepData),
     );
+  };
+
+  const handleCreateStream = () => {
+    updateStepData(stepsData, currentStepName, defaultStepData);
+    setShowCreateStream(true);
   };
 
   const onNextStep = () => {
@@ -184,8 +173,6 @@ const SetupRoutingStep = () => {
 
   const backButtonText = newStream ? 'Reset' : 'Back';
   const showNewStreamSection = newStream || showCreateStream;
-
-  // todo validate step
 
   return (
     <Row>
@@ -243,7 +230,7 @@ const SetupRoutingStep = () => {
             </ExistingStreamCol>
             <CreateStreamCol md={6}>
               <StyledHeading>Route to a new Stream</StyledHeading>
-              <Button onClick={() => setShowCreateStream(true)} bsStyle="primary">Create Stream</Button>
+              <Button onClick={handleCreateStream} bsStyle="primary">Create Stream</Button>
             </CreateStreamCol>
           </Row>
         )}
