@@ -28,8 +28,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
+import org.graylog.datanode.bindings.DatanodeServerBindings;
 import org.graylog.datanode.bindings.PeriodicalBindings;
-import org.graylog.datanode.bindings.ServerBindings;
 import org.graylog.datanode.bootstrap.DatanodeBootstrap;
 import org.graylog.datanode.bootstrap.Main;
 import org.graylog.datanode.configuration.DatanodeProvisioningBindings;
@@ -72,7 +72,7 @@ public class Datanode extends DatanodeBootstrap {
         modules.add(
                 new ConfigurationModule(configuration),
                 new MongoDBModule(),
-                new ServerBindings(configuration, isMigrationCommand()),
+                new DatanodeServerBindings(),
                 new RestBindings(),
                 new DatanodeProvisioningBindings(),
                 new PeriodicalBindings()
