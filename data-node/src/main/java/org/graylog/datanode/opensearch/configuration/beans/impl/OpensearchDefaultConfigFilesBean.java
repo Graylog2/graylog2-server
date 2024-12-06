@@ -95,8 +95,8 @@ public class OpensearchDefaultConfigFilesBean implements OpensearchConfiguration
             public FileVisitResult visitFile(Path sourceFile, BasicFileAttributes attrs) {
                 final Path relativePath = source.relativize(sourceFile);
                 try {
-                    configFiles.add(new InputStreamConfigFile(relativePath, new FileInputStream(sourceFile.toFile())));
-                } catch (FileNotFoundException e) {
+                    configFiles.add(new InputStreamConfigFile(relativePath, Files.newInputStream(sourceFile)));
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 return FileVisitResult.CONTINUE;

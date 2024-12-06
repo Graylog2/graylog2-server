@@ -144,6 +144,8 @@ public class DatanodeDirectories {
     /**
      * This is a subdirectory of {@link #getConfigurationTargetDir()}. It's used by us to synchronize and generate opensearch
      * configuration. Opensearch is then instructed to accept this dir as its base configuration dir (OPENSEARCH_PATH_CONF env property).
+      * Opensearch configuration is always regenerated during runtime, so the target dir may be temp and deleted when
+     * the JVM terminates. This prevents concurrency collisions, outdated files, need to remove existing but not needed.
      */
     public OpensearchConfigurationDir createUniqueOpensearchProcessConfigurationDir() {
         final Path configRootDir = getConfigurationTargetDir();
