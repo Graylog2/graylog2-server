@@ -43,7 +43,7 @@ public interface EventDefinition {
 
     default String remediationSteps() {
         return null;
-    };
+    }
 
     @Nullable
     DateTime updatedAt();
@@ -71,5 +71,9 @@ public interface EventDefinition {
 
     default Set<String> requiredPermissions() {
         return config().requiredPermissions();
+    }
+
+    default String eventProcedureId() {
+        return null;
     }
 }
