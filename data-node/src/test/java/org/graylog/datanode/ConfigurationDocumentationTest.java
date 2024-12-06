@@ -22,15 +22,13 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.ClassUtils;
 import org.bson.assertions.Assertions;
-import org.graylog.datanode.commands.Server;
+import org.graylog.datanode.commands.Datanode;
 import org.graylog2.configuration.Documentation;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +38,7 @@ class ConfigurationDocumentationTest {
 
     @Test
     void testAllFieldsAreDocumented() {
-        final List<Object> datanodeConfiguration = new Server().getCommandConfigurationBeans();
+        final List<Object> datanodeConfiguration = new Datanode().getNodeCommandConfigurationBeans();
         final List<Field> undocumentedFields = datanodeConfiguration.stream().flatMap(configurationBean -> {
             return Arrays.stream(configurationBean.getClass().getDeclaredFields())
                     .filter(f -> f.isAnnotationPresent(Parameter.class))
@@ -65,7 +63,7 @@ class ConfigurationDocumentationTest {
 
             printer.printRecord("Parameter", "Type", "Required", "Default value", "Description");
 
-            final List<Object> datanodeConfiguration = new Server().getCommandConfigurationBeans();
+            final List<Object> datanodeConfiguration = new Datanode().getNodeCommandConfigurationBeans();
 
             datanodeConfiguration.forEach(configurationBean -> {
                 Arrays.stream(configurationBean.getClass().getDeclaredFields())

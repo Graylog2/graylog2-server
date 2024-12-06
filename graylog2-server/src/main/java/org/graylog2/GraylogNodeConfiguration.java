@@ -14,15 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bindings;
+package org.graylog2;
 
-import com.google.inject.AbstractModule;
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.database.dbcatalog.DbEntitiesScanner;
+import org.graylog2.plugin.ServerStatus;
 
-public class MongoDBModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class).asEagerSingleton();
-    }
+import java.util.Set;
+
+/**
+ * Helper class to hold configuration shared by all Graylog node types
+ */
+public interface GraylogNodeConfiguration {
+
+    boolean withMongoDb();
+
+    boolean withScheduler();
+
+    boolean withEventBus();
+
+    boolean withPlugins();
+
+    boolean withNodeIdFile();
+
+    Set<ServerStatus.Capability> withCapabilities();
+
+    String getEnvironmentVariablePrefix();
+
+    String getSystemPropertyPrefix();
+
+    boolean isMessageRecordingsEnabled();
 }
