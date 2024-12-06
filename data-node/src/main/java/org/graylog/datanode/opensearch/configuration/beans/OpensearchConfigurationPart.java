@@ -19,6 +19,7 @@ package org.graylog.datanode.opensearch.configuration.beans;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nullable;
+import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 
 import java.security.KeyStore;
@@ -46,7 +47,7 @@ public abstract class OpensearchConfigurationPart {
     @Nullable
     public abstract KeyStore trustStore();
 
-    public abstract List<OpensearchConfigurationDirModifier> configurationDirModifiers();
+    public abstract List<ConfigFile> configFiles();
 
     public static Builder builder() {
         return new AutoValue_OpensearchConfigurationPart.Builder()
@@ -54,7 +55,7 @@ public abstract class OpensearchConfigurationPart {
                 .keystoreItems(Collections.emptyMap())
                 .properties(Collections.emptyMap())
                 .javaOpts(Collections.emptyList())
-                .configurationDirModifiers(Collections.emptyList())
+                .configFiles(Collections.emptyList())
                 .securityConfigured(false)
                 .trustStore(null);
     }
@@ -80,10 +81,12 @@ public abstract class OpensearchConfigurationPart {
             return this;
         }
 
-        abstract Builder configurationDirModifiers(List<OpensearchConfigurationDirModifier> configurationDirModifiers);
-        abstract ImmutableList.Builder<OpensearchConfigurationDirModifier> configurationDirModifiersBuilder();
-        public final Builder addConfigurationDirModifier(OpensearchConfigurationDirModifier modifier) {
-            configurationDirModifiersBuilder().add(modifier);
+        public abstract Builder configFiles(List<ConfigFile> configFiles);
+
+        abstract ImmutableList.Builder<ConfigFile> configFilesBuilder();
+
+        public Builder withConfigFile(ConfigFile configFile) {
+            configFilesBuilder().add(configFile);
             return this;
         }
 

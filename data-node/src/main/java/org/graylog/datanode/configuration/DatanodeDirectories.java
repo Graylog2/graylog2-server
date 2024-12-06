@@ -172,6 +172,7 @@ public class DatanodeDirectories {
     }
 
     public Path createOpensearchProcessConfigurationFile(Path relativePath) throws IOException {
+        // TODO: check and create parent directories if necessary!
         final Path resolvedPath = getOpensearchProcessConfigurationDir().resolve(relativePath);
         return createRestrictedAccessFile(resolvedPath);
     }

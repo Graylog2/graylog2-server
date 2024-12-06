@@ -26,6 +26,8 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.exec.OS;
+import org.graylog.datanode.configuration.OpensearchConfigurationException;
+import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.process.CommandLineProcess;
 import org.graylog.datanode.process.CommandLineProcessListener;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -93,12 +96,20 @@ public class OpensearchCommandLineProcess implements Closeable {
         try {
             final Path configFile = config.datanodeDirectories().createOpensearchProcessConfigurationFile(CONFIG);
             mapper.writeValue(configFile.toFile(), getOpensearchConfigurationArguments(config));
-            final Path opensearchProcessConfigurationDir = config.datanodeDirectories().getOpensearchProcessConfigurationDir();
-            config.configDirModifiers().forEach(modifier -> {
-                modifier.modifyConfigDir(opensearchProcessConfigurationDir);
-            });
+            config.configFiles().forEach(cf -> persistConfigFile(config, cf));
         } catch (IOException e) {
             throw new RuntimeException("Could not generate OpenSearch config: " + e.getMessage(), e);
+        }
+    }
+
+    private static void persistConfigFile(OpensearchConfiguration config, ConfigFile cf) {
+        try {
+            final Path targetFile = config.datanodeDirectories().createOpensearchProcessConfigurationFile(cf.relativePath());
+            try (final FileOutputStream file = new FileOutputStream(targetFile.toFile())) {
+                cf.write(file);
+            }
+        } catch (IOException e) {
+            throw new OpensearchConfigurationException("Failed to create opensearch config file " + cf.relativePath(), e);
         }
     }
 

@@ -20,8 +20,8 @@ import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationDirModifier;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
+import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
 import org.graylog.datanode.process.Environment;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
@@ -121,9 +121,9 @@ public record OpensearchConfiguration(
                 .findFirst();
     }
 
-    public Set<OpensearchConfigurationDirModifier> configDirModifiers() {
+    public List<ConfigFile> configFiles() {
         return configurationParts.stream()
-                .flatMap(c -> c.configurationDirModifiers().stream())
-                .collect(Collectors.toSet());
+                .flatMap(cp -> cp.configFiles().stream())
+                .collect(Collectors.toList());
     }
 }
