@@ -16,7 +16,7 @@
  */
 import React, { useState } from 'react';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, Icon, PageHeader } from 'components/common';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
 import ClusterConfigurationClusterView from 'components/cluster-configuration/ClusterConfigurationClusterView';
@@ -24,19 +24,19 @@ import ClusterConfigurationTableView from 'components/cluster-configuration/Clus
 
 const VIEW_TYPES_SEGMENTS = [
   {
-    value: 'list' as const,
-    label: 'Table view',
+    value: 'cards' as const,
+    label: (<Icon name="account_tree" type='regular' />),
   },
   {
-    value: 'icons' as const,
-    label: 'Cluster view',
+    value: 'list' as const,
+    label: (<Icon name="list" />),
   },
 ];
 
-type ViewTypesSegments = 'list' | 'icons';
+type ViewTypesSegments = 'list' | 'cards';
 
 const ClusterConfigurationPage = () => {
-  const [viewType, setViewType] = useState<ViewTypesSegments>('list');
+  const [viewType, setViewType] = useState<ViewTypesSegments>('cards');
   const { graylogNodes, dataNodes } = useClusterNodes();
 
   return (
@@ -51,17 +51,20 @@ const ClusterConfigurationPage = () => {
           </span>
         </PageHeader>
         <Row className="content">
-          <Col md={12}>
+          <Col xs={6}>
             <h2>Nodes</h2>
-            <br/>
+          </Col>
+          <Col xs={6} style={{ display: 'flex', justifyContent: 'right' }}>
             <SegmentedControl data={VIEW_TYPES_SEGMENTS}
                               radius="sm"
                               value={viewType}
                               onChange={(newViewType) => setViewType(newViewType)} />
+          </Col>
+          <Col md={12}>
             {viewType == 'list' && (
               <ClusterConfigurationTableView graylogNodes={graylogNodes} dataNodes={dataNodes} />
             )}
-            {viewType == 'icons' && (
+            {viewType == 'cards' && (
               <ClusterConfigurationClusterView graylogNodes={graylogNodes} dataNodes={dataNodes} />
             )}
           </Col>
