@@ -27,7 +27,7 @@ jest.mock('util/copyToClipboard', () => jest.fn(() => Promise.resolve()));
 describe('ClipboardIconButton', () => {
   it('should copy provided text to clipboard', async () => {
     const text = 'Text to copy';
-    render(<ClipboardIconButton text={text} buttonTitle="Click here to copy" name="copy_all" />);
+    render(<ClipboardIconButton text={text} buttonTitle="Click here to copy" />);
 
     userEvent.click(await screen.findByRole('button', { name: /click here to copy/i }));
 
