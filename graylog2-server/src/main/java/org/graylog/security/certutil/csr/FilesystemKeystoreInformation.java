@@ -19,10 +19,8 @@ package org.graylog.security.certutil.csr;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -38,7 +36,7 @@ public class FilesystemKeystoreInformation implements KeystoreInformation {
     }
 
     @Override
-    public KeyStore loadKeystore() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
+    public KeyStore loadKeystore() throws IOException, GeneralSecurityException {
         KeyStore keyStore = KeyStore.getInstance(PKCS12);
         try (FileInputStream fis = new FileInputStream(location.toFile())) {
             keyStore.load(fis, password);

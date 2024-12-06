@@ -28,10 +28,8 @@ import org.graylog2.security.TrustManagerAggregator;
 
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +52,7 @@ public class DatanodeTrustManagerProvider implements Provider<X509TrustManager> 
                 .map(t -> {
                     try {
                         return t.loadKeystore();
-                    } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException ex) {
+                    } catch (IOException | GeneralSecurityException ex) {
                         throw new RuntimeException(ex);
                     }
                 })

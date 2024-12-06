@@ -69,9 +69,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -151,7 +149,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     private X509TrustManager createAggregatedTrustManager(FilesystemKeystoreInformation truststore) {
         try {
             return new TrustManagerAggregator(List.of(this.trustManager, TrustManagerAggregator.trustManagerFromKeystore(truststore.loadKeystore())));
-        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
+        } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
     }
