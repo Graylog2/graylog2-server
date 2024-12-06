@@ -27,10 +27,12 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.database.Persisted;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -91,24 +93,7 @@ public class EventsSearchService {
 
         parameters.filter().aggregationTimerange()
                 .filter(range -> !range.isAllMessages())
-                .ifPresent(aggregationTimerange -> {
-                    filterBuilder.add(
-                            TermRangeQuery.newStringRange(
-                                    EventDto.FIELD_TIMERANGE_START,
-                                    quote("1970-01-01 00:00:00.000"),
-                                    quote(aggregationTimerange.getFrom().toString(ES_DATE_FORMAT_FORMATTER)),
-                                    true,
-                                    true).toString()
-                    );
-                    filterBuilder.add(
-                            TermRangeQuery.newStringRange(
-                                    EventDto.FIELD_TIMERANGE_END,
-                                    quote(aggregationTimerange.getTo().toString(ES_DATE_FORMAT_FORMATTER)),
-                                    quote("2038-01-01 00:00:00.000"),
-                                    true,
-                                    true).toString()
-                    );
-        });
+                .ifPresent(aggregationTimerange -> filterBuilder.add(createTimeRangeFilter(aggregationTimerange)));
 
         if (!parameters.filter().key().isEmpty()) {
             filterBuilder.add(parameters.filter().key().stream()
@@ -162,8 +147,61 @@ public class EventsSearchService {
                 .build();
     }
 
+    private String createTimeRangeFilter(TimeRange aggregationTimerange) {
+        final var formattedFrom = aggregationTimerange.getFrom().toString(ES_DATE_FORMAT_FORMATTER);
+        final var formattedTo = aggregationTimerange.getTo().toString(ES_DATE_FORMAT_FORMATTER);
+        return or(
+                group(
+                        or(
+                                TermRangeQuery.newStringRange(
+                                        EventDto.FIELD_TIMERANGE_START,
+                                        quote(formattedFrom),
+                                        quote(formattedTo),
+                                        true,
+                                        true).toString()
+                                ,
+                                TermRangeQuery.newStringRange(
+                                        EventDto.FIELD_TIMERANGE_END,
+                                        quote(formattedFrom),
+                                        quote(formattedTo),
+                                        true,
+                                        true).toString()
+                        )
+                ),
+                group(
+                        and(
+                                TermRangeQuery.newStringRange(
+                                        EventDto.FIELD_TIMERANGE_START,
+                                        quote("1970-01-01 00:00:00.000"),
+                                        quote(formattedFrom),
+                                        true,
+                                        true).toString()
+                                ,
+                                TermRangeQuery.newStringRange(
+                                        EventDto.FIELD_TIMERANGE_END,
+                                        quote(formattedTo),
+                                        quote("2038-01-01 00:00:00.000"),
+                                        true,
+                                        true).toString()
+                        )
+                )
+        );
+    }
+
     private String quote(String s) {
         return "\"" + s + "\"";
+    }
+
+    private String group(String s) {
+        return "(" + s + ")";
+    }
+
+    private String or(String... queries) {
+        return Arrays.stream(queries).collect(joiningQueriesWithOR);
+    }
+
+    private String and(String... queries) {
+        return Arrays.stream(queries).collect(joiningQueriesWithAND);
     }
 
     private long mapPriority(String priorityFilter) {
