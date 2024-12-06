@@ -37,6 +37,7 @@ const ClipboardIconButton = ({ buttonTitle, className, disabled, onSuccess, text
     {({ copy }) => (
       <IconButton className={className}
                   name="content_copy"
+                  iconType="regular"
                   disabled={disabled}
                   title={buttonTitle}
                   onClick={() => {
