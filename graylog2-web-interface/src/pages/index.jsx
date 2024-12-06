@@ -41,6 +41,7 @@ const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificatio
 const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
 const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
 const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
+const EntityGroupsPage = loadAsync(() => import('pages/EntityGroupsPage'));
 const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
 const EventNotificationsPage = loadAsync(() => import('./EventNotificationsPage'));
 const EventsPage = loadAsync(() => import('./EventsPage'));
@@ -138,6 +139,7 @@ export {
   EditContentPackPage,
   EditExtractorsPage,
   EnterprisePage,
+  EntityGroupsPage,
   EventDefinitionsPage,
   EventNotificationsPage,
   EventsPage,
