@@ -14,9 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+package org.graylog2.configuration;
 
-import org.graylog2.configuration.PluginPathConfiguration;
+import com.github.joschi.jadconfig.Parameter;
 
-public class PluginLoaderConfig extends PluginPathConfiguration {
+public class EventBusConfiguration {
+    
+    @Parameter(value = "async_eventbus_processors")
+    private final int asyncEventbusProcessors = 2;
+
+    public int getAsyncEventbusProcessors() {
+        return asyncEventbusProcessors;
+    }
+
 }
