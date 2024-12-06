@@ -5,11 +5,20 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.graylog2.plugin.journal.RawMessage;
 
+import java.util.Optional;
+
 public class InputProcessingException extends RuntimeException {
 
 
+    private final InputProcessingFailure inputProcessingFailure;
+
     public InputProcessingException(InputProcessingFailure inputProcessingFailure) {
         super(inputProcessingFailure.errorMessage(), inputProcessingFailure.exception());
+        this.inputProcessingFailure = inputProcessingFailure;
+    }
+
+    public Optional<String> inputMessageString() {
+        return Optional.ofNullable(inputProcessingFailure.inputMessage());
     }
 
     public static InputProcessingException create(@Nonnull String errorMessage,

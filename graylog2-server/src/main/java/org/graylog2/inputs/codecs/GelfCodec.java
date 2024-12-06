@@ -143,9 +143,7 @@ public class GelfCodec extends AbstractCodec {
         try {
             validateGELFMessage(node, rawMessage.getId(), rawMessage.getRemoteAddress());
         } catch (IllegalArgumentException e) {
-            log.trace("Invalid GELF message <{}>", node);
-            throw InputProcessingException.create("Invalid GELF message <%s>".formatted(node),
-                    e, rawMessage, json);
+            throw InputProcessingException.create("Invalid GELF message!", e, rawMessage, json);
         }
 
         // Timestamp.

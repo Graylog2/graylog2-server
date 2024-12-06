@@ -157,7 +157,11 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                 message = codec.decode(raw);
             }
         } catch (InputProcessingException e) {
-            LOG.error(e.getMessage(), e.getCause());
+            if(LOG.isTraceEnabled() && e.inputMessageString().isPresent()) {
+                LOG.error("%s - input message: %s".formatted(e.getMessage(), e.inputMessageString().get()), e.getCause());
+            }else{
+                LOG.error(e.getMessage(), e.getCause());
+            }
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
             throw e;
         } catch (RuntimeException e) {
