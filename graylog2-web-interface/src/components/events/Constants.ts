@@ -19,13 +19,7 @@ import type { Sort, Attribute } from 'stores/PaginationTypes';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
-export const detailsAttributes: Array<Attribute> = [
-  {
-    id: 'id',
-    title: 'ID',
-    type: 'STRING',
-    sortable: true,
-  },
+export const commonEventAttributes: Array<Attribute> = [
   {
     id: 'priority',
     title: 'Priority',
@@ -46,6 +40,8 @@ export const detailsAttributes: Array<Attribute> = [
     type: 'STRING',
     sortable: false,
     searchable: false,
+    filterable: true,
+    related_collection: 'event_definitions',
   },
   {
     id: 'event_definition_type',
@@ -53,6 +49,21 @@ export const detailsAttributes: Array<Attribute> = [
     type: 'STRING',
     sortable: true,
   },
+  {
+    id: 'key',
+    title: 'Key',
+    type: 'STRING',
+    sortable: true,
+    searchable: false,
+  },
+  {
+    id: 'group_by_fields',
+    title: 'Group-By Fields',
+    sortable: false,
+  },
+];
+export const detailsAttributes: Array<Attribute> = [
+  ...commonEventAttributes,
   {
     id: 'remediation_steps',
     title: 'Remediation Steps',
@@ -64,11 +75,10 @@ export const detailsAttributes: Array<Attribute> = [
     sortable: true,
   },
   {
-    id: 'key',
-    title: 'Key',
+    id: 'id',
+    title: 'ID',
     type: 'STRING',
     sortable: true,
-    searchable: false,
   },
   {
     id: 'fields',
@@ -76,13 +86,8 @@ export const detailsAttributes: Array<Attribute> = [
     type: 'STRING',
     sortable: false,
   },
-  {
-    id: 'group_by_fields',
-    title: 'Group-By Fields',
-    sortable: false,
-  },
 ];
-export const additionalAttributes: Array<Attribute> = [
+export const eventsTableSpecificAttributes: Array<Attribute> = [
   {
     id: 'message',
     title: 'Description',
@@ -98,6 +103,9 @@ export const additionalAttributes: Array<Attribute> = [
     filterable: true,
     filter_options: [{ value: 'false', title: 'Event' }, { value: 'true', title: 'Alert' }],
   },
+];
+export const additionalAttributes: Array<Attribute> = [
+  ...eventsTableSpecificAttributes,
   ...detailsAttributes,
 ];
 

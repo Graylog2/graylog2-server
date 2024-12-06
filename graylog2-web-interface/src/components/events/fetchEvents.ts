@@ -31,6 +31,16 @@ const url = URLUtils.qualifyUrl('/events/search');
 
 type FiltersResult = { filter: { alerts?: string }, timerange?: { from?: string, to?: string, type: string, range?: number}};
 
+export const parseTypeFilter = (alert: string) => {
+  switch (alert) {
+    case 'true':
+      return  'only';
+    case 'false':
+      return  'exclude';
+    default:
+      return  'include';
+  }
+}
 const parseFilters = (filters: UrlQueryFilters) => {
   const result: FiltersResult = { filter: {} };
 
@@ -44,17 +54,7 @@ const parseFilters = (filters: UrlQueryFilters) => {
     result.timerange = { type: 'relative', range: 0 };
   }
 
-  switch (filters?.get('alert')?.[0]) {
-    case 'true':
-      result.filter.alerts = 'only';
-      break;
-    case 'false':
-      result.filter.alerts = 'exclude';
-      break;
-    default:
-      result.filter.alerts = 'include';
-  }
-
+  result.filter.alerts = parseTypeFilter(filters?.get('alert')?.[0])
   return result;
 };
 
