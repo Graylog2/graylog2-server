@@ -44,12 +44,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
-import org.graylog.security.certutil.CertConstants;
-import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
@@ -60,10 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.Map;
 import java.util.Set;
@@ -130,14 +125,10 @@ public class JerseyService extends AbstractIdleService {
         doStartup(extractSslConfiguration(event.config()));
     }
 
-    private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) throws GeneralSecurityException, IOException {
-        final OpensearchSecurityConfiguration securityConfiguration = config.opensearchSecurityConfiguration();
-        if (securityConfiguration != null && securityConfiguration.securityEnabled()) {
-            return buildSslEngineConfigurator(securityConfiguration.getHttpCertificate());
-        } else {
-            return null;
-        }
-
+    private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) {
+        return config.httpCertificate()
+                .map(this::buildSslEngineConfigurator)
+                .orElse(null);
     }
 
     @Override
@@ -263,35 +254,26 @@ public class JerseyService extends AbstractIdleService {
         return httpServer;
     }
 
-    private SSLEngineConfigurator buildSslEngineConfigurator(FilesystemKeystoreInformation keystoreInformation)
-            throws GeneralSecurityException, IOException {
-        if (keystoreInformation == null || !Files.isRegularFile(keystoreInformation.location()) || !Files.isReadable(keystoreInformation.location())) {
+    private SSLEngineConfigurator buildSslEngineConfigurator(KeystoreInformation keystoreInformation) {
+
+        if (keystoreInformation == null) {
             throw new IllegalArgumentException("Unreadable to read private key");
         }
-
 
         final SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
         final char[] password = firstNonNull(keystoreInformation.password(), new char[]{});
 
-        final KeyStore keyStore = readKeystore(keystoreInformation);
+        try {
+            final KeyStore keyStore = keystoreInformation.loadKeystore();
+            sslContextConfigurator.setKeyStorePass(password);
+            sslContextConfigurator.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
 
-        sslContextConfigurator.setKeyStorePass(password);
-        sslContextConfigurator.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
-
-        final SSLContext sslContext = sslContextConfigurator.createSSLContext(true);
-        final SSLEngineConfigurator sslEngineConfigurator = new SSLEngineConfigurator(sslContext, false, false, false);
-        sslEngineConfigurator.setEnabledProtocols(tlsConfiguration.getEnabledTlsProtocols().toArray(new String[0]));
-        return sslEngineConfigurator;
-    }
-
-    private static KeyStore readKeystore(FilesystemKeystoreInformation keystoreInformation) {
-        LOG.info("Jersey is using keystore located in {}", keystoreInformation.location().toAbsolutePath());
-        try (var in = Files.newInputStream(keystoreInformation.location())) {
-            KeyStore caKeystore = KeyStore.getInstance(CertConstants.PKCS12);
-            caKeystore.load(in, keystoreInformation.password());
-            return caKeystore;
-        } catch (IOException | GeneralSecurityException ex) {
-            throw new RuntimeException("Could not read keystore: " + ex.getMessage(), ex);
+            final SSLContext sslContext = sslContextConfigurator.createSSLContext(true);
+            final SSLEngineConfigurator sslEngineConfigurator = new SSLEngineConfigurator(sslContext, false, false, false);
+            sslEngineConfigurator.setEnabledProtocols(tlsConfiguration.getEnabledTlsProtocols().toArray(new String[0]));
+            return sslEngineConfigurator;
+        } catch (Exception e) {
+            throw new RuntimeException("Could not read keystore: " + e.getMessage(), e);
         }
     }
 

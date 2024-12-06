@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
+import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
@@ -61,7 +62,7 @@ public class SearchableSnapshotsConfigurationBean implements OpensearchConfigura
     }
 
     @Override
-    public OpensearchConfigurationPart buildConfigurationPart() {
+    public OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams trustedCertificates) {
         if (snapshotsAreEnabled()) {
             validateUsableSpace();
             return OpensearchConfigurationPart.builder()
