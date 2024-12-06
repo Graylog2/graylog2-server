@@ -29,7 +29,16 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 const url = URLUtils.qualifyUrl('/events/search');
 
-type FiltersResult = { filter: { alerts?: string }, timerange?: { from?: string, to?: string, type: string, range?: number}};
+type FiltersResult = {
+  filter: {
+    alerts?: string,
+    event_definitions?: Array<string>,
+    priority?: Array<string>,
+    aggregation_timerange?: { from?: string, to?: string, type: string, range?: number },
+    key?: Array<string>,
+  },
+  timerange?: { from?: string, to?: string, type: string, range?: number },
+};
 
 const parseFilters = (filters: UrlQueryFilters) => {
   const result: FiltersResult = { filter: {} };
@@ -42,6 +51,26 @@ const parseFilters = (filters: UrlQueryFilters) => {
       : { type: 'relative', range: 0 };
   } else {
     result.timerange = { type: 'relative', range: 0 };
+  }
+
+  if (filters.get('timerange_start')?.[0]) {
+    const [from, to] = extractRangeFromString(filters.get('timerange_start')[0]);
+
+    result.filter.aggregation_timerange = from
+      ? { from, to: to || adjustFormat(moment().utc(), 'internal'), type: 'absolute' }
+      : { type: 'relative', range: 0 };
+  }
+
+  if (filters.get('key')?.length > 0) {
+    result.filter.key = filters.get('key');
+  }
+
+  if (filters.get('event_definition_id')?.length > 0) {
+    result.filter.event_definitions = filters.get('event_definition_id');
+  }
+
+  if (filters.get('priority')?.length > 0) {
+    result.filter.priority = filters.get('priority');
   }
 
   switch (filters?.get('alert')?.[0]) {

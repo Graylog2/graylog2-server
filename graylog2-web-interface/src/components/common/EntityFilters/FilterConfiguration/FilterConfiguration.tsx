@@ -23,6 +23,7 @@ import {
   isAttributeWithFilterOptions,
   isAttributeWithRelatedCollection, isDateAttribute,
 } from 'components/common/EntityFilters/helpers/AttributeIdentification';
+import GenericFilterInput from 'components/common/EntityFilters/FilterConfiguration/GenericFilterInput';
 
 import StaticOptionsList from './StaticOptionsList';
 import SuggestionsList from './SuggestionsList';
@@ -36,32 +37,50 @@ type Props = {
   allActiveFilters: Filters | undefined,
 }
 
-export const FilterConfiguration = ({
-  allActiveFilters,
-  attribute,
-  filter,
-  filterValueRenderer,
-  onSubmit,
-}: Props) => (
-  <>
-    <MenuItem header>{filter ? 'Edit' : 'Create'} {attribute.title.toLowerCase()} filter</MenuItem>
-    {isAttributeWithFilterOptions(attribute) && (
+const FilterComponent = ({ allActiveFilters, attribute, filter, filterValueRenderer, onSubmit }: Pick<Props, 'allActiveFilters' | 'attribute' | 'filter' | 'filterValueRenderer' | 'onSubmit'>) => {
+  if (isAttributeWithFilterOptions(attribute)) {
+    return (
       <StaticOptionsList attribute={attribute}
                          filterValueRenderer={filterValueRenderer}
                          onSubmit={onSubmit}
                          allActiveFilters={allActiveFilters} />
-    )}
-    {isAttributeWithRelatedCollection(attribute) && (
+    );
+  }
+
+  if (isAttributeWithRelatedCollection(attribute)) {
+    return (
       <SuggestionsList attribute={attribute}
                        filterValueRenderer={filterValueRenderer}
                        onSubmit={onSubmit}
                        allActiveFilters={allActiveFilters}
                        filter={filter} />
-    )}
-    {isDateAttribute(attribute) && (
+    );
+  }
+
+  if (isDateAttribute(attribute)) {
+    return (
       <DateRangeForm onSubmit={onSubmit}
                      filter={filter} />
-    )}
+    );
+  }
+
+  return <GenericFilterInput filter={filter} onSubmit={onSubmit} />;
+};
+
+export const FilterConfiguration = ({
+  allActiveFilters,
+  attribute,
+  filter = undefined,
+  filterValueRenderer,
+  onSubmit,
+}: Props) => (
+  <>
+    <MenuItem header>{filter ? 'Edit' : 'Create'} {attribute.title.toLowerCase()} filter</MenuItem>
+    <FilterComponent attribute={attribute}
+                     filterValueRenderer={filterValueRenderer}
+                     onSubmit={onSubmit}
+                     allActiveFilters={allActiveFilters}
+                     filter={filter} />
   </>
 );
 

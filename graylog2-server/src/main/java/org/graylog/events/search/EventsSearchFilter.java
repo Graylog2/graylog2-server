@@ -20,8 +20,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
@@ -29,6 +31,9 @@ import java.util.Set;
 public abstract class EventsSearchFilter {
     private static final String FIELD_ALERTS = "alerts";
     private static final String FIELD_EVENT_DEFINITIONS = "event_definitions";
+    private static final String FIELD_PRIORITY = "priority";
+    private static final String FIELD_AGGREGATION_TIMERANGE = "aggregation_timerange";
+    private static final String FIELD_KEY = "key";
 
     public enum Alerts {
         @JsonProperty("include")
@@ -44,6 +49,15 @@ public abstract class EventsSearchFilter {
 
     @JsonProperty(FIELD_EVENT_DEFINITIONS)
     public abstract Set<String> eventDefinitions();
+
+    @JsonProperty(FIELD_PRIORITY)
+    public abstract Set<String> priority();
+
+    @JsonProperty(FIELD_AGGREGATION_TIMERANGE)
+    public abstract Optional<TimeRange> aggregationTimerange();
+
+    @JsonProperty(FIELD_KEY)
+    public abstract Set<String> key();
 
     public static EventsSearchFilter empty() {
         return builder().build();
@@ -61,7 +75,9 @@ public abstract class EventsSearchFilter {
         public static Builder create() {
             return new AutoValue_EventsSearchFilter.Builder()
                     .alerts(Alerts.INCLUDE)
-                    .eventDefinitions(Collections.emptySet());
+                    .eventDefinitions(Collections.emptySet())
+                    .priority(Collections.emptySet())
+                    .key(Collections.emptySet());
         }
 
         @JsonProperty(FIELD_ALERTS)
@@ -69,6 +85,15 @@ public abstract class EventsSearchFilter {
 
         @JsonProperty(FIELD_EVENT_DEFINITIONS)
         public abstract Builder eventDefinitions(Set<String> eventDefinitions);
+
+        @JsonProperty(FIELD_PRIORITY)
+        public abstract Builder priority(Set<String> priority);
+
+        @JsonProperty(FIELD_AGGREGATION_TIMERANGE)
+        public abstract Builder aggregationTimerange(TimeRange aggregationTimerange);
+
+        @JsonProperty(FIELD_KEY)
+        public abstract Builder key(Set<String> key);
 
         public abstract EventsSearchFilter build();
     }

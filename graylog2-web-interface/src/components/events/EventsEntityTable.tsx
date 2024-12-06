@@ -28,6 +28,10 @@ import useColumnRenderers from 'components/events/events/ColumnRenderers';
 import EventsRefreshControls from 'components/events/events/EventsRefreshControls';
 import QueryHelper from 'components/common/QueryHelper';
 
+const additionalSearchFields = {
+  key: 'The key of the event',
+};
+
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
 
@@ -38,7 +42,7 @@ const EventsEntityTable = () => {
   return (
     <PaginatedEntityTable<Event, EventsAdditionalData> humanName="events"
                                                        columnsOrder={eventsTableElements.columnOrder}
-                                                       queryHelpComponent={<QueryHelper entityName="events" />}
+                                                       queryHelpComponent={<QueryHelper entityName="event" fieldMap={additionalSearchFields} />}
                                                        entityActions={entityActions}
                                                        tableLayout={eventsTableElements.defaultLayout}
                                                        fetchEntities={_fetchEvents}
