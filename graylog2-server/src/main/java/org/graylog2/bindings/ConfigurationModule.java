@@ -35,6 +35,7 @@ public class ConfigurationModule implements Module {
     public void configure(Binder binder) {
         binder.bind(Configuration.class).toInstance(configuration);
         binder.bind(BaseConfiguration.class).toInstance(configuration);
+        // even though this is already bound in the GraylogNodeModule, this needs to be bound here for use in preflight
         binder.bind(GraylogNodeConfiguration.class).toInstance(configuration);
     }
 }

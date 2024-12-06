@@ -25,15 +25,15 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useQuery from 'routing/useQuery';
 import useColumnRenderers from 'components/events/events/ColumnRenderers';
-
-import QueryHelper from '../common/QueryHelper';
+import EventsRefreshControls from 'components/events/events/EventsRefreshControls';
+import QueryHelper from 'components/common/QueryHelper';
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
 
   const columnRenderers = useColumnRenderers();
   const _fetchEvents = useCallback((searchParams: SearchParams) => fetchEvents(searchParams, streamId as string), [streamId]);
-  const { entityActions, expandedSections } = useTableElements({ defaultLayout: eventsTableElements.defaultLayout });
+  const { entityActions, expandedSections, bulkSelection } = useTableElements({ defaultLayout: eventsTableElements.defaultLayout });
 
   return (
     <PaginatedEntityTable<Event, EventsAdditionalData> humanName="events"
@@ -47,7 +47,9 @@ const EventsEntityTable = () => {
                                                        expandedSectionsRenderer={expandedSections}
                                                        entityAttributesAreCamelCase={false}
                                                        filterValueRenderers={FilterValueRenderers}
-                                                       columnRenderers={columnRenderers} />
+                                                       columnRenderers={columnRenderers}
+                                                       bulkSelection={bulkSelection}
+                                                       topRightCol={<EventsRefreshControls />} />
   );
 };
 

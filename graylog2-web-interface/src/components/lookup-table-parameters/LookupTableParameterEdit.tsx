@@ -79,7 +79,6 @@ const LookupTableParameterEdit = ({
              error={validationState?.lookupTable?.[1]}
              help="Select the lookup table Graylog should use to get the values.">
         <Select placeholder="Select lookup table"
-                inputProps={{ 'aria-label': 'Select lookup table' }}
                 onChange={_handleChange('lookupTable')}
                 options={lookupTableOptions}
                 value={lookupTable}

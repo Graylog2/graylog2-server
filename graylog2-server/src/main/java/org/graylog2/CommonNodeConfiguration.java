@@ -70,7 +70,7 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
     @Override
     default String getEnvironmentVariablePrefix() {
         return "GRAYLOG_";
-    };
+    }
 
     @Override
     default String getSystemPropertyPrefix() {
@@ -80,5 +80,5 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
     @Override
     default boolean isCloud() {
         return false;
-    };
+    }
 }

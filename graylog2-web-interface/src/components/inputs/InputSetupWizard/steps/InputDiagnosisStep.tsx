@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration.variants;
+import * as React from 'react';
 
-import java.util.Map;
+const InputDiagnosisStep = () => (
+  <div>
+    Input Diagnosis
+  </div>
+);
 
-public interface KeystoreContributor {
-    /**
-     * @return collection of key-value pairs that should be added to the opensearch keystore (holding secrets)
-     */
-    Map<String, String> getKeystoreItems();
-}
+export default InputDiagnosisStep;

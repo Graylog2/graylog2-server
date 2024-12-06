@@ -21,8 +21,10 @@ import com.google.inject.Scopes;
 import org.glassfish.jersey.internal.guava.Sets;
 import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.audit.AuditBindings;
+import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.configuration.EventBusConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -66,6 +68,7 @@ public class GraylogNodeModule extends Graylog2Module {
         install(new AuditBindings());
 
         if (configuration.withEventBus()) {
+            bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
             bind(EventBus.class).toProvider(EventBusProvider.class).in(Scopes.SINGLETON);
         }
         // ensure we always create a new LocalMetricRegistry, they are meant to be separate from each other
@@ -77,9 +80,7 @@ public class GraylogNodeModule extends Graylog2Module {
             bind(NodeId.class).toInstance(new SimpleNodeId("dummy-nodeid"));
         }
 
-        if (!configuration.withCapabilities().isEmpty()) {
-            install(new ServerStatusBindings(configuration.withCapabilities()));
-        }
+        install(new ServerStatusBindings(configuration.withCapabilities()));
 
         bind(EncryptedValueService.class).asEagerSingleton();
         bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());

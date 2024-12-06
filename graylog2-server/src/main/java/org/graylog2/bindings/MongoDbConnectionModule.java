@@ -16,7 +16,6 @@
  */
 package org.graylog2.bindings;
 
-import com.google.inject.AbstractModule;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.configuration.MongoDbConfiguration;
@@ -24,7 +23,6 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.inject.Graylog2Module;
 
-import java.util.List;
 import java.util.Set;
 
 /**

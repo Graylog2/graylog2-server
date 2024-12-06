@@ -17,14 +17,13 @@
 package org.graylog2.commands;
 
 import com.google.common.collect.Lists;
-import com.google.inject.Binder;
 import com.google.inject.Module;
+import jakarta.annotation.Nonnull;
 import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.GraylogNodeModule;
 import org.graylog2.bootstrap.CmdLineTool;
 import org.graylog2.featureflag.FeatureFlags;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,10 +45,7 @@ public abstract class AbstractNodeCommand extends CmdLineTool<GraylogNodeConfigu
 
     @Override
     protected List<Module> getCommandBindings(final FeatureFlags featureFlags) {
-        final List<Module> modules = Lists.newArrayList(
-                Binder::requireExplicitBindings,
-                nodeModule
-        );
+        final List<Module> modules = Lists.newArrayList(nodeModule);
         modules.addAll(getNodeCommandBindings(featureFlags));
         return modules;
     }

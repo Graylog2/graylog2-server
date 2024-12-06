@@ -29,10 +29,10 @@ import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.bindings.OpensearchProcessBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
-import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog.datanode.bootstrap.preflight.PreflightClusterConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
+import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
@@ -49,12 +49,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-public abstract class DatanodeBootstrap extends DatanodeCmdLineTool {
+public abstract class DatanodeBootstrap extends AbstractNodeCommand {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeBootstrap.class);
     protected Configuration configuration;
 
     protected DatanodeBootstrap(String commandName, Configuration configuration) {
-        super(commandName);
+        super(commandName, configuration);
         this.commandName = commandName;
         this.configuration = configuration;
     }
@@ -100,7 +100,7 @@ public abstract class DatanodeBootstrap extends DatanodeCmdLineTool {
 
         final OS os = OS.getOs();
 
-        LOG.info("Graylog Data Node {} {} starting up", commandName, version);
+        LOG.info("Graylog Data Node {} starting up (command: {})", version, commandName);
         LOG.info("JRE: {}", systemInformation);
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());
@@ -154,7 +154,6 @@ public abstract class DatanodeBootstrap extends DatanodeCmdLineTool {
     protected List<Module> getSharedBindingsModules() {
         final List<Module> result = super.getSharedBindingsModules();
         result.add(new GenericBindings(isMigrationCommand()));
-        result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new OpensearchProcessBindings());
         result.add(new DatanodeConfigurationBindings());

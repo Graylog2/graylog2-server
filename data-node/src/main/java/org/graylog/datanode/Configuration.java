@@ -256,7 +256,14 @@ public class Configuration implements CommonNodeConfiguration {
     @Parameter(value = "metrics_policy")
     private String metricsPolicy = "gl-datanode-metrics-ism";
 
-    @Documentation(value = "Cache size for searchable snaphots")
+    /**
+     * @see <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/searchable_snapshot/#configuring-a-node-to-use-searchable-snapshots}">Searchable snapshots</a>
+     */
+    @Documentation(value = """
+            Cache size for searchable snapshots. This space will be automatically reserved
+            if you have either S3 or shared filesystem repositories enabled and configured.
+            See s3_client_* configuration options and path_repo.
+            """)
     @Parameter(value = "node_search_cache_size")
     private String searchCacheSize = "10gb";
 
@@ -273,7 +280,7 @@ public class Configuration implements CommonNodeConfiguration {
 
     @Documentation("The list of the opensearch node’s roles.")
     @Parameter(value = "node_roles", converter = StringListConverter.class)
-    private List<String> nodeRoles = List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search");
+    private List<String> nodeRoles = List.of("cluster_manager", "data", "ingest", "remote_cluster_client");
 
     @Documentation(visible = false)
     @Parameter(value = "async_eventbus_processors")

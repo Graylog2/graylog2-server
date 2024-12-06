@@ -18,11 +18,10 @@ import styled from 'styled-components';
 import * as React from 'react';
 import { useMemo } from 'react';
 
-import { Checkbox, DropdownButton } from 'components/bootstrap';
+import { Checkbox, DropdownButton, MenuItem } from 'components/bootstrap';
 import type { Column } from 'components/common/EntityDataTable/types';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import MenuItem from 'components/bootstrap/MenuItem';
 
 const StyledDropdownButton = styled(DropdownButton)`
   ~ .dropdown-menu {

@@ -18,6 +18,7 @@
 import { useMutation } from '@tanstack/react-query';
 
 import { StreamOutputs } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 
 const addStreamOutput = async ({ streamId, outputs }: { streamId: string, outputs: { outputs: Array<string>}}) => StreamOutputs.add(streamId, outputs);

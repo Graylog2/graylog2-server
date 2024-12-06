@@ -82,7 +82,6 @@ const BackendCreateSelect = () => {
                 {({ field: { name, value, onChange }, meta: { error } }) => (
                   <>
                     <Select clearable={false}
-                            inputProps={{ 'aria-label': 'Select a service' }}
                             onChange={(authService) => {
                               sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.SERVICE_SELECTED, {
                                 app_pathname: getPathnameWithoutId(pathname),
