@@ -34,6 +34,7 @@ import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpaceProvid
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchClusterConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchCommonConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchDefaultConfigFilesBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchSecurityConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.SearchableSnapshotsConfigurationBean;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
@@ -63,8 +64,10 @@ public class OpensearchProcessBindings extends AbstractModule {
         opensearchCertificatesProviders.addBinding().to(NoOpensearchCertificatesProvider.class).asEagerSingleton();
 
 
-        //opensearch configuration beans
+        //opensearch configuration beans. The order of the beans is important here!
         Multibinder<OpensearchConfigurationBean> opensearchConfigurationBeanMultibinder = Multibinder.newSetBinder(binder(), OpensearchConfigurationBean.class);
+        opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchDefaultConfigFilesBean.class).asEagerSingleton();
+        opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchCommonConfigurationBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchCommonConfigurationBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchClusterConfigurationBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(SearchableSnapshotsConfigurationBean.class).asEagerSingleton();

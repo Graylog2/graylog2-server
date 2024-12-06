@@ -20,12 +20,17 @@ import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.configuration.OpensearchConfigurationDir;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
 import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
+import org.graylog.datanode.opensearch.configuration.beans.files.YamlConfigFile;
 import org.graylog.datanode.process.Environment;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -33,25 +38,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-public record OpensearchConfiguration(
-        OpensearchDistribution opensearchDistribution,
-        DatanodeDirectories datanodeDirectories,
-        String hostname,
-        int httpPort,
-        Set<OpensearchConfigurationPart> configurationParts
-) {
-    public Map<String, Object> asMap() {
-        Map<String, Object> config = new LinkedHashMap<>();
+public class OpensearchConfiguration {
 
-        config.put("node.roles", buildRolesList()); // this needs special treatment as it's as an aggregation of other configuration parts
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfiguration.class);
 
-        configurationParts.stream()
-                .map(OpensearchConfigurationPart::properties)
-                .forEach(config::putAll);
-        return config;
+    private final OpensearchDistribution opensearchDistribution;
+    private final String hostname;
+    private final int httpPort;
+    private final List<OpensearchConfigurationPart> configurationParts;
+    private final OpensearchConfigurationDir opensearchConfigurationDir;
+    private final DatanodeDirectories datanodeDirectories;
+
+    public OpensearchConfiguration(OpensearchDistribution opensearchDistribution, DatanodeDirectories datanodeDirectories, String hostname, int httpPort, List<OpensearchConfigurationPart> configurationParts) {
+        this.opensearchDistribution = opensearchDistribution;
+        this.hostname = hostname;
+        this.httpPort = httpPort;
+        this.configurationParts = configurationParts;
+        this.datanodeDirectories = datanodeDirectories;
+        this.opensearchConfigurationDir = datanodeDirectories.createUniqueOpensearchProcessConfigurationDir();
     }
 
     @Nonnull
@@ -70,12 +76,12 @@ public record OpensearchConfiguration(
                 .forEach(javaOpts::addAll);
 
         env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
-        env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
+        env.put("OPENSEARCH_PATH_CONF", opensearchConfigurationDir.configurationRoot().toString());
         return env;
     }
 
     public HttpHost getRestBaseUrl() {
-        return new HttpHost(hostname(), httpPort(), isHttpsEnabled() ? "https" : "http");
+        return new HttpHost(hostname, httpPort, isHttpsEnabled() ? "https" : "http");
     }
 
     public boolean isHttpsEnabled() {
@@ -122,8 +128,47 @@ public record OpensearchConfiguration(
     }
 
     public List<ConfigFile> configFiles() {
-        return configurationParts.stream()
+
+        final List<ConfigFile> configFiles = new LinkedList<>();
+
+        configurationParts.stream()
                 .flatMap(cp -> cp.configFiles().stream())
-                .collect(Collectors.toList());
+                .forEach(configFiles::add);
+
+        configFiles.add(new YamlConfigFile(Path.of("opensearch.yml"), opensearchYmlConfig()));
+
+        return configFiles;
+    }
+
+    private Map<String, Object> opensearchYmlConfig() {
+        Map<String, Object> config = new LinkedHashMap<>();
+
+        // this needs special treatment as it's as an aggregation of other configuration parts
+        config.put("node.roles", buildRolesList());
+
+        configurationParts.stream()
+                .map(OpensearchConfigurationPart::properties)
+                .forEach(config::putAll);
+
+        // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,
+        // because we are using tar distriburion and opensearch does this only for docker dist. See opensearch-env script
+        // additionally, the env variables have to be prefixed with opensearch. (e.g. "opensearch.cluster.routing.allocation.disk.threshold_enabled")
+        getEnv().getEnv().entrySet().stream()
+                .filter(entry -> entry.getKey().matches("^opensearch\\.[a-z0-9_]+(?:\\.[a-z0-9_]+)+"))
+                .peek(entry -> LOG.info("Detected pass-through opensearch property {}:{}", entry.getKey().substring("opensearch.".length()), entry.getValue()))
+                .forEach(entry -> config.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
+        return config;
+    }
+
+    public OpensearchDistribution getOpensearchDistribution() {
+        return opensearchDistribution;
+    }
+
+    public OpensearchConfigurationDir getOpensearchConfigurationDir() {
+        return opensearchConfigurationDir;
+    }
+
+    public DatanodeDirectories getDatanodeDirectories() {
+        return datanodeDirectories;
     }
 }

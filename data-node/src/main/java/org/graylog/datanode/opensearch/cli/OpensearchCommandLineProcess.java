@@ -26,6 +26,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.exec.OS;
+import org.graylog.datanode.configuration.OpensearchConfigurationDir;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
@@ -55,8 +56,7 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     private final CommandLineProcess commandLineProcess;
     private final CommandLineProcessListener resultHandler;
-    private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-    private static final Path CONFIG = Path.of("opensearch.yml");
+
 
     /**
      * as long as OpenSearch is not supported on macOS, we have to fix the jdk path if we want to
@@ -66,7 +66,7 @@ public class OpensearchCommandLineProcess implements Closeable {
      */
     private void fixJdkOnMac(final OpensearchConfiguration config) {
         final var isMacOS = OS.isFamilyMac();
-        final var jdk = config.opensearchDistribution().directory().resolve("jdk.app");
+        final var jdk = config.getOpensearchDistribution().directory().resolve("jdk.app");
         final var jdkNotLinked = !Files.exists(jdk);
         if (isMacOS && jdkNotLinked) {
             // Link System jdk into startup folder, get path:
@@ -93,18 +93,13 @@ public class OpensearchCommandLineProcess implements Closeable {
     }
 
     private void writeOpenSearchConfig(final OpensearchConfiguration config) {
-        try {
-            final Path configFile = config.datanodeDirectories().createOpensearchProcessConfigurationFile(CONFIG);
-            mapper.writeValue(configFile.toFile(), getOpensearchConfigurationArguments(config));
-            config.configFiles().forEach(cf -> persistConfigFile(config, cf));
-        } catch (IOException e) {
-            throw new RuntimeException("Could not generate OpenSearch config: " + e.getMessage(), e);
-        }
+        final OpensearchConfigurationDir confDir = config.getOpensearchConfigurationDir();
+        config.configFiles().forEach(cf -> persistConfigFile(confDir, cf));
     }
 
-    private static void persistConfigFile(OpensearchConfiguration config, ConfigFile cf) {
+    private static void persistConfigFile(OpensearchConfigurationDir confDir, ConfigFile cf) {
         try {
-            final Path targetFile = config.datanodeDirectories().createOpensearchProcessConfigurationFile(cf.relativePath());
+            final Path targetFile = confDir.createOpensearchProcessConfigurationFile(cf.relativePath());
             try (final FileOutputStream file = new FileOutputStream(targetFile.toFile())) {
                 cf.write(file);
             }
@@ -116,7 +111,7 @@ public class OpensearchCommandLineProcess implements Closeable {
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
         fixJdkOnMac(config);
         configureOpensearchKeystoreSecrets(config);
-        final Path executable = config.opensearchDistribution().getOpensearchExecutable();
+        final Path executable = config.getOpensearchDistribution().getOpensearchExecutable();
         writeOpenSearchConfig(config);
         resultHandler = new CommandLineProcessListener(listener);
         commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, config.getEnv());
@@ -130,20 +125,6 @@ public class OpensearchCommandLineProcess implements Closeable {
         final Map<String, String> keystoreItems = config.getKeystoreItems();
         keystoreItems.forEach((key, value) -> opensearchCli.keystore().add(key, value));
         LOG.info("Added {} keystore items", keystoreItems.size());
-    }
-
-
-    private static Map<String, Object> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
-        Map<String, Object> allArguments = new LinkedHashMap<>(config.asMap());
-
-        // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,
-        // because we are using tar distriburion and opensearch does this only for docker dist. See opensearch-env script
-        // additionally, the env variables have to be prefixed with opensearch. (e.g. "opensearch.cluster.routing.allocation.disk.threshold_enabled")
-        config.getEnv().getEnv().entrySet().stream()
-                .filter(entry -> entry.getKey().matches("^opensearch\\.[a-z0-9_]+(?:\\.[a-z0-9_]+)+"))
-                .peek(entry -> LOG.info("Detected pass-through opensearch property {}:{}", entry.getKey().substring("opensearch.".length()), entry.getValue()))
-                .forEach(entry -> allArguments.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
-        return allArguments;
     }
 
     public void start() {

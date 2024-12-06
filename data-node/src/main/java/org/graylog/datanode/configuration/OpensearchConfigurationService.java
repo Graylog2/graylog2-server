@@ -104,9 +104,9 @@ public class OpensearchConfigurationService extends AbstractIdleService {
 
     private OpensearchConfiguration get() {
 
-        final Set<OpensearchConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
+        final List<OpensearchConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
                 .map(bean -> bean.buildConfigurationPart(new ConfigurationBuildParams(trustedCertificates, transientConfiguration)))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         return new OpensearchConfiguration(
                 datanodeConfiguration.opensearchDistributionProvider().get(),
