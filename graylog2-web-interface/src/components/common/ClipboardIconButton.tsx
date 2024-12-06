@@ -19,8 +19,6 @@ import * as React from 'react';
 import ClipboardContainer from 'components/common/ClipboardContainer';
 import { IconButton } from 'components/common';
 
-import type { IconName } from './Icon';
-
 /**
  * Component that renders an icon button to copy some text in the clipboard when pressed.
  * The text to be copied can be given in the `text` prop, or in an external element through a CSS selector in the `target` prop.
@@ -32,14 +30,13 @@ type Props = {
   disabled?: boolean,
   onSuccess?: () => void,
   text: string,
-  name: IconName,
 }
 
-const ClipboardIconButton = ({ buttonTitle, className, disabled, onSuccess, text, name }: Props) => (
+const ClipboardIconButton = ({ buttonTitle, className, disabled, onSuccess, text }: Props) => (
   <ClipboardContainer text={text}>
     {({ copy }) => (
       <IconButton className={className}
-                  name={name}
+                  name="content_copy"
                   disabled={disabled}
                   title={buttonTitle}
                   onClick={() => {
