@@ -18,10 +18,11 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
+import ConfirmDialog from 'components/common/ConfirmDialog';
 import UserNotification from 'util/UserNotification';
+import useCurrentUser from 'hooks/useCurrentUser';
 import StreamsStore, { type Stream } from 'stores/streams/StreamsStore';
-
-import ConfirmDialog from '../common/ConfirmDialog';
+import { isPermitted } from 'util/PermissionsMixin';
 
 const StreamRuleConnector = styled.div(({ theme }) => css`
   margin-top: 10px;
@@ -53,7 +54,8 @@ type Props = {
 
 const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
   const [matchingType, setMatchingType] = useState<'AND'|'OR'|undefined>(undefined);
-  const disabled = stream.is_default || !stream.is_editable;
+  const currentUser = useCurrentUser();
+  const disabled = stream.is_default || !stream.is_editable || !isPermitted(currentUser.permissions, `streams:edit:${stream.id}`);
 
   const handleTypeChange = (newValue: 'AND'|'OR') => {
     StreamsStore.update(stream.id, { matching_type: newValue }, (response) => {

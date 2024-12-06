@@ -19,11 +19,13 @@ import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled, { css } from 'styled-components';
 
-import { IfPermitted } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
-import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import DestinationOutputs from 'components/streams/StreamDetails/routing-destination/DestinationOutputs';
 import DestinationIndexSetSection from 'components/streams/StreamDetails/routing-destination/DestinationIndexSetSection';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+
+import DestinationPermissionAlert from './DestinationPermissionAlert';
 
 type Props = {
   stream: Stream;
@@ -36,17 +38,17 @@ const Container = styled.div(({ theme }) => css`
 `);
 
 const StreamDataRoutingDestinations = ({ stream }: Props) => {
-  const { index_set_id: indexSetId } = stream;
-  const { data: indexSet, isSuccess } = useSingleIndexSet(indexSetId);
+  const currentUser = useCurrentUser();
   const StreamDataWarehouseComponent = PluginStore.exports('dataWarehouse')?.[0]?.StreamDataWarehouse;
+
+  const destinationIndexset = isPermitted(currentUser.permissions, ['indexsets:read']) ? <DestinationIndexSetSection stream={stream} /> : <DestinationPermissionAlert sectionName="Index Set" />;
+  const destinationOutput = isPermitted(currentUser.permissions, ['output:read']) ? <DestinationOutputs stream={stream} /> : <DestinationPermissionAlert sectionName="Outputs" />;
 
   return (
     <Container>
-      {isSuccess && <DestinationIndexSetSection indexSet={indexSet} stream={stream} />}
-      {StreamDataWarehouseComponent && <StreamDataWarehouseComponent />}
-      <IfPermitted permissions="outputs:edit">
-        <DestinationOutputs stream={stream} />
-      </IfPermitted>
+      {destinationIndexset}
+      {StreamDataWarehouseComponent && <StreamDataWarehouseComponent permissions={currentUser.permissions} />}
+      {destinationOutput}
     </Container>
   );
 };
