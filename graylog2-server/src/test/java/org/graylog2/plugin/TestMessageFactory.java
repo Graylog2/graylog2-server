@@ -27,16 +27,16 @@ import java.util.Map;
 public class TestMessageFactory implements MessageFactory {
     @Override
     public Message createMessage(String message, String source, DateTime timestamp) {
-        return new Message(message, source, timestamp);
+        return new Message(message, source, timestamp, true);
     }
 
     @Override
     public Message createMessage(Map<String, Object> fields) {
-        return new Message(fields);
+        return new Message(fields, true);
     }
 
     @Override
     public Message createMessage(String id, Map<String, Object> newFields) {
-        return new Message(id, newFields);
+        return new Message(id, newFields, true);
     }
 }

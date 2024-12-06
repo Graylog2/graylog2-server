@@ -67,7 +67,7 @@ public class SetFields extends AbstractFunction<Void> {
                     field = field + suffix.get();
                 }
                 if (cleanFields.optional(args, context).orElse(false)) {
-                    field = Message.cleanKey(field);
+                    field = message.cleanKey(field);
                 }
                 message.addField(field, value);
             });

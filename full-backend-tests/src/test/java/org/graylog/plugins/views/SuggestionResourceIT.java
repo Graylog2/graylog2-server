@@ -84,6 +84,8 @@ public class SuggestionResourceIT {
                                 {"short_message":"SuggestionResourceIT#2",
                                  "host":"example.org",
                                   "facility":"test",
+                                  "white space":"test",
+                                  "slash/field":"xyz",
                                   "_target_stream": "stream1",
                                   "http_response_code": 200
                                   }""")
@@ -91,18 +93,21 @@ public class SuggestionResourceIT {
                         """
                                 {"short_message":"SuggestionResourceIT#3",
                                 "host":"example.org",
-                                 "facility":"test",
-                                  "_target_stream": "stream1",
-                                  "http_response_code": 201
-                                  }""")
+                                "facility":"test",
+                                "white space":"test",
+                                "slash/field":"xyz",
+                                "_target_stream": "stream1",
+                                "http_response_code": 201
+                                }""")
                 .postMessage(
                         """
                                 {"short_message":"SuggestionResourceIT#4",
-                                 "host":"foreign.org",
-                                 "facility":"test",
-                                 "_target_stream": "stream2",
-                                 "http_response_code": 404
-                                 }""")
+                                "host":"foreign.org",
+                                "facility":"test",
+                                "white space":"test",
+                                "_target_stream": "stream2",
+                                "http_response_code": 404
+                                }""")
                 .postMessage(
                         """
                                 {"short_message":"SuggestionResourceIT#5",
@@ -133,6 +138,34 @@ public class SuggestionResourceIT {
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.value[0]", equalTo("test"))
                 .body("suggestions.occurrence[0]", greaterThanOrEqualTo(3));
+    }
+
+    @ContainerMatrixTest
+    void testWhitespaceField() {
+        given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(SuggestionsRequest.create("white space", ""))
+                .post("/search/suggest")
+                .then()
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("test"))
+                .body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
+    }
+
+    @ContainerMatrixTest
+    void testSlashField() {
+        given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(SuggestionsRequest.create("slash/field", ""))
+                .post("/search/suggest")
+                .then()
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("xyz"))
+                .body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
     }
 
     @ContainerMatrixTest
