@@ -31,7 +31,6 @@ import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.alerts.FormattedEmailAlertSender;
-import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
@@ -45,7 +44,6 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.indexer.fieldtypes.FieldTypesModule;
@@ -158,7 +156,6 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindProviders() {
-        bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
         bind(freemarker.template.Configuration.class).toProvider(SecureFreemarkerConfigProvider.class);
     }
 

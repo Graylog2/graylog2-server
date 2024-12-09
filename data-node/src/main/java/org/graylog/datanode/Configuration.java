@@ -32,10 +32,12 @@ import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.Configuration.SafeClassesValidator;
 import org.graylog2.configuration.Documentation;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
+import org.graylog2.shared.plugins.PluginLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +59,7 @@ import java.util.Set;
  * Helper class to hold configuration of DataNode
  */
 @SuppressWarnings("FieldMayBeFinal")
-public class Configuration {
+public class Configuration implements CommonNodeConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
     public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
     public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";
@@ -658,5 +660,25 @@ public class Configuration {
 
     public String getOpensearchHeap() {
         return opensearchHeap;
+    }
+
+    @Override
+    public boolean withPlugins() {
+        return true;
+    }
+
+    @Override
+    public PluginLoader.NodeType getPluginNodeType() {
+        return PluginLoader.NodeType.DATA_NODE;
+    }
+
+    @Override
+    public String getEnvironmentVariablePrefix() {
+        return "GRAYLOG_DATANODE_";
+    }
+
+    @Override
+    public String getSystemPropertyPrefix() {
+        return "graylog.datanode.";
     }
 }
