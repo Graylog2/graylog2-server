@@ -180,8 +180,8 @@ const SetupRoutingStep = () => {
         <Row>
           <DescriptionCol md={12}>
             <p>
-              Choose a Destination Stream to Route Messages from this Input to. Messages that are not
-              routed to any streams will be sent to the &quot;All Messages&quot; Stream.
+              Choose a Destination Stream to route Messages from this Input to. Messages that are not
+              routed to any Streams will be sent to the &quot;All Messages&quot; Stream.
             </p>
           </DescriptionCol>
         </Row>
@@ -189,7 +189,7 @@ const SetupRoutingStep = () => {
           <Row>
             <Col md={12}>
               <Alert title="Pipelines connected to stream" bsStyle="info">
-                The selected stream has existing pipelines connected to it:
+                The selected Stream has existing Pipelines connected to it:
                 <ConntectedPipelinesList>
                   {streamPipelinesData.map((pipeline) => <li key={pipeline.title}>{pipeline.title}</li>)}
                 </ConntectedPipelinesList>
@@ -201,13 +201,13 @@ const SetupRoutingStep = () => {
           <Row>
             <Col md={12}>
               <StyledHeading>
-                Create new stream
+                Create new Stream
               </StyledHeading>
               {newStream ? (
                 <>
-                  <p>This input will use a new stream: &quot;{newStream.title}&quot;.</p>
-                  <p>Matches will {!newStream.remove_matches_from_default_stream && ('not ')}be removed from the Default stream.</p>
-                  {getStepConfigOrData(stepsData, currentStepName, 'shouldCreateNewPipeline') && (<p>A new pipeline will be created.</p>)}
+                  <p>This Input will use a new stream: &quot;{newStream.title}&quot;.</p>
+                  <p>Matches will {!newStream.remove_matches_from_default_stream && ('not ')}be removed from the Default Stream.</p>
+                  {getStepConfigOrData(stepsData, currentStepName, 'shouldCreateNewPipeline') && (<p>A new Pipeline will be created.</p>)}
                 </>
               ) : (
                 <CreateStreamForm submitForm={submitStreamCreation} />
