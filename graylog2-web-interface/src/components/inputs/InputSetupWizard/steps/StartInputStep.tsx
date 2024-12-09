@@ -171,7 +171,7 @@ const StartInputStep = () => {
         <Row>
           <DescriptionCol md={12}>
             <p>
-              Setup your input according to your changes and...better description
+              Setup your Input according to your changes and...better description
             </p>
           </DescriptionCol>
         </Row>
@@ -179,7 +179,7 @@ const StartInputStep = () => {
           <Col md={12}>
             {startInputStatus !== 'NOT_STARTED' && (
               <>
-                <StyledHeading>Setting up input</StyledHeading>
+                <StyledHeading>Setting up Input...</StyledHeading>
                   {Object.keys(stepMutations).map((stepName) => {
                     const mutation = stepMutations[stepName];
                     if (mutation.isIdle) return null;
@@ -189,7 +189,7 @@ const StartInputStep = () => {
                                        isLoading={mutation.isLoading}
                                        isSuccess={mutation.isSuccess}
                                        isError={mutation.isError}
-                                       errorMessage={mutation.error} /> // todo handle error format
+                                       errorMessage={mutation.error} />
                     );
                   })}
                   {startInputStatus && (
@@ -203,9 +203,9 @@ const StartInputStep = () => {
             {(notStartedOrFailed) && (
               <>
                 {isInputStartable() ? (
-                  <Button onClick={handleStart}>Start Input</Button>
+                  <Button onClick={handleStart}>Setup Input</Button>
                 ) : (
-                  <p>Your input is not ready to be setup. Please complete the previous steps.</p>
+                  <p>Your Input is not ready to be setup yet. Please complete the previous steps.</p>
                 )}
               </>
             )}
