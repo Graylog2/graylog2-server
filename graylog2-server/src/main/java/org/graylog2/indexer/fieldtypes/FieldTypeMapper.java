@@ -18,9 +18,9 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.plugin.Message;
-
 import jakarta.inject.Singleton;
+import org.graylog.events.event.EventDto;
+import org.graylog2.plugin.Message;
 
 import java.util.Map;
 import java.util.Optional;
@@ -58,6 +58,7 @@ public class FieldTypeMapper {
     public static final FieldTypes.Type STREAMS_TYPE = createType("streams", of(PROP_ENUMERABLE));
     public static final FieldTypes.Type INPUT_TYPE = createType("input", of(PROP_ENUMERABLE));
     public static final FieldTypes.Type NODE_TYPE = createType("node", of(PROP_ENUMERABLE));
+    public static final FieldTypes.Type EVENT_DEFINITION_ID_TYPE = createType("event-definition-id", of(PROP_ENUMERABLE));
 
 
     /**
@@ -85,7 +86,8 @@ public class FieldTypeMapper {
             Message.FIELD_STREAMS, STREAMS_TYPE,
             Message.FIELD_FAILED_MESSAGE_STREAMS, STREAMS_TYPE,
             Message.FIELD_GL2_SOURCE_INPUT, INPUT_TYPE,
-            Message.FIELD_GL2_SOURCE_NODE, NODE_TYPE
+            Message.FIELD_GL2_SOURCE_NODE, NODE_TYPE,
+            EventDto.FIELD_EVENT_DEFINITION_ID, EVENT_DEFINITION_ID_TYPE
     );
 
     /**
