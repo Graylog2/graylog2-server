@@ -118,7 +118,13 @@ public class MongoIndexSetService implements IndexSetService {
 
     @Override
     public List<IndexSetConfig> findByIds(Set<String> ids) {
-        return MongoUtils.stream(collection.find(Filters.in("_id", ids))).toList();
+        return MongoUtils.stream(collection.find(MongoUtils.idsIn(idsToObjectIds(ids)))).toList();
+    }
+
+    private List<ObjectId> idsToObjectIds(Set<String> ids) {
+        return ids.stream()
+                .map(ObjectId::new)
+                .toList();
     }
 
     @Override
@@ -131,9 +137,9 @@ public class MongoIndexSetService implements IndexSetService {
      * {@inheritDoc}
      */
     @Override
-    public List<IndexSetConfig> findPaginated(Set<String> indexSetIds, int limit, int skip) {
+    public List<IndexSetConfig> findPaginated(Set<String> ids, int limit, int skip) {
         return ImmutableList.copyOf(
-                MongoUtils.stream(collection.find(Filters.in("_id", indexSetIds))
+                MongoUtils.stream(collection.find(MongoUtils.idsIn(idsToObjectIds(ids)))
                                 .sort(Indexes.ascending(FIELD_TITLE))
                                 .skip(skip)
                                 .limit(limit))
@@ -155,10 +161,19 @@ public class MongoIndexSetService implements IndexSetService {
      */
     @Override
     public IndexSetConfig save(IndexSetConfig indexSetConfig) {
-        final InsertOneResult insertOneResult = collection.insertOne(indexSetConfig);
-        final IndexSetConfig savedObject = mongoUtils.getById(MongoUtils.insertedId(insertOneResult))
-                .orElseThrow(() -> new IllegalStateException("Unable to retrieve saved index set!"));
+        String id = indexSetConfig.id();
+        if (id != null) {
+            final Optional<IndexSetConfig> byId = mongoUtils.getById(id);
+            if (byId.isPresent()) {
+                collection.replaceOne(idEq(id), indexSetConfig);
+            }
+        } else {
+            final InsertOneResult insertOneResult = collection.insertOne(indexSetConfig);
+            id = MongoUtils.insertedIdAsString(insertOneResult);
+        }
 
+        final IndexSetConfig savedObject = mongoUtils.getById(id)
+                .orElseThrow(() -> new IllegalStateException("Unable to retrieve saved index set!"));
         final IndexSetCreatedEvent createdEvent = IndexSetCreatedEvent.create(savedObject);
         clusterEventBus.post(createdEvent);
 
