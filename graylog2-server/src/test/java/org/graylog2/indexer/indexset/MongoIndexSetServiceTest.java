@@ -24,6 +24,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
@@ -83,7 +84,8 @@ public class MongoIndexSetServiceTest {
                 nodeId, new RestrictedChainingClassLoader(
                 new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 clusterEventBus);
-        indexSetService = new MongoIndexSetService(mongodb.mongoConnection(), objectMapperProvider, streamService, clusterConfigService, clusterEventBus);
+        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
+        indexSetService = new MongoIndexSetService(mongoCollections, streamService, clusterConfigService, clusterEventBus);
     }
 
     @Test
@@ -95,6 +97,7 @@ public class MongoIndexSetServiceTest {
                 .contains(
                         IndexSetConfig.create(
                                 "57f3d721a43c2d59cb750001",
+                                null,
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
                                 true, true,
@@ -124,6 +127,7 @@ public class MongoIndexSetServiceTest {
                 .contains(
                         IndexSetConfig.create(
                                 "57f3d721a43c2d59cb750001",
+                                null,
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
                                 true, true,
@@ -189,6 +193,7 @@ public class MongoIndexSetServiceTest {
                 .containsExactly(
                         IndexSetConfig.create(
                                 "57f3d721a43c2d59cb750001",
+                                null,
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
                                 true, true,
@@ -208,6 +213,7 @@ public class MongoIndexSetServiceTest {
                         ),
                         IndexSetConfig.create(
                                 "57f3d721a43c2d59cb750002",
+                                null,
                                 "Test 2",
                                 null,
                                 true, false,
@@ -227,6 +233,7 @@ public class MongoIndexSetServiceTest {
                         ),
                         IndexSetConfig.create(
                                 "57f3d721a43c2d59cb750003",
+                                null,
                                 "Test 3",
                                 "This is the index set configuration for Test 3 - with an index set index template",
                                 true, null,

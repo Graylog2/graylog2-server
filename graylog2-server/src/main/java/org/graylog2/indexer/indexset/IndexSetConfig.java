@@ -28,6 +28,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.IndexTemplateProvider;
@@ -71,6 +72,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
 
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+                                        @JsonProperty(FIELD_SCOPE) @Nullable String scope,
                                         @JsonProperty(FIELD_TITLE) @NotBlank String title,
                                         @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
                                         @JsonProperty(FIELD_WRITABLE) @Nullable Boolean isWritable,
@@ -129,11 +131,13 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
                 .customFieldMappings(customFieldMappings == null ? new CustomFieldMappings() : customFieldMappings)
                 .fieldTypeProfile(fieldTypeProfile)
                 .dataTieringConfig(dataTiering)
+                .scope(scope == null ? DefaultEntityScope.NAME : scope)
                 .build();
     }
 
     // Compatibility creator after field type refresh interval has been introduced
     public static IndexSetConfig create(String id,
+                                        String scope,
                                         String title,
                                         String description,
                                         boolean isWritable,
@@ -151,7 +155,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
                                         String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled) {
-        return create(id, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
+        return create(id, scope, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
                 DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null);
@@ -175,7 +179,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
                                         String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled) {
-        return create(null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
+        return create(null, DefaultEntityScope.NAME, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
                 DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null);
@@ -190,7 +194,8 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
                 // Index sets are writable by default.
                 .isWritable(true)
                 .customFieldMappings(new CustomFieldMappings())
-                .fieldTypeRefreshInterval(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
+                .fieldTypeRefreshInterval(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
+                .scope(DefaultEntityScope.NAME);
     }
 
     @JsonProperty("id")
@@ -283,7 +288,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
         public abstract Builder id(String id);
 
         public abstract Builder title(String title);
