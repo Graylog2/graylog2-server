@@ -98,7 +98,7 @@ class ContentPackParameterList extends React.Component<ContentPackParameterListP
           && (
             <td>
               <ButtonToolbar>
-                <Button bsStyle="primary"
+                <Button bsStyle="danger"
                         bsSize="xs"
                         title={buttonTitle}
                         disabled={parameterApplied}

@@ -90,7 +90,7 @@ const TimeRangeAddToQuickListForm = ({ children, addTimerange, toggleModal, show
   const onSubmit = ({ description }: { description: string }) => addTimerange(description);
 
   return (
-    <Popover position="left" withArrow opened={show}>
+    <Popover position="left" withArrow opened={show} withinPortal={false}>
       <Popover.Target>
         {children}
       </Popover.Target>

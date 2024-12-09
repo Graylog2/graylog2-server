@@ -22,7 +22,7 @@ import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
+import { defaultOnError } from 'util/conditional/onError';
 
 const urlPrefix = '/startpage';
 export const RECENT_ACTIONS_QUERY_KEY = 'recent_actions_query_key';
@@ -46,16 +46,15 @@ const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedR
   }));
 };
 
-const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRecentActivity, isFetching: boolean } => useQuery([RECENT_ACTIONS_QUERY_KEY, pagination], () => fetchRecentActivities(pagination), {
-  onError: (errorThrown) => {
-    UserNotification.error(`Loading recent activity failed with status: ${errorThrown}`,
-      'Could not load recent activity');
-  },
-  retry: 0,
-  initialData: {
-    recentActivity: [],
-    ...DEFAULT_PAGINATION,
-  },
-});
+const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRecentActivity, isFetching: boolean } => useQuery(
+  [RECENT_ACTIONS_QUERY_KEY, pagination],
+  () => defaultOnError(fetchRecentActivities(pagination), 'Loading recent activity failed with status', 'Could not load recent activity'),
+  {
+    retry: 0,
+    initialData: {
+      recentActivity: [],
+      ...DEFAULT_PAGINATION,
+    },
+  });
 
 export default useRecentActivity;

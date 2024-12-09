@@ -71,7 +71,7 @@ export const IndexRangesStore = singletonStore(
       const promise = fetch('POST', url);
 
       promise
-        .then(UserNotification.success('Index ranges will be recalculated shortly'))
+        .then(() => UserNotification.success('Index ranges will be recalculated shortly'))
         .catch((error) => {
           UserNotification.error(`Could not create a job to start index ranges recalculation, reason: ${error}`,
             'Error starting index ranges recalculation');
@@ -84,7 +84,7 @@ export const IndexRangesStore = singletonStore(
       const promise = fetch('POST', url);
 
       promise
-        .then(UserNotification.success(`Index ranges for ${indexName} will be recalculated shortly`))
+        .then(() => UserNotification.success(`Index ranges for ${indexName} will be recalculated shortly`))
         .catch((error) => {
           UserNotification.error(`Could not create a job to start index ranges recalculation for ${indexName}, reason: ${error}`,
             `Error starting index ranges recalculation for ${indexName}`);

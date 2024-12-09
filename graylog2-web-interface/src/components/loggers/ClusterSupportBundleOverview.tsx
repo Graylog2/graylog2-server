@@ -68,7 +68,7 @@ const ClusterSupportBundleOverview = () => {
                         onClick={() => onDownload(bundle.file_name)}>Download
         </DownloadButton>
         <Button bsSize="xsmall"
-                bsStyle="default"
+                bsStyle="danger"
                 onClick={() => setBundleNameToDelete(bundle.file_name)}>Delete
         </Button>
       </AlignRightCell>

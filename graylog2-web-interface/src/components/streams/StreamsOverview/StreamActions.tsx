@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useCallback } from 'react';
 
 import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
-import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import Routes from 'routing/Routes';
@@ -168,7 +168,8 @@ const StreamActions = ({
                     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_CLICKED, {
                       app_pathname: 'stream',
                     });
-                  }}>Data Routing
+                  }}>
+            Data routing
           </Button>
         </LinkContainer>
       </IfPermitted>
@@ -234,9 +235,9 @@ const StreamActions = ({
         </IfPermitted>
 
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <MenuItem onSelect={toggleDeleteModal} disabled={isDefaultStream}>
+          <DeleteMenuItem onSelect={toggleDeleteModal} disabled={isDefaultStream}>
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
-          </MenuItem>
+          </DeleteMenuItem>
         </IfPermitted>
       </MoreActions>
       {showUpdateModal && (

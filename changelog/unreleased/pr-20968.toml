@@ -1,0 +1,5 @@
+type = "c"
+message = "Suppress noisy aggregation search error when it is likely due to cloud maintenance."
+
+issues = ["Graylog2/graylog-plugin-enterprise#8919"]
+pulls = ["20968"]

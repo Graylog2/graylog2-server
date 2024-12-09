@@ -21,6 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { Event } from 'components/events/events/types';
 import type FetchError from 'logic/errors/FetchError';
+import { onError } from 'util/conditional/onError';
 
 export const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
 
@@ -34,14 +35,13 @@ const useEventById = (eventId: string, { onErrorHandler }: { onErrorHandler?: (e
 } => {
   const { data, refetch, isLoading, isFetched } = useQuery<Event>(
     ['event-by-id', eventId],
-    () => fetchEvent(eventId),
-    {
-      onError: (errorThrown: FetchError) => {
-        if (onErrorHandler) onErrorHandler(errorThrown);
+    () => onError(fetchEvent(eventId), (errorThrown: FetchError) => {
+      if (onErrorHandler) onErrorHandler(errorThrown);
 
-        UserNotification.error(`Loading event or alert failed with status: ${errorThrown}`,
-          'Could not load event or alert');
-      },
+      UserNotification.error(`Loading event or alert failed with status: ${errorThrown}`,
+        'Could not load event or alert');
+    }),
+    {
       keepPreviousData: true,
       enabled: !!eventId,
     },

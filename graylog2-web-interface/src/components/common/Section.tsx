@@ -58,6 +58,7 @@ type Props = React.PropsWithChildren<{
   actions?: React.ReactNode,
   headerLeftSection?: React.ReactNode,
   collapsible?: boolean,
+  onCollapse?: (opened?: boolean) => void,
   defaultClosed?: boolean,
   disableCollapseButton?: boolean,
 }>
@@ -65,9 +66,25 @@ type Props = React.PropsWithChildren<{
 /**
  * Simple section component. Currently only a "filled" version exists.
  */
-const Section = ({ title, header, actions, headerLeftSection, collapsible = false, defaultClosed = false, disableCollapseButton = false, children }: Props) => {
+const Section = ({
+  title,
+  header = null,
+  actions = null,
+  headerLeftSection = null,
+  collapsible = false,
+  defaultClosed = false,
+  onCollapse = () => {},
+  disableCollapseButton = false,
+  children = null,
+}: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
-  const onHeaderClick = () => (!disableCollapseButton && toggle());
+
+  const onToggle = () => {
+    toggle();
+    onCollapse(opened);
+  };
+
+  const onHeaderClick = () => (!disableCollapseButton && onToggle());
 
   return (
     <Container $opened={opened} $collapsible={collapsible}>
@@ -77,6 +94,7 @@ const Section = ({ title, header, actions, headerLeftSection, collapsible = fals
           {headerLeftSection && <FlexWrapper onClick={(e) => { e.stopPropagation(); }}>{headerLeftSection}</FlexWrapper>}
         </FlexWrapper>
         <FlexWrapper>
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           {actions && <div onClick={(e) => { e.stopPropagation(); }}>{actions}</div>}
           {collapsible && (
           <Button bsSize="sm"

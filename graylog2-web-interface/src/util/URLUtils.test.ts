@@ -91,5 +91,14 @@ describe('qualifyUrl', () => {
 
       expect(currentPathnameWithoutPrefix()).toBe(pathname);
     });
+
+    it('returns current path when prefix is defined and ends with `/`', () => {
+      const pathname = '/welcome';
+      setLocation(`/foo${pathname}`);
+
+      mockPathPrefix('/foo/');
+
+      expect(currentPathnameWithoutPrefix()).toBe(pathname);
+    });
   });
 });

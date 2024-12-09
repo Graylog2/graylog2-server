@@ -20,7 +20,6 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,19 +40,17 @@ public abstract class AbstractOpensearchCli {
     private final Path binPath;
 
     /**
-     *
      * @param configPath Opensearch CLI tools adapt configuration stored under OPENSEARCH_PATH_CONF env property.
      *                   This is why wealways want to set this configPath for each CLI tool.
-     * @param bin location of the actual executable binary that this wrapper handles
+     * @param bin        location of the actual executable binary that this wrapper handles
      */
     private AbstractOpensearchCli(Path configPath, Path bin) {
         this.configPath = configPath;
         this.binPath = bin;
     }
 
-    public AbstractOpensearchCli(OpensearchConfiguration config, String binName) {
-        this(config.datanodeDirectories().getOpensearchProcessConfigurationDir(),
-                checkExecutable(config.opensearchDistribution().getOpensearchBinDirPath().resolve(binName)));
+    protected AbstractOpensearchCli(Path configDir, Path binDir, String binName) {
+        this(configDir, checkExecutable(binDir.resolve(binName)));
     }
 
     private static Path checkExecutable(Path path) {
@@ -72,7 +69,7 @@ public abstract class AbstractOpensearchCli {
      *                         to questions the tool is asking. It's scripting unfriendly. Our way around this is to
      *                         provide an input stream of expected responses, each delimited by \n. There is no validation
      *                         and no logic, just the expected order of responses.
-     * @param args arguments of the command, in opensearch-keystore create, the create is the first argument
+     * @param args             arguments of the command, in opensearch-keystore create, the create is the first argument
      * @return All the STDOUT and STDERR of the process merged into one String.
      */
     protected String runWithStdin(List<String> answersToPrompts, String... args) {

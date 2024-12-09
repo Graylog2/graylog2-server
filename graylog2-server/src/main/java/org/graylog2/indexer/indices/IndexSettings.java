@@ -16,16 +16,29 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nullable;
 
-@AutoValue
-@JsonAutoDetect
-public abstract class IndexSettings {
-    public abstract int shards();
-    public abstract int replicas();
+import java.util.Map;
 
-    public static IndexSettings create(int shards, int replicas) {
-        return new AutoValue_IndexSettings(shards, replicas);
+public class IndexSettings {
+    private final Map<String, Object> settings;
+
+    public IndexSettings(Map<String, Object> settings) {
+        this.settings = settings;
+    }
+
+    public static IndexSettings create(int shards, int replicas, @Nullable Map<String, Object> analysis) {
+        ImmutableMap.Builder<String, Object> fields = ImmutableMap.<String, Object>builder()
+                .put("number_of_shards", shards)
+                .put("number_of_replicas", replicas);
+        if (analysis != null) {
+            fields.put("analysis", analysis);
+        }
+        return new IndexSettings(fields.build());
+    }
+
+    public Map<String, Object> map() {
+        return settings;
     }
 }

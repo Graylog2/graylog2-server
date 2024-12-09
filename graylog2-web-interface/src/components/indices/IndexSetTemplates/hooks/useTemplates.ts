@@ -16,7 +16,6 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
@@ -25,6 +24,7 @@ import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQue
 import type {
   IndexSetTemplate,
 } from 'components/indices/IndexSetTemplates/types';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -62,12 +62,8 @@ const useTemplates = (searchParams: SearchParams, { enabled } = { enabled: true 
 } => {
   const { data, isLoading, refetch } = useQuery(
     keyFn(searchParams),
-    () => fetchIndexSetTemplates(searchParams),
+    () => defaultOnError(fetchIndexSetTemplates(searchParams), 'Loading index set templates failed with status', 'Could not load index set templates'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index set templates failed with status: ${errorThrown}`,
-          'Could not load index set templates');
-      },
       keepPreviousData: true,
       enabled,
     },
