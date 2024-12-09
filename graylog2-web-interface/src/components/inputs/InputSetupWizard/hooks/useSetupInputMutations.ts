@@ -41,10 +41,10 @@ const createPipeline = (pipeline: PipelineConfiguration) : Promise<PipelineType>
   return fetch('POST', url, pipeline);
 };
 
-const updateRouting = async (params : RoutingParams) => {
+const updateRouting = async (params: RoutingParams) => {
   const url = qualifyUrl(ApiRoutes.PipelinesController.updateRouting().url);
 
-  return fetch('PUT', url, { ...params, remove_from_default: false }); // TODO: remove remove_from_default after API change
+  return fetch('PUT', url, params);
 };
 
 const usePipelineRoutingMutation = () => {
