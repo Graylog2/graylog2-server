@@ -697,7 +697,9 @@
                             <mainClass>org.graylog.datanode.docs.ConfigurationDocsGenerator</mainClass>
                             <arguments>
                                 <argument>conf</argument>
-                                <argument>${project.build.directory}/datanode.conf.example</argument>
+                                <argument>${project.build.directory}/datanode.conf.generated</argument>
+                                <!-- use the following line if you want to distribute the generated version instead of manually created -->
+                                <!-- <argument>${project.build.directory}/datanode.conf.example</argument> -->
                             </arguments>
                         </configuration>
                     </execution>
