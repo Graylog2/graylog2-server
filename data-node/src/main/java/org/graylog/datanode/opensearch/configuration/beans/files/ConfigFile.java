@@ -14,10 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans;
+package org.graylog.datanode.opensearch.configuration.beans.files;
 
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
 
-public interface OpensearchConfigurationBean {
-    OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams trustedCertificates);
+public interface ConfigFile {
+
+    /**
+     * Target relative path of the configuration file. May include parent directories.
+     */
+    Path relativePath();
+
+    /**
+     * Given a file stream, write the configuration file content in it. Everything will be automatically flushed and closed.
+     */
+    void write(OutputStream stream) throws IOException;
 }

@@ -14,18 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration.variants;
+package org.graylog.datanode.opensearch.configuration;
 
-import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.OpensearchConfigurationException;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
-public interface SecurityConfigurationVariant {
-
-    boolean isConfigured(final Configuration localConfiguration) throws OpensearchConfigurationException;
-
-    OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException;
+public record ConfigurationBuildParams(List<X509Certificate> trustedCertificates,
+                                       java.util.Map<String, String> transientConfiguration) {
 }

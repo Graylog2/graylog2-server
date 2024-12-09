@@ -14,10 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans;
+package org.graylog.datanode.opensearch.configuration.beans.files;
 
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
-public interface OpensearchConfigurationBean {
-    OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams trustedCertificates);
+public record TextConfigFile(Path relativePath, String text) implements ConfigFile {
+
+    @Override
+    public void write(OutputStream output) throws IOException {
+        try (final ByteArrayInputStream input = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
+            input.transferTo(output);
+        }
+    }
 }
