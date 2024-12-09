@@ -28,6 +28,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
@@ -53,7 +54,7 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 @JsonAutoDetect
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME,
           readPermission = INDEXSETS_READ)
-public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, SimpleIndexSetConfig {
+public abstract class IndexSetConfig extends ScopedEntity implements Comparable<IndexSetConfig>, SimpleIndexSetConfig {
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
     public static final String FIELD_REGULAR = "regular";
