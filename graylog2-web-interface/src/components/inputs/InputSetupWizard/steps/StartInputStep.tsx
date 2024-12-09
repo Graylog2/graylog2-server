@@ -165,6 +165,28 @@ const StartInputStep = () => {
     return false;
   };
 
+  const getProgressEntityName = (stepName) => {
+    const mutation = stepMutations[stepName];
+
+    const routingStepData = getStepConfigOrData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+
+    const name = mutation.data?.title ?? mutation.data?.name ?? undefined;
+
+    switch (stepName) {
+      case 'createStream':
+        return routingStepData?.newStream.title ?? undefined;
+
+      case 'startStream':
+        if (routingStepData.streamType === 'NEW') {
+          return routingStepData?.newStream.title ?? undefined;
+        }
+
+        return name;
+      default:
+        return name;
+    }
+  };
+
   return (
     <Row>
       <StepCol md={12}>
@@ -184,10 +206,13 @@ const StartInputStep = () => {
                     const mutation = stepMutations[stepName];
                     if (mutation.isIdle) return null;
 
+                    const name = getProgressEntityName(stepName);
+
                     return (
                       <ProgressMessage stepName={stepName as ProcessingSteps}
                                        isLoading={mutation.isLoading}
                                        isSuccess={mutation.isSuccess}
+                                       name={name}
                                        isError={mutation.isError}
                                        errorMessage={mutation.error} />
                     );

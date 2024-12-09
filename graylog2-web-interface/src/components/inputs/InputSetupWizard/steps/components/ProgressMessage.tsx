@@ -25,6 +25,7 @@ type Props = {
   stepName: ProcessingSteps,
   isLoading: boolean,
   isSuccess: boolean,
+  name?: string,
   isError: boolean,
   errorMessage?: FetchError,
 }
@@ -37,39 +38,39 @@ const ErrorIcon = styled(Icon)(({ theme }) => css`
   color: ${theme.colors.variant.danger}
 `);
 
-const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, errorMessage = undefined } : Props) => {
-  const loadingText: {[key in ProcessingSteps]: string} = {
-    createStream: 'Creating stream...',
-    startStream: 'Starting stream...',
-    createPipeline: 'Creating pipeline...',
-    setupRouting: 'Setting up routing...',
-    startInput: 'Starting input...',
+const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, name = undefined, errorMessage = undefined } : Props) => {
+  const loadingText: {[key in ProcessingSteps]: (entityName?: string) => string} = {
+    createStream: (entityName) => `Creating Stream${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
+    startStream: (entityName) => `Starting Stream${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
+    createPipeline: (entityName) => `Creating Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
+    setupRouting: (_) => 'Setting up routing...',
+    startInput: (_) => 'Starting Input...',
   };
 
-  const errorText: {[key in ProcessingSteps]: string} = {
-    createStream: 'Creating stream failed',
-    startStream: 'Starting stream failed',
-    createPipeline: 'Creating pipeline failed',
-    setupRouting: 'Setting up routing failed',
-    startInput: "Input couldn't be started",
+  const errorText: {[key in ProcessingSteps]: (name?: string) => string} = {
+    createStream: (entityName) => `Creating Stream${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
+    startStream: (entityName) => `Starting Stream${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
+    createPipeline: (entityName) => `Creating Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
+    setupRouting: (_) => 'Setting up routing failed!',
+    startInput: (_) => "Input couldn't be started!",
   };
 
-  const successText: {[key in ProcessingSteps]: string} = {
-    createStream: 'Stream created',
-    startStream: 'Stream started',
-    createPipeline: 'Pipeline created',
-    setupRouting: 'Routing set up',
-    startInput: 'Input started',
+  const successText: {[key in ProcessingSteps]: (entityName?: string) => string} = {
+    createStream: (entityName) => `Stream${entityName !== undefined ? (` "${entityName}"`) : ''} created!`,
+    startStream: (entityName) => `Stream${entityName !== undefined ? (` "${entityName}"`) : ''} started!`,
+    createPipeline: (entityName) => `Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''} created!`,
+    setupRouting: (_) => 'Routing set up!',
+    startInput: (_) => 'Input started!',
   };
 
   if (isLoading) {
-    return <p><Spinner text={loadingText[stepName]} /></p>;
+    return <p><Spinner text={loadingText[stepName](name)} /></p>;
   }
 
   if (isError) {
     return (
       <>
-        <p><ErrorIcon name="close" title={errorText[stepName]} /> {errorText[stepName]}</p>
+        <p><ErrorIcon name="close" title={errorText[stepName](name)} /> {errorText[stepName](name)}</p>
         {errorMessage && (<p><strong>Details:</strong> {errorMessage.message}</p>)}
       </>
     );
@@ -77,7 +78,7 @@ const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, errorMessage
 
   if (isSuccess) {
     return (
-      <p><SuccessIcon name="check" title={successText[stepName]} /> {successText[stepName]}</p>
+      <p><SuccessIcon name="check" title={successText[stepName](name)} /> {successText[stepName](name)}</p>
     );
   }
 
