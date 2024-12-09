@@ -177,7 +177,7 @@ const StartInputStep = () => {
         </Row>
         <Row>
           <Col md={12}>
-            {startInputStatus !== 'NOT_STARTED' && (
+            {hasBeenStarted && (
               <>
                 <StyledHeading>Setting up Input...</StyledHeading>
                   {Object.keys(stepMutations).map((stepName) => {
@@ -216,7 +216,7 @@ const StartInputStep = () => {
         <Row>
           <ButtonCol md={12}>
             {(hasPreviousStep) && (<Button disabled={isRunningOrDone} onClick={handleBackClick}>Back</Button>)}
-            {hasNextStep && (<Button disabled={isNextStepDisabled || hasBeenStarted} onClick={onNextStep} bsStyle="primary">Input Diagnosis</Button>)}
+            {hasNextStep && (<Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={onNextStep} bsStyle="primary">Input Diagnosis</Button>)}
           </ButtonCol>
         </Row>
         )}
