@@ -22,6 +22,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,13 +56,12 @@ public abstract class AbstractKinesisCodec extends AbstractCodec {
             try {
                 return decodeLogData(entry);
             } catch (Exception e) {
-                LOG.error("Couldn't decode log event <{}>", entry);
-
-                // Message will be dropped when returning null
-                return null;
+                throw InputProcessingException.create("Couldn't decode log event <%s>".formatted(entry),
+                        e, rawMessage, new String(rawMessage.getPayload(), charset));
             }
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't deserialize log data", e);
+            throw InputProcessingException.create("Couldn't deserialize log data",
+                    e, rawMessage, new String(rawMessage.getPayload(), charset));
         }
     }
 

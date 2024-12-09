@@ -31,6 +31,7 @@ import org.graylog2.plugin.inputs.annotations.Codec;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -77,8 +78,8 @@ public class Beats2Codec extends AbstractCodec {
                 throw new IOException("null result");
             }
         } catch (IOException e) {
-            LOG.error("Couldn't decode raw message {}", rawMessage);
-            return null;
+            throw InputProcessingException.create("Couldn't decode beats 2 message",
+                    e, rawMessage, new String(rawMessage.getPayload(), charset));
         }
 
         return parseEvent(event);

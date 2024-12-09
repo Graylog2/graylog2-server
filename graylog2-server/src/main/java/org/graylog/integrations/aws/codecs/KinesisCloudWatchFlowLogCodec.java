@@ -73,10 +73,6 @@ public class KinesisCloudWatchFlowLogCodec extends AbstractKinesisCodec {
         try {
             final FlowLogMessage flowLogMessage = FlowLogMessage.fromLogEvent(logEvent);
 
-            if (flowLogMessage == null) {
-                return null;
-            }
-
             final String source = configuration.getString(KinesisCloudWatchFlowLogCodec.Config.CK_OVERRIDE_SOURCE, SOURCE);
             final Message result = messageFactory.createMessage(
                     buildSummary(flowLogMessage),
