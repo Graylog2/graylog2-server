@@ -115,9 +115,11 @@ const SetupRoutingStep = () => {
 
   useEffect(() => {
     if (orderedSteps && activeStep && stepsData) {
-      const withInitialStepsData = updateStepConfigOrData(stepsData, currentStepName, defaultStepData);
+      if (!getStepConfigOrData(stepsData, currentStepName)?.streamType) {
+        const withInitialStepsData = updateStepConfigOrData(stepsData, currentStepName, defaultStepData);
 
-      setStepsData(withInitialStepsData);
+        setStepsData(withInitialStepsData);
+      }
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
