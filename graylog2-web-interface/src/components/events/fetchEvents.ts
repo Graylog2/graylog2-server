@@ -76,13 +76,14 @@ const parseTimestampFilter = (timestamp: string | undefined) => {
 export const parseTypeFilter = (alert: string) => {
   switch (alert) {
     case 'true':
-      return  'only';
+      return 'only';
     case 'false':
-      return  'exclude';
+      return 'exclude';
     default:
-      return  'include';
+      return 'include';
   }
-}
+};
+
 const parseFilters = (filters: UrlQueryFilters) => {
   const result: FiltersResult = { filter: {} };
 
@@ -108,7 +109,8 @@ const parseFilters = (filters: UrlQueryFilters) => {
     result.filter.priority = filters.get('priority');
   }
 
-  result.filter.alerts = parseTypeFilter(filters?.get('alert')?.[0])
+  result.filter.alerts = parseTypeFilter(filters?.get('alert')?.[0]);
+
   return result;
 };
 
