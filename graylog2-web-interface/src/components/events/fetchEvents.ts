@@ -16,6 +16,7 @@
  */
 
 import moment from 'moment';
+import trim from 'lodash/trim';
 
 import * as URLUtils from 'util/URLUtils';
 import { adjustFormat } from 'util/DateTime';
@@ -40,18 +41,42 @@ type FiltersResult = {
   timerange?: { from?: string, to?: string, type: string, range?: number },
 };
 
+const allTimesRange = { type: 'relative', range: 0 };
+
+const isNullOrBlank = (s: string | undefined) => {
+  if (!s) {
+    return true;
+  }
+
+  if (trim(s) === '') {
+    return true;
+  }
+
+  return false;
+};
+
+const parseTimestampFilter = (timestamp: string | undefined) => {
+  if (!timestamp) {
+    return allTimesRange;
+  }
+
+  const [from, to] = extractRangeFromString(timestamp);
+
+  if (!from && !to) {
+    return allTimesRange;
+  }
+
+  return {
+    type: 'absolute',
+    from: isNullOrBlank(from) ? adjustFormat(moment(0).utc(), 'internal') : from,
+    to: isNullOrBlank(to) ? adjustFormat(moment().utc(), 'internal') : to,
+  };
+};
+
 const parseFilters = (filters: UrlQueryFilters) => {
   const result: FiltersResult = { filter: {} };
 
-  if (filters.get('timestamp')?.[0]) {
-    const [from, to] = extractRangeFromString(filters.get('timestamp')[0]);
-
-    result.timerange = from
-      ? { from, to: to || adjustFormat(moment().utc(), 'internal'), type: 'absolute' }
-      : { type: 'relative', range: 0 };
-  } else {
-    result.timerange = { type: 'relative', range: 0 };
-  }
+  result.timerange = parseTimestampFilter(filters.get('timestamp')?.[0]);
 
   if (filters.get('timerange_start')?.[0]) {
     const [from, to] = extractRangeFromString(filters.get('timerange_start')[0]);
