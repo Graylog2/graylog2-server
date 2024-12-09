@@ -133,16 +133,22 @@ const SetupRoutingStep = () => {
   }, [streams]);
 
   const handleStreamSelect = (streamId: string) => {
-    if (!streamId) return;
-
     setSelectedStreamId(streamId);
 
-    setStepsData(
-      updateStepConfigOrData(stepsData, currentStepName, { streamId, streamType: 'EXISTING' } as RoutingStepData),
-    );
+    if (streamId) {
+      setStepsData(
+        updateStepConfigOrData(stepsData, currentStepName, { streamId, streamType: 'EXISTING' } as RoutingStepData),
+      );
+    } else {
+      setStepsData(
+        updateStepConfigOrData(stepsData, currentStepName, { streamId: undefined, streamType: 'DEFAULT' } as RoutingStepData),
+      );
+    }
   };
 
   const handleCreateStream = () => {
+    setSelectedStreamId(undefined);
+
     updateStepConfigOrData(stepsData, currentStepName, defaultStepData);
     setShowCreateStream(true);
   };
