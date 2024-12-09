@@ -16,12 +16,12 @@
  */
 package org.graylog.datanode.opensearch.configuration.beans.files;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 
-public record InputStreamConfigFile(Path relativePath, InputStream inputStream) implements ConfigFile {
+public record InputStreamConfigFile(Path relativePath, ByteArrayInputStream inputStream) implements ConfigFile {
     @Override
     public void write(OutputStream output) throws IOException {
         inputStream.transferTo(output);

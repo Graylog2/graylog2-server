@@ -16,15 +16,17 @@
  */
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
+import jakarta.annotation.Nonnull;
 import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
 import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
 import org.graylog.datanode.opensearch.configuration.beans.files.InputStreamConfigFile;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
@@ -94,8 +96,13 @@ public class OpensearchDefaultConfigFilesBean implements OpensearchConfiguration
             @Override
             public FileVisitResult visitFile(Path sourceFile, BasicFileAttributes attrs) {
                 final Path relativePath = source.relativize(sourceFile);
+                // the relative path may come from a different provider than we'll use later, triggering ProviderMismatchException
+                // We need to disconnect it from the existing provider and use the default one. We can't use relative paths from zip/jar
+                // to create configuration files on a local file system.
+                final Path relativePathWithoutProvider = Path.of(relativePath.toString());
                 try {
-                    configFiles.add(new InputStreamConfigFile(relativePath, Files.newInputStream(sourceFile)));
+                    final ByteArrayInputStream stream = copyToMemory(sourceFile);
+                    configFiles.add(new InputStreamConfigFile(relativePathWithoutProvider, stream));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -103,5 +110,14 @@ public class OpensearchDefaultConfigFilesBean implements OpensearchConfiguration
             }
         });
         return configFiles;
+    }
+
+    @Nonnull
+    private static ByteArrayInputStream copyToMemory(Path sourceFile) throws IOException {
+        try (final InputStream inputStream = Files.newInputStream(sourceFile)) {
+            ByteArrayOutputStream memory = new ByteArrayOutputStream();
+            inputStream.transferTo(memory);
+            return new ByteArrayInputStream(memory.toByteArray());
+        }
     }
 }
