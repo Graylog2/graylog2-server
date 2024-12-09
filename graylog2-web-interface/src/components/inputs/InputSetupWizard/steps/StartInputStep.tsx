@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
@@ -24,7 +24,7 @@ import { Button, Row, Col } from 'components/bootstrap';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/useInputSetupWizardSteps';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
-import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, getStepConfigOrData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
+import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, getStepConfigOrData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import type { RoutingStepData } from 'components/inputs/InputSetupWizard/steps/SetupRoutingStep';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
@@ -54,11 +54,11 @@ const ButtonCol = styled(Col)(({ theme }) => css`
 export type ProcessingSteps = 'createStream' | 'startStream' | 'createPipeline' | 'setupRouting' | 'startInput'
 
 const StartInputStep = () => {
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData, stepsConfig, setStepsConfig } = useInputSetupWizard();
+  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData, stepsConfig } = useInputSetupWizard();
   const { stepsData } = useInputSetupWizardSteps();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
-  const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsData);
+  const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsConfig);
   const [startInputStatus, setStartInputStatus] = useState<'NOT_STARTED' | 'RUNNING' | 'SUCCESS' | 'FAILED'>('NOT_STARTED');
   const isRunningOrDone = startInputStatus === 'RUNNING' || startInputStatus === 'SUCCESS';
   const notStartedOrFailed = startInputStatus === 'NOT_STARTED' || startInputStatus === 'FAILED';
@@ -77,13 +77,6 @@ const StartInputStep = () => {
     createPipeline: createPipelineMutation,
     setupRouting: updateRoutingMutation,
   }), [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation]);
-
-  useEffect(() => {
-    if (orderedSteps && activeStep && stepsConfig) {
-      const withNextStepEnabled = enableNextStep(orderedSteps, activeStep, stepsConfig);
-      setStepsConfig(withNextStepEnabled);
-    } // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const createPipeline = async (stream: StreamConfiguration) => {
     const pipeline = {
@@ -163,6 +156,15 @@ const StartInputStep = () => {
     goToPreviousStep();
   };
 
+  const isInputStartable = () => {
+    const routingStepData = getStepConfigOrData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+
+    if (!routingStepData) return false;
+    if (routingStepData.newStream || routingStepData.streamId || routingStepData.streamType === 'DEFAULT') return true;
+
+    return false;
+  };
+
   return (
     <Row>
       <StepCol md={12}>
@@ -199,7 +201,13 @@ const StartInputStep = () => {
               </>
             )}
             {(notStartedOrFailed) && (
-              <Button onClick={handleStart}>Start Input</Button>
+              <>
+                {isInputStartable() ? (
+                  <Button onClick={handleStart}>Start Input</Button>
+                ) : (
+                  <p>Your input is not ready to be setup. Please complete the previous steps.</p>
+                )}
+              </>
             )}
           </Col>
         </Row>

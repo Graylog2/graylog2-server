@@ -21,12 +21,12 @@ import styled, { css } from 'styled-components';
 import { Alert, Button, Row, Col } from 'components/bootstrap';
 import { Select } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
-import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/useInputSetupWizardSteps';
+import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStreamForm from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
 import type { StreamFormValues } from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
-import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, disableNextStep, updateStepConfigOrData, getStepConfigOrData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
+import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, updateStepConfigOrData, getStepConfigOrData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
@@ -76,7 +76,7 @@ export type RoutingStepData = {
 
 const SetupRoutingStep = () => {
   const currentStepName = useMemo(() => INPUT_WIZARD_STEPS.SETUP_ROUTING, []);
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsConfig, setStepsConfig } = useInputSetupWizard();
+  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsConfig } = useInputSetupWizard();
   const { stepsData, setStepsData } = useInputSetupWizardSteps();
   const newStream: StreamFormValues = getStepConfigOrData(stepsData, currentStepName, 'newStream');
   const [selectedStreamId, setSelectedStreamId] = useState(undefined);
@@ -112,16 +112,6 @@ const SetupRoutingStep = () => {
         return false;
     }
   }, [currentStepName, newStream, showCreateStream, stepsData]);
-
-  useEffect(() => {
-    if (isStepValid()) {
-      const withNextStepEnabled = enableNextStep(orderedSteps, activeStep, stepsData);
-      setStepsConfig(withNextStepEnabled);
-    } else {
-      const withNextStepDisabled = disableNextStep(orderedSteps, activeStep, stepsData);
-      setStepsConfig(withNextStepDisabled);
-    }
-  }, [isStepValid, stepsData, activeStep, orderedSteps, setStepsConfig]);
 
   useEffect(() => {
     if (orderedSteps && activeStep && stepsData) {

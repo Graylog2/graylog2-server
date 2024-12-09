@@ -43,6 +43,12 @@ const Wizard = ({ show, input, onClose }: Props) => {
     [INPUT_WIZARD_STEPS.SETUP_ROUTING]: {
       enabled: true,
     },
+    [INPUT_WIZARD_STEPS.START_INPUT]: {
+      enabled: true,
+    },
+    [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
+      enabled: true,
+    },
   };
 
   useEffect(() => {
@@ -60,7 +66,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
           </>
         ),
         component: (
-          <InputSetupWizardStepsProvider><SetupRoutingStep /></InputSetupWizardStepsProvider>
+          <SetupRoutingStep />
         ),
         disabled: !getStepConfigOrData(stepsConfig, INPUT_WIZARD_STEPS.SETUP_ROUTING, 'enabled'),
       },
@@ -72,7 +78,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
           </>
         ),
         component: (
-          <InputSetupWizardStepsProvider><StartInputStep /></InputSetupWizardStepsProvider>
+          <StartInputStep />
         ),
         disabled: !getStepConfigOrData(stepsConfig, INPUT_WIZARD_STEPS.START_INPUT, 'enabled'),
       },
@@ -84,7 +90,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
           </>
         ),
         component: (
-          <InputSetupWizardStepsProvider><InputDiagnosisStep /></InputSetupWizardStepsProvider>
+          <InputDiagnosisStep />
         ),
         disabled: !getStepConfigOrData(stepsConfig, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, 'enabled'),
       },
@@ -114,12 +120,14 @@ const Wizard = ({ show, input, onClose }: Props) => {
   return (
     <Modal show onHide={onClose}>
       <Modal.Body>
-        <CommonWizard activeStep={activeStep}
-                      hidePreviousNextButtons
-                      horizontal
-                      justified
-                      onStepChange={setActiveStep}
-                      steps={orderedSteps.map((step) => steps[step])} />
+        <InputSetupWizardStepsProvider>
+          <CommonWizard activeStep={activeStep}
+                        hidePreviousNextButtons
+                        horizontal
+                        justified
+                        onStepChange={setActiveStep}
+                        steps={orderedSteps.map((step) => steps[step])} />
+        </InputSetupWizardStepsProvider>
       </Modal.Body>
     </Modal>
   );
