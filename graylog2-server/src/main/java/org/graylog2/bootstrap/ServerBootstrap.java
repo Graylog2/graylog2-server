@@ -141,9 +141,6 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
         if (!isNoPidFile()) {
             savePidFile(getPidFile());
         }
-        // This needs to run before the first SSLContext is instantiated,
-        // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings(parseAndGetTLSConfiguration(configFile));
 
         // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
         setNettyNativeDefaults(parseAndGetPathConfiguration(configFile));

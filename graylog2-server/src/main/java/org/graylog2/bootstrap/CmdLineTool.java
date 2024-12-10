@@ -197,6 +197,9 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
      * Please note that this happens *before* the configuration file has been parsed.
      */
     protected void beforeStart() {
+        // This needs to run before the first SSLContext is instantiated,
+        // because it sets up the default SSLAlgorithmConstraints
+        applySecuritySettings(parseAndGetTLSConfiguration(configFile));
     }
 
     /**

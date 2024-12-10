@@ -51,7 +51,7 @@
     "styled-components": "6.1.1",
     "typescript": "5.7.2",
     "use-query-params": "^2.2.0",
-    "webpack": "5.97.0",
+    "webpack": "5.97.1",
     "webpack-cli": "5.1.4",
     "webpack-merge": "4.2.2"
   }
