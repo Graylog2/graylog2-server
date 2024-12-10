@@ -22,6 +22,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Assertions;
@@ -58,7 +59,7 @@ class EncodingTest {
         final Message message = gelfCodecUTF8.decodeSafe(rawUTF8).get();
         assertThat(message.getMessage()).isEqualTo(MESSAGE);
 
-        Assertions.assertThrows(IllegalStateException.class, () -> gelfCodecUTF8.decodeSafe(rawUTF16).get());
+        Assertions.assertThrows(InputProcessingException.class, () -> gelfCodecUTF8.decodeSafe(rawUTF16).get());
     }
 
     @Test
@@ -68,7 +69,7 @@ class EncodingTest {
         final Message message = gelfCodecUTF16.decodeSafe(rawUTF16).get();
         assertThat(message.getMessage()).isEqualTo(MESSAGE);
 
-        Assertions.assertThrows(IllegalStateException.class, () -> gelfCodecUTF16.decodeSafe(rawUTF8).get());
+        Assertions.assertThrows(InputProcessingException.class, () -> gelfCodecUTF16.decodeSafe(rawUTF8).get());
     }
 
     @Test
