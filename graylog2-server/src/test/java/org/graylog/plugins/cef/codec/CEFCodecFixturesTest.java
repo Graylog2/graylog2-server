@@ -130,7 +130,7 @@ public class CEFCodecFixturesTest {
     public void setUp() {
         final CEFCodec codec = new CEFCodec(new Configuration(fixture.codecConfiguration), messageFactory);
 
-        message = codec.decode(rawMessage);
+        message = codec.decodeSafe(rawMessage).get();
         assertThat(message).isNotNull();
     }
 

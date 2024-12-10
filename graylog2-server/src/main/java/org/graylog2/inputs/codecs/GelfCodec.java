@@ -38,6 +38,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -49,6 +50,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 @Codec(name = "gelf", displayName = "GELF")
 public class GelfCodec extends AbstractCodec {
@@ -121,9 +123,8 @@ public class GelfCodec extends AbstractCodec {
         }
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull final RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull final RawMessage rawMessage) {
         final GELFMessage gelfMessage = new GELFMessage(rawMessage.getPayload(), rawMessage.getRemoteAddress());
         final String json = gelfMessage.getJSON(decompressSizeLimit, charset);
 
@@ -135,16 +136,14 @@ public class GelfCodec extends AbstractCodec {
                 throw new IOException("null result");
             }
         } catch (final Exception e) {
-            log.error("Could not parse JSON, first 400 characters: " +
-                    StringUtils.abbreviate(json, 403), e);
-            throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)", e);
+            throw InputProcessingException.create("JSON is null/could not be parsed (invalid JSON)",
+                    e, rawMessage, json);
         }
 
         try {
             validateGELFMessage(node, rawMessage.getId(), rawMessage.getRemoteAddress());
         } catch (IllegalArgumentException e) {
-            log.trace("Invalid GELF message <{}>", node);
-            throw e;
+            throw InputProcessingException.create(e.getMessage(), e, rawMessage, json);
         }
 
         // Timestamp.
@@ -238,7 +237,7 @@ public class GelfCodec extends AbstractCodec {
             message.addField(key, fieldValue);
         }
 
-        return message;
+        return Optional.of(message);
     }
 
     private void validateGELFMessage(JsonNode jsonNode, UUID id, ResolvableInetSocketAddress remoteAddress) {

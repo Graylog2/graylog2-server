@@ -43,6 +43,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Codec(name = "jsonpath", displayName = "JSON Path")
 public class JsonPathCodec extends AbstractCodec {
@@ -77,22 +79,25 @@ public class JsonPathCodec extends AbstractCodec {
         this.objectMapper = objectMapper;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         Map<String, Object> fields = new HashMap<>();
         if (flatten) {
             final String json = new String(rawMessage.getPayload(), charset);
             try {
                 fields = flatten(json);
             } catch (JsonFlattenException e) {
-                LOG.warn("JSON contains type not supported by flatten method.", e);
+                throw InputProcessingException.create(
+                        "JSON contains type not supported by flatten method.", e, rawMessage, json);
             } catch (JsonProcessingException e) {
-                LOG.warn("Could not parse JSON.", e);
+                throw InputProcessingException.create(
+                        "Could not parse JSON.", e, rawMessage, json);
             }
         } else {
             if (jsonPath == null) {
-                return null;
+                throw InputProcessingException.create(
+                        "Field <%s> is empty for input with id <%s>".formatted(CK_PATH, rawMessage.getSourceNodes().get(0).inputId),
+                        rawMessage);
             }
             final String json = new String(rawMessage.getPayload(), charset);
             fields = read(json);
@@ -102,7 +107,7 @@ public class JsonPathCodec extends AbstractCodec {
                 configuration.getString(CK_SOURCE),
                 rawMessage.getTimestamp());
         message.addFields(fields);
-        return message;
+        return Optional.of(message);
     }
 
     @VisibleForTesting
@@ -137,7 +142,7 @@ public class JsonPathCodec extends AbstractCodec {
         if (fields.toString().length() > 50) {
             shortMessage.append(fields.toString().substring(0, 50)).append("[...]");
         } else {
-            shortMessage.append(fields.toString());
+            shortMessage.append(fields);
         }
 
         return shortMessage.toString();

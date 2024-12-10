@@ -78,7 +78,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
@@ -114,7 +114,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
@@ -149,7 +149,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
@@ -196,7 +196,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
@@ -249,7 +249,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
@@ -291,7 +291,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
@@ -326,7 +326,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
@@ -478,7 +478,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
@@ -494,7 +494,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
@@ -513,7 +513,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
@@ -653,7 +653,7 @@ public class PaloAlto9xTemplatesTest {
         String rawMessage = SYSLOG_PREFIX + log;
         RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
-        Message out = cut.decode(in);
+        Message out = cut.decodeSafe(in).get();
 
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));

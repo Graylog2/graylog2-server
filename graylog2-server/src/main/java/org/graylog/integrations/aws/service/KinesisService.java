@@ -23,6 +23,8 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.google.common.base.Preconditions;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.collections.CollectionUtils;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSLogMessage;
@@ -68,10 +70,6 @@ import software.amazon.awssdk.services.kinesis.model.Shard;
 import software.amazon.awssdk.services.kinesis.model.ShardIteratorType;
 import software.amazon.awssdk.services.kinesis.model.StreamDescription;
 import software.amazon.awssdk.services.kinesis.model.StreamStatus;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.BadRequestException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -359,11 +357,9 @@ public class KinesisService {
             throw new BadRequestException("Encoding the message to bytes failed.", e);
         }
 
-        final Message fullyParsedMessage = codec.decode(new RawMessage(payload));
-        if (fullyParsedMessage == null) {
-            throw new BadRequestException(String.format(Locale.ROOT, "Message decoding failed. More information might be " +
-                    "available by enabling Debug logging. message [%s]", logMessage));
-        }
+        final Message fullyParsedMessage = codec.decodeSafe(new RawMessage(payload)).orElseThrow(() ->
+                new BadRequestException(String.format(Locale.ROOT, "Message decoding failed. More information might be " +
+                        "available by enabling Debug logging. message [%s]", logMessage)));
 
         LOG.debug("Successfully parsed message type [{}] with codec [{}].", awsMessageType, awsMessageType.getCodecName());
 

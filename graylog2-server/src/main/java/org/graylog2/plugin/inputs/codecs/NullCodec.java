@@ -25,6 +25,7 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * This codec always returns a null Message.
@@ -33,10 +34,9 @@ import javax.annotation.Nullable;
 public class NullCodec implements Codec {
     public static final String NAME = "NullCodec";
 
-    @Nullable
     @Override
-    public Message decode(@NonNull RawMessage rawMessage) {
-        return null;
+    public Optional<Message> decodeSafe(@NonNull RawMessage rawMessage) {
+        return Optional.empty();
     }
 
     @Nullable

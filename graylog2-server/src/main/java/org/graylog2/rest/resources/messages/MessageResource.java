@@ -63,6 +63,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
@@ -161,17 +162,14 @@ public class MessageResource extends RestResource {
     }
 
     private Message decodeMessage(Codec codec, ResolvableInetSocketAddress remoteAddress, RawMessage rawMessage) {
-        Message message;
+        Optional<Message> messageOpt;
         try {
-            message = codec.decode(rawMessage);
-
+            messageOpt = codec.decodeSafe(rawMessage);
         } catch (Exception e) {
             throw new BadRequestException("Could not decode message");
         }
 
-        if (message == null) {
-            throw new BadRequestException("Could not decode message");
-        }
+        Message message = messageOpt.orElseThrow(() -> new BadRequestException("Could not decode message"));
 
         // Ensure the decoded Message has a source, otherwise creating a ResultMessage will fail
         if (isNullOrEmpty(message.getSource())) {

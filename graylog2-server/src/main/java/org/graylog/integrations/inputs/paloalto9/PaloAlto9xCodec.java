@@ -32,6 +32,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.CONFIG;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.CORRELATION;
@@ -78,67 +80,65 @@ public class PaloAlto9xCodec implements Codec {
         this.fieldProducer = fieldProducer;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         String s = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
         LOG.trace("Received raw message: {}", s);
 
-        PaloAltoMessageBase p = rawMessageParser.parse(s, timezone);
-        // Return when error occurs parsing syslog header.
-        if (p == null) {
-            return null;
-        }
+        try {
+            PaloAltoMessageBase p = rawMessageParser.parse(s, timezone);
+            Message message = messageFactory.createMessage(p.payload(), p.source(), p.timestamp());
 
-        Message message = messageFactory.createMessage(p.payload(), p.source(), p.timestamp());
-
-        switch (p.panType()) {
-            case "THREAT":
-                message.addFields(fieldProducer.parseFields(THREAT, p.fields(), timezone));
-                break;
-            case "SYSTEM":
-                message.addFields(fieldProducer.parseFields(SYSTEM, p.fields(), timezone));
-                break;
-            case "TRAFFIC":
-                message.addFields(fieldProducer.parseFields(TRAFFIC, p.fields(), timezone));
-                break;
-            case "CONFIG":
-                message.addFields(fieldProducer.parseFields(CONFIG, p.fields(), timezone));
-                break;
-            case "HIP-MATCH":
-            case "HIPMATCH":
-                message.addFields(fieldProducer.parseFields(HIP, p.fields(), timezone));
-                break;
-            case "CORRELATION":
-                message.addFields(fieldProducer.parseFields(CORRELATION, p.fields(), timezone));
-                break;
-            case "GLOBALPROTECT":
-                // For PAN v9.1.3 and later, Global Protect has type in the expected position
-                message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT_9_1_3, p.fields(), timezone));
-                break;
-            case "USERID":
-                message.addFields(fieldProducer.parseFields(USERID, p.fields(), timezone));
-                break;
-            default:
-                //For PAN v9.1.2 and earlier, Global Protect has type in position 5 rather than position 3
-                if (p.fields().get(5).equals("GLOBALPROTECT")) {
-                    message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT_PRE_9_1_3, p.fields(), timezone));
+            switch (p.panType()) {
+                case "THREAT":
+                    message.addFields(fieldProducer.parseFields(THREAT, p.fields(), timezone));
                     break;
-                } else {
-                    LOG.info("Received log for unsupported PAN type [{}]. Will not parse.", p.panType());
-                }
+                case "SYSTEM":
+                    message.addFields(fieldProducer.parseFields(SYSTEM, p.fields(), timezone));
+                    break;
+                case "TRAFFIC":
+                    message.addFields(fieldProducer.parseFields(TRAFFIC, p.fields(), timezone));
+                    break;
+                case "CONFIG":
+                    message.addFields(fieldProducer.parseFields(CONFIG, p.fields(), timezone));
+                    break;
+                case "HIP-MATCH":
+                case "HIPMATCH":
+                    message.addFields(fieldProducer.parseFields(HIP, p.fields(), timezone));
+                    break;
+                case "CORRELATION":
+                    message.addFields(fieldProducer.parseFields(CORRELATION, p.fields(), timezone));
+                    break;
+                case "GLOBALPROTECT":
+                    // For PAN v9.1.3 and later, Global Protect has type in the expected position
+                    message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT_9_1_3, p.fields(), timezone));
+                    break;
+                case "USERID":
+                    message.addFields(fieldProducer.parseFields(USERID, p.fields(), timezone));
+                    break;
+                default:
+                    //For PAN v9.1.2 and earlier, Global Protect has type in position 5 rather than position 3
+                    if (p.fields().get(5).equals("GLOBALPROTECT")) {
+                        message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT_PRE_9_1_3, p.fields(), timezone));
+                        break;
+                    } else {
+                        LOG.info("Received log for unsupported PAN type [{}]. Will not parse.", p.panType());
+                    }
+            }
+
+            message.addField(EventFields.EVENT_SOURCE_PRODUCT, "PAN");
+
+            // Store full message if configured.
+            if (configuration.getBoolean(CK_STORE_FULL_MESSAGE)) {
+                message.addField(Message.FIELD_FULL_MESSAGE, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
+            }
+
+            LOG.trace("Successfully processed [{}] message with [{}] fields.", p.panType(), message.getFieldCount());
+
+            return Optional.of(message);
+        } catch (Exception e) {
+            throw InputProcessingException.create("Could not decode PaloAlto9x message.", e, rawMessage, s);
         }
-
-        message.addField(EventFields.EVENT_SOURCE_PRODUCT, "PAN");
-
-        // Store full message if configured.
-        if (configuration.getBoolean(CK_STORE_FULL_MESSAGE)) {
-            message.addField(Message.FIELD_FULL_MESSAGE, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
-        }
-
-        LOG.trace("Successfully processed [{}] message with [{}] fields.", p.panType(), message.getFieldCount());
-
-        return message;
     }
 
     @Override

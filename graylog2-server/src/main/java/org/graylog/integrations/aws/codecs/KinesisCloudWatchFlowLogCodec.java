@@ -33,9 +33,9 @@ import org.graylog2.plugin.inputs.codecs.Codec;
 import org.joda.time.Seconds;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class KinesisCloudWatchFlowLogCodec extends AbstractKinesisCodec {
     public static final String NAME = "FlowLog";
@@ -67,15 +67,10 @@ public class KinesisCloudWatchFlowLogCodec extends AbstractKinesisCodec {
         this.noFlowLogPrefix = configuration.getBoolean(AWSCodec.CK_FLOW_LOG_PREFIX, AWSCodec.FLOW_LOG_PREFIX_DEFAULT);
     }
 
-    @Nullable
     @Override
-    public Message decodeLogData(@Nonnull final KinesisLogEntry logEvent) {
+    public Optional<Message> decodeLogData(@Nonnull final KinesisLogEntry logEvent) {
         try {
             final FlowLogMessage flowLogMessage = FlowLogMessage.fromLogEvent(logEvent);
-
-            if (flowLogMessage == null) {
-                return null;
-            }
 
             final String source = configuration.getString(KinesisCloudWatchFlowLogCodec.Config.CK_OVERRIDE_SOURCE, SOURCE);
             final Message result = messageFactory.createMessage(
@@ -88,7 +83,7 @@ public class KinesisCloudWatchFlowLogCodec extends AbstractKinesisCodec {
             result.addField(FIELD_LOG_STREAM, logEvent.logStream());
             result.addField(SOURCE_GROUP_IDENTIFIER, true);
 
-            return result;
+            return Optional.of(result);
         } catch (Exception e) {
             throw new RuntimeException("Could not deserialize AWS FlowLog record.", e);
         }
