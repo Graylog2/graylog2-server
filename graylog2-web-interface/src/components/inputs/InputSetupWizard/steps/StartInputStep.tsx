@@ -323,7 +323,7 @@ const StartInputStep = () => {
         <Row>
           <DescriptionCol md={12}>
             <p>
-              Setup your Input according to your changes and...better description
+              Set up and start the Input according to the configuration made.
             </p>
           </DescriptionCol>
         </Row>
