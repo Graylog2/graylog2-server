@@ -163,7 +163,7 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined, >({ v
                    min={0}
                    max={formValue('index_lifetime_max')}
                    validate={validateMinDaysInStorage}
-                   help="How many days at minumum your data should be stored."
+                   help="How many days at minimum your data should be stored."
                    required />
 
       {dataTieringPlugin && (
