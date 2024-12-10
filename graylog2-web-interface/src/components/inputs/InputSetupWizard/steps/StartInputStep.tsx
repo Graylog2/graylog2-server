@@ -295,7 +295,7 @@ const StartInputStep = () => {
   );
 
   const renderNextButton = () => {
-    if (startInputStatus === 'NOT_STARTED') {
+    if (startInputStatus === 'NOT_STARTED' || startInputStatus === 'ROLLED_BACK') {
       return (
         <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary">Setup Input</Button>
       );
