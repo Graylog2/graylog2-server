@@ -24,7 +24,6 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -37,8 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -231,23 +228,14 @@ public class EventsSearchService {
     }
 
     private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams) {
-        return streams.stream()
-                .map(streamId -> {
-                    try {
-                        return streamService.load(streamId);
-                    } catch (NotFoundException e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
+        return streamService.loadByIds(streams)
+                .stream()
                 .collect(Collectors.toMap(Persisted::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
     }
 
     private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions) {
-        return eventDefinitions.stream()
-                .map(eventDefinitionService::get)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        return eventDefinitionService.getByIds(eventDefinitions)
+                .stream()
                 .collect(Collectors.toMap(EventDefinitionDto::id,
                         d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description(), d.remediationSteps())));
     }
