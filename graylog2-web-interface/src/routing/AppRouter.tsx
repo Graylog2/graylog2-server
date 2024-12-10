@@ -112,6 +112,7 @@ import {
   ViewEventDefinitionPage,
   SidecarFailureTrackingPage,
   IndexSetFieldTypesPage,
+  ClusterConfigurationPage,
 } from 'pages';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
@@ -254,6 +255,8 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.PIPELINES.RULE(':ruleId'), element: <RuleDetailsPage /> },
             { path: RoutePaths.SYSTEM.PIPELINES.SIMULATOR, element: <SimulatorPage /> },
             { path: RoutePaths.SYSTEM.PIPELINES.PIPELINE(':pipelineId'), element: <PipelineDetailsPage /> },
+
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER, element: <ClusterConfigurationPage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
