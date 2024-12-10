@@ -21,6 +21,7 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 
+// eslint-disable-next-line import/prefer-default-export
 export const InputStaticFieldsStore = singletonStore(
   'core.InputStaticFields',
   () => Reflux.createStore({
@@ -49,7 +50,7 @@ export const InputStaticFieldsStore = singletonStore(
     },
 
     destroy(input, name) {
-      const url = URLUtils.qualifyUrl(`${this.sourceUrl(input.id)}/${name}`);
+      const url = URLUtils.qualifyUrl(`${this.sourceUrl(input.id)}/${encodeURIComponent(name)}`);
       const promise = fetch('DELETE', url);
 
       promise

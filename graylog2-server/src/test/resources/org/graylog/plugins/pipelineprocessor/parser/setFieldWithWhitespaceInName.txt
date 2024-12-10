@@ -1,0 +1,6 @@
+// Test if whitespace field names work in pipeline functions
+rule "set field with whitespace in name"
+when to_long(value: $message."response code", default: 200) >= 500
+then
+    set_field(field: "response_category", value: "server_error");
+end

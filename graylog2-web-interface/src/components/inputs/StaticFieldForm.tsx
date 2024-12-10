@@ -62,8 +62,8 @@ const StaticFieldForm = ({ input, setShowModal } : Props) => {
              id="field-name"
              label="Field name"
              required
-             pattern="[A-Za-z0-9_]*"
-             title="Should consist only of alphanumeric characters and underscores."
+             pattern="(\w[\w /]{1,}[\w/])|(\w{1,})"
+             title="Should consist only of alphanumeric characters and underscores. Can contain space and slashes."
              autoFocus />
       <Input value={fieldValue}
              onChange={(event) => { handleFieldChange('value', event); }}
