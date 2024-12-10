@@ -31,6 +31,7 @@ import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import useFeature from 'hooks/useFeature';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
+import EventDefinition from 'views/components/fieldtypes/EventDefinition';
 
 import EmptyValue from './EmptyValue';
 import type { ValueRendererProps, ValueRenderer } from './messagelist/decoration/ValueRenderer';
@@ -88,6 +89,7 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
     case 'node': return <NodeField value={String(value)} />;
     case 'streams': return <StreamsField value={value} />;
     case 'percentage': return <PercentageField value={value} />;
+    case 'event-definition-id': return <EventDefinition value={value} />;
     default: return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
   }
 };
