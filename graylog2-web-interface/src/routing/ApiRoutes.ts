@@ -422,6 +422,7 @@ const ApiRoutes = {
     delete: (pipelineId: string) => ({ url: `/system/pipelines/pipeline/${pipelineId}` }),
     parse: () => ({ url: '/system/pipelines/pipeline/parse' }),
     updateRouting: () => ({ url: '/system/pipelines/pipeline/routing' }),
+    deleteRouting: () => ({ url: '/system/pipelines/pipeline/routing' }),
   },
   RulesController: {
     list: () => ({ url: '/system/pipelines/rule' }),

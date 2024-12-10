@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import type { UseMutationResult } from '@tanstack/react-query';
 
 import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
@@ -51,7 +52,7 @@ const ButtonCol = styled(Col)(({ theme }) => css`
   margin-top: ${theme.spacings.lg};
 `);
 
-export type ProcessingSteps = 'createStream' | 'startStream' | 'createPipeline' | 'setupRouting' | 'startInput'
+export type ProcessingSteps = 'createStream' | 'startStream' | 'createPipeline' | 'setupRouting' | 'deleteStream' | 'deletePipeline' | 'deleteRouting' | 'result';
 
 const StartInputStep = () => {
   const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData, stepsConfig } = useInputSetupWizard();
@@ -59,24 +60,49 @@ const StartInputStep = () => {
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
   const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsConfig);
-  const [startInputStatus, setStartInputStatus] = useState<'NOT_STARTED' | 'RUNNING' | 'SUCCESS' | 'FAILED'>('NOT_STARTED');
-  const isRunningOrDone = startInputStatus === 'RUNNING' || startInputStatus === 'SUCCESS';
-  const notStartedOrFailed = startInputStatus === 'NOT_STARTED' || startInputStatus === 'FAILED';
+  const [startInputStatus, setStartInputStatus] = useState<'NOT_STARTED' | 'RUNNING' | 'SUCCESS' | 'FAILED' | 'ROLLED_BACK' | 'ROLLING_BACK'>('NOT_STARTED');
+  const isRunning = startInputStatus === 'RUNNING' || startInputStatus === 'ROLLING_BACK';
   const hasBeenStarted = startInputStatus !== 'NOT_STARTED';
+  const isRollback = startInputStatus === 'ROLLING_BACK' || startInputStatus === 'ROLLED_BACK';
 
   const {
     createStreamMutation,
     startStreamMutation,
     createPipelineMutation,
     updateRoutingMutation,
+    deleteStreamMutation,
+    deletePipelineMutation,
+    deleteRoutingMutation,
   } = useSetupInputMutations();
 
-  const stepMutations = useMemo<{[key in ProcessingSteps]?}>(() => ({
+  const stepMutations = useMemo<{[key in ProcessingSteps]?: UseMutationResult}>(() => ({
     createStream: createStreamMutation,
     startStream: startStreamMutation,
     createPipeline: createPipelineMutation,
     setupRouting: updateRoutingMutation,
   }), [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation]);
+
+  const rollBackMutations = useMemo<{[key in ProcessingSteps]?: UseMutationResult}>(() => ({
+    deleteStream: deleteStreamMutation,
+    deletePipeline: deletePipelineMutation,
+    deleteRouting: deleteRoutingMutation,
+  }), [deleteStreamMutation, deletePipelineMutation, deleteRoutingMutation]);
+
+  useEffect(() => {
+    if (!isRollback) {
+      const mutationsArray = Object.entries(stepMutations);
+
+      const hasError = !!mutationsArray.find(([_, mutation]) => mutation.isError);
+
+      const haveAllSucceeded = mutationsArray.every(([_, mutation]) => !mutation.isLoading && mutation.isSuccess);
+
+      if (hasError) {
+        setStartInputStatus('FAILED');
+      } else if (haveAllSucceeded) {
+        setStartInputStatus('SUCCESS');
+      }
+    }
+  }, [stepMutations, isRollback]);
 
   const createPipeline = async (stream: StreamConfiguration) => {
     const pipeline = {
@@ -101,6 +127,14 @@ const StartInputStep = () => {
       .finally(() => {
         setStartInputStatus('SUCCESS');
       });
+  };
+
+  const stopInput = async () => {
+    const { input } = wizardData;
+
+    if (!input) return;
+
+    InputStatesStore.stop(input);
   };
 
   const setupInput = async () => {
@@ -143,9 +177,62 @@ const StartInputStep = () => {
     }
   };
 
+  const rollback = () => {
+    const routingStepData = getStepConfigOrData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+    const { input } = wizardData;
+    const inputId = input?.id;
+    const createdStreamId = createStreamMutation.data?.stream_id;
+    const createdPipelineId = createPipelineMutation.data?.id;
+
+    switch (routingStepData.streamType) {
+      case 'NEW':
+        stopInput();
+
+        if (routingStepData.shouldCreateNewPipeline) {
+          if (createdPipelineId) {
+            deletePipelineMutation.mutateAsync(createdPipelineId);
+          }
+        }
+
+        if (!createdStreamId) return;
+
+        deleteRoutingMutation.mutateAsync({ input_id: inputId, stream_id: createdStreamId }, {
+        }).finally(() => {
+          deleteStreamMutation.mutateAsync(createdStreamId).finally(() => {
+            setStartInputStatus('ROLLED_BACK');
+          });
+        });
+
+        break;
+      case 'EXISTING':
+        stopInput();
+
+        deleteRoutingMutation.mutateAsync({ input_id: inputId, stream_id: routingStepData.streamId }).finally(
+          () => {
+            setStartInputStatus('ROLLED_BACK');
+          });
+
+        break;
+      case 'DEFAULT':
+        stopInput();
+
+        setStartInputStatus('ROLLED_BACK');
+
+        break;
+
+      default:
+        break;
+    }
+  };
+
   const handleStart = () => {
     setStartInputStatus('RUNNING');
     setupInput();
+  };
+
+  const handleRollback = () => {
+    setStartInputStatus('ROLLING_BACK');
+    rollback();
   };
 
   const onNextStep = () => {
@@ -165,8 +252,8 @@ const StartInputStep = () => {
     return false;
   };
 
-  const getProgressEntityName = (stepName) => {
-    const mutation = stepMutations[stepName];
+  const getProgressEntityName = (stepName, mutations) => {
+    const mutation = mutations[stepName];
 
     const routingStepData = getStepConfigOrData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
 
@@ -174,6 +261,7 @@ const StartInputStep = () => {
 
     switch (stepName) {
       case 'createStream':
+      case 'deleteStream':
         return routingStepData?.newStream.title ?? undefined;
 
       case 'startStream':
@@ -185,6 +273,48 @@ const StartInputStep = () => {
       default:
         return name;
     }
+  };
+
+  const renderProgressMessages = (mutations: {[key in ProcessingSteps]?: UseMutationResult}) => (Object.keys(mutations).map((stepName) => {
+    const mutation = mutations[stepName];
+
+    if (!mutation) return null;
+    if (mutation.isIdle) return null;
+
+    const name = getProgressEntityName(stepName, mutations);
+
+    return (
+      <ProgressMessage stepName={stepName as ProcessingSteps}
+                       isLoading={mutation.isLoading}
+                       isSuccess={mutation.isSuccess}
+                       name={name}
+                       isError={mutation.isError}
+                       errorMessage={mutation.error} />
+    );
+  })
+  );
+
+  const renderNextButton = () => {
+    if (startInputStatus === 'NOT_STARTED') {
+      return (
+        <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary">Setup Input</Button>
+      );
+    }
+
+    if (startInputStatus === 'FAILED' || startInputStatus === 'ROLLING_BACK') {
+      return (
+        <Button disabled={startInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary">Rollback Input</Button>
+      );
+    }
+
+    if (hasNextStep) {
+      return (
+        <Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={onNextStep} bsStyle="primary">Input Diagnosis</Button>
+
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -200,48 +330,35 @@ const StartInputStep = () => {
         <Row>
           <Col md={12}>
             {hasBeenStarted && (
-              <>
-                <StyledHeading>Setting up Input...</StyledHeading>
-                  {Object.keys(stepMutations).map((stepName) => {
-                    const mutation = stepMutations[stepName];
-                    if (mutation.isIdle) return null;
-
-                    const name = getProgressEntityName(stepName);
-
-                    return (
-                      <ProgressMessage stepName={stepName as ProcessingSteps}
-                                       isLoading={mutation.isLoading}
-                                       isSuccess={mutation.isSuccess}
-                                       name={name}
-                                       isError={mutation.isError}
-                                       errorMessage={mutation.error} />
-                    );
-                  })}
+              isRollback ? (
+                <>
+                  <StyledHeading>Rolling back Input...</StyledHeading>
+                  {renderProgressMessages(rollBackMutations)}
+                </>
+              ) : (
+                <>
+                  <StyledHeading>Setting up Input...</StyledHeading>
+                  {renderProgressMessages(stepMutations)}
                   {startInputStatus && (
-                  <ProgressMessage stepName="startInput"
+                  <ProgressMessage stepName="result"
                                    isLoading={false}
                                    isSuccess={startInputStatus === 'SUCCESS'}
                                    isError={startInputStatus === 'FAILED'} />
                   )}
-              </>
+                </>
+              )
+
             )}
-            {(notStartedOrFailed) && (
-              <>
-                {isInputStartable() ? (
-                  <Button onClick={handleStart}>Setup Input</Button>
-                ) : (
-                  <p>Your Input is not ready to be setup yet. Please complete the previous steps.</p>
-                )}
-              </>
-            )}
+
+            {!hasBeenStarted && !isInputStartable() && (<p>Your Input is not ready to be setup yet. Please complete the previous steps.</p>)}
           </Col>
         </Row>
 
         {(hasPreviousStep || hasNextStep) && (
         <Row>
           <ButtonCol md={12}>
-            {(hasPreviousStep) && (<Button disabled={isRunningOrDone} onClick={handleBackClick}>Back</Button>)}
-            {hasNextStep && (<Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={onNextStep} bsStyle="primary">Input Diagnosis</Button>)}
+            {(hasPreviousStep) && (<Button disabled={isRunning} onClick={handleBackClick}>Back</Button>)}
+            {renderNextButton()}
           </ButtonCol>
         </Row>
         )}

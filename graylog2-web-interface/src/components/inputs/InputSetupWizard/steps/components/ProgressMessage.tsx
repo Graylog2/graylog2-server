@@ -44,7 +44,10 @@ const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, name = undef
     startStream: (entityName) => `Starting Stream${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
     createPipeline: (entityName) => `Creating Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
     setupRouting: (_) => 'Setting up routing...',
-    startInput: (_) => 'Starting Input...',
+    result: (_) => '',
+    deleteStream: (entityName) => `Deleting Stream${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
+    deletePipeline: (entityName) => `Deleting Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
+    deleteRouting: (_) => 'Removing routing...',
   };
 
   const errorText: {[key in ProcessingSteps]: (name?: string) => string} = {
@@ -52,7 +55,10 @@ const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, name = undef
     startStream: (entityName) => `Starting Stream${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
     createPipeline: (entityName) => `Creating Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
     setupRouting: (_) => 'Setting up routing failed!',
-    startInput: (_) => "Input couldn't be started!",
+    result: (_) => 'Starting the Input has failed. Please roll it back to clean it up.',
+    deleteStream: (entityName) => `Deleting Stream${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
+    deletePipeline: (entityName) => `Deleting Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
+    deleteRouting: (_) => 'Removing routing failed!',
   };
 
   const successText: {[key in ProcessingSteps]: (entityName?: string) => string} = {
@@ -60,7 +66,10 @@ const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, name = undef
     startStream: (entityName) => `Stream${entityName !== undefined ? (` "${entityName}"`) : ''} started!`,
     createPipeline: (entityName) => `Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''} created!`,
     setupRouting: (_) => 'Routing set up!',
-    startInput: (_) => 'Input started!',
+    result: (_) => 'Input started sucessfully!',
+    deleteStream: (entityName) => `Stream${entityName !== undefined ? (` "${entityName}"`) : ''} deleted!`,
+    deletePipeline: (entityName) => `Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''} deleted!`,
+    deleteRouting: (_) => 'Routing removed!',
   };
 
   if (isLoading) {
