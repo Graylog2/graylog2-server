@@ -113,16 +113,16 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
                 <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
               </td>
               <td>
-                  <ActionButtonsWrap>
-                    <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet?.id)}>
-                      <Button bsStyle="default"
-                              bsSize="xsmall"
-                              onClick={() => {}}
-                              title="View index set">
-                        <Icon name="pageview" type="regular" />
-                      </Button>
-                    </LinkContainer>
-                  </ActionButtonsWrap>
+                <ActionButtonsWrap>
+                  <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet?.id)}>
+                    <Button bsStyle="default"
+                            bsSize="xsmall"
+                            onClick={() => {}}
+                            title="View index set">
+                      <Icon name="pageview" type="regular" />
+                    </Button>
+                  </LinkContainer>
+                </ActionButtonsWrap>
               </td>
             </tr>
           )}
