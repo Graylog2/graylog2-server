@@ -18,7 +18,11 @@ package org.graylog.datanode.opensearch.configuration.beans;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import jakarta.annotation.Nullable;
+import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 
+import java.security.KeyStore;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +35,29 @@ public abstract class OpensearchConfigurationPart {
 
     public abstract Map<String, String> properties();
 
+    public abstract List<String> javaOpts();
+
+    @Nullable
+    public abstract KeystoreInformation httpCertificate();
+    @Nullable
+    public abstract KeystoreInformation transportCertificate();
+
+    public abstract boolean securityConfigured();
+
+    @Nullable
+    public abstract KeyStore trustStore();
+
+    public abstract List<ConfigFile> configFiles();
+
     public static Builder builder() {
         return new AutoValue_OpensearchConfigurationPart.Builder()
                 .nodeRoles(Collections.emptyList())
                 .keystoreItems(Collections.emptyMap())
-                .properties(Collections.emptyMap());
+                .properties(Collections.emptyMap())
+                .javaOpts(Collections.emptyList())
+                .configFiles(Collections.emptyList())
+                .securityConfigured(false)
+                .trustStore(null);
     }
 
     @AutoValue.Builder
@@ -50,9 +72,35 @@ public abstract class OpensearchConfigurationPart {
             return this;
         }
 
+        public abstract Builder javaOpts(List<String> javaOpts);
+
+        abstract ImmutableList.Builder<String> javaOptsBuilder();
+
+        public final Builder javaOpt(String opt) {
+            javaOptsBuilder().add(opt);
+            return this;
+        }
+
+        public abstract Builder configFiles(List<ConfigFile> configFiles);
+
+        abstract ImmutableList.Builder<ConfigFile> configFilesBuilder();
+
+        public Builder withConfigFile(ConfigFile configFile) {
+            configFilesBuilder().add(configFile);
+            return this;
+        }
+
         public abstract Builder keystoreItems(Map<String, String> keystoreItems);
 
         public abstract Builder properties(Map<String, String> properties);
+
+        public abstract Builder httpCertificate(KeystoreInformation httpCertificate);
+        public abstract Builder transportCertificate(KeystoreInformation httpCertificate);
+
+        @Deprecated
+        public abstract Builder securityConfigured(boolean securityConfigured);
+
+        public abstract Builder trustStore(@Nullable KeyStore truststore);
 
         public abstract OpensearchConfigurationPart build();
     }
