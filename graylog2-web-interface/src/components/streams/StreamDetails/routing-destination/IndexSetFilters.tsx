@@ -30,7 +30,8 @@ const IndexSetFilters = ({ streamId, paginatedFilters, onPaginationChange }: Pro
   <FilterRulesList streamId={streamId}
                    paginatedFilters={paginatedFilters}
                    destinationType="indexer"
-                   onPaginationChange={onPaginationChange} />
+                   onPaginationChange={onPaginationChange}
+                   requiredPermissions={['indexsets:edit']} />
 
 );
 
