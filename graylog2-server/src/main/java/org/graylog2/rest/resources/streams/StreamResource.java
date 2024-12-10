@@ -285,6 +285,21 @@ public class StreamResource extends RestResource {
     }
 
     @GET
+    @Path("/byIndex/{indexSetId}")
+    @Timed
+    @ApiOperation(value = "Get a list of all streams connected to a given index set")
+    @Produces(MediaType.APPLICATION_JSON)
+    public StreamListResponse getByIndexSet(@ApiParam(name = "indexSetId", required = true)
+                                            @PathParam("indexSetId") @NotEmpty String indexSetId) {
+        checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
+        final List<Stream> streams = streamService.loadAll().stream()
+                .filter(stream -> stream.getIndexSetId().equals(indexSetId))
+                .toList();
+
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
+    }
+
+    @GET
     @Path("/enabled")
     @Timed
     @ApiOperation(value = "Get a list of all enabled streams")
@@ -656,7 +671,7 @@ public class StreamResource extends RestResource {
                             .map(PipelineConnections::pipelineIds)
                             .orElse(Set.of());
                     return pipelinesForStream.stream()
-                            .map(pipelines::get)
+                            .flatMap(pipeline -> Optional.ofNullable(pipelines.get(pipeline)).stream())
                             .map(pipeline -> PipelineCompactSource.create(pipeline.id(), pipeline.title()))
                             .toList();
                 }));

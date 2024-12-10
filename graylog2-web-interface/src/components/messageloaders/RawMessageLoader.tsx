@@ -19,6 +19,8 @@ import React, { useEffect, useState } from 'react';
 import * as Immutable from 'immutable';
 import type { Subtract } from 'utility-types';
 
+import { Messages } from '@graylog/server-api';
+
 import { getValueFromInput } from 'util/FormsUtils';
 import { Select, FormSubmit } from 'components/common';
 import { Col, Row, Input } from 'components/bootstrap';
@@ -31,7 +33,6 @@ import AppConfig from 'util/AppConfig';
 import { CodecTypesStore, CodecTypesActions } from 'stores/codecs/CodecTypesStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import useHistory from 'routing/useHistory';
-import { Messages } from '@graylog/server-api';
 import MessageFormatter from 'logic/message/MessageFormatter';
 import UserNotification from 'util/UserNotification';
 

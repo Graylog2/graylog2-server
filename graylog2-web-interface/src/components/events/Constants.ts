@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import type { Sort, Attribute } from 'stores/PaginationTypes';
+import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
@@ -32,6 +32,9 @@ export const detailsAttributes: Array<Attribute> = [
     type: 'STRING',
     sortable: true,
     searchable: false,
+    filterable: true,
+    filter_options: Object.keys(EventDefinitionPriorityEnum.properties)
+      .map((num) => ({ value: num, title: num })),
   },
   {
     id: 'timestamp',
@@ -46,6 +49,8 @@ export const detailsAttributes: Array<Attribute> = [
     type: 'STRING',
     sortable: false,
     searchable: false,
+    filterable: true,
+    related_collection: 'event_definitions',
   },
   {
     id: 'event_definition_type',
@@ -61,13 +66,17 @@ export const detailsAttributes: Array<Attribute> = [
   {
     id: 'timerange_start',
     title: 'Aggregation time range',
+    sortable: true,
+    type: 'DATE',
+    filterable: true,
   },
   {
     id: 'key',
     title: 'Key',
     type: 'STRING',
     sortable: true,
-    searchable: false,
+    searchable: true,
+    filterable: true,
   },
   {
     id: 'fields',

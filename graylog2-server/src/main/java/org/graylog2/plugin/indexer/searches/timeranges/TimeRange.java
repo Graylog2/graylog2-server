@@ -42,4 +42,9 @@ public abstract class TimeRange {
     public abstract DateTime getTo();
 
     public abstract TimeRange withReferenceDate(DateTime now);
+
+    @JsonIgnore
+    public boolean isAllMessages() {
+        return false;
+    }
 }

@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { create, windowScheduler, indexedResolver } from '@yornaath/batshit';
 
 import { Streams } from '@graylog/server-api';
+
 import type FetchError from 'logic/errors/FetchError';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 

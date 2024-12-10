@@ -18,6 +18,8 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import { useQuery as useReactQuery } from '@tanstack/react-query';
 
+import { SystemInputs } from '@graylog/server-api';
+
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
@@ -27,7 +29,6 @@ import { ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 import useMessage from 'views/hooks/useMessage';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
-import { SystemInputs } from '@graylog/server-api';
 import useQuery from 'routing/useQuery';
 
 const useInput = (inputId: string) => useReactQuery(['inputs', inputId], () => SystemInputs.get(inputId));
