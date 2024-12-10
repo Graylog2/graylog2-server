@@ -18,7 +18,6 @@ package org.graylog.datanode.bootstrap.preflight;
 
 import com.github.joschi.jadconfig.ValidationException;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.graylog.datanode.DirectoryReadableValidator;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
@@ -38,25 +37,19 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchDataDirCompatibilityCheck.class);
 
-    private final boolean isFreshInstallation;
     private final DatanodeConfiguration datanodeConfiguration;
     private final IndicesDirectoryParser indicesDirectoryParser;
     private final DirectoryReadableValidator directoryReadableValidator = new DirectoryReadableValidator();
 
 
     @Inject
-    public OpensearchDataDirCompatibilityCheck(@Named("isFreshInstallation") boolean isFreshInstallation, DatanodeConfiguration datanodeConfiguration, IndicesDirectoryParser indicesDirectoryParser) {
-        this.isFreshInstallation = isFreshInstallation;
+    public OpensearchDataDirCompatibilityCheck(DatanodeConfiguration datanodeConfiguration, IndicesDirectoryParser indicesDirectoryParser) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.indicesDirectoryParser = indicesDirectoryParser;
     }
 
     @Override
     public void runCheck() throws PreflightCheckException {
-
-        if (!isFreshInstallation) {
-            return;
-        }
 
         final Path opensearchDataDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
         final String opensearchVersion = datanodeConfiguration.opensearchDistributionProvider().get().version();
