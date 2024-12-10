@@ -16,36 +16,22 @@
  */
 package org.graylog.datanode.bindings;
 
-import com.google.common.eventbus.EventBus;
 import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
-import jakarta.ws.rs.container.DynamicFeature;
-import jakarta.ws.rs.ext.ExceptionMapper;
-import org.graylog.datanode.Configuration;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
-import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.events.ClusterEventBus;
-import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
 import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
-import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.system.activities.ActivityWriter;
 
-public class ServerBindings extends Graylog2Module {
-    private final Configuration configuration;
-    private final boolean isMigrationCommand;
+public class DatanodeServerBindings extends Graylog2Module {
 
-    public ServerBindings(Configuration configuration, boolean isMigrationCommand) {
-
-        this.configuration = configuration;
-        this.isMigrationCommand = isMigrationCommand;
+    public DatanodeServerBindings() {
     }
 
     @Override
@@ -53,24 +39,10 @@ public class ServerBindings extends Graylog2Module {
         bindInterfaces();
         bindSingletons();
 
-        bindProviders();
-        bindFactoryModules();
         bindDynamicFeatures();
         bindExceptionMappers();
-        bindAdditionalJerseyComponents();
-//        install(new AuthenticatingRealmModule(configuration));
-//        install(new AuthorizationOnlyRealmModule());
     }
 
-    private void bindProviders() {
-        bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
-        bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
-        bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
-    }
-
-    private void bindFactoryModules() {
-        // System Jobs
-    }
 
     private void bindSingletons() {
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
@@ -83,14 +55,11 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindDynamicFeatures() {
-        final Multibinder<Class<? extends DynamicFeature>> dynamicFeatures = jerseyDynamicFeatureBinder();
+        jerseyDynamicFeatureBinder();
     }
 
     private void bindExceptionMappers() {
-        final Multibinder<Class<? extends ExceptionMapper>> exceptionMappers = jerseyExceptionMapperBinder();
+        jerseyExceptionMapperBinder();
     }
 
-    private void bindAdditionalJerseyComponents() {
-//        jerseyAdditionalComponentsBinder().addBinding().toInstance(GenericErrorCsvWriter.class);
-    }
 }
