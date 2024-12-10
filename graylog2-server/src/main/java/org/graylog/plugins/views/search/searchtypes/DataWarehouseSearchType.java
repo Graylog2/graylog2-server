@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search;
+package org.graylog.plugins.views.search.searchtypes;
+
+import org.graylog.plugins.views.search.SearchType;
 
 /**
  * Marker interface for search types that are not search engine related, but Data Warehouse/Iceberg related

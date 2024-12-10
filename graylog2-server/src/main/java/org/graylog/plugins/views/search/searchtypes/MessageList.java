@@ -52,7 +52,7 @@ import java.util.UUID;
 @AutoValue
 @JsonTypeName(MessageList.NAME)
 @JsonDeserialize(builder = MessageList.Builder.class)
-public abstract class MessageList implements SearchType {
+public abstract class MessageList implements SearchEngineSearchType {
     public static final String NAME = "messages";
 
     @Override

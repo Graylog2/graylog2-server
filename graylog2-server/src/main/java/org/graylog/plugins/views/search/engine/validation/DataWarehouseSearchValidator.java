@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.engine.validation;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.views.search.DataWarehouseSearchType;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
@@ -25,6 +24,7 @@ import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.searchtypes.DataWarehouseSearchType;
 
 import java.util.Optional;
 import java.util.Set;
@@ -58,14 +58,13 @@ public class DataWarehouseSearchValidator implements SearchValidator {
                 return Set.of(new QueryError(query, "Data Warehouse query can contain only one search type"));
             }
             final Optional<SearchType> first = searchTypes.stream().findFirst();
-            if (!(first.get() instanceof DataWarehouseSearchType)) {
-                return Set.of(new SearchTypeError(query, first.get().id(), "Data Warehouse query can contain only data warehouse search types"));
-            } else {
-                final Set<String> streams = first.get().streams();
-                if (streams == null || streams.size() > 1) {
-                    return Set.of(new SearchTypeError(query, first.get().id(), "Data Warehouse preview can be executed on only 1 stream, search type contained more"));
-                }
+
+            final Set<String> streams = first.get().streams();
+            if (streams == null || streams.size() > 1) {
+                return Set.of(new SearchTypeError(query, first.get().id(),
+                        "Data Warehouse preview can be executed on only 1 stream, search type contained more"));
             }
+
         }
         return Set.of();
     }
