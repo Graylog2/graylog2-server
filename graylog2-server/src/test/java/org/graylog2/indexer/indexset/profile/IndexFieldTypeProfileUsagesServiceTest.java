@@ -18,6 +18,7 @@ package org.graylog2.indexer.indexset.profile;
 
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
@@ -57,8 +58,8 @@ public class IndexFieldTypeProfileUsagesServiceTest {
     public void setUp() {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        final MongoIndexSetService mongoIndexSetService = new MongoIndexSetService(mongoConnection,
-                objectMapperProvider,
+        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
+        final MongoIndexSetService mongoIndexSetService = new MongoIndexSetService(mongoCollections,
                 mock(StreamService.class),
                 mock(ClusterConfigService.class),
                 mock(ClusterEventBus.class)
@@ -97,6 +98,7 @@ public class IndexFieldTypeProfileUsagesServiceTest {
     private IndexSetConfig createIndexSetConfigForTest(final String id, final String profileId) {
         return IndexSetConfig.create(
                 id, "title", "description",
+                null,
                 true,
                 true, "prefix_" + id, null, null,
                 1, 0,

@@ -73,6 +73,7 @@ public class StreamMock implements Stream {
         this.categories = (List<String>) stream.getOrDefault(StreamImpl.FIELD_CATEGORIES, List.of());
         this.indexSet = new TestIndexSet(IndexSetConfig.create(
                 "index-set-id",
+                null,
                 "title",
                 "description",
                 true, true,

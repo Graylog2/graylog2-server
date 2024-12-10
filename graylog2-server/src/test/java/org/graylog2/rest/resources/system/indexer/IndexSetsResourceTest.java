@@ -292,6 +292,7 @@ public class IndexSetsResourceTest {
     public void update() {
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
+                null,
                 "new title",
                 "description",
                 true, false,
@@ -350,6 +351,7 @@ public class IndexSetsResourceTest {
         final String defaultIndexSetId = "defaultIndexSet";
         final IndexSetConfig defaultIndexSetConfig = IndexSetConfig.create(
                 defaultIndexSetId,
+                null,
                 "title",
                 "description",
                 true, true,
@@ -480,6 +482,7 @@ public class IndexSetsResourceTest {
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 indexSetId,
+                null,
                 "title",
                 "description",
                 true, true,
@@ -548,6 +551,7 @@ public class IndexSetsResourceTest {
         final IndexSet readOnlyIndexSet = mock(IndexSet.class);
         final IndexSetConfig readOnlyIndexSetConfig = IndexSetConfig.create(
                 readOnlyIndexSetId,
+                null,
                 "title",
                 "description",
                 false, true,
@@ -585,6 +589,7 @@ public class IndexSetsResourceTest {
         final IndexSet readOnlyIndexSet = mock(IndexSet.class);
         final IndexSetConfig readOnlyIndexSetConfig = IndexSetConfig.create(
                 readOnlyIndexSetId,
+                null,
                 "title",
                 "description",
                 true, false,
@@ -640,6 +645,7 @@ public class IndexSetsResourceTest {
     private IndexSetConfig createTestConfig(String id, String title) {
         return IndexSetConfig.create(
                 id,
+                null,
                 title,
                 "description",
                 true, true,
