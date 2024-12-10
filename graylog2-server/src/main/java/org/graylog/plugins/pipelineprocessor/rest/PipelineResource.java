@@ -317,6 +317,20 @@ public class PipelineResource extends RestResource implements PluginRestResource
         return pipelineSource;
     }
 
+    @ApiOperation(value = "Remove a stream routing rule from the default routing pipeline.")
+    @Path("/remove_routing")
+    @PUT
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
+    public Response deleteRouting(@ApiParam(name = "body", required = true) @NotNull DeleteRoutingRequest request) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_EDIT, request.streamId());
+        checkPermission(PipelineRestPermissions.PIPELINE_RULE_CREATE);
+
+        String ruleName = routingRuleName(request.inputId(), request.streamId());
+        ruleService.findByName(ruleName).ifPresent(ruleDao -> ruleService.delete(ruleDao.id()));
+
+        return Response.ok().build();
+    }
+
     private PipelineSource createRoutingPipeline(RuleDao ruleDao) {
         List<StageSource> stages = java.util.List.of(StageSource.create(
                 0, Stage.Match.EITHER, java.util.List.of(ruleDao.title())));
@@ -411,18 +425,4 @@ public class PipelineResource extends RestResource implements PluginRestResource
             @JsonProperty(value = "input_id", required = true) String inputId,
             @JsonProperty(value = "stream_id", required = true) String streamId
     ) {}
-
-    @ApiOperation(value = "Remove a stream routing rule from the default routing pipeline.")
-    @Path("/routing")
-    @DELETE
-    @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
-    public Response deleteRouting(@ApiParam(name = "body", required = true) @NotNull DeleteRoutingRequest request) throws NotFoundException {
-        checkPermission(RestPermissions.STREAMS_EDIT, request.streamId());
-        checkPermission(PipelineRestPermissions.PIPELINE_RULE_CREATE);
-
-        String ruleName = routingRuleName(request.inputId(), request.streamId());
-        ruleService.findByName(ruleName).ifPresent(ruleDao -> ruleService.delete(ruleDao.id()));
-
-        return Response.ok().build();
-    }
 }
