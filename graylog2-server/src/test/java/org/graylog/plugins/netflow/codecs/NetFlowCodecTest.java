@@ -24,6 +24,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,6 +42,7 @@ import java.util.Collection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class NetFlowCodecTest {
     @Rule
@@ -116,8 +118,7 @@ public class NetFlowCodecTest {
         final InetSocketAddress source = new InetSocketAddress(InetAddress.getLocalHost(), 12345);
         final RawMessage rawMessage = new RawMessage(b, source);
 
-        final Collection<Message> messages = codec.decodeMessages(rawMessage);
-        assertThat(messages).isNull();
+        assertThatThrownBy(() -> codec.decodeMessages(rawMessage)).isInstanceOf(InputProcessingException.class);
     }
 
     @Test
@@ -136,8 +137,7 @@ public class NetFlowCodecTest {
             }
         };
 
-        final Collection<Message> messages = codec.decodeMessages(rawMessage);
-        assertThat(messages).isNull();
+        assertThatThrownBy(() -> codec.decodeMessages(rawMessage)).isInstanceOf(InputProcessingException.class);
     }
 
     @Test
@@ -145,6 +145,7 @@ public class NetFlowCodecTest {
         final byte[] b = Resources.toByteArray(Resources.getResource("netflow-data/netflow-v9-3_incomplete.dat"));
         final InetSocketAddress source = new InetSocketAddress(InetAddress.getLocalHost(), 12345);
 
-        assertThat(codec.decodeMessages(new RawMessage(b, source))).isNull();
+        assertThatThrownBy(() -> codec.decodeMessages(new RawMessage(b, source))).isInstanceOf(InputProcessingException.class);
+
     }
 }
