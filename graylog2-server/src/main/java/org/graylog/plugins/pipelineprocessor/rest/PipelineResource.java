@@ -285,19 +285,13 @@ public class PipelineResource extends RestResource implements PluginRestResource
         checkPermission(RestPermissions.STREAMS_EDIT, request.streamId());
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_CREATE);
 
-        Stream stream;
-        try {
-            stream = streamService.load(request.streamId());
-        } catch (NotFoundException e) {
-            throw new NotFoundException(f("Unable to load stream %s", request.streamId()), e);
-        }
-
         boolean removeFromDefault = true;
         if (request.removeFromDefault() == null) {
+            Stream stream = streamService.load(request.streamId());
             removeFromDefault = stream.getRemoveMatchesFromDefaultStream();
         }
 
-        RuleDao ruleDao = createRoutingRule(request, removeFromDefault, stream.getTitle());
+        RuleDao ruleDao = createRoutingRule(request, removeFromDefault);
         PipelineDao pipelineDao;
         try {
             pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
@@ -352,8 +346,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
         connectionsService.save(pipelineConnections);
     }
 
-    private RuleDao createRoutingRule(RoutingRequest request, boolean removeFromDefault, String streamName) {
-        String ruleName = "route_" + request.inputId() + "_to_" + streamName;
+    private RuleDao createRoutingRule(RoutingRequest request, boolean removeFromDefault) throws NotFoundException {
+        String ruleName = routingRuleName(request.inputId(), request.streamId());
         final Optional<RuleDao> ruleDaoOpt = ruleService.findByName(ruleName);
         if (ruleDaoOpt.isPresent()) {
             log.info(f("Routing rule %s already exists - skipping", ruleName));
@@ -375,6 +369,17 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .build();
         return ruleService.save(ruleDao);
+    }
+
+    private String routingRuleName(String inputId, String streamId) throws NotFoundException {
+        try {
+            Stream stream = streamService.load(streamId);
+            return "route_" + inputId + "_to_" + stream.getTitle();
+        } catch (NotFoundException e) {
+            throw new NotFoundException(f("Unable to load stream %s", streamId), e);
+        } catch (Exception e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @VisibleForTesting
@@ -400,5 +405,24 @@ public class PipelineResource extends RestResource implements PluginRestResource
         checkPermission(PipelineRestPermissions.PIPELINE_DELETE, id);
         pipelineService.load(id);
         pipelineService.delete(id);
+    }
+
+    public record DeleteRoutingRequest(
+            @JsonProperty(value = "input_id", required = true) String inputId,
+            @JsonProperty(value = "stream_id", required = true) String streamId
+    ) {}
+
+    @ApiOperation(value = "Remove a stream routing rule from the default routing pipeline.")
+    @Path("/routing")
+    @DELETE
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
+    public Response deleteRouting(@ApiParam(name = "body", required = true) @NotNull DeleteRoutingRequest request) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_EDIT, request.streamId());
+        checkPermission(PipelineRestPermissions.PIPELINE_RULE_CREATE);
+
+        String ruleName = routingRuleName(request.inputId(), request.streamId());
+        ruleService.findByName(ruleName).ifPresent(ruleDao -> ruleService.delete(ruleDao.id()));
+
+        return Response.ok().build();
     }
 }
