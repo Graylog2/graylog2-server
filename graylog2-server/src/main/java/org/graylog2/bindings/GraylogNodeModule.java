@@ -41,12 +41,7 @@ import java.util.Set;
 
 /**
  * <p>Guice module that contains all necessary bindings to start a basic node in a Graylog cluster.</p>
- *
- * <ul>
- *     <li>{@link ConfigurationModule} binds the basic config settings common to each node</li>
- *     <li>{@link MongoDbConnectionModule} binds the basic database connection and mongojack infrastructure</li>
- *     <li>{@link SchedulerBindings} binds the scheduled executors for daemon and non-daemon usage in the node</li>
- * </ul>
+ * <p>Bindings will be loaded conditionally based on the configuration in {@link GraylogNodeConfiguration}</p>
  */
 public class GraylogNodeModule extends Graylog2Module {
     private final GraylogNodeConfiguration configuration;

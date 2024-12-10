@@ -25,21 +25,49 @@ import java.util.Set;
  */
 public interface GraylogNodeConfiguration {
 
+    /**
+     * This will load bindings required for basic database connection and mongojack infrastructure.
+     */
     boolean withMongoDb();
 
+    /**
+     * Binds the scheduled executors for daemon and non-daemon usage in the node.
+     */
     boolean withScheduler();
 
+    /**
+     * Binds event bus and cluster event bus.
+     */
     boolean withEventBus();
 
+    /**
+     * Configures node startup to load plugin configurations and plugins.
+     */
     boolean withPlugins();
 
+    /**
+     * Will bind NodeId to an id provided by FilePersistedNodeIdProvider.
+     * Falls back to use a dummy node id if set to 'false'.
+     */
     boolean withNodeIdFile();
 
+    /**
+     * Provides the {@link ServerStatus.Capability} to be used by ServerStatusBindings.
+     */
     Set<ServerStatus.Capability> withCapabilities();
 
+    /**
+     * Environment variable prefix to be used for this node (e.g. <pre>GRAYLOG_</pre> for Graylog nodes).
+     */
     String getEnvironmentVariablePrefix();
 
+    /**
+     * System property prefix to be used for this node (e.g. <pre>graylog.</pre> for Graylog nodes).
+     */
     String getSystemPropertyPrefix();
 
+    /**
+     * Enables message recording in ServerStatus.
+     */
     boolean isMessageRecordingsEnabled();
 }
