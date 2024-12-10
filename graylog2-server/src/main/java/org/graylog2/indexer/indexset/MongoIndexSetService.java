@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
@@ -143,7 +144,7 @@ public class MongoIndexSetService implements IndexSetService {
                                 .sort(Indexes.ascending(FIELD_TITLE))
                                 .skip(skip)
                                 .limit(limit))
-                        .toList());
+                        .toArray(IndexSetConfig[]::new));
     }
 
     @Override
@@ -163,20 +164,14 @@ public class MongoIndexSetService implements IndexSetService {
     public IndexSetConfig save(IndexSetConfig indexSetConfig) {
         String id = indexSetConfig.id();
         if (id != null) {
-            final Optional<IndexSetConfig> byId = mongoUtils.getById(id);
-            if (byId.isPresent()) {
-                collection.replaceOne(idEq(id), indexSetConfig);
-            }
+            collection.replaceOne(idEq(id), indexSetConfig, new ReplaceOptions().upsert(true));
         } else {
             final InsertOneResult insertOneResult = collection.insertOne(indexSetConfig);
             id = MongoUtils.insertedIdAsString(insertOneResult);
         }
 
-        final IndexSetConfig savedObject = mongoUtils.getById(id)
-                .orElseThrow(() -> new IllegalStateException("Unable to retrieve saved index set!"));
-        final IndexSetCreatedEvent createdEvent = IndexSetCreatedEvent.create(savedObject);
-        clusterEventBus.post(createdEvent);
-
+        final IndexSetConfig savedObject = indexSetConfig.toBuilder().id(id).build();
+        clusterEventBus.post(IndexSetCreatedEvent.create(savedObject));
         return savedObject;
     }
 
