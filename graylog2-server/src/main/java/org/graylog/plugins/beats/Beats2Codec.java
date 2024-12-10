@@ -39,11 +39,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -67,24 +67,25 @@ public class Beats2Codec extends AbstractCodec {
         this.messageFactory = messageFactory;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
-        final byte[] payload = rawMessage.getPayload();
-        final JsonNode event;
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         try {
+            final byte[] payload = rawMessage.getPayload();
+            final JsonNode event;
             event = objectMapper.readTree(payload);
             if (event == null || event.isMissingNode()) {
-                throw new IOException("null result");
+                throw InputProcessingException.create("Decoded message is null or empty!", rawMessage);
             }
-        } catch (IOException e) {
+            return Optional.of(parseEvent(event));
+        } catch (InputProcessingException e) {
+            throw e;
+        } catch (Exception e) {
             throw InputProcessingException.create("Couldn't decode beats 2 message",
                     e, rawMessage, new String(rawMessage.getPayload(), charset));
         }
-
-        return parseEvent(event);
     }
 
+    @Nonnull
     private Message parseEvent(JsonNode event) {
         final String beatsType = event.path("@metadata").path("beat").asText("beat");
         final String rootPath = noBeatsPrefix ? "" : beatsType;

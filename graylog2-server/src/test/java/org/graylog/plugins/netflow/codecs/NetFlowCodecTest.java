@@ -104,9 +104,9 @@ public class NetFlowCodecTest {
     }
 
     @Test
-    public void decodeThrowsUnsupportedOperationException() throws Exception {
+    public void decodeThrowsUnsupportedOperationException() {
         assertThatExceptionOfType(UnsupportedOperationException.class)
-                .isThrownBy(() -> codec.decode(new RawMessage(new byte[0])))
+                .isThrownBy(() -> codec.decodeSafe(new RawMessage(new byte[0])))
                 .withMessage("MultiMessageCodec " + NetFlowCodec.class + " does not support decode()");
     }
 

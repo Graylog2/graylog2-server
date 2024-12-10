@@ -46,6 +46,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -119,7 +120,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
     }
 
-    private void processMessage(final MessageEvent event) throws ExecutionException {
+    private void processMessage(final MessageEvent event) {
         final RawMessage raw = event.getRaw();
 
         // for backwards compatibility: the last source node should contain the input we use.
@@ -143,7 +144,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         final Codec codec = factory.create(raw.getCodecConfig());
         final String baseMetricName = name(codec.getClass(), inputIdOnCurrentNode);
 
-        Message message = null;
+        Optional<Message> message = Optional.empty();
         Collection<Message> messages = null;
 
         final Timer.Context decodeTimeCtx = parseTime.time();
@@ -154,7 +155,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             if (codec instanceof MultiMessageCodec) {
                 messages = ((MultiMessageCodec) codec).decodeMessages(raw);
             } else {
-                message = codec.decode(raw);
+                message = codec.decodeSafe(raw);
             }
         } catch (InputProcessingException e) {
             if(LOG.isTraceEnabled() && e.inputMessageString().isPresent()) {
@@ -172,8 +173,8 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             decodeTime = decodeTimeCtx.stop();
         }
 
-        if (message != null) {
-            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message, decodeTime));
+        if (message.isPresent()) {
+            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message.get(), decodeTime));
         } else if (messages != null && !messages.isEmpty()) {
             final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
 

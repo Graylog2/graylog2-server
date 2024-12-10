@@ -50,6 +50,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 @Codec(name = "gelf", displayName = "GELF")
 public class GelfCodec extends AbstractCodec {
@@ -122,9 +123,8 @@ public class GelfCodec extends AbstractCodec {
         }
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull final RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull final RawMessage rawMessage) {
         final GELFMessage gelfMessage = new GELFMessage(rawMessage.getPayload(), rawMessage.getRemoteAddress());
         final String json = gelfMessage.getJSON(decompressSizeLimit, charset);
 
@@ -237,7 +237,7 @@ public class GelfCodec extends AbstractCodec {
             message.addField(key, fieldValue);
         }
 
-        return message;
+        return Optional.of(message);
     }
 
     private void validateGELFMessage(JsonNode jsonNode, UUID id, ResolvableInetSocketAddress remoteAddress) {

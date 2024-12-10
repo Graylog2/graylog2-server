@@ -63,6 +63,7 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Codec(name = "netflow", displayName = "NetFlow")
@@ -106,9 +107,8 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
         return netflowV9CodecAggregator;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         throw new UnsupportedOperationException("MultiMessageCodec " + getClass() + " does not support decode()");
     }
 

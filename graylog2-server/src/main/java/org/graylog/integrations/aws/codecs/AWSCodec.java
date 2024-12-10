@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AWSCodec extends AbstractCodec {
@@ -63,9 +63,8 @@ public class AWSCodec extends AbstractCodec {
         this.availableCodecs = availableCodecs;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
 
         // Load the codec by message type.
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(CK_AWS_MESSAGE_TYPE));
@@ -78,7 +77,7 @@ public class AWSCodec extends AbstractCodec {
         final Codec codec = codecFactory.create(configuration);
 
         // Parse the message with the specified codec.
-        return codec.decode(new RawMessage(rawMessage.getPayload()));
+        return codec.decodeSafe(new RawMessage(rawMessage.getPayload()));
     }
 
     @Override

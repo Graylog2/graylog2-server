@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import com.google.inject.assistedinject.Assisted;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import io.netty.buffer.Unpooled;
 import jakarta.inject.Inject;
 import org.graylog.integrations.ipfix.Flow;
@@ -70,6 +69,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -212,7 +212,7 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
                                 .map(flow -> formatFlow(flowExportTimestamp, sender, flow));
                     })
                     .collect(Collectors.toList());
-        } catch (InvalidProtocolBufferException e) {
+        } catch (Exception e) {
             throw InputProcessingException.create("Unable to parse ipfix journal message", rawMessage);
         }
     }
@@ -226,9 +226,8 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
         return message;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         throw new UnsupportedOperationException("MultiMessageCodec " + getClass() + " does not support decode()");
     }
 

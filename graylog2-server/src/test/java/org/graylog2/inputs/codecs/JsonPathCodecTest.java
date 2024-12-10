@@ -50,7 +50,7 @@ public class JsonPathCodecTest {
     }
 
     @Test
-    public void testReadResultingInSingleInteger() throws Exception {
+    public void testReadResultingInSingleInteger() {
         String json = "{\"url\":\"https://api.github.com/repos/Graylog2/graylog2-server/releases/assets/22660\",\"download_count\":76185,\"id\":22660,\"name\":\"graylog2-server-0.20.0-preview.1.tgz\",\"label\":\"graylog2-server-0.20.0-preview.1.tgz\",\"content_type\":\"application/octet-stream\",\"state\":\"uploaded\",\"size\":38179285,\"updated_at\":\"2013-09-30T20:05:46Z\"}";
         String path = "$.download_count";
 
@@ -60,16 +60,16 @@ public class JsonPathCodecTest {
     }
 
     @Test
-    public void testReadResultingInSingleIntegerFullJson() throws Exception {
+    public void testReadResultingInSingleIntegerFullJson() {
         RawMessage json = new RawMessage("{\"download_count\":76185}".getBytes(StandardCharsets.UTF_8));
         String path = "$.download_count";
 
-        Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_FLATTEN, true), objectMapperProvider.get(), messageFactory).decode(json);
+        Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_FLATTEN, true), objectMapperProvider.get(), messageFactory).decodeSafe(json).get();
         assertThat(result.getField("download_count")).isEqualTo(76185);
     }
 
     @Test
-    public void testReadResultingInSingleString() throws Exception {
+    public void testReadResultingInSingleString() {
         String json = "{\"url\":\"https://api.github.com/repos/Graylog2/graylog2-server/releases/assets/22660\",\"download_count\":76185,\"id\":22660,\"name\":\"graylog2-server-0.20.0-preview.1.tgz\",\"label\":\"graylog2-server-0.20.0-preview.1.tgz\",\"content_type\":\"application/octet-stream\",\"state\":\"uploaded\",\"size\":38179285,\"updated_at\":\"2013-09-30T20:05:46Z\"}";
         String path = "$.state";
 
@@ -79,16 +79,16 @@ public class JsonPathCodecTest {
     }
 
     @Test
-    public void testReadResultingInSingleStringFullJson() throws Exception {
+    public void testReadResultingInSingleStringFullJson() {
         RawMessage json = new RawMessage("{\"url\":\"https://api.github.com/repos/Graylog2/graylog2-server/releases/assets/22660\",\"download_count\":76185,\"id\":22660,\"name\":\"graylog2-server-0.20.0-preview.1.tgz\",\"label\":\"graylog2-server-0.20.0-preview.1.tgz\",\"content_type\":\"application/octet-stream\",\"state\":\"uploaded\",\"size\":38179285,\"updated_at\":\"2013-09-30T20:05:46Z\"}".getBytes(StandardCharsets.UTF_8));
         String path = "$.state";
 
-        Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_FLATTEN, true), objectMapperProvider.get(), messageFactory).decode(json);
+        Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_FLATTEN, true), objectMapperProvider.get(), messageFactory).decodeSafe(json).get();
         assertThat(result.getField("state")).isEqualTo("\"uploaded\"");
     }
 
     @Test
-    public void testReadFromMap() throws Exception {
+    public void testReadFromMap() {
         String json = "{\"store\":{\"book\":[{\"category\":\"reference\",\"author\":\"Nigel Rees\",\"title\":\"Sayings of the Century\",\"price\":8.95},{\"category\":\"fiction\",\"author\":\"Evelyn Waugh\",\"title\":\"Sword of Honour\",\"price\":12.99,\"isbn\":\"0-553-21311-3\"}],\"bicycle\":{\"color\":\"red\",\"price\":19.95}}}";
         String path = "$.store.book[?(@.category == 'fiction')].author";
 
@@ -98,16 +98,16 @@ public class JsonPathCodecTest {
     }
 
     @Test
-    public void testReadFromMapFullJson() throws Exception {
+    public void testReadFromMapFullJson() {
         RawMessage json = new RawMessage("{\"store\":{\"book\":[{\"category\":\"reference\",\"author\":\"Nigel Rees\",\"title\":\"Sayings of the Century\",\"price\":8.95},{\"category\":\"fiction\",\"author\":\"Evelyn Waugh\",\"title\":\"Sword of Honour\",\"price\":12.99,\"isbn\":\"0-553-21311-3\"}],\"bicycle\":{\"color\":\"red\",\"price\":19.95}}}".getBytes(StandardCharsets.UTF_8));
         String path = "$.store.book[?(@.category == 'fiction')].author";
 
-        Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_FLATTEN, true), objectMapperProvider.get(), messageFactory).decode(json);
+        Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_FLATTEN, true), objectMapperProvider.get(), messageFactory).decodeSafe(json).get();
         assertThat(result.getField("store.book1.author")).isEqualTo("\"Evelyn Waugh\"");
     }
 
     @Test
-    public void testReadResultingInDouble() throws Exception {
+    public void testReadResultingInDouble() {
         String json = "{\"url\":\"https://api.github.com/repos/Graylog2/graylog2-server/releases/assets/22660\",\"some_double\":0.50,\"id\":22660,\"name\":\"graylog2-server-0.20.0-preview.1.tgz\",\"label\":\"graylog2-server-0.20.0-preview.1.tgz\",\"content_type\":\"application/octet-stream\",\"state\":\"uploaded\",\"size\":38179285,\"updated_at\":\"2013-09-30T20:05:46Z\"}";
         String path = "$.some_double";
 
@@ -117,16 +117,16 @@ public class JsonPathCodecTest {
     }
 
     @Test
-    public void testReadResultingInDoubleFullJson() throws Exception {
+    public void testReadResultingInDoubleFullJson() {
         RawMessage json = new RawMessage("{\"url\":\"https://api.github.com/repos/Graylog2/graylog2-server/releases/assets/22660\",\"some_double\":0.50,\"id\":22660,\"name\":\"graylog2-server-0.20.0-preview.1.tgz\",\"label\":\"graylog2-server-0.20.0-preview.1.tgz\",\"content_type\":\"application/octet-stream\",\"state\":\"uploaded\",\"size\":38179285,\"updated_at\":\"2013-09-30T20:05:46Z\"}".getBytes(StandardCharsets.UTF_8));
         String path = "$.store.book[?(@.category == 'fiction')].author";
 
-        Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_FLATTEN, true), objectMapperProvider.get(), messageFactory).decode(json);
+        Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_FLATTEN, true), objectMapperProvider.get(), messageFactory).decodeSafe(json).get();
         assertThat(result.getField("some_double")).isEqualTo(0.5);
     }
 
     @Test
-    public void testBuildShortMessage() throws Exception {
+    public void testBuildShortMessage() {
         Map<String, Object> fields = Maps.newLinkedHashMap();
         fields.put("baz", 9001);
         fields.put("foo", "bar");
@@ -136,7 +136,7 @@ public class JsonPathCodecTest {
     }
 
     @Test
-    public void testBuildShortMessageFullJson() throws Exception {
+    public void testBuildShortMessageFullJson() {
         Map<String, Object> fields = Maps.newLinkedHashMap();
         fields.put("baz", 9001);
         fields.put("foo", "bar");
@@ -146,7 +146,7 @@ public class JsonPathCodecTest {
     }
 
     @Test
-    public void testBuildShortMessageThatGetsCut() throws Exception {
+    public void testBuildShortMessageThatGetsCut() {
         Map<String, Object> fields = Maps.newLinkedHashMap();
         fields.put("baz", 9001);
         fields.put("foo", "bargggdzrtdfgfdgldfsjgkfdlgjdflkjglfdjgljslfperitperoujglkdnfkndsbafdofhasdpfoöadjsFOO");
@@ -156,7 +156,7 @@ public class JsonPathCodecTest {
     }
 
     @Test
-    public void testBuildShortMessageThatGetsCutFullJson() throws Exception {
+    public void testBuildShortMessageThatGetsCutFullJson() {
         Map<String, Object> fields = Maps.newLinkedHashMap();
         fields.put("baz", 9001);
         fields.put("foo", "bargggdzrtdfgfdgldfsjgkfdlgjdflkjglfdjgljslfperitperoujglkdnfkndsbafdofhasdpfoöadjsFOO");

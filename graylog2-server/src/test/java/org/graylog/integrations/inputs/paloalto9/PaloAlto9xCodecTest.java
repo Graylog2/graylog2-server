@@ -243,7 +243,7 @@ public class PaloAlto9xCodecTest {
 
     // WHENs
     private void whenDecodeIsCalled() {
-        out = cut.decode(in);
+        out = cut.decodeSafe(in).get();
     }
 
     // THENs

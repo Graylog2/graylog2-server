@@ -34,7 +34,7 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class CloudTrailCodec extends AbstractCodec {
     public static final String NAME = "AWSCloudTrail";
@@ -50,9 +50,8 @@ public class CloudTrailCodec extends AbstractCodec {
         this.messageFactory = messageFactory;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         try {
             final CloudTrailRecord record = objectMapper.readValue(rawMessage.getPayload(), CloudTrailRecord.class);
             final String source = configuration.getString(Config.CK_OVERRIDE_SOURCE, "aws-cloudtrail");
@@ -62,7 +61,7 @@ public class CloudTrailCodec extends AbstractCodec {
             message.addField("full_message", record.getFullMessage());
             message.addField(AWS.SOURCE_GROUP_IDENTIFIER, true);
 
-            return message;
+            return Optional.of(message);
         } catch (Exception e) {
             throw InputProcessingException.create("Could not deserialize CloudTrail record.",
                     e, rawMessage, new String(rawMessage.getPayload(), charset));

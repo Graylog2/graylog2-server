@@ -51,6 +51,7 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -95,9 +96,8 @@ public class CEFCodec extends AbstractCodec {
         this.useFullNames = configuration.getBoolean(CK_USE_FULL_NAMES);
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         final String s = new String(rawMessage.getPayload(), charset);
         try {
             final Matcher matcher = SYSLOG_PREFIX.matcher(s);
@@ -116,9 +116,9 @@ public class CEFCodec extends AbstractCodec {
                 final Message message = decodeCEF(rawMessage, msg);
                 message.addFields(syslogFields);
 
-                return message;
+                return Optional.of(message);
             } else {
-                return decodeCEF(rawMessage, s);
+                return Optional.of(decodeCEF(rawMessage, s));
             }
         } catch (Exception e) {
             throw InputProcessingException.create("Could not decode CEF message.", e, rawMessage, s);
@@ -130,6 +130,7 @@ public class CEFCodec extends AbstractCodec {
         return NAME;
     }
 
+    @Nonnull
     protected Message decodeCEF(@Nonnull RawMessage rawMessage, String s) {
         final MappedMessage cef = new MappedMessage(parser.parse(s, timezone.toTimeZone(), locale), useFullNames);
 

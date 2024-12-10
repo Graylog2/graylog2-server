@@ -35,10 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -57,21 +56,18 @@ public class BeatsCodec extends AbstractCodec {
         this.messageFactory = messageFactory;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
-        final byte[] payload = rawMessage.getPayload();
-        final Map<String, Object> event;
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         try {
-            event = objectMapper.readValue(payload, TypeReferences.MAP_STRING_OBJECT);
-        } catch (IOException e) {
+            final byte[] payload = rawMessage.getPayload();
+            return Optional.of(parseEvent(objectMapper.readValue(payload, TypeReferences.MAP_STRING_OBJECT)));
+        } catch (Exception e) {
             throw InputProcessingException.create("Couldn't decode beats message",
                     e, rawMessage, new String(rawMessage.getPayload(), charset));
         }
-
-        return parseEvent(event);
     }
 
+    @Nonnull
     private Message parseEvent(Map<String, Object> event) {
         @SuppressWarnings("unchecked")
         final Map<String, String> metadata = (HashMap<String, String>) event.remove("@metadata");

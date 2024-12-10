@@ -60,6 +60,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -90,9 +91,8 @@ public class SyslogCodec extends AbstractCodec {
         this.messageFactory = messageFactory;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         final String msg = new String(rawMessage.getPayload(), charset);
         try (Timer.Context ignored = this.decodeTime.time()) {
             final ResolvableInetSocketAddress address = rawMessage.getRemoteAddress();
@@ -102,12 +102,13 @@ public class SyslogCodec extends AbstractCodec {
             } else {
                 remoteAddress = address.getInetSocketAddress();
             }
-            return parse(msg, remoteAddress == null ? null : remoteAddress.getAddress(), rawMessage.getTimestamp());
+            return Optional.of(parse(msg, remoteAddress == null ? null : remoteAddress.getAddress(), rawMessage.getTimestamp()));
         } catch (Exception e) {
             throw InputProcessingException.create("Could not deserialize Syslog message.", e, rawMessage, msg);
         }
     }
 
+    @Nonnull
     private Message parse(String msg, InetAddress remoteAddress, DateTime receivedTimestamp) {
         /*
          * ZOMG funny 80s neckbeard protocols. We are now deciding if to parse

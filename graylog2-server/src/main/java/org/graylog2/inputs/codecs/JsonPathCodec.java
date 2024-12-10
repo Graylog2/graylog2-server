@@ -54,6 +54,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Codec(name = "jsonpath", displayName = "JSON Path")
 public class JsonPathCodec extends AbstractCodec {
@@ -78,9 +79,8 @@ public class JsonPathCodec extends AbstractCodec {
         this.objectMapper = objectMapper;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         Map<String, Object> fields = new HashMap<>();
         if (flatten) {
             final String json = new String(rawMessage.getPayload(), charset);
@@ -107,7 +107,7 @@ public class JsonPathCodec extends AbstractCodec {
                 configuration.getString(CK_SOURCE),
                 rawMessage.getTimestamp());
         message.addFields(fields);
-        return message;
+        return Optional.of(message);
     }
 
     @VisibleForTesting
