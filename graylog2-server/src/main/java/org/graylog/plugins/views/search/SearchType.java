@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.SearchEngineSearchType;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -140,7 +141,7 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
     }
 
     @JsonAutoDetect
-    class Fallback implements SearchType {
+    class Fallback implements SearchEngineSearchType {
 
         @JsonProperty
         private String type;
