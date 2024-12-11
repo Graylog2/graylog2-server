@@ -121,7 +121,7 @@
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.68.2</grpc.version>
+        <grpc.version>1.69.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.3.1-jre</guava.version>
         <guice.version>7.0.0</guice.version>
