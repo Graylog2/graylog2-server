@@ -17,10 +17,12 @@
 package org.graylog2.indexer.indexset;
 
 import com.google.common.collect.ImmutableList;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
@@ -35,6 +37,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.streams.StreamService;
 import org.mongojack.DBQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -52,7 +55,7 @@ public class MongoIndexSetService implements IndexSetService {
     public static final String COLLECTION_NAME = "index_sets";
     public static final String FIELD_TITLE = "title";
 
-    private final com.mongodb.client.MongoCollection<IndexSetConfig> collection;
+    private final MongoCollection<IndexSetConfig> collection;
     private final MongoUtils<IndexSetConfig> mongoUtils;
     private final ClusterConfigService clusterConfigService;
     private final ClusterEventBus clusterEventBus;
@@ -86,7 +89,7 @@ public class MongoIndexSetService implements IndexSetService {
      */
     @Override
     public Optional<IndexSetConfig> get(ObjectId id) {
-        return Optional.ofNullable(collection.find(idEq(id)).first());
+        return mongoUtils.getById(id);
     }
 
     @Override
@@ -114,24 +117,18 @@ public class MongoIndexSetService implements IndexSetService {
      */
     @Override
     public List<IndexSetConfig> findAll() {
-        return ImmutableList.copyOf(collection.find().sort(Indexes.ascending(FIELD_TITLE)));
+        return ImmutableList.copyOf(collection.find().sort(Sorts.ascending(FIELD_TITLE)));
     }
 
     @Override
     public List<IndexSetConfig> findByIds(Set<String> ids) {
-        return MongoUtils.stream(collection.find(MongoUtils.idsIn(idsToObjectIds(ids)))).toList();
-    }
-
-    private List<ObjectId> idsToObjectIds(Set<String> ids) {
-        return ids.stream()
-                .map(ObjectId::new)
-                .toList();
+        return collection.find(MongoUtils.stringIdsIn(ids)).into(new ArrayList<>());
     }
 
     @Override
     public List<IndexSetConfig> findMany(DBQuery.Query query) {
         mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return ImmutableList.copyOf(collection.find(query).sort(Indexes.ascending(FIELD_TITLE)));
+        return ImmutableList.copyOf(collection.find(query).sort(Sorts.ascending(FIELD_TITLE)));
     }
 
     /**
@@ -139,12 +136,10 @@ public class MongoIndexSetService implements IndexSetService {
      */
     @Override
     public List<IndexSetConfig> findPaginated(Set<String> ids, int limit, int skip) {
-        return ImmutableList.copyOf(
-                MongoUtils.stream(collection.find(MongoUtils.idsIn(idsToObjectIds(ids)))
-                                .sort(Indexes.ascending(FIELD_TITLE))
-                                .skip(skip)
-                                .limit(limit))
-                        .toArray(IndexSetConfig[]::new));
+        return ImmutableList.copyOf(collection.find(MongoUtils.stringIdsIn(ids))
+                .sort(Sorts.ascending(FIELD_TITLE))
+                .skip(skip)
+                .limit(limit));
     }
 
     @Override
@@ -152,9 +147,8 @@ public class MongoIndexSetService implements IndexSetService {
         String formatedSearchString = String.format(Locale.getDefault(), ".*%s.*", searchString);
         Pattern searchPattern = Pattern.compile(formatedSearchString, Pattern.CASE_INSENSITIVE);
 
-        return ImmutableList.copyOf(
-                MongoUtils.stream(collection.find(
-                        Filters.regex(FIELD_TITLE, searchPattern)).sort(Indexes.ascending(FIELD_TITLE))).toList());
+        return ImmutableList.copyOf(collection.find(Filters.regex(FIELD_TITLE, searchPattern))
+                .sort(Sorts.ascending(FIELD_TITLE)));
     }
 
     /**

@@ -137,7 +137,6 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
 
     // Compatibility creator after field type refresh interval has been introduced
     public static IndexSetConfig create(String id,
-                                        String scope,
                                         String title,
                                         String description,
                                         boolean isWritable,
@@ -155,7 +154,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
                                         String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled) {
-        return create(id, scope, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
+        return create(id, null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
                 DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null);

@@ -78,7 +78,6 @@ public class IndexSetConfigTest {
 
         final IndexSetConfig config3 = IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
-                null,
                 "Test 3",
                 "A test index-set.",
                 true, true,
@@ -99,7 +98,6 @@ public class IndexSetConfigTest {
 
         final IndexSetConfig config4 = IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
-                null,
                 "Test 3",
                 "A test index-set.",
                 true, true,
@@ -134,7 +132,6 @@ public class IndexSetConfigTest {
     public void writableIndexWithMissingTemplateType_isRegularIndex() {
         final IndexSetConfig config = IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
-                null,
                 "Test Regular Index",
                 "Test Regular Index",
                 true, false,
@@ -161,7 +158,6 @@ public class IndexSetConfigTest {
     public void writableIndexWithDefaultIndexTemplateType_isRegularIndex() {
         final IndexSetConfig config = IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
-                null,
                 "Test Regular Index",
                 "Test Regular Index",
                 true, false,
@@ -188,7 +184,6 @@ public class IndexSetConfigTest {
     public void writableIndexWithIsRegularFlag_isRegularIndex() {
         final IndexSetConfig config = IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
-                null,
                 "Test Regular Index",
                 "Test Regular Index",
                 true, true,
@@ -215,7 +210,6 @@ public class IndexSetConfigTest {
     public void writableIndexWithNonDefaultIndexTemplateType_isNotRegularIndex() {
         final IndexSetConfig config = IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
-                null,
                 "Test Regular Index",
                 "Test Regular Index",
                 true, false,
@@ -242,7 +236,6 @@ public class IndexSetConfigTest {
     public void nonWritableIndex_isNotRegularIndex() {
         final IndexSetConfig config = IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
-                null,
                 "Test Regular Index",
                 "Test Regular Index",
                 false, true,
@@ -269,7 +262,6 @@ public class IndexSetConfigTest {
     public void missingIsRegularField_defaultsToFalse() {
         final IndexSetConfig config = IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
-                null,
                 "Test Regular Index",
                 "Test Regular Index",
                 true, null,
