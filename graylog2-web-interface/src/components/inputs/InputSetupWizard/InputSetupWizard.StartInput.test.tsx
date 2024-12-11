@@ -314,6 +314,20 @@ describe('InputSetupWizard Start Input', () => {
       ));
     });
 
+    it('should start the new stream', async () => {
+      asMock(fetch).mockImplementation(() => Promise.resolve({ stream_id: 1 }));
+
+      renderWizard();
+      await waitFor(() => createStream());
+      goToStartInputStep();
+      startInput();
+
+      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
+        'POST',
+        expect.stringContaining(startStreamUrl(1)),
+      ));
+    });
+
     it('should create the new pipeline', async () => {
       renderWizard();
       await waitFor(() => createStream(true));
