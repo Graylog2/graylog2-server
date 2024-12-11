@@ -27,6 +27,7 @@ import { additionalAttributes } from 'components/events/Constants';
 import { extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 const url = URLUtils.qualifyUrl('/events/search');
 
@@ -38,7 +39,7 @@ type FiltersResult = {
     aggregation_timerange?: { from?: string, to?: string, type: string, range?: number },
     key?: Array<string>,
   },
-  timerange?: { from?: string, to?: string, type: string, range?: number },
+  timerange?: TimeRange,
 };
 
 export const parseTypeFilter = (alert: string) => {
