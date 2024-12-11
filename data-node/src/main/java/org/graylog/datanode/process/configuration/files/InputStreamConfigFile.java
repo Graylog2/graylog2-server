@@ -14,7 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans;
+package org.graylog.datanode.process.configuration.files;
 
-public interface ConfigurationBuildParams {
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
+
+public record InputStreamConfigFile(Path relativePath, ByteArrayInputStream inputStream) implements DatanodeConfigFile {
+    @Override
+    public void write(OutputStream output) throws IOException {
+        inputStream.transferTo(output);
+    }
 }

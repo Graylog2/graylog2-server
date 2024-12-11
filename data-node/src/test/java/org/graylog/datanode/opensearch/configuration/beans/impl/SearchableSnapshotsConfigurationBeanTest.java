@@ -26,7 +26,7 @@ import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
-import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 

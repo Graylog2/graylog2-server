@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans.files;
+package org.graylog.datanode.process.configuration.files;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
-public record TextConfigFile(Path relativePath, String text) implements ConfigFile {
+public record TextConfigFile(Path relativePath, String text) implements DatanodeConfigFile {
 
     @Override
     public void write(OutputStream output) throws IOException {

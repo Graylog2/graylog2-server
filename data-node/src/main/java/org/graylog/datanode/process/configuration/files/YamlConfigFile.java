@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans.files;
+package org.graylog.datanode.process.configuration.files;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Map;
 
-public record YamlConfigFile(Path relativePath, Map<String, Object> config) implements ConfigFile {
+public record YamlConfigFile(Path relativePath, Map<String, Object> config) implements DatanodeConfigFile {
     private static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());
 
     @Override

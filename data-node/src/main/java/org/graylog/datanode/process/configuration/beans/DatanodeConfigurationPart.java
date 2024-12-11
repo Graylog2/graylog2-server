@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans;
+package org.graylog.datanode.process.configuration.beans;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nullable;
-import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
+import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 
 import java.security.KeyStore;
@@ -51,7 +51,7 @@ public abstract class DatanodeConfigurationPart {
     @Nullable
     public abstract KeyStore trustStore();
 
-    public abstract List<ConfigFile> configFiles();
+    public abstract List<DatanodeConfigFile> configFiles();
 
     public static Builder builder() {
         return new AutoValue_DatanodeConfigurationPart.Builder()
@@ -86,11 +86,11 @@ public abstract class DatanodeConfigurationPart {
             return this;
         }
 
-        public abstract Builder configFiles(List<ConfigFile> configFiles);
+        public abstract Builder configFiles(List<DatanodeConfigFile> configFiles);
 
-        abstract ImmutableList.Builder<ConfigFile> configFilesBuilder();
+        abstract ImmutableList.Builder<DatanodeConfigFile> configFilesBuilder();
 
-        public Builder withConfigFile(ConfigFile configFile) {
+        public Builder withConfigFile(DatanodeConfigFile configFile) {
             configFilesBuilder().add(configFile);
             return this;
         }

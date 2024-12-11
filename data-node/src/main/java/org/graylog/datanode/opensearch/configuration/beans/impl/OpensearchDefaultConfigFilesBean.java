@@ -18,10 +18,10 @@ package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import jakarta.annotation.Nonnull;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
-import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
-import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
-import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
-import org.graylog.datanode.opensearch.configuration.beans.files.InputStreamConfigFile;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
+import org.graylog.datanode.process.configuration.files.InputStreamConfigFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -50,7 +50,7 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
                 .build();
     }
 
-    private List<ConfigFile> collectConfigFiles() {
+    private List<DatanodeConfigFile> collectConfigFiles() {
         // this is a directory in main/resources that holds all the initial configuration files needed by the opensearch
         // we manage this directory in git. Generally we assume that this is a read-only location and we need to copy
         // its content to a read-write location for the managed opensearch process.
@@ -64,7 +64,7 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
         }
     }
 
-    public List<ConfigFile> synchronizeConfig(Path configRelativePath) throws URISyntaxException, IOException {
+    public List<DatanodeConfigFile> synchronizeConfig(Path configRelativePath) throws URISyntaxException, IOException {
         final URI uriToConfig = OpensearchDefaultConfigFilesBean.class.getResource("/" + configRelativePath.toString()).toURI();
         if ("jar".equals(uriToConfig.getScheme())) {
             return copyFromJar(configRelativePath, uriToConfig);
@@ -73,7 +73,7 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
         }
     }
 
-    private static List<ConfigFile> copyFromJar(Path configRelativePath, URI uri) throws IOException {
+    private static List<DatanodeConfigFile> copyFromJar(Path configRelativePath, URI uri) throws IOException {
         try (
                 final FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap());
         ) {
@@ -84,14 +84,14 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
         }
     }
 
-    private static List<ConfigFile> copyFromLocalFs(Path configRelativePath) throws URISyntaxException, IOException {
+    private static List<DatanodeConfigFile> copyFromLocalFs(Path configRelativePath) throws URISyntaxException, IOException {
         final Path resourcesRoot = Paths.get(OpensearchDefaultConfigFilesBean.class.getResource("/").toURI());
         final Path source = resourcesRoot.resolve(configRelativePath);
         return collectRecursively(source);
     }
 
-    private static List<ConfigFile> collectRecursively(Path source) throws IOException {
-        List<ConfigFile> configFiles = new LinkedList<>();
+    private static List<DatanodeConfigFile> collectRecursively(Path source) throws IOException {
+        List<DatanodeConfigFile> configFiles = new LinkedList<>();
         Files.walkFileTree(source, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path sourceFile, BasicFileAttributes attrs) {

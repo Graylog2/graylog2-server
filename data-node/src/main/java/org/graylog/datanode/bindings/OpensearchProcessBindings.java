@@ -33,7 +33,6 @@ import org.graylog.datanode.opensearch.OpensearchProcessService;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpaceProvider;
-import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchClusterConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchCommonConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchDefaultConfigFilesBean;
@@ -45,6 +44,7 @@ import org.graylog.datanode.opensearch.statemachine.tracer.ClusterNodeStateTrace
 import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchWatchdog;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTransitionLogger;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 
 public class OpensearchProcessBindings extends AbstractModule {
 

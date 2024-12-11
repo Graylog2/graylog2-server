@@ -22,8 +22,8 @@ import org.apache.commons.exec.OS;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
-import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
-import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 
 import java.util.Map;
 

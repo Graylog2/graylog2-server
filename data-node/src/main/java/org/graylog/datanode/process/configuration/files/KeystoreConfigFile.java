@@ -14,21 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans.files;
+package org.graylog.datanode.process.configuration.files;
+
+import org.graylog.datanode.configuration.OpensearchConfigurationException;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 
-public interface ConfigFile {
+public record KeystoreConfigFile(Path relativePath, KeystoreInformation keystoreInformation) implements DatanodeConfigFile {
 
-    /**
-     * Target relative path of the configuration file. May include parent directories.
-     */
-    Path relativePath();
-
-    /**
-     * Given a file stream, write the configuration file content in it. Everything will be automatically flushed and closed.
-     */
-    void write(OutputStream stream) throws IOException;
+    @Override
+    public void write(OutputStream stream) throws IOException {
+        try {
+            keystoreInformation().loadKeystore().store(stream, keystoreInformation.password());
+        } catch (Exception e) {
+            throw new OpensearchConfigurationException("Failed to persist opensearch keystore file " + relativePath, e);
+        }
+    }
 }

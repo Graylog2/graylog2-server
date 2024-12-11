@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans;
+package org.graylog.datanode.process.configuration.beans;
 
-public interface DatanodeConfigurationBean<T extends ConfigurationBuildParams> {
-    DatanodeConfigurationPart buildConfigurationPart(T trustedCertificates);
+public interface ConfigurationBuildParams {
 }

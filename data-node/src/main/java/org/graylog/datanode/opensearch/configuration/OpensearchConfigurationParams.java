@@ -16,7 +16,8 @@
  */
 package org.graylog.datanode.opensearch.configuration;
 
-import org.graylog.datanode.opensearch.configuration.beans.ConfigurationBuildParams;
+
+import org.graylog.datanode.process.configuration.beans.ConfigurationBuildParams;
 
 import java.security.cert.X509Certificate;
 import java.util.List;

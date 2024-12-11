@@ -25,8 +25,8 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
-import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
-import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;

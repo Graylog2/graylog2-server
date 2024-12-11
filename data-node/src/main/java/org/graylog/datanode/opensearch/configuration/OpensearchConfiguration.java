@@ -21,9 +21,9 @@ import jakarta.annotation.Nonnull;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
-import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
-import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
-import org.graylog.datanode.opensearch.configuration.beans.files.YamlConfigFile;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
+import org.graylog.datanode.process.configuration.files.YamlConfigFile;
 import org.graylog.datanode.process.Environment;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
@@ -127,9 +127,9 @@ public class OpensearchConfiguration {
                 .findFirst();
     }
 
-    public List<ConfigFile> configFiles() {
+    public List<DatanodeConfigFile> configFiles() {
 
-        final List<ConfigFile> configFiles = new LinkedList<>();
+        final List<DatanodeConfigFile> configFiles = new LinkedList<>();
 
         configurationParts.stream()
                 .flatMap(cp -> cp.configFiles().stream())

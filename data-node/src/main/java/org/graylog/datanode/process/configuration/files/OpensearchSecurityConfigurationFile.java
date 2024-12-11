@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans.files;
+package org.graylog.datanode.process.configuration.files;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +28,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-public class OpensearchSecurityConfigurationFile implements ConfigFile {
+public class OpensearchSecurityConfigurationFile implements DatanodeConfigFile {
 
     private static final ObjectMapper OBJECT_MAPPER = new YAMLMapper();
     private static final Path TARGET_PATH = Path.of("opensearch-security", "config.yml");

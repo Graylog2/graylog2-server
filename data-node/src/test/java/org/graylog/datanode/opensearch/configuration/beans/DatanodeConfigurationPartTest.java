@@ -17,6 +17,7 @@
 package org.graylog.datanode.opensearch.configuration.beans;
 
 import org.assertj.core.api.Assertions;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
