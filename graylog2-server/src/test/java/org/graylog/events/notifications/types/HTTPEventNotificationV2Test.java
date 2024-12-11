@@ -16,7 +16,6 @@
  */
 package org.graylog.events.notifications.types;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.configuration.EventsConfigurationProvider;
@@ -38,7 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,21 +73,47 @@ public class HTTPEventNotificationV2Test {
     }
 
     @Test
-    public void testEscapedQuotesInBacklog() throws UnsupportedEncodingException, JsonProcessingException {
+    public void testEscapedQuotesInBacklog() {
         Map<String, Object> model = Map.of(
                 "event_definition_title", "<<Test Event Title>>",
-                "event", Map.of("message", "Event Message & Whatnot"),
-                "backlog", createBacklog()
+                "backlog", createBacklog(),
+                "event", createEvent()
         );
         String bodyTemplate = "${if backlog}{\"backlog\": [${foreach backlog message}{ \"title\": \"Message\", \"value\": \"${message.message}\" }${if last_message}${else},${end}${end}]}${end}";
         String body = notification.transformBody(bodyTemplate, HTTPEventNotificationConfigV2.ContentType.JSON, model);
         assertThat(body).contains("\"value\": \"Message with \\\"Double Quotes\\\"");
     }
 
+    @Test
+    public void testEscapedQuotesInEventFields() {
+        Map<String, Object> model = Map.of(
+                "event_definition_title", "<<Test Event Title>>",
+                "backlog", createBacklog(),
+                "event", createEvent()
+        );
+        String bodyTemplate = "{\n" +
+                "    \"message\": \"${event.message}\\\\n\\\\n${event.fields}\",\n" +
+                "    \"title\": \"${event_definition_title}\"\n" +
+                "}";
+        String body = notification.transformBody(bodyTemplate, HTTPEventNotificationConfigV2.ContentType.JSON, model);
+        assertThat(body).contains("\\\"bad_field\\\"");
+    }
+
     private ImmutableList<MessageSummary> createBacklog() {
         Message message = new TestMessageFactory().createMessage("Message with \"Double Quotes\"", "Unit Test", DateTime.now(DateTimeZone.UTC));
         MessageSummary summary = new MessageSummary("index1", message);
         return ImmutableList.of(summary);
+    }
+
+    private Map<String, Object> createEvent() {
+        final Map<String, Object> event = new HashMap<>();
+        final Map<String, Object> fields = Map.of(
+                "field1", "\"bad_field\"",
+                "field2", "A somehow \"worse\" field!"
+        );
+        event.put("message", "Event Message & Whatnot");
+        event.put("fields", fields);
+        return event;
     }
 
 }

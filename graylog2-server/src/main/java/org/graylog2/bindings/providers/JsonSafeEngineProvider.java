@@ -34,7 +34,9 @@ public class JsonSafeEngineProvider implements Provider<Engine> {
     public JsonSafeEngineProvider() {
         engine = Engine.createEngine();
         engine.registerRenderer(String.class, new JsonSafeRenderer());
+        engine.registerRenderer(Map.class, new JsonSafeMapRenderer());
     }
+
     @Override
     public Engine get() {
         return engine;
@@ -50,6 +52,24 @@ public class JsonSafeEngineProvider implements Provider<Engine> {
             // 'The only difference between Java strings and Json strings is that in Json, forward-slash (/) is escaped.'
             // So we use escapeJava and tack on an extra String.replace() call to escape forward slashes.
             return StringEscapeUtils.escapeJava(s).replace("/", "\\/");
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static class JsonSafeMapRenderer implements Renderer<Map> {
+
+        @Override
+        public String render(Map map, Locale locale, Map<String, Object> map2) {
+            final String renderedResult;
+
+            if (map.isEmpty()) {
+                renderedResult = "";
+            } else if (map.size() == 1) {
+                renderedResult = map.values().iterator().next().toString();
+            } else {
+                renderedResult = map.toString();
+            }
+            return StringEscapeUtils.escapeJava(renderedResult).replace("/", "\\/");
         }
     }
 }
