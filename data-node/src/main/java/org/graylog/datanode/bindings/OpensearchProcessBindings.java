@@ -71,7 +71,6 @@ public class OpensearchProcessBindings extends AbstractModule {
         Multibinder<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeanMultibinder = Multibinder.newSetBinder(binder(), new TypeLiteral<DatanodeConfigurationBean<OpensearchConfigurationParams>>() {});
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchDefaultConfigFilesBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchCommonConfigurationBean.class).asEagerSingleton();
-        opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchCommonConfigurationBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchClusterConfigurationBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(SearchableSnapshotsConfigurationBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchSecurityConfigurationBean.class).asEagerSingleton();

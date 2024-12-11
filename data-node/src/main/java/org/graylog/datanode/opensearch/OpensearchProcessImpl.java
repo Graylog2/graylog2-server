@@ -48,8 +48,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
 import org.graylog2.plugin.system.NodeId;
@@ -93,7 +91,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     private final Queue<String> stdout;
     private final Queue<String> stderr;
     private final CustomCAX509TrustManager trustManager;
-    private final NodeService<DataNodeDto> nodeService;
     private final Configuration configuration;
     private final ObjectMapper objectMapper;
     private final String nodeName;
@@ -107,14 +104,13 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Inject
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager,
-                          final Configuration configuration, final NodeService<DataNodeDto> nodeService,
+                          final Configuration configuration,
                           ObjectMapper objectMapper, OpensearchStateMachine processState, NodeId nodeId, EventBus eventBus) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = processState;
         this.stdout = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
         this.stderr = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
         this.trustManager = trustManager;
-        this.nodeService = nodeService;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
         this.nodeName = configuration.getDatanodeNodeName();
@@ -132,6 +128,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     /**
      * We have to combine the system-wide trust manager with a manager that trusts certificates used to secure
      * the datanode's opensearch process.
+     *
      * @param truststore truststore containing certificates used to secure datanode's opensearch
      * @return combined trust manager
      */
@@ -159,7 +156,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     }
 
     public OpensearchInfo processInfo() {
-        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(),  getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
+        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
     }
 
     @Override
@@ -214,21 +211,21 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public synchronized void start() {
-            opensearchConfiguration.ifPresentOrElse(
-                    (config -> {
-                        boolean startedPreviously = Objects.nonNull(commandLineProcess) && commandLineProcess.processInfo().alive();
-                        if (startedPreviously) {
-                            stop();
-                        }
+        opensearchConfiguration.ifPresentOrElse(
+                (config -> {
+                    boolean startedPreviously = Objects.nonNull(commandLineProcess) && commandLineProcess.processInfo().alive();
+                    if (startedPreviously) {
+                        stop();
+                    }
 
-                        commandLineProcess = new OpensearchCommandLineProcess(config, this);
-                        commandLineProcess.start();
+                    commandLineProcess = new OpensearchCommandLineProcess(config, this);
+                    commandLineProcess.start();
 
-                        restClient = Optional.of(createRestClient(config));
-                        openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
-                    }),
-                    () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
-            );
+                    restClient = Optional.of(createRestClient(config));
+                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
+                }),
+                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
+        );
     }
 
     /**
