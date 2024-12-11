@@ -14,11 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React from 'react';
 
-import { singleton } from 'logic/singleton';
-import type Widget from 'views/logic/widgets/Widget';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
-const WidgetContext = React.createContext<Widget | undefined>(undefined);
+const EventDefinitionLink = ({ title, id }: { title: string | undefined, id: string }) => {
+  const { permissions } = useCurrentUser();
 
-export default singleton('contexts.WidgetContext', () => WidgetContext);
+  if (!title) {
+    return <em>{id}</em>;
+  }
+
+  if (isPermitted(permissions, `eventdefinitions:edit:${id}`)) {
+    return (
+      <Link to={Routes.ALERTS.DEFINITIONS.edit(id)}>
+        {title}
+      </Link>
+    );
+  }
+
+  return <>{title}</>;
+};
+
+export default EventDefinitionLink;

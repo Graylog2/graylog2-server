@@ -14,11 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.events.procedures;
 
-import { singleton } from 'logic/singleton';
-import type Widget from 'views/logic/widgets/Widget';
+import com.google.inject.assistedinject.Assisted;
 
-const WidgetContext = React.createContext<Widget | undefined>(undefined);
+public abstract class Action {
+    private final String title;
+    private final String type;
 
-export default singleton('contexts.WidgetContext', () => WidgetContext);
+    protected Action(ActionDto dto) {
+        this.title = dto.title();
+        this.type = dto.config().type();
+    }
+
+    public String title() {
+        return title;
+    }
+
+    public String type() {
+        return type;
+    }
+
+    public interface Factory<T extends Action> {
+        T create(@Assisted("dto") ActionDto dto);
+    }
+
+}

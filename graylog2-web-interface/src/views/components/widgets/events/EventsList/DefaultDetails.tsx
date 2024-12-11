@@ -17,7 +17,7 @@
 import React, { useMemo } from 'react';
 
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
-import EventDetailsTable from 'components/events/events/EventDetailsTable';
+import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
 import { detailsAttributes } from 'components/events/Constants';
 import DropdownButton from 'components/bootstrap/DropdownButton';
 import useEventAction from 'components/events/events/hooks/useEventAction';
@@ -42,7 +42,7 @@ const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
 
   return (
     <>
-      <EventDetailsTable attributesList={attributesList} event={event} meta={meta} />
+      <GeneralEventDetailsTable attributesList={attributesList} event={event} meta={meta} />
       <ActionsWrapper>
         {moreActions}
       </ActionsWrapper>

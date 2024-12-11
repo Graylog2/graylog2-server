@@ -16,6 +16,7 @@
  */
 
 import moment from 'moment';
+import trim from 'lodash/trim';
 
 import * as URLUtils from 'util/URLUtils';
 import { adjustFormat } from 'util/DateTime';
@@ -29,31 +30,86 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 const url = URLUtils.qualifyUrl('/events/search');
 
-type FiltersResult = { filter: { alerts?: string }, timerange?: { from?: string, to?: string, type: string, range?: number}};
+type FiltersResult = {
+  filter: {
+    alerts?: string,
+    event_definitions?: Array<string>,
+    priority?: Array<string>,
+    aggregation_timerange?: { from?: string, to?: string, type: string, range?: number },
+    key?: Array<string>,
+  },
+  timerange?: { from?: string, to?: string, type: string, range?: number },
+};
+
+const allTimesRange = { type: 'relative', range: 0 };
+
+const isNullOrBlank = (s: string | undefined) => {
+  if (!s) {
+    return true;
+  }
+
+  if (trim(s) === '') {
+    return true;
+  }
+
+  return false;
+};
+
+const parseTimestampFilter = (timestamp: string | undefined) => {
+  if (!timestamp) {
+    return allTimesRange;
+  }
+
+  const [from, to] = extractRangeFromString(timestamp);
+
+  if (!from && !to) {
+    return allTimesRange;
+  }
+
+  return {
+    type: 'absolute',
+    from: isNullOrBlank(from) ? adjustFormat(moment(0).utc(), 'internal') : from,
+    to: isNullOrBlank(to) ? adjustFormat(moment().utc(), 'internal') : to,
+  };
+};
+
+export const parseTypeFilter = (alert: string) => {
+  switch (alert) {
+    case 'true':
+      return 'only';
+    case 'false':
+      return 'exclude';
+    default:
+      return 'include';
+  }
+};
 
 const parseFilters = (filters: UrlQueryFilters) => {
   const result: FiltersResult = { filter: {} };
 
-  if (filters.get('timestamp')?.[0]) {
-    const [from, to] = extractRangeFromString(filters.get('timestamp')[0]);
+  result.timerange = parseTimestampFilter(filters.get('timestamp')?.[0]);
 
-    result.timerange = from
+  if (filters.get('timerange_start')?.[0]) {
+    const [from, to] = extractRangeFromString(filters.get('timerange_start')[0]);
+
+    result.filter.aggregation_timerange = from
       ? { from, to: to || adjustFormat(moment().utc(), 'internal'), type: 'absolute' }
       : { type: 'relative', range: 0 };
-  } else {
-    result.timerange = { type: 'relative', range: 0 };
   }
 
-  switch (filters?.get('alert')?.[0]) {
-    case 'true':
-      result.filter.alerts = 'only';
-      break;
-    case 'false':
-      result.filter.alerts = 'exclude';
-      break;
-    default:
-      result.filter.alerts = 'include';
+  if (filters.get('key')?.length > 0) {
+    result.filter.key = filters.get('key');
   }
+
+  if (filters.get('event_definition_id')?.length > 0) {
+    result.filter.event_definitions = filters.get('event_definition_id');
+  }
+
+  if (filters.get('priority')?.length > 0) {
+    result.filter.priority = filters.get('priority');
+  }
+
+  result.filter.alerts = parseTypeFilter(filters?.get('alert')?.[0]);
 
   return result;
 };
