@@ -277,6 +277,8 @@ const StartInputStep = () => {
         }
 
         return name;
+      case 'createPipeline':
+        return routingStepData?.newStream.title ?? undefined;
       default:
         return name;
     }

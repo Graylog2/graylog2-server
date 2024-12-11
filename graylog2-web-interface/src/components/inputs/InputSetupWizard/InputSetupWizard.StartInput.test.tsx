@@ -24,6 +24,7 @@ import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import useStreams from 'components/streams/hooks/useStreams';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import { streams } from 'fixtures/streams';
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 
 import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
 import InputSetupWizard from './Wizard';
@@ -34,7 +35,13 @@ jest.mock('components/indices/hooks/useIndexSetsList');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('views/stores/StreamsStore', () => ({ StreamsStore: MockStore() }));
 jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
-jest.mock('stores/inputs/InputStatesStore', () => ({ InputStatesStore: { start: jest.fn(() => Promise.resolve()), stop: jest.fn(() => Promise.resolve()) } }));
+
+jest.mock('stores/inputs/InputStatesStore', () => ({
+  InputStatesStore: MockStore(
+    ['start', jest.fn(() => Promise.resolve())],
+    ['stop', jest.fn(() => Promise.resolve())],
+  ),
+}));
 
 jest.mock('stores/nodes/NodesStore', () => ({
   NodesStore: MockStore(),
@@ -146,7 +153,26 @@ const useIndexSetsListResult = {
   refetch: () => {},
 };
 
-const updateRoutingUrl = '/system/pipelines/pipeline/routing';
+const updateRoutingUrlRegEx = /.+(system\/pipelines\/pipeline\/routing)/i;
+const createStreamUrl = '/streams';
+const startStreamUrl = (streamId) => `/streams/${streamId}/resume`;
+const createPipelineUrlRegEx = /.+(system\/pipelines\/pipeline)/i;
+const deleteStreamUrl = (streamId) => `/streams/${streamId}`;
+const deletePipelineUrl = (pipelineId) => `/system/pipelines/pipeline/${pipelineId}`;
+const deleteRoutingRuleUrl = (ruleId) => `/system/pipelines/rule/${ruleId}`;
+
+const newStreamConfig = {
+  description: 'Wingardium new stream',
+  index_set_id: 'default_id',
+  remove_matches_from_default_stream: undefined,
+  title: 'Wingardium',
+};
+
+const newPipelineConfig = {
+  description: 'Pipeline for Stream: Wingardium created by the Input Setup Wizard.',
+  source: 'pipeline "Wingardium"\nstage 0 match either\nend',
+  title: 'Wingardium',
+};
 
 const goToStartInputStep = async () => {
   const nextButton = await screen.findByRole('button', { name: /Finish & Start Input/i, hidden: true });
@@ -160,15 +186,52 @@ const startInput = async () => {
   fireEvent.click(startInputButton);
 };
 
+const createStream = async (newPipeline = false) => {
+  const createStreamButton = await screen.findByRole('button', {
+    name: /Create Stream/i,
+    hidden: true,
+  });
+
+  fireEvent.click(createStreamButton);
+
+  await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+
+  const titleInput = await screen.findByRole('textbox', {
+    name: /Title/i,
+    hidden: true,
+  });
+
+  const descriptionInput = await screen.findByRole('textbox', {
+    name: /Description/i,
+    hidden: true,
+  });
+
+  const newPipelineCheckbox = await screen.findByRole('checkbox', {
+    name: /Create a new pipeline for this stream/i,
+    hidden: true,
+  });
+
+  const submitButton = await screen.findByRole('button', {
+    name: 'Create',
+    hidden: true,
+  });
+
+  fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+  fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+
+  if (newPipeline) {
+    fireEvent.click(newPipelineCheckbox);
+  }
+
+  await waitFor(() => expect(submitButton).toBeEnabled());
+  fireEvent.click(submitButton);
+};
+
 beforeEach(() => {
   asMock(useStreams).mockReturnValue(useStreamsResult);
   asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
   asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
   asMock(fetch).mockImplementation(() => Promise.resolve({}));
-});
-
-afterEach(() => {
-  jest.clearAllMocks();
 });
 
 describe('InputSetupWizard Start Input', () => {
@@ -184,13 +247,13 @@ describe('InputSetupWizard Start Input', () => {
     goToStartInputStep();
     startInput();
 
+    await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+
     expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
     expect(await screen.findByText(/Input started sucessfully!/i)).toBeInTheDocument();
   });
 
   it('should start input when an existing stream is selected', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve({}));
-
     renderWizard();
 
     const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
@@ -202,10 +265,79 @@ describe('InputSetupWizard Start Input', () => {
     goToStartInputStep();
     startInput();
 
+    await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'PUT',
-      expect.stringContaining(updateRoutingUrl),
+      expect.stringMatching(updateRoutingUrlRegEx),
       { input_id: 'input-test-id', stream_id: 'streamId1' },
     ));
+
+    expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
+    expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Input started sucessfully!/i)).toBeInTheDocument();
+  });
+
+  describe('new stream', () => {
+    it('should show the progress for all steps', async () => {
+      renderWizard();
+      await waitFor(() => createStream(true));
+      goToStartInputStep();
+      startInput();
+
+      expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
+      expect(await screen.findByText(/Stream "Wingardium" created!/i)).toBeInTheDocument();
+      expect(await screen.findByText(/Pipeline "Wingardium" created!/i)).toBeInTheDocument();
+      expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
+      expect(await screen.findByText(/Input started sucessfully!/i)).toBeInTheDocument();
+    });
+
+    it('should start the input', async () => {
+      renderWizard();
+      await waitFor(() => createStream());
+      goToStartInputStep();
+      startInput();
+
+      await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+    });
+
+    it('should create the new stream', async () => {
+      renderWizard();
+      await waitFor(() => createStream());
+      goToStartInputStep();
+      startInput();
+
+      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
+        'POST',
+        expect.stringContaining(createStreamUrl),
+        newStreamConfig,
+      ));
+    });
+
+    it('should create the new pipeline', async () => {
+      renderWizard();
+      await waitFor(() => createStream(true));
+      goToStartInputStep();
+      startInput();
+
+      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
+        'POST',
+        expect.stringMatching(createPipelineUrlRegEx),
+        newPipelineConfig,
+      ));
+    });
+
+    it('create routing for the new stream', async () => {
+      renderWizard();
+      await waitFor(() => createStream(true));
+      goToStartInputStep();
+      startInput();
+
+      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
+        'PUT',
+        expect.stringMatching(updateRoutingUrlRegEx),
+        { input_id: 'input-test-id', stream_id: 'streamId1' },
+      ));
+    });
   });
 });
