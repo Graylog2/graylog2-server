@@ -293,6 +293,7 @@ const StartInputStep = () => {
     return (
       <ProgressMessage stepName={stepName as ProcessingSteps}
                        isLoading={mutation.isLoading}
+                       key={stepName}
                        isSuccess={mutation.isSuccess}
                        name={name}
                        isError={mutation.isError}

@@ -180,9 +180,9 @@ describe('InputSetupWizard Setup Routing', () => {
   it('should render the Setup Routing step', async () => {
     renderWizard();
 
-    const wizard = await screen.findByText('Setup Routing');
+    const routingStepText = await screen.findByText(/Choose a Destination Stream to route Messages from this Input to./i);
 
-    expect(wizard).toBeInTheDocument();
+    expect(routingStepText).toBeInTheDocument();
   });
 
   it('should only show editable existing streams', async () => {
