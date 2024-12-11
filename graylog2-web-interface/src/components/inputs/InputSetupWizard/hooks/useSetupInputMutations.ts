@@ -41,7 +41,7 @@ const createPipeline = (pipeline: PipelineConfiguration) : Promise<PipelineType>
   return fetch('POST', url, pipeline);
 };
 
-const updateRouting = async (params: RoutingParams) => {
+const updateRouting = async (params: RoutingParams): Promise <{ id: string }> => {
   const url = qualifyUrl(ApiRoutes.PipelinesController.updateRouting().url);
 
   return fetch('PUT', url, params);
@@ -59,10 +59,10 @@ const deletePipeline = async (pipelineId: string) => {
   return fetch('DELETE', url);
 };
 
-const deleteRouting = async (params: RoutingParams) => {
-  const url = qualifyUrl(ApiRoutes.PipelinesController.deleteRouting().url);
+const deleteRoutingRule = async (ruleId: string) => {
+  const url = qualifyUrl(ApiRoutes.RulesController.delete(ruleId).url);
 
-  return fetch('PUT', url, params);
+  return fetch('DELETE', url);
 };
 
 const usePipelineRoutingMutation = () => {
@@ -72,7 +72,7 @@ const usePipelineRoutingMutation = () => {
   const updateRoutingMutation = useMutation(updateRouting);
   const deleteStreamMutation = useMutation(deleteStream);
   const deletePipelineMutation = useMutation(deletePipeline);
-  const deleteRoutingMutation = useMutation(deleteRouting);
+  const deleteRoutingRuleMutation = useMutation(deleteRoutingRule);
 
   return ({
     createStreamMutation,
@@ -81,7 +81,7 @@ const usePipelineRoutingMutation = () => {
     updateRoutingMutation,
     deleteStreamMutation,
     deletePipelineMutation,
-    deleteRoutingMutation,
+    deleteRoutingRuleMutation,
   });
 };
 

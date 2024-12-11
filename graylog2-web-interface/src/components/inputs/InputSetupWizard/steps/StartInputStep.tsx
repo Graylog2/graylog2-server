@@ -72,7 +72,7 @@ const StartInputStep = () => {
     updateRoutingMutation,
     deleteStreamMutation,
     deletePipelineMutation,
-    deleteRoutingMutation,
+    deleteRoutingRuleMutation,
   } = useSetupInputMutations();
 
   const stepMutations = useMemo<{[key in ProcessingSteps]?: UseMutationResult}>(() => ({
@@ -85,8 +85,8 @@ const StartInputStep = () => {
   const rollBackMutations = useMemo<{[key in ProcessingSteps]?: UseMutationResult}>(() => ({
     deleteStream: deleteStreamMutation,
     deletePipeline: deletePipelineMutation,
-    deleteRouting: deleteRoutingMutation,
-  }), [deleteStreamMutation, deletePipelineMutation, deleteRoutingMutation]);
+    deleteRouting: deleteRoutingRuleMutation,
+  }), [deleteStreamMutation, deletePipelineMutation, deleteRoutingRuleMutation]);
 
   useEffect(() => {
     if (!isRollback) {
@@ -179,10 +179,9 @@ const StartInputStep = () => {
 
   const rollback = () => {
     const routingStepData = getStepConfigOrData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
-    const { input } = wizardData;
-    const inputId = input?.id;
     const createdStreamId = createStreamMutation.data?.stream_id;
     const createdPipelineId = createPipelineMutation.data?.id;
+    const routingRuleId = updateRoutingMutation.data?.id;
 
     switch (routingStepData.streamType) {
       case 'NEW':
@@ -196,18 +195,26 @@ const StartInputStep = () => {
 
         if (!createdStreamId) return;
 
-        deleteRoutingMutation.mutateAsync({ input_id: inputId, stream_id: createdStreamId }, {
-        }).finally(() => {
+        if (routingRuleId) {
+          deleteRoutingRuleMutation.mutateAsync(routingRuleId, {
+          }).finally(() => {
+            deleteStreamMutation.mutateAsync(createdStreamId).finally(() => {
+              setStartInputStatus('ROLLED_BACK');
+            });
+          });
+        } else {
           deleteStreamMutation.mutateAsync(createdStreamId).finally(() => {
             setStartInputStatus('ROLLED_BACK');
           });
-        });
+        }
 
         break;
       case 'EXISTING':
         stopInput();
 
-        deleteRoutingMutation.mutateAsync({ input_id: inputId, stream_id: routingStepData.streamId }).finally(
+        if (!routingRuleId) return;
+
+        deleteRoutingRuleMutation.mutateAsync(routingRuleId).finally(
           () => {
             setStartInputStatus('ROLLED_BACK');
           });
@@ -297,7 +304,7 @@ const StartInputStep = () => {
   const renderNextButton = () => {
     if (startInputStatus === 'NOT_STARTED' || startInputStatus === 'ROLLED_BACK') {
       return (
-        <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary">Setup Input</Button>
+        <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary" data-testid="start-input-button">Start Input</Button>
       );
     }
 
@@ -310,7 +317,6 @@ const StartInputStep = () => {
     if (hasNextStep) {
       return (
         <Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={onNextStep} bsStyle="primary">Input Diagnosis</Button>
-
       );
     }
 
